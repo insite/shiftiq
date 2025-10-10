@@ -1,9 +1,31 @@
-# NuGet
-**/[Pp]ackages/*
-**/[Rr]eleases/*
-*.nupkg
+# Application Settings
+[Aa]pp[Ss]ettings.[Ll]ocal.json
 
-# Visual Studio
+# Build Outputs
+/Build/**/[Pp]ackages/*
+/Build/**/[Pp]ublished/*
+/Build/**/[Rr]eleases/*
+/Build/**/*.nupkg
+/Build/**/*.zip
+
+# Temporary Files
+**/_TEMP/
+[Tt]emp/
+tmp/
+
+# Packages
+/Packages
+
+# React UI and Node.js
+/source/InSite.UI/React
+node_modules
+
+# Static Resources
+**/_user-variables-local*.scss
+/Source/Polaris.UI/Assets
+/Source/Polaris.UI/node_modules
+
+# Visual Studio and VS Code
 *.[Cc]ache
 *.log
 *.obj
@@ -11,10 +33,13 @@
 *.rdl.data
 *.rsuser
 *.user
+.idea/
 .vs/
+.vscode/
 [Bb]in/
 [Dd]ebug/
 [Oo]bj/
 [Rr]elease/
 x64/
 x86/
+**/_user-variables-local*.scss
