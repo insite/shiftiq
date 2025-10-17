@@ -1,0 +1,38 @@
+.finder-search-input {
+    position: relative;
+
+    & > input {
+        padding-right: 4.5rem;
+    }
+
+    & > button {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        margin:1px;
+        border: none;
+        background: transparent;
+
+        &.clear-filter {
+            color: var(--ar-gray-400);
+            right: 2.7rem;
+
+            &:hover {
+                color: var(--ar-gray-700);
+            }
+        }
+
+        &.apply-filter {
+            color: var(--ar-gray-600);
+            right: 0px;
+            width: 2.7rem;
+            border-left: 1px solid var(--ar-gray-400);
+            border-top-right-radius: var(--ar-border-radius);
+            border-bottom-right-radius: var(--ar-border-radius);
+
+            &:hover {
+                color: var(--ar-gray-800);
+            }
+        }
+    }
+}

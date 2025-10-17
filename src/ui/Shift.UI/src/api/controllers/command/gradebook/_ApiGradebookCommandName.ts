@@ -1,0 +1,1 @@
+export type _ApiGradebookCommandName = "LockGradebook" | "UnlockGradebook" | "RenameGradebook" | "DeleteGradebook" | "CreateGradebook";

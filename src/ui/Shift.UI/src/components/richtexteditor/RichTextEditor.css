@@ -1,0 +1,37 @@
+.richtexteditor {
+    --borderColor: #ddd;
+
+    &.is-invalid > div.markdown {
+        border-color: rgb(247, 79, 120);
+    }
+    
+    & > div.markdown {
+        border-radius: 0.25rem;
+        border: 1px solid var(--borderColor);
+
+        .mdxeditor {
+            --baseBg: #fff;
+
+            blockquote {
+                border-left: 0.25rem solid var(--borderColor);
+                padding-left: 1rem;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .mdxeditor-toolbar {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom: 1px solid var(--borderColor);
+            }
+        }
+    }
+
+    & > div.language {
+        margin-top: 0.25rem;
+    }
+}
+
+.mdxeditor-popup-container {
+    z-index: 1032;
+}

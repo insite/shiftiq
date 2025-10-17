@@ -1,0 +1,26 @@
+.insite-modal .modal-body .input-group-text {
+    border-color: var(--ar-gray-400);
+}
+
+.insite-modal .modal-body .insite-clear-text {
+    color: var(--ar-gray-400);
+    margin-left: -35px;
+    z-index: 5;
+}
+.insite-modal .modal-body .insite-clear-text:hover {
+    color: var(--ar-gray-700);
+}
+
+.insite-modal .modal-body .insite-filter {
+    color: var(--ar-gray-600);
+}
+.insite-modal .modal-body .insite-filter:hover {
+    color: var(--ar-gray-800);
+}
+
+.insite-modal .modal-body .fe-input {
+    width: 35px;
+}
+.insite-modal .modal-body .fe-table {
+    cursor:pointer !important;
+}

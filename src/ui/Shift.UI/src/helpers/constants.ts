@@ -1,0 +1,15 @@
+export const CLIENT_PREFIX = import.meta.env.VITE_CLIENT_PREFIX as string;
+export const SHIFT_CSS_URL = import.meta.env.VITE_SHIFT_CSS_URL as string;
+export const FONT_AWESOME_URL = import.meta.env.VITE_FONT_AWESOME_URL as string;
+export const SIMPLEBAR_CSS_URL = import.meta.env.VITE_SIMPLEBAR_CSS_URL as string;
+export const SIMPLEBAR_JS_URL = import.meta.env.VITE_SIMPLEBAR_JS_URL as string;
+export const CUSTOM_CSS_URL = import.meta.env.VITE_CUSTOM_CSS_URL as string;
+export const LOGIN_PAGE_URL = import.meta.env.VITE_LOGIN_PAGE_URL as string;
+export const INSITE_LOCAL_DOMAIN = import.meta.env.VITE_INSITE_LOCAL_DOMAIN as string;
+export const IS_LOCAL = !!import.meta.env.VITE_IS_LOCAL && import.meta.env.VITE_IS_LOCAL.toLowerCase() === "true";
+export const LOCAL_USER = (import.meta.env.VITE_LOCAL_USER ?? null) as (string | null);
+export const LOCAL_ORGANIZATION = (import.meta.env.VITE_LOCAL_ORGANIZATION ?? null) as (string | null);
+export const PAGES_PER_VIEW = parseInt(import.meta.env.VITE_PAGES_PER_VIEW);
+export const SHIFT_API_HOST_URL = import.meta.env.VITE_SHIFT_API_HOST_URL as string;
+export const LOCAL_ENV_API_LATENCY = parseInt(import.meta.env.VITE_LOCAL_ENV_API_LATENCY);
+export const FINDER_PAGE_SIZE = parseInt(import.meta.env.VITE_FINDER_PAGE_SIZE);

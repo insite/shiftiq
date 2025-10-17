@@ -1,0 +1,7 @@
+.multiselect {
+    .btn-combobox {
+        &.is-invalid {
+            border-color: var(--ar-form-invalid-border-color);
+        }
+    }
+}

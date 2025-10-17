@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "GoDaddy ListSubdomains": {
+      "commandName": "Project",
+      "commandLineArgs": "GoDaddy ListSubdomains prod KEY SECRET cmds.app CNAME"
+    },
+    "GoDaddy AddSubdomains": {
+      "commandName": "Project",
+      "commandLineArgs": "GoDaddy AddSubdomains prod KEY SECRET cmds.app d:\\temp\\cmds-subdomains.txt dev.cmds.app. 1800"
+    }
+  }
+}

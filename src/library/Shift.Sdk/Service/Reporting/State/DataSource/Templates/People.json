@@ -1,0 +1,40 @@
+{
+  "Name": "People",
+  "View": {
+    "Name": "reports.VPerson",
+    "Title": "People",
+    "Alias": "P"
+  },
+  "Joins": [
+    {
+      "Name": "reports.VPersonGroup",
+      "Title": "Groups",
+      "Alias": "G",
+      "Expression": "LEFT JOIN reports.VPersonGroup AS G ON P.UserIdentifier = G.UserIdentifier"
+    },
+    {
+      "Name": "reports.VPersonAchievement",
+      "Title": "Achievements and Credentials",
+      "Alias": "A",
+      "Expression": "LEFT JOIN reports.VPersonAchievement AS A ON P.UserIdentifier = A.UserIdentifier"
+    },
+    {
+      "Name": "reports.VPersonAttempt",
+      "Title": "Assessment Attempts",
+      "Alias": "T",
+      "Expression": "LEFT JOIN reports.VPersonAttempt AS T ON P.UserIdentifier = T.UserIdentifier"
+    },
+    {
+      "Name": "reports.VPersonEventRegistration",
+      "Title": "Event Registrations",
+      "Alias": "R",
+      "Expression": "LEFT JOIN reports.VPersonEventRegistration AS R ON P.UserIdentifier = R.RegistrationCandidateIdentifier"
+    },
+    {
+      "Name": "reports.VPersonGradebookScore",
+      "Title": "Gradebook Scores",
+      "Alias": "S",
+      "Expression": "LEFT JOIN reports.VPersonGradebookScore AS S ON P.UserIdentifier = S.UserIdentifier"
+    }
+  ]
+}

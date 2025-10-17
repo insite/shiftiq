@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<NoWarn>1701;1702;IDE1006;NU1902;NU1903;</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
+		<PackageReference Include="Scrutor" Version="6.0.1" />
+		<PackageReference Include="System.Text.Json" Version="9.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Shift.Sdk\Shift.Sdk.csproj" />
+		<ProjectReference Include="..\Shift.Common\Shift.Common.csproj" />
+		<ProjectReference Include="..\Shift.Toolbox\Shift.Toolbox.csproj" />
+	</ItemGroup>
+
+</Project>

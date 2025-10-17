@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Shift.Nexus": {
+      "commandName": "Project",
+      "commandLineArgs": "IIS AddBinding local-global.insite.com * local-test.insite.com My a73b3318f5200a8824b1f29b033ac01ba63aee3f"
+    }
+  }
+}

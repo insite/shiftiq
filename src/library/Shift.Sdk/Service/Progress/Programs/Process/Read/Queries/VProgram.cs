@@ -1,0 +1,42 @@
+﻿using System;
+
+namespace InSite.Application.Records.Read
+{
+    public class VProgram
+    {
+        public Guid? AchievementIdentifier { get; set; }
+        public Guid? CatalogIdentifier { get; set; }
+        public Guid? CompletionTaskIdentifier { get; set; }
+        public Guid? GroupIdentifier { get; set; }
+        public Guid? NotificationCompletedAdministratorMessageIdentifier { get; set; }
+        public Guid? NotificationCompletedLearnerMessageIdentifier { get; set; }
+        public Guid? NotificationStalledAdministratorMessageIdentifier { get; set; }
+        public Guid? NotificationStalledLearnerMessageIdentifier { get; set; }
+        public Guid OrganizationIdentifier { get; set; }
+        public Guid ProgramIdentifier { get; set; }
+
+        public string AchievementElseCommand { get; set; }
+        public string AchievementThenCommand { get; set; }
+        public string AchievementWhenChange { get; set; }
+        public string AchievementWhenGrade { get; set; }
+        public string CatalogName { get; set; }
+        public string GroupName { get; set; }
+        public string ProgramCode { get; set; }
+        public string ProgramDescription { get; set; }
+        public string ProgramIcon { get; set; }
+        public string ProgramImage { get; set; }
+        public string ProgramName { get; set; }
+        public string ProgramSlug { get; set; }
+        public string ProgramTag { get; set; }
+        public string ProgramType { get; set; }
+
+        public int? NotificationStalledReminderLimit { get; set; }
+        public int? NotificationStalledTriggerDay { get; set; }
+
+        public int CategoryCount { get; set; }
+        public int EnrollmentCount { get; set; }
+        public int TaskCount { get; set; }
+
+        public DateTimeOffset? AchievementFixedDate { get; set; }
+    }
+}
