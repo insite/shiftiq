@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 35px 0 0 0;
+            font-family: Calibri, Helvetica, Arial;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table td {
+            vertical-align: middle;
+            width: 33%;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tbody>
+            <tr>
+                <td id="footer_title"></td>
+                <td id="footer_date" style="text-align:center;"></td>
+                <td style="text-align:right;">
+                    Page <span id="page"></span> of <span id="topage"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        (function () {
+            var variables = (function (a) {
+                if (a === '') return {};
+                var b = {};
+                for (var i = 0; i < a.length; ++i) {
+                    var p = a[i].split('=', 2);
+                    if (p.length !== 2) continue;
+                    b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+                }
+                return b;
+            })(window.location.search.substring(1).split('&'));
+
+            document.getElementById('footer_title').innerText = String(variables.footer_title);
+            document.getElementById('footer_date').innerText = String(variables.footer_date);
+            document.getElementById('page').innerText = String(variables.page);
+            document.getElementById('topage').innerText = String(variables.topage);
+        })();
+    </script>
+</body>
+</html>

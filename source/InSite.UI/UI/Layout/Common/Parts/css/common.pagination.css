@@ -1,0 +1,11 @@
+﻿nav.insite-pager {
+}
+
+    nav.insite-pager > .pagination {
+        float: left;
+    }
+
+    nav.insite-pager > .insite-pager-info {
+        float: right;
+        line-height: 2rem;
+    }

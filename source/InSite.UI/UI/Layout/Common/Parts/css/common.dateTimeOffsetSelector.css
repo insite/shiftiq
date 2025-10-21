@@ -1,0 +1,39 @@
+﻿.datetimeoffset > input.flatpickr-input[readonly] {
+    cursor: inherit;
+}
+
+.datetimeoffset > .btn {
+    background-color: #fff;
+}
+
+    .datetimeoffset > .btn:hover {
+        background-color: #9db6cb;
+    }
+
+.datetimeoffset > .btn-timezone > span {
+    font-size: 0.5rem;
+    text-shadow: #fff 0px 0px 3px;
+    position: absolute;
+    display: block;
+    bottom: 0.2rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.datetimeoffset > .btn-timezone > i {
+    margin-top: -0.2rem;
+}
+
+.datetimeoffset.is-invalid > :first-child {
+    border-left-color: var(--ar-form-invalid-border-color);
+}
+
+.datetimeoffset.is-invalid > :last-child {
+    border-right-color: var(--ar-form-invalid-border-color);
+}
+
+.datetimeoffset.is-invalid > * {
+    border-top-color: var(--ar-form-invalid-border-color);
+    border-bottom-color: var(--ar-form-invalid-border-color);
+}

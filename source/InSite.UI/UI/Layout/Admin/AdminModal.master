@@ -1,0 +1,21 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="AdminModal.master.cs" Inherits="InSite.UI.Layout.Admin.AdminModal" MasterPageFile="~/UI/Layout/Admin/AdminBase.master" %>
+
+<asp:Content runat="server" ContentPlaceHolderID="HeadContent">
+    <style type="text/css">
+        html, body {
+            height: 100%;
+        }
+
+        .btn-scroll-top {
+            display: none;
+        }
+    </style>
+
+    <asp:ContentPlaceHolder runat="server" ID="HeadContent" />
+</asp:Content>
+
+<asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+    <main class="container-fluid">
+        <asp:ContentPlaceHolder ID="BodyContent" runat="server" />
+    </main>
+</asp:Content>

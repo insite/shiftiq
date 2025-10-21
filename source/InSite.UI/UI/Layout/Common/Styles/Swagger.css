@@ -1,0 +1,7 @@
+﻿form#api_selector {
+    display: none; visibility: hidden;
+}
+
+#input_apiKey {
+    display: none;
+}

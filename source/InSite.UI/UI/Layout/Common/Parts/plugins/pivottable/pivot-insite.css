@@ -1,0 +1,206 @@
+﻿.pivottable-insite {
+    position: relative;
+}
+
+    .pivottable-insite table.pvtUi {
+        width: 100%;
+    }
+
+        .pivottable-insite table.pvtUi .btn + .btn {
+            margin-left: 5px;
+        }
+
+        .pivottable-insite table.pvtUi .pvtAxisContainer,
+        .pivottable-insite table.pvtUi .pvtVals {
+            border: 1px solid #cdcdcd;
+            background: #f5f5f5;
+            padding: 5px;
+            min-width: 20px;
+            min-height: 20px;
+            user-select: none;
+        }
+
+            .pivottable-insite table.pvtUi .pvtAxisContainer.pvtHorizList > li {
+                display: inline;
+            }
+
+            .pivottable-insite table.pvtUi .pvtAxisContainer.pvtVertList {
+                vertical-align: top;
+            }
+
+            .pivottable-insite table.pvtUi .pvtAxisContainer.pvtUnused > li > span.pvtAttr,
+            .pivottable-insite table.pvtUi .pvtAxisContainer.pvtRows > li > span.pvtAttr {
+                width: 100%;
+            }
+
+                .pivottable-insite table.pvtUi .pvtAxisContainer.pvtUnused > li > span.pvtAttr > .pvtTriangle,
+                .pivottable-insite table.pvtUi .pvtAxisContainer.pvtRows > li > span.pvtAttr > .pvtTriangle {
+                }
+
+            .pivottable-insite table.pvtUi .pvtAxisContainer > li {
+                padding: 6px 6px;
+                list-style-type: none;
+                cursor: move;
+            }
+
+                .pivottable-insite table.pvtUi .pvtAxisContainer > li.pvtFilteredAttribute {
+                    font-style: italic
+                }
+
+                .pivottable-insite table.pvtUi .pvtAxisContainer > li > span.pvtAttr {
+                    display: inline-block;
+                    background: #ffffff;
+                    border: 1px solid #dfdfeb;
+                    border-radius: 0.5rem;
+                    padding: 0.45rem 1.75rem 0.45rem 0.9rem;
+                    white-space: nowrap;
+                    position: relative;
+                    font-size: 0.875rem;
+                }
+
+                    .pivottable-insite table.pvtUi .pvtAxisContainer > li > span.pvtAttr > .pvtTriangle {
+                        display: inline-block;
+                        position: absolute;
+                        right: 0;
+                        width: 25px;
+                        text-align: center;
+                        cursor: pointer;
+                        color: grey;
+                        font-style: normal;
+                    }
+
+                .pivottable-insite table.pvtUi .pvtAxisContainer > li.pvtPlaceholder {
+                    padding: 3px 15px;
+                    border-radius: 5px;
+                    border: 1px dashed #aaa;
+                }
+
+        .pivottable-insite table.pvtUi .pvtFilterBox {
+            z-index: 100;
+            width: 300px;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+            background-color: #fff;
+            position: absolute;
+            text-align: center;
+        }
+
+            .pivottable-insite table.pvtUi .pvtFilterBox > h4 {
+                margin: 1rem;
+                padding: 0;
+                border: none;
+                font-size: 1.1rem;
+            }
+
+                .pivottable-insite table.pvtUi .pvtFilterBox > h4 > .count {
+                    color: #999;
+                    font-weight: normal;
+                    margin-left: 6px;
+                }
+
+            .pivottable-insite table.pvtUi .pvtFilterBox > p {
+                margin: 10px auto;
+            }
+
+                .pivottable-insite table.pvtUi .pvtFilterBox > p > input[type='text'] {
+                    width: 230px;
+                    margin-bottom: 10px;
+                }
+
+            .pivottable-insite table.pvtUi .pvtFilterBox > .pvtCheckContainer {
+                text-align: left;
+                font-size: 14px;
+                white-space: nowrap;
+                overflow-y: scroll;
+                width: 100%;
+                max-height: 250px;
+                border-top: 1px solid lightgrey;
+                border-bottom: 1px solid lightgrey;
+            }
+
+                .pivottable-insite table.pvtUi .pvtFilterBox > .pvtCheckContainer > p {
+                    margin: 5px;
+                }
+
+                    .pivottable-insite table.pvtUi .pvtFilterBox > .pvtCheckContainer > p > label {
+                        font-weight: normal;
+                    }
+
+                        .pivottable-insite table.pvtUi .pvtFilterBox > .pvtCheckContainer > p > label > input[type='checkbox'] {
+                            margin-right: 10px;
+                            margin-left: 10px;
+                        }
+
+                        .pivottable-insite table.pvtUi .pvtFilterBox > .pvtCheckContainer > p > label > .count {
+                            color: #999;
+                            margin-left: 3px;
+                            font-size: 0.75em;
+                        }
+
+        .pivottable-insite table.pvtUi .pvtRendererArea {
+            padding: 5px 0 0 5px;
+        }
+
+        .pivottable-insite table.pvtUi .pvtRowOrder,
+        .pivottable-insite table.pvtUi .pvtColOrder {
+            cursor: pointer;
+            width: 15px;
+            margin-left: 5px;
+            display: inline-block;
+            text-decoration: none !important;
+        }
+
+
+    .pivottable-insite table.pvtTable {
+        text-align: left;
+        border-collapse: collapse;
+        margin-bottom: 0;
+    }
+
+        .pivottable-insite table.pvtTable.table > :not(:last-child) > :last-child > * {
+            border-bottom-color: inherit;
+        }
+
+        .pivottable-insite table.pvtTable thead tr th,
+        .pivottable-insite table.pvtTable tbody tr th {
+            background-color: #fbfbfb;
+            padding: 5px;
+        }
+
+            .pivottable-insite table.pvtTable thead tr th.pvtRowTotalLabel {
+                white-space: nowrap;
+            }
+
+        .pivottable-insite table.pvtTable .pvtColLabel {
+            text-align: center;
+        }
+
+        .pivottable-insite table.pvtTable .pvtTotalLabel {
+            text-align: right;
+        }
+
+        .pivottable-insite table.pvtTable tbody tr td {
+            padding: 5px;
+            vertical-align: top;
+        }
+
+            .pivottable-insite table.pvtTable tbody tr td.pvtVal,
+            .pivottable-insite table.pvtTable tbody tr td.colTotal {
+                text-align: center;
+            }
+
+            .pivottable-insite table.pvtTable tbody tr td.rowTotal,
+            .pivottable-insite table.pvtTable tbody tr td.pvtGrandTotal {
+                text-align: right;
+            }
+
+        .pivottable-insite table.pvtTable > thead > tr > th,
+        .pivottable-insite table.pvtTable > thead > tr > td {
+            border-bottom-width: 1px !important;
+        }
+
+        .pivottable-insite table.pvtTable .pvtTotal,
+        .pivottable-insite table.pvtTable .pvtGrandTotal {
+            font-weight: bold;
+        }

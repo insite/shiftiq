@@ -1,0 +1,23 @@
+﻿.tile-icon-item:before {
+    display: inline-block !important;
+    line-height: 1em;
+    margin: 0 0.4em 0 0.2em;
+    text-align: center;
+    text-decoration: inherit;
+    text-transform: none;
+    width: 1em;
+    vertical-align: middle;
+}
+
+.editor-toolbar.fullscreen,
+.editor-preview-side,
+.CodeMirror-fullscreen {
+    z-index: 8001;
+}
+
+@media (min-width: 600px) {
+    .row .col-md-6 > .form-horizontal .form-group > .control-label {
+        width: 30%;
+        max-width: 160px;
+    }
+}

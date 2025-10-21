@@ -1,0 +1,72 @@
+﻿.dd-placeholder a {
+    color: #545454;
+    cursor: pointer;
+}
+
+    .dd-placeholder a:hover {
+        text-decoration: none;
+        color: #457897;
+    }
+
+.dd-placeholder.fullscreen {
+    z-index: 1100;
+    position: fixed;
+}
+
+#autosave-indicator {
+    position: fixed;
+    right: 10px;
+    bottom: 7px;
+    z-index: 1;
+    font-size: 34px;
+    display: none;
+}
+
+.message-preview,
+.message-preview-side {
+    padding: 10px;
+    background: #fafafa;
+    display: none;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+    .message-preview.mp-active,
+    .message-preview-side.mp-active {
+        display: block;
+    }
+
+    .message-preview > div,
+    .message-preview-side > div {
+        height: 100%;
+        border-top: none;
+        position: relative;
+    }
+
+        .message-preview > div > iframe,
+        .message-preview-side > div > iframe {
+            border: none;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+
+.message-preview {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 7;
+}
+
+.message-preview-side {
+    position: fixed;
+    bottom: 0;
+    width: 50%;
+    top: 50px;
+    right: 0;
+    border: 1px solid #ddd;
+    z-index: 1031;
+}

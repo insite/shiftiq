@@ -1,0 +1,139 @@
+﻿@import "../parts/custom/admin-toolkit";
+@import "../parts/custom/custom-master";
+@import "../parts/custom/custom-indicator";
+@import "../parts/custom/custom-entity";
+
+.form-header {
+    margin: 2rem 0;
+}
+
+label.form-label {
+    padding-left: 0rem;
+}
+
+.table-sm tr td {
+    font-size: 15px;
+}
+
+/* Experimenting with a smaller font size here... */
+
+label.form-label {
+    padding-left: 0rem;
+}
+
+table.table-search-download-columns {
+    > tbody {
+        &.ui-sortable > tr.ui-sortable-placeholder {
+            visibility: visible !important;
+            outline: 1px dashed #666666 !important;
+        }
+
+        + tbody {
+            border-top: 0;
+        }
+
+        > tr {
+            > td.cmd-dwn {
+                width: 40px;
+            }
+
+            > td.title-dwn {
+                cursor: grab;
+            }
+
+            &.hidden-dwn {
+                opacity: 0.6;
+            }
+
+            &.ui-sortable-helper > td {
+                border-bottom: 1px solid #ddd;
+            }
+
+            &.column-group > td {
+                color: #777;
+                background-color: #f5f5f5;
+                font-weight: bold;
+            }
+        }
+    }
+
+    &.hide-invisible-dwn {
+        > tbody.hidden-dwn,
+        > tbody > tr.hidden-dwn {
+            display: none !important;
+        }
+    }
+}
+
+.search-download-buttons {
+    display: block;
+    position: fixed;
+    bottom: 1.25rem;
+    background-color: #fff;
+}
+
+.search-download-buttons > div {
+    padding: 10px;
+}
+
+.datetimeoffset > .btn-timezone > span {
+    font-size: 0.5em;
+    text-shadow: #fff 0px 0px 3px;
+    position: absolute;
+    display: block;
+    bottom: 0.4em;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.card-body dl dd {
+    font-size: 0.9rem;
+}
+
+.bg-custom-default {
+    background-color: #777;
+}
+
+.radiobuttonspacing input[type="radio"] {
+    margin-left: 10px;
+}
+
+.multi-field-input {
+    width: calc(100% - 44px);
+    display: inline-block;
+    vertical-align: middle;
+}
+// Content Editor and Dropdown twicks
+
+.btn-group > .dropdown-menu > li > a {
+    color: #5a5b75 !important;
+}
+
+.btn-group > .dropdown-menu > li > a:hover {
+    color: #457897 !important;
+}
+
+.sticky-buttons {
+    position: sticky;
+    bottom: -100px;
+    z-index: 3;
+}
+
+.sticky-buttons.anim {
+    transition: bottom 0.15s ease-in-out;
+}
+
+.sticky-buttons.sticky {
+    margin-right: calc(var(--bs-gutter-x) * -0.5);
+    margin-bottom: 1px;
+    margin-left: calc(var(--bs-gutter-x) * -0.5);
+    padding-top: 1rem;
+    padding-right: calc(var(--bs-gutter-x) * 0.5);
+    padding-bottom: 1rem;
+    padding-left: calc(var(--bs-gutter-x) * 0.5);
+    box-shadow: 0 -0.125rem 0.625rem -0.1875rem rgba(0, 0, 0, 0.1);
+    background-color: white;
+    bottom: -1px;
+    border-radius: 0.75rem;
+}

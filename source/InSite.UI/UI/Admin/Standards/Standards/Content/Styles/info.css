@@ -1,0 +1,34 @@
+﻿.commands {
+}
+
+    .commands > .sub-commands {
+        display: none;
+        position: absolute;
+        right: 0;
+    }
+
+    .commands .btn[disabled].selected {
+        background-image: none;
+        outline: 0;
+        -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+        box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+        background-color: #e6e6e6;
+        border-color: #adadad;
+        opacity: 1;
+    }
+
+ul[data-reorder] > li {
+    padding-left: 40px;
+    cursor: grab;
+}
+
+    ul[data-reorder] > li > .fa,
+    ul[data-reorder] > li > .fas,
+    ul[data-reorder] > li > .far,
+    ul[data-reorder] > li > .fab,
+    ul[data-reorder] > li > .fal {
+        position: absolute;
+        left: 15px;
+        margin-top: 6px;
+        opacity: 0.75;
+    }

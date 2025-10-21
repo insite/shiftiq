@@ -1,0 +1,3 @@
+OBJ	SEQ	STEM	ANSWER	CHOICE_A	CHOICE_B	CHOICE_C	CHOICE_D	CAT_1	CAT_2	CAT_3	CAT_4	NOTES
+Q1	1	What's your favourite colour?	D	Red	Blue	Green	Yellow	Category 1	Category 2	Category 3	Category 4	This is one example.
+Q2	2	What's your favourite instrument?	A	Guitar	Piano	Harp	Cello	Category A	Category B	Category C	Category D	Here is another example!

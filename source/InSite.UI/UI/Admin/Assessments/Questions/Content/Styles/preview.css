@@ -1,0 +1,198 @@
+﻿.table-hover > tbody > tr:hover {
+    background-color: #fbfbfb;
+}
+
+.img-zoom {
+    cursor: zoom-in;
+}
+
+.card-question > .card-header > .question-text img {
+    max-height: 500px;
+    max-width: 100%;
+}
+
+div.card-header table.table-markdown {
+    margin-bottom: 1rem;
+}
+
+.table-option {
+    width: inherit;
+    background-color: transparent;
+}
+
+    .table-option .no-right-pad {
+        padding-right: 0 !important;
+    }
+
+    .table-option .no-left-pad {
+        padding-left: 0 !important;
+    }
+
+    .table-option .small-right-pad {
+        padding-right: 0.25em !important;
+    }
+
+    .table-option .small-left-pad {
+        padding-left: 0.25em !important;
+    }
+
+    .table-option .x-wide {
+        padding-right: 5em !important;
+    }
+
+    .table-option > thead > tr > th {
+        border-bottom: none;
+    }
+
+    .table-option > tbody > tr > td {
+        border-bottom: none;
+    }
+
+        .table-option > tbody > tr > td.input {
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+            .table-option > tbody > tr > td.input > .radio,
+            .table-option > tbody > tr > td.input > .checkbox {
+                margin-bottom: 0 !important;
+            }
+
+                .table-option > tbody > tr > td.input > .radio > input,
+                .table-option > tbody > tr > td.input > .checkbox > input {
+                    cursor: pointer;
+                }
+
+            .table-option > tbody > tr > td.input .radio > label,
+            .table-option > tbody > tr > td.input .checkbox > label {
+                margin-left: 0 !important;
+            }
+
+    .table-option > tbody > tr > .text {
+        cursor: pointer;
+    }
+
+        .table-option > thead > tr > .text p,
+        .table-option > tbody > tr > .text p {
+            margin-bottom: 0;
+        }
+
+.table-boolean {
+    background-color: transparent;
+}
+
+    .table-boolean > tbody > tr > td {
+        border-bottom: none;
+    }
+
+        .table-boolean > tbody > tr > td.input {
+            width: 160px;
+        }
+
+            .table-boolean > tbody > tr > td.input .radio {
+                margin-bottom: 0;
+                margin-top: 0;
+                cursor: pointer;
+            }
+
+                .table-boolean > tbody > tr > td.input .radio > * {
+                    cursor: pointer;
+                }
+
+    .table-boolean > tbody > tr + tr > td {
+        border-top-width: 1px;
+    }
+
+    .table-boolean > thead > tr > th.text p,
+    .table-boolean > tbody > tr > td.text p {
+        margin-bottom: 0;
+    }
+
+.table-match {
+    background-color: transparent;
+}
+
+    .table-match > tbody > tr > td {
+        border-bottom: none;
+    }
+
+        .table-match > tbody > tr > td.right,
+        .table-match > tbody > tr > td.left {
+            width: 50%;
+        }
+
+            .table-match > tbody > tr > td.right .form-group {
+                margin: 0;
+            }
+
+                .table-match > tbody > tr > td.right .form-group:not(.has-error) .bootstrap-select .dropdown-toggle {
+                    border-color: #d4dbe0;
+                }
+
+    .table-match > tbody > tr + tr > td {
+        border-top-width: 1px;
+    }
+
+    .table-match > tbody > tr > td.left {
+        vertical-align: middle;
+    }
+
+        .table-match > tbody > tr > td.left p {
+            margin-bottom: 0;
+        }
+
+.table-likert {
+    background-color: transparent;
+}
+
+    .table-likert > thead > tr > td {
+        border-bottom: none;
+        text-align: center;
+        vertical-align: bottom;
+    }
+
+    .table-likert > tbody > tr > td {
+        
+    }
+
+        .table-likert > tbody > tr > td.input {
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+            .table-likert > tbody > tr > td.input > .radio,
+            .table-likert > tbody > tr > td.input > .checkbox {
+                margin-bottom: 0 !important;
+            }
+
+                .table-likert > tbody > tr > td.input > .radio > input,
+                .table-likert > tbody > tr > td.input > .checkbox > input {
+                    cursor: pointer;
+                }
+
+            .table-likert > tbody > tr > td.input .radio > label,
+            .table-likert > tbody > tr > td.input .checkbox > label {
+                margin-left: 0 !important;
+            }
+
+        .table-likert > tbody > tr > td.text {
+            vertical-align: middle;
+        }
+
+            .table-likert > thead > tr > td.text p,
+            .table-likert > tbody > tr > td.text p {
+                margin-bottom: 0;
+            }
+
+.ordering-list > .ordering-list-container > div {
+    cursor: grab;
+}
+
+    .ordering-list > .ordering-list-container > div > p:last-child {
+        margin-bottom: 0;
+    }
+
+.fancybox-caption__body {
+    font-size: 1.5rem;
+}

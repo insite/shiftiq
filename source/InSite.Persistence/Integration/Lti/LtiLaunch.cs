@@ -1,0 +1,89 @@
+﻿using System;
+
+namespace InSite.Persistence
+{
+    public class LtiLaunch
+    {
+        public String context_id { get; set; }
+        public String context_label { get; set; }
+        public String context_title { get; set; }
+        public String context_type { get; set; }
+        public String custom_canvas_api_domain { get; set; }
+        public String custom_canvas_assignment_id { get; set; }
+        public String custom_canvas_assignment_points_possible { get; set; }
+        public String custom_canvas_assignment_title { get; set; }
+        public String custom_canvas_course_id { get; set; }
+        public String custom_canvas_enrollment_state { get; set; }
+        public String custom_canvas_user_id { get; set; }
+        public String custom_canvas_user_login_id { get; set; }
+        public String custom_canvas_workflow_state { get; set; }
+        public String custom_context_memberships_url { get; set; }
+        public String custom_context_setting_url { get; set; }
+        public String custom_genericmediaurl { get; set; }
+        public String custom_lineitem_url { get; set; }
+        public String custom_lineitems_url { get; set; }
+        public String custom_link_memberships_url { get; set; }
+        public String custom_link_setting_url { get; set; }
+        public String custom_lp { get; set; }
+        public String custom_result_url { get; set; }
+        public String custom_results_url { get; set; }
+        public String custom_system_setting_url { get; set; }
+        public String custom_tc_profile_url { get; set; }
+        public String ext_ims_lis_basic_outcome_url { get; set; }
+        public String ext_ims_lis_memberships_id { get; set; }
+        public String ext_ims_lis_memberships_url { get; set; }
+        public String ext_ims_lis_resultvalue_sourcedids { get; set; }
+        public String ext_ims_lti_tool_setting_id { get; set; }
+        public String ext_ims_lti_tool_setting_url { get; set; }
+        public String ext_lti_assignment_id { get; set; }
+        public String ext_outcome_data_values_accepted { get; set; }
+        public String ext_outcome_result_total_score_accepted { get; set; }
+        public String ext_outcome_submission_submitted_at_accepted { get; set; }
+        public String ext_outcomes_tool_placement_url { get; set; }
+        public String ext_roles { get; set; }
+        public String launch_presentation_css_url { get; set; }
+        public String launch_presentation_document_target { get; set; }
+        public String launch_presentation_locale { get; set; }
+        public String launch_presentation_return_url { get; set; }
+        public String LaunchParameters { get; set; }
+        public String LaunchSignature { get; set; }
+        public String LaunchType { get; set; }
+        public String LaunchUrl { get; set; }
+        public String lis_course_offering_sourcedid { get; set; }
+        public String lis_course_section_sourcedid { get; set; }
+        public String lis_outcome_service_url { get; set; }
+        public String lis_person_contact_email_primary { get; set; }
+        public String lis_person_name_family { get; set; }
+        public String lis_person_name_full { get; set; }
+        public String lis_person_name_given { get; set; }
+        public String lis_person_sourcedid { get; set; }
+        public String lis_result_sourcedid { get; set; }
+        public String lti_message_type { get; set; }
+        public String lti_version { get; set; }
+        public String oauth_callback { get; set; }
+        public String oauth_consumer_key { get; set; }
+        public String oauth_nonce { get; set; }
+        public String oauth_signature { get; set; }
+        public String oauth_signature_method { get; set; }
+        public String oauth_timestamp { get; set; }
+        public String oauth_version { get; set; }
+        public String resource_link_description { get; set; }
+        public String resource_link_id { get; set; }
+        public String resource_link_title { get; set; }
+        public String roles { get; set; }
+        public String TenantCode { get; set; }
+        public String tool_consumer_info_product_family_code { get; set; }
+        public String tool_consumer_info_version { get; set; }
+        public String tool_consumer_instance_contact_email { get; set; }
+        public String tool_consumer_instance_description { get; set; }
+        public String tool_consumer_instance_guid { get; set; }
+        public String tool_consumer_instance_name { get; set; }
+        public String tool_consumer_instance_url { get; set; }
+        public String user_id { get; set; }
+        public String user_image { get; set; }
+        public String ValidationErrors { get; set; }
+        public Int32? AssetNumber { get; set; }
+        public Int32 LaunchKey { get; set; }
+        public DateTimeOffset LaunchTime { get; set; }
+    }
+}

@@ -1,0 +1,41 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchCriteria.ascx.cs" Inherits="InSite.UI.Admin.Learning.Categories.Controls.SearchCriteria" %>
+
+<%@ Register TagPrefix="uc" TagName="FilterManager" Src="~/UI/Layout/Common/Controls/SearchCriteriaFilterManager.ascx" %>
+
+<div class="row">
+    <div class="col-6">
+        <div id="toolbox" class="toolbox-section">
+            <h4>Criteria</h4>
+            <div class="row">
+                <div class="col-6">
+
+                    <div class="mb-2">
+                        <insite:CollectionItemFolderComboBox runat="server" ID="CategoryFolder" EmptyMessage="Category Folder" />
+                    </div> 
+
+                    <div class="mb-2">
+                        <insite:TextBox ID="CategoryName" runat="server" EmptyMessage="Category Name" MaxLength="200" />
+                    </div> 
+
+                    <div class="mb-2">
+                        <insite:FilterButton runat="server" ID="SearchButton" />
+                        <insite:ClearButton runat="server" ID="ClearButton" />
+                    </div>
+
+                </div>
+            </div> 
+        </div>
+    </div>
+    <div class="col-3">       
+        <div class="mb-2">
+            <h4>Settings</h4>
+            <insite:MultiComboBox ID="ShowColumns" runat="server" />
+        </div>
+    </div>
+    <div class="col-3">
+        <div>
+            <h4>Saved Filters</h4>
+            <uc:FilterManager runat="server" ID="FilterManager" />
+        </div>
+    </div>
+</div>

@@ -1,0 +1,109 @@
+﻿select.insite-combobox {
+    display: inline-block;
+}
+
+.insite-combobox {
+    vertical-align: initial;
+}
+
+    .insite-combobox > .dropdown-menu {
+        z-index: 1021;
+    }
+
+    .insite-combobox.is-invalid > .btn-combobox {
+        border-color: var(--ar-form-invalid-border-color);
+    }
+
+    .insite-combobox > .btn-combobox {
+        --ar-btn-hover-border-color: #dfdfeb;
+        --ar-btn-font-weight: normal;
+        --ar-btn-disabled-bg: var(--ar-gray-100);
+        --ar-btn-disabled-border-color: var(--ar-gray-300);
+        border-color: #dfdfeb;
+        background-color: #fff;
+        vertical-align: initial;
+    }
+
+        .insite-combobox > .btn-combobox::after {
+            color: var(--ar-gray-700);
+        }
+
+        .insite-combobox > .btn-combobox > .filter-option > .filter-option-inner > .filter-option-inner-inner {
+            color: var(--ar-body-color);
+        }
+
+        .insite-combobox > .btn-combobox.bs-placeholder > .filter-option > .filter-option-inner > .filter-option-inner-inner {
+            color: var(--ar-gray-500);
+        }
+
+    .insite-combobox > button > .filter-option > .filter-option-inner > .filter-option-inner-inner {
+        min-height: 1.5rem;
+    }
+
+    .insite-combobox > button.btn-xs > .filter-option > .filter-option-inner > .filter-option-inner-inner {
+        min-height: 1.162rem;
+    }
+
+    .insite-combobox > button.btn-sm > .filter-option > .filter-option-inner > .filter-option-inner-inner {
+        min-height: 1.312rem;
+    }
+
+    .insite-combobox > button.btn-lg > .filter-option > .filter-option-inner > .filter-option-inner-inner {
+        min-height: 1.687rem;
+    }
+
+    .insite-combobox.open > .dropdown-menu.open {
+        display: block;
+    }
+
+        .insite-combobox.open > .dropdown-menu.open > div > ul.dropdown-menu.inner {
+            display: block;
+        }
+
+    .insite-combobox > .dropdown-menu > .bs-searchbox + .bs-actionsbox {
+        padding-top: 4px;
+    }
+
+    .insite-combobox > .dropdown-menu > .bs-actionsbox {
+        padding-bottom: 8px;
+    }
+
+    .insite-combobox.insite-multiple .dropdown-menu > .active > a {
+        pointer-events: all;
+        color: #5a5b75;
+    }
+
+    .insite-combobox .dropdown-menu li.disabled a {
+        cursor: not-allowed;
+        color: #9e9fb4 !important;
+    }
+
+select.insite-combobox.form-select {
+    overflow: hidden;
+    max-height: 2.7rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%234a4b65' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-size: 11px 11px;
+}
+
+    select.insite-combobox.form-select option {
+        display: none;
+    }
+
+.insite-combobox .bs-searchbox .form-control {
+    box-shadow: none;
+}
+
+.input-group:not(.has-validation) > .insite-combobox:not(:last-child) > .btn.dropdown-toggle {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group.has-validation > .insite-combobox:nth-last-child(n+3) > .btn.dropdown-toggle {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group > .insite-combobox:not(:first-child) > .btn.dropdown-toggle {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

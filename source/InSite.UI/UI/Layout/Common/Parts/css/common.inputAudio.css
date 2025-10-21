@@ -1,0 +1,22 @@
+﻿.insite-input-audio {
+}
+
+    .insite-input-audio > span.input-group-text {
+        padding-top: 0;
+        cursor: default;
+    }
+
+        .insite-input-audio > span.input-group-text > span {
+            text-align: left;
+            user-select: none;
+        }
+
+            .insite-input-audio > span.input-group-text > span > span.text-body-secondary {
+                font-size: 0.75rem;
+                margin-top: 0.45rem;
+                display: block;
+            }
+
+    .insite-input-audio > button {
+        width: 60px;
+    }

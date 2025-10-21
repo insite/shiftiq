@@ -1,0 +1,8 @@
+﻿body, p, li {
+    font-size: 11pt;
+    font-family: Arial,sans-serif;
+}
+
+code, kbd, pre, samp {
+    font-family: monospace,monospace;
+}

@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #title {
+            font-family: 'Arial';
+            font-size: 21pt;
+        }
+    </style>
+</head>
+<body>
+    <div id="title"></div>
+
+    <script type="text/javascript">
+        (function () {
+            var variables = (function (a) {
+                if (a === '') return {};
+                var b = {};
+                for (var i = 0; i < a.length; ++i) {
+                    var p = a[i].split('=', 2);
+                    if (p.length !== 2) continue;
+                    b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+                }
+                return b;
+            })(window.location.search.substring(1).split('&'));
+
+            document.getElementById('title').innerText = String(variables.title);
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+﻿div.section,
+div.section-odd {
+    padding: 10px;
+    width: 100%;
+}
+div.section-odd { background-color: #F4F4F4; }
+
+table.field-table { width: 1100px; }
+table.field-table th.field-label { width: 50px; }
+table.field-table th.field-text { width: 620px; }
+table.field-table th.field-button { width: 20px; }
+table.field-table td.option-label { width: 50px; }
+table.field-table td.option-text { width: 580px; }
+table.field-table td.option-button { width: 20px; }
+
+.translate-button { float: right; }
+
+table.translation tr td { padding: 5px; }
+table.translation tr td.translation-label { width: 40px; vertical-align: top; }
+table.translation tr td.translation-text { width: 500px; vertical-align: top; }
+table.translation tr td.translation-commands { width: 40px; vertical-align: top; }
+table.translation tr.section td { font-weight: bold; font-size: 1.1em; }
+table.translation tr.help td { font-style: italic; font-size: 1.1em; color: steelblue; }
+table.translation tr.option td.text { font-size: 0.8em !important; padding-left: 30px !important; }
+            
+table.translation { border-collapse: collapse; width: 1160px; }
+table.translation > tr:nth-child(odd), table.translation > tbody > tr:nth-child(odd) { background-color: #f4f4f4; }
+table.translation > tr:nth-child(even), table.translation > tbody > tr:nth-child(even) { background-color: #FFFFFF; }
+
+table.translation tr td.text { border-left: solid 1px #d4d4d4; }

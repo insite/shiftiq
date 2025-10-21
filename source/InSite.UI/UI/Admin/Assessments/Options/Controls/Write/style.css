@@ -1,0 +1,32 @@
+﻿table.table-write-options .start-sort {
+    cursor: grab;
+    display: inline-block;
+    width: 32px;
+    text-align: center;
+    line-height: 32px;
+}
+
+table.table-write-options .ui-sortable > tr.ui-sortable-placeholder {
+    visibility: visible !important;
+    outline: 1px dashed #666666 !important;
+}
+
+h3.table-write-header {
+}
+
+    h3.table-write-header > span {
+        display: block;
+        position: absolute;
+        right: 15px;
+        line-height: 23px;
+    }
+
+        h3.table-write-header > span > span {
+            display: block;
+            float: left;
+            font-size: 85%;
+        }
+
+        h3.table-write-header > span > i {
+            display: block;
+        }

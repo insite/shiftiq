@@ -1,0 +1,115 @@
+﻿ul.dot-indicator {
+  list-style: none;
+  margin: 30px 0 20px 0;
+  padding: 0;
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+
+ul.dot-indicator > li {
+  position: relative;
+  display: table-cell;
+  text-align: center;
+  font-size: 0.8em;
+}
+
+ul.dot-indicator > li:before {
+  content: attr(data-num);
+  display: block;
+  margin: 0 auto;
+  background: #edeff0;
+  width: 2.4em;
+  height: 2.4em;
+  text-align: center;
+  margin-bottom: 0.25em;
+  line-height: 2.4em;
+  border-radius: 100%;
+  position: relative;
+  font-size: 1.25em;
+  z-index: 2;
+}
+
+ul.dot-indicator > li:after {
+  content: "";
+  position: absolute;
+  display: block;
+  background: #e4e6e7;
+  width: 100%;
+  height: 0.5em;
+  top: 1.25em;
+  right: 50%;
+  margin-left: 1.5em;
+  z-index: 1;
+}
+
+ul.dot-indicator > li:first-child:after {
+  display: none;
+}
+
+ul.dot-indicator > li.step-complete:before {
+  color: #FFF;
+  background-color: #92c250;
+  font-weight: bold;
+}
+
+ul.dot-indicator > li.step-complete:after {
+  background-color: #88b846;
+}
+
+table.table-search-download-columns > tbody + tbody {
+  border-top: 0;
+}
+table.table-search-download-columns > tbody > tr > td.cmd-dwn {
+  width: 40px;
+}
+table.table-search-download-columns > tbody > tr > td.title-dwn {
+  cursor: grab;
+}
+table.table-search-download-columns > tbody > tr.hidden-dwn {
+  opacity: 0.6;
+}
+table.table-search-download-columns > tbody > tr.ui-sortable-helper > td {
+  border-bottom: 1px solid #ddd;
+}
+table.table-search-download-columns > tbody > tr.column-group > td {
+  color: #777;
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+table.table-search-download-columns > tbody.ui-sortable > tr.ui-sortable-placeholder {
+  visibility: visible !important;
+  outline: 1px dashed #666666 !important;
+}
+table.table-search-download-columns.hide-invisible-dwn > tbody.hidden-dwn,
+table.table-search-download-columns.hide-invisible-dwn > tbody > tr.hidden-dwn {
+  display: none !important;
+}
+
+body.input-md-fullscreen {
+  overflow: hidden;
+}
+
+.editor-toolbar.fullscreen,
+.CodeMirror-fullscreen,
+body.input-md-fullscreen .editor-preview-side {
+  z-index: 1031;
+}
+
+body.drag-active .upload-dropmessage {
+  display: block !important;
+}
+
+.upload-dropmessage,
+.upload-loadingmessage {
+  z-index: 501;
+}
+
+.upload-dropmessage > div > div {
+  font-size: 1.1em;
+}
+
+.upload-dropmessage.drag-over > div > div {
+  font-weight: bold;
+  font-size: 1.2em;
+}

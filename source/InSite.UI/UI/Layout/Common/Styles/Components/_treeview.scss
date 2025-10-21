@@ -1,0 +1,151 @@
+﻿ul.tree-view {
+    --in-tree-view-bg: #ffffff;
+    --in-tree-view-border-color: var(--ar-border-color);
+    --in-tree-view-border-width: var(--ar-border-width);
+    --in-tree-view-border-radius: var(--ar-border-radius-xl);
+    --in-tree-view-item-padding-x: 1.25rem;
+    --in-tree-view-item-padding-y: 0.875rem;
+    --in-tree-view-item-toggle-padding-x: var(--in-tree-view-item-padding-y);
+    --in-tree-view-item-toggle-padding-y: var(--in-tree-view-item-padding-y);
+    --in-tree-view-item-toggle-padding-width: calc(var(--in-tree-view-item-toggle-padding-x) * 2 + 1rem);
+    --in-tree-view-item-padding-start: var(--in-tree-view-item-toggle-padding-width);
+    --in-tree-view-item-padding-end: var(--in-tree-view-item-padding-x);
+    --in-tree-view-inner-offset: var(--in-tree-view-item-padding-x);
+    --in-tree-view-action-hover-bg: #fafafa;
+    --in-tree-view-action-selected-bg: #f5f5f5;
+    list-style: none;
+    padding: 0;
+    border: var(--in-tree-view-border-width) solid var(--in-tree-view-border-color);
+    border-radius: var(--ar-border-radius);
+    overflow: hidden;
+
+    > li {
+        position: relative;
+        display: block;
+        margin: 0;
+        background-color: var(--in-tree-view-bg);
+
+        &:first-child,
+        &.top-item {
+            border-top: none;
+        }
+
+        & + li {
+            border-top: var(--in-tree-view-border-width) solid var(--in-tree-view-border-color);
+        }
+
+        &.opened {
+            > ul.tree-view {
+                display: block;
+            }
+
+            > div > div > span.toggle-button {
+                > .fa-plus {
+                    display: none;
+                }
+
+                > .fa-minus {
+                    display: inline-block;
+                }
+            }
+        }
+
+        &.selected {
+            > div {
+                background-color: var(--in-tree-view-action-selected-bg);
+            }
+        }
+
+        > ul.tree-view {
+            display: none;
+            border: none;
+            border-radius: 0;
+
+            > li {
+                border-top: var(--in-tree-view-border-width) solid var(--in-tree-view-border-color);
+            }
+        }
+
+        > div {
+            &:hover {
+                background-color: var(--in-tree-view-action-hover-bg);
+            }
+
+            > div {
+                position: relative;
+                padding: var(--in-tree-view-item-padding-y) var(--in-tree-view-item-padding-end) var(--in-tree-view-item-padding-y) var(--in-tree-view-item-padding-start);
+
+                .node-title {
+                    position: relative;
+                }
+
+                .type-icon {
+                    opacity: 0.5;
+                    margin-right: 2px;
+                    position: absolute;
+                    padding: 5px 0;
+                }
+
+                .node-inputs {
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    padding: var(--in-tree-view-item-toggle-padding-y) var(--in-tree-view-item-toggle-padding-x);
+
+                    &.node-inputs-sm {
+                        padding: 0.5rem var(--in-tree-view-item-toggle-padding-x);
+                    }
+                }
+
+                > span.toggle-button {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    padding: var(--in-tree-view-item-toggle-padding-y) var(--in-tree-view-item-toggle-padding-x);
+                    width: var(--in-tree-view-item-toggle-padding-width);
+                    cursor: pointer;
+                    text-align: center;
+
+                    > .fa-minus {
+                        display: none;
+                    }
+
+                    > .fa-plus {
+                        display: inline-block;
+                    }
+                }
+            }
+        }
+    }
+
+    &.search-mode {
+        li {
+            display: none;
+
+            > ul.tree-view {
+                display: none;
+            }
+
+            > div > div {
+                opacity: 0.5;
+            }
+
+            &.match-contains,
+            &.opened.match-contains > ul.tree-view {
+                display: block !important;
+            }
+
+            &.match-search {
+                display: block !important;
+
+                > div > div {
+                    opacity: 1;
+
+                    a {
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+    }
+}

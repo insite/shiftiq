@@ -1,0 +1,19 @@
+﻿[
+  {
+    "outputFile": "UI/Layout/Common/Styles/Custom.css",
+    "inputFile": "UI/Layout/Common/Styles/Custom.scss"
+  },
+  {
+    "outputFile": "UI/Layout/Common/Styles/Shift.css",
+    "inputFile": "UI/Layout/Common/Styles/Shift.scss"
+  },
+  {
+    "outputFile": "UI/Layout/Common/Styles/CustomPortal.css",
+    "inputFile": "UI/Layout/Common/Styles/CustomPortal.scss",
+    "options": {
+      "relativeUrls": false,
+      "lineFeed": "crlf"
+    }
+  }
+
+]
