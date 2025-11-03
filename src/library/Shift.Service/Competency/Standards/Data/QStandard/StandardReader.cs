@@ -1,124 +1,143 @@
+using System.Runtime.CompilerServices;
+
 using Microsoft.EntityFrameworkCore;
 
+using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Contract;
 
-using Shift.Common;
-
 namespace Shift.Service.Competency;
 
-public interface IStandardReader : IEntityReader
+public class StandardReader : IEntityReader
 {
-    Task<bool> AssertAsync(Guid standard, CancellationToken cancellation = default);
-    Task<StandardEntity?> RetrieveAsync(Guid standard, CancellationToken cancellation = default);
-    Task<int> CountAsync(IStandardCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<StandardEntity>> CollectAsync(IStandardCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<StandardEntity>> DownloadAsync(IStandardCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<StandardMatch>> SearchAsync(IStandardCriteria criteria, CancellationToken cancellation = default);
-}
+    private string DefaultSort = "StandardIdentifier";
 
-internal class StandardReader : IStandardReader
-{
-    private const string DefaultSort = "ContentName";
     private readonly IDbContextFactory<TableDbContext> _context;
-    private readonly IShiftIdentityService _identity;
 
-    public StandardReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService identity)
+    private readonly IShiftIdentityService _auth;
+
+    public StandardReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
     {
         _context = context;
-        _identity = identity;
+        _auth = auth;
     }
 
-    public async Task<bool> AssertAsync(
-        Guid standard,
-        CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid standard, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db);
+
+            return query.AnyAsync(x => x.StandardIdentifier == standard, cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<List<StandardEntity>> CollectAsync(IStandardCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query
+                .OrderBy(criteria.Filter.Sort ?? DefaultSort)
+                .ApplyPaging(criteria.Filter)
+                .ToListAsync(cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<int> CountAsync(IStandardCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query.CountAsync(cancellation);
+
+        }, cancellation);
+    }
+
+    public async IAsyncEnumerable<StandardEntity> DownloadAsync(IStandardCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 
-        return await db.QStandard
-            .AnyAsync(x => x.StandardIdentifier == standard, cancellation);
+        var query = BuildQueryable(db, criteria);
+
+        await foreach (var entity in query.AsAsyncEnumerable().WithCancellation(cancellation))
+        {
+            yield return entity;
+        }
     }
 
-    public async Task<StandardEntity?> RetrieveAsync(
-        Guid standard,
-        CancellationToken cancellation = default)
+    public Task<StandardEntity?> RetrieveAsync(Guid standard, CancellationToken cancellation = default)
     {
-        using var db = _context.CreateDbContext();
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db);
 
-        return await db.QStandard
+            return query.FirstOrDefaultAsync(x => x.StandardIdentifier == standard, cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<List<StandardMatch>> SearchAsync(IStandardCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            query = query
+                .OrderBy(criteria.Filter.Sort ?? DefaultSort)
+                .ApplyPaging(criteria.Filter);
+
+            return ToMatchesAsync(query, cancellation);
+
+        }, cancellation);
+    }
+
+    /// <summary>
+    /// Creates a queryable for events
+    /// </summary>
+    /// <remarks>
+    /// If you call .Include() on the DbSet then remember to use .AsSplitQuery() so that cartesian explosion is avoided.
+    /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
+    /// ordering fully unique, otherwise the result set is non-deterministic.
+    /// </remarks>
+    private IQueryable<StandardEntity> BuildQueryable(TableDbContext db)
+    {
+        ValidateOrganizationContext();
+
+        var query = db.QStandard
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.StandardIdentifier == standard, cancellation);
+            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+
+        return query;
     }
 
-    public async Task<int> CountAsync(
-        IStandardCriteria criteria,
-        CancellationToken cancellation = default)
+    private IQueryable<StandardEntity> BuildQueryable(TableDbContext db, IStandardCriteria criteria)
     {
-        using var db = _context.CreateDbContext();
+        ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
-        return await BuildQueryable(db, criteria)
-            .CountAsync(cancellation);
-    }
-
-    public async Task<IEnumerable<StandardEntity>> CollectAsync(
-        IStandardCriteria criteria,
-        CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        return await BuildQueryable(db, criteria)
-            .OrderBy(criteria.Filter.Sort ?? DefaultSort)
-            .ApplyPaging(criteria.Filter)
-            .ToListAsync(cancellation);
-    }
-
-    public async Task<IEnumerable<StandardEntity>> DownloadAsync(
-        IStandardCriteria criteria,
-        CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        return await BuildQueryable(db, criteria)
-            .ToListAsync(cancellation);
-    }
-
-    public async Task<IEnumerable<StandardMatch>> SearchAsync(
-        IStandardCriteria criteria,
-        CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        var queryable = BuildQueryable(db, criteria)
-            .OrderBy(criteria.Filter.Sort ?? DefaultSort)
-            .ApplyPaging(criteria.Filter);
-
-        return await ToMatchesAsync(queryable, cancellation);
-    }
-
-    private IQueryable<StandardEntity> BuildQueryable(
-        TableDbContext db,
-        IStandardCriteria criteria)
-    {
-        var q = db.QStandard.AsNoTracking().AsQueryable();
-
-        // Force the organization identifier in the criteria to match the caller's context
-
-        criteria.OrganizationId = _identity.OrganizationId;
-
-        q = q.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
+        var query = BuildQueryable(db);
 
         if (!string.IsNullOrEmpty(criteria.ContentTitle))
-            q = q.Where(x => x.ContentTitle!.Contains(criteria.ContentTitle));
+            query = query.Where(x => x.ContentTitle!.Contains(criteria.ContentTitle));
 
         if (!string.IsNullOrEmpty(criteria.StandardType))
-            q = q.Where(x => x.StandardType == criteria.StandardType);
+            query = query.Where(x => x.StandardType == criteria.StandardType);
 
-        return q;
+        return query;
     }
 
-    public static async Task<IEnumerable<StandardMatch>> ToMatchesAsync(
-        IQueryable<StandardEntity> queryable,
-        CancellationToken cancellation = default)
+    private async Task<T> ExecuteAsync<T>(Func<TableDbContext, Task<T>> query, CancellationToken cancellation = default)
+    {
+        using var db = _context.CreateDbContext();
+
+        return await query(db);
+    }
+
+    public static async Task<List<StandardMatch>> ToMatchesAsync(IQueryable<StandardEntity> queryable, CancellationToken cancellation = default)
     {
         var matches = await queryable
             .Select(entity => new StandardMatch
@@ -132,5 +151,11 @@ internal class StandardReader : IStandardReader
             .ToListAsync(cancellation);
 
         return matches;
+    }
+
+    private void ValidateOrganizationContext()
+    {
+        if (_auth.OrganizationId == Guid.Empty)
+            throw new InvalidOperationException("Organization context is required");
     }
 }

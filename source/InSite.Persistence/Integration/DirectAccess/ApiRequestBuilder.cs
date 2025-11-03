@@ -125,16 +125,6 @@ namespace InSite.Persistence.Integration.DirectAccess
                     if (int.TryParse(candidate.PersonCode, out int personCode))
                         person.IndividualId = personCode;
 
-                    if (registration.SchoolIdentifier.HasValue)
-                    {
-                        var trainingProvider = contactSearch.GetGroup(registration.SchoolIdentifier.Value);
-                        if (trainingProvider != null)
-                        {
-                            person.SetVariable("TrainingProviderName", trainingProvider.GroupName);
-                            person.SetVariable("TrainingProviderEmail", trainingProvider.GroupEmail);
-                        }
-                    }
-
                     if (registration.AttemptIdentifier.HasValue)
                     {
                         var attempt = attemptSearch.GetAttempt(registration.AttemptIdentifier.Value);
@@ -182,6 +172,7 @@ namespace InSite.Persistence.Integration.DirectAccess
                 session.ExamCompletedDate = $"{time:yyyy-MM-dd}";
 
                 session.SetVariable("EventExamType", @event.ExamType);
+                session.SetVariable("EventNumber", @event.EventNumber.ToString());
                 session.SetVariable("EventSchedulingStatus", @event.EventSchedulingStatus);
 
                 if (session.Persons.Count > 0)

@@ -393,7 +393,7 @@
                                             </div>
 
                                             <asp:Panel runat="server" ID="NoCompetencyPanel" CssClass="alert alert-info" Style="margin-bottom: 0;" Visible="false">
-                                                <i class="far fa-info-circle"></i><strong>Competency Evaluation</strong>
+                                                <i class="far fa-info-circle me-1"></i><strong>Competency Evaluation</strong>
                                                 The selected question set is not aligned to a competency framework.
                                             </asp:Panel>
 
@@ -411,7 +411,7 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <insite:Container runat="server" ID="RandomizationContainer">
                         <div class="card border-0 shadow-lg mt-3">
                             <div class="card-body">

@@ -277,7 +277,7 @@ namespace InSite.Admin.Contacts.People.Controls
         {
             var result = PersonCriteria.SelectSearchResults(filter);
 
-            if (filter.ShowColumns.Contains("PERMISSION LISTS"))
+            if (filter.ShowColumns.FirstOrDefault(x => string.Equals(x, "Roles", StringComparison.OrdinalIgnoreCase)) != null)
             {
                 var users = result.Select(x => x.UserIdentifier).ToArray();
                 var accessibleOrgs = Identity.Organizations.Select(x => x.Identifier).ToArray();
@@ -459,7 +459,6 @@ namespace InSite.Admin.Contacts.People.Controls
             public string PersonAccessRevokedBy { get; set; }
             public string PersonJobsApprovedBy { get; set; }
             public string PersonCitizenship { get; set; }
-            public string PersonConsentConsultation { get; set; }
             public string PersonEducationLevel { get; set; }
             public string PersonEmergencyContactName { get; set; }
             public string PersonEmergencyContactPhone { get; set; }
@@ -467,19 +466,12 @@ namespace InSite.Admin.Contacts.People.Controls
             public string PersonEmployeeUnion { get; set; }
             public string PersonFirstLanguage { get; set; }
             public string PersonGender { get; set; }
-            public string PersonImmigrationApplicant { get; set; }
-            public string PersonImmigrationCategory { get; set; }
-            public string PersonImmigrationDestination { get; set; }
-            public string PersonImmigrationDisability { get; set; }
-            public string PersonImmigrationNumber { get; set; }
             public string PersonJobTitle { get; set; }
             public string PersonLanguage { get; set; }
             public string PersonPhone { get; set; }
             public string PersonPhoneHome { get; set; }
             public string PersonPhoneOther { get; set; }
             public string PersonPhoneWork { get; set; }
-            public string PersonReferrer { get; set; }
-            public string PersonReferrerOther { get; set; }
             public string PersonRegion { get; set; }
             public string PersonCredentialingCountry { get; set; }
             public string PersonShippingPreference { get; set; }
@@ -493,7 +485,6 @@ namespace InSite.Admin.Contacts.People.Controls
             public DateTimeOffset? PersonJobsApproved { get; set; }
             public DateTimeOffset? PersonBirthdate { get; set; }
             public DateTimeOffset PersonCreated { get; set; }
-            public DateTimeOffset? PersonImmigrationLandingDate { get; set; }
             public DateTimeOffset? PersonLastAuthenticated { get; set; }
             public DateTimeOffset? PersonMemberEndDate { get; set; }
             public DateTimeOffset? PersonMemberStartDate { get; set; }
@@ -610,13 +601,6 @@ namespace InSite.Admin.Contacts.People.Controls
                 exportItem.PersonEmployeeUnion = dataItem.EmployeeUnion;
                 exportItem.PersonFirstLanguage = dataItem.FirstLanguage;
                 exportItem.PersonGender = dataItem.Gender;
-                exportItem.PersonImmigrationApplicant = dataItem.ImmigrationApplicant;
-                exportItem.PersonImmigrationCategory = dataItem.ImmigrationCategory;
-                exportItem.PersonImmigrationDestination = dataItem.ImmigrationDestination;
-                exportItem.PersonImmigrationDisability = dataItem.ImmigrationDisability;
-                exportItem.PersonImmigrationLandingDate = dataItem.ImmigrationLandingDate;
-                exportItem.PersonImmigrationNumber = dataItem.ImmigrationNumber;
-                exportItem.PersonConsentConsultation = dataItem.ConsentConsultation;
                 exportItem.PersonJobTitle = dataItem.JobTitle;
                 exportItem.PersonLanguage = dataItem.Language;
                 exportItem.PersonLastAuthenticated = dataItem.LastAuthenticated;
@@ -627,8 +611,6 @@ namespace InSite.Admin.Contacts.People.Controls
                 exportItem.PersonPhoneHome = dataItem.PhoneHome;
                 exportItem.PersonPhoneOther = dataItem.PhoneOther;
                 exportItem.PersonPhoneWork = dataItem.PhoneWork;
-                exportItem.PersonReferrer = dataItem.Referrer;
-                exportItem.PersonReferrerOther = dataItem.ReferrerOther;
                 exportItem.PersonRegion = dataItem.Region;
                 exportItem.PersonCredentialingCountry = dataItem.CredentialingCountry;
                 exportItem.PersonShippingPreference = dataItem.ShippingPreference;
@@ -665,3 +647,4 @@ namespace InSite.Admin.Contacts.People.Controls
         #endregion
     }
 }
+

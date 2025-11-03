@@ -251,8 +251,8 @@ namespace InSite.Persistence
             if (filter.ProductType.HasValue())
                 query = query.Where(x => x.ProductType == filter.ProductType);
 
-            if (filter.IsPublished)
-                query = query.Where(x => x.Published.HasValue);
+            if (filter.IsPublished.HasValue)
+                query = query.Where(x => filter.IsPublished.Value ? x.Published.HasValue : !x.Published.HasValue);
 
             if (filter.IsAvailableForSale)
                 query = query.Where(x => x.ObjectIdentifier.HasValue);

@@ -15,13 +15,22 @@ namespace InSite.Admin.Records.Programs.Controls
     {
 
         /// <summary>
-        /// HeaderContent control.
+        /// PublicationTab control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.PageHeadContent HeaderContent;
+        protected global::InSite.Common.Web.UI.NavItem PublicationTab;
+
+        /// <summary>
+        /// ModifyPublicationLink1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink ModifyPublicationLink1;
 
         /// <summary>
         /// ProgramSlug control.
@@ -30,7 +39,7 @@ namespace InSite.Admin.Records.Programs.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox ProgramSlug;
+        protected global::System.Web.UI.WebControls.Literal ProgramSlug;
 
         /// <summary>
         /// ProgramIconPreview control.
@@ -48,7 +57,7 @@ namespace InSite.Admin.Records.Programs.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox ProgramIcon;
+        protected global::System.Web.UI.WebControls.Literal ProgramIcon;
 
         /// <summary>
         /// ProgramImageField control.
@@ -69,76 +78,40 @@ namespace InSite.Admin.Records.Programs.Controls
         protected global::System.Web.UI.WebControls.Image ProgramImage;
 
         /// <summary>
-        /// DeleteImage control.
+        /// WebPageSection control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.IconButton DeleteImage;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl WebPageSection;
 
         /// <summary>
-        /// ProgramImageUploadV2 control.
+        /// ModifyPublicationLink2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.FileUploadV2 ProgramImageUploadV2;
+        protected global::InSite.Common.Web.UI.IconLink ModifyPublicationLink2;
 
         /// <summary>
-        /// ProgramImageUrl control.
+        /// WebSiteName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox ProgramImageUrl;
+        protected global::System.Web.UI.WebControls.Literal WebSiteName;
 
         /// <summary>
-        /// WebSiteIdentifier control.
+        /// WebFolderName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.WebSiteComboBox WebSiteIdentifier;
-
-        /// <summary>
-        /// WebFolderIdentifier control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.WebFolderComboBox WebFolderIdentifier;
-
-        /// <summary>
-        /// WebPagePanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl WebPagePanel;
-
-        /// <summary>
-        /// WebPageIdentifierAdd control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.IconButton WebPageIdentifierAdd;
-
-        /// <summary>
-        /// WebPageIdentifierLinks control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl WebPageIdentifierLinks;
+        protected global::System.Web.UI.WebControls.Literal WebFolderName;
 
         /// <summary>
         /// WebPageIdentifierEdit control.
@@ -159,13 +132,13 @@ namespace InSite.Admin.Records.Programs.Controls
         protected global::System.Web.UI.HtmlControls.HtmlAnchor WebPageIdentifierView;
 
         /// <summary>
-        /// WebPageIdentifier control.
+        /// WebPageName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.WebPageComboBox WebPageIdentifier;
+        protected global::System.Web.UI.WebControls.Literal WebPageName;
 
         /// <summary>
         /// WebPageHelp control.
@@ -183,25 +156,25 @@ namespace InSite.Admin.Records.Programs.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox PublicationStatus;
+        protected global::System.Web.UI.WebControls.Literal PublicationStatus;
 
         /// <summary>
-        /// SaveButton control.
+        /// TasksTab control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.SaveButton SaveButton;
+        protected global::InSite.Common.Web.UI.NavItem TasksTab;
 
         /// <summary>
-        /// CancelButton control.
+        /// ModifyPublicationLink3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.CancelButton CancelButton;
+        protected global::InSite.Common.Web.UI.IconLink ModifyPublicationLink3;
 
         /// <summary>
         /// NoItemsMessage control.
@@ -213,51 +186,6 @@ namespace InSite.Admin.Records.Programs.Controls
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl NoItemsMessage;
 
         /// <summary>
-        /// UpdatePanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.UpdatePanel UpdatePanel;
-
-        /// <summary>
-        /// CommandButtons control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CommandButtons;
-
-        /// <summary>
-        /// ReorderButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.Button ReorderButton;
-
-        /// <summary>
-        /// ReorderCommandButtons control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel ReorderCommandButtons;
-
-        /// <summary>
-        /// SectionControl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SectionControl;
-
-        /// <summary>
         /// DataRepeater control.
         /// </summary>
         /// <remarks>
@@ -265,14 +193,5 @@ namespace InSite.Admin.Records.Programs.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater DataRepeater;
-
-        /// <summary>
-        /// RefreshButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button RefreshButton;
     }
 }

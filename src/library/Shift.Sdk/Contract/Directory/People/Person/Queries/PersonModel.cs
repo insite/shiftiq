@@ -31,6 +31,7 @@ namespace Shift.Contract
 
         public string AccessRevokedBy { get; set; }
         public string AccountStatusName { get; set; }
+        public string AgeGroup { get; set; }
         public string CandidateLinkedInUrl { get; set; }
         public string CandidateOccupationList { get; set; }
         public string Citizenship { get; set; }
@@ -85,6 +86,7 @@ namespace Shift.Contract
         public DateTimeOffset? JobsApproved { get; set; }
         public DateTimeOffset? LastAuthenticated { get; set; }
         public DateTimeOffset Modified { get; set; }
+        public DateTimeOffset? SinModified { get; set; }
         public DateTimeOffset? UserAccessGranted { get; set; }
         public DateTimeOffset? WhenArchived { get; set; }
         public DateTimeOffset? WhenUnarchived { get; set; }

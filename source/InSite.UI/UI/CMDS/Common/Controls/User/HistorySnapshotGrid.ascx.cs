@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -34,24 +35,35 @@ namespace InSite.Cmds.Controls.Reports.Compliances
                 return;
 
             var row = (DataRowView)e.Row.DataItem;
-            var timeSensitiveSafetyCertificateScore = ToDecimal(row["TimeSensitiveSafetyCertificateScore"]);
-            var additionalComplianceRequirementScore = ToDecimal(row["AdditionalComplianceRequirementScore"]);
-            var criticalCompetencyScore = ToDecimal(row["CriticalCompetencyScore"]);
-            var nonCriticalCompetencyScore = ToDecimal(row["NonCriticalCompetencyScore"]);
-            var codesOfPracticeScore = ToDecimal(row["CodesOfPracticeScore"]);
-            var safeOperatingPracticeScore = ToDecimal(row["SafeOperatingPracticeScore"]);
 
-            var avgCompliance = (
-                timeSensitiveSafetyCertificateScore
-                + additionalComplianceRequirementScore
-                + criticalCompetencyScore
-                + nonCriticalCompetencyScore
-                + codesOfPracticeScore
-                + safeOperatingPracticeScore
-                ) / 6;
+            var asAt = (DateTime)row["AsAt"];
+            var scoreFormatChangedAt = new DateTime(2025, 7, 13);
+
+            var scores = new[]
+            {
+                ToNullableDecimal(row["TimeSensitiveSafetyCertificateScore"]),
+                ToNullableDecimal(row["AdditionalComplianceRequirementScore"]),
+                ToNullableDecimal(row["CriticalCompetencyScore"]),
+                ToNullableDecimal(row["NonCriticalCompetencyScore"]),
+                ToNullableDecimal(row["CodesOfPracticeScore"]),
+                ToNullableDecimal(row["SafeOperatingPracticeScore"])
+            };
+
+            var validScores = scores.Where(s => s.HasValue).Select(s => s.Value).ToList();
+            var avgCompliance = validScores.Any() ? validScores.Average() : 0m;
 
             var avgComplianceLabel = (Literal)e.Row.FindControl("AvgCompliance");
-            avgComplianceLabel.Text = string.Format("{0:n0}", avgCompliance);
+            avgComplianceLabel.Text = asAt > scoreFormatChangedAt
+                ? string.Format("{0:P2}", avgCompliance)  // P2 = percentage format for scores in the range 0..1
+                : string.Format("{0:N2}%", avgCompliance) // N2 = percentage format for scores in the range 0..100
+                ;
+
+            decimal? ToNullableDecimal(object value)
+            {
+                if (value == null || value == DBNull.Value)
+                    return null;
+                return Convert.ToDecimal(value);
+            }
         }
 
         decimal ToDecimal(object o)

@@ -23,6 +23,12 @@
             </ItemTemplate>
         </asp:TemplateField>
 
+        <asp:TemplateField HeaderText="Publication">
+            <ItemTemplate>
+                <%# Eval("Published") != null ? "Published" : "Unpublished" %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
         <asp:TemplateField ItemStyle-Wrap="False" ItemStyle-Width="20px">
             <ItemTemplate>
                 <insite:IconLink runat="server" Name="pencil" ToolTip="Edit"

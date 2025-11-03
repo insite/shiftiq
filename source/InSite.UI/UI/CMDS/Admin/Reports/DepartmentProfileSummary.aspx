@@ -97,7 +97,7 @@
                                     </FooterTemplate>
                                     <ItemTemplate>
                                         <tr>
-                                            <td><%# Eval("PersonFullName") %></td>
+                                            <td><%# Eval("FullName") %></td>
                                             <td class="p-0">
                                                 <asp:Repeater runat="server" ID="EmployeeStatusRepeater">
                                                     <HeaderTemplate>

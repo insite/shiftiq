@@ -1,6 +1,6 @@
 <%@ Page Language="C#" CodeBehind="Create.aspx.cs" Inherits="InSite.Admin.Records.Programs.Create" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/AchievementListEditor.ascx" TagName="AchievementListEditor" TagPrefix="uc" %>
-<%@ Register Src="./Controls/TaskGrid.ascx" TagName="TaskGrid" TagPrefix="uc" %>
+<%@ Register Src="./Controls/TaskGridEdit.ascx" TagName="TaskGrid" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 

@@ -1522,8 +1522,14 @@ namespace InSite.UI.Portal.Events.Classes
                 && EmployerGroupIdentifier.HasValue
                 && EmployerGroupIdentifier.Value != Guid.Empty;
 
-            var employer = ServiceLocator.GroupSearch.GetGroup(EmployerGroupIdentifier.Value.Value);
-            var employerStatus = TCollectionItemCache.GetName(employer?.GroupStatusItemIdentifier);
+            string employerStatus;
+            if (existingEmployer)
+            {
+                var employer = ServiceLocator.GroupSearch.GetGroup(EmployerGroupIdentifier.Value.Value);
+                employerStatus = employer != null ? TCollectionItemCache.GetName(employer.GroupStatusItemIdentifier) : null;
+            }
+            else
+                employerStatus = null;
 
             var hideStatuslessPrices = Organization.OrganizationIdentifier == OrganizationIdentifiers.RCABC
                 && string.Equals(employerStatus, "Active Member", StringComparison.OrdinalIgnoreCase)

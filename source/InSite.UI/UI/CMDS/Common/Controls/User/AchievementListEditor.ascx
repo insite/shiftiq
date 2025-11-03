@@ -20,9 +20,9 @@
             </insite:ComboBox>
             <insite:ComboBox runat="server" ID="GroupByComboBox" Width="220px" ButtonStyle="Primary">
                 <Items>
-                    <insite:ComboBoxOption Value="None" Text="No Grouping" />
                     <insite:ComboBoxOption Value="Type" Text="Type" />
                     <insite:ComboBoxOption Value="TypeAndCategory" Text="Type and Category" />
+                    <insite:ComboBoxOption Value="None" Text="No Grouping" />
                 </Items>
             </insite:ComboBox>
         </div>

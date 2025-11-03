@@ -242,7 +242,7 @@ namespace InSite.Domain.Surveys.Forms
             Apply(new SurveyQuestionContentChanged(question, content));
         }
 
-        public void ChangeSurveyQuestionSettings(Guid question, bool isHidden, bool isRequired, bool isNested, string likertAnalysis, bool listEnableRandomization, bool listEnableOtherText, bool listEnableBranch, bool listEnableGroupMembership, bool disableColumnHeadingWrap, int? textLineCount, int? textCharacterLimit, bool numberEnableStatistics, bool numberEnableAutoCalc, Guid[] numberAutoCalcQuestions, bool numberEnableNotApplicable)
+        public void ChangeSurveyQuestionSettings(Guid question, bool isHidden, bool isRequired, bool isNested, string likertAnalysis, bool listEnableRandomization, bool listEnableOtherText, bool listEnableBranch, bool listEnableGroupMembership, bool disableColumnHeadingWrap, int? textLineCount, int? textCharacterLimit, bool numberEnableStatistics, bool numberEnableAutoCalc, Guid[] numberAutoCalcQuestions, bool numberEnableNotApplicable, SurveyQuestionListSelectionRange listSelectionRange, bool enableCreateCase)
         {
             var q = Data.Form.FindQuestion(question);
 
@@ -264,7 +264,9 @@ namespace InSite.Domain.Surveys.Forms
                 && q.NumberEnableAutoCalc == numberEnableAutoCalc
                 && q.NumberAutoCalcQuestions.EmptyIfNull().Length == numberAutoCalcQuestions.EmptyIfNull().Length
                 && (q.NumberAutoCalcQuestions.IsEmpty() && numberAutoCalcQuestions.IsEmpty() || q.NumberAutoCalcQuestions.All(x => numberAutoCalcQuestions.Contains(x)))
-                && q.NumberEnableNotApplicable == numberEnableNotApplicable)
+                && q.NumberEnableNotApplicable == numberEnableNotApplicable
+                && q.ListSelectionRange.IsEqual(listSelectionRange)
+                && q.EnableCreateCase == enableCreateCase)
                 return;
 
             Apply(new SurveyQuestionSettingsChanged(
@@ -283,7 +285,9 @@ namespace InSite.Domain.Surveys.Forms
                 numberEnableStatistics,
                 numberEnableAutoCalc,
                 numberAutoCalcQuestions,
-                numberEnableNotApplicable));
+                numberEnableNotApplicable,
+                listSelectionRange,
+                enableCreateCase));
         }
 
         public void ChangeSurveyScale(Guid question, SurveyScale scale)

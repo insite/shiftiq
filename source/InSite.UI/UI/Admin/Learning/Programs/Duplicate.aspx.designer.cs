@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace InSite.Custom.CMDS.Admin.Records.Programs
+namespace InSite.Admin.Records.Programs
 {
 
 

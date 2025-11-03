@@ -2,24 +2,18 @@ using InSite.Application.Files.Read;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
 using Shift.Common.File;
 using Shift.Service.Content;
 using Shift.Service.Feedback;
 
 namespace Shift.Api;
 
-/// <summary>
-/// Manages file storage operations including retrieval, temporary uploads, and purging expired files
-/// </summary>
 [ApiController]
 [ApiExplorerSettings(GroupName = "Content API: Files")]
 public class FileController : ShiftControllerBase
 {
     private readonly IMonitor _monitor;
     private readonly FileService _fileService;
-
-    private readonly SecuritySettings _securitySettings;
     private readonly IShiftIdentityService _identityService;
     private readonly IStorageServiceAsync _storageService;
     private readonly ResponseService _responseService;
@@ -27,15 +21,13 @@ public class FileController : ShiftControllerBase
     public FileController(
         IMonitor monitor,
         FileService fileService,
-        SecuritySettings securitySettings,
         IShiftIdentityService identityService,
         IStorageServiceAsync storageService,
-        ResponseService responseService)
+        ResponseService responseService
+        )
     {
         _monitor = monitor;
         _fileService = fileService;
-
-        _securitySettings = securitySettings;
         _identityService = identityService;
         _storageService = storageService;
         _responseService = responseService;
@@ -44,37 +36,30 @@ public class FileController : ShiftControllerBase
     #region Queries
 
     /// <summary>
-    /// Assert the existence of a file
+    /// Checks for the existence of one specific file
     /// </summary>
-    /// <remarks>
-    /// Returns true if a specific file exists.
-    /// </remarks>
     [HttpHead("content/files/{file:guid}")]
     [HybridAuthorize(Policies.Content.Files.File.Assert)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertFile")]
-    public async Task<IActionResult> AssertAsync(
-        [FromRoute] Guid file,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> AssertAsync([FromRoute] Guid file, CancellationToken cancellation = default)
     {
         var exists = await _fileService.AssertAsync(file, cancellation);
+
         return exists ? Ok() : NotFound();
     }
 
     /// <summary>
-    /// Collect files (metadata only)
+    /// Collects the list of files that match specific criteria
     /// </summary>
-    /// <remarks>
-    /// Returns the list of files that match specific criteria.
-    /// </remarks>
     [HttpPost("content/files/collect")]
     [HybridAuthorize(Policies.Content.Files.File.Collect)]
     [ProducesResponseType<IEnumerable<FileModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectFiles")]
-    public async Task<IActionResult> PostCollectAsync(
-        [FromBody] CollectFiles query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> PostCollectAsync([FromBody] CollectFiles query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
     [HttpGet("content/files")]
     [HybridAuthorize(Policies.Content.Files.File.Collect)]
@@ -82,14 +67,12 @@ public class FileController : ShiftControllerBase
     [EndpointName("collectFiles_get")]
     [AliasFor("collectFiles")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetCollectAsync(
-        [FromQuery] CollectFiles query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> GetCollectAsync([FromQuery] CollectFiles query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> CollectAsync(
-        CollectFiles query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CollectAsync(CollectFiles query, CancellationToken cancellation)
     {
         var models = await _fileService.CollectAsync(query, cancellation);
 
@@ -101,19 +84,16 @@ public class FileController : ShiftControllerBase
     }
 
     /// <summary>
-    /// Count files
+    /// Counts the files that match specific criteria
     /// </summary>
-    /// <remarks>
-    /// Returns the number of files that match specific criteria.
-    /// </remarks>
     [HttpPost("content/files/count")]
     [HybridAuthorize(Policies.Content.Files.File.Count)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countFiles")]
-    public async Task<IActionResult> PostCountAsync(
-        [FromBody] CountFiles query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> PostCountAsync([FromBody] CountFiles query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
     [HttpGet("content/files/count")]
     [HybridAuthorize(Policies.Content.Files.File.Count)]
@@ -121,34 +101,30 @@ public class FileController : ShiftControllerBase
     [EndpointName("countFiles_get")]
     [AliasFor("countFiles")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetCountAsync(
-        [FromQuery] CountFiles query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> GetCountAsync([FromQuery] CountFiles query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> CountAsync(
-        CountFiles query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CountAsync(CountFiles query, CancellationToken cancellation)
     {
         var count = await _fileService.CountAsync(query, cancellation);
+
         return Ok(new CountResult(count));
     }
 
     /// <summary>
-    /// Download files (metadata only)
-    /// </summary>
-    /// <remarks>
-    /// Downloads the list of files that match specific criteria.
-    /// </remarks>
+    /// Downloads the list of files that match specific criteria
+    /// </summary>    
     [HttpPost("content/files/download")]
     [HybridAuthorize(Policies.Content.Files.File.Download)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadFiles")]
-    public async Task<FileContentResult> PostDownloadAsync(
-        [FromBody] CollectFiles query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> PostDownloadAsync([FromBody] CollectFiles query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
     [HttpGet("content/files/download")]
     [HybridAuthorize(Policies.Content.Files.File.Download)]
@@ -157,18 +133,18 @@ public class FileController : ShiftControllerBase
     [EndpointName("downloadFiles_get")]
     [AliasFor("downloadFiles")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<FileContentResult> GetDownloadAsync(
-        [FromQuery] CollectFiles query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> GetDownloadAsync([FromQuery] CollectFiles query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
-    private async Task<FileContentResult> DownloadAsync(
-        CollectFiles query,
-        CancellationToken cancellation)
+    private async Task<FileContentResult> DownloadAsync(CollectFiles query, CancellationToken cancellation)
     {
         var exporter = new ExportHelper("Content", "Files", query.Filter.Format, User);
 
-        var models = await _fileService.DownloadAsync(query, cancellation);
+        var models = await _fileService
+            .DownloadAsync(query, cancellation)
+            .ToListAsync(cancellation);
 
         var content = _fileService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
 
@@ -182,37 +158,30 @@ public class FileController : ShiftControllerBase
     }
 
     /// <summary>
-    /// Retrieve a file (metadata only)
-    /// </summary>
-    /// <summary>
-    /// Retrieves the metadata for a specific file using its unique ID.
+    /// Retrieves one specific file
     /// </summary>
     [HttpGet("content/files/{file:guid}")]
     [HybridAuthorize(Policies.Content.Files.File.Retrieve)]
     [ProducesResponseType<FileModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveFile")]
-    public async Task<IActionResult> RetrieveAsync(
-        [FromRoute] Guid file,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> RetrieveAsync([FromRoute] Guid file, CancellationToken cancellation = default)
     {
         var model = await _fileService.RetrieveAsync(file, cancellation);
+
         return model != null ? Ok(model) : NotFound();
     }
 
     /// <summary>
-    /// Search files
+    /// Searches for the list of files that match specific criteria
     /// </summary>
-    /// <remarks>
-    /// Search for the list of files that match specific criteria.
-    /// </remarks>
     [HttpPost("content/files/search")]
     [HybridAuthorize(Policies.Content.Files.File.Search)]
     [ProducesResponseType<IEnumerable<FileMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchFiles")]
-    public async Task<IActionResult> PostSearchAsync(
-        [FromBody] SearchFiles query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> PostSearchAsync([FromBody] SearchFiles query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
     [HttpGet("content/files/search")]
     [HybridAuthorize(Policies.Content.Files.File.Search)]
@@ -220,14 +189,12 @@ public class FileController : ShiftControllerBase
     [EndpointName("searchFiles_get")]
     [AliasFor("searchFiles")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetSearchAsync(
-        [FromQuery] SearchFiles query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> GetSearchAsync([FromQuery] SearchFiles query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> SearchAsync(
-        SearchFiles query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> SearchAsync(SearchFiles query, CancellationToken cancellation)
     {
         var matches = await _fileService.SearchAsync(query, cancellation);
 
@@ -242,66 +209,62 @@ public class FileController : ShiftControllerBase
 
     #region Commands
 
-    /// <summary>
-    /// Retrieve a file (content only)
-    /// </summary>
-    /// <remarks>
-    /// Retrieves the content for a specific file using its unique ID and filename. Performs authorization checks and 
-    /// supports caching. It is important to note the caller must know the name of the file, in addition to its unique 
-    /// ID, or the server will return a 404 Not Found - even if the ID is valid.
-    /// </remarks>
-    /// <param name="id">The unique identifier of the file to retrieve</param>
-    /// <param name="name">The expected filename for validation purposes</param>
-    /// <param name="download">Optional parameter: set to "1" to force download, otherwise file is displayed inline</param>
-    /// <returns>
-    /// Returns the file content with appropriate headers, or:
-    /// - 404 Not Found if file doesn't exist or filename doesn't match
-    /// - 401 Unauthorized if user lacks permission to access the file
-    /// - 304 Not Modified if file hasn't changed since If-Modified-Since header date
-    /// </returns>
-    [HttpGet("content/files/{id:guid}/{name}")]
-    public async Task<IActionResult> RetrieveFileContentAsync(Guid id, string name, string? download = null)
+    [HttpPost("content/files")]
+    [HybridAuthorize(Policies.Content.Files.File.Create)]
+    [ProducesResponseType<FileModel>(StatusCodes.Status201Created, "application/json")]
+    [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
+    [EndpointName("createFile")]
+    public async Task<IActionResult> CreateAsync([FromBody] CreateFile create, CancellationToken cancellation = default)
     {
-        var principal = _identityService.GetPrincipal();
+        var created = await _fileService.CreateAsync(create, cancellation);
 
-        var (status, file) = await _storageService.GetFileAndAuthorizeAsync(principal, id);
+        if (!created)
+            return BadRequest($"Duplicate not permitted: FileIdentifier {create.FileIdentifier}. You cannot insert a duplicate object with the same primary key.");
 
-        switch (status)
-        {
-            case FileGrantStatus.NoFile:
-                return NotFound();
+        var model = await _fileService.RetrieveAsync(create.FileIdentifier, cancellation);
 
-            case FileGrantStatus.Denied:
-                return Unauthorized();
-
-            default:
-                break;
-        }
-
-        if (!string.Equals(file.FileName, name, StringComparison.OrdinalIgnoreCase)
-            || !_storageService.IsRemoteFilePathValid(file)
-            )
-        {
-            return NotFound();
-        }
-
-        // Handle If-Modified-Since header for caching
-
-        if (Request.Headers.IfModifiedSince.Count > 0)
-        {
-            if (DateTimeOffset.TryParse(Request.Headers.IfModifiedSince.ToString(), out var ifModifiedSince))
-            {
-                var fileModified = file.Uploaded.AddSeconds(-1);
-
-                if (ifModifiedSince >= fileModified)
-                {
-                    return StatusCode(304); // Not Modified
-                }
-            }
-        }
-
-        return await SendFileAsync(id, download == "1");
+        return CreatedAtAction(nameof(CreateAsync), model);
     }
+
+    [HttpDelete("content/files/{file:guid}")]
+    [HybridAuthorize(Policies.Content.Files.File.Delete)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EndpointName("deleteFile")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] Guid file, CancellationToken cancellation = default)
+    {
+        var deleted = await _fileService.DeleteAsync(file, cancellation);
+
+        if (!deleted)
+            return NotFound();
+
+        return Ok();
+    }
+
+    [HttpPut("content/files/{file:guid}")]
+    [HybridAuthorize(Policies.Content.Files.File.Modify)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
+    [EndpointName("modifyFile")]
+    public async Task<IActionResult> ModifyAsync([FromRoute] Guid file, [FromBody] ModifyFile modify, CancellationToken cancellation = default)
+    {
+        var model = await _fileService.RetrieveAsync(file, cancellation);
+
+        if (model is null)
+            return NotFound($"File not found: FileIdentifier {modify.FileIdentifier}. You cannot modify an object that is not in the database.");
+
+        var modified = await _fileService.ModifyAsync(modify, cancellation);
+
+        if (!modified)
+            return NotFound();
+
+        return Ok();
+    }
+
+    #endregion Commands
+
+    #region File upload/download
 
     /// <summary>
     /// Upload files (with content)
@@ -371,49 +334,65 @@ public class FileController : ShiftControllerBase
     }
 
     /// <summary>
-    /// Purge files
+    /// Retrieve a file (content only)
     /// </summary>
     /// <remarks>
-    /// Permanently deletes files that match specific criteria. Access to this function is restricted to the root 
-    /// sentinel.
+    /// Retrieves the content for a specific file using its unique ID and filename. Performs authorization checks and 
+    /// supports caching. It is important to note the caller must know the name of the file, in addition to its unique 
+    /// ID, or the server will return a 404 Not Found - even if the ID is valid.
     /// </remarks>
-    /// <param name="expired">If true (default), deletes only expired files; if false, no files deleted</param>
+    /// <param name="id">The unique identifier of the file to retrieve</param>
+    /// <param name="name">The expected filename for validation purposes</param>
+    /// <param name="download">Optional parameter: set to "1" to force download, otherwise file is displayed inline</param>
     /// <returns>
-    /// Returns a <see cref="CountResult"/> containing the number of files deleted and a summary message, or:
-    /// - 401 Unauthorized if the current user is not the root sentinel
-    /// - 500 Internal Server Error if an exception occurs during the purge operation
+    /// Returns the file content with appropriate headers, or:
+    /// - 404 Not Found if file doesn't exist or filename doesn't match
+    /// - 401 Unauthorized if user lacks permission to access the file
+    /// - 304 Not Modified if file hasn't changed since If-Modified-Since header date
     /// </returns>
-    [HttpPost("content/files/purge")]
-    [HybridAuthorize]
-    public async Task<IActionResult> PurgeAsync([FromQuery] bool expired = true)
+    [HttpGet("content/files/{id:guid}/{name}")]
+    public async Task<IActionResult> RetrieveFileContentAsync(Guid id, string name, string? download = null)
     {
         var principal = _identityService.GetPrincipal();
 
-        var root = _securitySettings.Sentinels.Root;
+        var (status, file) = await _storageService.GetFileAndAuthorizeAsync(principal, id);
 
-        if (principal.User.Identifier != root.Identifier)
-            return Unauthorized("Only the root sentinel is permitted to invoke this API method.");
-
-        try
+        switch (status)
         {
-            var count = 0;
+            case FileGrantStatus.NoFile:
+                return NotFound();
 
-            if (expired)
-                count = await _storageService.DeleteExpiredFilesAsync();
+            case FileGrantStatus.Denied:
+                return Unauthorized();
 
-            var summary = Common.Humanizer.ToQuantity(count, "file") + " deleted";
-
-            return Ok(new CountResult(count, summary));
+            default:
+                break;
         }
-        catch (Exception ex)
+
+        if (!string.Equals(file.FileName, name, StringComparison.OrdinalIgnoreCase)
+            || !_storageService.IsRemoteFilePathValid(file)
+            )
         {
-            return HandleUnexpectedError(ex, $"purging {(expired ? "expired " : "")}files");
+            return NotFound();
         }
+
+        // Handle If-Modified-Since header for caching
+
+        if (Request.Headers.IfModifiedSince.Count > 0)
+        {
+            if (DateTimeOffset.TryParse(Request.Headers.IfModifiedSince.ToString(), out var ifModifiedSince))
+            {
+                var fileModified = file.Uploaded.AddSeconds(-1);
+
+                if (ifModifiedSince >= fileModified)
+                {
+                    return StatusCode(304); // Not Modified
+                }
+            }
+        }
+
+        return await SendFileAsync(id, download == "1");
     }
-
-    #endregion Commands
-
-    #region Helpers (file content)
 
     /// <summary>
     /// Create a file content result
@@ -502,5 +481,5 @@ public class FileController : ShiftControllerBase
             .ToActionResult(this);
     }
 
-    #endregion Helpers (file content)
+    #endregion
 }

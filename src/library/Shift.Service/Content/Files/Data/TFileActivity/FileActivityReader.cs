@@ -1,121 +1,139 @@
+using System.Runtime.CompilerServices;
+
 using Microsoft.EntityFrameworkCore;
 
-using Shift.Contract;
-
 using Shift.Common;
+using Shift.Common.Linq;
+using Shift.Contract;
 
 namespace Shift.Service.Content;
 
-public interface IFileActivityReader : IEntityReader
-{
-    Task<bool> AssertAsync(Guid activity, CancellationToken cancellation = default);
-    Task<FileActivityEntity?> RetrieveAsync(Guid activity, CancellationToken cancellation = default);
-    Task<int> CountAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<FileActivityEntity>> CollectAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<FileActivityEntity>> DownloadAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<FileActivityMatch>> SearchAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default);
-}
-
-internal class FileActivityReader : IFileActivityReader
+public class FileActivityReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    public FileActivityReader(IDbContextFactory<TableDbContext> context)
+    private readonly IShiftIdentityService _auth;
+
+    private string DefaultSort = "ActivityIdentifier";
+
+    public FileActivityReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
     {
         _context = context;
+        _auth = auth;
     }
 
-    public async Task<bool> AssertAsync(
-        Guid activity,
-        CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid activity, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db);
+
+            return query.AnyAsync(x => x.ActivityIdentifier == activity, cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<List<FileActivityEntity>> CollectAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query
+                .OrderBy(criteria.Filter.Sort ?? DefaultSort)
+                .ApplyPaging(criteria.Filter)
+                .ToListAsync(cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<int> CountAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query.CountAsync(cancellation);
+
+        }, cancellation);
+    }
+
+    public async IAsyncEnumerable<FileActivityEntity> DownloadAsync(IFileActivityCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 
-        return await db.TFileActivity
-            .AnyAsync(x => x.ActivityIdentifier == activity, cancellation);
+        var query = BuildQueryable(db, criteria);
+
+        await foreach (var entity in query.AsAsyncEnumerable().WithCancellation(cancellation))
+        {
+            yield return entity;
+        }
     }
 
-    public async Task<FileActivityEntity?> RetrieveAsync(
-        Guid activity,
-        CancellationToken cancellation = default)
+    public Task<FileActivityEntity?> RetrieveAsync(Guid activity, CancellationToken cancellation = default)
     {
-        using var db = _context.CreateDbContext();
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db);
 
-        return await db.TFileActivity
+            return query.FirstOrDefaultAsync(x => x.ActivityIdentifier == activity, cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<List<FileActivityMatch>> SearchAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            query = query
+                .OrderBy(criteria.Filter.Sort ?? DefaultSort)
+                .ApplyPaging(criteria.Filter);
+
+            return ToMatchesAsync(query, cancellation);
+
+        }, cancellation);
+    }
+
+    /// <summary>
+    /// Creates a queryable for events
+    /// </summary>
+    /// <remarks>
+    /// If you call .Include() on the DbSet then remember to use .AsSplitQuery() so that cartesian explosion is avoided.
+    /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
+    /// ordering fully unique, otherwise the result set is non-deterministic.
+    /// </remarks>
+    private IQueryable<FileActivityEntity> BuildQueryable(TableDbContext db)
+    {
+        ValidateOrganizationContext();
+
+        var query = db.TFileActivity
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.ActivityIdentifier == activity, cancellation);
+            .Where(x => x.File.OrganizationIdentifier == _auth.OrganizationId);
+
+        return query;
     }
 
-    public async Task<int> CountAsync(
-        IFileActivityCriteria criteria,
-        CancellationToken cancellation = default)
+    private IQueryable<FileActivityEntity> BuildQueryable(TableDbContext db, IFileActivityCriteria criteria)
+    {
+        ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
+
+        var query = BuildQueryable(db);
+
+        // TODO: Apply criteria
+
+        return query;
+    }
+
+    private async Task<T> ExecuteAsync<T>(Func<TableDbContext, Task<T>> query, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 
-        return await BuildQueryable(db, criteria)
-            .CountAsync(cancellation);
+        return await query(db);
     }
 
-    public async Task<IEnumerable<FileActivityEntity>> CollectAsync(
-        IFileActivityCriteria criteria,
-        CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        return await BuildQueryable(db, criteria)
-            .ToListAsync(cancellation);
-    }
-
-    public async Task<IEnumerable<FileActivityEntity>> DownloadAsync(
-        IFileActivityCriteria criteria,
-        CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        return await BuildQueryable(db, criteria)
-            .ToListAsync(cancellation);
-    }
-
-    public async Task<IEnumerable<FileActivityMatch>> SearchAsync(
-        IFileActivityCriteria criteria,
-        CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        return await ToMatchesAsync(BuildQueryable(db, criteria), cancellation);
-    }
-
-    private IQueryable<FileActivityEntity> BuildQueryable(
-        TableDbContext db,
-        IFileActivityCriteria criteria)
-    {
-        var q = db.TFileActivity
-            .AsNoTracking()
-            .AsQueryable();
-
-        // FIXME: Implement the logic for this criteria. (This code was auto-generated as a reminder only.)
-
-        // if (criteria.FileIdentifier != null)
-        //    q = q.Where(x => x.FileIdentifier == criteria.FileIdentifier);
-
-        // if (criteria.UserIdentifier != null)
-        //    q = q.Where(x => x.UserIdentifier == criteria.UserIdentifier);
-
-        // if (criteria.ActivityIdentifier != null)
-        //    q = q.Where(x => x.ActivityIdentifier == criteria.ActivityIdentifier);
-
-        // if (criteria.ActivityTime != null)
-        //    q = q.Where(x => x.ActivityTime == criteria.ActivityTime);
-
-        // if (criteria.ActivityChanges != null)
-        //    q = q.Where(x => x.ActivityChanges == criteria.ActivityChanges);
-
-        return q;
-    }
-
-    public static async Task<IEnumerable<FileActivityMatch>> ToMatchesAsync(
-        IQueryable<FileActivityEntity> queryable,
-        CancellationToken cancellation = default)
+    public static async Task<List<FileActivityMatch>> ToMatchesAsync(IQueryable<FileActivityEntity> queryable, CancellationToken cancellation = default)
     {
         var matches = await queryable
             .Select(entity => new FileActivityMatch
@@ -126,5 +144,11 @@ internal class FileActivityReader : IFileActivityReader
             .ToListAsync(cancellation);
 
         return matches;
+    }
+
+    private void ValidateOrganizationContext()
+    {
+        if (_auth.OrganizationId == Guid.Empty)
+            throw new InvalidOperationException("Organization context is required");
     }
 }

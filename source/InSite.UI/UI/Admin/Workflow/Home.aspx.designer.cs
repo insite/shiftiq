@@ -24,6 +24,15 @@ namespace InSite.UI.Admin.Issues
         protected global::System.Web.UI.WebControls.Literal IssueCount;
 
         /// <summary>
+        /// CaseStatusesLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor CaseStatusesLink;
+
+        /// <summary>
         /// HistoryPanel control.
         /// </summary>
         /// <remarks>

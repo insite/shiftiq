@@ -17,7 +17,7 @@
         My Contacts
     </a>
 
-    <a runat="server" id="MyBadges" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/management/dashboard/reports">
+    <a runat="server" id="MyBadges" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/management/dashboard/reports" visible="false">
         <i class="fas fa-fw fa-copy fs-lg opacity-60 me-2"></i>
         Reports
     </a>

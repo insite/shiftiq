@@ -213,6 +213,19 @@ namespace InSite.UI.Portal.Events.Classes
 
             Date.Text = GetEventDateAndTimeText(@event.EventScheduledStart, @event.EventScheduledEnd);
 
+            if (@event.EventScheduledEnd.HasValue)
+            {
+                var start = TimeZones.GetDate(@event.EventScheduledStart, User.TimeZone);
+                var end = TimeZones.GetDate(@event.EventScheduledEnd.Value, User.TimeZone);
+                var title = @event.EventTitle;
+                var location = @event.VenueLocationName;
+                var helper = new CalendarHelper();
+
+                AddToGoogleLink.Text = helper.GenerateGoogleCalendarLink(start, end, title, location);
+                AddToOfficeLink.Text = helper.GenerateOffice365CalendarLink(start, end, title, location);
+                DownloadIcsLink.Text = helper.GenerateIcsDownloadLink(start, end, title, location);
+            }
+
             RegistrationStartField.Visible = @event.RegistrationStart.HasValue;
             RegistrationStart.Text = @event.RegistrationStart.Format(null, true);
 

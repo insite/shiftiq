@@ -9,6 +9,8 @@ using System.Web.UI.WebControls;
 
 using Common.Timeline.Commands;
 
+using Humanizer;
+
 using InSite.Admin.Assets.Glossaries.Utilities;
 using InSite.Application.Responses.Write;
 using InSite.Common.Web.UI;
@@ -68,9 +70,45 @@ namespace InSite.Portal.Surveys.Responses
                     AutoPostBack = true,
                     DisableTranslation = true,
                 };
+
+                if (question.ListSelectionRange.Enabled)
+                {
+                    input.Attributes["data-list-min"] = question.ListSelectionRange.Min.ToString();
+                    input.Attributes["data-list-max"] = question.ListSelectionRange.Max.ToString();
+                }
+
                 input.SelectedIndexChanged += CheckListOptionChanged;
                 BindList(question, input);
                 yield return input;
+
+                if (question.ListSelectionRange.Enabled)
+                {
+                    if (question.ListSelectionRange.Min.HasValue)
+                    {
+                        var minValidator = new Common.Web.UI.CustomValidator
+                        {
+                            ID = inputID + "_MinValidator",
+                            Display = ValidatorDisplay.None,
+                            ClientValidationFunction = "answerPage.onListRangeMinValidation",
+                            ErrorMessage = $"Select at least {"option".ToQuantity(question.ListSelectionRange.Min.Value)}"
+                        };
+
+                        yield return minValidator;
+                    }
+
+                    if (question.ListSelectionRange.Max.HasValue)
+                    {
+                        var maxValidator = new Common.Web.UI.CustomValidator
+                        {
+                            ID = inputID + "_MaxValidator",
+                            Display = ValidatorDisplay.None,
+                            ClientValidationFunction = "answerPage.onListRangeMaxValidation",
+                            ErrorMessage = $"Maximum number of selectable options exceeded"
+                        };
+
+                        yield return maxValidator;
+                    }
+                }
             }
             else if (item.AnswerInputType == SurveyQuestionType.Comment)
             {
@@ -259,6 +297,7 @@ namespace InSite.Portal.Surveys.Responses
                     ControlToValidate = inputID,
                     Display = ValidatorDisplay.None,
                     RenderMode = ValidatorRenderModeEnum.Exclamation,
+                    ErrorMessage = "This question is mandatory"
                 };
             }
         }

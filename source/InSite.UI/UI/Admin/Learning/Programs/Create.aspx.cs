@@ -113,7 +113,7 @@ namespace InSite.Admin.Records.Programs
             ProgramStore.Insert(program, User.Identifier);
             InsertContent(program);
 
-            HttpResponseHelper.Redirect($"/ui/admin/learning/programs/outline?id={programId}");
+            Outline.Redirect(programId);
         }
 
         private void InsertContent(TProgram program)
@@ -155,13 +155,13 @@ namespace InSite.Admin.Records.Programs
 
             var achievements = TaskGrid.GetAchievements();
 
-            var listIdentifier = UniqueIdentifier.Create();
+            var programId = UniqueIdentifier.Create();
             var list = new TProgram
             {
                 GroupIdentifier = DepartmentIdentifier.Value,
                 OrganizationIdentifier = Organization.Identifier,
                 ProgramDescription = ProgramDescription.Text,
-                ProgramIdentifier = listIdentifier,
+                ProgramIdentifier = programId,
                 ProgramName = ProgramName.Text,
                 ProgramType = ProgramType.Checked ? "Achievements Only" : null,
                 Tasks = new List<TTask>()
@@ -174,7 +174,7 @@ namespace InSite.Admin.Records.Programs
                     ObjectType = "Achievement",
                     ObjectIdentifier = achievement.AchievementIdentifier,
                     OrganizationIdentifier = Organization.Identifier,
-                    ProgramIdentifier = listIdentifier,
+                    ProgramIdentifier = programId,
                     TaskCompletionRequirement = "Credential Granted",
                     TaskIdentifier = UniqueIdentifier.Create(),
                     TaskIsPlanned = achievement.IsPlanned,
@@ -189,7 +189,7 @@ namespace InSite.Admin.Records.Programs
 
             NavPanel.Visible = false;
 
-            HttpResponseHelper.Redirect($"/ui/admin/learning/programs/outline?id={listIdentifier}");
+            Outline.Redirect(programId);
         }
     }
 }

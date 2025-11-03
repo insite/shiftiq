@@ -73,5 +73,6 @@ namespace InSite.Application.Contacts.Read
         public virtual ICollection<QPerson> EmployeePersons { get; set; } = new HashSet<QPerson>();
         public virtual ICollection<QMembership> QMemberships { get; set; } = new HashSet<QMembership>();
         public virtual ICollection<QJournalSetupGroup> JournalSetupGroups { get; set; } = new HashSet<QJournalSetupGroup>();
+        public virtual ICollection<TProgramGroupEnrollment> ProgramGroupEnrollments { get; set; } = new HashSet<TProgramGroupEnrollment>();
     }
 }

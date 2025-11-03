@@ -97,7 +97,7 @@ namespace InSite.UI.Portal.Learning.Programs.Controls
 
         private void CardRepeater_ProgramsSubmitted(List<Guid> ids)
         {
-            var result = ProgramRequestHelper.Submit(ids);
+            var result = ProgramRequestHelper.Submit(ids, CurrentLanguage);
 
             if (!string.IsNullOrEmpty(result.Error))
             {

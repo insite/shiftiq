@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
 using Shift.Service.Progress;
 
 namespace Shift.Api;
@@ -19,31 +18,30 @@ public class PeriodController : ShiftControllerBase
     #region Queries
 
     /// <summary>
-    /// Check for the existence of one specific period
+    /// Checks for the existence of one specific period
     /// </summary>
     [HttpHead("progress/periods/{period:guid}")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Assert)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertPeriod")]
-    public async Task<IActionResult> AssertAsync(
-        [FromRoute] Guid period,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> AssertAsync([FromRoute] Guid period, CancellationToken cancellation = default)
     {
         var exists = await _periodService.AssertAsync(period, cancellation);
+
         return exists ? Ok() : NotFound();
     }
 
     /// <summary>
-    /// Collect the list of periods that match specific criteria
+    /// Collects the list of periods that match specific criteria
     /// </summary>
     [HttpPost("progress/periods/collect")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Collect)]
     [ProducesResponseType<IEnumerable<PeriodModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectPeriods")]
-    public async Task<IActionResult> PostCollectAsync(
-        [FromBody] CollectPeriods query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> PostCollectAsync([FromBody] CollectPeriods query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
     [HttpGet("progress/periods")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Collect)]
@@ -51,14 +49,12 @@ public class PeriodController : ShiftControllerBase
     [EndpointName("collectPeriods_get")]
     [AliasFor("collectPeriods")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetCollectAsync(
-        [FromQuery] CollectPeriods query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> GetCollectAsync([FromQuery] CollectPeriods query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> CollectAsync(
-        CollectPeriods query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CollectAsync(CollectPeriods query, CancellationToken cancellation)
     {
         var models = await _periodService.CollectAsync(query, cancellation);
 
@@ -70,16 +66,16 @@ public class PeriodController : ShiftControllerBase
     }
 
     /// <summary>
-    /// Count the periods that match specific criteria
+    /// Counts the periods that match specific criteria
     /// </summary>
     [HttpPost("progress/periods/count")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Count)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countPeriods")]
-    public async Task<IActionResult> PostCountAsync(
-        [FromBody] CountPeriods query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> PostCountAsync([FromBody] CountPeriods query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
     [HttpGet("progress/periods/count")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Count)]
@@ -87,31 +83,30 @@ public class PeriodController : ShiftControllerBase
     [EndpointName("countPeriods_get")]
     [AliasFor("countPeriods")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetCountAsync(
-        [FromQuery] CountPeriods query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> GetCountAsync([FromQuery] CountPeriods query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> CountAsync(
-        CountPeriods query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CountAsync(CountPeriods query, CancellationToken cancellation)
     {
         var count = await _periodService.CountAsync(query, cancellation);
+
         return Ok(new CountResult(count));
     }
 
     /// <summary>
-    /// Download the list of periods that match specific criteria
+    /// Downloads the list of periods that match specific criteria
     /// </summary>    
     [HttpPost("progress/periods/download")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Download)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadPeriods")]
-    public async Task<FileContentResult> PostDownloadAsync(
-        [FromBody] CollectPeriods query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> PostDownloadAsync([FromBody] CollectPeriods query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
     [HttpGet("progress/periods/download")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Download)]
@@ -120,18 +115,18 @@ public class PeriodController : ShiftControllerBase
     [EndpointName("downloadPeriods_get")]
     [AliasFor("downloadPeriods")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<FileContentResult> GetDownloadAsync(
-        [FromQuery] CollectPeriods query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> GetDownloadAsync([FromQuery] CollectPeriods query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
-    private async Task<FileContentResult> DownloadAsync(
-        CollectPeriods query,
-        CancellationToken cancellation)
+    private async Task<FileContentResult> DownloadAsync(CollectPeriods query, CancellationToken cancellation)
     {
         var exporter = new ExportHelper("Progress", "Periods", query.Filter.Format, User);
 
-        var models = await _periodService.DownloadAsync(query, cancellation);
+        var models = await _periodService
+            .DownloadAsync(query, cancellation)
+            .ToListAsync(cancellation);
 
         var content = _periodService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
 
@@ -145,31 +140,30 @@ public class PeriodController : ShiftControllerBase
     }
 
     /// <summary>
-    /// Retrieve one specific period
+    /// Retrieves one specific period
     /// </summary>
     [HttpGet("progress/periods/{period:guid}")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Retrieve)]
     [ProducesResponseType<PeriodModel>(StatusCodes.Status200OK)]
     [EndpointName("retrievePeriod")]
-    public async Task<IActionResult> RetrieveAsync(
-        [FromRoute] Guid period,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> RetrieveAsync([FromRoute] Guid period, CancellationToken cancellation = default)
     {
         var model = await _periodService.RetrieveAsync(period, cancellation);
+
         return model != null ? Ok(model) : NotFound();
     }
 
     /// <summary>
-    /// Search for the list of periods that match specific criteria
+    /// Searches for the list of periods that match specific criteria
     /// </summary>
     [HttpPost("progress/periods/search")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Search)]
     [ProducesResponseType<IEnumerable<PeriodMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchPeriods")]
-    public async Task<IActionResult> PostSearchAsync(
-        [FromBody] SearchPeriods query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> PostSearchAsync([FromBody] SearchPeriods query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
     [HttpGet("progress/periods/search")]
     [HybridAuthorize(Policies.Progress.Periods.Period.Search)]
@@ -177,14 +171,12 @@ public class PeriodController : ShiftControllerBase
     [EndpointName("searchPeriods_get")]
     [AliasFor("searchPeriods")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetSearchAsync(
-        [FromQuery] SearchPeriods query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> GetSearchAsync([FromQuery] SearchPeriods query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> SearchAsync(
-        SearchPeriods query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> SearchAsync(SearchPeriods query, CancellationToken cancellation)
     {
         var matches = await _periodService.SearchAsync(query, cancellation);
 

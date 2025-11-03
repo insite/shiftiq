@@ -669,7 +669,7 @@ namespace InSite.Admin.Surveys.Forms.Forms
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ConditionsNoItemsMessage;
+        protected global::System.Web.UI.WebControls.Panel ConditionsNoItemsMessage;
 
         /// <summary>
         /// ConditionsRepeater control.
@@ -696,7 +696,7 @@ namespace InSite.Admin.Surveys.Forms.Forms
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl BranchesNoItemsMessage;
+        protected global::System.Web.UI.WebControls.Panel BranchesNoItemsMessage;
 
         /// <summary>
         /// BranchesRepeater control.

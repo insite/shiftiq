@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 
+using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Contract;
 
-using Shift.Common;
-
-namespace Shift.Service.Achievement;
+namespace Shift.Service.Progress;
 
 public class QCredentialReader : IEntityReader
 {

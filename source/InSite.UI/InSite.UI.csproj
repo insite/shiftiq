@@ -1053,6 +1053,13 @@
       <DependentUpon>SendEmail.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Events\Registrations\SendEmailModel.cs" />
+    <Compile Include="UI\Admin\Foundations\Colors.aspx.cs">
+      <DependentUpon>Colors.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Foundations\Colors.aspx.designer.cs">
+      <DependentUpon>Colors.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Foundations\Controls\HomeCounterRepeater.ascx.cs">
       <DependentUpon>HomeCounterRepeater.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1236,6 +1243,87 @@
     </Compile>
     <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramCategoryList.ascx.designer.cs">
       <DependentUpon>ProgramCategoryList.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramContactTab.ascx.cs">
+      <DependentUpon>ProgramContactTab.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramContactTab.ascx.designer.cs">
+      <DependentUpon>ProgramContactTab.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramGroupGrid.ascx.cs">
+      <DependentUpon>ProgramGroupGrid.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramGroupGrid.ascx.designer.cs">
+      <DependentUpon>ProgramGroupGrid.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\TaskGridBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\TaskGridEdit.ascx.cs">
+      <DependentUpon>TaskGridEdit.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\TaskGridEdit.ascx.designer.cs">
+      <DependentUpon>TaskGridEdit.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\TaskGridView.ascx.cs">
+      <DependentUpon>TaskGridView.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\TaskGridView.ascx.designer.cs">
+      <DependentUpon>TaskGridView.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyAchievement.aspx.cs">
+      <DependentUpon>ModifyAchievement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyAchievement.aspx.designer.cs">
+      <DependentUpon>ModifyAchievement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyCatalog.aspx.cs">
+      <DependentUpon>ModifyCatalog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyCatalog.aspx.designer.cs">
+      <DependentUpon>ModifyCatalog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyContent.aspx.cs">
+      <DependentUpon>ModifyContent.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyContent.aspx.designer.cs">
+      <DependentUpon>ModifyContent.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyNotification.aspx.cs">
+      <DependentUpon>ModifyNotification.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyNotification.aspx.designer.cs">
+      <DependentUpon>ModifyNotification.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyPublication.aspx.cs">
+      <DependentUpon>ModifyPublication.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifyPublication.aspx.designer.cs">
+      <DependentUpon>ModifyPublication.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifySettings.aspx.cs">
+      <DependentUpon>ModifySettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Learning\Programs\ModifySettings.aspx.designer.cs">
+      <DependentUpon>ModifySettings.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Messages\Subscribers\Controls\AddControl.ascx.cs">
+      <DependentUpon>AddControl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Messages\Subscribers\Controls\AddControl.ascx.designer.cs">
+      <DependentUpon>AddControl.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Prototype\DashboardAuditor.aspx.cs">
       <DependentUpon>DashboardAuditor.aspx</DependentUpon>
@@ -1564,34 +1652,6 @@
     </Compile>
     <Compile Include="UI\Admin\Workflow\Cases\Controls\SurveySection.ascx.designer.cs">
       <DependentUpon>SurveySection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\AchievementGrid.ascx.cs">
-      <DependentUpon>AchievementGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\AchievementGrid.ascx.designer.cs">
-      <DependentUpon>AchievementGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\CandidateCard.ascx.cs">
-      <DependentUpon>CandidateCard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\CandidateCard.ascx.designer.cs">
-      <DependentUpon>CandidateCard.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\LanguageAbilitySection.ascx.cs">
-      <DependentUpon>LanguageAbilitySection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\LanguageAbilitySection.ascx.designer.cs">
-      <DependentUpon>LanguageAbilitySection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Controls\Details.ascx.cs">
-      <DependentUpon>Details.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Controls\Details.ascx.designer.cs">
-      <DependentUpon>Details.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Records\Achievements\Controls\AchievementExpirationField.ascx.cs">
       <DependentUpon>AchievementExpirationField.ascx</DependentUpon>
@@ -2024,6 +2084,7 @@
     <Compile Include="UI\Portal\Controls\WelcomeUser.ascx.designer.cs">
       <DependentUpon>WelcomeUser.ascx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Portal\Events\Classes\CalendarHelper.cs" />
     <Compile Include="UI\Portal\Home\Controls\CmdsOrientationSummary.ascx.cs">
       <DependentUpon>CmdsOrientationSummary.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2302,27 +2363,6 @@
     <Compile Include="UI\Portal\Workflow\Cases\Controls\CaseFileRequirementList.ascx.designer.cs">
       <DependentUpon>CaseFileRequirementList.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\AchievementSection.ascx.cs">
-      <DependentUpon>AchievementSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\AchievementSection.ascx.designer.cs">
-      <DependentUpon>AchievementSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\RequestContact.aspx.cs">
-      <DependentUpon>RequestContact.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\RequestContact.aspx.designer.cs">
-      <DependentUpon>RequestContact.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\Details.ascx.cs">
-      <DependentUpon>Details.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\Details.ascx.designer.cs">
-      <DependentUpon>Details.ascx</DependentUpon>
-    </Compile>
     <Compile Include="UI\Admin\Reports\Dashboards\Controls\DashboardContainer.ascx.cs">
       <DependentUpon>DashboardContainer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2338,20 +2378,6 @@
       <DependentUpon>DashboardGrid.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Lobby\Events\LoginController.cs" />
-    <Compile Include="UI\Portal\Job\Employers\Candidates\Controls\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\Controls\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\Controls\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\Controls\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
     <Compile Include="UI\CMDS\Portal\Achievements\Credentials\Models\AchievementCategoryGroup.cs" />
     <Compile Include="UI\CMDS\Portal\Achievements\Credentials\Models\AchievementItem.cs" />
     <Compile Include="UI\CMDS\Portal\Achievements\Credentials\Models\AchievementTypeGroup.cs" />
@@ -3360,259 +3386,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UI\Admin\Workflow\Cases\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Controls\Detail.ascx.cs">
-      <DependentUpon>Detail.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Controls\Detail.ascx.designer.cs">
-      <DependentUpon>Detail.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Controls\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Controls\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Controls\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Controls\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Create.aspx.cs">
-      <DependentUpon>Create.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Create.aspx.designer.cs">
-      <DependentUpon>Create.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Applications\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\AddComment.aspx.cs">
-      <DependentUpon>AddComment.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\AddComment.aspx.designer.cs">
-      <DependentUpon>AddComment.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\AddEducation.aspx.cs">
-      <DependentUpon>AddEducation.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\AddEducation.aspx.designer.cs">
-      <DependentUpon>AddEducation.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\AddExperience.aspx.cs">
-      <DependentUpon>AddExperience.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\AddExperience.aspx.designer.cs">
-      <DependentUpon>AddExperience.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\AuthorCommentGrid.ascx.cs">
-      <DependentUpon>AuthorCommentGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\AuthorCommentGrid.ascx.designer.cs">
-      <DependentUpon>AuthorCommentGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\CandidateEducationGrid.ascx.cs">
-      <DependentUpon>CandidateEducationGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\CandidateEducationGrid.ascx.designer.cs">
-      <DependentUpon>CandidateEducationGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\CandidateExperienceGrid.ascx.cs">
-      <DependentUpon>CandidateExperienceGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\CandidateExperienceGrid.ascx.designer.cs">
-      <DependentUpon>CandidateExperienceGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\CommentDetail.ascx.cs">
-      <DependentUpon>CommentDetail.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\CommentDetail.ascx.designer.cs">
-      <DependentUpon>CommentDetail.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\ContactCommentGrid.ascx.cs">
-      <DependentUpon>ContactCommentGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\ContactCommentGrid.ascx.designer.cs">
-      <DependentUpon>ContactCommentGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\ContactUploadsGrid.ascx.cs">
-      <DependentUpon>ContactUploadsGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\ContactUploadsGrid.ascx.designer.cs">
-      <DependentUpon>ContactUploadsGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\EducationDetail.ascx.cs">
-      <DependentUpon>EducationDetail.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\EducationDetail.ascx.designer.cs">
-      <DependentUpon>EducationDetail.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\ExperienceDetail.ascx.cs">
-      <DependentUpon>ExperienceDetail.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\ExperienceDetail.ascx.designer.cs">
-      <DependentUpon>ExperienceDetail.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\SubjectCommentGrid.ascx.cs">
-      <DependentUpon>SubjectCommentGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Controls\SubjectCommentGrid.ascx.designer.cs">
-      <DependentUpon>SubjectCommentGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\EditComment.aspx.cs">
-      <DependentUpon>EditComment.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\EditComment.aspx.designer.cs">
-      <DependentUpon>EditComment.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\EditEducation.aspx.cs">
-      <DependentUpon>EditEducation.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\EditEducation.aspx.designer.cs">
-      <DependentUpon>EditEducation.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\EditExperience.aspx.cs">
-      <DependentUpon>EditExperience.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\EditExperience.aspx.designer.cs">
-      <DependentUpon>EditExperience.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Helpers\UploadHelper.cs" />
-    <Compile Include="UI\Admin\Jobs\Candidates\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Candidates\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Employers\Controls\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Employers\Controls\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Employers\Controls\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Employers\Controls\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Employers\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Employers\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Home.aspx.cs">
-      <DependentUpon>Home.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Home.aspx.designer.cs">
-      <DependentUpon>Home.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Controls\OpportunityInfo.ascx.cs">
-      <DependentUpon>OpportunityInfo.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Controls\OpportunityInfo.ascx.designer.cs">
-      <DependentUpon>OpportunityInfo.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Controls\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Controls\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Controls\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Controls\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Create.aspx.cs">
-      <DependentUpon>Create.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Create.aspx.designer.cs">
-      <DependentUpon>Create.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Delete.aspx.cs">
-      <DependentUpon>Delete.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Delete.aspx.designer.cs">
-      <DependentUpon>Delete.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Jobs\Opportunities\Search.aspx.designer.cs">
       <DependentUpon>Search.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Logs\Commands\Controls\SearchCriteria.ascx.cs">
@@ -5297,325 +5070,6 @@
     <Compile Include="UI\Portal\Events\Exams\Search.aspx.designer.cs">
       <DependentUpon>Search.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\AddEducation.aspx.cs">
-      <DependentUpon>AddEducation.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\AddEducation.aspx.designer.cs">
-      <DependentUpon>AddEducation.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\AddSelfEmployment.aspx.cs">
-      <DependentUpon>AddSelfEmployment.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\AddSelfEmployment.aspx.designer.cs">
-      <DependentUpon>AddSelfEmployment.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\AddWorkExperience.aspx.cs">
-      <DependentUpon>AddWorkExperience.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\AddWorkExperience.aspx.designer.cs">
-      <DependentUpon>AddWorkExperience.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\BaseView.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\AccountStatus.ascx.cs">
-      <DependentUpon>AccountStatus.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\AccountStatus.ascx.designer.cs">
-      <DependentUpon>AccountStatus.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\CompletionBars.ascx.cs">
-      <DependentUpon>CompletionBars.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\CompletionBars.ascx.designer.cs">
-      <DependentUpon>CompletionBars.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\CredentialSection.ascx.cs">
-      <DependentUpon>CredentialSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\CredentialSection.ascx.designer.cs">
-      <DependentUpon>CredentialSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\DocumentSection.ascx.cs">
-      <DependentUpon>DocumentSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\DocumentSection.ascx.designer.cs">
-      <DependentUpon>DocumentSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\EducationDetail.ascx.cs">
-      <DependentUpon>EducationDetail.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\EducationDetail.ascx.designer.cs">
-      <DependentUpon>EducationDetail.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\EducationSection.ascx.cs">
-      <DependentUpon>EducationSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\EducationSection.ascx.designer.cs">
-      <DependentUpon>EducationSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ExperienceSection.ascx.cs">
-      <DependentUpon>ExperienceSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ExperienceSection.ascx.designer.cs">
-      <DependentUpon>ExperienceSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\FastProgramSection.ascx.cs">
-      <DependentUpon>FastProgramSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\FastProgramSection.ascx.designer.cs">
-      <DependentUpon>FastProgramSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ItemList.ascx.cs">
-      <DependentUpon>ItemList.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ItemList.ascx.designer.cs">
-      <DependentUpon>ItemList.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\JobInterestSection.ascx.cs">
-      <DependentUpon>JobInterestSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\JobInterestSection.ascx.designer.cs">
-      <DependentUpon>JobInterestSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\LanguageAbilitySection.ascx.cs">
-      <DependentUpon>LanguageAbilitySection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\LanguageAbilitySection.ascx.designer.cs">
-      <DependentUpon>LanguageAbilitySection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ProgressSection.ascx.cs">
-      <DependentUpon>ProgressSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ProgressSection.ascx.designer.cs">
-      <DependentUpon>ProgressSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\SelfEmploymentDetail.ascx.cs">
-      <DependentUpon>SelfEmploymentDetail.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\SelfEmploymentDetail.ascx.designer.cs">
-      <DependentUpon>SelfEmploymentDetail.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewDocumentSection.ascx.cs">
-      <DependentUpon>ViewDocumentSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewDocumentSection.ascx.designer.cs">
-      <DependentUpon>ViewDocumentSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewEducationSection.ascx.cs">
-      <DependentUpon>ViewEducationSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewEducationSection.ascx.designer.cs">
-      <DependentUpon>ViewEducationSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewExperienceSection.ascx.cs">
-      <DependentUpon>ViewExperienceSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewExperienceSection.ascx.designer.cs">
-      <DependentUpon>ViewExperienceSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewJobInterestSection.ascx.cs">
-      <DependentUpon>ViewJobInterestSection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewJobInterestSection.ascx.designer.cs">
-      <DependentUpon>ViewJobInterestSection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewLanguageAbilitySection.ascx.cs">
-      <DependentUpon>ViewLanguageAbilitySection.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\ViewLanguageAbilitySection.ascx.designer.cs">
-      <DependentUpon>ViewLanguageAbilitySection.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\UploadHelper.cs" />
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\WorkExperienceDetail.ascx.cs">
-      <DependentUpon>WorkExperienceDetail.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Controls\WorkExperienceDetail.ascx.designer.cs">
-      <DependentUpon>WorkExperienceDetail.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\EditEducation.aspx.cs">
-      <DependentUpon>EditEducation.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\EditEducation.aspx.designer.cs">
-      <DependentUpon>EditEducation.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\EditSelfEmployment.aspx.cs">
-      <DependentUpon>EditSelfEmployment.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\EditSelfEmployment.aspx.designer.cs">
-      <DependentUpon>EditSelfEmployment.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\EditWorkExperience.aspx.cs">
-      <DependentUpon>EditWorkExperience.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\EditWorkExperience.aspx.designer.cs">
-      <DependentUpon>EditWorkExperience.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\View.aspx.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Profile\View.aspx.designer.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\Apply.aspx.cs">
-      <DependentUpon>Apply.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\Apply.aspx.designer.cs">
-      <DependentUpon>Apply.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\Controls\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\Controls\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\Controls\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\Controls\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\View.aspx.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Candidates\Opportunities\View.aspx.designer.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\View.aspx.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Candidates\View.aspx.designer.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Profile\Controls\MyJobOpportunityGrid.ascx.cs">
-      <DependentUpon>MyJobOpportunityGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Profile\Controls\MyJobOpportunityGrid.ascx.designer.cs">
-      <DependentUpon>MyJobOpportunityGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Profile\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Profile\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Profile\View.aspx.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Profile\View.aspx.designer.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Profile\ViewModel.cs" />
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\CandidatesGrid.ascx.cs">
-      <DependentUpon>CandidatesGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\CandidatesGrid.ascx.designer.cs">
-      <DependentUpon>CandidatesGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Create.aspx.cs">
-      <DependentUpon>Create.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Create.aspx.designer.cs">
-      <DependentUpon>Create.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\ViewDetails.ascx.cs">
-      <DependentUpon>ViewDetails.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Controls\ViewDetails.ascx.designer.cs">
-      <DependentUpon>ViewDetails.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\View.aspx.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Job\Employers\Opportunities\View.aspx.designer.cs">
-      <DependentUpon>View.aspx</DependentUpon>
-    </Compile>
     <Compile Include="UI\Portal\Events\Classes\Registrations\Search.aspx.cs">
       <DependentUpon>Search.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -5661,7 +5115,6 @@
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindGroup.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindCollectionItem.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindOccupation.cs" />
-    <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindOpportunity.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindRubric.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindStandard.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindStandardHelper.cs" />
@@ -5833,6 +5286,7 @@
     <Compile Include="Web\Helpers\HttpRequestHelper.cs" />
     <Compile Include="Web\Helpers\HttpResponseHelper.cs" />
     <Compile Include="Web\Helpers\PathHelper.cs" />
+    <Compile Include="Web\Helpers\PdfHelper.cs" />
     <Compile Include="Web\Helpers\ProfilePictureHelper.cs" />
     <Compile Include="Web\Helpers\AntiForgeryHelper.cs" />
     <Compile Include="Web\Instrumentation\LongRunningTask.cs" />
@@ -6941,6 +6395,7 @@
     <Content Include="UI\Admin\Events\Classes\ModifyNotification.aspx" />
     <Content Include="UI\Admin\Events\Registrations\SendEmail.ascx" />
     <Content Include="UI\Admin\Foundations\AudioSample.mp3" />
+    <Content Include="UI\Admin\Foundations\Colors.aspx" />
     <Content Include="UI\Admin\Foundations\Controls\HomeCounterRepeater.ascx" />
     <Content Include="UI\Admin\Identity\UsersConnections\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Identity\UsersConnections\Controls\SearchResults.ascx" />
@@ -6967,6 +6422,17 @@
     <Content Include="UI\Admin\Learning\Categories\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Learning\Categories\Controls\SearchResults.ascx" />
     <Content Include="UI\Admin\Learning\Programs\Controls\ProgramCategoryList.ascx" />
+    <Content Include="UI\Admin\Learning\Programs\Controls\ProgramContactTab.ascx" />
+    <Content Include="UI\Admin\Learning\Programs\Controls\ProgramGroupGrid.ascx" />
+    <Content Include="UI\Admin\Learning\Programs\Controls\TaskGridEdit.ascx" />
+    <Content Include="UI\Admin\Learning\Programs\Controls\TaskGridView.ascx" />
+    <Content Include="UI\Admin\Learning\Programs\ModifyAchievement.aspx" />
+    <Content Include="UI\Admin\Learning\Programs\ModifyCatalog.aspx" />
+    <Content Include="UI\Admin\Learning\Programs\ModifyContent.aspx" />
+    <Content Include="UI\Admin\Learning\Programs\ModifyNotification.aspx" />
+    <Content Include="UI\Admin\Learning\Programs\ModifyPublication.aspx" />
+    <Content Include="UI\Admin\Learning\Programs\ModifySettings.aspx" />
+    <Content Include="UI\Admin\Messages\Subscribers\Controls\AddControl.ascx" />
     <Content Include="UI\Admin\Prototype\DashboardAuditor.aspx" />
     <Content Include="UI\Admin\Prototype\DashboardOhs.aspx" />
     <Content Include="UI\Admin\Prototype\DashboardEmployer.aspx" />
@@ -7011,10 +6477,6 @@
     <Content Include="UI\Admin\Workflow\Cases\Controls\CaseDocumentList.ascx" />
     <Content Include="UI\Admin\Workflow\Cases\Controls\CaseFileRequirementList.ascx" />
     <Content Include="UI\Admin\Workflow\Cases\Controls\SurveySection.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\AchievementGrid.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\CandidateCard.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\LanguageAbilitySection.ascx" />
-    <Content Include="UI\Admin\Jobs\Opportunities\Controls\Details.ascx" />
     <Content Include="UI\Admin\Records\Achievements\Controls\AchievementExpirationField.ascx" />
     <Content Include="UI\Admin\Learning\Programs\Controls\CredentialGrid.ascx" />
     <Content Include="UI\Admin\Learning\Programs\Controls\NotificationSetup.ascx" />
@@ -7049,42 +6511,6 @@
     <Content Include="UI\Admin\Workflow\Cases\ModifyStatus.aspx" />
     <Content Include="UI\Admin\Workflow\Cases\Controls\AttachmentsSection.ascx" />
     <Content Include="UI\Admin\Workflow\Cases\SendEmail.aspx" />
-    <Content Include="UI\Admin\Jobs\Applications\Controls\Detail.ascx" />
-    <Content Include="UI\Admin\Jobs\Applications\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Jobs\Applications\Controls\SearchResults.ascx" />
-    <Content Include="UI\Admin\Jobs\Applications\Create.aspx" />
-    <Content Include="UI\Admin\Jobs\Applications\Edit.aspx" />
-    <Content Include="UI\Admin\Jobs\Applications\Search.aspx" />
-    <Content Include="UI\Admin\Jobs\Candidates\AddComment.aspx" />
-    <Content Include="UI\Admin\Jobs\Candidates\AddEducation.aspx" />
-    <Content Include="UI\Admin\Jobs\Candidates\AddExperience.aspx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\AuthorCommentGrid.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\CandidateEducationGrid.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\CandidateExperienceGrid.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\CommentDetail.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\ContactCommentGrid.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\ContactUploadsGrid.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\EducationDetail.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\ExperienceDetail.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\SearchResults.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Controls\SubjectCommentGrid.ascx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Edit.aspx" />
-    <Content Include="UI\Admin\Jobs\Candidates\EditComment.aspx" />
-    <Content Include="UI\Admin\Jobs\Candidates\EditEducation.aspx" />
-    <Content Include="UI\Admin\Jobs\Candidates\EditExperience.aspx" />
-    <Content Include="UI\Admin\Jobs\Candidates\Search.aspx" />
-    <Content Include="UI\Admin\Jobs\Employers\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Jobs\Employers\Controls\SearchResults.ascx" />
-    <Content Include="UI\Admin\Jobs\Employers\Search.aspx" />
-    <Content Include="UI\Admin\Jobs\Home.aspx" />
-    <Content Include="UI\Admin\Jobs\Opportunities\Controls\OpportunityInfo.ascx" />
-    <Content Include="UI\Admin\Jobs\Opportunities\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Jobs\Opportunities\Controls\SearchResults.ascx" />
-    <Content Include="UI\Admin\Jobs\Opportunities\Create.aspx" />
-    <Content Include="UI\Admin\Jobs\Opportunities\Delete.aspx" />
-    <Content Include="UI\Admin\Jobs\Opportunities\Edit.aspx" />
-    <Content Include="UI\Admin\Jobs\Opportunities\Search.aspx" />
     <Content Include="UI\Admin\Messages\Messages\Content\Scripts\content.js" />
     <Content Include="UI\Admin\Messages\Messages\Content\Scripts\markdown.js" />
     <Content Include="UI\Admin\Messages\Messages\Content\Styles\content.css" />
@@ -7374,7 +6800,7 @@
     <Content Include="UI\Admin\Records\Outcomes\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Records\Outcomes\Controls\SearchDownload.ascx" />
     <Content Include="UI\Admin\Records\Outcomes\Controls\SearchResults.ascx" />
-    <Content Include="UI\Admin\Learning\Programs\Controls\ProgramUserGrid.ascx" />
+    <Content Include="UI\Admin\Learning\Programs\Controls\ProgramPersonGrid.ascx" />
     <Content Include="UI\Admin\Learning\Programs\Controls\ProgramDetails.ascx" />
     <Content Include="UI\Admin\Learning\Programs\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Learning\Programs\Controls\SearchResults.ascx" />
@@ -8440,11 +7866,6 @@
     <Content Include="UI\Portal\Learning\Content\Progress.html" />
     <Content Include="UI\Portal\Workflow\Cases\Controls\CaseDocumentList.ascx" />
     <Content Include="UI\Portal\Workflow\Cases\Controls\CaseFileRequirementList.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\AchievementSection.ascx" />
-    <Content Include="UI\Portal\Job\Employers\Candidates\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Portal\Job\Employers\Candidates\Controls\SearchResults.ascx" />
-    <Content Include="UI\Portal\Job\Employers\Candidates\RequestContact.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\Controls\Details.ascx" />
     <Content Include="UI\Admin\Records\Logbooks\Validators\Forms\AddExperience.aspx" />
     <Content Include="UI\Portal\Learning\Program.aspx" />
     <Content Include="UI\Portal\Learning\ProgramTask.aspx" />
@@ -8517,51 +7938,6 @@
     <Content Include="UI\Portal\Events\Calendar.aspx" />
     <Content Include="UI\Portal\Events\Exams\Outline.aspx" />
     <Content Include="UI\Portal\Events\Exams\Search.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\AddEducation.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\AddSelfEmployment.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\AddWorkExperience.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\AccountStatus.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\CompletionBars.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\CredentialSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\DocumentSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\EducationDetail.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\EducationSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\ExperienceSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\FastProgramSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\ItemList.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\JobInterestSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\LanguageAbilitySection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\ProgressSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\SelfEmploymentDetail.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\ViewDocumentSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\ViewEducationSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\ViewExperienceSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\ViewJobInterestSection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\ViewLanguageAbilitySection.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Controls\WorkExperienceDetail.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\Edit.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\EditEducation.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\EditSelfEmployment.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\EditWorkExperience.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Profile\View.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Opportunities\Apply.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Opportunities\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Opportunities\Controls\SearchResults.ascx" />
-    <Content Include="UI\Portal\Job\Candidates\Opportunities\Search.aspx" />
-    <Content Include="UI\Portal\Job\Candidates\Opportunities\View.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Candidates\Search.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Candidates\View.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Profile\Controls\MyJobOpportunityGrid.ascx" />
-    <Content Include="UI\Portal\Job\Employers\Profile\Edit.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Profile\View.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\Controls\CandidatesGrid.ascx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\Create.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\Edit.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\Controls\SearchResults.ascx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\Controls\ViewDetails.ascx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\Search.aspx" />
-    <Content Include="UI\Portal\Job\Employers\Opportunities\View.aspx" />
     <Content Include="UI\Portal\Records\Logbooks\Controls\CompetencyProgressGrid.ascx" />
     <Content Include="UI\Portal\Records\Logbooks\Controls\ExperienceFields\Date.ascx" />
     <Content Include="UI\Portal\Records\Logbooks\Controls\ExperienceFields\Markdown.ascx" />
@@ -9606,7 +8982,6 @@
     <Content Include="UI\CMDS\Common\Controls\User\AchievementDownloadList.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\AchievementHierarchy.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\AchievementSummary.ascx" />
-    <Content Include="UI\Admin\Learning\Programs\Controls\TaskGrid.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\SignOff.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\StandardValidationGrid.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\TrainingSummary.ascx" />
@@ -10535,12 +9910,12 @@
     </Compile>
     <Compile Include="UI\Admin\Records\Outcomes\Reports\NotAchievedMasteryReport.cs" />
     <Compile Include="UI\Admin\Records\Outcomes\Reports\ValidationCriteriaHelper.cs" />
-    <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramUserGrid.ascx.cs">
-      <DependentUpon>ProgramUserGrid.ascx</DependentUpon>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramPersonGrid.ascx.cs">
+      <DependentUpon>ProgramPersonGrid.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramUserGrid.ascx.designer.cs">
-      <DependentUpon>ProgramUserGrid.ascx</DependentUpon>
+    <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramPersonGrid.ascx.designer.cs">
+      <DependentUpon>ProgramPersonGrid.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Learning\Programs\Controls\ProgramDetails.ascx.cs">
       <DependentUpon>ProgramDetails.ascx</DependentUpon>
@@ -16533,13 +15908,6 @@
     <Compile Include="UI\CMDS\Common\Controls\User\AchievementSummary.ascx.designer.cs">
       <DependentUpon>AchievementSummary.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Learning\Programs\Controls\TaskGrid.ascx.cs">
-      <DependentUpon>TaskGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Learning\Programs\Controls\TaskGrid.ascx.designer.cs">
-      <DependentUpon>TaskGrid.ascx</DependentUpon>
-    </Compile>
     <Compile Include="UI\CMDS\Common\Controls\User\SignOff.ascx.cs">
       <DependentUpon>SignOff.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -18068,6 +17436,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="PDFsharp">
+      <Version>6.2.2</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>4.2.0</Version>

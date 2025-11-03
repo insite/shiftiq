@@ -102,7 +102,7 @@
                                         </div>
                                     </div>
 
-                                    <asp:Panel runat="server" ID="SettingsPanel">
+                                    <insite:Container runat="server" ID="SettingsContainer">
 
                                         <h3>Settings</h3>
 
@@ -129,7 +129,11 @@
                                         <div runat="server" id="NumberNaPermitted">
                                             <insite:CheckBox runat="server" ID="NumberEnableNa" Text="Not Applicable Permitted" />
                                         </div>
-                                    </asp:Panel>
+
+                                        <div runat="server" id="EnableCreateCaseField">
+                                            <insite:CheckBox runat="server" ID="EnableCreateCase" Text="Create Case" />
+                                        </div>
+                                    </insite:Container>
                                 </ContentTemplate>
                             </insite:UpdatePanel>
 

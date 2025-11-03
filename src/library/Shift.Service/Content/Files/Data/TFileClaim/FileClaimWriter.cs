@@ -4,14 +4,7 @@ using Shift.Common;
 
 namespace Shift.Service.Content;
 
-public interface IFileClaimWriter : IEntityWriter
-{
-    Task<bool> CreateAsync(FileClaimEntity entity, CancellationToken cancellation = default);
-    Task<bool> DeleteAsync(Guid claim, CancellationToken cancellation = default);
-    Task<bool> ModifyAsync(FileClaimEntity entity, CancellationToken cancellation = default);
-}
-
-internal class FileClaimWriter : IFileClaimWriter
+public class FileClaimWriter : IEntityWriter
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
@@ -27,11 +20,11 @@ internal class FileClaimWriter : IFileClaimWriter
         var exists = await AssertAsync(entity.ClaimIdentifier, cancellation, db);
         if (exists)
             return false;
-                
+
         await db.TFileClaim.AddAsync(entity, cancellation);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> DeleteAsync(Guid claim, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -43,7 +36,7 @@ internal class FileClaimWriter : IFileClaimWriter
         db.TFileClaim.Remove(entity);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> ModifyAsync(FileClaimEntity entity, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -57,5 +50,5 @@ internal class FileClaimWriter : IFileClaimWriter
     }
 
     private async Task<bool> AssertAsync(Guid claim, CancellationToken cancellation, TableDbContext db)
-		=> await db.TFileClaim.AsNoTracking().AnyAsync(x => x.ClaimIdentifier == claim, cancellation);
+        => await db.TFileClaim.AsNoTracking().AnyAsync(x => x.ClaimIdentifier == claim, cancellation);
 }

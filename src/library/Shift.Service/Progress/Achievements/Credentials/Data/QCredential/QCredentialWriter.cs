@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Shift.Common;
 
-namespace Shift.Service.Achievement;
+namespace Shift.Service.Progress;
 
 public class QCredentialWriter : IEntityWriter
 {
@@ -20,11 +20,11 @@ public class QCredentialWriter : IEntityWriter
         var exists = await AssertAsync(entity.CredentialIdentifier, cancellation, db);
         if (exists)
             return false;
-                
+
         await db.QCredential.AddAsync(entity, cancellation);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> ModifyAsync(QCredentialEntity entity, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -36,7 +36,7 @@ public class QCredentialWriter : IEntityWriter
         db.Entry(entity).State = EntityState.Modified;
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> DeleteAsync(Guid credential, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -48,7 +48,7 @@ public class QCredentialWriter : IEntityWriter
         db.QCredential.Remove(entity);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     private async Task<bool> AssertAsync(Guid credential, CancellationToken cancellation, TableDbContext db)
-		=> await db.QCredential.AsNoTracking().AnyAsync(x => x.CredentialIdentifier == credential, cancellation);
+        => await db.QCredential.AsNoTracking().AnyAsync(x => x.CredentialIdentifier == credential, cancellation);
 }

@@ -33,6 +33,7 @@
                                         <th class="text-center">
                                             <insite:ContentTextLiteral runat="server" ContentLabel="Number of Hours"/>
                                         </th>
+                                        <th style="text-align:center;">Number of Log Entries</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -60,6 +61,9 @@
                                         </td>
                                         <td class="text-center align-middle">
                                             <%# Eval("Hours") %>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <%# Eval("JournalItems") %>
                                         </td>
                                     </tr>
                                 </ItemTemplate>

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Web.UI.WebControls;
 
 using InSite.Application.Records.Read;
-using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
@@ -16,7 +15,7 @@ using Shift.Sdk.UI;
 
 using AlertType = Shift.Constant.AlertType;
 
-namespace InSite.Custom.CMDS.Admin.Records.Programs
+namespace InSite.Admin.Records.Programs
 {
     public partial class Duplicate : AdminBasePage, ICmdsUserControl, IHasParentLinkParameters
     {
@@ -117,13 +116,13 @@ namespace InSite.Custom.CMDS.Admin.Records.Programs
                     : null;
 
                 if (asset == null)
-                    HttpResponseHelper.Redirect(GetFinderUrl());
+                    Search.Redirect();
 
                 SourceTemplate = new TemplateInfo(asset);
 
                 PageHelper.AutoBindHeader(Page);
 
-                CancelButton.NavigateUrl = GetEditorUrl(SourceTemplate.ProgramIdentifier);
+                CancelButton.NavigateUrl = Outline.GetNavigateUrl(SourceTemplate.ProgramIdentifier);
 
                 DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
                 DepartmentIdentifier.Value = null;
@@ -177,6 +176,7 @@ namespace InSite.Custom.CMDS.Admin.Records.Programs
                 if (departmentTemplates.TryGetValue(achievement.AchievementIdentifier, out var source))
                 {
                     copy.TaskLifetimeMonths = source.TaskLifetimeMonths;
+                    copy.TaskIsPlanned = source.TaskIsPlanned;
                     copy.TaskIsRequired = source.TaskIsRequired;
                 }
 
@@ -185,7 +185,7 @@ namespace InSite.Custom.CMDS.Admin.Records.Programs
 
             ProgramStore.Insert(list, User.Identifier);
 
-            HttpResponseHelper.Redirect(GetEditorUrl(listIdentifier) + "&status=saved");
+            Outline.Redirect(listIdentifier, status: "saved");
         }
 
         private void DepartmentIdentifier_ValueChanged(object sender, EventArgs e) => OnDepartmentSelected();
@@ -270,10 +270,6 @@ namespace InSite.Custom.CMDS.Admin.Records.Programs
             });
             itemRepeater.DataBind();
         }
-
-        private string GetFinderUrl() => "/ui/admin/learning/programs/search";
-
-        private string GetEditorUrl(Guid achievementIdentifier) => $"/ui/admin/learning/programs/outline?id={achievementIdentifier}";
 
         string IHasParentLinkParameters.GetParentLinkParameters(IWebRoute parent)
             => (parent != null && parent.Name.EndsWith("/outline")) ? $"id={AchievementId}" : null;

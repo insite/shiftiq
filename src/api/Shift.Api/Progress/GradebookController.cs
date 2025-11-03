@@ -1,115 +1,60 @@
-using System.Text;
-
 using Microsoft.AspNetCore.Mvc;
 
-using Shift.Api.Internal;
-using Shift.Common;
-using Shift.Service.Gradebook;
+using Shift.Service.Progress;
 
 namespace Shift.Api;
 
-/// <remarks>
-/// This entity models a current-state projection of an aggregate event/change stream. This is the reason there are no
-/// methods here to create, modify, or delete this entity. Data changes are permitted only using Timeline commands.
-/// </remarks>
 [ApiController]
 [ApiExplorerSettings(GroupName = "Progress API: Gradebooks")]
-public class GradebookController : ControllerBase
+public class GradebookController : ShiftControllerBase
 {
-    private readonly ILogger<GradebookController> _logger;
-    private readonly ReleaseSettings _releaseSettings;
-    private readonly DatabaseSettings _databaseSettings;
     private readonly GradebookService _gradebookService;
 
-    public GradebookController(
-        ILogger<GradebookController> logger,
-        ReleaseSettings releaseSettings,
-        DatabaseSettings databaseSettings,
-        GradebookService gradebookService)
+    public GradebookController(GradebookService gradebookService)
     {
-        _logger = logger;
-        _releaseSettings = releaseSettings;
-        _databaseSettings = databaseSettings;
         _gradebookService = gradebookService;
     }
 
-    // HTTP method and route
+    #region Queries
+
+    /// <summary>
+    /// Checks for the existence of one specific gradebook
+    /// </summary>
     [HttpHead("progress/gradebooks/{gradebook:guid}")]
-
-    // Authorization and filters
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-
-    // OpenAPI metadata
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Assert)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertGradebook")]
-
-    public async Task<ActionResult<bool>> AssertAsync(
-        [FromRoute] Guid gradebook,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> AssertAsync([FromRoute] Guid gradebook, CancellationToken cancellation = default)
     {
         var exists = await _gradebookService.AssertAsync(gradebook, cancellation);
+
         return exists ? Ok() : NotFound();
     }
 
-    [HttpGet("progress/gradebooks/{gradebook:guid}")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType<GradebookModel>(StatusCodes.Status200OK)]
-    [EndpointName("retrieveGradebook")]
-    public async Task<ActionResult<GradebookModel>> RetrieveAsync(
-        [FromRoute] Guid gradebook,
-        CancellationToken cancellation = default)
+    /// <summary>
+    /// Collects the list of gradebooks that match specific criteria
+    /// </summary>
+    [HttpPost("progress/gradebooks/collect")]
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Collect)]
+    [ProducesResponseType<IEnumerable<GradebookModel>>(StatusCodes.Status200OK)]
+    [EndpointName("collectGradebooks")]
+    public async Task<IActionResult> PostCollectAsync([FromBody] CollectGradebooks query, CancellationToken cancellation = default)
     {
-        var model = await _gradebookService.RetrieveAsync(gradebook, cancellation);
-        return model != null ? Ok(model) : NotFound();
-    }
-
-    [HttpGet("progress/gradebooks/count")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
-    [EndpointName("countGradebooks")]
-    public async Task<ActionResult<CountResult>> GetCountAsync(
-        [FromQuery] CountGradebooks query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
-
-    [HttpPost("progress/gradebooks/count")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType(typeof(CountResult), StatusCodes.Status200OK)]
-    [EndpointName("countGradebooks_post")]
-    [AliasFor("countGradebooks")]
-    public async Task<ActionResult<CountResult>> PostCountAsync(
-        [FromBody] CountGradebooks query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
-
-    private async Task<ActionResult<CountResult>> CountAsync(CountGradebooks query, CancellationToken cancellation)
-    {
-        var count = await _gradebookService.CountAsync(query, cancellation);
-        return Ok(new CountResult(count));
+        return await CollectAsync(query, cancellation);
     }
 
     [HttpGet("progress/gradebooks")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType(typeof(IEnumerable<GradebookModel>), StatusCodes.Status200OK)]
-    [EndpointName("collectGradebooks")]
-    public async Task<ActionResult<IEnumerable<GradebookModel>>> GetCollectAsync(
-        [FromQuery] CollectGradebooks query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
-
-    [HttpPost("progress/gradebooks/collect")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType(typeof(IEnumerable<GradebookModel>), StatusCodes.Status200OK)]
-    [EndpointName("collectGradebooks_post")]
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Collect)]
+    [ProducesResponseType<IEnumerable<GradebookModel>>(StatusCodes.Status200OK)]
+    [EndpointName("collectGradebooks_get")]
     [AliasFor("collectGradebooks")]
-    public async Task<ActionResult<IEnumerable<GradebookModel>>> PostCollectAsync(
-        [FromBody] CollectGradebooks query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> GetCollectAsync([FromQuery] CollectGradebooks query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
-    private async Task<ActionResult<IEnumerable<GradebookModel>>> CollectAsync(
-        [FromBody] CollectGradebooks query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CollectAsync(CollectGradebooks query, CancellationToken cancellation)
     {
         var models = await _gradebookService.CollectAsync(query, cancellation);
 
@@ -120,28 +65,118 @@ public class GradebookController : ControllerBase
         return Ok(models);
     }
 
-    [HttpGet("progress/gradebooks/search")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType(typeof(IEnumerable<GradebookMatch>), StatusCodes.Status200OK)]
-    [EndpointName("searchGradebooks")]
-    public async Task<ActionResult<IEnumerable<GradebookMatch>>> GetSearchAsync(
-        [FromQuery] SearchGradebooks query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    /// <summary>
+    /// Counts the gradebooks that match specific criteria
+    /// </summary>
+    [HttpPost("progress/gradebooks/count")]
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Count)]
+    [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
+    [EndpointName("countGradebooks")]
+    public async Task<IActionResult> PostCountAsync([FromBody] CountGradebooks query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
+    [HttpGet("progress/gradebooks/count")]
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Count)]
+    [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
+    [EndpointName("countGradebooks_get")]
+    [AliasFor("countGradebooks")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> GetCountAsync([FromQuery] CountGradebooks query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
+
+    private async Task<IActionResult> CountAsync(CountGradebooks query, CancellationToken cancellation)
+    {
+        var count = await _gradebookService.CountAsync(query, cancellation);
+
+        return Ok(new CountResult(count));
+    }
+
+    /// <summary>
+    /// Downloads the list of gradebooks that match specific criteria
+    /// </summary>    
+    [HttpPost("progress/gradebooks/download")]
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Download)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Produces("application/octet-stream")]
+    [EndpointName("downloadGradebooks")]
+    public async Task<FileContentResult> PostDownloadAsync([FromBody] CollectGradebooks query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
+
+    [HttpGet("progress/gradebooks/download")]
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Download)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Produces("application/octet-stream")]
+    [EndpointName("downloadGradebooks_get")]
+    [AliasFor("downloadGradebooks")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<FileContentResult> GetDownloadAsync([FromQuery] CollectGradebooks query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
+
+    private async Task<FileContentResult> DownloadAsync(CollectGradebooks query, CancellationToken cancellation)
+    {
+        var exporter = new ExportHelper("Progress", "Gradebooks", query.Filter.Format, User);
+
+        var models = await _gradebookService
+            .DownloadAsync(query, cancellation)
+            .ToListAsync(cancellation);
+
+        var content = _gradebookService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
+
+        var contentBytes = System.Text.Encoding.UTF8.GetBytes(content);
+
+        var fileName = exporter.CreateFileName();
+
+        var contentType = exporter.GetContentType(fileName);
+
+        return File(contentBytes, contentType, fileName);
+    }
+
+    /// <summary>
+    /// Retrieves one specific gradebook
+    /// </summary>
+    [HttpGet("progress/gradebooks/{gradebook:guid}")]
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Retrieve)]
+    [ProducesResponseType<GradebookModel>(StatusCodes.Status200OK)]
+    [EndpointName("retrieveGradebook")]
+    public async Task<IActionResult> RetrieveAsync([FromRoute] Guid gradebook, CancellationToken cancellation = default)
+    {
+        var model = await _gradebookService.RetrieveAsync(gradebook, cancellation);
+
+        return model != null ? Ok(model) : NotFound();
+    }
+
+    /// <summary>
+    /// Searches for the list of gradebooks that match specific criteria
+    /// </summary>
     [HttpPost("progress/gradebooks/search")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType(typeof(IEnumerable<GradebookMatch>), StatusCodes.Status200OK)]
-    [EndpointName("searchGradebooks_post")]
-    [AliasFor("searchGradebooks")]
-    public async Task<ActionResult<IEnumerable<GradebookMatch>>> PostSearchAsync(
-        [FromBody] SearchGradebooks query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Search)]
+    [ProducesResponseType<IEnumerable<GradebookMatch>>(StatusCodes.Status200OK)]
+    [EndpointName("searchGradebooks")]
+    public async Task<IActionResult> PostSearchAsync([FromBody] SearchGradebooks query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
-    private async Task<ActionResult<IEnumerable<GradebookMatch>>> SearchAsync(
-        [FromBody] SearchGradebooks query,
-        CancellationToken cancellation)
+    [HttpGet("progress/gradebooks/search")]
+    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Search)]
+    [ProducesResponseType<IEnumerable<GradebookMatch>>(StatusCodes.Status200OK)]
+    [EndpointName("searchGradebooks_get")]
+    [AliasFor("searchGradebooks")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> GetSearchAsync([FromQuery] SearchGradebooks query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
+
+    private async Task<IActionResult> SearchAsync(SearchGradebooks query, CancellationToken cancellation)
     {
         var matches = await _gradebookService.SearchAsync(query, cancellation);
 
@@ -152,111 +187,5 @@ public class GradebookController : ControllerBase
         return Ok(matches);
     }
 
-    [HttpGet("progress/gradebooks/download")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [Produces("application/octet-stream")]
-    [EndpointName("downloadGradebooks")]
-    public async Task<FileContentResult> GetDownloadAsync(
-        [FromQuery] CollectGradebooks query,
-        CancellationToken cancellation)
-        => await DownloadAsync(query, cancellation);
-
-    [HttpPost("progress/gradebooks/download")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [Produces("application/octet-stream")]
-    [EndpointName("downloadGradebooks_post")]
-    [AliasFor("downloadGradebooks")]
-    public async Task<FileContentResult> PostDownloadAsync(
-        [FromBody] CollectGradebooks query,
-        CancellationToken cancellation)
-        => await DownloadAsync(query, cancellation);
-
-    private async Task<FileContentResult> DownloadAsync(
-        [FromBody] CollectGradebooks query,
-        CancellationToken cancellation)
-    {
-        var exporter = new ExportHelper("progress", "gradebook", query.Filter.Format, User);
-
-        var models = await _gradebookService.DownloadAsync(query, cancellation);
-
-        var content = _gradebookService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
-
-        var contentBytes = Encoding.UTF8.GetBytes(content);
-
-        var fileName = exporter.CreateFileName();
-
-        var contentType = exporter.GetContentType(fileName);
-
-        return File(contentBytes, contentType, fileName);
-    }
-
-    /// <remarks>
-    /// DO NOT use allow this endpoint to be used in live Production environments. When time and budget permit, we will
-    /// design and implement a fire-and-forget strategy managing a queue of large exports, reports, etc.
-    /// </remarks>
-    [HttpGet("progress/gradebooks/export")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    public ActionResult<ExportStarted> ExportAsync([FromQuery] CollectGradebooks query, CancellationToken cancellation)
-    {
-        // TODO: Ensure rate limiter is configured to throttle usage
-
-        if (_releaseSettings.GetEnvironment().IsProduction())
-            return Forbid("This API endpoint is not currently available for use in Production environments.");
-
-        var exporter = new ExportManager(_databaseSettings, "progress", "gradebook");
-
-        var start = exporter.Start(query.Filter.Format);
-
-        // Fire and forget so the export is executed in the background.
-
-        var task = Task.Run(async () =>
-        {
-            try
-            {
-                await _gradebookService.ExportAsync(start, query, cancellation);
-            }
-            catch (Exception ex)
-            {
-                // FIXME: Log error and mark export as failed
-                // exporter.MarkAsFailed(start.ExportKey, ex.Message);
-                _logger.LogError(ex, "Export failed for {ExportKey}", start.ExportKey);
-            }
-        });
-
-        var started = exporter.Started(start, "progress/gradebooks/exports/{key}");
-
-        return Ok(started);
-    }
-
-    [HttpGet("progress/gradebooks/exports/{key:guid}")]
-    [HybridAuthorize(Policies.Progress.Gradebooks.Gradebook.Read)]
-    public async Task<IActionResult> ExportAsync(string key)
-    {
-        // TODO: Replace the key with a value that has higher entropy. Perhaps validate a digital signature generated
-        // and delivered to the client in the ExportStarted event.
-
-        var helper = new ExportManager(_databaseSettings, "progress", "gradebook");
-
-        var completed = helper.Find(key);
-
-        if (completed.PhysicalFile == null)
-            return NotFound();
-
-        Response.Headers.Append("Content-Disposition", completed.ContentDisposition);
-
-        Response.ContentType = completed.ContentType;
-
-        await using var stream = new FileStream(completed.PhysicalFile, FileMode.Open, FileAccess.Read);
-
-        await stream.CopyToAsync(Response.Body);
-
-        return new EmptyResult();
-    }
-
-
-    // This entity is a current-state projection of an aggregate event/change stream. This is the reason you do not see
-    // any controller actions implemented here to create, modify, or delete this entity. Data changes to this entity are 
-    // permitted only using Timeline commands.
+    #endregion Queries
 }

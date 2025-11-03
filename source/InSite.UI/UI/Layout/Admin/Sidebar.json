@@ -1,6 +1,6 @@
 {
   "Home": {
-    "Icon": "fas fa-fw fa-home",
+    "Icon": "fa-fw fa-regular fa-home",
     "Image": "/favicon.png",
     "Text": "Shift iQ",
     "Href": "/ui/home"
@@ -10,22 +10,22 @@
       "Category": "Communication",
       "Links": [
         {
-          "Icon": "fa-fw fa fa-users",
+          "Icon": "fa-fw fa-regular fa-users",
           "Text": "Contacts",
           "Href": "/ui/admin/contacts/home"
         },
         {
-          "Icon": "fa-fw fa fa-paper-plane",
+          "Icon": "fa-fw fa-regular fa-paper-plane",
           "Text": "Messages",
           "Href": "/ui/admin/messages/home"
         },
         {
-          "Icon": "fa-fw fa fa-clouds",
+          "Icon": "fa-fw fa-regular fa-clouds",
           "Text": "Sites",
           "Href": "/ui/admin/sites/home"
         },
         {
-          "Icon": "fa-fw fa fa-check-square",
+          "Icon": "fa-fw fa-regular fa-check-square",
           "Text": "Surveys",
           "Href": "/ui/admin/surveys/home"
         }
@@ -35,27 +35,27 @@
       "Category": "Learning",
       "Links": [
         {
-          "Icon": "fa-fw fa fa-balance-scale",
+          "Icon": "fa-fw fa-regular fa-balance-scale",
           "Text": "Assessments",
           "Href": "/ui/admin/assessments/home"
         },
         {
-          "Icon": "fa-fw fa fa-users-class",
+          "Icon": "fa-fw fa-regular fa-users-class",
           "Text": "Courses",
           "Href": "/ui/admin/courses/home"
         },
         {
-          "Icon": "fa-fw fa fa-calendar-alt",
+          "Icon": "fa-fw fa-regular fa-calendar-alt",
           "Text": "Events",
           "Href": "/ui/admin/events/home"
         },
         {
-          "Icon": "fa-fw fa fa-pencil-ruler",
+          "Icon": "fa-fw fa-regular fa-pencil-ruler",
           "Text": "Records",
           "Href": "/ui/admin/records/home"
         },
         {
-          "Icon": "fa-fw fa fa-ruler-triangle",
+          "Icon": "fa-fw fa-regular fa-ruler-triangle",
           "Text": "Standards",
           "Href": "/ui/admin/standards/home"
         }
@@ -65,27 +65,22 @@
       "Category": "Management",
       "Links": [
         {
-          "Icon": "fa-fw fa fa-inventory",
+          "Icon": "fa-fw fa-regular fa-inventory",
           "Text": "Assets",
           "Href": "/ui/admin/assets/home"
         },
         {
-          "Icon": "fa-fw fa fa-user-hard-hat",
-          "Text": "Jobs",
-          "Href": "/ui/admin/jobs/home"
-        },
-        {
-          "Icon": "fa-fw fa fa-file-chart-line",
+          "Icon": "fa-fw fa-regular fa-file-chart-line",
           "Text": "Reports",
           "Href": "/ui/admin/reporting"
         },
         {
-          "Icon": "fa-fw fa fa-file-invoice-dollar",
+          "Icon": "fa-fw fa-regular fa-file-invoice-dollar",
           "Text": "Sales",
           "Href": "/ui/admin/sales/home"
         },
         {
-          "Icon": "fa-fw fa fa-arrow-progress",
+          "Icon": "fa-fw fa-regular fa-arrow-progress",
           "Text": "Workflows",
           "Href": "/ui/admin/workflow/home"
         }

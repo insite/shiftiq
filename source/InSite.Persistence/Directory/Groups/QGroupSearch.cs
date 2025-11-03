@@ -683,26 +683,6 @@ namespace InSite.Persistence
             }
         }
 
-        public List<UserRoleItem> GetCmdsUserRoles(Guid user, string groupNameStarts)
-        {
-            using (var db = CreateContext())
-            {
-                return db.QGroups.Where(x =>
-                        x.Organization.OrganizationCode == "cmds"
-                        && x.GroupType == GroupTypes.Role
-                        && x.GroupName.StartsWith(groupNameStarts)
-                    )
-                    .Select(x => new UserRoleItem
-                    {
-                        GroupIdentifier = x.GroupIdentifier,
-                        GroupName = x.GroupName,
-                        Selected = x.VMemberships.Any(y => y.UserIdentifier == user)
-                    })
-                    .OrderBy(x => x.GroupName)
-                    .ToList();
-            }
-        }
-
         public List<string> GetGroupLabels(Guid organization, string groupType)
         {
             using (var db = new InternalDbContext())

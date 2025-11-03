@@ -93,11 +93,17 @@ namespace InSite.UI.Portal.Home.Learning
 
             if (status == CourseDistributionGridItem.StatusType.NotStarted)
             {
+                var managerPerson = ServiceLocator.PersonSearch.GetPerson(
+                    first.ManagerUserIdentifier, Organization.Identifier,
+                    x => x.User, x => x.EmployerGroup);
+                var firsName = managerPerson?.User.FirstName ?? "N/A";
+                var employerName = managerPerson?.EmployerGroup?.GroupName ?? "N/A";
+
                 AttemptCardHeader.InnerHtml =
                     "<i class='fas fa-fw fa-circle text-info'></i>" +
                     "<span class='fst-italic ps-1'>SkillsCheck – Not Started</span>";
                 AttemptCardBody.InnerText =
-                    "[AdminFirstName] at [Company Name] assigned this SkillsCheck to you.";
+                    $"{firsName} at {employerName} assigned this SkillsCheck to you.";
                 AttemptCardStartButton.Visible = true;
                 AttemptCardStartButton.NavigateUrl = GetGridAttemptStartUrl(first.FormIdentifier);
             }

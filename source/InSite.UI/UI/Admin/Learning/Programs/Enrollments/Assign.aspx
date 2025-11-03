@@ -77,13 +77,14 @@
 
                                         <div class="mb-3">
 
-                                            <insite:RadioButton runat="server" ID="AssignStrategy_NoChange" GroupName="ModifyStrategy" Text="Do not modify any current training plans" Checked="true" />
+                                            <insite:RadioButton runat="server" ID="AssignStrategy_NoChange" GroupName="ModifyStrategy" Text="<strong>Do nothing</strong>. No changes will be made to any previously assigned achievements. Their existing Planned and Required statuses will remain as-is. <small>(Use this if you want to preserve each learner's current setup without overriding anything.)</small>"
+                                                Checked="true" />
 
-                                            <insite:RadioButton runat="server" ID="AssignStrategy_PlanAndRequire" GroupName="ModifyStrategy" Text="Previously assigned achievements are required in current training plans" />
+                                            <insite:RadioButton runat="server" ID="AssignStrategy_PlanAndRequire" GroupName="ModifyStrategy" Text="Ensure all previously assigned achievements (in this Program) are Required in current training plans for the selected learners" Visible="false" />
 
-                                            <insite:RadioButton runat="server" ID="AssignStrategy_PlanAndRecommend" GroupName="ModifyStrategy" Text="Previously assigned achievements are optional in current training plans" />
+                                            <insite:RadioButton runat="server" ID="AssignStrategy_PlanAndRecommend" GroupName="ModifyStrategy" Text="Ensure all previously assigned achievements (in this Program) are Optional (recommended but not mandatory) in current training plans for the selected learners" Visible="false" />
 
-                                            <insite:RadioButton runat="server" ID="AssignStrategy_Unplan" GroupName="ModifyStrategy" Text="Previously assigned achievements are no longer required in current training plans" />
+                                            <insite:RadioButton runat="server" ID="AssignStrategy_Unplan" GroupName="ModifyStrategy" Text="<strong>Make all unplanned and optional</strong>. All previously assigned achievements will be set to Planned = No and Required = No. <small>(Use this if you want to remove any previous assignments from the learner's plan and mark them as not required.)</small>" />
 
                                         </div>
 
@@ -96,13 +97,13 @@
 
                     </div>
                 </div>
-                
             
             </section>
 
         </insite:NavItem>
 
         <insite:NavItem runat="server" ID="Step2" Title="Pending Changes" Icon="far fa-users" IconPosition="BeforeText" Visible="false">
+
             <section>
 
                 <h2 class="h4 mt-4 mb-3">
@@ -183,7 +184,9 @@
 
                     </div>
                 </div>
+
             </section>
+
         </insite:NavItem>
 
     </insite:Nav>

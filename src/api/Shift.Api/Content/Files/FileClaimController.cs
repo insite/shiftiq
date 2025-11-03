@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
 using Shift.Service.Content;
 
 namespace Shift.Api;
 
 [ApiController]
 [ApiExplorerSettings(GroupName = "Content API: Files")]
-public class FileClaimController : ControllerBase
+public class FileClaimController : ShiftControllerBase
 {
     private readonly FileClaimService _fileClaimService;
 
@@ -19,31 +18,30 @@ public class FileClaimController : ControllerBase
     #region Queries
 
     /// <summary>
-    /// Check for the existence of one specific file claim
+    /// Checks for the existence of one specific file claim
     /// </summary>
     [HttpHead("content/files-claims/{claim:guid}")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Assert)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertFileClaim")]
-    public async Task<ActionResult<bool>> AssertAsync(
-        [FromRoute] Guid claim,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> AssertAsync([FromRoute] Guid claim, CancellationToken cancellation = default)
     {
         var exists = await _fileClaimService.AssertAsync(claim, cancellation);
+
         return exists ? Ok() : NotFound();
     }
 
     /// <summary>
-    /// Collect the list of file claims that match specific criteria
+    /// Collects the list of file claims that match specific criteria
     /// </summary>
     [HttpPost("content/files-claims/collect")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Collect)]
     [ProducesResponseType<IEnumerable<FileClaimModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectFileClaims")]
-    public async Task<ActionResult<IEnumerable<FileClaimModel>>> PostCollectAsync(
-        [FromBody] CollectFileClaims query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> PostCollectAsync([FromBody] CollectFileClaims query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
     [HttpGet("content/files-claims")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Collect)]
@@ -51,14 +49,12 @@ public class FileClaimController : ControllerBase
     [EndpointName("collectFileClaims_get")]
     [AliasFor("collectFileClaims")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<IEnumerable<FileClaimModel>>> GetCollectAsync(
-        [FromQuery] CollectFileClaims query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> GetCollectAsync([FromQuery] CollectFileClaims query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
-    private async Task<ActionResult<IEnumerable<FileClaimModel>>> CollectAsync(
-        CollectFileClaims query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CollectAsync(CollectFileClaims query, CancellationToken cancellation)
     {
         var models = await _fileClaimService.CollectAsync(query, cancellation);
 
@@ -70,16 +66,16 @@ public class FileClaimController : ControllerBase
     }
 
     /// <summary>
-    /// Count the file claims that match specific criteria
+    /// Counts the file claims that match specific criteria
     /// </summary>
     [HttpPost("content/files-claims/count")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Count)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countFileClaims")]
-    public async Task<ActionResult<CountResult>> PostCountAsync(
-        [FromBody] CountFileClaims query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> PostCountAsync([FromBody] CountFileClaims query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
     [HttpGet("content/files-claims/count")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Count)]
@@ -87,31 +83,30 @@ public class FileClaimController : ControllerBase
     [EndpointName("countFileClaims_get")]
     [AliasFor("countFileClaims")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<CountResult>> GetCountAsync(
-        [FromQuery] CountFileClaims query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> GetCountAsync([FromQuery] CountFileClaims query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
-    private async Task<ActionResult<CountResult>> CountAsync(
-        CountFileClaims query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CountAsync(CountFileClaims query, CancellationToken cancellation)
     {
         var count = await _fileClaimService.CountAsync(query, cancellation);
+
         return Ok(new CountResult(count));
     }
 
     /// <summary>
-    /// Download the list of file claims that match specific criteria
+    /// Downloads the list of file claims that match specific criteria
     /// </summary>    
     [HttpPost("content/files-claims/download")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Download)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadFileClaims")]
-    public async Task<FileContentResult> PostDownloadAsync(
-        [FromBody] CollectFileClaims query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> PostDownloadAsync([FromBody] CollectFileClaims query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
     [HttpGet("content/files-claims/download")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Download)]
@@ -120,20 +115,20 @@ public class FileClaimController : ControllerBase
     [EndpointName("downloadFileClaims_get")]
     [AliasFor("downloadFileClaims")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<FileContentResult> GetDownloadAsync(
-        [FromQuery] CollectFileClaims query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> GetDownloadAsync([FromQuery] CollectFileClaims query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
-    private async Task<FileContentResult> DownloadAsync(
-        CollectFileClaims query,
-        CancellationToken cancellation)
+    private async Task<FileContentResult> DownloadAsync(CollectFileClaims query, CancellationToken cancellation)
     {
         var exporter = new ExportHelper("Content", "FileClaims", query.Filter.Format, User);
 
-        var models = await _fileClaimService.DownloadAsync(query, cancellation);
+        var models = await _fileClaimService
+            .DownloadAsync(query, cancellation)
+            .ToListAsync(cancellation);
 
-        var content = _fileClaimService.Serialize(models, exporter.GetFileFormat());
+        var content = _fileClaimService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
 
         var contentBytes = System.Text.Encoding.UTF8.GetBytes(content);
 
@@ -145,31 +140,30 @@ public class FileClaimController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieve one specific file claim
+    /// Retrieves one specific file claim
     /// </summary>
     [HttpGet("content/files-claims/{claim:guid}")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Retrieve)]
     [ProducesResponseType<FileClaimModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveFileClaim")]
-    public async Task<ActionResult<FileClaimModel>> RetrieveAsync(
-        [FromRoute] Guid claim,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> RetrieveAsync([FromRoute] Guid claim, CancellationToken cancellation = default)
     {
         var model = await _fileClaimService.RetrieveAsync(claim, cancellation);
+
         return model != null ? Ok(model) : NotFound();
     }
 
     /// <summary>
-    /// Search for the list of file claims that match specific criteria
+    /// Searches for the list of file claims that match specific criteria
     /// </summary>
     [HttpPost("content/files-claims/search")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Search)]
     [ProducesResponseType<IEnumerable<FileClaimMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchFileClaims")]
-    public async Task<ActionResult<IEnumerable<FileClaimMatch>>> PostSearchAsync(
-        [FromBody] SearchFileClaims query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> PostSearchAsync([FromBody] SearchFileClaims query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
     [HttpGet("content/files-claims/search")]
     [HybridAuthorize(Policies.Content.Files.FileClaim.Search)]
@@ -177,14 +171,12 @@ public class FileClaimController : ControllerBase
     [EndpointName("searchFileClaims_get")]
     [AliasFor("searchFileClaims")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<IEnumerable<FileClaimMatch>>> GetSearchAsync(
-        [FromQuery] SearchFileClaims query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> GetSearchAsync([FromQuery] SearchFileClaims query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
-    private async Task<ActionResult<IEnumerable<FileClaimMatch>>> SearchAsync(
-        SearchFileClaims query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> SearchAsync(SearchFileClaims query, CancellationToken cancellation)
     {
         var matches = await _fileClaimService.SearchAsync(query, cancellation);
 
@@ -204,9 +196,7 @@ public class FileClaimController : ControllerBase
     [ProducesResponseType<FileClaimModel>(StatusCodes.Status201Created, "application/json")]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
     [EndpointName("createFileClaim")]
-    public async Task<ActionResult<FileClaimModel>> CreateAsync(
-        [FromBody] CreateFileClaim create,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateFileClaim create, CancellationToken cancellation = default)
     {
         var created = await _fileClaimService.CreateAsync(create, cancellation);
 
@@ -223,9 +213,7 @@ public class FileClaimController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointName("deleteFileClaim")]
-    public async Task<IActionResult> DeleteAsync(
-        [FromRoute] Guid claim,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> DeleteAsync([FromRoute] Guid claim, CancellationToken cancellation = default)
     {
         var deleted = await _fileClaimService.DeleteAsync(claim, cancellation);
 
@@ -241,11 +229,9 @@ public class FileClaimController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
     [EndpointName("modifyFileClaim")]
-    public async Task<IActionResult> ModifyAsync(
-        [FromBody] ModifyFileClaim modify,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> ModifyAsync([FromRoute] Guid claim, [FromBody] ModifyFileClaim modify, CancellationToken cancellation = default)
     {
-        var model = await _fileClaimService.RetrieveAsync(modify.ClaimIdentifier, cancellation);
+        var model = await _fileClaimService.RetrieveAsync(claim, cancellation);
 
         if (model is null)
             return NotFound($"FileClaim not found: ClaimIdentifier {modify.ClaimIdentifier}. You cannot modify an object that is not in the database.");

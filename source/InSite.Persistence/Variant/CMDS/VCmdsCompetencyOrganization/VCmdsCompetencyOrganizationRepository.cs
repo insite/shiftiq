@@ -60,7 +60,7 @@ namespace InSite.Persistence.Plugin.CMDS
                 _sendCommands(commands);
         }
 
-        public static void DeleteUnusedByProfileID(Guid profileStandardId)
+        public static void DeleteUnusedByProfileId(Guid profileStandardId)
         {
             var commands = new List<ICommand>();
 

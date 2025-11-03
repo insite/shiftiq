@@ -5,6 +5,8 @@ using Common.Timeline.Changes;
 using Common.Timeline.Exceptions;
 using Common.Timeline.Services;
 
+using Shift.Common;
+
 namespace Common.Timeline.Snapshots
 {
     /// <summary>
@@ -145,7 +147,7 @@ namespace Common.Timeline.Snapshots
         }
 
         public (AggregateState prev, AggregateState current) GetPrevAndCurrentStates(Guid aggregateId, int version)
-        {           
+        {
             var changes = _changeStore.GetChanges(aggregateId, -1, version);
             if (changes.Length == 0)
                 return (null, null);

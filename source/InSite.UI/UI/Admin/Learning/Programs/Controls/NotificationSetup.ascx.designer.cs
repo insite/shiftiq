@@ -15,22 +15,31 @@ namespace InSite.Admin.Records.Programs.Controls
     {
 
         /// <summary>
-        /// NotificationStalledLearnerMessageIdentifier control.
+        /// EditLink1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.FindMessage NotificationStalledLearnerMessageIdentifier;
+        protected global::InSite.Common.Web.UI.IconLink EditLink1;
 
         /// <summary>
-        /// NotificationStalledAdministratorMessageIdentifier control.
+        /// NotificationStalledLearnerMessageName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.FindMessage NotificationStalledAdministratorMessageIdentifier;
+        protected global::System.Web.UI.WebControls.Literal NotificationStalledLearnerMessageName;
+
+        /// <summary>
+        /// NotificationStalledAdministratorMessageName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal NotificationStalledAdministratorMessageName;
 
         /// <summary>
         /// NotificationStalledTriggerDay control.
@@ -39,7 +48,7 @@ namespace InSite.Admin.Records.Programs.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.NumericBox NotificationStalledTriggerDay;
+        protected global::System.Web.UI.WebControls.Literal NotificationStalledTriggerDay;
 
         /// <summary>
         /// NotificationStalledReminderLimit control.
@@ -48,25 +57,34 @@ namespace InSite.Admin.Records.Programs.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.NumericBox NotificationStalledReminderLimit;
+        protected global::System.Web.UI.WebControls.Literal NotificationStalledReminderLimit;
 
         /// <summary>
-        /// NotificationCompletedLearnerMessageIdentifier control.
+        /// EditLink2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.FindMessage NotificationCompletedLearnerMessageIdentifier;
+        protected global::InSite.Common.Web.UI.IconLink EditLink2;
 
         /// <summary>
-        /// NotificationCompletedAdministratorMessageIdentifier control.
+        /// NotificationCompletedLearnerMessageName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.FindMessage NotificationCompletedAdministratorMessageIdentifier;
+        protected global::System.Web.UI.WebControls.Literal NotificationCompletedLearnerMessageName;
+
+        /// <summary>
+        /// NotificationCompletedAdministratorMessageName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal NotificationCompletedAdministratorMessageName;
 
         /// <summary>
         /// TaskInProgram control.
@@ -75,24 +93,6 @@ namespace InSite.Admin.Records.Programs.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.ComboBox TaskInProgram;
-
-        /// <summary>
-        /// SaveButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.SaveButton SaveButton;
-
-        /// <summary>
-        /// CancelButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.CancelButton CancelButton;
+        protected global::System.Web.UI.WebControls.Literal TaskInProgram;
     }
 }

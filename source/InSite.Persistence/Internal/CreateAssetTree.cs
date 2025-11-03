@@ -21,7 +21,7 @@ namespace InSite.Persistence
         /// </summary>
         public INode<CreateAssetNode> Root { get { return _tree.Root; } }
 
-       
+
         /// <summary>
         /// Enables indexing by group name.
         /// </summary>
@@ -100,7 +100,7 @@ namespace InSite.Persistence
 
                 if (parentNode.AllChildren.Nodes.Contains(childNode))
                     return;
-                
+
                 // Throw an exception otherwise. A child can't be assigned to multiple locations in the hierarchy.
 
                 error = string.Format(
@@ -109,18 +109,18 @@ namespace InSite.Persistence
                     parent);
                 throw new Exception(error);
             }
-            
+
             // Otherwise, add the parent if it is not already in the tree, and then add the child.
 
             if (!Contains(parent))
                 Add(parent);
 
-            _tree[parent].AddChild(child);    
+            _tree[parent].AddChild(child);
         }
 
-        public INode<CreateAssetNode> FindByID(int id)
+        public INode<CreateAssetNode> FindById(int id)
         {
-            var mock = new CreateAssetNode {Id = id};
+            var mock = new CreateAssetNode { Id = id };
             return Root[mock];
         }
     }

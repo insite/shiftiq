@@ -42,7 +42,10 @@ namespace InSite.Admin.Surveys.Responses
             if (response == null)
                 HttpResponseHelper.SendHttp400($"Survey response not found: {ResponseIdentifier}");
 
-            var surveyForm = ServiceLocator.SurveySearch.GetSurveyForm(response.SurveyFormIdentifier);
+            if (!response.ResponseSessionCompleted.HasValue)
+                RedirectToSearch();
+
+                var surveyForm = ServiceLocator.SurveySearch.GetSurveyForm(response.SurveyFormIdentifier);
             if (surveyForm == null)
                 HttpResponseHelper.SendHttp400($"Survey form not found: {response.SurveyFormIdentifier}");
 

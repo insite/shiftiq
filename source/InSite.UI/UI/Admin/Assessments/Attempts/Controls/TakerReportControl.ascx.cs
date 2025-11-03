@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -37,8 +38,6 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
         private class FrameworkItem
         {
             public string FrameworkTitle { get; set; }
-            public string PassingScore { get; set; }
-            public string Score { get; set; }
             public string PassOrFail { get; set; }
         }
 
@@ -92,7 +91,35 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
 
             var data = HtmlConverter.HtmlToPdf(siteContent.ToString(), settings);
 
-            return data;
+            return PdfHelper.Process(data, doc =>
+            {
+                var logoUrl = GetLogoUrl();
+
+                var watermark = PdfHelper.LoadImageByUrl(logoUrl, greyscale: true, opacity: 0.1);
+                try
+                {
+                    if (watermark != null)
+                        PdfHelper.AddWatermark(doc, watermark, PdfHelper.WatermarkPosition.Diagonal);
+                }
+                finally 
+                { 
+                    if (watermark != null)
+                        watermark.Dispose();
+                }
+
+                var organization = CurrentSessionState.Identity.Organization;
+                doc.Info.Title = LabelHelper.GetTranslation("TakerReport.Title", Shift.Common.Language.Default);
+                doc.Info.Author = organization.LegalName;
+                doc.Info.CreationDate = DateTime.Now;
+
+                var appRelease = ServiceLocator.AppSettings.Release;
+                if (appRelease != null)
+                    doc.Info.Creator = $"{appRelease.Brand} v{appRelease.Version}";
+
+                PdfHelper.SetReadOnly(doc);
+
+                doc.SecuritySettings.OwnerPassword = "9v![EDs8U|o*Uw.o\"+ibK!~}\\V*ec-Y8COc/mg|W3X7?^@+)~7";
+            });
         }
 
         protected string Translate(string text) => LabelHelper.GetTranslation(text, CurrentLanguage == Language.English ? "en" : "fr");
@@ -114,7 +141,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
                 return;
 
             var logo = (HtmlImage)e.Item.FindControl("Logo");
-            logo.Src = $"{Request.Url.Scheme}://{Request.Url.Host}{CurrentSessionState.Identity.Organization.PlatformCustomization.PlatformUrl.Logo}";
+            logo.Src = GetLogoUrl();
 
             var attempt = (AttemptItem)e.Item.DataItem;
 
@@ -124,6 +151,12 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
             var frameworkRepeater = (Repeater)e.Item.FindControl("FrameworkRepeater");
             frameworkRepeater.DataSource = attempt.Frameworks;
             frameworkRepeater.DataBind();
+        }
+
+        private static string GetLogoUrl()
+        {
+            var request = HttpContext.Current.Request;
+            return $"{request.Url.Scheme}://{request.Url.Host}{CurrentSessionState.Identity.Organization.PlatformCustomization.PlatformUrl.Logo}";
         }
 
         private List<AttemptItem> GetAttempts(Guid userId, Guid organizationId, Guid[] attemptIds)
@@ -194,8 +227,6 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
                     var item = new FrameworkItem
                     {
                         FrameworkTitle = framework.FrameworkTitle,
-                        PassingScore = $"{framework.PassingScore:p0}",
-                        Score = $"{framework.Score:p0}",
                         PassOrFail = framework.Score >= framework.PassingScore ? Translate("Pass") : Translate("Fail")
                     };
 

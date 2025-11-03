@@ -456,40 +456,13 @@ namespace InSite.Cmds.Admin.People.Controls
         protected global::InSite.Common.Web.UI.NavItem GroupsTab;
 
         /// <summary>
-        /// CmdsUserGroupsColumn control.
+        /// UserRoleList control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CmdsUserGroupsColumn;
-
-        /// <summary>
-        /// CmdsUserGroups control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList CmdsUserGroups;
-
-        /// <summary>
-        /// SkillsPassportUserGroupsColumn control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SkillsPassportUserGroupsColumn;
-
-        /// <summary>
-        /// SkillsPassportUserGroups control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList SkillsPassportUserGroups;
+        protected global::System.Web.UI.WebControls.CheckBoxList UserRoleList;
 
         /// <summary>
         /// DuplicatesTab control.

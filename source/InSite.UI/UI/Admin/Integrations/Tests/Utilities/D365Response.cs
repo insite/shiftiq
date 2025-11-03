@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.UI.Admin.Integrations.Tests.Utilities
 {
@@ -13,7 +14,28 @@ namespace InSite.UI.Admin.Integrations.Tests.Utilities
         public string Status { get; private set; }
         public string Body { get; private set; }
 
-        const string BearerTokenSecret = "b3DZm7e7teW+gNP2/8tO7gkFkgaqHDoUYu4/AfGwiN8lOb8yx7UgaEo9R0uXyjSE3Kjwog0zsy6zLKbIx3yuaA==";
+        private static string GetApiClientSecret()
+        {
+            var identity = CurrentSessionState.Identity;
+
+            var userId = identity.User.Identifier;
+
+            var organizationId = identity.Organization.Identifier;
+
+            var person = ServiceLocator.PersonSearch.GetPerson(userId, organizationId);
+
+            if (person == null)
+                throw new Exception($"Person not found for user {userId} in organization {organizationId}");
+
+            var personId = person.PersonIdentifier;
+
+            var secret = ServiceLocator.PersonSecretSearch.GetByPerson(personId, SecretName.ShiftClientSecret)?.SecretValue;
+
+            if (secret == null)
+                throw new Exception($"API Client Secret not found for person {personId}");
+
+            return secret;
+        }
 
         private D365Response() { }
 
@@ -26,13 +48,15 @@ namespace InSite.UI.Admin.Integrations.Tests.Utilities
                     Body = "N/A"
                 };
 
+            var secret = GetApiClientSecret();
+
             url = "https://" + HttpContext.Current.Request.Url.Host + url;
 
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Timeout = 60 * 1000;
             request.Method = method;
             request.ContentType = contentType;
-            request.Headers.Add("Authorization", $"Bearer {BearerTokenSecret}");
+            request.Headers.Add("Authorization", $"Bearer {secret}");
 
             if (body.IsNotEmpty())
             {

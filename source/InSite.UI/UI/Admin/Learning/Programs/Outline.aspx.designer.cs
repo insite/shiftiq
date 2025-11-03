@@ -258,49 +258,22 @@ namespace InSite.Admin.Records.Programs
         protected global::System.Web.UI.WebControls.Literal ProgramType;
 
         /// <summary>
-        /// AchievementUpdatePanel control.
+        /// EditAchievementLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.UpdatePanel AchievementUpdatePanel;
+        protected global::InSite.Common.Web.UI.IconLink EditAchievementLink;
 
         /// <summary>
-        /// AchievementIdentifierField control.
+        /// NoAchievementMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AchievementIdentifierField;
-
-        /// <summary>
-        /// AchievementCreateButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.IconButton AchievementCreateButton;
-
-        /// <summary>
-        /// AchievementOutlineLink control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.IconLink AchievementOutlineLink;
-
-        /// <summary>
-        /// AchievementIdentifier control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.FindAchievement AchievementIdentifier;
+        protected global::System.Web.UI.WebControls.Panel NoAchievementMessage;
 
         /// <summary>
         /// AchievementFields control.
@@ -312,13 +285,22 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.Container AchievementFields;
 
         /// <summary>
-        /// AchievementName control.
+        /// AchievementOutlineLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox AchievementName;
+        protected global::InSite.Common.Web.UI.IconLink AchievementOutlineLink;
+
+        /// <summary>
+        /// AchievementTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal AchievementTitle;
 
         /// <summary>
         /// AchievementLabel control.
@@ -327,7 +309,7 @@ namespace InSite.Admin.Records.Programs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox AchievementLabel;
+        protected global::System.Web.UI.WebControls.Literal AchievementLabel;
 
         /// <summary>
         /// AchievementExpiration control.
@@ -336,7 +318,16 @@ namespace InSite.Admin.Records.Programs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.UI.Admin.Records.Achievements.Controls.AchievementExpirationField AchievementExpiration;
+        protected global::System.Web.UI.WebControls.Literal AchievementExpiration;
+
+        /// <summary>
+        /// AchievementLayoutField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AchievementLayoutField;
 
         /// <summary>
         /// AchievementLayout control.
@@ -345,25 +336,7 @@ namespace InSite.Admin.Records.Programs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.CertificateLayoutComboBox AchievementLayout;
-
-        /// <summary>
-        /// AchievementSaveButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.SaveButton AchievementSaveButton;
-
-        /// <summary>
-        /// AchievementCancelButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.CancelButton AchievementCancelButton;
+        protected global::System.Web.UI.WebControls.Literal AchievementLayout;
 
         /// <summary>
         /// EditButton control.
@@ -447,13 +420,22 @@ namespace InSite.Admin.Records.Programs
         protected global::System.Web.UI.WebControls.Literal CatalogName;
 
         /// <summary>
-        /// ProgramCategoryList control.
+        /// CategoriesFolderRepeater control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.UI.Admin.Learning.Programs.Controls.ProgramCategoryList ProgramCategoryList;
+        protected global::System.Web.UI.WebControls.Repeater CategoriesFolderRepeater;
+
+        /// <summary>
+        /// NoCatalogCategories control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel NoCatalogCategories;
 
         /// <summary>
         /// ContentTab control.
@@ -483,13 +465,13 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.NavItem LearnerTab;
 
         /// <summary>
-        /// ProgramUserGrid control.
+        /// ContactTabControl control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Admin.Records.Programs.Controls.ProgramUserGrid ProgramUserGrid;
+        protected global::InSite.UI.Admin.Learning.Programs.Controls.ProgramContactTab ContactTabControl;
 
         /// <summary>
         /// CredentialPanel control.
@@ -528,13 +510,22 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.UI.CMDS.Common.Controls.User.AchievementListEditor AchievementEditor;
 
         /// <summary>
-        /// AchievementTaskSection control.
+        /// SettingsSection control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.NavItem AchievementTaskSection;
+        protected global::InSite.Common.Web.UI.NavItem SettingsSection;
+
+        /// <summary>
+        /// ModifySettingsLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink ModifySettingsLink;
 
         /// <summary>
         /// TaskGrid control.
@@ -543,7 +534,7 @@ namespace InSite.Admin.Records.Programs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Cmds.Admin.Records.Programs.TaskGrid TaskGrid;
+        protected global::InSite.Admin.Records.Programs.Controls.TaskGridView TaskGrid;
 
         /// <summary>
         /// PublicationTab control.
@@ -598,14 +589,5 @@ namespace InSite.Admin.Records.Programs
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Admin.Courses.Outlines.Controls.PrivacySettingsGroups PrivacySettingRepeater;
-
-        /// <summary>
-        /// SaveAchievementsButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.SaveButton SaveAchievementsButton;
     }
 }

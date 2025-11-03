@@ -5,6 +5,8 @@ using System.Linq;
 using Common.Timeline.Exceptions;
 using Common.Timeline.Services;
 
+using Shift.Common;
+
 namespace Common.Timeline.Changes
 {
     /// <summary>

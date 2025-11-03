@@ -4,14 +4,7 @@ using Shift.Common;
 
 namespace Shift.Service.Directory;
 
-public interface IPersonWriter : IEntityWriter
-{
-    Task<bool> CreateAsync(PersonEntity entity, CancellationToken cancellation = default);
-    Task<bool> DeleteAsync(Guid person, CancellationToken cancellation = default);
-    Task<bool> ModifyAsync(PersonEntity entity, CancellationToken cancellation = default);
-}
-
-internal class PersonWriter : IPersonWriter
+public class PersonWriter : IEntityWriter
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
@@ -27,11 +20,11 @@ internal class PersonWriter : IPersonWriter
         var exists = await AssertAsync(entity.PersonIdentifier, cancellation, db);
         if (exists)
             return false;
-                
+
         await db.QPerson.AddAsync(entity, cancellation);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> DeleteAsync(Guid person, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -43,7 +36,7 @@ internal class PersonWriter : IPersonWriter
         db.QPerson.Remove(entity);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> ModifyAsync(PersonEntity entity, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -57,5 +50,5 @@ internal class PersonWriter : IPersonWriter
     }
 
     private async Task<bool> AssertAsync(Guid person, CancellationToken cancellation, TableDbContext db)
-		=> await db.QPerson.AsNoTracking().AnyAsync(x => x.PersonIdentifier == person, cancellation);
+        => await db.QPerson.AsNoTracking().AnyAsync(x => x.PersonIdentifier == person, cancellation);
 }

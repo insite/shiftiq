@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
 using Shift.Service.Booking;
 
 namespace Shift.Api;
@@ -25,11 +24,10 @@ public class EventUserController : ShiftControllerBase
     [HybridAuthorize(Policies.Booking.Events.EventUser.Assert)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertEventUser")]
-    public async Task<IActionResult> AssertAsync(
-        [FromRoute] Guid @event, [FromRoute] Guid user,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> AssertAsync([FromRoute] Guid @event, [FromRoute] Guid user, CancellationToken cancellation = default)
     {
         var exists = await _eventUserService.AssertAsync(@event, user, cancellation);
+
         return exists ? Ok() : NotFound();
     }
 
@@ -40,10 +38,10 @@ public class EventUserController : ShiftControllerBase
     [HybridAuthorize(Policies.Booking.Events.EventUser.Collect)]
     [ProducesResponseType<IEnumerable<EventUserModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectEventUsers")]
-    public async Task<IActionResult> PostCollectAsync(
-        [FromBody] CollectEventUsers query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> PostCollectAsync([FromBody] CollectEventUsers query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
     [HttpGet("booking/events-users")]
     [HybridAuthorize(Policies.Booking.Events.EventUser.Collect)]
@@ -51,14 +49,12 @@ public class EventUserController : ShiftControllerBase
     [EndpointName("collectEventUsers_get")]
     [AliasFor("collectEventUsers")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetCollectAsync(
-        [FromQuery] CollectEventUsers query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> GetCollectAsync([FromQuery] CollectEventUsers query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> CollectAsync(
-        CollectEventUsers query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CollectAsync(CollectEventUsers query, CancellationToken cancellation)
     {
         var models = await _eventUserService.CollectAsync(query, cancellation);
 
@@ -76,10 +72,10 @@ public class EventUserController : ShiftControllerBase
     [HybridAuthorize(Policies.Booking.Events.EventUser.Count)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countEventUsers")]
-    public async Task<IActionResult> PostCountAsync(
-        [FromBody] CountEventUsers query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> PostCountAsync([FromBody] CountEventUsers query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
     [HttpGet("booking/events-users/count")]
     [HybridAuthorize(Policies.Booking.Events.EventUser.Count)]
@@ -87,16 +83,15 @@ public class EventUserController : ShiftControllerBase
     [EndpointName("countEventUsers_get")]
     [AliasFor("countEventUsers")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetCountAsync(
-        [FromQuery] CountEventUsers query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> GetCountAsync([FromQuery] CountEventUsers query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> CountAsync(
-        CountEventUsers query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CountAsync(CountEventUsers query, CancellationToken cancellation)
     {
         var count = await _eventUserService.CountAsync(query, cancellation);
+
         return Ok(new CountResult(count));
     }
 
@@ -108,10 +103,10 @@ public class EventUserController : ShiftControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadEventUsers")]
-    public async Task<FileContentResult> PostDownloadAsync(
-        [FromBody] CollectEventUsers query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> PostDownloadAsync([FromBody] CollectEventUsers query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
     [HttpGet("booking/events-users/download")]
     [HybridAuthorize(Policies.Booking.Events.EventUser.Download)]
@@ -120,18 +115,18 @@ public class EventUserController : ShiftControllerBase
     [EndpointName("downloadEventUsers_get")]
     [AliasFor("downloadEventUsers")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<FileContentResult> GetDownloadAsync(
-        [FromQuery] CollectEventUsers query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> GetDownloadAsync([FromQuery] CollectEventUsers query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
-    private async Task<FileContentResult> DownloadAsync(
-        CollectEventUsers query,
-        CancellationToken cancellation)
+    private async Task<FileContentResult> DownloadAsync(CollectEventUsers query, CancellationToken cancellation)
     {
         var exporter = new ExportHelper("Booking", "EventUsers", query.Filter.Format, User);
 
-        var models = await _eventUserService.DownloadAsync(query, cancellation);
+        var models = await _eventUserService
+            .DownloadAsync(query, cancellation)
+            .ToListAsync(cancellation);
 
         var content = _eventUserService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
 
@@ -151,11 +146,10 @@ public class EventUserController : ShiftControllerBase
     [HybridAuthorize(Policies.Booking.Events.EventUser.Retrieve)]
     [ProducesResponseType<EventUserModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveEventUser")]
-    public async Task<IActionResult> RetrieveAsync(
-        [FromRoute] Guid @event, [FromRoute] Guid user,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> RetrieveAsync([FromRoute] Guid @event, [FromRoute] Guid user, CancellationToken cancellation = default)
     {
         var model = await _eventUserService.RetrieveAsync(@event, user, cancellation);
+
         return model != null ? Ok(model) : NotFound();
     }
 
@@ -166,10 +160,10 @@ public class EventUserController : ShiftControllerBase
     [HybridAuthorize(Policies.Booking.Events.EventUser.Search)]
     [ProducesResponseType<IEnumerable<EventUserMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchEventUsers")]
-    public async Task<IActionResult> PostSearchAsync(
-        [FromBody] SearchEventUsers query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> PostSearchAsync([FromBody] SearchEventUsers query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
     [HttpGet("booking/events-users/search")]
     [HybridAuthorize(Policies.Booking.Events.EventUser.Search)]
@@ -177,14 +171,12 @@ public class EventUserController : ShiftControllerBase
     [EndpointName("searchEventUsers_get")]
     [AliasFor("searchEventUsers")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetSearchAsync(
-        [FromQuery] SearchEventUsers query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> GetSearchAsync([FromQuery] SearchEventUsers query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> SearchAsync(
-        SearchEventUsers query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> SearchAsync(SearchEventUsers query, CancellationToken cancellation)
     {
         var matches = await _eventUserService.SearchAsync(query, cancellation);
 

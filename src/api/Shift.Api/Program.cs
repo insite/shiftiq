@@ -10,12 +10,13 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 
 using Shift.Common.Integration.Google;
+using Shift.Constant;
 using Shift.Contract.Presentation;
 using Shift.Service.Content;
 using Shift.Service.Directory;
 using Shift.Service.Feedback;
 using Shift.Service.Presentation;
-using Shift.Service.Site;
+using Shift.Service.Workspace;
 
 // Step 1. Load configuration settings (from appsettings.json) before doing anything else.
 
@@ -284,6 +285,8 @@ void AddSettings(IServiceCollection services)
     services.AddSingleton(settings.Shift.Api.Telemetry.Logging);
     services.AddSingleton(settings.Shift.Api.Telemetry.Monitoring);
     services.AddSingleton(platform);
+
+    OrganizationIdentifiers.Initialize(settings.Application.Organizations);
 }
 
 void AddEntities(IServiceCollection services)

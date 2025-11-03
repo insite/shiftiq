@@ -10,6 +10,7 @@ export const IS_LOCAL = !!import.meta.env.VITE_IS_LOCAL && import.meta.env.VITE_
 export const LOCAL_USER = (import.meta.env.VITE_LOCAL_USER ?? null) as (string | null);
 export const LOCAL_ORGANIZATION = (import.meta.env.VITE_LOCAL_ORGANIZATION ?? null) as (string | null);
 export const PAGES_PER_VIEW = parseInt(import.meta.env.VITE_PAGES_PER_VIEW);
+export const TINYMCE_SCRIPT = import.meta.env.VITE_TINYMCE_SCRIPT as string;
 export const SHIFT_API_HOST_URL = import.meta.env.VITE_SHIFT_API_HOST_URL as string;
 export const LOCAL_ENV_API_LATENCY = parseInt(import.meta.env.VITE_LOCAL_ENV_API_LATENCY);
 export const FINDER_PAGE_SIZE = parseInt(import.meta.env.VITE_FINDER_PAGE_SIZE);

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -177,6 +178,9 @@ namespace InSite.Admin.Contacts.Groups.Controls
             var history = (IconLink)e.Row.FindControl("HistoryLink");
             var returnUrl = $"/ui/admin/contacts/groups/edit?contact={GroupIdentifier}&panel=people";
             history.NavigateUrl = Logs.Aggregates.Outline.GetUrl(membership, returnUrl);
+
+            var edit = (IconLink)e.Row.FindControl("EditButton");
+            edit.NavigateUrl += "&returnURL=" + HttpUtility.UrlEncode(returnUrl);
         }
 
         private void DownloadBtn_Click(object sender, CommandEventArgs e)

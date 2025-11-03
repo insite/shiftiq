@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Web.UI.WebControls;
 
 using Common.Timeline.Commands;
 
-using InSite.Admin.Invoices.Controls;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Events.Read;
 using InSite.Application.Gateways.Write;
@@ -681,7 +679,7 @@ namespace InSite.UI.Portal.Events.Classes
                 foreach (var command in commands)
                     ServiceLocator.SendCommand(command);
 
-                SendRegistratrionCompleteNotification(registrationIdentifier, user);
+                RegistrationHelper.SendRegistratrionCompleteAlert(registrationIdentifier, user);
             }
 
             if (invoice != null)
@@ -714,130 +712,6 @@ namespace InSite.UI.Portal.Events.Classes
                 }
                 return dict;
             }
-        }
-
-        private void SendRegistratrionCompleteNotification(Guid registrationIdentifier, Guid registeredUserIdentifier)
-        {
-            var registration = ServiceLocator.RegistrationSearch.GetRegistration(registrationIdentifier);
-            var report = registration.PaymentIdentifier.HasValue ? CreateInvoiceReport(registrationIdentifier) : null;
-            var variables = BuildVariableList();
-
-            try
-            {
-                var alert = new AlertRegistrationComplete { RegistrationCompleteProperties = variables };
-                var attachments = report != null ? new string[] { report } : null;
-                var to = new Guid[] { User.UserIdentifier, registeredUserIdentifier };
-
-                ServiceLocator.AlertMailer.Send(Organization.OrganizationIdentifier, User.UserIdentifier, alert, to, attachments);
-            }
-            catch (MessageNotFoundException)
-            {
-            }
-
-            StringDictionary BuildVariableList()
-            {
-                var @event = ServiceLocator.EventSearch.GetEvent(registration.EventIdentifier, x => x.VenueLocation);
-                var content = ContentEventClass.Deserialize(@event.Content);
-                var seat = registration.SeatIdentifier.HasValue ? ServiceLocator.EventSearch.GetSeat(registration.SeatIdentifier.Value) : null;
-                var payment = registration.PaymentIdentifier.HasValue ? ServiceLocator.PaymentSearch.GetPayment(registration.PaymentIdentifier.Value) : null;
-                var person = PersonSearch.Select(Organization.Identifier, registration.CandidateIdentifier, x => x.User, x => x.HomeAddress);
-
-                string invoiceNumber = "None";
-                if (payment != null)
-                {
-                    var invoice = ServiceLocator.InvoiceSearch.GetInvoice(payment.InvoiceIdentifier);
-                    invoiceNumber = invoice?.InvoiceNumber != null
-                        ? Invoice.FormatInvoiceNumber(invoice.InvoiceNumber.Value)
-                        : invoice.InvoiceIdentifier.ToString();
-                }
-
-                var employer = person.EmployerGroupIdentifier.HasValue
-                    ? ServiceLocator.GroupSearch.GetGroup(person.EmployerGroupIdentifier.Value)
-                    : null;
-                var employerAddress = employer != null
-                    ? ServiceLocator.GroupSearch.GetAddress(employer.GroupIdentifier, AddressType.Shipping)
-                    : null;
-                var venueAddress = @event.VenueLocationIdentifier.HasValue
-                    ? ServiceLocator.GroupSearch.GetAddress(@event.VenueLocationIdentifier.Value, AddressType.Physical)
-                    : null;
-
-                Person manager = null;
-                string employerStatus = null;
-
-                if (employer != null)
-                {
-                    var managerReference = MembershipSearch.SelectFirst(x => x.GroupIdentifier == employer.GroupIdentifier && x.MembershipType == MembershipType.EmployerContact);
-                    if (managerReference != null)
-                        manager = PersonSearch.Select(Organization.Identifier, managerReference.UserIdentifier, x => x.User);
-
-                    employerStatus = TCollectionItemCache.GetName(employer.GroupStatusItemIdentifier);
-                }
-
-                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(person.User.TimeZone);
-                var eventDate = @event.EventScheduledEnd.HasValue
-                    ? $"{@event.EventScheduledStart.FormatDateOnly(timeZone)} - {@event.EventScheduledEnd.Value.FormatDateOnly(timeZone)}"
-                    : $"{@event.EventScheduledStart.FormatDateOnly(timeZone)}";
-
-                var eventTime = @event.EventScheduledEnd.HasValue
-                    ? $"{@event.EventScheduledStart.FormatTimeOnly(timeZone)} - {@event.EventScheduledEnd.Value.FormatTimeOnly(timeZone)}"
-                    : $"{@event.EventScheduledStart.FormatTimeOnly(timeZone)}";
-
-                var dict = new StringDictionary();
-                dict.Add("CandidateName", person.User.FullName);
-                dict.Add("CandidateEmail", person.User.Email);
-                dict.Add("CandidateStreet1", person.HomeAddress?.Street1);
-                dict.Add("CandidateCity", person.HomeAddress?.City);
-                dict.Add("CandidateProvince", person.HomeAddress?.Province);
-                dict.Add("CandidatePostalCode", person.HomeAddress?.PostalCode);
-                dict.Add("EmployerStatus", employerStatus ?? "Unknown");
-                dict.Add("CandidateBirthdate", person.Birthdate.HasValue ? $"{person.Birthdate:MM/dd/yyyy}" : "Unknown");
-                dict.Add("CandidateTradeworkerNumber", person.TradeworkerNumber);
-                dict.Add("CandidateWorkBasedHoursToDate", registration.WorkBasedHoursToDate.HasValue ? $"{registration.WorkBasedHoursToDate:n0}" : "None");
-                dict.Add("CandidatePhone", person.Phone ?? "None");
-                dict.Add("CandidateIsEnglishFirstLanguage", string.Equals(person.FirstLanguage, "Not English", StringComparison.OrdinalIgnoreCase) ? "No" : "Yes");
-                dict.Add("EmergencyContactName", person.EmergencyContactName);
-                dict.Add("EmergencyContactPhone", person.EmergencyContactPhone);
-                dict.Add("EmergencyContactRelationship", person.EmergencyContactRelationship);
-                dict.Add("EmployerName", employer?.GroupName ?? "None");
-                dict.Add("EmployerContactName", manager?.User?.FullName ?? "None");
-                dict.Add("EmployerContactPhone", manager?.Phone ?? "None");
-                dict.Add("EmployerContactEmail", manager?.User?.Email ?? "None");
-                dict.Add("EmployerStreet1", employerAddress?.Street1);
-                dict.Add("EmployerCity", employerAddress?.City);
-                dict.Add("EmployerProvince", employerAddress?.Province);
-                dict.Add("EmployerPostalCode", employerAddress?.PostalCode);
-                dict.Add("InvoiceNumber", invoiceNumber);
-                dict.Add("EventTitle", @event.EventTitle);
-                dict.Add("EventDate", eventDate);
-                dict.Add("EventTime", eventTime);
-                dict.Add("VenueName", @event.VenueLocation?.GroupName);
-                dict.Add("VenueStreet1", venueAddress?.Street1);
-                dict.Add("VenueCity", venueAddress?.City);
-                dict.Add("VenueProvince", venueAddress?.Province);
-                dict.Add("VenuePostalCode", venueAddress?.PostalCode);
-                dict.Add("SeatTitle", seat?.SeatTitle ?? "Free");
-                dict.Add("SeatPrice", $"{registration.RegistrationFee ?? 0:n2}");
-                dict.Add("CandidateAuthenticationDetails", RegistrationHelper.GenerateCandidateAuthenticationDetailsMarkdown(person.User.FullName, person.PersonCode, registration.RegistrationPassword));
-                dict.Add("PersonCode", person.PersonCode);
-                dict.Add("MeetingLink", content.ClassLink.Default);
-
-                return dict;
-            }
-        }
-
-        private string CreateInvoiceReport(Guid registrationIdentifier)
-        {
-            var data = InvoiceEventReport.PrintByRegistration(registrationIdentifier, InvoiceEventReportType.Invoice);
-
-            string folder = ServiceLocator.FilePaths.GetPhysicalPathToShareFolder("Files", "Temp", "Invoices", Guid.NewGuid().ToString());
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
-
-            var path = folder + @"\Invoice.pdf";
-
-            File.WriteAllBytes(path, data);
-
-            return path;
         }
 
         private List<Guid> SaveUsers(QGroup employer)

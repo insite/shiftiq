@@ -69,7 +69,7 @@ namespace InSite.Application.Surveys.Write
         private void AddCommands(Guid form, SurveyQuestion question, List<ICommand> script)
         {
             script.Add(new AddSurveyQuestion(form, question.Identifier, question.Type, question.Code, question.Indicator, question.Source));
-            script.Add(new ChangeSurveyQuestionSettings(form, question.Identifier, question.IsHidden, question.IsRequired, question.IsNested, question.LikertAnalysis, question.ListEnableRandomization, question.ListEnableOtherText, question.ListEnableBranch, question.ListEnableGroupMembership, question.ListDisableColumnHeadingWrap, question.TextLineCount, question.TextCharacterLimit, question.NumberEnableStatistics, question.NumberEnableAutoCalc, question.NumberAutoCalcQuestions, question.NumberEnableNotApplicable));
+            script.Add(new ChangeSurveyQuestionSettings(form, question.Identifier, question.IsHidden, question.IsRequired, question.IsNested, question.LikertAnalysis, question.ListEnableRandomization, question.ListEnableOtherText, question.ListEnableBranch, question.ListEnableGroupMembership, question.ListDisableColumnHeadingWrap, question.TextLineCount, question.TextCharacterLimit, question.NumberEnableStatistics, question.NumberEnableAutoCalc, question.NumberAutoCalcQuestions, question.NumberEnableNotApplicable, question.ListSelectionRange, question.EnableCreateCase));
 
             if (question.Content != null)
                 script.Add(new ChangeSurveyQuestionContent(form, question.Identifier, question.Content));
@@ -180,9 +180,11 @@ namespace InSite.Application.Surveys.Write
                 || original.NumberAutoCalcQuestions.EmptyIfNull().Length != changed.NumberAutoCalcQuestions.EmptyIfNull().Length
                 || original.NumberAutoCalcQuestions.IsNotEmpty() && changed.NumberAutoCalcQuestions.IsNotEmpty() && original.NumberAutoCalcQuestions.Any(x => !changed.NumberAutoCalcQuestions.Contains(x))
                 || original.NumberEnableNotApplicable != changed.NumberEnableNotApplicable
+                || !original.ListSelectionRange.IsEqual(changed.ListSelectionRange)
+                || original.EnableCreateCase != changed.EnableCreateCase
                 )
             {
-                script.Add(new ChangeSurveyQuestionSettings(form, changed.Identifier, changed.IsHidden, changed.IsRequired, changed.IsNested, changed.LikertAnalysis, changed.ListEnableRandomization, changed.ListEnableOtherText, changed.ListEnableBranch, changed.ListEnableGroupMembership, changed.ListDisableColumnHeadingWrap, changed.TextLineCount, changed.TextCharacterLimit, changed.NumberEnableStatistics, changed.NumberEnableAutoCalc, changed.NumberAutoCalcQuestions, changed.NumberEnableNotApplicable));
+                script.Add(new ChangeSurveyQuestionSettings(form, changed.Identifier, changed.IsHidden, changed.IsRequired, changed.IsNested, changed.LikertAnalysis, changed.ListEnableRandomization, changed.ListEnableOtherText, changed.ListEnableBranch, changed.ListEnableGroupMembership, changed.ListDisableColumnHeadingWrap, changed.TextLineCount, changed.TextCharacterLimit, changed.NumberEnableStatistics, changed.NumberEnableAutoCalc, changed.NumberAutoCalcQuestions, changed.NumberEnableNotApplicable, changed.ListSelectionRange, changed.EnableCreateCase));
             }
 
             if (!ContentContainer.IsEqual(original.Content, changed.Content))

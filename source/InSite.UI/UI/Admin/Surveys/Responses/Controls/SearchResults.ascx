@@ -17,10 +17,10 @@
                     Visible='<%# CanChangeResponse %>' />
                 <insite:IconLink runat="server" Name="lock" ToolTip="Lock Response Session"
                     NavigateUrl='<%# Eval("ResponseSessionIdentifier", "/ui/admin/surveys/responses/lock?session={0}") %>' 
-                    Visible='<%# !(bool)Eval("ResponseIsLocked") %>'/>
+                    Visible='<%# Eval("ResponseSessionCompleted") != null && !(bool)Eval("ResponseIsLocked") %>'/>
                 <insite:IconLink runat="server" Name="lock-open" ToolTip="Unlock Response Session"
                     NavigateUrl='<%# Eval("ResponseSessionIdentifier", "/ui/admin/surveys/responses/unlock?session={0}") %>' 
-                    Visible='<%# Eval("ResponseIsLocked") %>'/>
+                    Visible='<%# Eval("ResponseSessionCompleted") != null && (bool)Eval("ResponseIsLocked") %>'/>
                 <insite:IconLink runat="server" Name="trash-alt" ToolTip="Delete Response Session"
                     NavigateUrl='<%# Eval("ResponseSessionIdentifier", "/admin/surveys/responses/delete-session?session={0}") %>' />
             </ItemTemplate>

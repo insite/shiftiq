@@ -14,6 +14,7 @@ namespace Shift.Contract
         public Guid OrganizationIdentifier { get; set; }
         public Guid? ParentGroupIdentifier { get; set; }
         public Guid? SurveyFormIdentifier { get; set; }
+        public Guid? GroupStatusItemIdentifier { get; set; }
 
         public bool AddNewUsersAutomatically { get; set; }
         public bool AllowJoinGroupUsingLink { get; set; }
@@ -33,7 +34,6 @@ namespace Shift.Contract
         public string GroupPhone { get; set; }
         public string GroupRegion { get; set; }
         public string GroupSize { get; set; }
-        public string GroupStatus { get; set; }
         public string GroupType { get; set; }
         public string GroupWebSiteUrl { get; set; }
         public string LastChangeType { get; set; }

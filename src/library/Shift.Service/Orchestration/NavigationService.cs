@@ -67,6 +67,9 @@ namespace Shift.Service.Presentation
 
         public async Task<List<NavigationItem>> SearchShortcutsAsync(IShiftPrincipal principal)
         {
+            if (!principal.IsAuthenticated)
+                return new List<NavigationItem>();
+
             var organizationCode = principal.Organization.Name;
 
             var domain = _securitySettings.Domain;

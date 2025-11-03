@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
 using Shift.Service.Directory;
 
 namespace Shift.Api;
@@ -19,31 +18,30 @@ public class PersonController : ShiftControllerBase
     #region Queries
 
     /// <summary>
-    /// Check for the existence of one specific person
+    /// Checks for the existence of one specific person
     /// </summary>
     [HttpHead("directory/people/{person:guid}")]
     [HybridAuthorize(Policies.Directory.People.Person.Assert)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertPerson")]
-    public async Task<IActionResult> AssertAsync(
-        [FromRoute] Guid person,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> AssertAsync([FromRoute] Guid person, CancellationToken cancellation = default)
     {
         var exists = await _personService.AssertAsync(person, cancellation);
+
         return exists ? Ok() : NotFound();
     }
 
     /// <summary>
-    /// Collect the list of people that match specific criteria
+    /// Collects the list of people that match specific criteria
     /// </summary>
     [HttpPost("directory/people/collect")]
     [HybridAuthorize(Policies.Directory.People.Person.Collect)]
     [ProducesResponseType<IEnumerable<PersonModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectPeople")]
-    public async Task<IActionResult> PostCollectAsync(
-        [FromBody] CollectPeople query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> PostCollectAsync([FromBody] CollectPeople query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
     [HttpGet("directory/people")]
     [HybridAuthorize(Policies.Directory.People.Person.Collect)]
@@ -51,14 +49,12 @@ public class PersonController : ShiftControllerBase
     [EndpointName("collectPeople_get")]
     [AliasFor("collectPeople")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetCollectAsync(
-        [FromQuery] CollectPeople query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> GetCollectAsync([FromQuery] CollectPeople query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> CollectAsync(
-        CollectPeople query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CollectAsync(CollectPeople query, CancellationToken cancellation)
     {
         var models = await _personService.CollectAsync(query, cancellation);
 
@@ -70,16 +66,16 @@ public class PersonController : ShiftControllerBase
     }
 
     /// <summary>
-    /// Count the people that match specific criteria
+    /// Counts the people that match specific criteria
     /// </summary>
     [HttpPost("directory/people/count")]
     [HybridAuthorize(Policies.Directory.People.Person.Count)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countPeople")]
-    public async Task<IActionResult> PostCountAsync(
-        [FromBody] CountPeople query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> PostCountAsync([FromBody] CountPeople query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
     [HttpGet("directory/people/count")]
     [HybridAuthorize(Policies.Directory.People.Person.Count)]
@@ -87,31 +83,30 @@ public class PersonController : ShiftControllerBase
     [EndpointName("countPeople_get")]
     [AliasFor("countPeople")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetCountAsync(
-        [FromQuery] CountPeople query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> GetCountAsync([FromQuery] CountPeople query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> CountAsync(
-        CountPeople query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CountAsync(CountPeople query, CancellationToken cancellation)
     {
         var count = await _personService.CountAsync(query, cancellation);
+
         return Ok(new CountResult(count));
     }
 
     /// <summary>
-    /// Download the list of people that match specific criteria
+    /// Downloads the list of people that match specific criteria
     /// </summary>    
     [HttpPost("directory/people/download")]
     [HybridAuthorize(Policies.Directory.People.Person.Download)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadPeople")]
-    public async Task<FileContentResult> PostDownloadAsync(
-        [FromBody] CollectPeople query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> PostDownloadAsync([FromBody] CollectPeople query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
     [HttpGet("directory/people/download")]
     [HybridAuthorize(Policies.Directory.People.Person.Download)]
@@ -120,18 +115,18 @@ public class PersonController : ShiftControllerBase
     [EndpointName("downloadPeople_get")]
     [AliasFor("downloadPeople")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<FileContentResult> GetDownloadAsync(
-        [FromQuery] CollectPeople query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> GetDownloadAsync([FromQuery] CollectPeople query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
-    private async Task<FileContentResult> DownloadAsync(
-        CollectPeople query,
-        CancellationToken cancellation)
+    private async Task<FileContentResult> DownloadAsync(CollectPeople query, CancellationToken cancellation)
     {
         var exporter = new ExportHelper("Directory", "People", query.Filter.Format, User);
 
-        var models = await _personService.DownloadAsync(query, cancellation);
+        var models = await _personService
+            .DownloadAsync(query, cancellation)
+            .ToListAsync(cancellation);
 
         var content = _personService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
 
@@ -145,31 +140,30 @@ public class PersonController : ShiftControllerBase
     }
 
     /// <summary>
-    /// Retrieve one specific person
+    /// Retrieves one specific person
     /// </summary>
     [HttpGet("directory/people/{person:guid}")]
     [HybridAuthorize(Policies.Directory.People.Person.Retrieve)]
     [ProducesResponseType<PersonModel>(StatusCodes.Status200OK)]
     [EndpointName("retrievePerson")]
-    public async Task<IActionResult> RetrieveAsync(
-        [FromRoute] Guid person,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> RetrieveAsync([FromRoute] Guid person, CancellationToken cancellation = default)
     {
         var model = await _personService.RetrieveAsync(person, cancellation);
+
         return model != null ? Ok(model) : NotFound();
     }
 
     /// <summary>
-    /// Search for the list of people that match specific criteria
+    /// Searches for the list of people that match specific criteria
     /// </summary>
     [HttpPost("directory/people/search")]
     [HybridAuthorize(Policies.Directory.People.Person.Search)]
     [ProducesResponseType<IEnumerable<PersonMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchPeople")]
-    public async Task<IActionResult> PostSearchAsync(
-        [FromBody] SearchPeople query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> PostSearchAsync([FromBody] SearchPeople query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
     [HttpGet("directory/people/search")]
     [HybridAuthorize(Policies.Directory.People.Person.Search)]
@@ -177,23 +171,18 @@ public class PersonController : ShiftControllerBase
     [EndpointName("searchPeople_get")]
     [AliasFor("searchPeople")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetSearchAsync(
-        [FromQuery] SearchPeople query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> GetSearchAsync([FromQuery] SearchPeople query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
-    private async Task<IActionResult> SearchAsync(
-        SearchPeople query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> SearchAsync(SearchPeople query, CancellationToken cancellation)
     {
         var matches = await _personService.SearchAsync(query, cancellation);
 
         var count = await _personService.CountAsync(query, cancellation);
 
         Response.AddPagination(query.Filter, count);
-
-        if (query.Filter.Includes != null)
-            return SerializedContent(_personService.Serialize(matches, "json", query.Filter.Includes));
 
         return Ok(matches);
     }

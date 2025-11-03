@@ -52,7 +52,7 @@ ORDER BY FullName;";
             return DatabaseHelper.CreateDataTable(query, new SqlParameter("OrganizationIdentifier", organizationId));
         }
 
-        public static DataTable SelectEmployeesByDepartmentID(Guid department)
+        public static DataTable SelectEmployeesByDepartmentId(Guid department)
         {
             const string query = @"
 SELECT p.UserIdentifier
@@ -70,7 +70,7 @@ SELECT p.UserIdentifier
             return DatabaseHelper.CreateDataTable(query, new SqlParameter("DepartmentIdentifier", department));
         }
 
-        public static DataTable SelectEmployeesByDepartmentProfileID(Guid department, Guid profileStandardIdentifier, bool isPrimaryProfile)
+        public static DataTable SelectEmployeesByDepartmentProfileId(Guid department, Guid profileStandardIdentifier, bool isPrimaryProfile)
         {
             const string query = @"
 SELECT
@@ -328,7 +328,7 @@ ORDER BY
             return table;
         }
 
-        public static List<Department> SelectGroupsByFromID(Guid division)
+        public static List<Department> SelectGroupsByFromId(Guid division)
         {
             const string query = @"
 SELECT Department.*

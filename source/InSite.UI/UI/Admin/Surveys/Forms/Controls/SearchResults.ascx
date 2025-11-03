@@ -11,7 +11,7 @@
                     NavigateUrl='<%# Eval("SurveyFormIdentifier", "/admin/surveys/forms/report?survey={0}") %>' />
                 <insite:IconLink runat="server" Name="tasks" ToolTip="Responses"
                     NavigateUrl='<%# Eval("SurveyFormIdentifier", "/ui/admin/surveys/responses/search?survey={0}") %>' />
-                <%# GetInvitationLink(Eval("SurveyMessageInvitation") as Guid?) %>
+                <%# GetInvitationLink(Container.DataItem as InSite.Application.Surveys.Read.QSurveyForm) %>
             </ItemTemplate>
         </asp:TemplateField>
 

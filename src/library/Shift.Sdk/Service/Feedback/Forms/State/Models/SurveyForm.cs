@@ -12,6 +12,8 @@ namespace InSite.Domain.Surveys.Forms
     [Serializable]
     public class SurveyForm
     {
+        public SurveyState State { get; internal set; }
+
         public SurveyFormStatus Status { get; set; }
 
         public Guid Identifier { get; set; }

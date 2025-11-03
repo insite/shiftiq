@@ -1,8 +1,7 @@
-namespace Shift.Service.Achievement;
-
+using Shift.Common;
 using Shift.Contract;
 
-using Shift.Common;
+namespace Shift.Service.Progress;
 
 public class QCredentialAdapter : IEntityAdapter
 {

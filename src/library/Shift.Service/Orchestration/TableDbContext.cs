@@ -1,16 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 
-using Shift.Service.Achievement;
 using Shift.Service.Booking;
 using Shift.Service.Cases;
 using Shift.Service.Competency;
 using Shift.Service.Content;
 using Shift.Service.Directory;
-using Shift.Service.Gradebook;
 using Shift.Service.Metadata;
 using Shift.Service.Progress;
 using Shift.Service.Security;
-using Shift.Service.Site;
+using Shift.Service.Workspace;
 
 namespace Shift.Service;
 
@@ -21,15 +19,15 @@ public class TableDbContext : DbContext
     #region Storage Tables
 
     // Feature: Booking
-    internal DbSet<QEventEntity> QEvent { get; set; }
+    internal DbSet<EventEntity> QEvent { get; set; }
     internal DbSet<EventUserEntity> QEventUser { get; set; }
 
     // Feature: Competency
     internal DbSet<StandardEntity> QStandard { get; set; }
 
     // Feature: Contact
-    internal DbSet<QGroupEntity> QGroup { get; set; }
-    internal DbSet<QMembershipEntity> QMembership { get; set; }
+    internal DbSet<GroupEntity> QGroup { get; set; }
+    internal DbSet<MembershipEntity> QMembership { get; set; }
     internal DbSet<PersonEntity> QPerson { get; set; }
     internal DbSet<QPersonSecretEntity> QPersonSecret { get; set; }
 
@@ -40,15 +38,15 @@ public class TableDbContext : DbContext
     internal DbSet<TInputEntity> TInput { get; set; }
 
     // Feature: Progress
-    internal DbSet<QAchievementEntity> QAchievement { get; set; }
+    internal DbSet<AchievementEntity> QAchievement { get; set; }
     internal DbSet<QCredentialEntity> QCredential { get; set; }
-    internal DbSet<QGradebookEntity> QGradebook { get; set; }
+    internal DbSet<GradebookEntity> QGradebook { get; set; }
     internal DbSet<QGradebookEnrollmentEntity> QGradebookEnrollment { get; set; }
     internal DbSet<PeriodEntity> QPeriod { get; set; }
 
     // Feature: Shell
-    internal DbSet<QPageEntity> QPage { get; set; }
-    internal DbSet<QSiteEntity> QSite { get; set; }
+    internal DbSet<PageEntity> QPage { get; set; }
+    internal DbSet<SiteEntity> QSite { get; set; }
 
     // Feature: Workflow
     internal DbSet<TCaseStatusEntity> TCaseStatus { get; set; }
@@ -58,11 +56,11 @@ public class TableDbContext : DbContext
 
     // Utility: Security
     internal DbSet<QOrganizationEntity> QOrganization { get; set; }
-    internal DbSet<QUserConnectionEntity> QUserConnection { get; set; }
-    internal DbSet<QUserEntity> QUser { get; set; }
+    internal DbSet<UserConnectionEntity> QUserConnection { get; set; }
+    internal DbSet<UserEntity> QUser { get; set; }
     internal DbSet<TPartitionFieldEntity> TPartitionSetting { get; set; }
     internal DbSet<TPermissionEntity> TPermission { get; set; }
-    internal DbSet<TUserSessionEntity> TUserSession { get; set; }
+    internal DbSet<UserSessionEntity> TUserSession { get; set; }
     internal DbSet<TUserFieldEntity> TUserSetting { get; set; }
 
     #endregion
@@ -78,15 +76,15 @@ public class TableDbContext : DbContext
     private void ApplyConfigurations(ModelBuilder builder)
     {
         // Feature: Booking
-        builder.ApplyConfiguration(new QEventConfiguration());
+        builder.ApplyConfiguration(new EventConfiguration());
         builder.ApplyConfiguration(new EventUserConfiguration());
 
         // Feature: Competency
         builder.ApplyConfiguration(new StandardConfiguration());
 
         // Feature: Contact
-        builder.ApplyConfiguration(new QGroupConfiguration());
-        builder.ApplyConfiguration(new QMembershipConfiguration());
+        builder.ApplyConfiguration(new GroupConfiguration());
+        builder.ApplyConfiguration(new MembershipConfiguration());
         builder.ApplyConfiguration(new PersonConfiguration());
         builder.ApplyConfiguration(new QPersonSecretConfiguration());
 
@@ -97,15 +95,15 @@ public class TableDbContext : DbContext
         builder.ApplyConfiguration(new TInputConfiguration());
 
         // Feature: Progress
-        builder.ApplyConfiguration(new QAchievementConfiguration());
+        builder.ApplyConfiguration(new AchievementConfiguration());
         builder.ApplyConfiguration(new QCredentialConfiguration());
-        builder.ApplyConfiguration(new QGradebookConfiguration());
+        builder.ApplyConfiguration(new GradebookConfiguration());
         builder.ApplyConfiguration(new QGradebookEnrollmentConfiguration());
         builder.ApplyConfiguration(new PeriodConfiguration());
 
         // Feature: Shell
-        builder.ApplyConfiguration(new QPageConfiguration());
-        builder.ApplyConfiguration(new QSiteConfiguration());
+        builder.ApplyConfiguration(new PageConfiguration());
+        builder.ApplyConfiguration(new SiteConfiguration());
 
         // Feature: Workflow
         builder.ApplyConfiguration(new TCaseStatusConfiguration());
@@ -115,11 +113,11 @@ public class TableDbContext : DbContext
 
         // Utility: Security
         builder.ApplyConfiguration(new QOrganizationConfiguration());
-        builder.ApplyConfiguration(new QUserConfiguration());
-        builder.ApplyConfiguration(new QUserConnectionConfiguration());
+        builder.ApplyConfiguration(new UserConfiguration());
+        builder.ApplyConfiguration(new UserConnectionConfiguration());
         builder.ApplyConfiguration(new TPartitionFieldConfiguration());
         builder.ApplyConfiguration(new TPermissionConfiguration());
-        builder.ApplyConfiguration(new TUserSessionConfiguration());
+        builder.ApplyConfiguration(new UserSessionConfiguration());
         builder.ApplyConfiguration(new TUserFieldConfiguration());
     }
 
@@ -135,49 +133,49 @@ public class TableDbContext : DbContext
 
     private void ConfigureEntities(ModelBuilder builder)
     {
-        builder.Entity<QAchievementEntity>()
+        builder.Entity<AchievementEntity>()
             .HasMany(e => e.Credentials)
             .WithOne(e => e.Achievement)
             .HasForeignKey(e => e.AchievementIdentifier)
             .HasPrincipalKey(e => e.AchievementIdentifier);
 
-        builder.Entity<QAchievementEntity>()
+        builder.Entity<AchievementEntity>()
             .HasMany(e => e.Gradebooks)
             .WithOne(e => e.Achievement)
             .HasForeignKey(e => e.AchievementIdentifier)
             .HasPrincipalKey(e => e.AchievementIdentifier);
 
-        builder.Entity<QEventEntity>()
+        builder.Entity<EventEntity>()
             .HasMany(e => e.Gradebooks)
             .WithOne(e => e.Event)
             .HasForeignKey(e => e.EventIdentifier)
             .HasPrincipalKey(e => e.EventIdentifier);
 
-        builder.Entity<QEventEntity>()
+        builder.Entity<EventEntity>()
             .HasMany(e => e.Users)
             .WithOne(e => e.Event)
             .HasForeignKey(e => e.EventIdentifier)
             .HasPrincipalKey(e => e.EventIdentifier);
 
-        builder.Entity<QGradebookEntity>()
+        builder.Entity<GradebookEntity>()
             .HasMany(e => e.Enrollments)
             .WithOne(e => e.Gradebook)
             .HasForeignKey(e => e.GradebookIdentifier)
             .HasPrincipalKey(e => e.GradebookIdentifier);
 
-        builder.Entity<QGroupEntity>()
+        builder.Entity<GroupEntity>()
             .HasMany(e => e.Memberships)
             .WithOne(e => e.Group)
             .HasForeignKey(e => e.GroupIdentifier)
             .HasPrincipalKey(e => e.GroupIdentifier);
 
-        builder.Entity<QGroupEntity>()
+        builder.Entity<GroupEntity>()
             .HasMany(e => e.Permissions)
             .WithOne(e => e.Group)
             .HasForeignKey(e => e.GroupIdentifier)
             .HasPrincipalKey(e => e.GroupIdentifier);
 
-        builder.Entity<QPageEntity>()
+        builder.Entity<PageEntity>()
             .HasMany(e => e.Children)
             .WithOne(e => e.Parent)
             .HasForeignKey(e => e.ParentPageIdentifier)
@@ -195,31 +193,31 @@ public class TableDbContext : DbContext
            .HasForeignKey(e => e.OrganizationIdentifier)
            .HasPrincipalKey(e => e.OrganizationIdentifier);
 
-        builder.Entity<QSiteEntity>()
+        builder.Entity<SiteEntity>()
             .HasMany(e => e.Pages)
             .WithOne(e => e.Site)
             .HasForeignKey(e => e.SiteIdentifier)
             .HasPrincipalKey(e => e.SiteIdentifier);
 
-        builder.Entity<QUserEntity>()
+        builder.Entity<UserEntity>()
             .HasMany(e => e.Events)
             .WithOne(e => e.User)
             .HasForeignKey(e => e.UserIdentifier)
             .HasPrincipalKey(e => e.UserIdentifier);
 
-        builder.Entity<QUserEntity>()
+        builder.Entity<UserEntity>()
             .HasMany(e => e.Memberships)
             .WithOne(e => e.User)
             .HasForeignKey(e => e.UserIdentifier)
             .HasPrincipalKey(e => e.UserIdentifier);
 
-        builder.Entity<QUserEntity>()
+        builder.Entity<UserEntity>()
             .HasMany(e => e.People)
             .WithOne(e => e.User)
             .HasForeignKey(e => e.UserIdentifier)
             .HasPrincipalKey(e => e.UserIdentifier);
 
-        builder.Entity<QUserEntity>()
+        builder.Entity<UserEntity>()
            .HasMany(e => e.Files)
            .WithOne(e => e.User)
            .HasForeignKey(e => e.UserIdentifier)

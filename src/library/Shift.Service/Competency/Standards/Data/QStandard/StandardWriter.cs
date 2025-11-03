@@ -4,14 +4,7 @@ using Shift.Common;
 
 namespace Shift.Service.Competency;
 
-public interface IStandardWriter : IEntityWriter
-{
-    Task<bool> CreateAsync(StandardEntity entity, CancellationToken cancellation = default);
-    Task<bool> DeleteAsync(Guid standard, CancellationToken cancellation = default);
-    Task<bool> ModifyAsync(StandardEntity entity, CancellationToken cancellation = default);
-}
-
-internal class StandardWriter : IStandardWriter
+public class StandardWriter : IEntityWriter
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
@@ -27,11 +20,11 @@ internal class StandardWriter : IStandardWriter
         var exists = await AssertAsync(entity.StandardIdentifier, cancellation, db);
         if (exists)
             return false;
-                
+
         await db.QStandard.AddAsync(entity, cancellation);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> DeleteAsync(Guid standard, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -43,7 +36,7 @@ internal class StandardWriter : IStandardWriter
         db.QStandard.Remove(entity);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> ModifyAsync(StandardEntity entity, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -57,5 +50,5 @@ internal class StandardWriter : IStandardWriter
     }
 
     private async Task<bool> AssertAsync(Guid standard, CancellationToken cancellation, TableDbContext db)
-		=> await db.QStandard.AsNoTracking().AnyAsync(x => x.StandardIdentifier == standard, cancellation);
+        => await db.QStandard.AsNoTracking().AnyAsync(x => x.StandardIdentifier == standard, cancellation);
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Web.UI.WebControls;
@@ -323,7 +324,8 @@ namespace InSite.Admin.Assessments.Banks.Forms
             }
             catch (Exception ex)
             {
-                AppSentry.SentryError(ex);
+                if (ex is TargetInvocationException tiex && tiex.InnerException != null)
+                    ex = tiex.InnerException;
 
                 CreatorStatus.AddMessage(AlertType.Error, "An error occurred on the server side: " + ex.Message);
             }

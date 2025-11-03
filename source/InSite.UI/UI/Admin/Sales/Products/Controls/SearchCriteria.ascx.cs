@@ -14,7 +14,8 @@ namespace InSite.Admin.Invoices.Products.Controls
                     OrganizationIdentifier = Organization.OrganizationIdentifier,
                     ProductName = ProductName.Text,
                     ProductDescription = ProductDescription.Text,
-                    ProductType = ProductType.Value
+                    ProductType = ProductType.Value,
+                    IsPublished = ProductPublishedStatus.ValueAsBoolean
                 };
 
                 GetCheckedShowColumns(filter);
@@ -26,6 +27,7 @@ namespace InSite.Admin.Invoices.Products.Controls
                 ProductName.Text = value.ProductName;
                 ProductDescription.Text = value.ProductDescription;
                 ProductType.Value = value.ProductType;
+                ProductPublishedStatus.ValueAsBoolean = value.IsPublished;
             }
         }
 
@@ -34,6 +36,7 @@ namespace InSite.Admin.Invoices.Products.Controls
             ProductName.Text = null;
             ProductDescription.Text = null;
             ProductType.Value = null;
+            ProductPublishedStatus.Value = null;
         }
     }
 }

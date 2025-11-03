@@ -8,11 +8,9 @@ using Common.Timeline.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-using TimelineServices = Common.Timeline.Services;
-
 namespace Shift.Common.Json
 {
-    public class Serializer : IJsonSerializer, TimelineServices.IJsonSerializer
+    public class Serializer : IJsonSerializer
     {
         static readonly Resolver IgnoreAttrResolver = new Resolver(null, true);
         static readonly CommandContractResolver CommandResolver = new CommandContractResolver(typeof(ICommand), new[] {

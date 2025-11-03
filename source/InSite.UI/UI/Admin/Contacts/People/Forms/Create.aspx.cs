@@ -54,8 +54,6 @@ namespace InSite.Admin.Contacts.People.Forms
 
         private string ReturnUrl => Request["return"];
 
-        private bool IsCandidate => Request["candidate"] == "1";
-
         private List<Guid> RolesIdentifiers => (List<Guid>)(ViewState[nameof(RolesIdentifiers)]
             ?? (ViewState[nameof(RolesIdentifiers)] = new List<Guid>()));
 
@@ -225,8 +223,7 @@ namespace InSite.Admin.Contacts.People.Forms
             SetNotification(ScreenNotification);
             SetDefaultInputValues();
 
-            CreationTypePanel.Visible = !IsCandidate;
-            OnePersonDepartmentField.Visible = IsCandidate;
+            CreationTypePanel.Visible = true;
 
             CreationType.EnsureDataBound();
             CreationType.SetVisibleOptions(CreationTypeEnum.One, CreationTypeEnum.Bulk);
@@ -238,14 +235,11 @@ namespace InSite.Admin.Contacts.People.Forms
             if (allowGenerateEmail)
                 OnePersonEmail.Attributes["style"] = "width:calc(100% - 170px);";
 
-            OnePersonDepartmentGroup.Filter.OrganizationIdentifier = Organization.Identifier;
-            OnePersonDepartmentGroup.Filter.GroupType = GroupTypes.Department;
-
             OnePersonEmployerGroupIdentifier.Filter.OrganizationIdentifier = Organization.Key;
 
             OnCreationTypeSelected();
 
-            CancelButton.NavigateUrl = !IsCandidate && ReturnUrl.IsNotEmpty()
+            CancelButton.NavigateUrl = ReturnUrl.IsNotEmpty()
                 ? ReturnUrl
                 : SearchUrl;
         }
@@ -453,8 +447,6 @@ namespace InSite.Admin.Contacts.People.Forms
             if (!isOrphan)
                 UserStore.Insert(user, person);
 
-            AssignMembershipDepartments(user.UserIdentifier, Organization.Identifier);
-
             if (OnePersonIsUserAccessGranted.Checked)
             {
                 PersonHelper.SendAccountCreated(Organization.OrganizationIdentifier, Organization.LegalName, user, person);
@@ -565,7 +557,6 @@ namespace InSite.Admin.Contacts.People.Forms
 
             PersonStore.Insert(person);
 
-            AssignMembershipDepartments(user.UserIdentifier, Organization.Identifier);
             AddUserToRoles(user.UserIdentifier);
 
             RedirectAfterSave(user.UserIdentifier);
@@ -599,15 +590,6 @@ namespace InSite.Admin.Contacts.People.Forms
             person.ShippingAddress = new QPersonAddress();
             person.BillingAddress = new QPersonAddress();
             person.WorkAddress = new QPersonAddress();
-        }
-
-        private void AssignMembershipDepartments(Guid userId, Guid organizationId)
-        {
-            if (!IsCandidate)
-                return;
-
-            foreach (var groupId in OnePersonDepartmentGroup.Values)
-                MembershipStore.Save(MembershipFactory.Create(userId, groupId, organizationId));
         }
 
         private void AddUserToRoles(Guid userIdentifier)
@@ -865,12 +847,7 @@ namespace InSite.Admin.Contacts.People.Forms
 
         private void RedirectAfterSave(params Guid[] ids)
         {
-            if (IsCandidate)
-            {
-                var url = $"/ui/admin/jobs/candidates/edit?contact={ids[0]}";
-                HttpResponseHelper.Redirect(url);
-            }
-            else if (ReturnUrl.HasValue())
+            if (ReturnUrl.HasValue())
             {
                 SavedIdentifiers = ids;
 

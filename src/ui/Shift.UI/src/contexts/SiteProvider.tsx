@@ -112,7 +112,7 @@ export default function SiteProvider({ children }: Props) {
         return <LoadingPanel />;
     }
 
-    if (!contextData) {
+    if (state.error) {
         return (
             <Alert alertType="error" className="my-4 mx-4">
                 {state.error ?? "Unknown error while loading site settings"}

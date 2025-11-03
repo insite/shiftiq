@@ -19,6 +19,7 @@ using InSite.Application.Surveys.Read;
 using InSite.Common.Web;
 using InSite.Domain.Foundations;
 using InSite.Persistence;
+using InSite.UI.Admin.Records.Programs.Utilities;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
 using InSite.UI.Portal.Assessments.Attempts.Utilities;
@@ -307,6 +308,8 @@ namespace InSite.UI.Portal.Learning
 
         private void LoadProgress()
         {
+            ProgramHelper.EnrollLearnerByObjectId(Organization.Identifier, User.Identifier, Progress.Course.Identifier);
+
             CheckNotCompletedCourse();
 
             var model = Progress;

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Shift.Common;
 
-namespace Shift.Service.Gradebook;
+namespace Shift.Service.Progress;
 
 public class QGradebookEnrollmentWriter : IEntityWriter
 {
@@ -20,11 +20,11 @@ public class QGradebookEnrollmentWriter : IEntityWriter
         var exists = await AssertAsync(entity.EnrollmentIdentifier, cancellation, db);
         if (exists)
             return false;
-                
+
         await db.QGradebookEnrollment.AddAsync(entity, cancellation);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> ModifyAsync(QGradebookEnrollmentEntity entity, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -36,7 +36,7 @@ public class QGradebookEnrollmentWriter : IEntityWriter
         db.Entry(entity).State = EntityState.Modified;
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> DeleteAsync(Guid enrollment, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -48,7 +48,7 @@ public class QGradebookEnrollmentWriter : IEntityWriter
         db.QGradebookEnrollment.Remove(entity);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     private async Task<bool> AssertAsync(Guid enrollment, CancellationToken cancellation, TableDbContext db)
-		=> await db.QGradebookEnrollment.AsNoTracking().AnyAsync(x => x.EnrollmentIdentifier == enrollment, cancellation);
+        => await db.QGradebookEnrollment.AsNoTracking().AnyAsync(x => x.EnrollmentIdentifier == enrollment, cancellation);
 }

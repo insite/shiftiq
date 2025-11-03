@@ -224,6 +224,40 @@
             });
         });
 
+        instance.onListRangeMinValidation = function (s, a) {
+            const item = s.closest('div[data-question-item]');
+            const table = item.querySelector('table[data-list-min]');
+
+            const minValue = parseInt(table.dataset.listMin);
+            if (isNaN(minValue) || minValue < 1)
+                return;
+
+            const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+            if (checkboxes.length === 0)
+                return;
+
+            const count = Array.from(checkboxes).filter(x => x.checked).length;
+
+            a.IsValid = count >= minValue;
+        };
+
+        instance.onListRangeMaxValidation = function (s, a) {
+            const item = s.closest('div[data-question-item]');
+            const table = item.querySelector('table[data-list-max]');
+
+            const maxValue = parseInt(table.dataset.listMax);
+            if (isNaN(maxValue) || maxValue < 1)
+                return;
+
+            const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+            if (checkboxes.length === 0)
+                return;
+
+            const count = Array.from(checkboxes).filter(x => x.checked).length;
+
+            a.IsValid = count <= maxValue;
+        };
+
         instance.onFileUploaded = function () {
             var $fileQueue = $(this).closest('.file-upload').parent().find(".file-queue");
 
@@ -360,7 +394,8 @@
                 let added = false;
                 const lines = card.querySelectorAll("[data-question-item]");
                 for (const line of lines) {
-                    if (!validators.find(v => line.contains(v))) {
+                    var vs = validators.filter(v => line.contains(v));
+                    if (vs.length === 0) {
                         continue;
                     }
 
@@ -369,14 +404,17 @@
                         continue;
                     }
 
-                    const item = {
-                        top: line.offsetTop,
-                        message
-                    };
-                    invalidItems.push(item);
-                    if (!topItem || topItem.top > line.offsetTop) {
-                        topItem = item;
-                    }
+                    vs.forEach(x => {
+                        const error = x.errormessage ?? 'This question is mandatory';
+                        const item = {
+                            top: line.offsetTop,
+                            message: error + ': ' + message
+                        };
+                        invalidItems.push(item);
+                        if (!topItem || topItem.top > line.offsetTop) {
+                            topItem = item;
+                        }
+                    });
                     added = true;
                 }
                 return added;
@@ -421,7 +459,7 @@
                     return null;
                 }
 
-                return `This question is mandatory: ${clean}`;
+                return clean;
             }
 
             function getCardMessage(card) {
@@ -884,6 +922,117 @@
         };
 
         instance.refreshLinks();
+    })();
+
+    (function () {
+        Sys.Application.add_load(init);
+
+        function init() {
+            document.querySelectorAll('div[data-question-item] table[data-list-max]').forEach(table => {
+                if (table.__listRangeMaxInited === true)
+                    return;
+
+                const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+                if (checkboxes.length === 0)
+                    return;
+
+                const maxValue = parseInt(table.dataset.listMax);
+                if (isNaN(maxValue) || maxValue < 1)
+                    return;
+
+                let isMaxExceeded = false;
+
+                checkboxes.forEach(c => c.addEventListener('change', updateState));
+
+                function updateState() {
+                    const count = Array.from(checkboxes).filter(x => x.checked).length;
+                    const newValue = count >= maxValue;
+
+                    if (isMaxExceeded === newValue)
+                        return;
+
+                    isMaxExceeded = newValue;
+
+                    checkboxes.forEach(checkbox => {
+                        if (!checkbox.checked) {
+                            checkbox.disabled = isMaxExceeded;
+                        }
+                    });
+                }
+
+                updateState();
+
+                table.__listRangeMaxInited = true;
+            });
+        }
+
+        init();
+    })();
+
+    (function () {
+        const counterState = Object.freeze({
+            Normal: 0,
+            Warning: 1,
+            Danger: 2
+        });
+
+        Sys.Application.add_load(init);
+
+        function init() {
+            document.querySelectorAll('textarea[maxlength],input[type="text"][maxlength]').forEach(createCounter);
+
+            function createCounter(element) {
+                if (element.__maxLengthCounter)
+                    return;
+
+                const maxLen = element.maxLength;
+                if (!maxLen)
+                    return;
+
+                const counter = element.__maxLengthCounter = document.createElement('div');
+                counter.classList.add('fs-sm', 'mt-2', 'text-end');
+
+                element.after(counter)
+                element.addEventListener('input', updateCounter);
+                element.addEventListener('keyup', updateCounter);
+                element.addEventListener('paste', onPaste);
+
+                updateCounter.apply(element);
+            }
+        }
+
+        function onPaste() {
+            setTimeout(el => updateCounter.apply(el), 10, this)
+        }
+
+        function updateCounter() {
+            const valueLen = this.value.length;
+            const maxLen = this.maxLength;
+            const counter = this.__maxLengthCounter;
+
+            counter.textContent = String(maxLen - valueLen) + ' / ' + String(maxLen);
+
+            if (valueLen >= maxLen * 0.9) {
+                if (counter.__prevState !== counterState.Danger)
+                    counter.classList.remove('text-warning');
+
+                counter.classList.add('text-danger');
+                counter.__prevState = counterState.Danger;
+            } else if (valueLen >= maxLen * 0.75) {
+                if (counter.__prevState !== counterState.Warning)
+                    counter.classList.remove('text-danger');
+
+                counter.classList.add('text-warning');
+                counter.__prevState = counterState.Warning;
+            } else {
+                if (counter.__prevState !== counterState.Normal)
+                    counter.classList.remove('text-danger', 'text-warning');
+
+                counter.__prevState = counterState.Normal;
+            }
+        }
+
+        init();
     })();
 
 </script>

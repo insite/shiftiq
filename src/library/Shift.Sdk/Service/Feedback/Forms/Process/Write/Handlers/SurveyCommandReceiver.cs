@@ -267,7 +267,7 @@ namespace InSite.Application.Surveys.Write.Handlers
         {
             _repository.LockAndRun<SurveyAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.ChangeSurveyQuestionSettings(c.Question, c.IsHidden, c.IsRequired, c.IsNested, c.LikertAnalysis, c.ListEnableRandomization, c.ListEnableOtherText, c.ListEnableBranch, c.ListEnableGroupMembership, c.ListDisableColumnHeadingWrap, c.TextLineCount, c.TextCharacterLimit, c.NumberEnableStatistics, c.NumberEnableAutoCalc, c.NumberAutoCalcQuestions, c.NumberEnableNotApplicable);
+                aggregate.ChangeSurveyQuestionSettings(c.Question, c.IsHidden, c.IsRequired, c.IsNested, c.LikertAnalysis, c.ListEnableRandomization, c.ListEnableOtherText, c.ListEnableBranch, c.ListEnableGroupMembership, c.ListDisableColumnHeadingWrap, c.TextLineCount, c.TextCharacterLimit, c.NumberEnableStatistics, c.NumberEnableAutoCalc, c.NumberAutoCalcQuestions, c.NumberEnableNotApplicable, c.ListSelectionRange, c.EnableCreateCase);
                 Commit(aggregate, c);
             });
         }

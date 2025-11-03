@@ -157,33 +157,10 @@ namespace InSite.UI.Admin.Records.Programs.Controls
         {
             ProgramIdentifier = programId;
             AutoPostBack = true;
-            ProgramTasks = ProgramSearch1.GetProgramTasks(new TTaskFilter { ProgramIdentifier = programId, OrganizationIdentifier = Organization.OrganizationIdentifier });
 
-            var objects = ProgramHelper.GetTaskObjects(ObjectType, Organization.OrganizationIdentifier);
-            var items = new List<ProgramTaskItem>();
+            var (programTasks, items) = ProgramHelper.GetTasksAndItems(programId, ObjectType, Organization.OrganizationIdentifier, null);
 
-            foreach (var o in objects)
-            {
-                var item = new ProgramTaskItem
-                {
-                    ObjectIdentifier = Guid.Parse(o.Value),
-                    ObjectType = ObjectType,
-                    TaskName = o.Text
-                };
-                items.Add(item);
-
-                if (!programId.HasValue)
-                    continue;
-
-                var task = ProgramTasks.FirstOrDefault(x => x.ObjectIdentifier == item.ObjectIdentifier);
-                if (task == null)
-                    continue;
-
-                item.TaskIdentifier = task.TaskIdentifier;
-                item.TaskCompletionRequirement = task.TaskCompletionRequirement;
-                item.ProgramIdentifier = programId.Value;
-                item.IsSelected = true;
-            }
+            ProgramTasks = programTasks;
 
             TaskRepeater.DataSource = items.OrderBy(x => x.TaskName);
             TaskRepeater.DataBind();

@@ -10,10 +10,11 @@ using Shift.Common;
 
 namespace InSite.Admin.Contacts.People.Forms
 {
-    public partial class EditMembership : AdminBasePage, IHasParentLinkParameters
+    public partial class EditMembership : AdminBasePage, IOverrideWebRouteParent, IHasParentLinkParameters
     {
         private const string EditUrl = "/ui/admin/contacts/people/edit";
         private const string SearchUrl = "/ui/admin/contacts/people/search";
+        private string ReturnUrl => !string.IsNullOrEmpty(Request.QueryString["returnURL"]) ? Request.QueryString["returnURL"] : "/";
 
         private Guid? GroupIdentifier => Guid.TryParse(Request["from"], out var value) ? value : (Guid?)null;
 
@@ -83,8 +84,8 @@ namespace InSite.Admin.Contacts.People.Forms
 
         protected override string GetReturnUrl()
         {
-            var url = base.GetReturnUrl();
-            if (!string.IsNullOrEmpty(url))
+            var url = ReturnUrl;
+            if (!(string.IsNullOrEmpty(url) || url == "/"))
                 return url;
 
             return EditUrl + $"?contact={UserIdentifier}&panel=groups";
@@ -92,9 +93,42 @@ namespace InSite.Admin.Contacts.People.Forms
 
         public string GetParentLinkParameters(IWebRoute parent)
         {
-            return parent.Name.EndsWith("/edit")
-                ? $"contact={UserIdentifier}"
+            return parent != null && string.Equals(parent.Name, GetParentAction(), StringComparison.OrdinalIgnoreCase)
+                ? GetParentActionParameters()
                 : null;
+        }
+
+        private string GetParentActionParameters()
+        {
+            if (ReturnUrl == "/" || !ReturnUrl.StartsWith("/"))
+                return null;
+
+            var index = ReturnUrl.IndexOf('?');
+
+            return index > 0 && index < ReturnUrl.Length
+                ? ReturnUrl.Substring(index + 1)
+                : null;
+        }
+
+        public new IWebRoute GetParent()
+        {
+            var parentAction = GetParentAction();
+
+            return !string.IsNullOrEmpty(parentAction)
+                ? WebRoute.GetWebRoute(parentAction)
+                : null;
+        }
+
+        private string GetParentAction()
+        {
+            if (ReturnUrl == "/" || !ReturnUrl.StartsWith("/"))
+                return null;
+
+            var index = ReturnUrl.IndexOf('?');
+
+            return index > 0
+                ? ReturnUrl.Substring(1, index - 1)
+                : ReturnUrl.Substring(1);
         }
     }
 }

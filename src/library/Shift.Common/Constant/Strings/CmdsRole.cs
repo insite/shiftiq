@@ -3,7 +3,6 @@
     public class CmdsRole
     {
         public static string Administrators => "CMDS Administrators";
-        public static string Authors => "CMDS Authors";
         public static string CollegeAdministrators => "CMDS College Administrators";
         public static string FieldAdministrators => "CMDS Field Administrators";
         public static string Impersonators => "CMDS Impersonators";

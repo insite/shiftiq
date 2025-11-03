@@ -217,11 +217,22 @@ namespace InSite.Admin.Events.Registrations.Forms
 
         private void OnEmployerValueChanged()
         {
-            var statusId = ServiceLocator.GroupSearch.GetGroup(Employer.Value.Value)?.GroupStatusItemIdentifier;
+            var groupId = Employer.Value;
+
+            if (!groupId.HasValue)
+            {
+                EmployerStatus.Visible = false;
+                EmployerStatus.InnerText = string.Empty;
+                return;
+            }
+
+            var group = ServiceLocator.GroupSearch.GetGroup(groupId.Value);
+            var statusId = group?.GroupStatusItemIdentifier;
+
             var employerStatus = TCollectionItemCache.GetName(statusId);
 
-            EmployerStatus.Visible = employerStatus != null;
-            EmployerStatus.InnerText = employerStatus;
+            EmployerStatus.Visible = employerStatus.HasValue();
+            EmployerStatus.InnerText = employerStatus ?? string.Empty;
         }
 
         #endregion

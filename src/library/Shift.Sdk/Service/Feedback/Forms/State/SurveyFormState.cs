@@ -16,12 +16,14 @@ namespace InSite.Domain.Surveys.Forms
         public SurveyState()
         {
             Form = new SurveyForm();
+            Form.State = this;
         }
 
         [OnDeserialized]
         internal void OnDeserialized(StreamingContext context)
         {
             Form.Initialize();
+            Form.State = this;
         }
 
         public void When(SurveyBranchAdded e)
@@ -327,6 +329,8 @@ namespace InSite.Domain.Surveys.Forms
             question.NumberEnableAutoCalc = e.NumberEnableAutoCalc;
             question.NumberAutoCalcQuestions = e.NumberAutoCalcQuestions;
             question.NumberEnableNotApplicable = !e.NumberEnableAutoCalc && e.NumberEnableNotApplicable;
+            question.ListSelectionRange.Set(e.ListSelectionRange);
+            question.EnableCreateCase = e.EnableCreateCase;
         }
 
         public void When(SurveyQuestionsReordered e)

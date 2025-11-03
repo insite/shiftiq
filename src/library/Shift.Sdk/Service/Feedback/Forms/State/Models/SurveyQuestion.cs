@@ -80,6 +80,7 @@ namespace InSite.Domain.Surveys.Forms
         public bool NumberEnableAutoCalc { get; set; }
         public Guid[] NumberAutoCalcQuestions { get; set; }
         public bool NumberEnableNotApplicable { get; set; }
+        public bool EnableCreateCase { get; set; }
 
         public int? TextCharacterLimit { get; set; }
         public int? TextLineCount { get; set; }
@@ -115,11 +116,15 @@ namespace InSite.Domain.Surveys.Forms
             || Type == SurveyQuestionType.RadioList
             || Type == SurveyQuestionType.Selection;
 
+        [JsonProperty]
+        public SurveyQuestionListSelectionRange ListSelectionRange { get; private set; }
+
         public SurveyQuestion()
         {
             Content = new Shift.Common.ContentContainer();
             Options = new SurveyOptionTable();
             Scales = new List<SurveyScale>();
+            ListSelectionRange = new SurveyQuestionListSelectionRange();
         }
 
         public SurveyQuestion(Guid identifier) : this()

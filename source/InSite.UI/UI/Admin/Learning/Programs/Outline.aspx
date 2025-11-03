@@ -1,7 +1,6 @@
 <%@ Page Language="C#" CodeBehind="Outline.aspx.cs" Inherits="InSite.Admin.Records.Programs.Outline" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
-<%@ Register TagPrefix="uc" TagName="ProgramCategoryList" Src="./Controls/ProgramCategoryList.ascx" %>
-<%@ Register TagPrefix="uc" TagName="ProgramUserGrid" Src="./Controls/ProgramUserGrid.ascx" %>
+<%@ Register TagPrefix="uc" TagName="ProgramContactTab" Src="./Controls/ProgramContactTab.ascx" %>
 <%@ Register TagPrefix="uc" TagName="ProgramContent" Src="./Controls/ProgramContent.ascx" %>
 <%@ Register TagPrefix="uc" TagName="NotificationSetup" Src="./Controls/NotificationSetup.ascx" %>
 <%@ Register TagPrefix="uc" TagName="ProgramTaskViewer" Src="./Controls/ProgramTaskViewer.ascx" %>
@@ -9,8 +8,7 @@
 <%@ Register TagPrefix="uc" TagName="PrivacySettingRepeater" Src="~/UI/Admin/Courses/Outlines/Controls/PrivacySettingsGroups.ascx" %>
 <%@ Register TagPrefix="uc" TagName="CredentialGrid" Src="./Controls/CredentialGrid.ascx" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/AchievementListEditor.ascx" TagName="AchievementListEditor" TagPrefix="uc" %>
-<%@ Register TagPrefix="uc" TagName="ExpirationField" Src="~/UI/Admin/Records/Achievements/Controls/AchievementExpirationField.ascx" %>
-<%@ Register Src="./Controls/TaskGrid.ascx" TagName="TaskGrid" TagPrefix="uc" %>
+<%@ Register Src="./Controls/TaskGridView.ascx" TagName="TaskGrid" TagPrefix="uc" %>
 
 <asp:Content ContentPlaceHolderID="BodyContent" runat="server">
 
@@ -27,7 +25,7 @@
                     <insite:Button runat="server" ID="ViewHistoryLink" Visible="false" Text="History" Icon="fas fa-history" ButtonStyle="Default" />
                     <insite:DeleteButton runat="server" ID="DeleteLink" />
                     <insite:ButtonSpacer runat="server" />
-                    <insite:Button runat="server" id="DuplicateLink" ToolTip="Duplicate" ButtonStyle="Default" Text="Duplicate" Icon="far fa-fw fa-copy" />
+                    <insite:Button runat="server" ID="DuplicateLink" ToolTip="Duplicate" ButtonStyle="Default" Text="Duplicate" Icon="far fa-fw fa-copy" />
                 </div>
             </div>
 
@@ -41,7 +39,7 @@
 
                             <div class="form-group mb-3">
                                 <div class="float-end">
-                                    <insite:IconLink runat="server" ID="RenameLink" Style="padding: 8px" ToolTip="Rename program" Name="pencil" />
+                                    <insite:IconLink runat="server" ID="RenameLink" CssClass="p-2" ToolTip="Rename program" Name="pencil" />
                                 </div>
                                 <asp:Label ID="ProgramNameLabel" runat="server" Text="Program Name" CssClass="form-label" AssociatedControlID="ProgramName" />
                                 <div>
@@ -50,7 +48,7 @@
                             </div>
                             <div runat="server" id="ProgramCodeField" class="form-group mb-3">
                                 <div class="float-end">
-                                    <insite:IconLink runat="server" ID="RecodeLink" Style="padding: 8px" ToolTip="Recode program" Name="pencil" />
+                                    <insite:IconLink runat="server" ID="RecodeLink" CssClass="p-2" ToolTip="Recode program" Name="pencil" />
                                 </div>
                                 <asp:Label ID="ProgramCodeLabel" runat="server" Text="Program Code" CssClass="form-label" AssociatedControlID="ProgramCode" />
                                 <div>
@@ -59,7 +57,7 @@
                             </div>
                             <div runat="server" id="GroupField" class="form-group mb-3">
                                 <div class="float-end">
-                                    <insite:IconLink runat="server" ID="ModifyGroupLink" Style="padding: 8px" ToolTip="Modify group" Name="pencil" />
+                                    <insite:IconLink runat="server" ID="ModifyGroupLink" CssClass="p-2" ToolTip="Modify group" Name="pencil" />
                                 </div>
                                 <asp:Label ID="GroupLabel" runat="server" Text="Group" CssClass="form-label" AssociatedControlID="GroupName" />
                                 <div>
@@ -68,7 +66,7 @@
                             </div>
                             <div runat="server" id="ProgramTagField" class="form-group mb-3">
                                 <div class="float-end">
-                                    <insite:IconLink runat="server" ID="RetagLink" Style="padding: 8px" ToolTip="Retag program" Name="pencil" />
+                                    <insite:IconLink runat="server" ID="RetagLink" CssClass="p-2" ToolTip="Retag program" Name="pencil" />
                                 </div>
                                 <asp:Label ID="ProgramTagLabel" runat="server" Text="Program Tag" CssClass="form-label" AssociatedControlID="ProgramTag" />
                                 <div>
@@ -77,7 +75,7 @@
                             </div>
                             <div class="form-group mb-3">
                                 <div class="float-end">
-                                    <insite:IconLink runat="server" ID="DescribeLink" Style="padding: 8px" ToolTip="Describe program" Name="pencil" />
+                                    <insite:IconLink runat="server" ID="DescribeLink" CssClass="p-2" ToolTip="Describe program" Name="pencil" />
                                 </div>
                                 <asp:Label ID="ProgramDescriptionLabel" runat="server" Text="Description" CssClass="form-label" AssociatedControlID="ProgramDescription" />
                                 <div>
@@ -100,68 +98,58 @@
                     <div class="card border-0 shadow-lg mt-3">
                         <div class="card-body">
 
-                            <h3>Recognition</h3>
+                            <div class="float-end">
+                                <insite:IconLink runat="server" ID="EditAchievementLink" CssClass="p-2" ToolTip="Modify achievement" Name="pencil" />
+                            </div>
 
-                            <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="AchievementUpdatePanel" />
-                            <insite:UpdatePanel runat="server" ID="AchievementUpdatePanel">
-                                <Triggers>
-                                    <asp:PostBackTrigger ControlID="AchievementSaveButton" />
-                                </Triggers>
-                                <ContentTemplate>
+                            <h3>
+                                Recognition
+                            </h3>
 
-                                    <div runat="server" id="AchievementIdentifierField" class="form-group mb-3">
-                                        <div class="float-end">
-                                            <insite:IconButton runat="server" id="AchievementCreateButton" ToolTip="Add a new certificate" Name="plus-square" />
-                                            <insite:IconLink runat="server" id="AchievementOutlineLink" ToolTip="View details for this certificate" Name="external-link-square" Target="_blank" />
-                                        </div>
-                                        <label class="form-label">Achievement</label>
-                                        <div>
-                                            <insite:FindAchievement runat="server" ID="AchievementIdentifier" />
-                                        </div>
+                            <asp:Panel runat="server" ID="NoAchievementMessage" CssClass="alert alert-info" Visible="false">
+                                No achievement have been assigned to this program.
+                            </asp:Panel>
+
+                            <insite:Container runat="server" id="AchievementFields">
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        Achievement Name
+                                        <insite:IconLink runat="server" id="AchievementOutlineLink" ToolTip="View details for this certificate" Name="external-link-square" Target="_blank" />
+                                    </label>
+                                    <div>
+                                        <asp:Literal runat="server" ID="AchievementTitle" />
                                     </div>
+                                </div>
 
-                                    <insite:Container runat="server" id="AchievementFields">
-
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">
-                                                Achievement Name
-                                                <insite:RequiredValidator runat="server" ControlToValidate="AchievementName" FieldName="Achievement Name" ValidationGroup="Achievement" />
-                                            </label>
-                                            <div>
-                                                <insite:TextBox runat="server" ID="AchievementName" />
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">
-                                                Achievement Type
-                                                <insite:RequiredValidator runat="server" ControlToValidate="AchievementLabel" FieldName="Achievement Type" ValidationGroup="Achievement" />
-                                            </label>
-                                            <div>
-                                                <insite:TextBox runat="server" ID="AchievementLabel" />
-                                            </div>
-                                        </div>
-
-                                        <uc:ExpirationField runat="server" ID="AchievementExpiration" 
-                                            LabelText="Achievement Expiration" HelpText="" 
-                                            ValidationGroup="Achievement" />
-
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">Certificate Layout</label>
-                                            <div>
-                                                <insite:CertificateLayoutComboBox CssClass="dropup" runat="server" ID="AchievementLayout" />
-                                            </div>
-                                        </div>
-
-                                    </insite:Container>
-
-                                    <div class="mt-3">
-                                        <insite:SaveButton runat="server" ID="AchievementSaveButton" ValidationGroup="Achievement" />
-                                        <insite:CancelButton runat="server" ID="AchievementCancelButton" />
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        Achievement Type
+                                    </label>
+                                    <div>
+                                        <asp:Literal runat="server" ID="AchievementLabel" />
                                     </div>
+                                </div>
 
-                                </ContentTemplate>
-                            </insite:UpdatePanel>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        Achievement Expiration
+                                    </label>
+                                    <div>
+                                        <asp:Literal runat="server" ID="AchievementExpiration" />
+                                    </div>
+                                </div>
+
+                                <div runat="server" id="AchievementLayoutField" class="form-group mb-3">
+                                    <label class="form-label">
+                                        Certificate Layout
+                                    </label>
+                                    <div>
+                                        <asp:Literal runat="server" ID="AchievementLayout" />
+                                    </div>
+                                </div>
+
+                            </insite:Container>
 
                         </div>
                     </div>
@@ -206,7 +194,7 @@
 
                             <div class="form-group mb-3">
                                 <div class="float-end">
-                                    <insite:IconLink runat="server" ID="ModifyCatalogLink" Style="padding: 8px" ToolTip="Modify catalog" Name="pencil" />
+                                    <insite:IconLink runat="server" ID="ModifyCatalogLink" CssClass="p-2" ToolTip="Modify catalog" Name="pencil" />
                                 </div>
                                 <asp:Label runat="server" Text="Catalog" CssClass="form-label" />
                                 <div>
@@ -214,7 +202,35 @@
                                 </div>
                             </div>
 
-                            <uc:ProgramCategoryList runat="server" ID="ProgramCategoryList" />
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    Categories
+                                </label>
+                                <div class="ms-2">
+                                    <asp:Repeater runat="server" ID="CategoriesFolderRepeater">
+                                        <ItemTemplate>
+                                            <div class="mt-1 mb-2 fs-sm">
+                                                <%# Eval("FolderName") %>
+                                            </div>
+
+                                            <asp:Repeater runat="server" ID="ItemRepeater">
+                                                <HeaderTemplate>
+                                                    <div class="ms-2"><ul>
+                                                </HeaderTemplate>
+                                                <FooterTemplate>
+                                                    </ul></div>
+                                                </FooterTemplate>
+                                                <ItemTemplate>
+                                                    <li><%# Eval("ItemName") %></li>
+                                                </ItemTemplate>
+                                            </asp:Repeater>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    <asp:Panel runat="server" ID="NoCatalogCategories" CssClass="alert alert-info" Visible="false">
+                                        There are no selected catalog categories.
+                                    </asp:Panel>
+                                </div>
+                            </div>
 
                         </div>
                     </div>
@@ -231,7 +247,7 @@
 
         <insite:NavItem runat="server" ID="LearnerTab" Title="Enrollments" Icon="far fa-users" IconPosition="BeforeText">
 
-            <uc:ProgramUserGrid runat="server" ID="ProgramUserGrid" />
+            <uc:ProgramContactTab runat="server" ID="ContactTabControl" />
 
         </insite:NavItem>
 
@@ -263,12 +279,20 @@
             </section>
         </insite:NavItem>
 
-        <insite:NavItem runat="server" ID="AchievementTaskSection" Visible="false" Title="Settings" Icon="far fa-cogs" IconPosition="BeforeText">
+        <insite:NavItem runat="server" ID="SettingsSection" Visible="false" Title="Settings" Icon="far fa-cogs" IconPosition="BeforeText">
             <section>
                 <h2 class="h4 mt-4 mb-3">Settings</h2>
-                <div class="card border-0 shadow-lg">
-                    <div class="card-body">
-                        <uc:TaskGrid runat="server" ID="TaskGrid" />
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-body">
+                                <div class="float-end">
+                                    <insite:IconLink runat="server" ID="ModifySettingsLink" CssClass="p-2" ToolTip="Modify settings" Name="pencil" />
+                                </div>
+                        
+                                <uc:TaskGrid runat="server" ID="TaskGrid" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -301,9 +325,5 @@
         </insite:NavItem>
 
     </insite:Nav>
-
-    <div class="mt-4">
-        <insite:SaveButton runat="server" ID="SaveAchievementsButton" Visible="false" />
-    </div>
 
 </asp:Content>

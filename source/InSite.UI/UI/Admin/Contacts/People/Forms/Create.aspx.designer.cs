@@ -168,24 +168,6 @@ namespace InSite.Admin.Contacts.People.Forms
         protected global::InSite.Common.Web.UI.TextBox OnePersonCode;
 
         /// <summary>
-        /// OnePersonDepartmentField control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl OnePersonDepartmentField;
-
-        /// <summary>
-        /// OnePersonDepartmentGroup control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.FindGroup OnePersonDepartmentGroup;
-
-        /// <summary>
         /// OnePersonEmployerUpdatePanel control.
         /// </summary>
         /// <remarks>

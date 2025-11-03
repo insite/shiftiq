@@ -137,6 +137,22 @@ namespace InSite.Admin.Records.Gradebooks.Forms
         {
             var achievements = data.GetItemsWithAchievements().Select(x => x.Achievement.Achievement).ToList();
 
+            var toRemove = new List<Guid>();
+
+            foreach (var achievementId in achievements)
+            {
+                var gradeItems = ServiceLocator.RecordSearch.GetGradeItems(new QGradeItemFilter { AchievementIdentifier = achievementId })
+                    .ToArray()
+                    .Select(g => g.GradebookIdentifier)
+                    .Distinct()
+                    .Count();
+
+                if (gradeItems > 1)
+                    toRemove.Add(achievementId);
+            }
+
+            achievements.RemoveAll(a => toRemove.Contains(a));
+
             if (achievements.Count == 0)
                 return null;
 

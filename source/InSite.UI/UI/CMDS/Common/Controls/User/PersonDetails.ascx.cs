@@ -43,28 +43,25 @@ namespace InSite.Cmds.Admin.People.Controls
 
         #region Security
 
-        private void ApplyUserGroupAssignmentPermissions(int list)
+        private void ApplyUserGroupAssignmentPermissions()
         {
-            if (list == 1)
-            {
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.Administrators, CmdsRole.Programmers);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.CollegeAdministrators, CmdsRole.Programmers);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.FieldAdministrators, CmdsRole.Programmers, CmdsRole.SystemAdministrators, CmdsRole.OfficeAdministrators);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.Impersonators, CmdsRole.Programmers);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.OfficeAdministrators, CmdsRole.Programmers);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.Programmers, CmdsRole.Programmers);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.SuperValidators, CmdsRole.Programmers);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.SystemAdministrators, CmdsRole.Programmers);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.Testers, CmdsRole.Programmers);
-                ApplyUserGroupAssignmentPermission(CmdsUserGroups, CmdsRole.Validators, CmdsRole.Programmers, CmdsRole.SystemAdministrators);
-            }
-            else if (list == 2)
-            {
-                ApplyUserGroupAssignmentPermission(SkillsPassportUserGroups, "Skills Passport Administrators", "Skills Passport Administrators", "Skills Passport Developers");
-                ApplyUserGroupAssignmentPermission(SkillsPassportUserGroups, "Skills Passport Developers", "Skills Passport Developers");
-                ApplyUserGroupAssignmentPermission(SkillsPassportUserGroups, "Skills Passport Instructors", "Skills Passport Administrators");
-                ApplyUserGroupAssignmentPermission(SkillsPassportUserGroups, "Skills Passport Users", "Skills Passport Administrators");
-            }
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.Administrators, CmdsRole.Programmers);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.CollegeAdministrators, CmdsRole.Programmers);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.FieldAdministrators, CmdsRole.Programmers, CmdsRole.SystemAdministrators, CmdsRole.OfficeAdministrators);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.Impersonators, CmdsRole.Programmers);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.OfficeAdministrators, CmdsRole.Programmers);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.Programmers, CmdsRole.Programmers);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.SuperValidators, CmdsRole.Programmers);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.SystemAdministrators, CmdsRole.Programmers);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.Testers, CmdsRole.Programmers);
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.Validators, CmdsRole.Programmers, CmdsRole.SystemAdministrators);
+
+            ApplyUserGroupAssignmentPermission(UserRoleList, "Skills Passport Administrators", "Skills Passport Administrators", "Skills Passport Developers");
+            ApplyUserGroupAssignmentPermission(UserRoleList, "Skills Passport Developers", "Skills Passport Developers");
+            ApplyUserGroupAssignmentPermission(UserRoleList, "Skills Passport Instructors", "Skills Passport Administrators");
+            ApplyUserGroupAssignmentPermission(UserRoleList, "Skills Passport Users", "Skills Passport Administrators");
+
+            ApplyUserGroupAssignmentPermission(UserRoleList, "TSSC Only Users", CmdsRole.Administrators, CmdsRole.Programmers, CmdsRole.SystemAdministrators);
         }
 
         private void ApplyUserGroupAssignmentPermission(CheckBoxList list, string role, params string[] accessors)
@@ -136,6 +133,10 @@ namespace InSite.Cmds.Admin.People.Controls
         public void SetInputValues(Persistence.User user, Person person)
         {
             var isNew = user.UserIdentifier == Guid.Empty;
+            var hasPerson = person != null;
+
+            if (!hasPerson)
+                person = new Person();
 
             if (!isNew)
             {
@@ -145,7 +146,7 @@ namespace InSite.Cmds.Admin.People.Controls
                 MiddleName.Text = user.MiddleName;
                 LastName.Text = user.LastName;
 
-                var homeAddress = person?.HomeAddressIdentifier != null
+                var homeAddress = hasPerson && person.HomeAddressIdentifier != null
                     ? AddressSearch.Select(person.HomeAddressIdentifier.Value)
                     : null;
 
@@ -177,27 +178,27 @@ namespace InSite.Cmds.Admin.People.Controls
                         }
                     }
                 }
-                else if (person == null)
+                else if (!hasPerson)
                     HidePersonFields();
 
                 EmailWork.Text = user.Email;
                 TimeZone.Value = user.TimeZone;
                 PhoneMobile.Text = user.PhoneMobile;
 
-                PhoneWork.Text = person?.PhoneWork;
-                PhoneHome.Text = person?.PhoneHome;
-                Birthdate.Value = person?.Birthdate;
+                PhoneWork.Text = person.PhoneWork;
+                PhoneHome.Text = person.PhoneHome;
+                Birthdate.Value = person.Birthdate;
 
-                PersonCode.Text = person?.PersonCode;
-                PersonType.Text = person?.PersonType;
-                EmployeeType.Text = person?.EmployeeType;
-                JobTitle.Text = person?.JobTitle;
-                JobDivision.Text = person?.JobDivision;
-                AgeGroup.Text = person?.AgeGroup;
+                PersonCode.Text = person.PersonCode;
+                PersonType.Text = person.PersonType;
+                EmployeeType.Text = person.EmployeeType;
+                JobTitle.Text = person.JobTitle;
+                JobDivision.Text = person.JobDivision;
+                AgeGroup.Text = person.AgeGroup;
 
-                EmailEnabled.Checked = person?.EmailEnabled ?? false;
+                EmailEnabled.Checked = person.EmailEnabled;
 
-                bool approved = person?.UserAccessGranted != null;
+                bool approved = hasPerson && person.UserAccessGranted != null;
 
                 EnableEmailNotificationField.Visible = approved && (
                        Identity.IsInRole(CmdsRole.Programmers)
@@ -219,7 +220,7 @@ namespace InSite.Cmds.Admin.People.Controls
             {
                 LoginTab.Title = user.UtcArchived.HasValue ? "Login (Archived)" : "Login";
 
-                if (person?.UserAccessGranted != null)
+                if (hasPerson && person.UserAccessGranted != null)
                 {
                     Status.Value = PersonStatusSelector.Approved;
                     StatusTimestamp.Text = $@"{person.UserAccessGrantedBy ?? UserNames.Someone} approved this login {person.UserAccessGranted.Humanize()}";
@@ -240,23 +241,22 @@ namespace InSite.Cmds.Admin.People.Controls
                 PasswordExpires.Value = user.UserPasswordExpired;
 
                 LoadRoles1(user.UserIdentifier);
-                LoadRoles2(user.UserIdentifier);
             }
 
             if (isUserDetailsVisible)
                 LoadDuplicates(user);
 
-            SendEmailField.Visible = isUserDetailsVisible && UserID != Guid.Empty && person?.UserAccessGranted != null;
+            SendEmailField.Visible = hasPerson && isUserDetailsVisible && UserID != Guid.Empty && person.UserAccessGranted != null;
             SendEmailButton.NavigateUrl = $"/ui/cmds/admin/users/send?id={UserID}";
 
-            SendEmailButton.Visible = person != null && person.EmailEnabled;
-            SendEmailDisabled.Visible = person == null || !person.EmailEnabled;
+            SendEmailButton.Visible = hasPerson && person.EmailEnabled;
+            SendEmailDisabled.Visible = !hasPerson || !person.EmailEnabled;
 
             ShowSentCount();
 
             LockEmploymentDetails();
 
-            CommentRepeater.LoadData(person.UserIdentifier, Organization.Identifier);
+            CommentRepeater.LoadData(user.UserIdentifier, Organization.Identifier);
         }
 
         private void LockEmploymentDetails()
@@ -353,10 +353,9 @@ namespace InSite.Cmds.Admin.People.Controls
             }
         }
 
-        public void SaveRoles(Guid userKey)
+        public void SaveRoles(Guid userId)
         {
-            SaveCmdsUserGroups(CmdsUserGroups, userKey);
-            SaveSkillsPassportUserGroups(SkillsPassportUserGroups, userKey);
+            SaveCmdsUserGroups(UserRoleList, userId);
         }
 
         #endregion
@@ -415,57 +414,25 @@ namespace InSite.Cmds.Admin.People.Controls
         {
             SetHasRole(false);
 
-            var groups = ServiceLocator.GroupSearch.GetCmdsUserRoles(user, "CMDS");
+            var partition = ServiceLocator.Partition.Identifier;
 
-            CmdsUserGroups.DataSource = groups;
-            CmdsUserGroups.DataValueField = "GroupIdentifier";
-            CmdsUserGroups.DataTextField = "GroupName";
-            CmdsUserGroups.DataBind();
+            var groups = ServiceLocator.GroupSearch.GetUserRoles(partition, user);
 
-            foreach (var info in groups)
-                if (info.Selected)
-                {
-                    CmdsUserGroups.Items.FindByValue(info.GroupIdentifier.ToString()).Selected = true;
-                    SetHasRole(true);
-                }
-
-            ApplyUserGroupAssignmentPermissions(1);
-        }
-
-        private void LoadRoles2(Guid user)
-        {
-            var identity = Identity;
-            var isDeveloper = identity.IsInRole(CmdsRole.Programmers) || identity.IsInRole("Skills Passport Developers");
-            var isAdministrator = identity.IsInRole("Skills Passport Administrators");
-            var isImpersonator = identity.IsInRole(CmdsRole.Impersonators);
-            var hasAccess = isDeveloper || isAdministrator || isImpersonator;
-
-            SkillsPassportUserGroupsColumn.Visible = false;
-
-            if (!hasAccess)
-                return;
-
-            var groups = ServiceLocator.GroupSearch.GetCmdsUserRoles(user, "Skills Passport");
-            var hasData = groups.Count > 0;
-
-            SkillsPassportUserGroupsColumn.Visible = hasData;
-
-            if (!hasData)
-                return;
-
-            SkillsPassportUserGroups.DataSource = groups;
-            SkillsPassportUserGroups.DataValueField = "GroupIdentifier";
-            SkillsPassportUserGroups.DataTextField = "GroupName";
-            SkillsPassportUserGroups.DataBind();
+            UserRoleList.DataSource = groups;
+            UserRoleList.DataValueField = "GroupIdentifier";
+            UserRoleList.DataTextField = "GroupName";
+            UserRoleList.DataBind();
 
             foreach (var info in groups)
+            {
                 if (info.Selected)
                 {
-                    SkillsPassportUserGroups.Items.FindByValue(info.GroupIdentifier.ToString()).Selected = true;
+                    UserRoleList.Items.FindByValue(info.GroupIdentifier.ToString()).Selected = true;
                     SetHasRole(true);
                 }
+            }
 
-            ApplyUserGroupAssignmentPermissions(2);
+            ApplyUserGroupAssignmentPermissions();
         }
 
         private void SaveCmdsUserGroups(CheckBoxList list, Guid userKey)

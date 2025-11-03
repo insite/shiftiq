@@ -1,8 +1,8 @@
-namespace Shift.Service.Gradebook;
+namespace Shift.Service.Progress;
 
 public partial class QGradebookEnrollmentEntity
 {
-    public QGradebookEntity? Gradebook { get; set; }
+    public GradebookEntity? Gradebook { get; set; }
 
     public Guid EnrollmentIdentifier { get; set; }
     public Guid GradebookIdentifier { get; set; }

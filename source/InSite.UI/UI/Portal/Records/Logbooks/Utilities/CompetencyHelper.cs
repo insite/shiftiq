@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using InSite.Application.Records.Read;
 using InSite.Application.Standards.Read;
 using InSite.Persistence;
 
@@ -34,11 +35,23 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
             public List<CompetencyItem> Competencies { get; set; }
         }
 
-        public static List<AreaItem> GetAreasByExperience(Guid experienceIdentifier, string language, bool useSimpleNameConvention = false)
+        public static List<AreaItem> GetAreasByExperience(Guid experienceIdentifier, Guid journalSetupIdentifier, Guid userIdentifier, string language, bool useSimpleNameConvention = false)
         {
-            var experienceCompetencies = ServiceLocator.JournalSearch.GetExperienceCompetencies(experienceIdentifier, x => x.Competency);
+            var experienceCompetencies = ServiceLocator.JournalSearch.GetExperienceCompetencies(experienceIdentifier, x => x.Competency, x => x.Experience);
             if (experienceCompetencies.Count == 0)
                 return null;
+
+            var userCompetencies =
+                ServiceLocator.JournalSearch
+                    .GetExperienceCompetencies(
+                        new QExperienceCompetencyFilter
+                        {
+                            JournalSetupIdentifier = journalSetupIdentifier,
+                            UserIdentifier = userIdentifier
+                        },
+                        x => x.Experience)
+                    .GroupBy(x => x.CompetencyStandardIdentifier)
+                    .ToDictionary(g => g.Key, g => (int?)g.Count());
 
             var areas = new List<AreaItem>();
 
@@ -46,12 +59,15 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
 
             foreach (var experienceCompetency in experienceCompetencies)
             {
+                if (!userCompetencies.TryGetValue(experienceCompetency.CompetencyStandardIdentifier, out var journalItems))
+                    journalItems = null;
+
                 AddCompetency(
                     areas,
                     classifications,
                     experienceCompetency.Competency,
                     experienceCompetency.CompetencyHours,
-                    null,
+                    journalItems,
                     null,
                     false,
                     experienceCompetency.SatisfactionLevel,

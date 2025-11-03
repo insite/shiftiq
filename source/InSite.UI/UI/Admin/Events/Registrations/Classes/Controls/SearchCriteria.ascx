@@ -56,11 +56,11 @@
                 </div>
                 <div class="col-4">
                     <div class="mb-2">
-                        <insite:DateTimeOffsetSelector ID="RegistrationRequestedSince" runat="server" EmptyMessage="Registration Date Since" />
+                        <insite:DateTimeOffsetSelector ID="RegistrationRequestedSince" runat="server" EmptyMessage="Registration Date Since" ApplyUserTimezone="true" />
                     </div>
 
                     <div class="mb-2">
-                        <insite:DateTimeOffsetSelector ID="RegistrationRequestedBefore" runat="server" EmptyMessage="Registration Date Before" />
+                        <insite:DateTimeOffsetSelector ID="RegistrationRequestedBefore" runat="server" EmptyMessage="Registration Date Before" ApplyUserTimezone="true" />
                     </div>
 
                     <div class="mb-2">

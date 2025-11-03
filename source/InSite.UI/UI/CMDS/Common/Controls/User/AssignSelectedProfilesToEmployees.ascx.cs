@@ -9,8 +9,8 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
-using Shift.Constant;
 using Shift.Common.Events;
+using Shift.Constant;
 
 namespace InSite.Cmds.Controls.BulkTool.Assign
 {
@@ -79,7 +79,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
             DepartmentProfiles.DataSource = ProfileRepository.SelectCompanyProfilesForDepartment(CurrentIdentityFactory.ActiveOrganizationIdentifier, DepartmentIdentifier.Value.Value);
             DepartmentProfiles.DataBind();
 
-            DepartmentEmployees.DataSource = ContactRepository3.SelectEmployeesByDepartmentID(DepartmentIdentifier.Value.Value);
+            DepartmentEmployees.DataSource = ContactRepository3.SelectEmployeesByDepartmentId(DepartmentIdentifier.Value.Value);
             DepartmentEmployees.DataBind();
         }
 
@@ -124,7 +124,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
 
         private void SaveProfilesForEmployees()
         {
-            var persons = ContactRepository3.SelectEmployeesByDepartmentID(DepartmentIdentifier.Value.Value);
+            var persons = ContactRepository3.SelectEmployeesByDepartmentId(DepartmentIdentifier.Value.Value);
 
             var departmentKey = DepartmentIdentifier.Value.Value;
 

@@ -6,8 +6,8 @@
 
             <asp:TemplateField HeaderText="Name" ItemStyle-Wrap="false"> 
                 <ItemTemplate>
-                    <a href='/ui/admin/learning/programs/outline?<%# Eval("ProgramIdentifier", "id={0}") %>'><i class="fas fa-pencil me-2"></i></a>
-                    <a href='/ui/admin/learning/programs/outline?<%# Eval("ProgramIdentifier", "id={0}") %>'><%# Eval("ProgramName") %></a>
+                    <a href='<%# InSite.Admin.Records.Programs.Outline.GetNavigateUrl((Guid)Eval("ProgramIdentifier")) %>'><i class="fas fa-pencil me-2"></i></a>
+                    <a href='<%# InSite.Admin.Records.Programs.Outline.GetNavigateUrl((Guid)Eval("ProgramIdentifier")) %>'><%# Eval("ProgramName") %></a>
                     <%# Eval("CatalogName") %>
                 </ItemTemplate>
             </asp:TemplateField>

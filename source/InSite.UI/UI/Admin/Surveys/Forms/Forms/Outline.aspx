@@ -340,17 +340,21 @@
 
                                     </insite:NavItem>
 
-                                    <insite:NavItem runat="server" ID="ConditionsTab" Title="Conditions">
+                                    <insite:NavItem runat="server" ID="ConditionsTab" Title="Conditions"> 
                                         <div class="row">
                                             <div class="col-lg-12 conditions-list">
 
-                                                <div class="button-group">
+                                                <div class="alert alert-warning">
+                                                    If a condition is set, this question will be hidden based on the respondent's previous answers. Ensure the question you are hiding is placed on a separate page from the one where the condition is applied.
+                                                </div>
+
+                                                <div class="button-group mb-3">
                                                     <insite:Button runat="server" ID="AddConditions" Text="Add Conditions" Icon="fas fa-plus-circle" ButtonStyle="Default" />
                                                 </div>
 
-                                                <p runat="server" id="ConditionsNoItemsMessage" visible="false">
+                                                <asp:Panel runat="server" ID="ConditionsNoItemsMessage" CssClass="alert alert-info" Visible="false">
                                                     There are no conditions in this survey form.
-                                                </p>
+                                                </asp:Panel>
 
                                                 <asp:Repeater runat="server" ID="ConditionsRepeater" Visible="false">
                                                     <ItemTemplate>
@@ -414,9 +418,14 @@
                                     <insite:NavItem runat="server" ID="BranchesTab" Title="Branches">
                                         <div class="row">
                                             <div class="col-md-12 branches-list">
-                                                <p runat="server" id="BranchesNoItemsMessage" visible="false">
+
+                                                <div class="alert alert-warning">
+                                                    If branching is set, respondents will be redirected to a specific question and will skip any questions before that point. The branching destination must be on a new page.
+                                                </div>
+
+                                                <asp:Panel runat="server" ID="BranchesNoItemsMessage" CssClass="alert alert-info" Visible="false">
                                                     There are no branches in this survey form.
-                                                </p>
+                                                </asp:Panel>
 
                                                 <asp:Repeater runat="server" ID="BranchesRepeater" Visible="false">
                                                     <ItemTemplate>

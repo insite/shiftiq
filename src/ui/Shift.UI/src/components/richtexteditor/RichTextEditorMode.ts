@@ -1,0 +1,1 @@
+export type RichTextEditorMode = "markdown" | "html";

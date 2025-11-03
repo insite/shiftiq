@@ -4,7 +4,7 @@ namespace Shift.Service.Directory;
 
 public partial class PersonEntity
 {
-    public QUserEntity? User { get; set; }
+    public UserEntity? User { get; set; }
 
     public Guid? BillingAddressIdentifier { get; set; }
     public Guid CreatedBy { get; set; }
@@ -33,6 +33,7 @@ public partial class PersonEntity
 
     public string? AccessRevokedBy { get; set; }
     public string? AccountStatusName { get; set; }
+    public string? AgeGroup { get; set; }
     public string? CandidateLinkedInUrl { get; set; }
     public string? CandidateOccupationList { get; set; }
     public string? Citizenship { get; set; }
@@ -87,6 +88,7 @@ public partial class PersonEntity
     public DateTimeOffset? JobsApproved { get; set; }
     public DateTimeOffset? LastAuthenticated { get; set; }
     public DateTimeOffset Modified { get; set; }
+    public DateTimeOffset? SinModified { get; set; }
     public DateTimeOffset? UserAccessGranted { get; set; }
     public DateTimeOffset? WhenArchived { get; set; }
     public DateTimeOffset? WhenUnarchived { get; set; }

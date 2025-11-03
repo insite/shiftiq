@@ -268,8 +268,8 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
             }
 
             StandardContainmentStore.Delete(x => x.ParentStandardIdentifier == ProfileStandardIdentifier && competencyIDs.Contains(x.ChildStandardIdentifier));
-            DepartmentProfileCompetencyRepository2.DeleteUnusedByProfileID(ProfileStandardIdentifier);
-            VCmdsCompetencyOrganizationRepository.DeleteUnusedByProfileID(ProfileStandardIdentifier);
+            DepartmentProfileCompetencyRepository2.DeleteUnusedByProfileId(ProfileStandardIdentifier);
+            VCmdsCompetencyOrganizationRepository.DeleteUnusedByProfileId(ProfileStandardIdentifier);
 
             var totalCount = LoadCompetencies();
             OnRefreshed(totalCount);

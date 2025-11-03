@@ -11,6 +11,8 @@ using InSite.UI.Portal.Records.Logbooks.Models;
 using Shift.Common;
 using Shift.Constant;
 
+using static InSite.Admin.Records.Logbooks.CompetencyHelper;
+
 namespace InSite.UI.Portal.Records.Logbooks
 {
     public partial class OutlineEntry : PortalBasePage, IHasParentLinkParameters
@@ -70,7 +72,7 @@ namespace InSite.UI.Portal.Records.Logbooks
 
         public bool LoadCompetencies()
         {
-            var areas = CompetencyHelper.GetAreasByExperience(ExperienceIdentifier, Identity.Language);
+            var areas = CompetencyHelper.GetAreasByExperience(ExperienceIdentifier, JournalSetupIdentifier, User.UserIdentifier, Identity.Language, true);
             if (areas == null)
                 return false;
 

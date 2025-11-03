@@ -4,7 +4,7 @@ namespace Shift.Service.Security;
 
 public partial class TPermissionEntity
 {
-    public QGroupEntity? Group { get; set; }
+    public GroupEntity? Group { get; set; }
     public QOrganizationEntity? Organization { get; set; }
 
     public Guid GroupIdentifier { get; set; }

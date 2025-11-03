@@ -98,6 +98,13 @@
                 <div>
                     <asp:Literal runat="server" ID="RegistrationDeadline" />
                 </div>
+
+                <div class="mt-3">
+                    <asp:Literal runat="server" ID="AddToOfficeLink" />
+                    <asp:Literal runat="server" ID="AddToGoogleLink" />
+                    <asp:Literal runat="server" ID="DownloadIcsLink" />
+                </div>
+
             </div>
         </div>
 

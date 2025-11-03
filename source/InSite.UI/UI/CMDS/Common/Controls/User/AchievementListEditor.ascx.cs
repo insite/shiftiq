@@ -74,8 +74,7 @@ namespace InSite.UI.CMDS.Common.Controls.User
 
         private GroupByEnum GroupBy
         {
-            get => ((GroupByEnum?)ViewState[nameof(GroupBy)]) ?? GroupByEnum.None;
-            set => ViewState[nameof(GroupBy)] = value;
+            get => GroupByComboBox.Value.ToEnum<GroupByEnum>();
         }
 
         #endregion
@@ -131,9 +130,6 @@ namespace InSite.UI.CMDS.Common.Controls.User
 
         private void GroupByComboBox_ValueChanged(object sender, EventArgs e)
         {
-            if (IsGroupingEnabled())
-                GroupBy = GroupByComboBox.Value.ToEnum<GroupByEnum>();
-
             LoadAchievements(GroupBy);
         }
 
@@ -185,9 +181,6 @@ namespace InSite.UI.CMDS.Common.Controls.User
 
         private void FilterButton_Click(object sender, EventArgs e)
         {
-            if (IsGroupingEnabled())
-                GroupBy = GroupByComboBox.Value.ToEnum<GroupByEnum>();
-
             LoadAchievements(GroupBy);
         }
 
@@ -324,7 +317,7 @@ namespace InSite.UI.CMDS.Common.Controls.User
 
         #region Helper methods
 
-        private bool IsGroupingEnabled() => GroupByComboBox.Value != "None";
+        private bool IsGroupingEnabled() => GroupBy != GroupByEnum.None;
 
         #endregion
     }

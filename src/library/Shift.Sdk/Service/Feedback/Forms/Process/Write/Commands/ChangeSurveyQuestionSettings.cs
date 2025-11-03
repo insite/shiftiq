@@ -2,11 +2,13 @@
 
 using Common.Timeline.Commands;
 
+using InSite.Domain.Surveys.Forms;
+
 namespace InSite.Application.Surveys.Write
 {
     public class ChangeSurveyQuestionSettings : Command
     {
-        public ChangeSurveyQuestionSettings(Guid form, Guid question, bool isHidden, bool isRequired, bool isNested, string likertAnalysis, bool listEnableRandomization, bool listEnableOtherText, bool listEnableBranch, bool listEnableGroupMembership, bool listDisableColumnHeadingWrap, int? textLineCount, int? textCharacterLimit, bool numberEnableStatistics, bool numberEnableAutoCalc, Guid[] numberAutoCalcQuestions, bool numberEnableNotApplicable)
+        public ChangeSurveyQuestionSettings(Guid form, Guid question, bool isHidden, bool isRequired, bool isNested, string likertAnalysis, bool listEnableRandomization, bool listEnableOtherText, bool listEnableBranch, bool listEnableGroupMembership, bool listDisableColumnHeadingWrap, int? textLineCount, int? textCharacterLimit, bool numberEnableStatistics, bool numberEnableAutoCalc, Guid[] numberAutoCalcQuestions, bool numberEnableNotApplicable, SurveyQuestionListSelectionRange listSelectionRange, bool enableCreateCase)
         {
             AggregateIdentifier = form;
             Question = question;
@@ -25,6 +27,8 @@ namespace InSite.Application.Surveys.Write
             NumberEnableAutoCalc = numberEnableAutoCalc;
             NumberAutoCalcQuestions = numberAutoCalcQuestions;
             NumberEnableNotApplicable = numberEnableNotApplicable;
+            ListSelectionRange = listSelectionRange;
+            EnableCreateCase = enableCreateCase;
         }
 
         public Guid Question { get; }
@@ -41,7 +45,9 @@ namespace InSite.Application.Surveys.Write
         public int? TextCharacterLimit { get; }
         public bool NumberEnableStatistics { get; }
         public bool NumberEnableAutoCalc { get; }
-        public Guid[] NumberAutoCalcQuestions{ get; }
+        public Guid[] NumberAutoCalcQuestions { get; }
         public bool NumberEnableNotApplicable { get; }
+        public SurveyQuestionListSelectionRange ListSelectionRange { get; }
+        public bool EnableCreateCase { get; }
     }
 }

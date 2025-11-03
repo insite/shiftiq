@@ -1,25 +1,26 @@
-using Shift.Contract;
+using System.Runtime.CompilerServices;
 
 using Shift.Common;
+using Shift.Contract;
 
 namespace Shift.Service.Content;
 
 public class FileActivityService : IEntityService
 {
-    private readonly IFileActivityReader _reader;
-    private readonly IFileActivityWriter _writer;
+    private readonly FileActivityReader _reader;
+    private readonly FileActivityWriter _writer;
     private readonly FileActivityAdapter _adapter = new FileActivityAdapter();
 
-    public FileActivityService(IFileActivityReader reader, IFileActivityWriter writer)
+    public FileActivityService(FileActivityReader reader, FileActivityWriter writer)
     {
         _reader = reader;
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(
-        Guid activity, 
-        CancellationToken cancellation = default)
-        => await _reader.AssertAsync(activity, cancellation);
+    public async Task<bool> AssertAsync(Guid activity, CancellationToken cancellation = default)
+    {
+        return await _reader.AssertAsync(activity, cancellation);
+    }
 
     public async Task<IEnumerable<FileActivityModel>> CollectAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default)
     {
@@ -28,10 +29,10 @@ public class FileActivityService : IEntityService
         return _adapter.ToModel(entities);
     }
 
-    public async Task<int> CountAsync(
-        IFileActivityCriteria criteria, 
-        CancellationToken cancellation = default)
-        => await _reader.CountAsync(criteria, cancellation);
+    public async Task<int> CountAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default)
+    {
+        return await _reader.CountAsync(criteria, cancellation);
+    }
 
     public async Task<bool> CreateAsync(CreateFileActivity create, CancellationToken cancellation = default)
     {
@@ -40,23 +41,20 @@ public class FileActivityService : IEntityService
         return await _writer.CreateAsync(entity, cancellation);
     }
 
-    public async Task<bool> DeleteAsync(
-        Guid activity, 
-        CancellationToken cancellation = default)
-        => await _writer.DeleteAsync(activity, cancellation);
-
-    public async Task<IEnumerable<FileActivityModel>> DownloadAsync(
-        IFileActivityCriteria criteria, 
-        CancellationToken cancellation)
+    public async Task<bool> DeleteAsync(Guid activity, CancellationToken cancellation = default)
     {
-        var entities = await _reader.DownloadAsync(criteria, cancellation);
-
-        return _adapter.ToModel(entities);
+        return await _writer.DeleteAsync(activity, cancellation);
     }
 
-    public async Task<bool> ModifyAsync(
-        ModifyFileActivity modify, 
-        CancellationToken cancellation = default)
+    public async IAsyncEnumerable<FileActivityModel> DownloadAsync(IFileActivityCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation)
+    {
+        await foreach (var entity in _reader.DownloadAsync(criteria, cancellation))
+        {
+            yield return _adapter.ToModel(entity);
+        }
+    }
+
+    public async Task<bool> ModifyAsync(ModifyFileActivity modify, CancellationToken cancellation = default)
     {
         var entity = await _reader.RetrieveAsync(modify.ActivityIdentifier, cancellation);
 
@@ -68,20 +66,20 @@ public class FileActivityService : IEntityService
         return await _writer.ModifyAsync(entity, cancellation);
     }
 
-    public async Task<FileActivityModel?> RetrieveAsync(
-        Guid activity, 
-        CancellationToken cancellation = default)
+    public async Task<FileActivityModel?> RetrieveAsync(Guid activity, CancellationToken cancellation = default)
     {
         var entity = await _reader.RetrieveAsync(activity, cancellation);
 
         return entity != null ? _adapter.ToModel(entity) : null;
     }
 
-    public async Task<IEnumerable<FileActivityMatch>> SearchAsync(
-        IFileActivityCriteria criteria, 
-        CancellationToken cancellation = default)
-        => await _reader.SearchAsync(criteria, cancellation);
+    public async Task<IEnumerable<FileActivityMatch>> SearchAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default)
+    {
+        return await _reader.SearchAsync(criteria, cancellation);
+    }
 
-    public string Serialize(IEnumerable<FileActivityModel> models, string format)
-        => _adapter.Serialize(models, format);
+    public string Serialize<T>(IEnumerable<T> models, string format, string includes)
+    {
+        return _adapter.Serialize(models, format, includes);
+    }
 }

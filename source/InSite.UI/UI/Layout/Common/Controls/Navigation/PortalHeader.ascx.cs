@@ -2,10 +2,14 @@
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 
 using InSite.Common.Web;
 using InSite.Domain.Foundations;
 using InSite.Domain.Organizations;
+using InSite.Persistence;
 using InSite.UI.Portal.Billing.Models;
 
 using Shift.Common;
@@ -27,14 +31,53 @@ namespace InSite.UI.Layout.Portal.Controls
         {
             base.OnLoad(e);
 
-            var security = CurrentSessionState.Identity;
+            var identity = CurrentSessionState.Identity;
 
-            BindHomeLink(security);
+            AdminMenu.Visible = identity != null && identity.IsActionAuthorized(RelativeUrl.AdminHomeUrl);
+
+            if (AdminMenu.Visible)
+                BindNavbar(AdminMenu);
+
+            BindHomeLink(identity);
             BindImpersonator();
-            BindLanguages(security.Organization.Languages);
-            BindHelpMenu(security.Organization);
+            BindLanguages(identity.Organization.Languages, LanguageItem, CurrentLanguageOutput, LanguageMenuItems, Request.RawUrl, Request.Url.Query);
+            BindHelpMenu(identity.Organization);
 
-            BindSalesNav(security);
+            BindSalesNav(identity);
+        }
+
+        public static void BindNavbar(Control menu)
+        {
+            var identity = CurrentSessionState.Identity;
+
+            foreach (var control in menu.Controls)
+            {
+                if (control is HtmlAnchor a)
+                {
+                    a.Visible = IsAccessGranted(a.HRef);
+                }
+                else if (control is HtmlGenericControl div)
+                {
+                    BindNavbar(div);
+                }
+            }
+
+            bool IsAccessGranted(string href)
+            {
+                if (!href.StartsWith("/ui/"))
+                    return true;
+
+                var actionUrl = href.TrimStart('/');
+
+                if (identity.IsActionAuthorized(actionUrl))
+                    return true;
+
+                var permission = TActionSearch.Get(actionUrl);
+                if (permission == null)
+                    return true;
+
+                return identity.IsGranted(permission.PermissionParentActionIdentifier);
+            }
         }
 
         private void BindHomeLink(ISecurityFramework security)
@@ -57,8 +100,6 @@ namespace InSite.UI.Layout.Portal.Controls
 
             CmdsHomeLink.HRef = Urls.CmdsHomeUrl;
             CmdsHomeItem.Visible = isCmds;
-            PortalHomeItem.Visible = !isCmds;
-            AdminHomeItem.Visible = security.IsActionAuthorized(RelativeUrl.AdminHomeUrl);
 
             if (CmdsHomeItem.Visible && StringHelper.StartsWithAny(Request.RawUrl, new[] { "/ui/portal/accounts/my", "/ui/portal/reports/my" }))
                 HomeLink.HRef = CmdsHomeLink.HRef;
@@ -82,27 +123,27 @@ namespace InSite.UI.Layout.Portal.Controls
         public static string GetLogoImageUrl(ISecurityFramework security, HttpServerUtility server)
             => WallpaperManager.GetLogoUrl(security.Organization.PlatformCustomization?.PlatformUrl?.Logo, security.Organization.Code);
 
-        private void BindLanguages(CultureInfo[] organizationLanguages)
+        public static void BindLanguages(CultureInfo[] organizationLanguages, HtmlGenericControl menuItem, Literal currentLanguage, Repeater menuItems, string rawUrl, string query)
         {
             var multiLang = organizationLanguages.Length > 1;
 
-            LanguageItem.Visible = multiLang;
+            menuItem.Visible = multiLang;
 
             if (!multiLang)
                 return;
 
             var current = CookieTokenModule.Current.Language;
 
-            CurrentLanguageOutput.Text = current.ToUpper();
+            currentLanguage.Text = current.ToUpper();
 
-            var index = Request.RawUrl.IndexOf('?');
-            var baseUrl = index > 0 ? Request.RawUrl.Substring(0, index) : Request.RawUrl;
+            var index = rawUrl.IndexOf('?');
+            var baseUrl = index > 0 ? rawUrl.Substring(0, index) : rawUrl;
 
-            LanguageMenuItems.DataSource = organizationLanguages
+            menuItems.DataSource = organizationLanguages
                 .Where(x => !x.TwoLetterISOLanguageName.Equals(current, StringComparison.OrdinalIgnoreCase))
                 .Select(cultureInfo =>
                 {
-                    var queryString = HttpUtility.ParseQueryString(Request.Url.Query);
+                    var queryString = HttpUtility.ParseQueryString(query);
                     queryString.Remove("action-url");
                     queryString.Remove("path");
 
@@ -114,7 +155,7 @@ namespace InSite.UI.Layout.Portal.Controls
                         Url = $"{baseUrl}?{queryString}"
                     };
                 });
-            LanguageMenuItems.DataBind();
+            menuItems.DataBind();
         }
 
         private void BindHelpMenu(OrganizationState organization)
@@ -183,9 +224,8 @@ namespace InSite.UI.Layout.Portal.Controls
 
             UserNavItem.Visible = Request.IsAuthenticated;
             HelpMenuItem.Visible = false;
-            AdminHomeItem.Visible = false;
+            AdminMenu.Visible = false;
             CmdsHomeItem.Visible = false;
-            PortalHomeItem.Visible = false;
             LanguageItem.Visible = false;
 
             HomeLink.Visible = true;

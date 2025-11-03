@@ -11,7 +11,6 @@ import {
     MDXEditor,
     MDXEditorMethods,
     Separator,
-    UndoRedo,
     diffSourcePlugin,
     headingsPlugin,
     imagePlugin,
@@ -36,7 +35,7 @@ export interface RichTextEditor_MarkdownRef {
 }
 
 interface Props {
-    ref?: ForwardedRef<RichTextEditor_MarkdownRef>,
+    ref?: ForwardedRef<RichTextEditor_MarkdownRef>;
     isTranslating: boolean;
     markdown: string;
     disableUploadFile: boolean;
@@ -54,6 +53,11 @@ export default function RichTextEditor_Markdown({
     onChange,
     onBlur
 }: Props) {
+    // MDXEditor trims the initial value and even if I set trim=false then it doesn't prevent trimming
+    // This triggers the change event before the component is mounted
+    // Therefore prevMarkdown is needed to prevent triggering the change event
+    const prevMarkdown = useRef<string | undefined>(undefined);
+
     const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
 
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -78,7 +82,8 @@ export default function RichTextEditor_Markdown({
         editor.addEventListener("drop", editorDrop);
 
         async function editorDrop(e: DragEvent) {
-            if (!markdownRef.current
+            if (disableUploadFile
+                || !markdownRef.current
                 || !e.dataTransfer?.items
                 || e.dataTransfer.items.length !== 1
                 || e.dataTransfer.items[0].kind !== "file"
@@ -103,10 +108,18 @@ export default function RichTextEditor_Markdown({
         }
 
         return () => editor.removeEventListener("drop", editorDrop);
-    }, [onUploadFile]);
+    }, [onUploadFile, disableUploadFile]);
 
     useEffect(() => {
-        if (markdownRef.current && markdownRef.current.getMarkdown() !== markdown) {
+        if (prevMarkdown.current === undefined) {
+            prevMarkdown.current = markdown;
+        }
+        else if (markdownRef.current
+            && prevMarkdown.current !== markdown
+            && markdownRef.current.getMarkdown() !== markdown
+        ) {
+            prevMarkdown.current = markdown;
+
             markdownRef.current.setMarkdown(markdown);
         }
     }, [markdown]);
@@ -122,6 +135,12 @@ export default function RichTextEditor_Markdown({
         setUploadedFileIds([...uploadedFileIds, fileId]);
 
         return urlHelper.getFileUrl(fileId, fileName);
+    }
+
+    function handleChange(newMarkdown: string) {
+        if (prevMarkdown.current !== undefined && onChange) {
+            onChange(newMarkdown);
+        }
     }
 
     return (
@@ -146,8 +165,6 @@ export default function RichTextEditor_Markdown({
                     toolbarPlugin({
                         toolbarContents: () => (
                             <DiffSourceToggleWrapper options={["rich-text", "source"]}>
-                                <UndoRedo />
-                                <Separator />
                                 <BoldItalicUnderlineToggles />
                                 <Separator />
                                 <BlockTypeSelect />
@@ -161,7 +178,7 @@ export default function RichTextEditor_Markdown({
                         )
                     })
                 ]}
-                onChange={onChange}
+                onChange={handleChange}
                 onBlur={onBlur}
             />
         </div>

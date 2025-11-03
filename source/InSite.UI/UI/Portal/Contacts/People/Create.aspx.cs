@@ -106,15 +106,15 @@ namespace InSite.UI.Portal.Contacts.People
 
         private void AddMembership(Guid userId, Guid? group)
         {
-            if (group.HasValue)
+            if (!group.HasValue)
+                return;
+
+            MembershipHelper.Save(new Membership
             {
-                MembershipHelper.Save(new Membership
-                {
-                    UserIdentifier = userId,
-                    GroupIdentifier = group.Value,
-                    Assigned = DateTimeOffset.UtcNow
-                });
-            }
+                UserIdentifier = userId,
+                GroupIdentifier = group.Value,
+                Assigned = DateTimeOffset.UtcNow
+            });
         }
 
         private QPersonAddress GetAddress()

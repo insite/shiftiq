@@ -4,8 +4,12 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+using AngleSharp.Text;
+
 using InSite.Application.Records.Read;
 using InSite.Persistence;
+
+using Shift.Constant;
 
 namespace InSite.Admin.Records.Logbooks.Controls
 {
@@ -18,8 +22,11 @@ namespace InSite.Admin.Records.Logbooks.Controls
             public string Name { get; set; }
             public decimal? RequiredHours { get; set; }
             public decimal CompletedHours { get; set; }
+            public decimal Hours { get; set; }
             public int? RequiredJournalItems { get; set; }
             public int CompletedJournalItems { get; set; }
+            public int JournalItems { get; set; }
+            public ExperienceCompetencySatisfactionLevel SatisfactionLevel { get; set; }
             public int? SkillRating { get; set; }
         }
 
@@ -95,18 +102,15 @@ namespace InSite.Admin.Records.Logbooks.Controls
             if (areas == null)
                 return null;
 
-            var userCompetencies = ServiceLocator.JournalSearch.GetExperienceCompetencies(new QExperienceCompetencyFilter
-                {
-                    JournalSetupIdentifier = journalSetupIdentifier,
-                    UserIdentifier = userIdentifier
-                })
+            var userCompetencies = ServiceLocator.JournalSearch.GetExperienceCompetencies(
+            new QExperienceCompetencyFilter
+            {
+                JournalSetupIdentifier = journalSetupIdentifier,
+                UserIdentifier = userIdentifier
+            },
+            x => x.Experience)
                 .GroupBy(x => x.CompetencyStandardIdentifier)
-                .Select(x => new
-                {
-                    Identifier = x.Key,
-                    JournalItems = x.Count(),
-                    Hours = x.Sum(y => y.CompetencyHours ?? 0)
-                })
+                .Select(AggregateCompetency)
                 .ToDictionary(x => x.Identifier);
 
             return areas
@@ -129,12 +133,33 @@ namespace InSite.Admin.Records.Logbooks.Controls
                             CompletedHours = userCompetency?.Hours ?? 0,
                             RequiredJournalItems = y.JournalItems,
                             CompletedJournalItems = userCompetency?.JournalItems ?? 0,
+                            SatisfactionLevel = userCompetency?.SatisfactionLevel ?? ExperienceCompetencySatisfactionLevel.None,
                             SkillRating = y.SkillRating
                         };
                     })
                     .ToList()
                 })
                 .ToList();
+        }
+
+        private static CompetencyProgressItem AggregateCompetency(IGrouping<Guid, QExperienceCompetency> g)
+        {
+            var ordered = g.OrderByDescending(c => c.Experience.ExperienceCreated);
+
+            var level = ordered
+                .Select(c => c.SatisfactionLevel.ToEnum(ExperienceCompetencySatisfactionLevel.None))
+                .FirstOrDefault(v => v != ExperienceCompetencySatisfactionLevel.None);
+
+            if (level == default) 
+                level = ExperienceCompetencySatisfactionLevel.None;
+
+            return new CompetencyProgressItem
+            {
+                Identifier = g.Key,
+                JournalItems = g.Count(),
+                Hours = g.Sum(y => y.CompetencyHours ?? 0),
+                SatisfactionLevel = level
+            };
         }
     }
 }

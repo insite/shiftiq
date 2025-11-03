@@ -71,7 +71,7 @@ namespace InSite.UI.Layout.Common.Controls
             SignOutItem.Visible = Request.IsAuthenticated;
             SignOutLink.HRef = InSite.UI.Lobby.SignOut.GetUrl();
 
-            UserName.InnerHtml = "<i class='fas fa-user me-2'></i>" + User.FullName;
+            UserName.InnerHtml = "<i class='fa-fw fa-regular fa-user me-1'></i>" + User.FirstName;
         }
     }
 }

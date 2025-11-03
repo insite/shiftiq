@@ -30,7 +30,7 @@ namespace InSite.UI.Portal.Learning.Programs.Models
         private static Guid OrganizationId => CurrentSessionState.Identity.Organization.Identifier;
         private static Guid? ParentOrganizationId => CurrentSessionState.Identity.Organization.ParentOrganizationIdentifier;
 
-        public static SubmitResult Submit(List<Guid> programIds)
+        public static SubmitResult Submit(List<Guid> programIds, string language)
         {
             var supervisorUserId = GetSupervisorUserId();
             if (supervisorUserId == null)
@@ -50,7 +50,7 @@ namespace InSite.UI.Portal.Learning.Programs.Models
                 };
             }
 
-            var programs = ServiceLocator.ProgramSearch.GetProgramsForSubmit(OrganizationId, programIds);
+            var programs = ServiceLocator.ProgramSearch.GetProgramsForSubmit(OrganizationId, programIds, language);
 
             var commands = CreateCommands(programs, supervisorUserId.Value, caseStatusId.Value);
 
@@ -85,7 +85,7 @@ namespace InSite.UI.Portal.Learning.Programs.Models
                 caseId,
                 UniqueIdentifier.Create(),
                 comment,
-                null,
+                "Programs",
                 null,
                 UserIdentifiers.Someone,
                 null,
@@ -104,8 +104,6 @@ namespace InSite.UI.Portal.Learning.Programs.Models
 
         private static string CreateComment(List<SubmittedProgram> programs)
         {
-            var achievements = GetAchievements();
-
             var comment = new StringBuilder();
             comment.Append("The requested program(s):");
 
@@ -115,24 +113,32 @@ namespace InSite.UI.Portal.Learning.Programs.Models
                 comment.AppendLine();
                 comment.AppendLine($"Program: {program.ProgramName}");
                 comment.Append($"Categories: {string.Join(", ", program.CategoryNames)}");
-            }
 
-            if (achievements.Count > 0)
-            {
-                comment.AppendLine();
-                comment.AppendLine();
+                if (!string.IsNullOrEmpty(program.ProgramSummary))
+                {
+                    comment.AppendLine();
+                    comment.AppendLine("Summary:");
+                    comment.Append(program.ProgramSummary);
+                }
 
-                var achievementsText = string.Join("", achievements.Select(x => "\n - " + x));
-                comment.AppendLine($"Achievements: {achievementsText}");
+                var achievements = GetAchievements(program.ProgramId);
+                if (achievements.Count > 0)
+                {
+                    var achievementsText = string.Join("", achievements.Select(x => "\n - " + x));
+
+                    comment.AppendLine();
+                    comment.AppendLine();
+                    comment.AppendLine($"Achievements: {achievementsText}");
+                }
             }
 
             return comment.ToString();
         }
 
-        private static List<string> GetAchievements()
+        private static List<string> GetAchievements(Guid programId)
         {
-            var objects = ProgramHelper.GetTaskObjects("Achievement", OrganizationId, ParentOrganizationId);
-            return objects.Select(x => x.Text).ToList();
+            var (_, items) = ProgramHelper.GetTasksAndItems(programId, "Achievement", OrganizationId, ParentOrganizationId);
+            return items.Select(x => x.TaskName).ToList();
         }
 
         private static Guid? GetSupervisorUserId()

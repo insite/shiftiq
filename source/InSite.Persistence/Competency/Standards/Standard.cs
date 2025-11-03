@@ -93,7 +93,6 @@ namespace InSite.Persistence
         public virtual ICollection<DepartmentProfileCompetency> DepartmentProfiles { get; set; }
         public virtual ICollection<DepartmentProfileUser> DepartmentUsers { get; set; }
         public virtual ICollection<Person> OccupationStandardPersons { get; set; }
-        public virtual ICollection<TOpportunity> Opportunities { get; set; }
 
         public Standard()
         {
@@ -110,7 +109,6 @@ namespace InSite.Persistence
             DepartmentProfiles = new HashSet<DepartmentProfileCompetency>();
             DepartmentUsers = new HashSet<DepartmentProfileUser>();
             OccupationStandardPersons = new HashSet<Person>();
-            Opportunities = new HashSet<TOpportunity>();
         }
     }
 }

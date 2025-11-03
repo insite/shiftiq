@@ -15,6 +15,7 @@ namespace InSite.UI.Admin.Issues
 
             HistoryPanel.Visible = issues > 0;
             IssueCount.Text = $@"{issues:n0}";
+            CaseStatusesLink.Visible = Identity.IsOperator;
         }
 
         private QIssueFilter CreateFilter()

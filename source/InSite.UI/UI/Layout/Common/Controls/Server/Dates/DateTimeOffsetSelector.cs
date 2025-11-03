@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using Newtonsoft.Json;
 
@@ -7,6 +8,14 @@ using Shift.Common;
 
 namespace InSite.Common.Web.UI
 {
+    public enum DatePreset
+    {
+        None,
+        SinceStartOfDay,   
+        BeforeEndOfDay     
+    }
+
+
     public class DateTimeOffsetSelector : BaseDateTimeSelector<DateTimeOffset?>
     {
         #region Classes
@@ -91,8 +100,22 @@ namespace InSite.Common.Web.UI
 
         public string DefaultTimeZone
         {
-            get { return (string)(ViewState[nameof(DefaultTimeZone)] ?? CurrentSessionState.Identity?.User.TimeZone.Id ?? TimeZones.Utc.Id); }
+            get { return (string)(ViewState[nameof(DefaultTimeZone)] ?? CurrentSessionState.Identity?.User?.TimeZone.Id ?? TimeZones.Utc.Id); }
             set { ViewState[nameof(DefaultTimeZone)] = value; }
+        }
+
+        public bool ApplyUserTimezone
+        {
+            get => (bool?)ViewState[nameof(ApplyUserTimezone)] ?? false;
+            set => ViewState[nameof(ApplyUserTimezone)] = value;
+        }
+
+        [Browsable(true)]
+        [DefaultValue(DatePreset.SinceStartOfDay)]
+        public DatePreset Preset
+        {
+            get => (DatePreset?)ViewState[nameof(Preset)] ?? DatePreset.SinceStartOfDay;
+            set => ViewState[nameof(Preset)] = value;
         }
 
         public override DateTimeOffset? Value
@@ -103,7 +126,7 @@ namespace InSite.Common.Web.UI
             }
             set
             {
-                ViewState[nameof(Value)] = value.HasValue
+                var newValue = value.HasValue
                     ? new DateTimeOffset(
                         value.Value.Year,
                         value.Value.Month,
@@ -113,6 +136,16 @@ namespace InSite.Common.Web.UI
                         0,
                         value.Value.Offset)
                     : (DateTimeOffset?)null;
+
+                if (newValue.HasValue && ApplyUserTimezone)
+                {
+                    newValue = TimeZones.ConvertFromUtc(
+                        newValue.Value,
+                        CurrentSessionState.Identity?.User?.TimeZone ?? throw new ArgumentNullException("CurrentSessionState.Identity.User")
+                    );
+                }
+
+                ViewState[nameof(Value)] = newValue;
             }
         }
 
@@ -130,6 +163,20 @@ namespace InSite.Common.Web.UI
             result.ShowTime = true;
             result.ShowTimeZone = true;
 
+
+            var presetExplicitlySet = ViewState[nameof(Preset)] != null;
+            var effective = Preset;
+
+            if (!presetExplicitlySet && ID != null)
+            {
+                var id = ID.ToLowerInvariant();
+                if (id.Contains("before"))
+                    effective = DatePreset.BeforeEndOfDay;
+                else if (id.Contains("since"))
+                    effective = DatePreset.SinceStartOfDay;
+            }
+
+            result.Preset = (effective == DatePreset.BeforeEndOfDay) ? "before" : "since";
             return result;
         }
 

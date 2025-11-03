@@ -4,16 +4,95 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 
+using InSite.Application.Contents.Read;
 using InSite.Application.Records.Read;
 using InSite.Domain.Records;
+
+using Shift.Common;
+using Shift.Common.Linq;
+using Shift.Constant;
 
 namespace InSite.Persistence
 {
     public class ProgramSearch2 : IProgramSearch
     {
+        private readonly IContentSearch _contentSearch;
+
         private static InternalDbContext CreateContext()
         {
             return new InternalDbContext(false);
+        }
+
+        public ProgramSearch2(IContentSearch contentSearch)
+        {
+            _contentSearch = contentSearch;
+        }
+
+        public Guid? GetGroupEnrollmentProgramId(Guid userId, Guid objectId)
+        {
+            using (var db = CreateContext())
+            {
+                return db.TTasks
+                    .Where(x =>
+                        x.ObjectIdentifier == objectId
+                        && db.TProgramGroupEnrollments
+                            .Where(y =>
+                                y.ProgramIdentifier == x.ProgramIdentifier
+                                && db.QMemberships.Where(z =>
+                                    z.GroupIdentifier == y.GroupIdentifier
+                                    && z.UserIdentifier == userId
+                                ).Any()
+                            )
+                            .Any()
+                    )
+                    .Select(x => (Guid?)x.ProgramIdentifier)
+                    .FirstOrDefault();
+            }
+        }
+
+        public bool IsTaskEnrollmentExist(Guid userId, Guid objectId)
+        {
+            using (var db = CreateContext())
+            {
+                return db.TTaskEnrollments.Where(x =>
+                    x.LearnerUserIdentifier == userId
+                    && x.ObjectIdentifier == objectId
+                ).Any();
+            }
+
+        }
+
+        public int CountProgramGroups(Guid programId, string keyword)
+        {
+            using (var db = CreateContext())
+            {
+                var query = db.TProgramGroupEnrollments.Where(x => x.ProgramIdentifier == programId);
+                if (!string.IsNullOrEmpty(keyword))
+                    query = query.Where(x => x.Group.GroupName.Contains(keyword));
+
+                return query.Count();
+            }
+        }
+
+        public List<ProgramGroup> GetProgramGroups(Guid programId, string keyword, Paging paging)
+        {
+            using (var db = CreateContext())
+            {
+                var query = db.TProgramGroupEnrollments.Where(x => x.ProgramIdentifier == programId);
+                if (!string.IsNullOrEmpty(keyword))
+                    query = query.Where(x => x.Group.GroupName.Contains(keyword));
+
+                return query
+                    .Select(x => new ProgramGroup
+                    {
+                        GroupIdentifier = x.GroupIdentifier,
+                        GroupName = x.Group.GroupName,
+                        GroupSize = x.Group.QMemberships.Count(),
+                        Added = x.Created
+                    })
+                    .ApplyPaging(paging)
+                    .ToList();
+            }
         }
 
         public List<Guid> GetProgramIds(Guid taskObjectId)
@@ -36,11 +115,13 @@ namespace InSite.Persistence
             }
         }
 
-        public List<SubmittedProgram> GetProgramsForSubmit(Guid organizationId, List<Guid> programsIds)
+        public List<SubmittedProgram> GetProgramsForSubmit(Guid organizationId, List<Guid> programsIds, string language)
         {
+            List<SubmittedProgram> programs;
+
             using (var db = CreateContext())
             {
-                return db.TPrograms
+                programs = db.TPrograms
                     .Where(x =>
                         x.OrganizationIdentifier == organizationId
                         && programsIds.Contains(x.ProgramIdentifier)
@@ -58,6 +139,19 @@ namespace InSite.Persistence
                     .OrderBy(x => x.ProgramName)
                     .ToList();
             }
+
+            var programSummaries = _contentSearch.GetBlocks(programsIds, new[] { language, ContentContainer.DefaultLanguage }, new[] { ContentLabel.Summary });
+
+            foreach (var program in programs)
+            {
+                if (programSummaries.TryGetValue(program.ProgramId, out var content))
+                {
+                    program.ProgramSummary = content.Summary.GetText(language)
+                        ?? content.Summary.GetText(ContentContainer.DefaultLanguage);
+                }
+            }
+
+            return programs;
         }
 
         public ProgramValuesResult GetProgramValues(Guid programId, Guid taskObjectId)

@@ -38,12 +38,20 @@ namespace InSite.Admin.Surveys.Forms.Controls
             return ServiceLocator.ContentSearch.GetTitleText(surveyIdentifier);
         }
 
-        protected string GetInvitationLink(Guid? surveyMessageInvitation)
+        protected string GetInvitationLink(QSurveyForm surveyForm)
         {
-            if (surveyMessageInvitation.HasValue)
-                return $"<a href='/ui/admin/messages/outline?message={surveyMessageInvitation}'><i class='icon far fa-envelope-open-text'></i></a>";
+            if (surveyForm == null) return string.Empty;
 
-            return null;
+            var hasAnyMessage =
+                surveyForm.SurveyMessageInvitation.HasValue ||
+                surveyForm.SurveyMessageResponseCompleted.HasValue ||
+                surveyForm.SurveyMessageResponseConfirmed.HasValue ||
+                surveyForm.SurveyMessageResponseStarted.HasValue;
+
+            if (!hasAnyMessage || surveyForm.SurveyFormIdentifier == Guid.Empty)
+                return string.Empty;
+
+            return $"<a href='/ui/admin/surveys/forms/outline?survey={surveyForm.SurveyFormIdentifier}&panel=messages&tab=Invitation'><i class=\"icon far fa-envelope-open-text\"></i></a>";
         }
 
         protected string GetSummaryHtml(Guid id)

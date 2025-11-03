@@ -94,5 +94,59 @@ namespace InSite.Admin.Surveys.Questions.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.CheckBox ListEnableGroupMembership;
+
+        /// <summary>
+        /// SelectionRangeField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel SelectionRangeField;
+
+        /// <summary>
+        /// SelectionRangeEnabled control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox SelectionRangeEnabled;
+
+        /// <summary>
+        /// SelectionRangeFieldsPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel SelectionRangeFieldsPanel;
+
+        /// <summary>
+        /// SelectionRangeRequiredValidation control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CustomValidator SelectionRangeRequiredValidation;
+
+        /// <summary>
+        /// SelectionRangeMin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NumericBox SelectionRangeMin;
+
+        /// <summary>
+        /// SelectionRangeMax control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NumericBox SelectionRangeMax;
     }
 }

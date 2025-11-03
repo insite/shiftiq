@@ -8,7 +8,7 @@ public partial class FileEntity
     public ICollection<FileClaimEntity> Claims { get; set; } = new List<FileClaimEntity>();
 
     public QOrganizationEntity Organization { get; set; } = null!;
-    public QUserEntity User { get; set; } = null!;
+    public UserEntity User { get; set; } = null!;
 
     public Guid? ApprovedUserIdentifier { get; set; }
     public Guid FileIdentifier { get; set; }

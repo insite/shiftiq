@@ -149,34 +149,9 @@ namespace InSite.UI.Admin.Records.Programs.Controls
             ProgramIdentifier = programId;
             AutoPostBack = true;
 
-            var objects = ProgramHelper.GetTaskObjects(ObjectType, Organization.OrganizationIdentifier, (includeEnterpriseTasks ? Organization.ParentOrganizationIdentifier : null));
+            var (programTasks, items) = ProgramHelper.GetTasksAndItems(programId, ObjectType, Organization.OrganizationIdentifier, (includeEnterpriseTasks ? Organization.ParentOrganizationIdentifier : null));
 
-            ProgramTasks = ProgramSearch1.GetProgramTasks(new TTaskFilter { ProgramIdentifier = programId, OrganizationIdentifier = Organization.OrganizationIdentifier, ParentOrganizationIdentifier = (includeEnterpriseTasks ? Organization.ParentOrganizationIdentifier : null) });
-
-            var items = new List<ProgramTaskItem>();
-            foreach (var o in objects)
-            {
-                var item = new ProgramTaskItem
-                {
-                    ObjectIdentifier = Guid.Parse(o.Value),
-                    ObjectType = ObjectType,
-                    TaskName = o.Text
-                };
-
-                var task = ProgramTasks.FirstOrDefault(x => x.ObjectIdentifier == item.ObjectIdentifier);
-                if (task == null)
-                    continue;
-
-
-                if (!programId.HasValue)
-                    continue;
-
-                items.Add(item);
-                item.TaskIdentifier = task.TaskIdentifier;
-                item.TaskCompletionRequirement = task.TaskCompletionRequirement;
-                item.ProgramIdentifier = programId.Value;
-                item.IsSelected = true;
-            }
+            ProgramTasks = programTasks;
 
             TaskRepeater.DataSource = items.OrderBy(x => x.TaskName);
             TaskRepeater.DataBind();

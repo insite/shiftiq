@@ -1,6 +1,4 @@
-﻿using Shift.Common;
-
-namespace Shift.Api
+﻿namespace Shift.Api
 {
     public class IdentityService : IShiftIdentityService
     {
@@ -23,7 +21,7 @@ namespace Shift.Api
 
         private const string PrincipalKey = nameof(IShiftPrincipal);
 
-        private static MemoryCache<string, IShiftPrincipal> PrincipalCache = new MemoryCache<string, IShiftPrincipal>();
+        private static MemoryCache<(Guid OrgId, Guid UserId), IShiftPrincipal> PrincipalCache = new MemoryCache<(Guid, Guid), IShiftPrincipal>();
 
         public IShiftPrincipal GetPrincipal()
         {
@@ -41,8 +39,12 @@ namespace Shift.Api
             // Check cache if available
 
             var userId = GetUserIdFromClaims(context);
+            var orgId = GetOrganizationIdFromClaims(context);
+            var principalKey = userId == Guid.Empty || orgId == Guid.Empty
+                ? (Guid.Empty, Guid.Empty)
+                : (orgId, userId);
 
-            if (PrincipalCache.TryGet(userId, out principal))
+            if (PrincipalCache.TryGet(principalKey, out principal))
             {
                 return principal;
             }
@@ -57,7 +59,7 @@ namespace Shift.Api
 
             context.Items[PrincipalKey] = principal;
 
-            PrincipalCache.Add(userId, principal);
+            PrincipalCache.Add(principalKey, principal);
 
             return principal;
         }
@@ -78,17 +80,19 @@ namespace Shift.Api
             }
         }
 
-        private string GetUserIdFromClaims(HttpContext context)
+        private Guid GetUserIdFromClaims(HttpContext context) => GetIdFromClaims(context, "user_id");
+
+        private Guid GetOrganizationIdFromClaims(HttpContext context) => GetIdFromClaims(context, "org_id");
+
+        private Guid GetIdFromClaims(HttpContext context, string name)
         {
-            if (context.User != null)
-            {
-                var claim = context.User.Claims.FirstOrDefault(x => x.Type == "user_id");
+            var claim = context.User != null
+                ? context.User.Claims.FirstOrDefault(x => x.Type == name)
+                : null;
 
-                if (claim != null)
-                    return claim.Value;
-            }
-
-            return Guid.Empty.ToString();
+            return claim != null && Guid.TryParse(claim.Value, out var value)
+                ? value
+                : Guid.Empty;
         }
     }
 }

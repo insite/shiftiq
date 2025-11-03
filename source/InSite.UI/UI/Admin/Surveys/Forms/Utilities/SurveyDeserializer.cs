@@ -106,6 +106,7 @@ namespace InSite.Admin.Surveys.Forms.Utilities
                     NumberEnableAutoCalc = question.NumberEnableAutoCalc,
                     NumberEnableNotApplicable = question.NumberEnableNotApplicable,
                     NumberEnableStatistics = question.NumberEnableStatistics,
+                    EnableCreateCase = question.EnableCreateCase,
                     Source = question.Source,
                     TextCharacterLimit = question.TextCharacterLimit,
                     TextLineCount = question.TextLineCount,

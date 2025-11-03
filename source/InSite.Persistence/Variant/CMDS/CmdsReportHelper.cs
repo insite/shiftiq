@@ -256,6 +256,7 @@ namespace InSite.Persistence.Plugin.CMDS
             {
                 public Guid ProfileStandardIdentifier { get; set; }
                 public Guid UserId { get; set; }
+                public string FullName { get; set; }
 
                 public IEnumerable<EmployeeStatus> EmployeeStatuses { get; set; }
             }
@@ -1409,7 +1410,7 @@ ORDER BY CompanyName,
             const string query = @"
 SELECT DISTINCT ep.ProfileStandardIdentifier AS ProfileStandardIdentifier
               , u.UserIdentifier
-              , P.FullName
+              , P.FullName AS PersonFullName
 FROM custom_cmds.UserProfile AS ep
          INNER JOIN contacts.Membership AS m ON m.UserIdentifier = ep.UserIdentifier
          INNER JOIN contacts.QGroup AS G ON G.GroupIdentifier = m.GroupIdentifier
@@ -1422,7 +1423,7 @@ WHERE
     ep.ProfileStandardIdentifier = @ProfileStandardIdentifier
     AND m.GroupIdentifier = @DepartmentIdentifier
 
-ORDER BY FullName
+ORDER BY PersonFullName
 ;";
 
             var sqlParameters = new[]

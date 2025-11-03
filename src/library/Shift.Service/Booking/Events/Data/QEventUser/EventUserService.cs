@@ -1,25 +1,26 @@
-using Shift.Contract;
+using System.Runtime.CompilerServices;
 
 using Shift.Common;
+using Shift.Contract;
 
 namespace Shift.Service.Booking;
 
 public class EventUserService : IEntityService
 {
-    private readonly IEventUserReader _reader;
-    private readonly IEventUserWriter _writer;
+    private readonly EventUserReader _reader;
+    private readonly EventUserWriter _writer;
     private readonly EventUserAdapter _adapter = new EventUserAdapter();
 
-    public EventUserService(IEventUserReader reader, IEventUserWriter writer)
+    public EventUserService(EventUserReader reader, EventUserWriter writer)
     {
         _reader = reader;
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(
-        Guid @event, Guid user,
-        CancellationToken cancellation = default)
-        => await _reader.AssertAsync(@event, user, cancellation);
+    public async Task<bool> AssertAsync(Guid @event, Guid user, CancellationToken cancellation = default)
+    {
+        return await _reader.AssertAsync(@event, user, cancellation);
+    }
 
     public async Task<IEnumerable<EventUserModel>> CollectAsync(IEventUserCriteria criteria, CancellationToken cancellation = default)
     {
@@ -28,10 +29,10 @@ public class EventUserService : IEntityService
         return _adapter.ToModel(entities);
     }
 
-    public async Task<int> CountAsync(
-        IEventUserCriteria criteria,
-        CancellationToken cancellation = default)
-        => await _reader.CountAsync(criteria, cancellation);
+    public async Task<int> CountAsync(IEventUserCriteria criteria, CancellationToken cancellation = default)
+    {
+        return await _reader.CountAsync(criteria, cancellation);
+    }
 
     public async Task<bool> CreateAsync(CreateEventUser create, CancellationToken cancellation = default)
     {
@@ -40,23 +41,20 @@ public class EventUserService : IEntityService
         return await _writer.CreateAsync(entity, cancellation);
     }
 
-    public async Task<bool> DeleteAsync(
-        Guid @event, Guid user,
-        CancellationToken cancellation = default)
-        => await _writer.DeleteAsync(@event, user, cancellation);
-
-    public async Task<IEnumerable<EventUserModel>> DownloadAsync(
-        IEventUserCriteria criteria,
-        CancellationToken cancellation)
+    public async Task<bool> DeleteAsync(Guid @event, Guid user, CancellationToken cancellation = default)
     {
-        var entities = await _reader.DownloadAsync(criteria, cancellation);
-
-        return _adapter.ToModel(entities);
+        return await _writer.DeleteAsync(@event, user, cancellation);
     }
 
-    public async Task<bool> ModifyAsync(
-        ModifyEventUser modify,
-        CancellationToken cancellation = default)
+    public async IAsyncEnumerable<EventUserModel> DownloadAsync(IEventUserCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation)
+    {
+        await foreach (var entity in _reader.DownloadAsync(criteria, cancellation))
+        {
+            yield return _adapter.ToModel(entity);
+        }
+    }
+
+    public async Task<bool> ModifyAsync(ModifyEventUser modify, CancellationToken cancellation = default)
     {
         var entity = await _reader.RetrieveAsync(modify.EventIdentifier, modify.UserIdentifier, cancellation);
 
@@ -68,19 +66,17 @@ public class EventUserService : IEntityService
         return await _writer.ModifyAsync(entity, cancellation);
     }
 
-    public async Task<EventUserModel?> RetrieveAsync(
-        Guid @event, Guid user,
-        CancellationToken cancellation = default)
+    public async Task<EventUserModel?> RetrieveAsync(Guid @event, Guid user, CancellationToken cancellation = default)
     {
         var entity = await _reader.RetrieveAsync(@event, user, cancellation);
 
         return entity != null ? _adapter.ToModel(entity) : null;
     }
 
-    public async Task<IEnumerable<EventUserMatch>> SearchAsync(
-        IEventUserCriteria criteria,
-        CancellationToken cancellation = default)
-        => await _reader.SearchAsync(criteria, cancellation);
+    public async Task<IEnumerable<EventUserMatch>> SearchAsync(IEventUserCriteria criteria, CancellationToken cancellation = default)
+    {
+        return await _reader.SearchAsync(criteria, cancellation);
+    }
 
     public string Serialize(IEnumerable<EventUserModel> models, string format, string includes)
     {

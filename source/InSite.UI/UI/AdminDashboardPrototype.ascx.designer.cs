@@ -22,23 +22,5 @@ namespace InSite.UI
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Portal.Controls.WelcomeUser WelcomeUser;
-
-        /// <summary>
-        /// PerformanceButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlButton PerformanceButton;
-
-        /// <summary>
-        /// InfoWindow control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.Modal InfoWindow;
     }
 }

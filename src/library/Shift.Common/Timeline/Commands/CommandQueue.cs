@@ -9,6 +9,8 @@ using Common.Timeline.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using Shift.Common;
+
 namespace Common.Timeline.Commands
 {
     /// <summary>

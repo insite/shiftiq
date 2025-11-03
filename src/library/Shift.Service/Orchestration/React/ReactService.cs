@@ -56,16 +56,15 @@ public class ReactService : IReactService
         _partitionService = partitionService;
     }
 
-    private static MemoryCache<string, SiteSettings> SiteSettingsCache = new MemoryCache<string, SiteSettings>();
+    private static MemoryCache<(Guid OrgId, Guid UserId), SiteSettings> SiteSettingsCache = new MemoryCache<(Guid, Guid), SiteSettings>();
 
     public async Task<SiteSettings> RetrieveSiteSettingsAsync(IShiftPrincipal principal, bool refresh)
     {
         // Check the in-memory cache before building a new SiteSettings object. If the caller has explicitly requested a
         // cache refresh then skip this intial check.
 
-        var identityName = principal.Name ?? "Someone";
-
-        if (!refresh && SiteSettingsCache.TryGet(identityName, out SiteSettings cachedSettings))
+        var identityKey = GetIdentityKey(principal);
+        if (!refresh && SiteSettingsCache.TryGet(identityKey, out SiteSettings cachedSettings))
         {
             return cachedSettings;
         }
@@ -133,9 +132,22 @@ public class ReactService : IReactService
         settings.PartitionEmail = (await _partitionService.RetrieveModelAsync()).Email;
         settings.SupportedLanguages = organizationData != null ? [.. organizationData.Languages.Select(x => x.TwoLetterISOLanguageName)] : ["en"];
 
-        SiteSettingsCache.Add(identityName, settings);
+        SiteSettingsCache.Add(identityKey, settings);
 
         return settings;
+    }
+
+    private static (Guid, Guid) GetIdentityKey(IShiftPrincipal principal)
+    {
+        if (principal != null)
+        {
+            var userId = principal.UserId;
+            var orgId = principal.OrganizationId;
+            if (userId.HasValue && userId.Value != Guid.Empty && orgId.HasValue && orgId.Value != Guid.Empty)
+                return (orgId.Value, userId.Value);
+        }
+
+        return (Guid.Empty, UserIdentifiers.Someone);
     }
 
     public async Task<PageSettings> RetrievePageSettingsAsync(IShiftPrincipal principal, string actionUrl)

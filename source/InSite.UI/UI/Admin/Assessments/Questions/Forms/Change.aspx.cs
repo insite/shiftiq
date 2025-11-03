@@ -654,9 +654,12 @@ namespace InSite.Admin.Assessments.Questions.Forms
             if (optionsCommands != null)
                 commands.AddRange(optionsCommands);
 
-            var prerequisitesCommands = Prerequisites.GetCommands(question);
-            if (prerequisitesCommands != null)
-                commands.AddRange(prerequisitesCommands);
+            if (!IsStandardScenario)
+            {
+                var prerequisitesCommands = Prerequisites.GetCommands(question);
+                if (prerequisitesCommands != null)
+                    commands.AddRange(prerequisitesCommands);
+            }
 
             var matches = MatchingDetails.Visible ? MatchingDetails.GetMatches() : null;
             if (matches != null && !matches.Equals(question.Matches))

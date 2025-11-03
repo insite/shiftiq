@@ -90,14 +90,16 @@ public class PersonAdapter : IEntityAdapter
         entity.IsDeveloper = modify.IsDeveloper;
         entity.JobDivision = modify.JobDivision;
         entity.PersonType = modify.PersonType;
+        entity.SinModified = modify.SinModified;
+        entity.AgeGroup = modify.AgeGroup;
 
     }
 
-    public string Serialize<T>(IEnumerable<T> items, string format, string includes)
+    public string Serialize<T>(IEnumerable<T> models, string format, string includes)
     {
         return format.ToLower() == "csv"
-            ? CsvHelper.SerializeCsv(items, includes)
-            : JsonHelper.SerializeJson(items, includes);
+            ? CsvHelper.SerializeCsv(models, includes)
+            : JsonHelper.SerializeJson(models, includes);
     }
 
     public PersonEntity ToEntity(CreatePerson create)
@@ -187,7 +189,9 @@ public class PersonAdapter : IEntityAdapter
             EmployeeType = create.EmployeeType,
             IsDeveloper = create.IsDeveloper,
             JobDivision = create.JobDivision,
-            PersonType = create.PersonType
+            PersonType = create.PersonType,
+            SinModified = create.SinModified,
+            AgeGroup = create.AgeGroup
         };
         return entity;
     }
@@ -284,7 +288,9 @@ public class PersonAdapter : IEntityAdapter
             EmployeeType = entity.EmployeeType,
             IsDeveloper = entity.IsDeveloper,
             JobDivision = entity.JobDivision,
-            PersonType = entity.PersonType
+            PersonType = entity.PersonType,
+            SinModified = entity.SinModified,
+            AgeGroup = entity.AgeGroup
         };
 
         return model;

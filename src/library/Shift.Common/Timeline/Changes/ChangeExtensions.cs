@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Shift.Common;
+
 namespace Common.Timeline.Changes
 {
     /// <summary>
@@ -15,7 +17,7 @@ namespace Common.Timeline.Changes
             var type = Registries.TypeRegistry.GetChangeType(x.ChangeType)
                 ?? throw new ChangeNotFoundException(x.ChangeType);
 
-            var serializer = Services.ServiceLocator.Instance.GetService<Services.IJsonSerializer>();
+            var serializer = Services.ServiceLocator.Instance.GetService<IJsonSerializer>();
             var data = serializer.Deserialize<IChange>(x.ChangeData, type, false);
 
             CopyChangeProperties(x, data);
@@ -26,9 +28,9 @@ namespace Common.Timeline.Changes
         /// <summary>
         /// Returns a deserialized change.
         /// </summary>
-        public static T Deserialize<T>(this SerializedChange x) where T: IChange
+        public static T Deserialize<T>(this SerializedChange x) where T : IChange
         {
-            var serializer = Services.ServiceLocator.Instance.GetService<Services.IJsonSerializer>();
+            var serializer = Services.ServiceLocator.Instance.GetService<IJsonSerializer>();
             var data = serializer.Deserialize<T>(x.ChangeData, typeof(T), false);
 
             CopyChangeProperties(x, data);
@@ -50,7 +52,7 @@ namespace Common.Timeline.Changes
         /// </summary>
         public static SerializedChange Serialize(this IChange change, Guid aggregateIdentifier, int version)
         {
-            var serializer = Services.ServiceLocator.Instance.GetService<Services.IJsonSerializer>();
+            var serializer = Services.ServiceLocator.Instance.GetService<IJsonSerializer>();
             var data = serializer.SerializeChange(change);
 
             var serialized = new SerializedChange

@@ -249,6 +249,33 @@ namespace InSite.UI.Portal.Events.Classes
         protected global::System.Web.UI.WebControls.Literal RegistrationDeadline;
 
         /// <summary>
+        /// AddToOfficeLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal AddToOfficeLink;
+
+        /// <summary>
+        /// AddToGoogleLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal AddToGoogleLink;
+
+        /// <summary>
+        /// DownloadIcsLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal DownloadIcsLink;
+
+        /// <summary>
         /// DescriptionPanel control.
         /// </summary>
         /// <remarks>

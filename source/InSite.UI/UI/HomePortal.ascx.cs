@@ -76,24 +76,25 @@ namespace InSite.UI
 
         private void CheckRequiredUserFields()
         {
-            if (User == null)
+            if (User == null || Organization.Fields?.User == null)
                 return;
 
             var user = UserSearch.Select(User.UserIdentifier);
+            if (user == null)
+                return;
 
-            if (user != null)
+            var type = user.GetType();
+
+            foreach (var field in Organization.Fields.User)
             {
-                var type = user.GetType();
+                if (field.IsRequired)
+                {
+                    var prop = type.GetProperty(field.FieldName);
 
-                foreach (var field in Organization.Fields.User)
-                    if (field.IsRequired)
-                    {
-                        var prop = type.GetProperty(field.FieldName);
-
-                        if (prop != null)
-                            if (prop.GetValue(user) == null)
-                                Response.Redirect("/ui/portal/profile", true);
-                    }
+                    if (prop != null)
+                        if (prop.GetValue(user) == null)
+                            Response.Redirect("/ui/portal/profile", true);
+                }
             }
         }
 

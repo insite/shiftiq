@@ -1,8 +1,8 @@
-namespace Shift.Service.Achievement;
+namespace Shift.Service.Progress;
 
 public partial class QCredentialEntity
 {
-    public QAchievementEntity? Achievement { get; set; }
+    public AchievementEntity? Achievement { get; set; }
 
     public Guid AchievementIdentifier { get; set; }
     public Guid? AuthorityIdentifier { get; set; }

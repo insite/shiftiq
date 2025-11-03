@@ -183,7 +183,7 @@ namespace InSite.Admin.Records.Programs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Cmds.Admin.Records.Programs.TaskGrid TaskGrid;
+        protected global::InSite.Admin.Records.Programs.Controls.TaskGridEdit TaskGrid;
 
         /// <summary>
         /// Step3SaveButton control.

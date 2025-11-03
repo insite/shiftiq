@@ -42,7 +42,7 @@
                         <div class="form-group mb-3">
                             <label class="form-label">
                                 Email
-        <insite:RequiredValidator runat="server" FieldName="Email" ControlToValidate="EmailWork" ValidationGroup="ContactInfo" Display="Dynamic" />
+                                <insite:RequiredValidator runat="server" FieldName="Email" ControlToValidate="EmailWork" ValidationGroup="ContactInfo" Display="Dynamic" />
                                 <insite:EmailValidator runat="server" FieldName="Email" ControlToValidate="EmailWork" ValidationGroup="ContactInfo" Display="Dynamic" Enabled="true" />
                                 <cmds:IxCustomValidator ID="ValidateEmailUnique" runat="server" ControlToValidate="EmailWork" ErrorMessage="This email already exists" ValidationGroup="ContactInfo" Display="Dynamic" />
                             </label>
@@ -68,7 +68,7 @@
                         <div runat="server" id="RowConfirmEmail" visible="false" class="form-group mb-3">
                             <label class="form-label">
                                 Confirm Email
-        <insite:CompareValidator runat="server" ControlToValidate="EmailWork" ControlToCompare="ConfirmEmail" ValidationGroup="ContactInfo" ErrorMessage="Emails do not match" />
+                                <insite:CompareValidator runat="server" ControlToValidate="EmailWork" ControlToCompare="ConfirmEmail" ValidationGroup="ContactInfo" ErrorMessage="Emails do not match" />
                             </label>
                             <insite:TextBox runat="server" ID="ConfirmEmail" MaxLength="256" />
                         </div>
@@ -91,12 +91,12 @@
                             </div>
                             <div class="form-text">
                                 Click the calendar icon to choose a date from the calendar, or enter your 
-        birthdate manually. You can enter the date in any format. For example: 
-        <ul>
-            <li>MMM d, yyyy</li>
-            <li>MM d yy</li>
-            <li>MM/d/yy</li>
-        </ul>
+                                birthdate manually. You can enter the date in any format. For example: 
+                                <ul>
+                                    <li>MMM d, yyyy</li>
+                                    <li>MM d yy</li>
+                                    <li>MM/d/yy</li>
+                                </ul>
                                 This information is required to track your progress with regard to various college certification programs.
                             </div>
                         </div>
@@ -184,7 +184,7 @@
                         <div runat="server" id="RowTimeZone" visible="false" class="form-group mb-3">
                             <label class="form-label">
                                 Time Zone
-        <insite:RequiredValidator runat="server" FieldName="Time Zone" ControlToValidate="TimeZone" ValidationGroup="ContactInfo" Display="Dynamic" />
+                                <insite:RequiredValidator runat="server" FieldName="Time Zone" ControlToValidate="TimeZone" ValidationGroup="ContactInfo" Display="Dynamic" />
                             </label>
                             <insite:TimeZoneComboBox ID="TimeZone" runat="server" />
                         </div>
@@ -261,20 +261,17 @@
 
             <insite:NavItem runat="server" ID="GroupsTab" Title="Groups">
                 <div class="row">
-                    <div runat="server" ID="CmdsUserGroupsColumn" class="col-lg-4 mb-3 mb-lg-0">
-                        <h3>CMDS</h3>
-                        <asp:CheckBoxList ID="CmdsUserGroups" runat="server" />
-                    </div>
-
-                    <div runat="server" ID="SkillsPassportUserGroupsColumn" class="col-lg-4">
-                        <h3>Skills Passport</h3>
-                        <asp:CheckBoxList ID="SkillsPassportUserGroups" runat="server" />
+                    <div class="col-lg-4 mb-3 mb-lg-0">
+                        <h3>Roles</h3>
+                        <asp:CheckBoxList ID="UserRoleList" runat="server" />
                     </div>
                 </div>
             </insite:NavItem>
 
             <insite:NavItem runat="server" ID="DuplicatesTab" Visible="false" Title="Possible Duplicates">
-                <p><asp:Literal ID="WarningMessage" runat="server" /></p>
+                <p>
+                    <asp:Literal ID="WarningMessage" runat="server" />
+                </p>
                 <uc:PersonGrid ID="Duplicates" runat="server" />
             </insite:NavItem>
 

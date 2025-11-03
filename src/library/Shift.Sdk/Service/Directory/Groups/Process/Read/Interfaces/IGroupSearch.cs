@@ -36,7 +36,6 @@ namespace InSite.Application.Contacts.Read
 
         List<UserRoleItem> GetUserRoles(Guid organization, Guid[] groups, bool isPlatformAdministrator, Guid user);
         List<UserRoleItem> GetUserRoles(Guid organization, Guid user);
-        List<UserRoleItem> GetCmdsUserRoles(Guid user, string groupNameStarts);
 
         List<string> GetGroupLabels(Guid organization, string groupType);
         List<string> GetGroupTags(Guid groupIdentifier);

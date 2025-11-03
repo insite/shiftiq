@@ -121,7 +121,7 @@ namespace InSite.Cmds.Admin.Districts.Forms
 
         private bool CheckDeleteAllowed()
         {
-            var departments = Persistence.Plugin.CMDS.ContactRepository3.SelectGroupsByFromID(Identifier);
+            var departments = Persistence.Plugin.CMDS.ContactRepository3.SelectGroupsByFromId(Identifier);
 
             if (departments.Count == 0)
                 return true;

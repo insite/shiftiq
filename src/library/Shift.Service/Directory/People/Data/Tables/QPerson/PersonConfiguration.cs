@@ -94,5 +94,7 @@ public class PersonConfiguration : IEntityTypeConfiguration<PersonEntity>
         builder.Property(x => x.IsDeveloper).HasColumnName("IsDeveloper").IsRequired();
         builder.Property(x => x.JobDivision).HasColumnName("JobDivision").IsUnicode(false).HasMaxLength(100);
         builder.Property(x => x.PersonType).HasColumnName("PersonType").IsUnicode(false).HasMaxLength(20);
+        builder.Property(x => x.SinModified).HasColumnName("SinModified");
+        builder.Property(x => x.AgeGroup).HasColumnName("AgeGroup").IsUnicode(false).HasMaxLength(20);
     }
 }

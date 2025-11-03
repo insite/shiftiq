@@ -269,9 +269,6 @@
                         </div>
                         <ul class="list-group list-group-flush">
                             <li runat="server" id="ViewMyTrainingPlanLink2" class="list-group-item"><a href="/ui/portal/learning/plan">My Training Plan</a></li>
-                            <li class="list-group-item"><a href="/ui/portal/learning/catalog">e-Learning Modules</a></li>
-                            <li class="list-group-item"><a href="/ui/portal/learning/catalog">HR Learning Modules</a></li>
-
                             <li class="list-group-item"><a href="/ui/cmds/admin/uploads/outline">Organization-Specific Achievements</a></li>
                             <li class="list-group-item"><i class="fas fa-caret-right fa-fw me-1"></i><a href="/ui/cmds/admin/uploads/outline?achievementType=Additional+Compliance+Requirement">Additional Compliance Requirements</a></li>
                             <li class="list-group-item"><i class="fas fa-caret-right fa-fw me-1"></i><a href="/ui/cmds/admin/uploads/outline?achievementType=Code+of+Practice" runat="server" id="CopAnchor">Codes of Practice</a></li>

@@ -24,7 +24,6 @@ namespace InSite.UI.Admin.Contacts.Groups
         #region Constants
 
         private const string GroupSearchUrl = "/ui/admin/contacts/groups/search";
-        private const string EmployerSearchUrl = "/ui/admin/jobs/employers/search";
 
         #endregion
 
@@ -201,14 +200,6 @@ namespace InSite.UI.Admin.Contacts.Groups
             var eventsCount = ServiceLocator.EventSearch.CountEvents(new QEventFilter { VenueLocationIdentifier = new[] { GroupIdentifier } });
             EventsCount.Text = eventsCount.ToString();
 
-            //Jobs
-            var opportunityCount = TOpportunitySearch.Count(x => x.EmployerGroupIdentifier == GroupIdentifier);
-            OpportunityCount.Text = $"{opportunityCount:n0}";
-
-            //Job Applications
-            var applicationCount = TApplicationSearch.Count(new TApplicationFilter { EmployerGroupIdentifier = GroupIdentifier });
-            ApplicationCount.Text = $"{applicationCount:n0}";
-
             if (eventsCount > 0)
             {
                 AdminErrorPanel.InnerHtml = $"This group is a <strong>Venue</strong> for {"event".ToQuantity(eventsCount)}. You cannot delete this group without first assigning a different venue to these events.";
@@ -235,9 +226,7 @@ namespace InSite.UI.Admin.Contacts.Groups
 
         private void RedirectToFinder()
         {
-            var url = IsEmployer ? EmployerSearchUrl : GroupSearchUrl;
-
-            HttpResponseHelper.Redirect(url);
+            HttpResponseHelper.Redirect(GroupSearchUrl);
         }
 
         #endregion

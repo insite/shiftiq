@@ -6,6 +6,7 @@ namespace Shift.Contract
     {
         public Guid AchievementIdentifier { get; set; }
         public Guid OrganizationIdentifier { get; set; }
+        public bool AchievementAllowSelfDeclared { get; set; }
         public bool AchievementIsEnabled { get; set; }
         public bool AchievementReportingDisabled { get; set; }
         public bool? HasBadgeImage { get; set; }

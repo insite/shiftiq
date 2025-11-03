@@ -1,10 +1,12 @@
+import { useMemo } from "react";
 import showdown from "showdown";
 import { useSiteProvider } from "@/contexts/SiteProvider";
 import { Language, MultiLanguageText } from "./language";
-import { useMemo } from "react";
+import { RichTextEditorMode } from "./RichTextEditorMode";
 
 interface Props {
-    markdown?: MultiLanguageText | null;
+    text?: MultiLanguageText | null;
+    mode: RichTextEditorMode;
     excludeLanguage: Language;
     onSelect: (language: Language) => void;
 }
@@ -17,14 +19,15 @@ interface LanguageItem {
 const _converter = new showdown.Converter({ simpleLineBreaks: true });
 
 export default function RichTextEditor_Languages({
-    markdown,
+    text,
+    mode,
     excludeLanguage,
     onSelect
 }: Props) {
     const { siteSetting } = useSiteProvider();
 
     const items = useMemo(() => {
-        if (!markdown || Object.keys(markdown).length === 1 && markdown[excludeLanguage]) {
+        if (!text || Object.keys(text).length === 1 && text[excludeLanguage]) {
             return null;
         }
 
@@ -35,17 +38,17 @@ export default function RichTextEditor_Languages({
                 continue;
             }
 
-            const text = markdown[language];
-            if (text) {
+            const langText = text[language];
+            if (langText) {
                 items.push({
                     language,
-                    text: _converter.makeHtml(text),
+                    text: mode === "markdown" ? _converter.makeHtml(langText) : langText,
                 });
             }
         }
 
         return items;
-    }, [markdown, excludeLanguage, siteSetting]);
+    }, [text, mode, excludeLanguage, siteSetting]);
 
     if (!items) {
         return null;

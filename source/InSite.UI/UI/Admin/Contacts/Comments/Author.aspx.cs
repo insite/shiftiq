@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 
+using InSite.Application.Contacts.Read;
 using InSite.Application.Contents.Read;
 using InSite.Application.People.Write;
 using InSite.Common.Web;
@@ -37,7 +39,9 @@ namespace InSite.Admin.Contacts.Comments.Forms
         {
             var comment = Get();
 
-            var person = ServiceLocator.PersonSearch.GetPerson(ContactIdentifier, Organization.Identifier);
+            var organizationId = GetOrganizationId();
+
+            var person = ServiceLocator.PersonSearch.GetPerson(ContactIdentifier, organizationId);
             if (person == null)
                 RedirectToParent();
 
@@ -45,6 +49,25 @@ namespace InSite.Admin.Contacts.Comments.Forms
 
             if (comment != null)
                 RedirectToParent();
+        }
+
+        /// <remarks>
+        /// If the person is assigned to the current organization then assume the current organization owns the comment.
+        /// Otherwise, get the list of organizations assigned to the person, sort alphabetically by organization code, 
+        /// and assume the first organization in the list owns the comment.
+        /// </remarks>
+        private Guid GetOrganizationId()
+        {
+            var organizationId = Organization.Identifier;
+
+            var people = ServiceLocator.PersonSearch.GetPersons(new QPersonFilter { UserIdentifier = ContactIdentifier }, x => x.Organization);
+
+            if (people.Count > 0 && !people.Any(p => p.OrganizationIdentifier == organizationId))
+            {
+                organizationId = people.OrderBy(p => p.Organization.OrganizationCode).First().OrganizationIdentifier;
+            }
+
+            return organizationId;
         }
 
         private void SendEmailNotification(QComment comment)

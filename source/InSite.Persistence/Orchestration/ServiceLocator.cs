@@ -448,7 +448,7 @@ namespace InSite
 
             UploadSearch = new UploadSearch2();
 
-            ProgramSearch = new ProgramSearch2();
+            ProgramSearch = new ProgramSearch2(ContentSearch);
             ProgramStore = new ProgramStore1();
             ProgramService = new ProgramService(ContactSearch, AchievementSearch, ProgramSearch, ProgramStore);
 

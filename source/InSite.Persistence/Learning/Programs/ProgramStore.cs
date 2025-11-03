@@ -72,6 +72,42 @@ namespace InSite.Persistence
             }
         }
 
+        public static void InsertGroupEnrollment(Guid organizationId, Guid programId, Guid groupId, Guid creatorUserId)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var existing = db.TProgramGroupEnrollments.FirstOrDefault(x => x.ProgramIdentifier == programId && x.GroupIdentifier == groupId);
+                if (existing != null)
+                    return;
+
+                var enrollment = new TProgramGroupEnrollment
+                {
+                    ProgramGroupEnrollmentIdentifier = UniqueIdentifier.Create(),
+                    OrganizationIdentifier = organizationId,
+                    GroupIdentifier = groupId,
+                    ProgramIdentifier = programId,
+                    Created = DateTimeOffset.UtcNow,
+                    CreatedBy = creatorUserId,
+                };
+
+                db.TProgramGroupEnrollments.Add(enrollment);
+                db.SaveChanges();
+            }
+        }
+
+        public static void DeleteGroupEnrollment(Guid programId, Guid groupId)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var enrollment = db.TProgramGroupEnrollments.FirstOrDefault(x => x.ProgramIdentifier == programId && x.GroupIdentifier == groupId);
+                if (enrollment == null)
+                    return;
+
+                db.TProgramGroupEnrollments.Remove(enrollment);
+                db.SaveChanges();
+            }
+        }
+
         public static void InsertEnrollment(Guid organization, Guid program, Guid learner, Guid creator, DateTimeOffset? completion = null)
         {
             using (var db = new InternalDbContext())

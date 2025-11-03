@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
-
 namespace Shift.Api;
 
 [ApiController]
 [ApiExplorerSettings(GroupName = "Security API: Users")]
-public class UserSessionController : ControllerBase
+public class UserSessionController : ShiftControllerBase
 {
     private readonly UserSessionService _userSessionService;
 
@@ -18,31 +16,30 @@ public class UserSessionController : ControllerBase
     #region Queries
 
     /// <summary>
-    /// Check for the existence of one specific user session
+    /// Checks for the existence of one specific user session
     /// </summary>
     [HttpHead("security/users-sessions/{session:guid}")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Assert)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertUserSession")]
-    public async Task<ActionResult<bool>> AssertAsync(
-        [FromRoute] Guid session,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> AssertAsync([FromRoute] Guid session, CancellationToken cancellation = default)
     {
         var exists = await _userSessionService.AssertAsync(session, cancellation);
+
         return exists ? Ok() : NotFound();
     }
 
     /// <summary>
-    /// Collect the list of user sessions that match specific criteria
+    /// Collects the list of user sessions that match specific criteria
     /// </summary>
     [HttpPost("security/users-sessions/collect")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Collect)]
     [ProducesResponseType<IEnumerable<UserSessionModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectUserSessions")]
-    public async Task<ActionResult<IEnumerable<UserSessionModel>>> PostCollectAsync(
-        [FromBody] CollectUserSessions query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> PostCollectAsync([FromBody] CollectUserSessions query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
     [HttpGet("security/users-sessions")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Collect)]
@@ -50,14 +47,12 @@ public class UserSessionController : ControllerBase
     [EndpointName("collectUserSessions_get")]
     [AliasFor("collectUserSessions")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<IEnumerable<UserSessionModel>>> GetCollectAsync(
-        [FromQuery] CollectUserSessions query,
-        CancellationToken cancellation = default)
-        => await CollectAsync(query, cancellation);
+    public async Task<IActionResult> GetCollectAsync([FromQuery] CollectUserSessions query, CancellationToken cancellation = default)
+    {
+        return await CollectAsync(query, cancellation);
+    }
 
-    private async Task<ActionResult<IEnumerable<UserSessionModel>>> CollectAsync(
-        CollectUserSessions query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CollectAsync(CollectUserSessions query, CancellationToken cancellation)
     {
         var models = await _userSessionService.CollectAsync(query, cancellation);
 
@@ -69,16 +64,16 @@ public class UserSessionController : ControllerBase
     }
 
     /// <summary>
-    /// Count the user sessions that match specific criteria
+    /// Counts the user sessions that match specific criteria
     /// </summary>
     [HttpPost("security/users-sessions/count")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Count)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countUserSessions")]
-    public async Task<ActionResult<CountResult>> PostCountAsync(
-        [FromBody] CountUserSessions query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> PostCountAsync([FromBody] CountUserSessions query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
     [HttpGet("security/users-sessions/count")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Count)]
@@ -86,31 +81,30 @@ public class UserSessionController : ControllerBase
     [EndpointName("countUserSessions_get")]
     [AliasFor("countUserSessions")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<CountResult>> GetCountAsync(
-        [FromQuery] CountUserSessions query,
-        CancellationToken cancellation = default)
-        => await CountAsync(query, cancellation);
+    public async Task<IActionResult> GetCountAsync([FromQuery] CountUserSessions query, CancellationToken cancellation = default)
+    {
+        return await CountAsync(query, cancellation);
+    }
 
-    private async Task<ActionResult<CountResult>> CountAsync(
-        CountUserSessions query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> CountAsync(CountUserSessions query, CancellationToken cancellation)
     {
         var count = await _userSessionService.CountAsync(query, cancellation);
+
         return Ok(new CountResult(count));
     }
 
     /// <summary>
-    /// Download the list of user sessions that match specific criteria
+    /// Downloads the list of user sessions that match specific criteria
     /// </summary>    
     [HttpPost("security/users-sessions/download")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Download)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadUserSessions")]
-    public async Task<FileContentResult> PostDownloadAsync(
-        [FromBody] CollectUserSessions query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> PostDownloadAsync([FromBody] CollectUserSessions query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
     [HttpGet("security/users-sessions/download")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Download)]
@@ -119,20 +113,20 @@ public class UserSessionController : ControllerBase
     [EndpointName("downloadUserSessions_get")]
     [AliasFor("downloadUserSessions")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<FileContentResult> GetDownloadAsync(
-        [FromQuery] CollectUserSessions query,
-        CancellationToken cancellation = default)
-        => await DownloadAsync(query, cancellation);
+    public async Task<FileContentResult> GetDownloadAsync([FromQuery] CollectUserSessions query, CancellationToken cancellation = default)
+    {
+        return await DownloadAsync(query, cancellation);
+    }
 
-    private async Task<FileContentResult> DownloadAsync(
-        CollectUserSessions query,
-        CancellationToken cancellation)
+    private async Task<FileContentResult> DownloadAsync(CollectUserSessions query, CancellationToken cancellation)
     {
         var exporter = new ExportHelper("Security", "UserSessions", query.Filter.Format, User);
 
-        var models = await _userSessionService.DownloadAsync(query, cancellation);
+        var models = await _userSessionService
+            .DownloadAsync(query, cancellation)
+            .ToListAsync(cancellation);
 
-        var content = _userSessionService.Serialize(models, exporter.GetFileFormat());
+        var content = _userSessionService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
 
         var contentBytes = System.Text.Encoding.UTF8.GetBytes(content);
 
@@ -144,31 +138,30 @@ public class UserSessionController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieve one specific user session
+    /// Retrieves one specific user session
     /// </summary>
     [HttpGet("security/users-sessions/{session:guid}")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Retrieve)]
     [ProducesResponseType<UserSessionModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveUserSession")]
-    public async Task<ActionResult<UserSessionModel>> RetrieveAsync(
-        [FromRoute] Guid session,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> RetrieveAsync([FromRoute] Guid session, CancellationToken cancellation = default)
     {
         var model = await _userSessionService.RetrieveAsync(session, cancellation);
+
         return model != null ? Ok(model) : NotFound();
     }
 
     /// <summary>
-    /// Search for the list of user sessions that match specific criteria
+    /// Searches for the list of user sessions that match specific criteria
     /// </summary>
     [HttpPost("security/users-sessions/search")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Search)]
     [ProducesResponseType<IEnumerable<UserSessionMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchUserSessions")]
-    public async Task<ActionResult<IEnumerable<UserSessionMatch>>> PostSearchAsync(
-        [FromBody] SearchUserSessions query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> PostSearchAsync([FromBody] SearchUserSessions query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
     [HttpGet("security/users-sessions/search")]
     [HybridAuthorize(Policies.Security.Users.UserSession.Search)]
@@ -176,14 +169,12 @@ public class UserSessionController : ControllerBase
     [EndpointName("searchUserSessions_get")]
     [AliasFor("searchUserSessions")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<IEnumerable<UserSessionMatch>>> GetSearchAsync(
-        [FromQuery] SearchUserSessions query,
-        CancellationToken cancellation = default)
-        => await SearchAsync(query, cancellation);
+    public async Task<IActionResult> GetSearchAsync([FromQuery] SearchUserSessions query, CancellationToken cancellation = default)
+    {
+        return await SearchAsync(query, cancellation);
+    }
 
-    private async Task<ActionResult<IEnumerable<UserSessionMatch>>> SearchAsync(
-        SearchUserSessions query,
-        CancellationToken cancellation)
+    private async Task<IActionResult> SearchAsync(SearchUserSessions query, CancellationToken cancellation)
     {
         var matches = await _userSessionService.SearchAsync(query, cancellation);
 
@@ -203,9 +194,7 @@ public class UserSessionController : ControllerBase
     [ProducesResponseType<UserSessionModel>(StatusCodes.Status201Created, "application/json")]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
     [EndpointName("createUserSession")]
-    public async Task<ActionResult<UserSessionModel>> CreateAsync(
-        [FromBody] CreateUserSession create,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateUserSession create, CancellationToken cancellation = default)
     {
         var created = await _userSessionService.CreateAsync(create, cancellation);
 
@@ -222,9 +211,7 @@ public class UserSessionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointName("deleteUserSession")]
-    public async Task<IActionResult> DeleteAsync(
-        [FromRoute] Guid session,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> DeleteAsync([FromRoute] Guid session, CancellationToken cancellation = default)
     {
         var deleted = await _userSessionService.DeleteAsync(session, cancellation);
 
@@ -240,11 +227,9 @@ public class UserSessionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
     [EndpointName("modifyUserSession")]
-    public async Task<IActionResult> ModifyAsync(
-        [FromBody] ModifyUserSession modify,
-        CancellationToken cancellation = default)
+    public async Task<IActionResult> ModifyAsync([FromRoute] Guid session, [FromBody] ModifyUserSession modify, CancellationToken cancellation = default)
     {
-        var model = await _userSessionService.RetrieveAsync(modify.SessionIdentifier, cancellation);
+        var model = await _userSessionService.RetrieveAsync(session, cancellation);
 
         if (model is null)
             return NotFound($"UserSession not found: SessionIdentifier {modify.SessionIdentifier}. You cannot modify an object that is not in the database.");

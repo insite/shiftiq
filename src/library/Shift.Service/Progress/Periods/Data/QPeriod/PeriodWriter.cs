@@ -4,14 +4,7 @@ using Shift.Common;
 
 namespace Shift.Service.Progress;
 
-public interface IPeriodWriter : IEntityWriter
-{
-    Task<bool> CreateAsync(PeriodEntity entity, CancellationToken cancellation = default);
-    Task<bool> DeleteAsync(Guid period, CancellationToken cancellation = default);
-    Task<bool> ModifyAsync(PeriodEntity entity, CancellationToken cancellation = default);
-}
-
-internal class PeriodWriter : IPeriodWriter
+public class PeriodWriter : IEntityWriter
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
@@ -27,11 +20,11 @@ internal class PeriodWriter : IPeriodWriter
         var exists = await AssertAsync(entity.PeriodIdentifier, cancellation, db);
         if (exists)
             return false;
-                
+
         await db.QPeriod.AddAsync(entity, cancellation);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> DeleteAsync(Guid period, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -43,7 +36,7 @@ internal class PeriodWriter : IPeriodWriter
         db.QPeriod.Remove(entity);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> ModifyAsync(PeriodEntity entity, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -57,5 +50,5 @@ internal class PeriodWriter : IPeriodWriter
     }
 
     private async Task<bool> AssertAsync(Guid period, CancellationToken cancellation, TableDbContext db)
-		=> await db.QPeriod.AsNoTracking().AnyAsync(x => x.PeriodIdentifier == period, cancellation);
+        => await db.QPeriod.AsNoTracking().AnyAsync(x => x.PeriodIdentifier == period, cancellation);
 }

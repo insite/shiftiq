@@ -1,7 +1,3 @@
-using System.Reflection;
-
-using Newtonsoft.Json;
-
 using Shift.Common;
 using Shift.Contract;
 
@@ -15,32 +11,13 @@ public class FileActivityAdapter : IEntityAdapter
         entity.UserIdentifier = modify.UserIdentifier;
         entity.ActivityTime = modify.ActivityTime;
         entity.ActivityChanges = modify.ActivityChanges;
-
     }
 
-    public string Serialize(IEnumerable<FileActivityModel> models, string format)
+    public string Serialize<T>(IEnumerable<T> models, string format, string includes)
     {
-        var content = string.Empty;
-
-        if (format.ToLower() == "csv")
-        {
-            var csv = new CsvExportHelper(models);
-
-            var properties = typeof(FileActivityModel)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Select(p => p.Name);
-
-            foreach (var property in properties)
-                csv.AddMapping(property, property);
-
-            content = csv.GetString();
-        }
-        else // The default export file format is JSON.
-        {
-            content = JsonConvert.SerializeObject(models, Formatting.Indented);
-        }
-
-        return content;
+        return format.ToLower() == "csv"
+            ? CsvHelper.SerializeCsv(models, includes)
+            : JsonHelper.SerializeJson(models, includes);
     }
 
     public FileActivityEntity ToEntity(CreateFileActivity create)

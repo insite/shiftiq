@@ -11,6 +11,7 @@ namespace Shift.Contract
         public Guid? OrganizationIdentifier { get; set; }
         public Guid? UserIdentifier { get; set; }
 
+        public string AccountScope { get; set; }
         public string MembershipFunction { get; set; }
 
         public DateTimeOffset? MembershipEffective { get; set; }

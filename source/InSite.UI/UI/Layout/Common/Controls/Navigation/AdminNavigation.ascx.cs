@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 using InSite.Common.Web;
@@ -17,6 +16,8 @@ using InSite.UI.Layout.Lobby;
 using Shift.Common;
 using Shift.Constant;
 
+using PortalNavigation = InSite.UI.Layout.Portal.Controls.PortalHeader;
+
 namespace InSite.UI.Layout.Admin
 {
     public partial class AdminNavigation : AdminBaseControl
@@ -24,6 +25,7 @@ namespace InSite.UI.Layout.Admin
         protected int SessionTimeountInMinutes => Session.Timeout;
 
         private static readonly NavigationRoot _navigationRoot = NavigationRoot.GetSidebarInstance();
+
         private static readonly ConcurrentDictionary<string, bool> _validUrlCache = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
         private static bool TestUrl(string url)
@@ -82,58 +84,20 @@ namespace InSite.UI.Layout.Admin
 
             var isE03 = ServiceLocator.Partition.IsE03();
 
-            BindNavbar(CmdsMenu);
-
-            CmdsMenuManagement.Visible = CmdsAchievementsLink.Visible || CmdsCompetenciesLink.Visible ||
-                CmdsProfilesLink.Visible || CmdsProgramsLink.Visible;
-
-            CmdsMenu.Visible = false;
-
             AdminMenu.Visible = Identity.IsGranted(PermissionNames.Admin_Courses);
 
             if (AdminMenu.Visible)
-                BindNavbar(AdminMenu);
+                PortalNavigation.BindNavbar(AdminMenu);
 
             BindUser();
             BindImpersonator();
             BindHelpLink();
+            PortalNavigation.BindLanguages(Identity.Organization.Languages, LanguageItem, CurrentLanguageOutput, LanguageMenuItems, Request.RawUrl, Request.Url.Query);
             BindSetupLink();
 
             BindSidebar(sidebar?.Menu);
 
             BindThemeMode();
-        }
-
-        private void BindNavbar(Control menu)
-        {
-            foreach (var control in menu.Controls)
-            {
-                if (control is HtmlAnchor a)
-                {
-                    a.Visible = IsAccessGranted(a.HRef);
-                }
-                else if (control is HtmlGenericControl div)
-                {
-                    BindNavbar(div);
-                }
-            }
-
-            bool IsAccessGranted(string href)
-            {
-                if (!href.StartsWith("/ui/"))
-                    return true;
-
-                var actionUrl = href.TrimStart('/');
-
-                if (Identity.IsActionAuthorized(actionUrl))
-                    return true;
-
-                var permission = TActionSearch.Get(actionUrl);
-                if (permission == null)
-                    return true;
-
-                return Identity.IsGranted(permission.PermissionParentActionIdentifier);
-            }
         }
 
         private void BindThemeMode()

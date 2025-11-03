@@ -1,4 +1,4 @@
-<%@ Page Language="C#" CodeBehind="Search.aspx.cs" Inherits="InSite.UI.Admin.Records.Programs.Search" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
+<%@ Page Language="C#" CodeBehind="Search.aspx.cs" Inherits="InSite.Admin.Records.Programs.Search" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 <%@ Register Src="./Controls/SearchCriteria.ascx" TagName="SearchCriteria" TagPrefix="uc" %>
 <%@ Register Src="./Controls/SearchResults.ascx" TagName="SearchResults" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Layout/Common/Controls/SearchDownload.ascx" TagName="SearchDownload" TagPrefix="uc" %>

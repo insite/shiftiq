@@ -30,6 +30,12 @@ namespace InSite.Admin.Surveys.Questions.Controls
             set => ViewState[nameof(Language)] = value;
         }
 
+        private bool OpenIssueEnabled
+        {
+            get => (bool)(ViewState[nameof(OpenIssueEnabled)] ?? false);
+            set => ViewState[nameof(OpenIssueEnabled)] = value;
+        }
+
         public int PageNumber => PageID.ValueAsInt.Value;
 
         private SurveyForm Form
@@ -137,6 +143,7 @@ namespace InSite.Admin.Surveys.Questions.Controls
         {
             Form = survey.Form;
             Language = survey.Form.Language;
+            OpenIssueEnabled = Form.State.WorkflowConfiguration != null;
 
             SetupPageID(survey.Form);
 
@@ -162,6 +169,7 @@ namespace InSite.Admin.Surveys.Questions.Controls
             Form = question.Form;
             QuestionIdentifier = question.Identifier;
             Language = question.Form.Language;
+            OpenIssueEnabled = Form.State.WorkflowConfiguration != null;
 
             SetupPageID(question.Form);
 
@@ -301,7 +309,7 @@ namespace InSite.Admin.Surveys.Questions.Controls
 
         private void InitQuestionTypeControls(SurveyQuestionType? questionType)
         {
-            SettingsPanel.Visible = questionType.HasValue
+            SettingsContainer.Visible = questionType.HasValue
                 && questionType != SurveyQuestionType.BreakPage
                 && questionType != SurveyQuestionType.BreakQuestion
                 && questionType != SurveyQuestionType.Terminate;
@@ -333,6 +341,8 @@ namespace InSite.Admin.Surveys.Questions.Controls
                 || questionType == SurveyQuestionType.Selection
                 || questionType == SurveyQuestionType.CheckList;
 
+            EnableCreateCaseField.Visible = OpenIssueEnabled;
+
             if (ListSection.Visible && questionType.HasValue)
                 DetailList.SetDefaultInputValues(questionType.Value, Language);
 
@@ -350,13 +360,16 @@ namespace InSite.Admin.Surveys.Questions.Controls
                     IsRequired.Checked = question.IsRequired;
                     IsNested.Checked = question.IsNested;
                     DetailCommentBox.SetInputValues(question);
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
                 case SurveyQuestionType.Date:
                     IsRequired.Checked = question.IsRequired;
                     IsNested.Checked = question.IsNested;
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
                 case SurveyQuestionType.Text:
                     IsRequired.Checked = question.IsRequired;
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
                 case SurveyQuestionType.Number:
                     IsRequired.Checked = question.IsRequired;
@@ -365,31 +378,37 @@ namespace InSite.Admin.Surveys.Questions.Controls
                     NumberEnableAutoCalc.Checked = question.NumberEnableAutoCalc;
                     NumberAutoCalcFields.Values = question.NumberAutoCalcQuestions;
                     NumberEnableNa.Checked = !question.NumberEnableAutoCalc && question.NumberEnableNotApplicable;
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
                 case SurveyQuestionType.RadioList:
                     IsRequired.Checked = question.IsRequired;
                     IsNested.Checked = question.IsNested;
                     NumberEnableStatistics.Checked = question.NumberEnableStatistics;
                     ListSection.SetTitle("Options", DetailList.SetInputValues(question, Language));
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
                 case SurveyQuestionType.Selection:
                     IsRequired.Checked = question.IsRequired;
                     IsNested.Checked = question.IsNested;
                     NumberEnableStatistics.Checked = question.NumberEnableStatistics;
                     ListSection.SetTitle("Options", DetailList.SetInputValues(question, Language));
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
                 case SurveyQuestionType.CheckList:
                     IsNested.Checked = question.IsNested;
                     ListSection.SetTitle("Options", DetailList.SetInputValues(question, Language));
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
                 case SurveyQuestionType.Likert:
                     IsRequired.Checked = question.IsRequired;
                     NumberEnableStatistics.Checked = question.NumberEnableStatistics;
                     LikertTableSection.SetTitle("Options", DetailLikertTable.SetInputValues(question, Language));
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
                 case SurveyQuestionType.Upload:
                     IsRequired.Checked = question.IsRequired;
                     IsNested.Checked = question.IsNested;
+                    EnableCreateCase.Checked = question.EnableCreateCase;
                     break;
             }
         }
@@ -402,13 +421,16 @@ namespace InSite.Admin.Surveys.Questions.Controls
                     question.IsRequired = IsRequired.Checked;
                     question.IsNested = IsNested.Checked;
                     DetailCommentBox.GetInputValues(question);
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
                 case SurveyQuestionType.Date:
                     question.IsRequired = IsRequired.Checked;
                     question.IsNested = IsNested.Checked;
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
                 case SurveyQuestionType.Text:
                     question.IsRequired = IsRequired.Checked;
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
                 case SurveyQuestionType.Number:
                     question.IsRequired = IsRequired.Checked;
@@ -417,31 +439,37 @@ namespace InSite.Admin.Surveys.Questions.Controls
                     question.NumberEnableAutoCalc = NumberEnableAutoCalc.Checked;
                     question.NumberAutoCalcQuestions = question.NumberEnableAutoCalc ? NumberAutoCalcFields.Values : null;
                     question.NumberEnableNotApplicable = !question.NumberEnableAutoCalc && NumberEnableNa.Checked;
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
                 case SurveyQuestionType.RadioList:
                     question.IsRequired = IsRequired.Checked;
                     question.IsNested = IsNested.Checked;
                     question.NumberEnableStatistics = NumberEnableStatistics.Checked;
                     DetailList.GetInputValues(question);
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
                 case SurveyQuestionType.Selection:
                     question.IsRequired = IsRequired.Checked;
                     question.IsNested = IsNested.Checked;
                     question.NumberEnableStatistics = NumberEnableStatistics.Checked;
                     DetailList.GetInputValues(question);
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
                 case SurveyQuestionType.CheckList:
                     question.IsNested = IsNested.Checked;
                     DetailList.GetInputValues(question);
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
                 case SurveyQuestionType.Likert:
                     question.IsRequired = IsRequired.Checked;
                     question.NumberEnableStatistics = NumberEnableStatistics.Checked;
                     DetailLikertTable.GetInputValues(question);
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
                 case SurveyQuestionType.Upload:
                     question.IsRequired = IsRequired.Checked;
                     question.IsNested = IsNested.Checked;
+                    question.EnableCreateCase = EnableCreateCase.Checked;
                     break;
             }
         }

@@ -29,6 +29,7 @@ namespace Shift.Sdk.UI
         public bool NumberEnableStatistics { get; set; }
         public bool NumberEnableAutoCalc { get; set; }
         public bool NumberEnableNotApplicable { get; set; }
+        public bool EnableCreateCase { get; set; }
         public int? TextCharacterLimit { get; set; }
         public int? TextLineCount { get; set; }
 

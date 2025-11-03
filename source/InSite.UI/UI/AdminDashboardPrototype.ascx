@@ -4,6 +4,15 @@
 
 <insite:PageHeadContent runat="server">
     <style>
+        :root {
+            --ar-skillscheck-blue: #68add1;
+        }
+
+        .skills-progress {
+            --ar-progress-thickness: 0.75rem;
+            --ar-progress-bar-bg-primary: var(--ar-skillscheck-blue);
+        }
+
         .notification-grid > div {
             display: grid;
             align-items: center;
@@ -68,7 +77,11 @@
             align-items: center;
         }
         .dashboard-card .action-list.with-icons > div > span i {
-            color: rgb(var(--ar-info-rgb));
+            color: var(--ar-skillscheck-blue);
+        }
+
+        .text-skillscheck-blue {
+            color: var(--ar-skillscheck-blue);
         }
     </style>
 </insite:PageHeadContent>
@@ -185,13 +198,13 @@
             </h3>
 
             <div class="card-description">
-                Assessments available: <span class="text-info">Unlimited</span>
+                Assessments available: <span class="text-skillscheck-blue">Unlimited</span>
             </div>
 
             <div class="d-flex gap-4 mb-3">
                 <div class="d-flex flex-column align-items-center">
                     <div class="mb-2" style="width:120px; height:120px;">
-                        <div class="circular-progress skills-progress" style="--ar-progress-value:67; --ar-progress-thickness: 0.75rem;">
+                        <div class="circular-progress skills-progress" style="--ar-progress-value:67;">
                             <span>10/15</span>
                         </div>
                     </div>
@@ -201,7 +214,7 @@
                 </div>
                 <div class="d-flex flex-column align-items-center">
                     <div class="mb-2" style="width:120px; height:120px;">
-                        <div class="circular-progress skills-progress" style="--ar-progress-value:30; --ar-progress-thickness: 0.75rem;">
+                        <div class="circular-progress skills-progress" style="--ar-progress-value:30;">
                             <span>3/10</span>
                         </div>
                     </div>
@@ -225,14 +238,14 @@
             </h3>
 
             <div class="card-description">
-                Contacts in account: <span class="text-info">186</span><br />
-                Contacts available: <span class="text-info">Unlimited</span>
+                Contacts in account: <span class="text-skillscheck-blue">186</span><br />
+                Contacts available: <span class="text-skillscheck-blue">Unlimited</span>
             </div>
 
             <div class="d-flex gap-4 mb-3">
                 <div class="d-flex flex-column align-items-center">
                     <div class="mb-2" style="width:120px; height:120px;">
-                        <div class="circular-progress skills-progress" style="--ar-progress-value:100; --ar-progress-thickness: 0.75rem;">
+                        <div class="circular-progress skills-progress" style="--ar-progress-value:100;">
                             <span>96</span>
                         </div>
                     </div>
@@ -242,7 +255,7 @@
                 </div>
                 <div class="d-flex flex-column align-items-center">
                     <div class="mb-2" style="width:120px; height:120px;">
-                        <div class="circular-progress skills-progress" style="--ar-progress-value:100; --ar-progress-thickness: 0.75rem;">
+                        <div class="circular-progress skills-progress" style="--ar-progress-value:100;">
                             <span>45</span>
                         </div>
                     </div>
@@ -347,15 +360,9 @@
                         <i class="far fa-star"></i>
                         CE Performance
                     </span>
-                    <button
-                        runat="server"
-                        id="PerformanceButton"
-                        type="button"
-                        class="btn btn-sm btn-outline-primary"
-                        title="View"
-                    >
+                    <a class="btn btn-sm btn-outline-primary" title="View" target="_blank" href="/ui/images/ce-performance.jpg">
                         <i class="far fa-magnifying-glass"></i>
-                    </button>
+                    </a>
                 </div>
 
             </div>
@@ -369,31 +376,3 @@
 </div>
 
 <h3>My Apps</h3>
-
-<insite:Modal runat="server" ID="InfoWindow" Title="CE Performance" Width="1030px">
-    <ContentTemplate>
-        <div class="mb-3">
-            <img alt="CE Performance" src="/ui/images/ce-performance.jpg" />
-        </div>
-
-        <insite:CancelButton runat="server" data-action="close" Text="Close" />
-    </ContentTemplate>
-</insite:Modal>
-
-<insite:PageFooterContent runat="server">
-    <script type="text/javascript">
-        (() => {
-            const modal = document.getElementById("<%= InfoWindow.ClientID %>");
-
-            modal.querySelector("[data-action]").addEventListener("click", e => {
-                e.preventDefault();
-
-                modalManager.close($(modal));
-            });
-
-            document.getElementById("<%= PerformanceButton.ClientID %>").addEventListener("click", () => {
-                modalManager.show($(modal));
-            });
-        })();
-    </script>
-</insite:PageFooterContent>

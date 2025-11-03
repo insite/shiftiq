@@ -4,14 +4,7 @@ using Shift.Common;
 
 namespace Shift.Service.Booking;
 
-public interface IEventUserWriter : IEntityWriter
-{
-    Task<bool> CreateAsync(EventUserEntity entity, CancellationToken cancellation = default);
-    Task<bool> DeleteAsync(Guid @event, Guid user, CancellationToken cancellation = default);
-    Task<bool> ModifyAsync(EventUserEntity entity, CancellationToken cancellation = default);
-}
-
-internal class EventUserWriter : IEventUserWriter
+public class EventUserWriter : IEntityWriter
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
@@ -27,11 +20,11 @@ internal class EventUserWriter : IEventUserWriter
         var exists = await AssertAsync(entity.EventIdentifier, entity.UserIdentifier, cancellation, db);
         if (exists)
             return false;
-                
+
         await db.QEventUser.AddAsync(entity, cancellation);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> DeleteAsync(Guid @event, Guid user, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -43,7 +36,7 @@ internal class EventUserWriter : IEventUserWriter
         db.QEventUser.Remove(entity);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
-        
+
     public async Task<bool> ModifyAsync(EventUserEntity entity, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -57,5 +50,5 @@ internal class EventUserWriter : IEventUserWriter
     }
 
     private async Task<bool> AssertAsync(Guid @event, Guid user, CancellationToken cancellation, TableDbContext db)
-		=> await db.QEventUser.AsNoTracking().AnyAsync(x => x.EventIdentifier == @event && x.UserIdentifier == user, cancellation);
+        => await db.QEventUser.AsNoTracking().AnyAsync(x => x.EventIdentifier == @event && x.UserIdentifier == user, cancellation);
 }

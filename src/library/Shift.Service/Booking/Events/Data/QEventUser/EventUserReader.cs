@@ -1,128 +1,146 @@
+using System.Runtime.CompilerServices;
+
 using Microsoft.EntityFrameworkCore;
 
+using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Contract;
 
-using Shift.Common;
-
 namespace Shift.Service.Booking;
 
-public interface IEventUserReader : IEntityReader
-{
-    Task<bool> AssertAsync(Guid @event, Guid user, CancellationToken cancellation = default);
-    Task<EventUserEntity?> RetrieveAsync(Guid @event, Guid user, CancellationToken cancellation = default);
-    Task<int> CountAsync(IEventUserCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<EventUserEntity>> CollectAsync(IEventUserCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<EventUserEntity>> DownloadAsync(IEventUserCriteria criteria, CancellationToken cancellation = default);
-    Task<IEnumerable<EventUserMatch>> SearchAsync(IEventUserCriteria criteria, CancellationToken cancellation = default);
-}
-
-public class EventUserReader : IEventUserReader
+public class EventUserReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
-    private readonly IShiftIdentityService _identityService;
 
-    public EventUserReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService identityService)
+    private readonly IShiftIdentityService _auth;
+
+    public EventUserReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
     {
         _context = context;
-        _identityService = identityService;
+        _auth = auth;
     }
 
-    public async Task<bool> AssertAsync(
-        Guid @event, Guid user,
-        CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid @event, Guid user, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db);
+
+            return query.AnyAsync(x => x.EventIdentifier == @event && x.UserIdentifier == user, cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<List<EventUserEntity>> CollectAsync(IEventUserCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query
+                .OrderBy(criteria.Filter.Sort)
+                .ApplyPaging(criteria.Filter)
+                .ToListAsync();
+
+        }, cancellation);
+    }
+
+    public Task<int> CountAsync(IEventUserCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query.CountAsync(cancellation);
+
+        }, cancellation);
+    }
+
+    public async IAsyncEnumerable<EventUserEntity> DownloadAsync(IEventUserCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 
-        return await db.QEventUser
-            .AnyAsync(x => x.EventIdentifier == @event && x.UserIdentifier == user, cancellation);
+        var query = BuildQueryable(db, criteria);
+
+        await foreach (var entity in query.AsAsyncEnumerable().WithCancellation(cancellation))
+        {
+            yield return entity;
+        }
     }
 
-    public async Task<EventUserEntity?> RetrieveAsync(
-        Guid @event, Guid user,
-        CancellationToken cancellation = default)
+    public Task<EventUserEntity?> RetrieveAsync(Guid @event, Guid user, CancellationToken cancellation = default)
     {
-        using var db = _context.CreateDbContext();
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db);
 
-        return await db.QEventUser
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.EventIdentifier == @event && x.UserIdentifier == user, cancellation);
+            return query.FirstOrDefaultAsync(x => x.EventIdentifier == @event && x.UserIdentifier == user, cancellation);
+
+        }, cancellation);
     }
 
-    public async Task<int> CountAsync(
-        IEventUserCriteria criteria,
-        CancellationToken cancellation = default)
+    public Task<List<EventUserMatch>> SearchAsync(IEventUserCriteria criteria, CancellationToken cancellation = default)
     {
-        using var db = _context.CreateDbContext();
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
 
-        return await BuildQueryable(db, criteria)
-            .CountAsync(cancellation);
+            query = query
+                .OrderBy(criteria.Filter.Sort)
+                .ApplyPaging(criteria.Filter);
+
+            return ToMatchesAsync(query, cancellation);
+
+        }, cancellation);
     }
 
-    public async Task<IEnumerable<EventUserEntity>> CollectAsync(
-        IEventUserCriteria criteria,
-        CancellationToken cancellation = default)
+    /// <summary>
+    /// Creates a queryable for events
+    /// </summary>
+    /// <remarks>
+    /// If you call .Include() on the DbSet then remember to use .AsSplitQuery() so that cartesian explosion is avoided.
+    /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
+    /// ordering fully unique, otherwise the result set is non-deterministic.
+    /// </remarks>
+    private IQueryable<EventUserEntity> BuildQueryable(TableDbContext db)
     {
-        using var db = _context.CreateDbContext();
+        ValidateOrganizationContext();
 
-        return await BuildQueryable(db, criteria)
-            .OrderBy(criteria.Filter.Sort)
-            .ApplyPaging(criteria.Filter)
-            .ToListAsync(cancellation);
-    }
-
-    public async Task<IEnumerable<EventUserEntity>> DownloadAsync(
-        IEventUserCriteria criteria,
-        CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        return await BuildQueryable(db, criteria)
-            .ToListAsync(cancellation);
-    }
-
-    public async Task<IEnumerable<EventUserMatch>> SearchAsync(
-        IEventUserCriteria criteria,
-        CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        var queryable = BuildQueryable(db, criteria)
-            .OrderBy(criteria.Filter.Sort)
-            .ApplyPaging(criteria.Filter);
-
-        return await ToMatchesAsync(queryable, cancellation);
-    }
-
-    private IQueryable<EventUserEntity> BuildQueryable(
-        TableDbContext db,
-        IEventUserCriteria criteria)
-    {
-        var q = db.QEventUser
+        var query = db.QEventUser
             .Include(x => x.Event)
             .Include(x => x.User)
             .AsNoTracking()
-            .AsQueryable();
+            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
 
-        q = q.Where(x => x.OrganizationIdentifier == _identityService.OrganizationId);
-
-        if (criteria.Role != null)
-            q = q.Where(x => x.AttendeeRole == criteria.Role);
-
-        if (criteria.EventId != null)
-            q = q.Where(x => x.EventIdentifier == criteria.EventId);
-
-        if (criteria.UserId != null)
-            q = q.Where(x => x.UserIdentifier == criteria.UserId);
-
-        return q;
+        return query;
     }
 
-    public static async Task<IEnumerable<EventUserMatch>> ToMatchesAsync(
-        IQueryable<EventUserEntity> queryable,
-        CancellationToken cancellation = default)
+    private IQueryable<EventUserEntity> BuildQueryable(TableDbContext db, IEventUserCriteria criteria)
     {
-        var matches = await queryable
+        var query = BuildQueryable(db);
+
+        if (criteria.Role != null)
+            query = query.Where(x => x.AttendeeRole == criteria.Role);
+
+        if (criteria.EventId != null)
+            query = query.Where(x => x.EventIdentifier == criteria.EventId);
+
+        if (criteria.UserId != null)
+            query = query.Where(x => x.UserIdentifier == criteria.UserId);
+
+        return query;
+    }
+
+    private async Task<T> ExecuteAsync<T>(Func<TableDbContext, Task<T>> query, CancellationToken cancellation = default)
+    {
+        using var db = _context.CreateDbContext();
+
+        return await query(db);
+    }
+
+    private async Task<List<EventUserMatch>> ToMatchesAsync(IQueryable<EventUserEntity> query, CancellationToken cancellation = default)
+    {
+        var matches = await query
             .Select(entity => new EventUserMatch
             {
                 EventId = entity.EventIdentifier,
@@ -138,5 +156,11 @@ public class EventUserReader : IEventUserReader
             .ToListAsync(cancellation);
 
         return matches;
+    }
+
+    private void ValidateOrganizationContext()
+    {
+        if (_auth.OrganizationId == Guid.Empty)
+            throw new InvalidOperationException("Organization context is required");
     }
 }

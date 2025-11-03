@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 using Shift.Common;
 
@@ -9,18 +10,10 @@ namespace InSite.Domain.Organizations
     [Serializable]
     public class OrganizationFields
     {
-        public List<OrganizationField> User { get; set; }
-        public List<OrganizationField> ClassRegistration { get; set; }
-        public List<OrganizationField> LearnerDashboard { get; set; }
-        public List<OrganizationField> InvoiceBillingAddress { get; set; }
-
-        public OrganizationFields()
-        {
-            User = new List<OrganizationField>();
-            ClassRegistration = new List<OrganizationField>();
-            LearnerDashboard = new List<OrganizationField>();
-            InvoiceBillingAddress = new List<OrganizationField>();
-        }
+        public List<OrganizationField> User { get; set; } = new List<OrganizationField>();
+        public List<OrganizationField> ClassRegistration { get; set; } = new List<OrganizationField>();
+        public List<OrganizationField> LearnerDashboard { get; set; } = new List<OrganizationField>();
+        public List<OrganizationField> InvoiceBillingAddress { get; set; } = new List<OrganizationField>();
 
         public bool IsVisible(string item, List<OrganizationField> list, bool @default = true)
         {
@@ -30,13 +23,29 @@ namespace InSite.Domain.Organizations
 
         public OrganizationFields Clone()
         {
-            return new OrganizationFields 
+            return new OrganizationFields
             {
                 User = User.Select(x => x.Clone()).ToList(),
                 ClassRegistration = ClassRegistration.Select(x => x.Clone()).ToList(),
                 LearnerDashboard = LearnerDashboard.Select(x => x.Clone()).ToList(),
                 InvoiceBillingAddress = InvoiceBillingAddress.Select(x => x.Clone()).ToList(),
             };
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            if (User == null)
+                User = new List<OrganizationField>();
+
+            if (ClassRegistration == null)
+                ClassRegistration = new List<OrganizationField>();
+
+            if (LearnerDashboard == null)
+                LearnerDashboard = new List<OrganizationField>();
+
+            if (InvoiceBillingAddress == null)
+                InvoiceBillingAddress = new List<OrganizationField>();
         }
     }
 }

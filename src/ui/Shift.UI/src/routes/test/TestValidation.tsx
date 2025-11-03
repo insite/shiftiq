@@ -6,15 +6,15 @@ import { useForm } from "react-hook-form";
 import ControlledMultiSelect from "@/components/multiselect/ControlledMultiSelect";
 import ControlledDatePicker from "@/components/date/ControlledDatePicker";
 import { DateParts } from "@/helpers/date/dateTimeTypes";
-import { MultiLanguageText } from "@/components/richtexteditor/language";
 import ControlledRichTextEditor from "@/components/richtexteditor/ControlledRichTextEditor";
+import { RichTextEditorValue } from "@/components/richtexteditor/RichTextEditorValue";
 
 interface FormFields {
     fullName: string | null;
     birthdate: DateParts | null;
     options: string[] | null;
-    summary: MultiLanguageText | null;
-    template: MultiLanguageText | null;
+    summary: RichTextEditorValue | null;
+    template: RichTextEditorValue | null;
 }
 
 export default function TestValidation() {
@@ -25,8 +25,13 @@ export default function TestValidation() {
             options: null,
             summary: null,
             template: {
-                en: "English Template",
-                fr: "French Template"
+                markdown: {
+                    en: "English Template",
+                    fr: "French Template"
+                },
+                html: {
+                    en: "<p>Test</p>"
+                }
             }
         }
     });
@@ -75,19 +80,20 @@ export default function TestValidation() {
                     </FormField>
                 </div>
                 <div className="col-6">
-                    <FormField label="Summary" required>
+                    <FormField label="Summary" required error={errors.summary}>
                         <ControlledRichTextEditor
                             control={control}
                             name="summary"
                             required
+                            defaultMode="markdown"
                         />
                     </FormField>
                     <FormField label="Template">
                         <ControlledRichTextEditor
                             control={control}
                             name="template"
-                            required
                             disableUploadFile
+                            defaultMode="html"
                         />
                     </FormField>
                 </div>
