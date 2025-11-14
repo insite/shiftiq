@@ -126,7 +126,6 @@ namespace InSite.Admin.Surveys.Forms.Utilities
                     TextCharacterLimit = question.TextCharacterLimit,
                     TextLineCount = question.TextLineCount,
                     ListEnableBranch = question.ListEnableBranch,
-                    EnableCreateCase = question.EnableCreateCase,
                     Source = question.Source,
                     Type = question.Type,
                     Content = GetContent(question.Identifier),

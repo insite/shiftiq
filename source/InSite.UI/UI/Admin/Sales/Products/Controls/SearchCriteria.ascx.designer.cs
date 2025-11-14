@@ -60,15 +60,6 @@ namespace InSite.Admin.Invoices.Products.Controls
         protected global::InSite.Common.Web.UI.ClearButton ClearButton;
 
         /// <summary>
-        /// ProductPublishedStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.BooleanComboBox ProductPublishedStatus;
-
-        /// <summary>
         /// ShowColumns control.
         /// </summary>
         /// <remarks>

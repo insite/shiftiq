@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using InSite.Application.Surveys.Read;
@@ -38,7 +39,9 @@ namespace InSite.Portal.Surveys.Responses
             var currentPage = Number.CheckRange(page, 1, lastPage);
 
             var surveyPage = survey.GetPage(currentPage);
-            if (surveyPage == null || surveyPage.Questions.Any(q => !q.IsHidden && q.IsRequired && q.HasInput && !IsQuestionHasAnswer(q, session)))
+            var questions = GetPageActiveQuestions(surveyPage, survey.GetConditions(), session.QResponseOptions);
+
+            if (surveyPage == null || questions.Any(q => q.IsRequired && q.HasInput && !IsQuestionHasAnswer(q, session)))
                 return new GoToInfo(currentPage);
 
             // Get all the option items in the survey.
@@ -162,6 +165,33 @@ namespace InSite.Portal.Surveys.Responses
                     .Any(x => x.SurveyQuestionIdentifier == question.Identifier && x.ResponseOptionIsSelected)
                 : response.QResponseAnswers
                     .Any(x => x.SurveyQuestionIdentifier == question.Identifier && x.ResponseAnswerText.HasValue());
+        }
+
+        public static List<SurveyQuestion> GetCurrentPageActiveQuestions(ResponseSessionState state) =>
+            GetPageActiveQuestions(state.Survey.GetPage(state.PageNumber), state.Survey.GetConditions(), state.Session.QResponseOptions);
+
+        public static List<SurveyQuestion> GetPageActiveQuestions(SurveyPage page, IEnumerable<SurveyCondition> conditions, IEnumerable<QResponseOption> options)
+        {
+            var allQuestions = page.Questions;
+            var allOptions = options.Where(x => x.ResponseOptionIsSelected).ToList();
+
+            var filteredQuestions = new List<SurveyQuestion>();
+
+            foreach (var question in allQuestions)
+            {
+                if (question.IsHidden || question.Type == SurveyQuestionType.Terminate)
+                    continue;
+
+                var maskingOptions = conditions
+                    .Where(x => x.MaskedQuestion == question)
+                    .Select(x => x.MaskingOptionItem.Identifier)
+                    .ToHashSet();
+
+                if (maskingOptions.Count == 0 || !allOptions.Any(x => maskingOptions.Contains(x.SurveyOptionIdentifier)))
+                    filteredQuestions.Add(question);
+            }
+
+            return filteredQuestions;
         }
     }
 }

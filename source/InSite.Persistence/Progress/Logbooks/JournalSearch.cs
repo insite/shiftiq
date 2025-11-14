@@ -56,84 +56,39 @@ namespace InSite.Persistence
 
         public List<UserJournalDetail> GetEnrolledJournals(Guid organizationIdentifier, Guid userIdentifier, string language)
         {
-            List<UserJournalDetail> groupJournals1, groupJournals2;
+            List<UserJournalDetail> groupJournals;
 
             using (var db = CreateContext())
             {
-                groupJournals1 = GetJournalsByGroups(db, organizationIdentifier, userIdentifier, language);
-                groupJournals2 = GetJournalsByProgramGroups(db, organizationIdentifier, userIdentifier, language);
+                groupJournals = db.QJournalSetupGroups
+                    .Join(db.QMemberships.Where(x => x.UserIdentifier == userIdentifier),
+                        a => a.GroupIdentifier,
+                        b => b.GroupIdentifier,
+                        (a, b) => a
+                    )
+                    .Select(x => new UserJournalDetail
+                    {
+                        JournalSetupIdentifier = x.JournalSetupIdentifier,
+                        UserIdentifier = userIdentifier,
+                        JournalSetupLocked = x.JournalSetup.JournalSetupLocked,
+                        Title = CoreFunctions.GetContentText(x.JournalSetupIdentifier, JournalSetupState.ContentLabels.Title, language),
+                        JournalSetupCreated = x.JournalSetup.JournalSetupCreated,
+                        ExperienceCount = 0
+                    })
+                    .Distinct()
+                    .ToList();
             }
 
             var userJournals = GetLearnerJournals(organizationIdentifier, userIdentifier, language);
 
-            var missingJournals1 = groupJournals1
+            var missingJournals = groupJournals
                 .Where(x => !userJournals.Any(y => y.JournalSetupIdentifier == x.JournalSetupIdentifier))
                 .ToList();
 
-            userJournals.AddRange(missingJournals1);
-
-            var missingJournals2 = groupJournals2
-                .Where(x => !userJournals.Any(y => y.JournalSetupIdentifier == x.JournalSetupIdentifier))
-                .ToList();
-
-            userJournals.AddRange(missingJournals2);
-
+            userJournals.AddRange(missingJournals);
             userJournals.Sort((a, b) => a.JournalSetupCreated.CompareTo(b.JournalSetupCreated));
 
             return userJournals;
-        }
-
-        private List<UserJournalDetail> GetJournalsByGroups(InternalDbContext db, Guid organizationIdentifier, Guid userIdentifier, string language)
-        {
-            return db.QJournalSetupGroups
-                .Where(x => x.JournalSetup.OrganizationIdentifier == organizationIdentifier)
-                .Join(db.QMemberships.Where(x => x.UserIdentifier == userIdentifier),
-                    a => a.GroupIdentifier,
-                    b => b.GroupIdentifier,
-                    (a, b) => a
-                )
-                .Select(x => new UserJournalDetail
-                {
-                    JournalSetupIdentifier = x.JournalSetupIdentifier,
-                    UserIdentifier = userIdentifier,
-                    JournalSetupLocked = x.JournalSetup.JournalSetupLocked,
-                    Title = CoreFunctions.GetContentText(x.JournalSetupIdentifier, JournalSetupState.ContentLabels.Title, language),
-                    JournalSetupCreated = x.JournalSetup.JournalSetupCreated,
-                    ExperienceCount = 0
-                })
-                .Distinct()
-                .ToList();
-        }
-
-        private List<UserJournalDetail> GetJournalsByProgramGroups(InternalDbContext db, Guid organizationIdentifier, Guid userIdentifier, string language)
-        {
-            return db.QMemberships
-                .Where(x => x.UserIdentifier == userIdentifier && x.Group.OrganizationIdentifier == organizationIdentifier)
-                .Join(db.TProgramGroupEnrollments,
-                    m => m.GroupIdentifier,
-                    e => e.GroupIdentifier,
-                    (m, e) => e
-                )
-                .Join(db.TTasks.Where(x => x.OrganizationIdentifier == organizationIdentifier && x.ObjectType == "Logbook"),
-                    e => e.ProgramIdentifier,
-                    t => t.ProgramIdentifier,
-                    (e, t) => t
-                )
-                .Join(db.QJournalSetups,
-                    t => t.ObjectIdentifier,
-                    l => l.JournalSetupIdentifier,
-                    (t, l) => new UserJournalDetail
-                    {
-                        JournalSetupIdentifier = l.JournalSetupIdentifier,
-                        UserIdentifier = userIdentifier,
-                        JournalSetupLocked = l.JournalSetupLocked,
-                        Title = CoreFunctions.GetContentText(l.JournalSetupIdentifier, JournalSetupState.ContentLabels.Title, language),
-                        JournalSetupCreated = l.JournalSetupCreated,
-                        ExperienceCount = 0
-                    }
-                )
-                .Distinct()
-                .ToList();
         }
 
         public List<UserJournalDetail> GetLearnerJournals(Guid organizationIdentifier, Guid userIdentifier, string language)

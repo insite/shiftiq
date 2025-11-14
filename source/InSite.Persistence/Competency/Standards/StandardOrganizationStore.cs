@@ -46,7 +46,7 @@ namespace InSite.Persistence
                 _sendCommand(new RemoveStandardOrganization(standardId, organizationId));
         }
 
-        public static void DeleteByAssetId(Guid standardId)
+        public static void DeleteByAssetID(Guid standardId)
         {
             Guid[] organizationIds;
             using (var db = new InternalDbContext())

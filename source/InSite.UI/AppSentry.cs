@@ -34,7 +34,6 @@ namespace InSite
             get
             {
                 var version = AssemblyVersion;
-
                 return version.Substring(0, version.LastIndexOf('.'));
             }
         }
@@ -109,12 +108,8 @@ namespace InSite
         public static bool IsInvalidWebResourceRequestException(Exception ex)
         {
             if (ex is HttpException)
-            {
                 if (ex.Message == "This is an invalid webresource request.")
-                {
                     return true;
-                }
-            }
 
             return false;
         }
@@ -165,7 +160,8 @@ namespace InSite
 
             return request.Url.AbsolutePath.StartsWith("/api/commands/")
                 || request.Url.AbsolutePath.EndsWith(".axd")
-                || request.Url.AbsolutePath.EndsWith(".ico");
+                || request.Url.AbsolutePath.EndsWith(".ico")
+                ;
         }
 
         public static bool IsIntercepted(Exception error)
@@ -187,7 +183,6 @@ namespace InSite
                 return true;
 
             var rootCause = error.GetBaseException();
-
             if (rootCause != null)
             {
                 if (rootCause is HttpException && rootCause.Message.Contains("Failed to load viewstate"))

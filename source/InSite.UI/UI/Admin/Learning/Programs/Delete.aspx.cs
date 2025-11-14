@@ -1,5 +1,6 @@
 ﻿using System;
 
+using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
@@ -26,14 +27,14 @@ namespace InSite.Admin.Records.Programs
             {
                 var program = ProgramID.HasValue ? ProgramSearch.GetProgram(ProgramID.Value, x => x.Tasks, x => x.Enrollments) : null;
                 if (program == null || program.OrganizationIdentifier != Organization.Identifier)
-                    Search.Redirect();
+                    HttpResponseHelper.Redirect($"/ui/admin/learning/programs/search");
 
                 ProgramDetails.BindProgram(program);
 
                 LearnersCount.Text = program.Enrollments?.Count.ToString();
                 TasksCount.Text = program.Tasks?.Count.ToString();
 
-                CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramID.Value);
+                CancelButton.NavigateUrl = $"/ui/admin/learning/programs/outline?id={ProgramID}";
 
                 PageHelper.AutoBindHeader(Page, null, program.ProgramName);
             }
@@ -42,7 +43,7 @@ namespace InSite.Admin.Records.Programs
         private void DeleteButton_Click(object sender, EventArgs e)
         {
             ProgramStore.Delete(ProgramID.Value);
-            Search.Redirect();
+            HttpResponseHelper.Redirect($"/ui/admin/learning/programs/search");
         }
 
         public string GetParentLinkParameters(IWebRoute parent)

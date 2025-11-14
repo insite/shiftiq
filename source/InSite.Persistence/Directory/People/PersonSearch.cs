@@ -92,12 +92,61 @@ namespace InSite.Persistence
             if (filter.WillingToRelocate.HasValue)
                 query = query.Where(x => x.CandidateIsWillingToRelocate == filter.WillingToRelocate.Value);
 
+            if (!string.IsNullOrEmpty(filter.Qualification))
+            {
+                var builder = new StringBuilder(filter.Qualification.Trim());
+
+                foreach (var garbageChar in KeywordGarbageChars) builder.Replace(garbageChar, ' ');
+                foreach (var conjunction in KeywordConjunctions) builder.Replace(conjunction, " ");
+                builder.Replace("  ", " ");
+
+                var keywords = builder.ToString().Split(new char[] { ' ', ',' });
+                foreach (var keyword in keywords)
+                {
+                    query = query.Where(x =>
+                        x.User.CandidateExperiences.Any(y =>
+                               y.EmployerName.Contains(keyword)
+                            || y.ExperienceJobTitle.Contains(keyword)
+                            || y.ExperienceCountry.Contains(keyword)
+                            || y.ExperienceCity.Contains(keyword)
+                            )
+                        || x.User.CandidateEducations.Any(y =>
+                               y.EducationInstitution.Contains(keyword)
+                            || y.EducationName.Contains(keyword)
+                            || y.EducationCountry.Contains(keyword)
+                            || y.EducationCity.Contains(keyword)
+                            || y.EducationQualification.Contains(keyword))
+                    );
+                }
+            }
+
             if (filter.IsActivelySeeking)
                 query = query.Where(x => x.CandidateIsActivelySeeking == true);
 
             if (filter.IsApproved.HasValue)
                 query = filter.IsApproved == true ? query.Where(x => x.JobsApproved != null)
                     : query.Where(x => x.JobsApproved == null);
+
+            if (filter.HightSchoolDiploma)
+                query = query.Where(x => x.User.CandidateEducations.Any(y => y.EducationQualification == "High School Diploma"));
+
+            if (filter.CollegeUniversityCertificate)
+                query = query.Where(x => x.User.CandidateEducations.Any(y => y.EducationQualification == "College / University Certificate"));
+
+            if (filter.CollegeDiploma)
+                query = query.Where(x => x.User.CandidateEducations.Any(y => y.EducationQualification == "College Diploma"));
+
+            if (filter.TradesCertificate)
+                query = query.Where(x => x.User.CandidateEducations.Any(y => y.EducationQualification == "Trades Certificate/Apprenticeship"));
+
+            if (filter.BachelorsDegree)
+                query = query.Where(x => x.User.CandidateEducations.Any(y => y.EducationQualification == "Bachelor’s Degree"));
+
+            if (filter.MastersDegree)
+                query = query.Where(x => x.User.CandidateEducations.Any(y => y.EducationQualification == "Master’s Degree"));
+
+            if (filter.DoctoralDegree)
+                query = query.Where(x => x.User.CandidateEducations.Any(y => y.EducationQualification == "Doctoral Degree"));
 
             if (filter.Occupation.IsNotEmpty())
             {
@@ -123,7 +172,23 @@ namespace InSite.Persistence
                 var keywords = builder.ToString().Split(new char[] { ' ', ',' });
                 foreach (var keyword in keywords)
                 {
-                    query = query.Where(x => x.User.FirstName == keyword || x.User.LastName == keyword);
+                    query = query.Where(x =>
+                        x.User.FirstName == keyword
+                        || x.User.LastName == keyword
+                        || x.User.CandidateExperiences.Any(y =>
+                               y.EmployerName.Contains(keyword)
+                            || y.ExperienceJobTitle.Contains(keyword)
+                            || y.ExperienceCountry.Contains(keyword)
+                            || y.ExperienceCity.Contains(keyword)
+                            )
+                        || x.User.CandidateEducations.Any(y =>
+                               y.EducationInstitution.Contains(keyword)
+                            || y.EducationName.Contains(keyword)
+                            || y.EducationCountry.Contains(keyword)
+                            || y.EducationCity.Contains(keyword)
+                            || y.EducationQualification.Contains(keyword)
+                            )
+                    );
                 }
             }
             return query;

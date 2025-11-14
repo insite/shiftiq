@@ -14,6 +14,7 @@ namespace InSite.Persistence
 
         public string Occupation { get; set; }
         public string Keywords { get; set; }
+        public string Qualification { get; set; }
         public string CurrentJobTitle { get; set; }
         public string FullName { get; set; }
         public string City { get; set; }
@@ -22,6 +23,13 @@ namespace InSite.Persistence
         public bool? IsApproved { get; set; }
 
         public bool IsActivelySeeking { get; set; }
+        public bool HightSchoolDiploma { get; set; }
+        public bool CollegeUniversityCertificate { get; set; }
+        public bool CollegeDiploma { get; set; }
+        public bool TradesCertificate { get; set; }
+        public bool BachelorsDegree { get; set; }
+        public bool MastersDegree { get; set; }
+        public bool DoctoralDegree { get; set; }
         public bool LandedRefugee { get; set; }
         public bool ApprovedImmigrationInCanada { get; set; }
         public bool LandedImmigrantInCanada { get; set; }

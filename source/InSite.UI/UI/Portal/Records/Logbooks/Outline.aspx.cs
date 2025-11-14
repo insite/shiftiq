@@ -5,7 +5,6 @@ using System.Linq;
 using InSite.Application.Records.Read;
 using InSite.Common.Web;
 using InSite.Persistence;
-using InSite.UI.Admin.Records.Programs.Utilities;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
 using InSite.UI.Portal.Records.Logbooks.Utilities;
@@ -85,8 +84,6 @@ namespace InSite.UI.Portal.Records.Logbooks
 
         private bool IsEnrolled()
         {
-            ProgramHelper.EnrollLearnerByObjectId(Organization.Identifier, UserIdentifier, JournalSetupIdentifier);
-
             return ServiceLocator.JournalSearch.GetEnrollmentStatus(JournalSetupIdentifier, UserIdentifier) != LogbookEnrollmentStatus.NotEnrolled;
         }
 

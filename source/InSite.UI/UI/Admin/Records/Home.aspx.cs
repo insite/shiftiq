@@ -288,7 +288,7 @@ namespace InSite.UI.Admin.Records
             ProgramsCounterRepeater.LoadData(
                 new CounterItem
                 {
-                    Url = InSite.Admin.Records.Programs.Search.NavigateUrl,
+                    Url = "/ui/admin/learning/programs/search",
                     Count = ProgramSearch.CountPrograms(new TProgramFilter
                     {
                         OrganizationIdentifier = Organization.OrganizationIdentifier

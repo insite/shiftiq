@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 using Common.Timeline.Changes;
 
@@ -109,11 +108,7 @@ namespace InSite.Application.Surveys.Read
 
         public void Handle(ResponseSessionCompleted e)
         {
-            var session = _surveys.GetResponseSession(
-                e.AggregateIdentifier,
-                x => x.Respondent, x => x.SurveyForm,
-                x => x.QResponseAnswers, x => x.QResponseOptions);
-
+            var session = _surveys.GetResponseSession(e.AggregateIdentifier, x => x.Respondent, x => x.SurveyForm);
             if (session == null)
                 return;
 
@@ -123,41 +118,10 @@ namespace InSite.Application.Surveys.Read
             CompleteUserProgramTaskEnrollment(session);
             SendProgramCompletionNotificationMessage(session, e);
             TryAddUserToReviewQueue(session, e);
-            TryOpenIssue(e, session);
-        }
 
-        private void TryOpenIssue(ResponseSessionCompleted e, QResponseSession session)
-        {
             var survey = _surveys.GetSurveyState(session.SurveyFormIdentifier);
-            if (survey?.WorkflowConfiguration == null)
-                return;
 
-            var questions = survey.Form.Questions.Where(x => x.EnableCreateCase).ToArray();
-            if (questions.Length == 0)
-                return;
-
-            var hasAnswer = false;
-            foreach (var question in questions)
-            {
-                var hasSelectedOption = session.QResponseOptions.Any(
-                    x => x.SurveyQuestionIdentifier == question.Identifier && x.ResponseOptionIsSelected);
-                if (hasSelectedOption)
-                {
-                    hasAnswer = true;
-                    break;
-                }
-
-                var hasTextAnswer = session.QResponseAnswers.Any(
-                    x => x.SurveyQuestionIdentifier == question.Identifier && x.ResponseAnswerText.IsNotEmpty());
-                if (hasTextAnswer)
-                {
-                    hasAnswer = true;
-                    break;
-                }
-            }
-
-            if (hasAnswer)
-                OpenIssue(survey.WorkflowConfiguration, session, e);
+            OpenIssue(survey?.WorkflowConfiguration, session, e);
         }
 
         private void ViewUserProgramTaskEnrollment(QResponseSession session)
@@ -243,8 +207,8 @@ namespace InSite.Application.Surveys.Read
             if (workflow == null)
                 return;
 
-            var issues = _issues.GetIssues(new QIssueFilter
-            {
+            var issues = _issues.GetIssues(new QIssueFilter() 
+            { 
                 OrganizationIdentifier = e.OriginOrganization,
                 ResponseSessionIdentifier = session.ResponseSessionIdentifier
             });

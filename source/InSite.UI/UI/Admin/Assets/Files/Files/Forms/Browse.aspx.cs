@@ -9,24 +9,22 @@ namespace InSite.UI.Admin.Assets.Files.Files.Forms
 {
     public partial class Browse : AdminBasePage
     {
-        protected override void OnInit(EventArgs e)
+        protected void Page_Init(object sender, EventArgs e)
         {
-            base.OnInit(e);
-
             PageHelper.AutoBindHeader(this);
         }
 
-        protected override void OnLoad(EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
-            if (!Identity.IsInGroup(GroupIdentifiers.PlatformAdministrator))
+            if (IsPostBack)
+                return;
+
+            var isPlatformAdmin = Identity.IsGranted(PermissionNames.Admin_Settings);
+
+            if (!isPlatformAdmin)
                 HttpResponseHelper.Redirect(RelativeUrl.AdminHomeUrl);
 
-            base.OnLoad(e);
-
-            if (!IsPostBack)
-            {
-                TreeView.LoadData();
-            }
+            TreeView.LoadData();
         }
     }
 }

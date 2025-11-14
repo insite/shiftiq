@@ -1,6 +1,6 @@
 <%@ Page Language="C#" CodeBehind="Create.aspx.cs" Inherits="InSite.Admin.Records.Programs.Create" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/AchievementListEditor.ascx" TagName="AchievementListEditor" TagPrefix="uc" %>
-<%@ Register Src="./Controls/TaskGridEdit.ascx" TagName="TaskGrid" TagPrefix="uc" %>
+<%@ Register Src="./Controls/TaskGrid.ascx" TagName="TaskGrid" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 
@@ -98,12 +98,7 @@
 
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
-                        <insite:UpdatePanel runat="server">
-                            <ContentTemplate>
-                                <uc:AchievementListEditor ID="AchievementEditor" runat="server" />
-                            </ContentTemplate>
-                        </insite:UpdatePanel>
-
+                        <uc:AchievementListEditor ID="AchievementEditor" runat="server" />
                         <div class="mt-3">
                             <insite:NextButton runat="server" ID="Step2NextButton" DisableAfterClick="true" />
                         </div>

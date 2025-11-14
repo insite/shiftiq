@@ -5,7 +5,8 @@
 <div class="table-responsive">
     <insite:Grid runat="server" ID="Grid" DataKeyNames="OrganizationIdentifier" Translation="Header">
         <Columns>
-            <asp:TemplateField HeaderText="Granted">
+
+            <asp:TemplateField HeaderText="Granted" HeaderStyle-Wrap="false" ItemStyle-Wrap="false">
                 <ItemTemplate>
                       <%# GetDateString(Eval("CredentialGranted") as DateTimeOffset?) %>
                 </ItemTemplate>
@@ -43,15 +44,18 @@
                 </ItemTemplate>
             </asp:TemplateField>
 
-            <asp:TemplateField HeaderText="Action" HeaderStyle-Width="40px" ItemStyle-Wrap="false" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
+            <asp:TemplateField ItemStyle-Width="60px" ItemStyle-Wrap="false">
                 <ItemTemplate>
-                    <insite:Button runat="server"
-                        Visible='<%# (string)Eval("CredentialStatus") == "Valid" %>'
+
+                    <%# Eval("DownloadLink") %>
+
+                    <asp:LinkButton runat="server"
                         CommandName="Expire"
                         CommandArgument='<%# Eval("CredentialIdentifier") %>'
+                        OnClientClick="return confirm('Are you sure you want to expire this credential?');"
                         ToolTip="Expire Now"
-                        ConfirmText="Expire Confirmation Prompt" Icon="fas fa-fw fa-undo"
-                        ButtonStyle="Default" />
+                        Visible='<%# (string)Eval("CredentialStatus") == "Valid" %>'><i class="fa-solid fa-fw fa-alarm-clock"></i></asp:LinkButton>
+
                 </ItemTemplate>
             </asp:TemplateField>
 

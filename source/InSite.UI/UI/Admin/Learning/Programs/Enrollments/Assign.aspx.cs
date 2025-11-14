@@ -118,55 +118,67 @@ namespace InSite.Cmds.Admin.Records.Programs
             if (!Page.IsValid)
                 return;
 
-            var settings = GetAssignLearnerItems();
+            var items = GetAssignLearnerItems();
 
-            if (settings.Count == 0)
+            if (items.Count == 0)
             {
                 EditorStatus.AddMessage(AlertType.Error, "No achievements selected");
                 return;
             }
 
             var programIdentifier = ProgramIdentifier.Value.Value;
-            var contactIds = settings.Select(x => x.UserIdentifier).Distinct().ToList();
-            var achievementIds = settings.Select(x => x.AchievementIdentifier).Distinct().ToList();
+            var contactIds = items.Select(x => x.UserIdentifier).Distinct().ToList();
+            var achievementIds = items.Select(x => x.AchievementIdentifier).Distinct().ToList();
             var credentials = VCmdsCredentialSearch.Select(x => contactIds.Contains(x.UserIdentifier) && achievementIds.Contains(x.AchievementIdentifier));
             var commands = new List<Command>();
 
-            foreach (var setting in settings)
+            foreach (var item in items)
             {
-                var achievement = setting.AchievementIdentifier;
-                var learner = setting.UserIdentifier;
+                var achievement = item.AchievementIdentifier;
+                var learner = item.UserIdentifier;
 
                 try
                 {
-                    ProgramStore.InsertEnrollment(Organization.Identifier, programIdentifier, setting.UserIdentifier, User.Identifier);
-
-                    var label = ServiceLocator.AchievementSearch.GetAchievement(achievement).AchievementLabel;
-                    var credential = credentials.FirstOrDefault(x => x.UserIdentifier == learner && x.AchievementIdentifier == achievement);
-
-                    var expiration = setting.LifetimeMonths.HasValue
-                        ? new Expiration { Type = ExpirationType.Relative, Lifetime = new Lifetime { Quantity = setting.LifetimeMonths.Value, Unit = "Month" } }
-                        : null;
-
-                    var necessity = setting.IsRequired ? "Mandatory" : "Optional";
-                    var priority = setting.IsPlanned ? "Planned" : "Unplanned";
-                    var authority = EmployeeAchievementHelper.TypeAllowsSignOff(label) ? "Self" : null;
-
-                    if (credential == null)
+                    if (item.Action == "Unassign from learner")
                     {
-                        var id = ServiceLocator.AchievementSearch.GetCredentialIdentifier(null, achievement, learner);
-                        commands.Add(new CreateCredential(id, Organization.OrganizationIdentifier, achievement, learner, DateTimeOffset.Now));
-                        commands.Add(new ChangeCredentialExpiration(id, expiration));
-                        commands.Add(new TagCredential(id, necessity, priority));
-                        commands.Add(new ChangeCredentialAuthority(id, null, null, authority, null, null, null));
+                        var credential = credentials.FirstOrDefault(x => x.UserIdentifier == learner && x.AchievementIdentifier == achievement);
+
+                        if (credential != null)
+                        {
+                            commands.Add(new DeleteCredential(credential.CredentialIdentifier));
+                        }
                     }
-                    else if (credential.CredentialExpirationLifetimeQuantity != setting.LifetimeMonths
-                        || credential.CredentialIsMandatory != setting.IsRequired
-                        || credential.IsInTrainingPlan != setting.IsPlanned
-                        )
+                    else
                     {
-                        commands.Add(new ChangeCredentialExpiration(credential.CredentialIdentifier, expiration));
-                        commands.Add(new TagCredential(credential.CredentialIdentifier, necessity, priority));
+                        ProgramStore.InsertEnrollment(Organization.Identifier, programIdentifier, item.UserIdentifier, User.Identifier);
+
+                        var label = ServiceLocator.AchievementSearch.GetAchievement(achievement).AchievementLabel;
+                        var credential = credentials.FirstOrDefault(x => x.UserIdentifier == learner && x.AchievementIdentifier == achievement);
+
+                        var expiration = item.LifetimeMonths.HasValue
+                            ? new Expiration { Type = ExpirationType.Relative, Lifetime = new Lifetime { Quantity = item.LifetimeMonths.Value, Unit = "Month" } }
+                            : null;
+
+                        var necessity = item.IsRequired ? "Mandatory" : "Optional";
+                        var priority = item.IsPlanned ? "Planned" : "Unplanned";
+                        var authority = EmployeeAchievementHelper.TypeAllowsSignOff(label) ? "Self" : null;
+
+                        if (credential == null)
+                        {
+                            var id = ServiceLocator.AchievementSearch.GetCredentialIdentifier(null, achievement, learner);
+                            commands.Add(new CreateCredential(id, Organization.OrganizationIdentifier, achievement, learner, DateTimeOffset.Now));
+                            commands.Add(new ChangeCredentialExpiration(id, expiration));
+                            commands.Add(new TagCredential(id, necessity, priority));
+                            commands.Add(new ChangeCredentialAuthority(id, null, null, authority, null, null, null));
+                        }
+                        else if (credential.CredentialExpirationLifetimeQuantity != item.LifetimeMonths
+                            || credential.CredentialIsMandatory != item.IsRequired
+                            || credential.IsInTrainingPlan != item.IsPlanned
+                            )
+                        {
+                            commands.Add(new ChangeCredentialExpiration(credential.CredentialIdentifier, expiration));
+                            commands.Add(new TagCredential(credential.CredentialIdentifier, necessity, priority));
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -260,54 +272,55 @@ namespace InSite.Cmds.Admin.Records.Programs
 
                 // Find all other achievements previously assigned to the learner
 
-                var currentCredentials = VCmdsCredentialSearch
+                var previousCredentials = VCmdsCredentialSearch
                     .Select(x => x.UserIdentifier == user.UserIdentifier &&
                                  !achievementIds.Contains(x.AchievementIdentifier))
                     .OrderBy(x => x.AchievementTitle);
 
-                foreach (var current in currentCredentials)
+                foreach (var previous in previousCredentials)
                 {
-                    var isPlanned = AssignStrategy_PlanAndRequire.Checked || AssignStrategy_PlanAndRecommend.Checked;
-
-                    var isRequired = AssignStrategy_PlanAndRequire.Checked;
-
-                    var action = (isPlanned && isRequired)
-                        ? "Add to training plan (required)"
-                        : (isPlanned && !isRequired)
-                        ? "Add to training plan (not required)"
-                        : (!isPlanned && !isRequired)
-                        ? "Remove from training plan (not required)"
-                        : "Remove from training plan (but still required!)";
-
-                    if (isPlanned == current.IsInTrainingPlan)
+                    if (AssignStrategy_Unplan.Checked)
                     {
-                        if (isRequired && current.CredentialPriority == "Required")
-                            continue;
+                        var action = "Make unplanned and optional";
 
-                        if (!isRequired && current.CredentialPriority != "Required")
-                            continue;
+                        var change = new AssignLearnerItem
+                        {
+                            UserIdentifier = user.UserIdentifier,
+                            FullName = user.FullName,
+                            AchievementIdentifier = previous.AchievementIdentifier,
+                            AchievementTitle = previous.AchievementTitle,
+                            AchievementLabel = previous.AchievementLabel,
+                            LifetimeMonths = previous.CredentialExpirationLifetimeQuantity,
+                            Action = action,
+                            IsRequired = false,
+                            IsPlanned = false
+                        };
+
+                        if (previous.CredentialExpirationLifetimeUnit == "Year")
+                            change.LifetimeMonths = previous.CredentialExpirationLifetimeQuantity * 12;
+
+                        else if (previous.CredentialExpirationLifetimeUnit == "Month")
+                            change.LifetimeMonths = previous.CredentialExpirationLifetimeQuantity;
+
+                        changes.Add(change);
                     }
-
-                    var change = new AssignLearnerItem
+                    else if (AssignStrategy_Unassign.Checked)
                     {
-                        UserIdentifier = user.UserIdentifier,
-                        FullName = user.FullName,
-                        AchievementIdentifier = current.AchievementIdentifier,
-                        AchievementTitle = current.AchievementTitle,
-                        AchievementLabel = current.AchievementLabel,
-                        LifetimeMonths = current.CredentialExpirationLifetimeQuantity,
-                        Action = action,
-                        IsRequired = isRequired,
-                        IsPlanned = isPlanned
-                    };
+                        var action = "Unassign from learner";
 
-                    if (current.CredentialExpirationLifetimeUnit == "Year")
-                        change.LifetimeMonths = current.CredentialExpirationLifetimeQuantity * 12;
+                        var change = new AssignLearnerItem
+                        {
+                            UserIdentifier = user.UserIdentifier,
+                            FullName = user.FullName,
+                            AchievementIdentifier = previous.AchievementIdentifier,
+                            AchievementTitle = previous.AchievementTitle,
+                            AchievementLabel = previous.AchievementLabel,
+                            LifetimeMonths = previous.CredentialExpirationLifetimeQuantity,
+                            Action = action
+                        };
 
-                    else if (current.CredentialExpirationLifetimeUnit == "Month")
-                        change.LifetimeMonths = current.CredentialExpirationLifetimeQuantity;
-
-                    changes.Add(change);
+                        changes.Add(change);
+                    }
                 }
             }
 
@@ -344,9 +357,11 @@ namespace InSite.Cmds.Admin.Records.Programs
                 var userIdentifier = Guid.Parse(data[0]);
                 var achievementIdentifier = Guid.Parse(data[1]);
                 var lifetimeMonths = data.Length > 2 && !string.IsNullOrEmpty(data[2]) ? int.Parse(data[2]) : (int?)null;
+                var action = data.Length > 3 && !string.IsNullOrEmpty(data[3]) ? data[3] : null;
 
                 var item = new AssignLearnerItem
                 {
+                    Action = action,
                     UserIdentifier = userIdentifier,
                     AchievementIdentifier = achievementIdentifier,
                     LifetimeMonths = lifetimeMonths,

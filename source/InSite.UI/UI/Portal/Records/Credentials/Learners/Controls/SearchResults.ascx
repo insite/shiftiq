@@ -5,6 +5,7 @@
 <div class="table-responsive">
     <insite:Grid runat="server" ID="Grid">
         <Columns>
+            
             <asp:TemplateField HeaderText="Achievement">
                 <ItemTemplate>
                     <%# Eval("AchievementTitle") %>
@@ -29,12 +30,16 @@
                     <%# Eval("CredentialStatus") %>
                 </ItemTemplate>
             </asp:TemplateField>
-            <asp:TemplateField HeaderText="Attachment">
+
+            <asp:TemplateField ItemStyle-Width="30px" ItemStyle-Wrap="false">
                 <ItemTemplate>
-                    <%# Eval("DownloadLink") %>
-                    <%# Eval("DeleteLink") %>
+
+                    <span class=''><%# Eval("DownloadLink") %></span>
+                    <span class=''><%# Eval("DeleteLink") %></span>
+
                 </ItemTemplate>
             </asp:TemplateField>
+
         </Columns>
     </insite:Grid>
 </div>

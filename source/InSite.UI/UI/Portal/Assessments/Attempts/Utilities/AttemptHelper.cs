@@ -157,9 +157,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             var analyze = new AnalyzeForm(bankId, bankForm.Identifier);
             ServiceLocator.SendCommand(analyze);
 
-            ProgramHelper.EnrollLearnerByObjectId(organizationId, learnerId, bankForm.Identifier);
-
-            ServiceLocator.ProgramStore.TaskViewed(learnerId, organizationId, bankForm.Identifier);
+            ServiceLocator.ProgramStore.TaskViewed(learnerId, CurrentSessionState.Identity.Organization.OrganizationIdentifier, bankForm.Identifier);
 
             if(bankForm.WhenAttemptStartedNotifyAdminMessageIdentifier.HasValue)
                 SendBankNotification(organizationId, bankForm, bankForm.WhenAttemptStartedNotifyAdminMessageIdentifier.Value, learnerId);

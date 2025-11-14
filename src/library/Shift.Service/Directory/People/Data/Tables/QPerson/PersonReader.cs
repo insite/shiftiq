@@ -26,7 +26,7 @@ public class PersonReader : IEntityReader
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, _auth.OrganizationId);
+            var query = BuildQueryable(db);
 
             return query.AnyAsync(x => x.PersonIdentifier == person, cancellation);
 
@@ -74,7 +74,7 @@ public class PersonReader : IEntityReader
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, _auth.OrganizationId);
+            var query = BuildQueryable(db);
 
             return query.FirstOrDefaultAsync(x => x.PersonIdentifier == person, cancellation);
 
@@ -104,13 +104,14 @@ public class PersonReader : IEntityReader
     /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
     /// ordering fully unique, otherwise the result set is non-deterministic.
     /// </remarks>
-    private IQueryable<PersonEntity> BuildQueryable(TableDbContext db, Guid organizationId)
+    private IQueryable<PersonEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext(organizationId);
+        ValidateOrganizationContext();
 
         var query = db.QPerson
             .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == organizationId);
+            .Include(x => x.User!.Events)
+            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
 
         return query;
     }
@@ -119,7 +120,7 @@ public class PersonReader : IEntityReader
     {
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
-        var query = BuildQueryable(db, criteria.OrganizationIdentifier ?? _auth.OrganizationId);
+        var query = BuildQueryable(db);
 
         if (!string.IsNullOrEmpty(criteria.EmailExact))
             query = query.Where(x => x.User!.Email == criteria.EmailExact);
@@ -165,9 +166,9 @@ public class PersonReader : IEntityReader
         return matches;
     }
 
-    private void ValidateOrganizationContext(Guid organizationId)
+    private void ValidateOrganizationContext()
     {
-        if (organizationId == Guid.Empty)
+        if (_auth.OrganizationId == Guid.Empty)
             throw new InvalidOperationException("Organization context is required");
     }
 }

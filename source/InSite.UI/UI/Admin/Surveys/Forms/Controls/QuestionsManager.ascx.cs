@@ -14,7 +14,6 @@ using InSite.Application.Surveys.Write;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Surveys.Forms;
-using InSite.UI.Portal.Assessments.Attempts.Controls;
 using InSite.Web.Helpers;
 
 using Shift.Common;
@@ -209,8 +208,6 @@ namespace InSite.Admin.Surveys.Forms.Controls
 
             if (!info.Options.IsEmpty)
             {
-                var isLikert = info.Type == SurveyQuestionType.Likert;
-
                 var optionListPanel = (Panel)e.Item.FindControl("OptionListPanel");
                 optionListPanel.Visible = true;
 
@@ -227,8 +224,7 @@ namespace InSite.Admin.Surveys.Forms.Controls
                             TitleHtml = Markdown.ToHtml(y.Content?.Title?.Text.Default),
                             PointsText = y.Points != 0 ? $"{y.Points:n2} points" : ""
                         })
-                        .ToList(),
-                        IsLikert = isLikert
+                        .ToList()
                     })
                     .ToList();
 
@@ -358,9 +354,6 @@ namespace InSite.Admin.Surveys.Forms.Controls
 
             if (question.Attribute.HasValue())
                 html += $" <span class='badge bg-success'>{question.Attribute}</span>";
-
-            if (question.EnableCreateCase && question.Form.State.WorkflowConfiguration != null)
-                html += $" <span class='badge bg-info'>Create Case</span>";
 
             return html;
         }

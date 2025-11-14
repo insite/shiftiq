@@ -47,7 +47,6 @@ namespace InSite.UI.Portal
             base.OnInit(e);
 
             PersonCodeUniqueValidator.ServerValidate += PersonCodeUniqueValidator_ServerValidate;
-            EmailUniqueValidator.ServerValidate += EmailUniqueValidator_ServerValidate;
 
             EmployerGroupIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
@@ -148,16 +147,6 @@ namespace InSite.UI.Portal
             args.IsValid = !ServiceLocator.PersonSearch.IsPersonExist(Organization.Identifier, args.Value, User.Identifier);
         }
 
-        private void EmailUniqueValidator_ServerValidate(object source, ServerValidateEventArgs args)
-        {
-            var emailUser = ServiceLocator.UserSearch.GetUserByEmail(args.Value);
-
-            EmailUniqueValidator.ErrorMessage = $"There is another user already registered with the login name <strong>{HttpUtility.HtmlEncode(args.Value)}</strong>. " +
-                "If this is a valid email that belongs solely to you, please use the Support button above to report the issue to an administrator.";
-
-            args.IsValid = emailUser == null || emailUser.UserIdentifier == User.UserIdentifier;
-        }
-
         private void CertificateButton_Click(object sender, EventArgs e)
         {
             Response.Redirect("/ui/portal/record/credentials/learners/search");
@@ -247,6 +236,7 @@ namespace InSite.UI.Portal
             TimeZone.Value = user.TimeZone;
 
             Email.Text = string.IsNullOrEmpty(user.Email) ? string.Empty : user.Email.ToLower();
+            Email.Enabled = false;
 
             EmployerGroupIdentifier.Value = person?.EmployerGroupIdentifier;
 

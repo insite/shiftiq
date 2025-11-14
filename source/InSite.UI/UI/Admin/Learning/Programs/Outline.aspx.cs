@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
-using Humanizer;
-
+using InSite.Application.Achievements.Write;
 using InSite.Application.Records.Read;
 using InSite.Common.Web;
-using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
+using InSite.UI.Admin.Records.Programs.Utilities;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
@@ -24,35 +20,18 @@ namespace InSite.Admin.Records.Programs
 {
     public partial class Outline : AdminBasePage
     {
-        public const string NavigateUrl = "/ui/admin/learning/programs/outline";
-
-        public static string GetNavigateUrl(Guid programId, string status = null, string tab = null, string subtab = null, string panel = null)
-        {
-            var url = NavigateUrl + "?id=" + programId;
-
-            if (status.IsNotEmpty())
-                url += "&status=" + HttpUtility.UrlEncode(status);
-
-            if (tab.IsNotEmpty())
-                url += "&tab=" + HttpUtility.UrlEncode(tab);
-
-            if (subtab.IsNotEmpty())
-                url += "&subtab=" + HttpUtility.UrlEncode(subtab);
-
-            if (panel.IsNotEmpty())
-                url += "&panel=" + HttpUtility.UrlEncode(panel);
-
-            return url;
-        }
-
-        public static void Redirect(Guid programId, string status = null, string tab = null, string subtab = null, string panel = null) =>
-            HttpResponseHelper.Redirect(GetNavigateUrl(programId, status, tab, subtab, panel));
-
         private Guid? ProgramID => Guid.TryParse(Request["id"], out var result) ? result : (Guid?)null;
 
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
+            AchievementIdentifier.AutoPostBack = true;
+            AchievementIdentifier.ValueChanged += (x, y) => BindModelToControlsForAchievement(AchievementIdentifier.Value, false);
+            AchievementCreateButton.Click += (x, y) => BindModelToControlsForAchievement(null, true);
+
+            AchievementSaveButton.Click += (x, y) => SaveChangesToAchievement();
+            AchievementCancelButton.Click += (x, y) => BindModelToControlsForAchievement(AchievementIdentifier.Value, false);
 
             AchievementEditor.InitDelegates(
                 Organization.Identifier,
@@ -62,6 +41,8 @@ namespace InSite.Admin.Records.Programs
                 "program");
 
             AchievementEditor.Refreshed += AchievementEditor_Refreshed;
+
+            SaveAchievementsButton.Click += (x, y) => SaveAchievements();
 
             InitTab();
         }
@@ -81,30 +62,19 @@ namespace InSite.Admin.Records.Programs
 
         private void InitTab()
         {
-            var url = new WebUrl(Request.RawUrl);
-            var tab = url.QueryString["tab"];
-            var isPublication = tab == "publication";
-
-            SelectTab(CatalogTab, tab == "catalog");
-            SelectTab(ContentTab, tab == "content");
-            SelectTab(LearnerTab, tab == "enrollments");
-            SelectTab(PublicationTab, isPublication);
-            SelectTab(NotificationTab, tab == "notification");
-            SelectTab(PrivacyTab, tab == "privacy");
-            SelectTab(SettingsSection, tab == "settings");
-
-            if (isPublication)
-                PublicationSetup.SetTab(url.QueryString["subtab"]);
-
-            void SelectTab(NavItem nav, bool selected)
-            {
-                if (selected)
-                    nav.IsSelected = true;
-            }
+            var parser = new UrlParser();
+            var _url = parser.Parse(Request.RawUrl);
+            if (_url.Parameters != null && _url.Parameters.Count > 0)
+                SelectTab(_url.Get("tab"));
         }
 
         private void SelectTab(string tab)
         {
+            ContentTab.IsSelected = tab == "content";
+            LearnerTab.IsSelected = tab == "enrollments";
+            PublicationTab.IsSelected = tab == "publication";
+            NotificationTab.IsSelected = tab == "notification";
+            PrivacyTab.IsSelected = tab == "privacy";
         }
 
         protected override void OnLoad(EventArgs e)
@@ -169,7 +139,7 @@ namespace InSite.Admin.Records.Programs
             ProgramTagField.Visible = model.ProgramTag.HasValue();
 
             PrivacySettingRepeater.LoadData(model.ProgramIdentifier, "Program");
-            ProgramContent.LoadData(model.ProgramIdentifier);
+            ProgramContent.LoadData(model);
             NotificationSetup.LoadData(model);
             PublicationSetup.LoadData(model);
 
@@ -178,27 +148,27 @@ namespace InSite.Admin.Records.Programs
                 RenameLink.NavigateUrl =
                 DescribeLink.NavigateUrl =
                 ModifyGroupLink.NavigateUrl =
+                ModifyCatalogLink.NavigateUrl =
                 $"/ui/admin/learning/programs/describe?id={model.ProgramIdentifier}";
 
-            ModifyCatalogLink.NavigateUrl = ModifyCatalog.GetNavigateUrl(model.ProgramIdentifier);
-            ModifySettingsLink.NavigateUrl = ModifySettings.GetNavigateUrl(model.ProgramIdentifier);
+            AchievementIdentifier.Value = model.AchievementIdentifier;
+            BindModelToControlsForAchievement(model.AchievementIdentifier, false);
 
-            BindModelToControlsForAchievement(model.AchievementIdentifier);
-            BindModelToControlsForCategories(model.ProgramIdentifier);
+            ProgramCategoryList.SetProgram(model.ProgramIdentifier);
 
-            ViewHistoryLink.NavigateUrl = AggregateOutline.GetUrl(model.ProgramIdentifier, Outline.GetNavigateUrl(model.ProgramIdentifier));
+            ViewHistoryLink.NavigateUrl = AggregateOutline.GetUrl(model.ProgramIdentifier, $"/ui/admin/learning/programs/outline?id={model.ProgramIdentifier}");
             DeleteLink.NavigateUrl = $"/ui/admin/learning/programs/delete?id={model.ProgramIdentifier}";
             EditButton.NavigateUrl = $"/ui/admin/learning/programs/tasks/assign?id={model.ProgramIdentifier}";
             DuplicateLink.NavigateUrl = $"/ui/admin/learning/programs/duplicate?id={model.ProgramIdentifier}";
-            EditAchievementLink.NavigateUrl = ModifyAchievement.GetNavigateUrl(model.ProgramIdentifier);
 
-            ContactTabControl.LoadData(model.ProgramIdentifier, model.AchievementIdentifier);
+            ProgramUserGrid.LoadDataByProgram(model.ProgramIdentifier, model.AchievementIdentifier, true, Request.RawUrl);
 
             if (model.ProgramType == "Achievements Only")
             {
                 AchievementTaskRepeater.BindModelToControls(model.ProgramIdentifier, true);
 
                 AchievementTaskRepeater.Visible = true;
+                SaveAchievementsButton.Visible = true;
             }
             else
             {
@@ -215,7 +185,7 @@ namespace InSite.Admin.Records.Programs
             if (model.ProgramType == "Achievements Only")
             {
                 AchievementSection.Visible = true;
-                SettingsSection.Visible = true;
+                AchievementTaskSection.Visible = true;
                 AchievementEditor.SetEditable(true, true);
                 AchievementEditor.LoadAchievements(GroupByEnum.TypeAndCategory);
                 EditButton.Visible = false;
@@ -231,86 +201,169 @@ namespace InSite.Admin.Records.Programs
         private void ValidateQueryString()
         {
             if (ProgramID == null)
-                Search.Redirect();
+                HttpResponseHelper.Redirect("/ui/admin/learning/programs/search");
         }
 
         private TProgram InitModel()
         {
             var model = ProgramSearch.GetProgram(ProgramID.Value);
             if (model == null)
-                Search.Redirect();
+                HttpResponseHelper.Redirect("/ui/admin/learning/programs/search");
             return model;
         }
 
-        #region Program Categories
-
-        public void BindModelToControlsForCategories(Guid programId)
-        {
-            List<TCollectionItem> items = null;
-
-            var selections = CourseSearch.BindProgramCategories(x => x.ItemIdentifier, x => x.ProgramIdentifier == programId).ToHashSet();
-            if (selections.Count > 0)
-            {
-                items = TCollectionItemSearch.Select(new TCollectionItemFilter
-                {
-                    CollectionName = CollectionName.Learning_Catalogs_Category_Name,
-                    OrganizationIdentifier = Organization.Identifier,
-                    OrderBy = nameof(TCollectionItem.ItemFolder) + "," + nameof(TCollectionItem.ItemName)
-                });
-                items = items.Where(x => selections.Contains(x.ItemIdentifier)).ToList();
-            }
-
-            NoCatalogCategories.Visible = items.IsEmpty();
-
-            CategoriesFolderRepeater.DataSource = items?.GroupBy(x => x.ItemFolder.IfNullOrEmpty("None")).Select(x => new
-            {
-                FolderName = x.Key,
-                Items = x
-            });
-            CategoriesFolderRepeater.ItemDataBound += CategoriesFolderRepeater_ItemDataBound;
-            CategoriesFolderRepeater.DataBind();
-        }
-
-        private void CategoriesFolderRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
-        {
-            if (!IsContentItem(e))
-                return;
-
-            var itemRepeater = (Repeater)e.Item.FindControl("ItemRepeater");
-            itemRepeater.DataSource = DataBinder.Eval(e.Item.DataItem, "Items");
-            itemRepeater.DataBind();
-        }
-
-        #endregion
-
         #region Program Achievement
 
-        public void BindModelToControlsForAchievement(Guid? achievementId)
+        public void BindModelToControlsForAchievement(Guid? achievementId, bool forceNew)
         {
+            AchievementFields.Visible = forceNew;
+            AchievementIdentifierField.Visible = !forceNew;
+            AchievementCancelButton.Visible = forceNew;
+            AchievementSaveButton.Text = "Update Achievement";
+
+            if (forceNew)
+            {
+                AchievementName.Text = "New Achievement";
+                AchievementExpiration.SetExpiration();
+                AchievementLabel.Text = string.Empty;
+                AchievementLayout.Value = null;
+                AchievementSaveButton.Text = "Add Achievement";
+                return;
+            }
+
             var achievement = achievementId.HasValue
                 ? ServiceLocator.AchievementSearch.GetAchievement(achievementId.Value)
                 : null;
-            var hasAchievement = achievement != null;
 
-            AchievementFields.Visible = hasAchievement;
-            NoAchievementMessage.Visible = !hasAchievement;
-
-            if (!hasAchievement)
+            if (achievement == null)
                 return;
 
             AchievementOutlineLink.NavigateUrl = $"/ui/admin/records/achievements/outline?id={achievementId}";
-            AchievementTitle.Text = achievement.AchievementTitle;
+            AchievementName.Text = achievement.AchievementTitle;
             AchievementLabel.Text = achievement.AchievementLabel;
-            AchievementLayout.Text = achievement.CertificateLayoutCode;
-            AchievementLayoutField.Visible = achievement.CertificateLayoutCode.IsNotEmpty();
+            AchievementExpiration.SetExpiration(achievement);
+            AchievementLayout.Value = achievement.CertificateLayoutCode;
 
-            var expirationType = achievement.ExpirationType.ToEnum(ExpirationType.None);
-            if (expirationType == ExpirationType.Fixed && achievement.ExpirationFixedDate.HasValue)
-                AchievementExpiration.Text = achievement.ExpirationFixedDate.Value.Format(User.TimeZone);
-            else if (expirationType == ExpirationType.Relative && achievement.ExpirationLifetimeUnit.IsNotEmpty() && achievement.ExpirationLifetimeQuantity > 0)
-                AchievementExpiration.Text = achievement.ExpirationLifetimeUnit.ToQuantity(achievement.ExpirationLifetimeQuantity.Value).ToLower();
+            AchievementFields.Visible = true;
+        }
+
+        private void SaveChangesToAchievement()
+        {
+            if (!Page.IsValid)
+                return;
+
+            var program = ProgramID.HasValue ? ProgramSearch.GetProgram(ProgramID.Value) : null;
+            if (program == null)
+                return;
+
+            if (!AchievementIdentifierField.Visible)
+                CreateAchievement(program);
             else
-                AchievementExpiration.Text = "No Expiry";
+                ModifyAchievement(program);
+        }
+
+        private void CreateAchievement(TProgram program)
+        {
+            var id = UniqueIdentifier.Create();
+            var expiration = AchievementExpiration.GetExpiration();
+
+            ServiceLocator.SendCommand(new Application.Achievements.Write.CreateAchievement(
+                id, Organization.OrganizationIdentifier, AchievementLabel.Text, AchievementName.Text, null, expiration, null));
+
+            var layout = AchievementLayout.Value;
+            if (layout.IsNotEmpty())
+                ServiceLocator.SendCommand(new ChangeCertificateLayout(id, layout));
+
+            AssignAchievementToProgram(id, program);
+            CheckProgramCompletion(program);
+            BindModelToControlsForAchievement(AchievementIdentifier.Value = id, false);
+
+            StatusAlert.AddMessage(AlertType.Success, "The achievement have been created");
+        }
+
+        private static void CheckProgramCompletion(TProgram program)
+        {
+            var enrollments = ProgramSearch1.GetProgramUsers(new VProgramEnrollmentFilter()
+            { ProgramIdentifier = program.ProgramIdentifier, OrganizationIdentifier = program.OrganizationIdentifier })
+                .Select(x => x.UserIdentifier).ToList();
+
+            foreach (var userIdentifier in enrollments)
+            {
+                if ((program.CompletionTaskIdentifier.HasValue && ServiceLocator.ProgramSearch.IsTaskCompletedByLearner(program.CompletionTaskIdentifier.Value, userIdentifier)) ||
+                    ServiceLocator.ProgramSearch.IsProgramFullyCompletedByLearner(program.ProgramIdentifier, userIdentifier))
+                {
+                    if (program.AchievementIdentifier.HasValue)
+                        ProgramHelper.SendGrantCommands(TriggerEffectCommand.Grant, CurrentSessionState.Identity.Organization.Identifier, program.AchievementIdentifier.Value, userIdentifier);
+
+                    ProgramStore.InsertEnrollment(Organization.Identifier, program.ProgramIdentifier, userIdentifier, User.Identifier, DateTimeOffset.UtcNow);
+                }
+            }
+        }
+
+        private void ModifyAchievement(TProgram program)
+        {
+            if (AchievementIdentifier.HasValue)
+            {
+                var achievement = ServiceLocator.AchievementSearch.GetAchievement(AchievementIdentifier.Value.Value);
+
+                if (achievement == null)
+                    return;
+
+                if (!achievement.AchievementIsEnabled)
+                {
+                    StatusAlert.AddMessage(AlertType.Warning, "Modifications are not permitted while the achievement is locked. Please unlock it before making any changes.");
+                    return;
+                }
+
+                if (achievement.AchievementLabel != AchievementLabel.Text || achievement.AchievementTitle != AchievementName.Text)
+                    ServiceLocator.SendCommand(new DescribeAchievement(
+                        achievement.AchievementIdentifier, AchievementLabel.Text, AchievementName.Text, achievement.AchievementDescription, false));
+
+                if (achievement.CertificateLayoutCode != AchievementLayout.Value)
+                    ServiceLocator.SendCommand(new ChangeCertificateLayout(
+                        achievement.AchievementIdentifier, AchievementLayout.Value));
+
+                ServiceLocator.SendCommand(new ChangeAchievementExpiry(AchievementIdentifier.Value.Value, AchievementExpiration.GetExpiration()));
+            }
+
+            if (program.AchievementIdentifier == null && AchievementIdentifier.Value == null)
+                return;
+
+            if (program.AchievementIdentifier == null && AchievementIdentifier.Value != null)
+                AssignAchievementToProgram(AchievementIdentifier.Value.Value, program);
+
+            else if (program.AchievementIdentifier != null && AchievementIdentifier.Value == null)
+            {
+                program.AchievementIdentifier = null;
+                program.AchievementWhenChange = null;
+                program.AchievementWhenGrade = null;
+                program.AchievementThenCommand = null;
+                program.AchievementElseCommand = null;
+                program.AchievementFixedDate = null;
+                ProgramStore.Update(program, User.Identifier);
+            }
+
+            else
+            {
+                program.AchievementIdentifier = AchievementIdentifier.Value.Value;
+                ProgramStore.Update(program, User.Identifier);
+            }
+
+            CheckProgramCompletion(program);
+            BindModelToControlsForAchievement(AchievementIdentifier.Value, false);
+
+            StatusAlert.AddMessage(AlertType.Success, "The achievement have been updated");
+        }
+
+        private void AssignAchievementToProgram(Guid achievement, TProgram program)
+        {
+            program.AchievementIdentifier = achievement;
+            program.AchievementWhenChange = TriggerCauseChange.Changed.ToString();
+            program.AchievementWhenGrade = TriggerCauseGrade.Pass.ToString();
+            program.AchievementThenCommand = TriggerEffectCommand.Grant.ToString();
+            program.AchievementElseCommand = TriggerEffectCommand.Void.ToString();
+
+            ProgramStore.Update(program, User.Identifier);
         }
 
         #endregion
@@ -366,6 +419,32 @@ namespace InSite.Admin.Records.Programs
             TaskGrid.BindModelToControls(ProgramID.Value);
 
             return items.Count;
+        }
+
+        private void SaveAchievements()
+        {
+            var achievements = TaskGrid.GetAchievements();
+            var items = new List<TTask>();
+
+            foreach (var achievement in achievements)
+            {
+                var item = new TTask
+                {
+                    ProgramIdentifier = ProgramID.Value,
+                    ObjectIdentifier = achievement.AchievementIdentifier,
+                    TaskLifetimeMonths = achievement.LifetimeMonths,
+                    TaskIsRequired = achievement.IsRequired,
+                    TaskIsPlanned = achievement.IsPlanned
+                };
+
+                items.Add(item);
+            }
+
+            TaskStore.Update(items);
+
+            TaskGrid.BindModelToControls(ProgramID.Value);
+
+            ProgramCategoryList.SaveData();
         }
 
         #endregion

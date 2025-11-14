@@ -81,7 +81,7 @@
                     </div>
 
                     <div runat="server" id="SearchProgramsLink" class="col">
-                        <a class="card card-hover card-tile border-0 shadow" href='<%= InSite.Admin.Records.Programs.Search.NavigateUrl %>'>
+                        <a class="card card-hover card-tile border-0 shadow" href='/ui/admin/learning/programs/search'>
                             <div class="card-body text-center">
                                 <i class='far fa-map-marked-alt fa-3x mb-3'></i>
                                 <h3 class='h5 nav-heading mb-2 text-break'>Programs</h3>

@@ -220,7 +220,7 @@
                                 <ItemTemplate>
                                     <tr>
                                         <td style="width:40px; vertical-align:top;">
-                                            <div runat="server" style="margin-bottom: 10px;" visible='<%# Eval("IsLikert") %>'>
+                                            <div style="margin-bottom: 10px;">
                                                 <span class="badge bg-custom-default"><%# Eval("Sequence") %></span>
                                             </div>
                                             <insite:IconLink runat="server" ID="AddNewBranch"

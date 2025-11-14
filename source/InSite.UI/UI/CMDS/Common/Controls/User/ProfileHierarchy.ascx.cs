@@ -91,11 +91,13 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
 
         public void GetInputValues(QStandard info)
         {
-            info.OrganizationIdentifier = Visibility.Value == AccountScopes.Organization
-                ? OrganizationIdentifiers.CMDS
-                : Company.Value.Value;
+            var isOrganizationScope = Visibility.Value == AccountScopes.Organization;
 
-            info.ParentStandardIdentifier = Visibility.Value == AccountScopes.Organization
+            info.OrganizationIdentifier = isOrganizationScope
+                ? Company.Value.Value
+                : OrganizationIdentifiers.CMDS;
+
+            info.ParentStandardIdentifier = isOrganizationScope
                 ? null
                 : ParentProfile.Value;
         }

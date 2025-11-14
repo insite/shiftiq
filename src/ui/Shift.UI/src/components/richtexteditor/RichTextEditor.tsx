@@ -1,118 +1,161 @@
 import { ForwardedRef, useImperativeHandle, useRef, useState } from "react";
 import { FieldError } from "react-hook-form";
-import { Language } from "./language";
+import { useSaveAction } from "@/hooks/useSaveAction";
+import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useStatusProvider } from "@/contexts/StatusProvider";
+import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
+import { shiftClient } from "@/api/shiftClient";
+import { Language, MultiLanguageText } from "./language";
 import RichTextEditor_Translate from "./RichTextEditor_Translate";
 import RichTextEditor_Markdown, { RichTextEditor_MarkdownRef } from "./RichTextEditor_Markdown";
 import RichTextEditor_FileTypes from "./RichTextEditor_FileTypes";
 import RichTextEditor_Languages from "./RichTextEditor_Languages";
-import RichTextEditor_Html, { RichTextEditor_HtmlRef } from "./RichTextEditor_Html";
-import { RichTextEditorValue } from "./RichTextEditorValue";
-import { RichTextEditorMode } from "./RichTextEditorMode";
-import { RichTextEditorRef } from "./RichTextEditorRef";
-import { useRichTextEditor } from "./useRichTextEditor";
-import RichTextEditor_ModeSwitch from "./RichTextEditor_ModeSwitch";
 
 import "./RichTextEditor.css";
+import { urlHelper } from "@/helpers/urlHelper";
 
-const _supportedImageFileTypes = [".png", ".gif", ".jpg", ".jpeg", ".txt"];
 const _supportedFileTypes = [".png", ".gif", ".jpg", ".jpeg", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".txt", ".pdf", ".zip"];
 
+interface EditorRef {
+    focus: () => void;
+}
+
 export interface RichTextEditorProps {
-    ref?: ForwardedRef<RichTextEditorRef>,
-    defaultMode?: RichTextEditorMode;
-    value?: RichTextEditorValue | null;
-    defaultValue?: RichTextEditorValue | null;
+    ref?: ForwardedRef<EditorRef>,
+    markdown?: MultiLanguageText | null;
+    defaultMarkdown?: MultiLanguageText | null;
     defaultLanguage?: Language;
     disableUploadFile?: boolean;
-    enableModeSwitch?: boolean;
-    htmlTitle?: string;
-    markdownTitle?: string;
     error?: FieldError;
-    onChange?: (value: RichTextEditorValue) => void;
+    onChange?: (value: MultiLanguageText) => void;
     onBlur?: () => void;
 }
 
 export default function RichTextEditor ({
     ref,
-    defaultMode = "markdown",
-    value,
-    defaultValue,
-    defaultLanguage = "en",
+    markdown,
+    defaultMarkdown,
+    defaultLanguage,
     disableUploadFile = false,
-    enableModeSwitch = false,
-    htmlTitle = "Body HTML",
-    markdownTitle = "Body Text (Markdown)",
     error,
     onChange,
     onBlur
 }: RichTextEditorProps) {
-    const [mode, setMode] = useState(defaultMode);
+    const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage ?? "en");
+    const [storedMarkdown, setStoredMarkdown] = useState<MultiLanguageText | undefined | null>(defaultMarkdown);
+
+    const { isSaving: isTranslating, runSave } = useSaveAction();
+    const { siteSetting } = useSiteProvider();
+
+    const currentMarkdown = markdown !== undefined ? markdown : storedMarkdown;
+
+    const setCurrentMarkdown = markdown !== undefined
+        ? (newMarkdown: MultiLanguageText) => onChange?.(newMarkdown)
+        : (newMarkdown: MultiLanguageText) => {
+            setStoredMarkdown(newMarkdown);
+            onChange?.(newMarkdown);
+        };
+
+    const { addError, removeError } = useStatusProvider();
 
     const markdownRef = useRef<RichTextEditor_MarkdownRef>(null);
-    const htmlRef = useRef<RichTextEditor_HtmlRef>(null);
 
     useImperativeHandle(ref, () => ({
         focus() {
             markdownRef.current?.focus();
-            htmlRef.current?.focus();
         }
     }), []);
 
-    const {
-        isTranslating,
-        currentValue,
-        currentLanguage,
-        handleUploadFile,
-        handleMarkdownChange,
-        handleHtmlChange,
-        handleTranslate,
-        handleUploadFileAndInsert,
-        handleSelectLanguage,
-    } = useRichTextEditor(
-        markdownRef,
-        htmlRef,
-        mode,
-        value,
-        defaultValue,
-        defaultLanguage,
-        _supportedFileTypes,
-        onChange,
-    );
+    function handleMarkdownChange(markdownText: string) {
+        if (currentMarkdown?.[currentLanguage] === markdownText) {
+            return;
+        }
+
+        const newMarkdown: MultiLanguageText = {...currentMarkdown};
+        newMarkdown[currentLanguage] = markdownText;
+
+        setCurrentMarkdown(newMarkdown);
+    }
+
+    function handleTranslate() {
+        runSave(async () => {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const newMarkdown: MultiLanguageText = {...currentMarkdown};
+
+            for (const language of siteSetting.SupportedLanguages) {
+                if (language !== "en") {
+                    newMarkdown[language] = newMarkdown.en + `\n(translated ${language})`;
+                }
+            }
+
+            setCurrentMarkdown(newMarkdown);
+        });
+    }
+
+    function handleSelectLanguage(language: Language) {
+        setCurrentLanguage(language);
+    }
+
+    async function handleUploadFile(file: File): Promise<ApiUploadFileInfo | null> {
+        const fileExtIndex = file.name.lastIndexOf(".");
+        const fileExt = fileExtIndex > 0 ? file.name.substring(fileExtIndex).toLowerCase() : null;
+
+        if (!fileExt || !_supportedFileTypes.find(x => fileExt === x.toLowerCase())) {
+            window.alert(`Unsupported file extension: ${fileExt}`);
+            return null;
+        }
+
+        let result: ApiUploadFileInfo[] | null;
+
+        try {
+            result = await shiftClient.file.uploadTempFile(file);
+            removeError();
+        } catch (err) {
+            addError(err, "Failed to upload file");
+            return null;
+        }
+
+        if (!result || result.length === 0) {
+            return null;
+        }
+
+        return result[0];
+    }
+
+    async function handleUploadFileAndInsert(file: File) {
+        if (!markdownRef.current) {
+            return;
+        }
+
+        const apiFile = await handleUploadFile(file);
+        if (!apiFile) {
+            return;
+        }
+
+        const { FileIdentifier: fileId, FileName: fileName, DocumentName: documentName } = apiFile;
+
+        let text = `[${documentName}](${urlHelper.getFileUrl(fileId, fileName)})`;
+
+        if (file.type.toLowerCase().startsWith("image/")) {
+            text = "!" + text;
+        }
+
+        markdownRef.current.focus();
+        markdownRef.current.insert(text);
+    }
 
     return (
         <div className={`richtexteditor ${error ? "is-invalid" : ""}`}>
-            {enableModeSwitch && (
-                <RichTextEditor_ModeSwitch
-                    markdownTitle={markdownTitle}
-                    htmlTitle={htmlTitle}
-                    mode={mode}
-                    onChange={setMode}
-                />
-            )}
-
-            {mode === "markdown" && (
-                <RichTextEditor_Markdown
-                    ref={markdownRef}
-                    isTranslating={isTranslating}
-                    markdown={currentValue?.markdown?.[currentLanguage] ?? ""}
-                    disableUploadFile={disableUploadFile}
-                    onUploadFile={handleUploadFile}
-                    onChange={handleMarkdownChange}
-                    onBlur={onBlur}
-                />
-            )}
-            {mode === "html" && (
-                <RichTextEditor_Html
-                    ref={htmlRef}
-                    isTranslating={isTranslating}
-                    html={currentValue?.html?.[currentLanguage] ?? ""}
-                    disableUploadFile={disableUploadFile}
-                    supportedImageFileTypes={_supportedImageFileTypes}
-                    onUploadFile={handleUploadFile}
-                    onChange={handleHtmlChange}
-                    onBlur={onBlur}
-                />
-            )}
+            <RichTextEditor_Markdown
+                ref={markdownRef}
+                isTranslating={isTranslating}
+                markdown={currentMarkdown?.[currentLanguage] ?? ""}
+                disableUploadFile={disableUploadFile}
+                onUploadFile={handleUploadFile}
+                onChange={handleMarkdownChange}
+                onBlur={onBlur}
+            />
 
             <RichTextEditor_Translate
                 isTranslating={isTranslating}
@@ -128,8 +171,7 @@ export default function RichTextEditor ({
             )}
 
             <RichTextEditor_Languages
-                text={mode === "markdown" ? currentValue?.markdown : currentValue?.html}
-                mode={mode}
+                markdown={currentMarkdown}
                 excludeLanguage={currentLanguage}
                 onSelect={handleSelectLanguage}
             />

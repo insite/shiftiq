@@ -1,6 +1,6 @@
 {
   "Home": {
-    "Icon": "fa-fw fa-regular fa-home",
+    "Icon": "fas fa-fw fa-home",
     "Image": "/favicon-cmds.png",
     "Text": "CMDS",
     "Href": "/ui/home"
@@ -10,7 +10,7 @@
       "Category": "System",
       "Links": [
         {
-          "Icon": "fa-fw fa-regular fa-file-chart-line",
+          "Icon": "fa-fw fa fa-file-chart-line",
           "Text": "Reports",
           "Href": "/ui/admin/reporting",
           "Security": {
@@ -19,7 +19,7 @@
           }
         },
         {
-          "Icon": "fa-fw fa-regular fa-tools",
+          "Icon": "fa-fw fa fa-tools",
           "Text": "Tools",
           "Href": "/ui/admin/tools",
           "Security": {
@@ -61,7 +61,7 @@
           }
         },
         {
-          "Icon": "fa-fw fa-regular fa-users",
+          "Icon": "fa-fw fa fa-users",
           "Text": "People",
           "Href": "/ui/cmds/admin/users/search",
           "Security": {
@@ -70,7 +70,7 @@
           }
         },
         {
-          "Icon": "fa-fw fa-regular fa-city",
+          "Icon": "fa-fw fa fa-city",
           "Text": "Organizations",
           "Href": "/ui/cmds/admin/organizations/search",
           "Security": {
@@ -84,17 +84,17 @@
       "Category": "My Development",
       "Links": [
         {
-          "Icon": "fa-fw fa-regular fa-id-badge",
+          "Icon": "fa-fw fa fa-id-badge",
           "Text": "Profiles",
           "Href": "/ui/cmds/portal/validations/profiles/search"
         },
         {
-          "Icon": "fa-fw fa-regular fa-ruler-triangle",
+          "Icon": "fa-fw fa fa-ruler-triangle",
           "Text": "Request Validation",
           "Href": "/ui/cmds/portal/validations/competencies/submit"
         },
         {
-          "Icon": "fa-fw fa-regular fa-balance-scale",
+          "Icon": "fa-fw fa fa-balance-scale",
           "Text": "Self-Assessments",
           "Href": "/ui/cmds/portal/validations/competencies/search"
         }
@@ -104,27 +104,27 @@
       "Category": "Management",
       "Links": [
         {
-          "Icon": "fa-fw fa-regular fa-award",
+          "Icon": "fa-fw fa fa-award",
           "Text": "Achievements",
           "Href": "/ui/cmds/admin/achievements/search"
         },
         {
-          "Icon": "fa-fw fa-regular fa-ruler-triangle",
+          "Icon": "fa-fw fa fa-ruler-triangle",
           "Text": "Competencies",
           "Href": "/ui/cmds/admin/standards/competencies/search"
         },
         {
-          "Icon": "fa-fw fa-regular fa-id-badge",
+          "Icon": "fa-fw fa fa-id-badge",
           "Text": "Profiles",
           "Href": "/ui/cmds/admin/standards/profiles/search"
         },
         {
-          "Icon": "fa-fw fa-regular fa-map-marked-alt",
+          "Icon": "fa-fw fa fa-map-marked-alt",
           "Text": "Programs",
           "Href": "/ui/admin/learning/programs/search"
         },
         {
-          "Icon": "fa-fw fa-regular fa-balance-scale",
+          "Icon": "fa-fw fa fa-balance-scale",
           "Text": "Validations",
           "Href": "/ui/cmds/design/validations/competencies/start"
         }

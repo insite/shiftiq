@@ -58,7 +58,7 @@ namespace InSite.Admin.Records.Programs
             {
                 var program = ProgramId.HasValue ? ProgramSearch.GetProgram(ProgramId.Value) : null;
                 if (program == null)
-                    Search.Redirect();
+                    HttpResponseHelper.Redirect($"/ui/admin/learning/programs/search", true);
 
                 PageHelper.AutoBindHeader(this, null, program.ProgramName);
 
@@ -68,7 +68,7 @@ namespace InSite.Admin.Records.Programs
                 ProgramDescription.Text = program.ProgramDescription;
                 ProgramTag.Text = program.ProgramTag.HasValue() ? program.ProgramTag : "None";
 
-                CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramId.Value);
+                CancelButton.NavigateUrl = $"/ui/admin/learning/programs/outline?id={ProgramId}";
 
                 BindTasks(program.ProgramIdentifier);
             }
@@ -91,7 +91,7 @@ namespace InSite.Admin.Records.Programs
 
             EnsureProgramCompletion(program);
 
-            Outline.Redirect(ProgramId.Value);
+            HttpResponseHelper.Redirect($"/ui/admin/learning/programs/outline?id={ProgramId}");
         }
 
         private void AddTaskButton_Click(object sender, EventArgs e)

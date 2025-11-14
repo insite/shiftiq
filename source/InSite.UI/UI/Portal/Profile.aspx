@@ -219,12 +219,15 @@
 
                             <div class="form-group mb-3" runat="server" id="EmailField">
                                 <label class="form-label" for="<%# Email.ClientID %>">
-                                    <insite:Literal runat="server" Text="Email / Login Name" />
+                                    <insite:Literal runat="server" Text="Email" />
                                     <insite:RequiredValidator runat="server" ID="EmailRequiredValidator" ControlToValidate="Email" Display="None" />
                                     <insite:EmailValidator runat="server" ID="EmailPatternValidator" ControlToValidate="Email" Display="None" />
-                                    <insite:CustomValidator runat="server" ID="EmailUniqueValidator" ControlToValidate="Email" Display="None" />
                                 </label>
-                                <insite:TextBox ID="Email" runat="server" MaxLength="128" />
+                                <div>
+                                    <div>
+                                        <insite:TextBox ID="Email" runat="server" MaxLength="128" />
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group mb-3" runat="server" id="LanguageField">

@@ -173,7 +173,6 @@
                 $output: $inputText,
                 $input: $input,
                 $openbutton: $group.find('> .btn-datepicker').on('click', onOpenClick),
-                preset: (options && options.preset) || null
             };
 
             const pickerOptions = {
@@ -189,14 +188,6 @@
                 onClose: onClose,
                 onChange: onDateChange
             };
-
-            if (data.preset === 'since') {
-                pickerOptions.defaultHour = 0;
-                pickerOptions.defaultMinute = 0;
-            } else if (data.preset === 'before') {
-                pickerOptions.defaultHour = 23;
-                pickerOptions.defaultMinute = 59;
-            }
 
             if (options.data.fullFormat)
                 pickerOptions.dateFormat = options.data.fullFormat;
@@ -510,15 +501,8 @@
         };
 
         const date = getDate(data.datePicker);
-
-        if (date) {
-            if (data.preset === 'before') {
-                date.seconds(59).milliseconds(0);
-            } else if (data.preset === 'since') {
-                date.seconds(0).milliseconds(0);
-            }
+        if (date)
             inputData.value = date.format();
-        }
 
         if (data.datePicker.config.timeZone) {
             const tz = getTimeZone(data.datePicker.config.timeZone);

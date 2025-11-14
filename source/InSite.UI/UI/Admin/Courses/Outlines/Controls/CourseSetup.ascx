@@ -24,7 +24,7 @@
                                 <insite:RequiredValidator runat="server" ID="CourseNameValidator" ControlToValidate="CourseName" ValidationGroup="CourseSetup" />
                             </label>
                             <div>
-                                <insite:TextBox runat="server" ID="CourseName" MaxLength="100" />
+                                <insite:TextBox runat="server" ID="CourseName" MaxLength="200" />
                             </div>
                             <div class="form-text">
         

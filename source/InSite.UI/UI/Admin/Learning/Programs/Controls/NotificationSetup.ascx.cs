@@ -1,67 +1,92 @@
 ﻿using System;
-using System.Web;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.UI;
 
 using InSite.Application.Records.Read;
-using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Admin.Records.Programs.Utilities;
 
 using Shift.Common;
+using Shift.Sdk.UI;
 
 namespace InSite.Admin.Records.Programs.Controls
 {
-    public partial class NotificationSetup : BaseUserControl
+    public partial class NotificationSetup : UserControl
     {
+        private Guid ProgramIdentifier
+        {
+            get => (Guid)ViewState[nameof(ProgramIdentifier)];
+            set => ViewState[nameof(ProgramIdentifier)] = value;
+        }
+
+        public List<TaskInfo> TaskInfoContainer
+        {
+            get => (List<TaskInfo>)ViewState[nameof(TaskInfoContainer)];
+            set => ViewState[nameof(TaskInfoContainer)] = value;
+        }
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            SaveButton.Click += SaveButton_Click;
+        }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            if (!Page.IsValid)
+                return;
+
+            var program = ProgramSearch.GetProgram(ProgramIdentifier);
+
+            program.NotificationStalledLearnerMessageIdentifier = NotificationStalledLearnerMessageIdentifier.Value;
+            program.NotificationStalledAdministratorMessageIdentifier = NotificationStalledAdministratorMessageIdentifier.Value;
+            program.NotificationCompletedLearnerMessageIdentifier = NotificationCompletedLearnerMessageIdentifier.Value;
+            program.NotificationCompletedAdministratorMessageIdentifier = NotificationCompletedAdministratorMessageIdentifier.Value;
+            program.NotificationStalledTriggerDay = NotificationStalledTriggerDay.ValueAsInt;
+            program.NotificationStalledReminderLimit = NotificationStalledReminderLimit.ValueAsInt;
+            program.CompletionTaskIdentifier = TaskInProgram.ValueAsGuid;
+
+            ProgramStore.Update(program, CurrentSessionState.Identity.User.UserIdentifier);
+        }
+
         public void LoadData(TProgram program)
         {
-            NotificationStalledLearnerMessageName.Text = GetMessageName(program.NotificationStalledLearnerMessageIdentifier);
-            NotificationStalledAdministratorMessageName.Text = GetMessageName(program.NotificationStalledAdministratorMessageIdentifier);
-            NotificationCompletedLearnerMessageName.Text = GetMessageName(program.NotificationCompletedLearnerMessageIdentifier);
-            NotificationCompletedAdministratorMessageName.Text = GetMessageName(program.NotificationCompletedAdministratorMessageIdentifier);
+            ProgramIdentifier = program.ProgramIdentifier;
 
-            NotificationStalledTriggerDay.Text = GetIntValue(program.NotificationStalledTriggerDay);
-            NotificationStalledReminderLimit.Text = GetIntValue(program.NotificationStalledReminderLimit);
+            NotificationStalledLearnerMessageIdentifier.Filter.Type = MessageTypeName.Notification;
+            NotificationStalledLearnerMessageIdentifier.Value = program.NotificationStalledLearnerMessageIdentifier;
 
-            var task = program.CompletionTaskIdentifier.HasValue
-                ? ProgramSearch1.GetProgramTask(program.CompletionTaskIdentifier.Value)
-                : null;
+            NotificationStalledAdministratorMessageIdentifier.Filter.Type = MessageTypeName.Notification;
+            NotificationStalledAdministratorMessageIdentifier.Value = program.NotificationStalledAdministratorMessageIdentifier;
 
-            if (task != null)
+            NotificationCompletedLearnerMessageIdentifier.Filter.Type = MessageTypeName.Notification;
+            NotificationCompletedLearnerMessageIdentifier.Value = program.NotificationCompletedLearnerMessageIdentifier;
+
+            NotificationCompletedAdministratorMessageIdentifier.Filter.Type = MessageTypeName.Notification;
+            NotificationCompletedAdministratorMessageIdentifier.Value = program.NotificationCompletedAdministratorMessageIdentifier;
+
+            NotificationStalledTriggerDay.ValueAsInt = program.NotificationStalledTriggerDay;
+            NotificationStalledReminderLimit.ValueAsInt = program.NotificationStalledReminderLimit;
+
+            BindTasksInProgram(program.CompletionTaskIdentifier);
+        }
+
+        private void BindTasksInProgram(Guid? completionTaskIdentifier)
+        {
+            var taskObjectData = ProgramHelper.GetTaskObjectData(CurrentSessionState.Identity.Organization.Identifier, CurrentSessionState.Identity.Organization.ParentOrganizationIdentifier);
+            var tasks = ProgramSearch1.GetProgramTasks(new TTaskFilter
             {
-                var taskObjectData = ProgramHelper.GetTaskObjectData(
-                    Organization.OrganizationIdentifier,
-                    Organization.ParentOrganizationIdentifier);
-                var taskInfo = ProgramHelper.GetTaskInfo(taskObjectData, task);
+                ProgramIdentifier = ProgramIdentifier,
+                OrganizationIdentifier = CurrentSessionState.Identity.Organization.Identifier,
+                ExcludeObjectTypes = new string[] { "Assessment" }
+            });
 
-                TaskInProgram.Text = GetEntityName(taskInfo.DisplayTitle);
-            }
-            else
-            {
-                TaskInProgram.Text = GetEntityName(null);
-            }
+            var taskInfoContainer = ProgramHelper.BindTaskInfo(taskObjectData, tasks);
 
-            var editUrl = ModifyNotification.GetNavigateUrl(program.ProgramIdentifier);
-            EditLink1.NavigateUrl = editUrl;
-            EditLink2.NavigateUrl = editUrl;
-
-            string GetMessageName(Guid? id)
-            {
-                var result = id.HasValue
-                    ? ServiceLocator.MessageSearch.GetMessage(id.Value)?.MessageTitle
-                    : null;
-
-                return GetEntityName(result);
-            }
-
-            string GetEntityName(string value)
-            {
-                return value.IsNotEmpty() ? HttpUtility.HtmlEncode(value) : "<i>None</i>";
-            }
-
-            string GetIntValue(int? value)
-            {
-                return value.HasValue ? value.Value.ToString("n0") : "<i>None</i>";
-            }
+            TaskInProgram.LoadItems(taskInfoContainer.OrderBy(x => x.Type), "TaskIdentifier", "DisplayTitle");
+            TaskInProgram.ValueAsGuid = completionTaskIdentifier;
         }
     }
 }

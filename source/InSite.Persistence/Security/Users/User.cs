@@ -71,6 +71,13 @@ namespace InSite.Persistence
         public virtual ICollection<VCmdsCredential> CmdsCredentials { get; set; } = new HashSet<VCmdsCredential>();
 
         public virtual ICollection<QLearnerProgramSummary> QLearnerProgramSummaries { get; set; }
+        public virtual ICollection<TCandidateEducation> CandidateEducations { get; set; } = new HashSet<TCandidateEducation>();
+        public virtual ICollection<TCandidateExperience> CandidateExperiences { get; set; } = new HashSet<TCandidateExperience>();
+        public virtual ICollection<TApplication> Applications { get; set; } = new HashSet<TApplication>();
+        public virtual ICollection<VCandidateComment> AuthorCandidateComments { get; set; } = new HashSet<VCandidateComment>();
+        public virtual ICollection<VCandidateComment> CandidateComments { get; set; } = new HashSet<VCandidateComment>();
+        public virtual ICollection<TCandidateUpload> CandidateUploads { get; set; } = new HashSet<TCandidateUpload>();
+        public virtual ICollection<TCandidateLanguageProficiency> CandidateLanguageProficiencies { get; set; } = new HashSet<TCandidateLanguageProficiency>();
         public virtual ICollection<TPersonField> PersonFields { get; set; } = new HashSet<TPersonField>();
 
         public User()

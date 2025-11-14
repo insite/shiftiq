@@ -59,6 +59,17 @@ namespace InSite.Admin.Assets.Contents.Utilities
             ServiceLocator.TranslationClient.Translate(from, to, list);
         }
 
+        private string GetTranslationWithFallback(string label, string language, params Guid[] scopes)
+        {
+            foreach (var scope in scopes)
+            {
+                var translation = LabelSearch.GetTranslation(label, language, scope, true, false);
+                if (translation != null)
+                    return translation;
+            }
+            return null;
+        }
+
         public string Translate(string label, string source)
         {
             if (source.HasNoValue())
@@ -66,7 +77,12 @@ namespace InSite.Admin.Assets.Contents.Utilities
 
             try
             {
-                var target = LabelSearch.GetTranslation(label, _language, _organization, true, false);
+                var partition = ServiceLocator.Partition.Identifier;
+
+                var originalGlobalOrganizationId = Guid.Parse("0C071B03-6FE1-400F-82F4-78FF6F751AE7");
+
+                var target = GetTranslationWithFallback(label, _language, _organization, partition, originalGlobalOrganizationId);
+
                 if (target.IsEmpty())
                 {
                     if (_language == "en")

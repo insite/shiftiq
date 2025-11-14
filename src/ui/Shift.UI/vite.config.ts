@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
         },
         build: {
             outDir: "../../../source/InSite.UI/React",
-            chunkSizeWarningLimit: 5000,
+            chunkSizeWarningLimit: 2000,
         },
         base: isLocal ? "" : "/react",
     };

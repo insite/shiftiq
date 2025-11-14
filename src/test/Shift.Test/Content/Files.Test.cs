@@ -24,6 +24,8 @@ namespace Shift.Test.Content
     [Trait("Category", "Unit")]
     public class FilesTests
     {
+        private static Guid PlatformAdministrator = Guid.Parse("4F2EF8FF-CF14-4EA0-AC7C-D67FCA57469E");
+
         private const string BaseAddress = "https://localhost:5000";
         private const string StorageEndpoint = "content/files";
 
@@ -154,7 +156,7 @@ namespace Shift.Test.Content
         private static readonly Guid UserId1 = Guid.NewGuid();
         private static readonly Guid UserId2 = Guid.NewGuid();
 
-        private static readonly Guid[] GroupsOfUser2 = new[] { GroupIdentifiers.PlatformAdministrator };
+        private static readonly Guid[] GroupsOfUser2 = new[] { PlatformAdministrator };
 
         private readonly TestFixture _fixture;
         private readonly string _domain;
@@ -344,7 +346,7 @@ namespace Shift.Test.Content
                     props,
                     new FileClaim[]
                     {
-                        new FileClaim { ObjectIdentifier = Shift.Constant.GroupIdentifiers.PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
+                        new FileClaim { ObjectIdentifier = PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
                     }
                 );
             }
@@ -556,7 +558,7 @@ namespace Shift.Test.Content
                     props,
                     new FileClaim[]
                     {
-                        new FileClaim { ObjectIdentifier = Shift.Constant.GroupIdentifiers.PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
+                        new FileClaim { ObjectIdentifier = PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
                     }
                 );
             }
@@ -582,7 +584,7 @@ namespace Shift.Test.Content
             await _fixture.StorageService.ChangeClaimsAsync(model.FileIdentifier, new FileClaim[]
             {
                 new FileClaim { ObjectIdentifier = UserId1, ObjectType = FileClaimObjectType.Person },
-                new FileClaim { ObjectIdentifier = Shift.Constant.GroupIdentifiers.PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
+                new FileClaim { ObjectIdentifier = PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
             });
 
             var status4 = await _fixture.StorageService.GetGrantStatusAsync(new Identity(GlobalId, UserId2, GroupsOfUser2), model.FileIdentifier);
@@ -595,7 +597,7 @@ namespace Shift.Test.Content
 
             await _fixture.StorageService.ChangeClaimsAsync(model.FileIdentifier, new FileClaim[]
             {
-                new FileClaim { ObjectIdentifier = Shift.Constant.GroupIdentifiers.PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
+                new FileClaim { ObjectIdentifier = PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
             });
 
             var status6 = await _fixture.StorageService.GetGrantStatusAsync(new Identity(GlobalId, UserId2, GroupsOfUser2), model.FileIdentifier);
@@ -631,7 +633,7 @@ namespace Shift.Test.Content
                     props,
                     new FileClaim[]
                     {
-                        new FileClaim { ObjectIdentifier = Shift.Constant.GroupIdentifiers.PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
+                        new FileClaim { ObjectIdentifier = PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
                     }
                 );
             }
@@ -661,7 +663,7 @@ namespace Shift.Test.Content
             await _fixture.StorageService.ChangeClaimsAsync(model.FileIdentifier, new FileClaim[]
             {
                 new FileClaim { ObjectIdentifier = UserId1, ObjectType = FileClaimObjectType.Person },
-                new FileClaim { ObjectIdentifier = Shift.Constant.GroupIdentifiers.PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
+                new FileClaim { ObjectIdentifier = PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
             });
 
             _fixture.StorageService.ClearCache();
@@ -676,7 +678,7 @@ namespace Shift.Test.Content
 
             await _fixture.StorageService.ChangeClaimsAsync(model.FileIdentifier, new FileClaim[]
             {
-                new FileClaim { ObjectIdentifier = Shift.Constant.GroupIdentifiers.PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
+                new FileClaim { ObjectIdentifier = PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
             });
 
             _fixture.StorageService.ClearCache();
@@ -1100,7 +1102,6 @@ namespace Shift.Test.Content
             }
         }
 
-
         [Fact]
         public async Task Files_StorageControllerPrivate_Unauthorized()
         {
@@ -1133,7 +1134,7 @@ namespace Shift.Test.Content
                     props,
                     new FileClaim[]
                     {
-                        new FileClaim { ObjectIdentifier = GroupIdentifiers.PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
+                        new FileClaim { ObjectIdentifier = PlatformAdministrator, ObjectType = FileClaimObjectType.Group }
                     }
                 );
             }

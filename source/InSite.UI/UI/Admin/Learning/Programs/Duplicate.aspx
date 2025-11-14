@@ -1,4 +1,4 @@
-<%@ Page Language="C#" CodeBehind="Duplicate.aspx.cs" Inherits="InSite.Admin.Records.Programs.Duplicate" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
+<%@ Page Language="C#" CodeBehind="Duplicate.aspx.cs" Inherits="InSite.Custom.CMDS.Admin.Records.Programs.Duplicate" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">

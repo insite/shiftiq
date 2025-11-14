@@ -562,7 +562,7 @@ namespace InSite.Cmds.Actions.Contact.Company.Competency
             for (var i = 0; i < DepartmentNames.Length; i++)
                 departments[i] = DepartmentNames[i].Identifier;
 
-            var table = Persistence.Plugin.CMDS.DepartmentProfileCompetencyRepository2.SelectCompetenciesByProfileId(departments, CurrentProfileIdentifier.Value, OrganizationIdentifier, competencyStartRow, competencyEndRow);
+            var table = Persistence.Plugin.CMDS.DepartmentProfileCompetencyRepository2.SelectCompetenciesByProfileID(departments, CurrentProfileIdentifier.Value, OrganizationIdentifier, competencyStartRow, competencyEndRow);
 
             foreach (DataRow row in table.Rows)
             {

@@ -41,7 +41,7 @@ namespace InSite.Admin.Records.Programs
         private void LoadData()
         {
             var returnUrl = Request.QueryString["return"];
-            ReturnUrl = returnUrl.IfNullOrEmpty(Outline.GetNavigateUrl(ProgramIdentifier, panel: "users"));
+            ReturnUrl = returnUrl.IfNullOrEmpty($"/ui/admin/learning/programs/outline?id={ProgramIdentifier}&panel=users");
 
             var program = ProgramSearch.GetProgram(ProgramIdentifier);
             var programUser = ProgramSearch1.GetProgramUsers(new VProgramEnrollmentFilter
@@ -54,7 +54,7 @@ namespace InSite.Admin.Records.Programs
 
             if (programUser == null || program?.OrganizationIdentifier != Organization.Identifier)
             {
-                Search.Redirect();
+                HttpResponseHelper.Redirect($"/ui/admin/learning/programs/search");
                 return;
             }
 

@@ -127,7 +127,7 @@ ROWS FETCH NEXT @PageSize ROWS ONLY
             return DatabaseHelper.CreateDataTable(query, parameters.ToArray());
         }
 
-        public static DataTable SelectCompetenciesByProfileId(Guid[] departments, Guid profileStandardIdentifier, Guid organizationId,
+        public static DataTable SelectCompetenciesByProfileID(Guid[] departments, Guid profileStandardIdentifier, Guid organizationId,
                                                        Int32 competencyStartRow, Int32 competencyEndRow)
         {
             const String query = @"
@@ -198,7 +198,7 @@ WHERE cs.DepartmentIdentifier = @DepartmentIdentifier
             }
         }
 
-        public static void DeleteUnusedByProfileId(Guid profileStandardIdentifier)
+        public static void DeleteUnusedByProfileID(Guid profileStandardIdentifier)
         {
             const string query = "EXEC custom_cmds.DeleteUnusedDepartmentProfileCompetencies1 @ProfileStandardIdentifier";
 

@@ -51,6 +51,10 @@ namespace InSite.UI.Portal.Home.Controls
                 item.ProgressText = string.Format("{0} out of {1} completed", completedAchievements, totalAchievements);
                 item.ProgressPercent = string.Format("{0:n1}%", score);
             }
+            else
+            {
+                item.ProgressText = string.Format("0 out of 0 completed", completedAchievements, totalAchievements);
+            }
 
             if (totalAchievements == completedAchievements)
             {
@@ -106,6 +110,10 @@ namespace InSite.UI.Portal.Home.Controls
                     item.FlagTooltip = "Not Completed";
                 }
             }
+            else
+            {
+                item.ProgressText = "0 out of 0 completed";
+            }
 
             list.Add(item);
         }
@@ -149,6 +157,10 @@ namespace InSite.UI.Portal.Home.Controls
                     item.FlagType = CmdsFlagType.Red;
                     item.FlagTooltip = "Not Completed";
                 }
+            }
+            else
+            {
+                item.ProgressText = "0 out of 0 completed";
             }
 
             list.Add(item);

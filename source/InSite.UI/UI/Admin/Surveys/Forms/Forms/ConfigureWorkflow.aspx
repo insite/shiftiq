@@ -54,18 +54,13 @@
 
                             <h3 class="mt-4">Case Workflow</h3>
 
-                            <asp:Panel runat="server" ID="OpenIssueEnabledWarning" class="alert alert-warning" Visible="false">
-                                When Case Workflows are enabled for a survey, you must select the Create Case checkbox on at least one question.
-                                A case will only be created if the respondent answers that question.
-                            </asp:Panel>
-
                             <div class="form-group mb-3">
                                 <div>
                                     <insite:CheckBox runat="server" ID="OpenIssueEnabled" Text="Open a new case when a response to this survey is completed" />
                                 </div>
                             </div>
 
-                            <insite:Container runat="server" ID="IssueWorkflowContainer">
+                            <asp:Panel runat="server" ID="IssueWorkflowPanel">
 
                                 <div class="form-group mb-3">
                                     <label class="form-label">Case Type</label>
@@ -95,7 +90,7 @@
                                     </div>
                                 </div>
 
-                            </insite:Container>
+                            </asp:Panel>
 
                         </div>
                     </div>

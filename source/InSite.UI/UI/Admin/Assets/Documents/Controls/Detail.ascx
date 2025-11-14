@@ -63,7 +63,7 @@
                                 <insite:RequiredValidator runat="server" ID="CourseNameValidator" ControlToValidate="CourseName" ValidationGroup="Course" />
                             </label>
                             <div>
-                                <insite:TextBox runat="server" ID="CourseName" Text="New Course" MaxLength="100" />
+                                <insite:TextBox runat="server" ID="CourseName" Text="New Course" MaxLength="200" />
                             </div>
                         </div>
                     </ContentTemplate>

@@ -208,6 +208,11 @@ namespace InSite.Persistence
         public DbSet<TAction> TActions { get; set; }
         public DbSet<TActivity> TActivities { get; set; }
         public DbSet<TActivityCompetency> TActivityCompetencies { get; set; }
+        public DbSet<TApplication> TApplications { get; set; }
+        public DbSet<TCandidateEducation> TCandidateEducations { get; set; }
+        public DbSet<TCandidateExperience> TCandidateExperiences { get; set; }
+        public DbSet<TCandidateLanguageProficiency> TCandidateLanguageProficiencies { get; set; }
+        public DbSet<TCandidateUpload> TCandidateUploads { get; set; }
         public DbSet<TCertificateLayout> TCertificateLayouts { get; set; }
         public DbSet<TCollection> TCollections { get; set; }
         public DbSet<TCollectionItem> TCollectionItems { get; set; }
@@ -225,6 +230,8 @@ namespace InSite.Persistence
         public DbSet<TLtiLink> LtiLinks { get; set; }
         public DbSet<TMeasurement> Measurements { get; set; }
         public DbSet<TModule> TModules { get; set; }
+        public DbSet<TOpportunity> TOpportunities { get; set; }
+        public DbSet<TOpportunityCategory> TOpportunityCategories { get; set; }
         public DbSet<TPartitionSettingEntity> TPartitionSettings { get; set; }
         public DbSet<TPersonField> TPersonFields { get; set; }
         public DbSet<TPrerequisite> TPrerequisites { get; set; }
@@ -234,7 +241,6 @@ namespace InSite.Persistence
         public DbSet<TProgram> TPrograms { get; set; }
         public DbSet<TProgramCategory> TProgramCategories { get; set; }
         public DbSet<TProgramEnrollment> TProgramEnrollments { get; set; }
-        public DbSet<TProgramGroupEnrollment> TProgramGroupEnrollments { get; set; }
         public DbSet<TTax> TTaxes { get; set; }
         public DbSet<TReport> TReports { get; set; }
         public DbSet<QRubric> QRubrics { get; set; }
@@ -269,6 +275,7 @@ namespace InSite.Persistence
         public DbSet<VAssessmentPage> VAssessmentPages { get; set; }
         public DbSet<VAttendance> Attendances { get; set; }
         public DbSet<VBank> VBanks { get; set; }
+        public DbSet<VCandidateComment> VCandidateComments { get; set; }
         public DbSet<VClick> VClicks { get; set; }
         public DbSet<VComment> VComments { get; set; }
         public DbSet<VCompetency> VCompetencies { get; set; }
@@ -570,6 +577,12 @@ namespace InSite.Persistence
             builder.Configurations.Add(new TActionConfiguration());
             builder.Configurations.Add(new TActivityCompetencyConfiguration());
             builder.Configurations.Add(new TActivityConfiguration());
+            builder.Configurations.Add(new TApplicationConfiguration());
+            builder.Configurations.Add(new TCandidateCommentConfiguration());
+            builder.Configurations.Add(new TCandidateEducationConfiguration());
+            builder.Configurations.Add(new TCandidateExperienceConfiguration());
+            builder.Configurations.Add(new TCandidateLanguageProficiencyConfiguration());
+            builder.Configurations.Add(new TCandidateUploadConfiguration());
             builder.Configurations.Add(new TCertificateLayoutConfiguration());
             builder.Configurations.Add(new TCollectionConfiguration());
             builder.Configurations.Add(new TCollectionItemConfiguration());
@@ -590,6 +603,8 @@ namespace InSite.Persistence
             builder.Configurations.Add(new TLtiLinkConfiguration());
             builder.Configurations.Add(new TMeasurementConfiguration());
             builder.Configurations.Add(new TModuleConfiguration());
+            builder.Configurations.Add(new TOpportunityCategoryConfiguration());
+            builder.Configurations.Add(new TOpportunityConfiguration());
             builder.Configurations.Add(new TPartitionSettingConfiguration());
             builder.Configurations.Add(new TPersonFieldConfiguration());
             builder.Configurations.Add(new TPrerequisiteConfiguration());
@@ -599,7 +614,6 @@ namespace InSite.Persistence
             builder.Configurations.Add(new TProgramConfiguration());
             builder.Configurations.Add(new TProgramCategoryConfiguration());
             builder.Configurations.Add(new TProgramEnrollmentConfiguration());
-            builder.Configurations.Add(new TProgramGroupEnrollmentConfiguration());
             builder.Configurations.Add(new TTaxConfiguration());
             builder.Configurations.Add(new TQuizConfiguration());
             builder.Configurations.Add(new TQuizAttemptConfiguration());

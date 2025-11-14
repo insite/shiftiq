@@ -46,6 +46,5 @@ namespace InSite.Application.Records.Read
 
         public virtual ICollection<TTask> Tasks { get; set; } = new HashSet<TTask>();
         public virtual ICollection<TProgramEnrollment> Enrollments { get; set; } = new HashSet<TProgramEnrollment>();
-        public virtual ICollection<TProgramGroupEnrollment> GroupEnrollments { get; set; } = new HashSet<TProgramGroupEnrollment>();
     }
 }

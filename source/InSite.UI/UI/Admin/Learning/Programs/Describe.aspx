@@ -50,6 +50,24 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label">
+                                Catalog
+                            </label>
+                            <div>
+                                <insite:CatalogComboBox runat="server" ID="CatalogIdentifier" />
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">
+                                Sequence in Catalog
+                            </label>
+                            <div>
+                                <insite:NumericBox runat="server" ID="CatalogSequence" NumericMode="Integer" />
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">
                                 Options
                             </label>
                             <div>

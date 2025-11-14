@@ -116,7 +116,6 @@
     <Compile Include="Learning\Courses\CourseSearchResult.cs" />
     <Compile Include="Learning\Courses\TProgramCategoryConfiguration.cs" />
     <Compile Include="Learning\Courses\TProgramCategory.cs" />
-    <Compile Include="Learning\Enrollments\TProgramGroupEnrollmentConfiguration.cs" />
     <Compile Include="Messaging\Mailouts\SenderNotFoundException.cs" />
     <Compile Include="Progress\Regulations\QAreaRequirementConfiguration.cs" />
     <Compile Include="Orchestration\ServiceLocator.cs" />
@@ -390,6 +389,42 @@
     <Compile Include="Directory\Groups\QGroupSearch.cs" />
     <Compile Include="Directory\Groups\QGroupStore.cs" />
     <Compile Include="Learning\Enrollments\TCourseUserConfiguration.cs" />
+    <Compile Include="Job\Candidates\TCandidateExperienceConfiguration.cs" />
+    <Compile Include="Job\Candidates\JobCandidateFilter.cs" />
+    <Compile Include="Job\Candidates\JobCandidateSearch.cs" />
+    <Compile Include="Job\Applications\TApplication.cs" />
+    <Compile Include="Job\Applications\TApplicationConfiguration.cs" />
+    <Compile Include="Job\Applications\TApplicationFilter.cs" />
+    <Compile Include="Job\Applications\TApplicationSearch.cs" />
+    <Compile Include="Job\Applications\TApplicationStore.cs" />
+    <Compile Include="Job\Candidates\VCandidateComment.cs" />
+    <Compile Include="Job\Candidates\TCandidateCommentConfiguration.cs" />
+    <Compile Include="Job\Candidates\TCandidateCommentFilter.cs" />
+    <Compile Include="Job\Candidates\TCandidateCommentSearch.cs" />
+    <Compile Include="Job\Candidates\TCandidateCommentStore.cs" />
+    <Compile Include="Job\Candidates\TCandidateEducation.cs" />
+    <Compile Include="Job\Candidates\TCandidateEducationConfiguration.cs" />
+    <Compile Include="Job\Candidates\TCandidateEducationSearch.cs" />
+    <Compile Include="Job\Candidates\TCandidateEducationStore.cs" />
+    <Compile Include="Job\Candidates\TCandidateExperience.cs" />
+    <Compile Include="Job\Candidates\TCandidateExperienceSearch.cs" />
+    <Compile Include="Job\Candidates\TCandidateExperienceStore.cs" />
+    <Compile Include="Job\Candidates\TCandidateLanguageProficiency.cs" />
+    <Compile Include="Job\Candidates\TCandidateLanguageProficiencyConfiguration.cs" />
+    <Compile Include="Job\Candidates\TCandidateLanguageProficiencySearch.cs" />
+    <Compile Include="Job\Candidates\TCandidateLanguageProficiencyStore.cs" />
+    <Compile Include="Job\Candidates\TCandidateUpload.cs" />
+    <Compile Include="Job\Candidates\TCandidateUploadConfiguration.cs" />
+    <Compile Include="Job\Candidates\TCandidateUploadSearch.cs" />
+    <Compile Include="Job\Candidates\TCandidateUploadStore.cs" />
+    <Compile Include="Job\Opportunities\TOpportunity.cs" />
+    <Compile Include="Job\Opportunities\TOpportunityFilter.cs" />
+    <Compile Include="Job\Opportunities\TOpportunitySearch.cs" />
+    <Compile Include="Job\Opportunities\TOpportunityStore.cs" />
+    <Compile Include="Job\Opportunities\TOpportunityCategory.cs" />
+    <Compile Include="Job\Opportunities\TOpportunityCategoryConfiguration.cs" />
+    <Compile Include="Job\Opportunities\TOpportunityConfiguration.cs" />
+    <Compile Include="Job\Opportunities\TOpportunityCategorySearch.cs" />
     <Compile Include="Directory\Memberships\VGroupEmployer.cs" />
     <Compile Include="Directory\Memberships\VGroupEmployerConfiguration.cs" />
     <Compile Include="Directory\Memberships\VGroupEmployerFilter.cs" />
@@ -1181,7 +1216,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Analyzer Include="..\..\build\Analyzers\EyeSpy.dll" />
+    <Analyzer Include="..\..\build\Analyzers\Engine.CodeAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">

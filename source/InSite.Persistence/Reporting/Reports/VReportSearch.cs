@@ -114,7 +114,9 @@ namespace InSite.Persistence
 
         private static IQueryable<VReport> CreateQuery(VReportFilter filter, InternalDbContext db)
         {
-            var query = db.VReports.AsQueryable();
+            var query = db.VReports
+                .AsNoTracking()
+                .AsQueryable();
 
             query = filter.IncludeShared
                 ? query.Where(x => x.OrganizationIdentifier == filter.OrganizationIdentifier || x.ReportType == ReportType.Shared)

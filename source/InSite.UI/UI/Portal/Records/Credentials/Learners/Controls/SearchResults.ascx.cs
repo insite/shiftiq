@@ -146,31 +146,31 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             if (!item.IsSelfDeclared)
                 return string.Empty;
 
-            var html = $"<a class='btn btn-danger btn-sm' href='/ui/portal/record/credentials/learners/delete?credential={item.CredentialIdentifier}'><i class='far fa-trash-alt fa-fw me-1'></i>Delete</a>";
+            var html = $"<a title='Delete Certificate' class='text-danger' href='/ui/portal/record/credentials/learners/delete?credential={item.CredentialIdentifier}'><i class='fa-solid fa-trash-alt fa-fw'></i></a>";
 
             return html;
         }
 
-        private string GetDownloadLink(Guid id, CredentialStatus status, string downloadUrl, string badgeUrl, string layout)
+        public static string GetDownloadLink(Guid id, CredentialStatus status, string downloadUrl, string badgeUrl, string layout)
         {
             if (status != CredentialStatus.Valid)
                 return null;
 
             if (downloadUrl.IsNotEmpty())
             {
-                var html = $"<a target='_blank' class='btn btn-info btn-sm' href='{downloadUrl}'><i class='far fa-award fa-fw me-1'></i>Download</a>";
+                var html = $"<a title='Download Certificate' target='_blank' href='{downloadUrl}'><i class='fa-solid fa-download fa-fw'></i></a>";
                 return html;
             }
 
             if (badgeUrl.IsNotEmpty())
             {
-                var html = $"<a target='_blank' class='btn btn-success btn-sm' href='/ui/portal/records/certificates/badge.ashx?credential={id}'><i class='far fa-award fa-fw me-1'></i>Download</a>";
+                var html = $"<a title='Download Badge' target='_blank' href='/ui/portal/records/certificates/badge.ashx?credential={id}'><i class='fa-solid fa-download fa-fw'></i></a>";
                 return html;
             }
 
             if (ServiceLocator.Partition.IsE03() && layout.IsNotEmpty())
             {
-                var html = $"<a target='_blank' class='btn btn-primary btn-sm' href='/ui/portal/records/credentials/certificate?credential={id}'><i class='far fa-award fa-fw me-1'></i>Download</a>";
+                var html = $"<a title='Download Certificate' target='_blank' href='/ui/portal/records/credentials/certificate?credential={id}'><i class='fa-solid fa-download fa-fw'></i></a>";
                 return html;
             }
 

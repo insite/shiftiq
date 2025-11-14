@@ -58,9 +58,6 @@ namespace InSite.Common.Web.UI
             [JsonProperty(PropertyName = "data", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public JsonOutput Data { get; set; }
 
-            [JsonProperty(PropertyName = "preset", DefaultValueHandling = DefaultValueHandling.Ignore)]
-            public string Preset { get; set; }
-
             public bool ShouldSerializeEvents() => Events != null && !Events.IsEmpty;
         }
 

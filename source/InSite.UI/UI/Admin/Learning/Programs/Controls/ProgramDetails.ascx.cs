@@ -7,7 +7,7 @@ namespace InSite.Admin.Records.Programs.Controls
     {
         public void BindProgram(TProgram program)
         {
-            ProgramLink.HRef = Outline.GetNavigateUrl(program.ProgramIdentifier);
+            ProgramLink.HRef = $"/ui/admin/learning/programs/outline?id={program.ProgramIdentifier}";
             ProgramCode.Text = program.ProgramCode;
             ProgramName.Text = program.ProgramName;
         }

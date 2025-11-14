@@ -153,7 +153,7 @@ namespace InSite.Common.Web.UI
 
                 if (icon.IsNotEmpty())
                 {
-                    writer.AddAttribute(HtmlTextWriterAttribute.Class, $"{icon} pe-1 me-2");
+                    writer.AddAttribute(HtmlTextWriterAttribute.Class, $"{icon} me-2");
                     writer.RenderBeginTag(HtmlTextWriterTag.I);
                     writer.RenderEndTag();
                 }

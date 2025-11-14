@@ -31,12 +31,11 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
 
         public static TaskInfo GetTaskInfo(List<TaskObjectData> taskObjects, TTask task)
         {
-            if (taskObjects == null || taskObjects.Count == 0)
-                return null;
+            if (taskObjects == null || taskObjects.Count == 0) return null;
 
             var taskObject = taskObjects.FirstOrDefault(x => x.ObjectIdentifier == task.ObjectIdentifier);
-            if (taskObject == null)
-                return null;
+
+            if (taskObject == null) return null;
 
             return new TaskInfo()
             {
@@ -76,36 +75,6 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
             GetAssessmentFormsObjectData(Organization, results);
 
             return results;
-        }
-
-        public static bool EnrollLearnerByObjectId(Guid organizationId, Guid userId, Guid objectId)
-        {
-            if (ServiceLocator.ProgramSearch.IsTaskEnrollmentExist(userId, objectId))
-                return true;
-
-            var programId = ServiceLocator.ProgramSearch.GetGroupEnrollmentProgramId(userId, objectId);
-            if (programId == null)
-                return false;
-
-            EnrollLearner(organizationId, programId.Value, userId);
-
-            return true;
-        }
-
-        public static void EnrollLearner(Guid organizationId, Guid programId, Guid userId)
-        {
-            var tasks = TaskStore.EnrollUserToProgramTasks(organizationId, programId, userId);
-
-            if (tasks != null && tasks.Length > 0)
-            {
-                foreach (var task in tasks.Where(x => x.ObjectType == "Course"))
-                    EnsureCourseEnrollment(userId, task.ObjectIdentifier);
-
-                foreach (var task in tasks.Where(x => x.ObjectType == "Logbook"))
-                    EnsureLogbookEnrollment(userId, task.ObjectIdentifier);
-            }
-
-            ServiceLocator.ProgramService.CompletionOfProgramAchievement(programId, userId, organizationId);
         }
 
         public static void EnsureLogbookEnrollment(Guid userIdentifier, Guid taskObjectIdentifier)

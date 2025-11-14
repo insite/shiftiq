@@ -12,8 +12,6 @@ dist
 dist-ssr
 *.local
 
-public/font-awesome
-public/tinymce
 public/ui
 
 # Editor directories and files

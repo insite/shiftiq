@@ -60,6 +60,24 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.Custom.CMDS.Common.Controls.Server.FindDepartment DepartmentIdentifier;
 
         /// <summary>
+        /// CatalogIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CatalogComboBox CatalogIdentifier;
+
+        /// <summary>
+        /// CatalogSequence control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NumericBox CatalogSequence;
+
+        /// <summary>
         /// IsHidden control.
         /// </summary>
         /// <remarks>

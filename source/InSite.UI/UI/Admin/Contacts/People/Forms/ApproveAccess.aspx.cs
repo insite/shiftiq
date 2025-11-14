@@ -95,7 +95,9 @@ namespace InSite.Admin.Contacts.People.Forms
                 ? ServiceLocator.GroupSearch.GetGroup(employerId.Value)
                 : null;
 
-            var status = TCollectionItemCache.GetName(employer.GroupStatusItemIdentifier);
+            var status = employer != null
+                ? TCollectionItemCache.GetName(employer.GroupStatusItemIdentifier)
+                : null;
 
             EmployerBadge.Visible = status.IsNotEmpty();
             EmployerBadge.InnerText = status;

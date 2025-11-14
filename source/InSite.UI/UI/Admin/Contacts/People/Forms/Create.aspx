@@ -111,6 +111,16 @@
                                         </div>
                                     </div>
 
+                                    <div runat="server" id="OnePersonDepartmentField" class="form-group mb-3">
+                                        <label class="form-label">
+                                            Department
+                                            <insite:RequiredValidator runat="server" ControlToValidate="OnePersonDepartmentGroup" FieldName="Department" ValidationGroup="Person" Display="Dynamic" />
+                                        </label>
+                                        <insite:FindGroup runat="server" ID="OnePersonDepartmentGroup" MaxSelectionCount="0" />
+                                        <div class="form-text">
+                                        </div>
+                                    </div>
+
                                     <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="OnePersonEmployerUpdatePanel" />
 
                                     <insite:UpdatePanel runat="server" ID="OnePersonEmployerUpdatePanel">

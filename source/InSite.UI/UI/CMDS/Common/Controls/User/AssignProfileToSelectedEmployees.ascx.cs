@@ -11,8 +11,8 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 
 using Shift.Common;
-using Shift.Common.Events;
 using Shift.Constant;
+using Shift.Common.Events;
 
 using UserProfileRepository = InSite.Persistence.Plugin.CMDS.UserProfileRepository;
 
@@ -132,7 +132,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
             ComplianceRequired.Checked = isPrimaryProfile;
             ComplianceRequired.Enabled = !isPrimaryProfile;
 
-            DepartmentEmployees.DataSource = Persistence.Plugin.CMDS.ContactRepository3.SelectEmployeesByDepartmentProfileId(
+            DepartmentEmployees.DataSource = Persistence.Plugin.CMDS.ContactRepository3.SelectEmployeesByDepartmentProfileID(
                 DepartmentIdentifier.Value.Value, ProfileIdentifier.Value.Value, isPrimaryProfile);
             DepartmentEmployees.DataBind();
         }

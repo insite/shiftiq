@@ -80,7 +80,6 @@ namespace InSite.Domain.Surveys.Forms
         public bool NumberEnableAutoCalc { get; set; }
         public Guid[] NumberAutoCalcQuestions { get; set; }
         public bool NumberEnableNotApplicable { get; set; }
-        public bool EnableCreateCase { get; set; }
 
         public int? TextCharacterLimit { get; set; }
         public int? TextLineCount { get; set; }

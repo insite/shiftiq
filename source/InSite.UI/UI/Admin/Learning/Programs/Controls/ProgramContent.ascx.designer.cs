@@ -15,13 +15,13 @@ namespace InSite.Admin.Records.Programs.Controls
     {
 
         /// <summary>
-        /// EditLink control.
+        /// ScreenStatus control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.IconLink EditLink;
+        protected global::InSite.Common.Web.UI.Alert ScreenStatus;
 
         /// <summary>
         /// Language control.
@@ -40,5 +40,23 @@ namespace InSite.Admin.Records.Programs.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater ContentRepeater;
+
+        /// <summary>
+        /// ProgramContentSaveButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.SaveButton ProgramContentSaveButton;
+
+        /// <summary>
+        /// ProgramContentCancelButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CancelButton ProgramContentCancelButton;
     }
 }

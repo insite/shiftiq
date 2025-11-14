@@ -47,15 +47,13 @@ namespace InSite.UI.Admin.Reporting
 
             PageHelper.AutoBindHeader(this);
 
-            var reportFilter = new VReportFilter
-            {
-                OrganizationIdentifier = Organization.Identifier,
-                UserIdentifier = User.UserIdentifier,
-                IncludeShared = true
-            };
+            var isE03 = ServiceLocator.Partition.IsE03();
 
-            var reportCount = VReportSearch.Count(reportFilter);
-            LoadCounter(ReportCounter, ReportCount, true, reportCount, ReportLink, "/ui/admin/reports/search");
+            var isE03Admin = Identity.IsInRole(CmdsRole.SystemAdministrators);
+
+            FrequentlyUsedReports.Visible = !isE03 || isE03Admin;
+
+            CurrentUserSessions.Visible = !isE03 || isE03Admin;
 
             var isQueriesVisible = tempQueryCount > 0 || Identity.IsOperator;
             LoadCounter(QueryCounter, QueryCount, isQueriesVisible, tempQueryCount, QueryLink, "/ui/admin/reports/queries/search");

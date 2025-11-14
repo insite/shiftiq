@@ -5,7 +5,7 @@
 <div class="row">
 
     <div class="col-lg-3">
-        
+        <div id="toolbox" class="toolbox-section">
         <h3>Criteria</h3>
 
         <div class="mb-2">
@@ -37,7 +37,7 @@
             <insite:FilterButton ID="SearchButton" runat="server" />
             <insite:ClearButton ID="ClearButton" runat="server" />
         </div>
-
+        </div>
     </div>
 
     <div class="col-lg-3">

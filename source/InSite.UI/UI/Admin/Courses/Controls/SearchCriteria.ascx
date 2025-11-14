@@ -13,7 +13,7 @@
                     </div>
 
                     <div class="mb-2">
-                        <insite:TextBox runat="server" ID="CourseName" EmptyMessage="Course Name" MaxLength="100" />
+                        <insite:TextBox runat="server" ID="CourseName" EmptyMessage="Course Name" MaxLength="200" />
                     </div>
     
                     <div class="mb-2">

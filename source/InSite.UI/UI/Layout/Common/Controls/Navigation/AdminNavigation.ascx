@@ -11,6 +11,58 @@
         
         <nav class="collapse navbar-collapse">
             
+            <ul class="navbar-nav navbar-nav-left" style="margin-left: 11rem;">
+
+                <li runat="server" id="CmdsMenu" class="nav-item dropdown">
+                
+                    <a runat="server" id="CmdsMenuAnchor" href="#" class="nav-link dropdown-toggle fs-sm"
+                        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fa-fw far fa-grid-round me-1"></i>CMDS</a>
+
+                    <div class="dropdown-menu overflow-hidden p-0">
+                        <div class="d-lg-flex">
+                            <div class="mega-dropdown-column pt-1 pt-lg-3 pb-lg-4" style="width: 10rem;">
+                                
+                                <ul class="list-unstyled mb-0">
+                                    <li><span class="fs-lg ms-3 text-info">CMDS</span></li>
+                                    <li><a runat="server" id="CmdsHomeLink" class="dropdown-item" href="/ui/home"><i class="me-1 fa-fw far fa-home"></i>Home</a></li>
+                                    <li><a runat="server" id="CmdsReportsLink" class="dropdown-item" href="/ui/admin/reporting"><i class="me-1 fa-fw far fa-file-chart-line"></i>Reports</a></li>
+                                    <li><a runat="server" id="CmdsToolsLink" class="dropdown-item" href="/ui/admin/tools"><i class="me-1 fa-fw far fa-tools"></i>Tools</a></li>
+                                    <li><a runat="server" id="CmdsPeopleLink" class="dropdown-item" href="/ui/cmds/admin/users/search"><i class="me-1 fa-fw far fa-users"></i>People</a></li>
+                                    <li><a runat="server" id="CmdsOrganizationLink" class="dropdown-item" href="/ui/cmds/admin/organizations/search"><i class="me-1 fa-fw far fa-city"></i>Organizations</a></li>
+                                </ul>
+
+                            </div>
+                            <div class="mega-dropdown-column pb-2 pt-lg-3 pb-lg-4">
+
+                                <ul class="list-unstyled mb-0">
+                                    <li><span class="fs-lg ms-3 text-info">My Development</span></li>
+                                    <li><a runat="server" id="CmdsProfileLink" class="dropdown-item" href="/ui/cmds/portal/validations/profiles/search"><i class="me-1 fa-fw far fa-id-badge"></i>Profiles</a></li>
+                                    <li><a runat="server" id="CmdsRequestLink" class="dropdown-item" href="/ui/cmds/portal/validations/competencies/submit"><i class="me-1 fa-fw far fa-ruler-triangle"></i>Request Validation</a></li>
+                                    <li><a runat="server" id="CmdsAssessLink" class="dropdown-item" href="/ui/cmds/portal/validations/competencies/search"><i class="me-1 fa-fw far fa-balance-scale"></i>Self-Assessments</a></li>
+                                    <li><a runat="server" id="CmdsPlanLink" class="dropdown-item" href="/ui/portal/learning/plan"><i class="me-1 fa-fw far fa-map-marked-alt"></i>Training Plan</a></li>
+                                </ul>
+
+                            </div>
+                            <div runat="server" id="CmdsMenuManagement" class="mega-dropdown-column pb-2 pt-lg-3 pb-lg-4">
+
+                                <ul class="list-unstyled mb-0">
+                                    <li><span class="fs-lg ms-3 text-info">Management</span></li>
+                                    <li><a runat="server" id="CmdsAchievementsLink" class="dropdown-item" href="/ui/cmds/admin/achievements/search"><i class="me-1 fa-fw far fa-award"></i>Achievements</a></li>
+                                    <li><a runat="server" id="CmdsCompetenciesLink" class="dropdown-item" href="/ui/cmds/admin/standards/competencies/search"><i class="me-1 fa-fw far fa-ruler-triangle"></i>Competencies</a></li>
+                                    <li><a runat="server" id="CmdsProfilesLink" class="dropdown-item" href="/ui/cmds/admin/standards/profiles/search"><i class="me-1 fa-fw far fa-id-badge"></i>Profiles</a></li>
+                                    <li><a runat="server" id="CmdsProgramsLink" class="dropdown-item" href="/ui/admin/learning/programs/search"><i class="me-1 fa-fw far fa-map-marked"></i>Programs</a></li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </li>
+
+                
+
+            </ul>
+
             <ul class="navbar-nav ms-auto">
 
                 <li runat="server" id="RecentMenu" class="nav-item dropdown fs-sm">
@@ -58,6 +110,7 @@
                                 <ul class="list-unstyled mb-0">
                                     <li><span class="fs-lg ms-3 text-info">Management</span></li>
                                     <li><a runat="server" id="AdminAssetsLink" class="dropdown-item" href="/ui/admin/assets/home"><i class="me-1 fa-fw far fa-inventory"></i>Assets</a></li>
+                                    <li><a runat="server" id="AdminJobsLink" class="dropdown-item" href="/ui/admin/jobs/home"><i class="me-1 fa-fw far fa-user-hard-hat"></i>Jobs</a></li>
                                     <li><a runat="server" id="AdminReportsLink" class="dropdown-item" href="/ui/admin/reporting"><i class="me-1 fa-fw far fa-file-chart-line"></i>Reports</a></li>
                                     <li><a runat="server" id="AdminSalesLink" class="dropdown-item" href="/ui/admin/sales/home"><i class="me-1 fa-fw far fa-file-invoice-dollar"></i>Sales</a></li>
                                     <li><a runat="server" id="AdminWorkflowsLink" class="dropdown-item" href="/ui/admin/workflow/home"><i class="me-1 fa-fw far fa-arrow-progress"></i>Workflows</a></li>
@@ -115,7 +168,7 @@
 
                 <li runat="server" id="ImpersonatorMenu" class="nav-item fs-sm">
                     <a runat="server" id="ImpersonatorAnchor" class="nav-link text-danger" href="/ui/portal/identity/impersonate">
-                        <i class="fa-fw fa-regular fa-user-secret me-2"></i>
+                        <i class="fas fa-fw fa-user-secret me-2"></i>
                         <asp:Literal runat="server" ID="ImpersonatorName" />
                     </a>
                 </li>
@@ -157,24 +210,6 @@
                         
                     </ul>
 
-                </li>
-
-                <li runat="server" id="LanguageItem" class="nav-item fs-sm dropdown">
-
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                        <i class="fa-fw fa-regular fa-globe me-1"></i>
-                        <asp:Literal runat="server" ID="CurrentLanguageOutput" />
-                    </a>
-
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <asp:Repeater runat="server" ID="LanguageMenuItems">
-                            <ItemTemplate>
-                                <li>
-                                    <a class="dropdown-item" href='<%# Eval("Url") %>'><%# Eval("Name") %></a>
-                                </li>
-                            </ItemTemplate>
-                        </asp:Repeater>
-                    </ul>
                 </li>
 
             </ul>

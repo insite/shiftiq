@@ -55,6 +55,9 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
         {
             base.OnInit(e);
 
+            AchievementSelector.AutoPostBack = true;
+            AchievementSelector.ValueChanged += AchievementSelector_ValueChanged;
+
             AchievementSelector.Filter.AchievementType = AchievementType;
             AchievementSelector.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementSelector.Filter.AllowSelfDeclared = true;
@@ -66,6 +69,37 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
             SaveButton.Click += SaveButton_Click;
             CancelButton.NavigateUrl = Page.Request.RawUrl;
+        }
+
+        private void AchievementSelector_ValueChanged(object sender, Shift.Sdk.UI.FindEntityValueChangedEventArgs e)
+        {
+            AchievementLifetime.Enabled = true;
+
+            if (e.NewValue == null)
+                return;
+
+            var achievementId = e.NewValue.Value;
+
+            var achievement = ServiceLocator.AchievementSearch.GetAchievement(achievementId);
+
+            var lifetimeUnit = achievement.ExpirationLifetimeUnit;
+
+            var lifetimeQuantity = achievement.ExpirationLifetimeQuantity ?? 0;
+
+            var lifetimeInMonths = 0;
+
+            if (StringHelper.Equals(lifetimeUnit, "Year"))
+                lifetimeInMonths = 12 * lifetimeQuantity;
+
+            else if (StringHelper.Equals(lifetimeUnit, "Month"))
+                lifetimeInMonths = lifetimeQuantity;
+
+            if (lifetimeInMonths == 0)
+                return;
+
+            AchievementLifetime.ValueAsInt = lifetimeInMonths;
+
+            AchievementLifetime.Enabled = false;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -172,6 +206,11 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             model.AchievementId = AchievementSelector.Value.Value;
             model.Issued = AchievementIssued.Value.Value;
             model.Lifetime = AchievementLifetime.ValueAsInt.Value;
+
+            if (!AchievementFile.HasFile)
+            {
+                model.Errors.Add($"Please attach a copy of your certificate.");
+            }
 
             return model;
         }

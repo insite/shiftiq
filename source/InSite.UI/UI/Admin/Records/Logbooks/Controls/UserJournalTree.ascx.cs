@@ -28,8 +28,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Controls
             JournalSetupFieldType.TrainingLevel,
             JournalSetupFieldType.TrainingLocation,
             JournalSetupFieldType.TrainingProvider,
-            JournalSetupFieldType.TrainingCourseTitle,
-            JournalSetupFieldType.TrainingType
+            JournalSetupFieldType.TrainingCourseTitle
         };
 
         private class FieldItem

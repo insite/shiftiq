@@ -219,6 +219,8 @@ namespace InSite.UI.CMDS.Common.Controls.User
 
             Visibility.Toggle(DeleteAchievementButton, IsEditable);
 
+            AchievementTab.Visible = AllowSelect;
+
             NewAchievementTab.Visible = IsEditable;
 
             var scope = SelectedAccountScope();
@@ -233,7 +235,9 @@ namespace InSite.UI.CMDS.Common.Controls.User
 
             var hasMatchingAchievements = matchingAchievements.Count > 0;
 
-            var assignedAchievements = _getAssignedAchievements(matchingAchievements);
+            var assignedAchievements = _getAssignedAchievements != null
+                ? _getAssignedAchievements(matchingAchievements)
+                : new List<AchievementListGridItem>();
 
             var hasAssignedAchievements = assignedAchievements.Count > 0;
 

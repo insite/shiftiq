@@ -132,13 +132,13 @@ namespace InSite.Admin.Surveys.Questions.Controls
         protected global::InSite.Common.Web.UI.TextBox QuestionAttribute;
 
         /// <summary>
-        /// SettingsContainer control.
+        /// SettingsPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Container SettingsContainer;
+        protected global::System.Web.UI.WebControls.Panel SettingsPanel;
 
         /// <summary>
         /// IsRequiredField control.
@@ -238,24 +238,6 @@ namespace InSite.Admin.Surveys.Questions.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.CheckBox NumberEnableNa;
-
-        /// <summary>
-        /// EnableCreateCaseField control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl EnableCreateCaseField;
-
-        /// <summary>
-        /// EnableCreateCase control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.CheckBox EnableCreateCase;
 
         /// <summary>
         /// QuestionTitle control.

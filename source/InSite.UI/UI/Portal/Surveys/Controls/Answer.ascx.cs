@@ -130,7 +130,7 @@ namespace InSite.Portal.Surveys.Responses
             if (Current.PageNumber > Current.PageCount)
                 Navigator.RedirectToConfirmPage(Current.SessionIdentifier);
 
-            var questions = GetQuestions();
+            var questions = ResponseSessionHelper.GetCurrentPageActiveQuestions(Current);
             if (questions.Count == 0)
                 Navigator.RedirectToNextPage(Current.SessionIdentifier, Current.PageNumber);
 
@@ -297,34 +297,6 @@ namespace InSite.Portal.Surveys.Responses
             return groups.ToArray();
         }
 
-        private List<SurveyQuestion> GetQuestions()
-        {
-            var allQuestions = Current.Survey.GetPage(Current.PageNumber).Questions;
-            var allConditions = Current.Survey.GetConditions();
-            var allOptions = Current.Session.QResponseOptions.Where(x => x.ResponseOptionIsSelected).ToList();
-
-            var filteredQuestions = new List<SurveyQuestion>();
-
-            foreach (var question in allQuestions)
-            {
-                if (question.IsHidden)
-                    continue;
-
-                if (question.Type == SurveyQuestionType.Terminate)
-                    continue;
-
-                var maskingOptions = allConditions
-                    .Where(x => x.MaskedQuestion == question)
-                    .Select(x => x.MaskingOptionItem.Identifier)
-                    .ToList();
-
-                if (maskingOptions.Count == 0 || !allOptions.Any(x => maskingOptions.Contains(x.SurveyOptionIdentifier)))
-                    filteredQuestions.Add(question);
-            }
-
-            return filteredQuestions;
-        }
-
         private void Previous()
         {
             if (SaveAnswers())
@@ -345,7 +317,7 @@ namespace InSite.Portal.Surveys.Responses
 
         private bool SaveAnswers()
         {
-            var questions = GetQuestions();
+            var questions = ResponseSessionHelper.GetCurrentPageActiveQuestions(Current);
 
             if (!CheckUploadsValid(questions))
                 return false;

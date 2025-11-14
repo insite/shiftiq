@@ -14,6 +14,7 @@ using InSite.Persistence;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Constant;
 
 namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
 {
@@ -48,6 +49,11 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
             public string AchievementLabel { get; set; }
             public string AchievementTitle { get; set; }
             public string CredentialStatus { get; set; }
+
+            public string AchievementCertificateLayoutCode { get; set; }
+            public string BadgeImageUrl { get; set; }
+            public string DownloadLink { get; set; }
+            public bool HasBadgeImage { get; set; }
 
             public decimal? CredentialGrantedScore { get; set; }
 
@@ -120,7 +126,7 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
         {
             filter.OrderBy = $"{nameof(VCredential.CredentialGranted)} desc, {nameof(VCredential.UserFullName)}";
 
-            return ServiceLocator.AchievementSearch
+            var items = ServiceLocator.AchievementSearch
                 .GetCredentials(filter)
                 .Select(x => new SearchDataItem
                 {
@@ -136,9 +142,38 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
                     CredentialExpirationExpected = x.CredentialExpirationExpected,
                     CredentialGrantedScore = x.CredentialGrantedScore,
                     CredentialExpired = x.CredentialExpired,
-                    CredentialIdentifier = x.CredentialIdentifier
-                }).ToList()
-                .ToSearchResult();
+                    CredentialIdentifier = x.CredentialIdentifier,
+
+                    AchievementCertificateLayoutCode = x.AchievementCertificateLayoutCode,
+                    BadgeImageUrl = x.BadgeImageUrl,
+                    HasBadgeImage = x.HasBadgeImage ?? false
+
+                }).ToList();
+
+            var files = ServiceLocator.FileSearch
+                .GetModels(filter.OrganizationIdentifier, items.Select(x => x.CredentialIdentifier).ToArray(), null, false);
+
+            foreach (var item in items)
+            {
+                var status = item.CredentialStatus.ToEnum(CredentialStatus.Undefined);
+
+                string fileUrl = null;
+                var file = files.FirstOrDefault(x => x.ObjectIdentifier == item.CredentialIdentifier);
+                if (file != null)
+                    fileUrl = ServiceLocator.StorageService.GetFileUrl(file.FileIdentifier, file.FileName, true);
+
+                string badgeUrl = null;
+                if (item.HasBadgeImage && item.BadgeImageUrl.IsNotEmpty())
+                    badgeUrl = item.BadgeImageUrl;
+
+                var layout = item.AchievementCertificateLayoutCode;
+
+                item.DownloadLink = InSite.UI.Portal.Records.Credentials.Learners.Controls.SearchResults
+                    .GetDownloadLink(item.CredentialIdentifier, status, fileUrl, badgeUrl, layout);
+            }
+
+            return items.ToSearchResult();
+
         }
         #endregion
 

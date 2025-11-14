@@ -42,6 +42,10 @@ namespace InSite.UI.Admin.Contacts.People.Forms
         {
             ServiceLocator.StorageService.Delete(FileIdentifier);
 
+            var upload = TCandidateUploadSearch.SelectFirst(x => x.CandidateUserIdentifier == UserIdentifier && x.FileIdentifier == FileIdentifier);
+            if (upload != null)
+                TCandidateUploadStore.Delete(upload.UploadIdentifier);
+
             RedirectToUser();
         }
 

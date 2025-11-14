@@ -28,7 +28,7 @@
                         <div class="mb-1"><%= GetDisplayText("Number of Entries") %>: <%# Eval("ExperienceCount", "{0:n0}") %></div>
                     </div>
                     <div class="float-end">
-                        <insite:Button runat="server" ID="AddEntryButton" Icon="fas fa-plus-circle" Text="Add Entry" ButtonStyle="Default"
+                        <insite:Button runat="server" ID="AddEntryButton" Icon="fas fa-plus-circle" ToolTip="Add Entry" ButtonStyle="Default"
                             NavigateUrl='<%# Eval("JournalSetupIdentifier", "/ui/portal/records/logbooks/learners/add-experience?journalsetup={0}") %>' 
                             Visible='<%# !((DateTimeOffset?)Eval("JournalSetupLocked")).HasValue %>'
                         />

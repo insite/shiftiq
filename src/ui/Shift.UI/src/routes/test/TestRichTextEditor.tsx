@@ -7,22 +7,13 @@ export default function TestRichTextEditor() {
             <div className="row">
                 <div className="col-6">
                     <FormField>
-                        <RichTextEditor
-                            enableModeSwitch
-                            defaultMode="markdown"
-                            defaultValue={{
-                                markdown: {
-                                    en: `
-                                        # Hello world
-                                        > Quote
-                                    `,
-                                    fr: "Another test"
-                                },
-                                html: {
-                                    en: "<p>Hello world</p>"
-                                }
-                            }}
-                        />
+                        <RichTextEditor defaultMarkdown={{
+                            en: `
+                                # Hello world
+                                > Quote
+                            `,
+                            fr: "Another test"
+                        }} />
                     </FormField>
                 </div>
             </div>

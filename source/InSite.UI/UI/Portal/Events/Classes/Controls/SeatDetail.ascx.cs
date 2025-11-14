@@ -117,7 +117,7 @@ namespace InSite.UI.Portal.Events.Classes.Controls
             MultiplePrice.Items.Clear();
 
             var employerStatusId = employerIdentifier.HasValue && (employerIdentifier.Value != Guid.Empty)
-                ? ServiceLocator.GroupSearch.GetGroup(employerIdentifier.Value).GroupStatusItemIdentifier
+                ? ServiceLocator.GroupSearch.GetGroup(employerIdentifier.Value)?.GroupStatusItemIdentifier
                 : null;
             var employerStatus = TCollectionItemCache.GetName(employerStatusId);
 

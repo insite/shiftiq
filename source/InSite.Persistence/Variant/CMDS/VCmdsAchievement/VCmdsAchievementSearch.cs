@@ -910,41 +910,31 @@ namespace InSite.Persistence.Plugin.CMDS
 
         public static List<AchievementListGridItem> SelectAllNewDepartmentTemplateAchievements(Guid? department, Guid organization)
         {
+            var organizations = new[] { organization, CurrentPartition.OrganizationId };
+
             using (var db = new InternalDbContext())
             {
-                if (department.HasValue)
-                    return
-                        db.VCmdsAchievementDepartments
-                        .Where(x => x.DepartmentIdentifier == department)
-                        .SelectMany(x => x.Achievement.Categories.DefaultIfEmpty()
-                            .Select(y => new AchievementListGridItem
-                            {
-                                OrganizationIdentifier = x.Achievement.OrganizationIdentifier,
-                                AchievementIdentifier = x.AchievementIdentifier,
-                                AchievementTitle = x.Achievement.AchievementTitle,
-                                AchievementLabel = x.Achievement.AchievementLabel,
-                                Visibility = x.Achievement.Visibility,
-                                CategoryName = y.CategoryName
-                            }))
-                        .OrderBy(x => x.AchievementTitle)
-                        .ToList();
-                else
-                    return
-                        db.VCmdsAchievements
-                        .Where(x => x.OrganizationIdentifier == organization ||
-                                    x.OrganizationIdentifier == CurrentPartition.OrganizationId)
-                        .SelectMany(x => x.Categories.DefaultIfEmpty()
-                            .Select(y => new AchievementListGridItem
-                            {
-                                OrganizationIdentifier = x.OrganizationIdentifier,
-                                AchievementIdentifier = x.AchievementIdentifier,
-                                AchievementTitle = x.AchievementTitle,
-                                AchievementLabel = x.AchievementLabel,
-                                Visibility = x.Visibility,
-                                CategoryName = y.CategoryName
-                            }))
-                        .OrderBy(x => x.AchievementTitle)
-                        .ToList();
+                var query = department.HasValue
+                    ? db.VCmdsAchievementDepartments
+                        .Where(x => x.DepartmentIdentifier == department.Value)
+                        .Select(x => x.Achievement)
+                    : db.VCmdsAchievements
+                        .Where(x => organizations.Contains(x.OrganizationIdentifier));
+
+                return query
+                    .SelectMany(achievement => achievement.Categories.DefaultIfEmpty(),
+                        (achievement, category) => new { achievement, category })
+                    .Select(x => new AchievementListGridItem
+                    {
+                        OrganizationIdentifier = x.achievement.OrganizationIdentifier,
+                        AchievementIdentifier = x.achievement.AchievementIdentifier,
+                        AchievementTitle = x.achievement.AchievementTitle,
+                        AchievementLabel = x.achievement.AchievementLabel,
+                        Visibility = x.achievement.Visibility,
+                        CategoryName = x.category != null ? x.category.CategoryName : null
+                    })
+                    .OrderBy(x => x.AchievementTitle)
+                    .ToList();
             }
         }
 

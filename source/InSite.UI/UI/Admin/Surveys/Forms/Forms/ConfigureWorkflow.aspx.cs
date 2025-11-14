@@ -28,7 +28,7 @@ namespace InSite.Admin.Surveys.Forms.Forms
             base.OnInit(e);
 
             OpenIssueEnabled.AutoPostBack = true;
-            OpenIssueEnabled.CheckedChanged += (s, a) => OnCheckedChanged();
+            OpenIssueEnabled.CheckedChanged += (x, y) => { IssueWorkflowPanel.Visible = OpenIssueEnabled.Checked; };
 
             IssueType.Settings.CollectionName = CollectionName.Cases_Classification_Type;
             IssueType.Settings.OrganizationIdentifier = Organization.OrganizationIdentifier;
@@ -80,12 +80,9 @@ namespace InSite.Admin.Surveys.Forms.Forms
             ResponseCompletedRespondentMessageIdentifier.Filter.Type = MessageTypeName.Notification;
             ResponseCompletedRespondentMessageIdentifier.Value = messages.FirstOrDefault(x => x.Type == SurveyMessageType.ResponseConfirmed)?.Identifier;
 
-            var openIssueEnabled = survey.WorkflowConfiguration != null;
-            OpenIssueEnabled.Checked = openIssueEnabled;
-
-            OnCheckedChanged();
-            
-            if (openIssueEnabled)
+            OpenIssueEnabled.Checked = survey.WorkflowConfiguration != null;
+            IssueWorkflowPanel.Visible = OpenIssueEnabled.Checked;
+            if (survey.WorkflowConfiguration != null)
             {
                 IssueType.Value = survey.WorkflowConfiguration.IssueType;
                 IssueStatus.IssueType = survey.WorkflowConfiguration.IssueType;
@@ -96,13 +93,6 @@ namespace InSite.Admin.Surveys.Forms.Forms
             }
 
             CancelButton.NavigateUrl = $"/ui/admin/surveys/forms/outline?survey={SurveyIdentifier}&panel={ReturnPanel}&tab={ReturnTab}";
-        }
-
-        private void OnCheckedChanged()
-        {
-            var isChecked = OpenIssueEnabled.Checked;
-            IssueWorkflowContainer.Visible = isChecked;
-            OpenIssueEnabledWarning.Visible = isChecked;
         }
 
         private void SaveButton_Click(object sender, EventArgs e)

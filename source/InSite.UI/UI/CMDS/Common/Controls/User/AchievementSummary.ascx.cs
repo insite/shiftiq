@@ -123,6 +123,8 @@ namespace InSite.Cmds.Controls.Training.EmployeeAchievements
 
                 var isIssued = EmployeeAchievementHelper.IsSignedOff(employeeAchievement);
 
+                var isMyCredential = userIdentifier == identity.User.UserIdentifier;
+
                 // In the E03 (CMDS) partition the business rule is slightly different. Somehow this needs to be made
                 // configurable per partition (and possibly per organization), but in the meantime this is hard-coded
                 // for simplicity.
@@ -136,9 +138,9 @@ namespace InSite.Cmds.Controls.Training.EmployeeAchievements
                     ? (allowSelfDeclaredAchievementType && allowSelfDeclaredCredential)
                     : allowSelfDeclaredAchievement;
 
-                SignOffPanel.Visible = allowSignOff && !isIssued;
+                SignOffPanel.Visible = allowSignOff && !isIssued && isMyCredential;
 
-                RenewSignOffPanel.Visible = allowSignOff && isIssued;
+                RenewSignOffButton.Visible = allowSignOff && isIssued && isMyCredential;
 
                 if (employeeAchievement.CredentialGranted.HasValue)
                 {

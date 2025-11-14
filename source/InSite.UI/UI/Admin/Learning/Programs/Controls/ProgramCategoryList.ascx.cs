@@ -33,6 +33,7 @@ namespace InSite.UI.Admin.Learning.Programs.Controls
         private void LoadData()
         {
             List<TCollectionItem> items = null;
+
             HashSet<Guid> selections = null;
 
             if (ProgramId.HasValue)

@@ -452,71 +452,73 @@ namespace InSite.Admin.Surveys.Forms.Forms
         {
             var items = form.FlattenOptionItems().Where(x => x.MaskedQuestionIdentifiers.Count > 0).ToList();
 
-            var conditions = new List<OutlineCondition>();
-            foreach (var item in items)
+            if (items.Count > 0)
             {
-                foreach (var masked in item.MaskedQuestionIdentifiers)
+                var conditions = new List<OutlineCondition>();
+                foreach (var item in items)
                 {
-                    var condition = new OutlineCondition();
-
-                    condition.MaskingOptionIdentifier = item.Identifier;
-                    condition.MaskingOptionTitle = GetTitle(item.Identifier);
-                    condition.MaskingListSequence = item.List.Sequence;
-                    condition.MaskingListTitle = GetTitle(item.List.Identifier);
-                    condition.ShowList = item.List.Question.Options.Lists.Count > 1;
-                    condition.MaskingQuestionSequence = item.Question.Sequence;
-                    condition.MaskingQuestionCode = item.Question.Code.HasValue() ? item.Question.Code : item.Question.Sequence.ToString();
-                    condition.MaskingQuestionTitle = GetTitle(item.Question.Identifier);
-
-                    var question = form.FindQuestion(masked);
-                    condition.MaskedQuestionIdentifier = masked;
-
-                    if (question != null)
+                    foreach (var masked in item.MaskedQuestionIdentifiers)
                     {
-                        condition.MaskedQuestionSequence = question.Sequence;
-                        condition.MaskedQuestionCode = question.Code.HasValue() ? question.Code : question.Sequence.ToString();
-                        condition.MaskedQuestionTitle = GetTitle(question.Identifier);
-                    }
+                        var condition = new OutlineCondition();
 
-                    conditions.Add(condition);
-                }
-            }
+                        condition.MaskingOptionIdentifier = item.Identifier;
+                        condition.MaskingOptionTitle = GetTitle(item.Identifier);
+                        condition.MaskingListSequence = item.List.Sequence;
+                        condition.MaskingListTitle = GetTitle(item.List.Identifier);
+                        condition.ShowList = item.List.Question.Options.Lists.Count > 1;
+                        condition.MaskingQuestionSequence = item.Question.Sequence;
+                        condition.MaskingQuestionCode = item.Question.Code.HasValue() ? item.Question.Code : item.Question.Sequence.ToString();
+                        condition.MaskingQuestionTitle = GetTitle(item.Question.Identifier);
 
-            ConditionsRepeater.DataSource = conditions
-                .OrderBy(x => x.MaskingQuestionSequence)
-                .ThenBy(x => x.MaskingQuestionTitle)
-                .ThenBy(x => x.MaskingListSequence)
-                .ThenBy(x => x.MaskingListTitle)
-                .ThenBy(x => x.MaskedQuestionSequence)
-                .GroupBy(r => r.MaskingOptionIdentifier)
-                .Select(group =>
-                    {
-                        var first = group.First();
+                        var question = form.FindQuestion(masked);
+                        condition.MaskedQuestionIdentifier = masked;
 
-                        return new
+                        if (question != null)
                         {
-                            first.MaskingQuestionCode,
-                            first.MaskingQuestionTitle,
-                            first.MaskingListSequence,
-                            first.MaskingListTitle,
-                            first.ShowList,
-                            first.MaskingOptionIdentifier,
-                            first.MaskingOptionTitle,
+                            condition.MaskedQuestionSequence = question.Sequence;
+                            condition.MaskedQuestionCode = question.Code.HasValue() ? question.Code : question.Sequence.ToString();
+                            condition.MaskedQuestionTitle = GetTitle(question.Identifier);
+                        }
 
-                            MaskedQuestions = group.Select(row => new
+                        conditions.Add(condition);
+                    }
+                }
+
+                ConditionsRepeater.DataSource = conditions
+                    .OrderBy(x => x.MaskingQuestionSequence)
+                    .ThenBy(x => x.MaskingQuestionTitle)
+                    .ThenBy(x => x.MaskingListSequence)
+                    .ThenBy(x => x.MaskingListTitle)
+                    .ThenBy(x => x.MaskedQuestionSequence)
+                    .GroupBy(r => r.MaskingOptionIdentifier)
+                    .Select(group =>
+                        {
+                            var first = group.First();
+
+                            return new
                             {
-                                row.MaskedQuestionCode,
-                                row.MaskedQuestionTitle,
-                                row.MaskingOptionIdentifier,
-                                row.MaskedQuestionIdentifier
-                            })
-                        };
-                    });
-            ConditionsRepeater.DataBind();
+                                first.MaskingQuestionCode,
+                                first.MaskingQuestionTitle,
+                                first.MaskingListSequence,
+                                first.MaskingListTitle,
+                                first.ShowList,
+                                first.MaskingOptionIdentifier,
+                                first.MaskingOptionTitle,
 
-            var hasConditions = conditions.Count > 0;
-            ConditionsRepeater.Visible = hasConditions;
-            ConditionsNoItemsMessage.Visible = !hasConditions;
+                                MaskedQuestions = group.Select(row => new
+                                {
+                                    row.MaskedQuestionCode,
+                                    row.MaskedQuestionTitle,
+                                    row.MaskingOptionIdentifier,
+                                    row.MaskedQuestionIdentifier
+                                })
+                            };
+                        });
+                ConditionsRepeater.DataBind();
+
+                ConditionsRepeater.Visible = conditions.Count > 0;
+                ConditionsNoItemsMessage.Visible = !ConditionsRepeater.Visible;
+            }
         }
 
         private void ConditionsRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
@@ -588,40 +590,42 @@ namespace InSite.Admin.Surveys.Forms.Forms
                 .ThenBy(x => x.OptionItemSequence)
                 .ToList();
 
-            BranchesRepeater.DataSource = data.GroupBy(r => r.OptionListIdentifier).Select(group =>
+            if (data.Count > 0)
             {
-                var first = group.First();
-
-                return new
+                BranchesRepeater.DataSource = data.GroupBy(r => r.OptionListIdentifier).Select(group =>
                 {
-                    first.QuestionIdentifier,
-                    first.QuestionCode,
-                    first.QuestionTitle,
+                    var first = group.First();
 
-                    first.OptionListIdentifier,
-                    first.OptionListSequence,
-                    first.OptionListTitle,
-
-                    first.SingleList,
-
-                    Options = group.Select(row => new
+                    return new
                     {
-                        Letter = row.OptionItemLetter,
-                        Sequence = row.OptionItemSequence,
-                        Title = row.OptionItemTitle,
-                        row.BranchToQuestionCode,
-                        row.BranchToQuestionTitle,
-                        row.BranchToPageNumber,
-                        row.IsNotFirstQuestion,
-                        row.IsNotFollowingPage
-                    })
-                };
-            });
-            BranchesRepeater.DataBind();
+                        first.QuestionIdentifier,
+                        first.QuestionCode,
+                        first.QuestionTitle,
 
-            var hasBranches = data.Count > 0;
-            BranchesRepeater.Visible = hasBranches;
-            BranchesNoItemsMessage.Visible = !hasBranches;
+                        first.OptionListIdentifier,
+                        first.OptionListSequence,
+                        first.OptionListTitle,
+
+                        first.SingleList,
+
+                        Options = group.Select(row => new
+                        {
+                            Letter = row.OptionItemLetter,
+                            Sequence = row.OptionItemSequence,
+                            Title = row.OptionItemTitle,
+                            row.BranchToQuestionCode,
+                            row.BranchToQuestionTitle,
+                            row.BranchToPageNumber,
+                            row.IsNotFirstQuestion,
+                            row.IsNotFollowingPage
+                        })
+                    };
+                });
+                BranchesRepeater.DataBind();
+
+                BranchesRepeater.Visible = data.Count > 0;
+                BranchesNoItemsMessage.Visible = !BranchesRepeater.Visible;
+            }
         }
 
         private void BranchesRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)

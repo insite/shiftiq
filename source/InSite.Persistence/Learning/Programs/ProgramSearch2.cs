@@ -9,7 +9,6 @@ using InSite.Application.Records.Read;
 using InSite.Domain.Records;
 
 using Shift.Common;
-using Shift.Common.Linq;
 using Shift.Constant;
 
 namespace InSite.Persistence
@@ -26,73 +25,6 @@ namespace InSite.Persistence
         public ProgramSearch2(IContentSearch contentSearch)
         {
             _contentSearch = contentSearch;
-        }
-
-        public Guid? GetGroupEnrollmentProgramId(Guid userId, Guid objectId)
-        {
-            using (var db = CreateContext())
-            {
-                return db.TTasks
-                    .Where(x =>
-                        x.ObjectIdentifier == objectId
-                        && db.TProgramGroupEnrollments
-                            .Where(y =>
-                                y.ProgramIdentifier == x.ProgramIdentifier
-                                && db.QMemberships.Where(z =>
-                                    z.GroupIdentifier == y.GroupIdentifier
-                                    && z.UserIdentifier == userId
-                                ).Any()
-                            )
-                            .Any()
-                    )
-                    .Select(x => (Guid?)x.ProgramIdentifier)
-                    .FirstOrDefault();
-            }
-        }
-
-        public bool IsTaskEnrollmentExist(Guid userId, Guid objectId)
-        {
-            using (var db = CreateContext())
-            {
-                return db.TTaskEnrollments.Where(x =>
-                    x.LearnerUserIdentifier == userId
-                    && x.ObjectIdentifier == objectId
-                ).Any();
-            }
-
-        }
-
-        public int CountProgramGroups(Guid programId, string keyword)
-        {
-            using (var db = CreateContext())
-            {
-                var query = db.TProgramGroupEnrollments.Where(x => x.ProgramIdentifier == programId);
-                if (!string.IsNullOrEmpty(keyword))
-                    query = query.Where(x => x.Group.GroupName.Contains(keyword));
-
-                return query.Count();
-            }
-        }
-
-        public List<ProgramGroup> GetProgramGroups(Guid programId, string keyword, Paging paging)
-        {
-            using (var db = CreateContext())
-            {
-                var query = db.TProgramGroupEnrollments.Where(x => x.ProgramIdentifier == programId);
-                if (!string.IsNullOrEmpty(keyword))
-                    query = query.Where(x => x.Group.GroupName.Contains(keyword));
-
-                return query
-                    .Select(x => new ProgramGroup
-                    {
-                        GroupIdentifier = x.GroupIdentifier,
-                        GroupName = x.Group.GroupName,
-                        GroupSize = x.Group.QMemberships.Count(),
-                        Added = x.Created
-                    })
-                    .ApplyPaging(paging)
-                    .ToList();
-            }
         }
 
         public List<Guid> GetProgramIds(Guid taskObjectId)

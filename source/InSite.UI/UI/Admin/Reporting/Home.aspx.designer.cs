@@ -15,31 +15,13 @@ namespace InSite.UI.Admin.Reporting
     {
 
         /// <summary>
-        /// ReportCounter control.
+        /// FrequentlyUsedReports control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ReportCounter;
-
-        /// <summary>
-        /// ReportLink control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor ReportLink;
-
-        /// <summary>
-        /// ReportCount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ReportCount;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl FrequentlyUsedReports;
 
         /// <summary>
         /// QueryCounter control.
@@ -139,6 +121,15 @@ namespace InSite.UI.Admin.Reporting
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlAnchor DatabaseQueryRow;
+
+        /// <summary>
+        /// CurrentUserSessions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CurrentUserSessions;
 
         /// <summary>
         /// CurrentSessionGrid control.

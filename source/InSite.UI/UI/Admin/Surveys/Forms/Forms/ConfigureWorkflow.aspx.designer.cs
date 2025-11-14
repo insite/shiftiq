@@ -78,15 +78,6 @@ namespace InSite.Admin.Surveys.Forms.Forms
         protected global::InSite.Common.Web.UI.FindMessage ResponseCompletedRespondentMessageIdentifier;
 
         /// <summary>
-        /// OpenIssueEnabledWarning control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel OpenIssueEnabledWarning;
-
-        /// <summary>
         /// OpenIssueEnabled control.
         /// </summary>
         /// <remarks>
@@ -96,13 +87,13 @@ namespace InSite.Admin.Surveys.Forms.Forms
         protected global::InSite.Common.Web.UI.CheckBox OpenIssueEnabled;
 
         /// <summary>
-        /// IssueWorkflowContainer control.
+        /// IssueWorkflowPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Container IssueWorkflowContainer;
+        protected global::System.Web.UI.WebControls.Panel IssueWorkflowPanel;
 
         /// <summary>
         /// IssueType control.

@@ -91,10 +91,10 @@ namespace InSite.Admin.Records.Programs.Tasks
             SaveButton.Enabled = CanEdit;
 
             if (ProgramId == Guid.Empty)
-                Search.Redirect();
+                RedirectToSearch();
 
             if (TaskId == Guid.Empty)
-                Outline.Redirect(ProgramId);
+                RedirectToOutline();
 
             if (!IsPostBack)
             {
@@ -259,6 +259,16 @@ namespace InSite.Admin.Records.Programs.Tasks
 
         #endregion
 
+        #region Methods (redirect)
+
+        private void RedirectToSearch()
+            => HttpResponseHelper.Redirect($"/ui/admin/learning/programs/search", true);
+
+        private void RedirectToOutline()
+            => HttpResponseHelper.Redirect($"/ui/admin/learning/programs/outline?id={ProgramId}", true);
+
+        #endregion
+
         #region Database operations
 
         private void Open()
@@ -278,13 +288,13 @@ namespace InSite.Admin.Records.Programs.Tasks
 
             var currentTask = ProgramSearch1.GetProgramTask(TaskId);
             if (currentTask == null)
-                Outline.Redirect(ProgramId);
+                RedirectToOutline();
 
             CurrentTaskInfo = ProgramHelper.GetTaskInfo(taskObjectData, currentTask);
 
             PageHelper.AutoBindHeader(this, null, CurrentTaskInfo.TaskTitle);
 
-            CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramId);
+            CancelButton.NavigateUrl = $"/ui/admin/learning/programs/outline?id={ProgramId}";
 
             TaskInfoContainer = taskInfoContainer;
 
@@ -363,7 +373,7 @@ namespace InSite.Admin.Records.Programs.Tasks
                 if (TaskPresentationSetup.SaveTaskImageV2())
                     HttpResponseHelper.Redirect(UrlParser.BuildRelativeUrl(Request.RawUrl, "tab", "presentation"));
 
-                Outline.Redirect(ProgramId);
+                RedirectToOutline();
             }
             catch (ApplicationError apperr)
             {

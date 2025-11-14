@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web.UI;
 
 using InSite.Application.Records.Read;
@@ -31,9 +30,9 @@ namespace InSite.Admin.Records.Programs
 
             AchievementEditor.InitDelegates(
                 Organization.Identifier,
-                (achievements) => GetAssignedAchievements(achievements),
                 null,
                 null,
+                (achievements) => BookmarkAchievements(achievements),
                 "template");
 
             if (!IsPostBack)
@@ -48,18 +47,27 @@ namespace InSite.Admin.Records.Programs
             Step3SaveButton.Click += Step3SaveButton_Click;
         }
 
-        private List<AchievementListGridItem> GetAssignedAchievements(List<AchievementListGridItem> list)
+        public List<Guid> BookmarkedAchievements
         {
-            var groupId = DepartmentIdentifier.Value;
+            get => (List<Guid>)ViewState[nameof(BookmarkedAchievements)] ?? new List<Guid>();
+            set => ViewState[nameof(BookmarkedAchievements)] = value;
+        }
 
-            var groupAchievementIds = TAchievementDepartmentSearch
-                .Bind(x => x.AchievementIdentifier, x => x.DepartmentIdentifier == groupId);
+        private int BookmarkAchievements(IEnumerable<Guid> achievements)
+        {
+            var list = new List<Guid>();
 
-            var assignedAchievementIds = groupAchievementIds.Select(x => x).ToList();
+            foreach (var achievement in BookmarkedAchievements)
+                list.Add(achievement);
 
-            return list
-                .Where(x => assignedAchievementIds.Contains(x.AchievementIdentifier))
-                .ToList();
+            foreach (var achievement in achievements)
+                list.Add(achievement);
+
+            BookmarkedAchievements = list;
+
+            Step2NextButton_Click(this, new EventArgs());
+
+            return BookmarkedAchievements.Count;
         }
 
         private void ProgramTypeChanged()
@@ -113,7 +121,7 @@ namespace InSite.Admin.Records.Programs
             ProgramStore.Insert(program, User.Identifier);
             InsertContent(program);
 
-            Outline.Redirect(programId);
+            HttpResponseHelper.Redirect($"/ui/admin/learning/programs/outline?id={programId}");
         }
 
         private void InsertContent(TProgram program)
@@ -131,7 +139,7 @@ namespace InSite.Admin.Records.Programs
             Step2Section.Visible = true;
             Step2Section.IsSelected = true;
 
-            AchievementEditor.SetEditable(false, true);
+            AchievementEditor.SetEditable(true, false);
             AchievementEditor.LoadAchievements(GroupByEnum.Type);
         }
 
@@ -143,9 +151,7 @@ namespace InSite.Admin.Records.Programs
             Step3Section.Visible = true;
             Step3Section.IsSelected = true;
 
-            var achievementIds = AchievementEditor.GetSelectedAchievements();
-
-            TaskGrid.BindModelToControls(achievementIds);
+            TaskGrid.BindModelToControls(BookmarkedAchievements);
         }
 
         private void Step3SaveButton_Click(object sender, EventArgs e)
@@ -155,13 +161,13 @@ namespace InSite.Admin.Records.Programs
 
             var achievements = TaskGrid.GetAchievements();
 
-            var programId = UniqueIdentifier.Create();
+            var listIdentifier = UniqueIdentifier.Create();
             var list = new TProgram
             {
                 GroupIdentifier = DepartmentIdentifier.Value,
                 OrganizationIdentifier = Organization.Identifier,
                 ProgramDescription = ProgramDescription.Text,
-                ProgramIdentifier = programId,
+                ProgramIdentifier = listIdentifier,
                 ProgramName = ProgramName.Text,
                 ProgramType = ProgramType.Checked ? "Achievements Only" : null,
                 Tasks = new List<TTask>()
@@ -174,7 +180,7 @@ namespace InSite.Admin.Records.Programs
                     ObjectType = "Achievement",
                     ObjectIdentifier = achievement.AchievementIdentifier,
                     OrganizationIdentifier = Organization.Identifier,
-                    ProgramIdentifier = programId,
+                    ProgramIdentifier = listIdentifier,
                     TaskCompletionRequirement = "Credential Granted",
                     TaskIdentifier = UniqueIdentifier.Create(),
                     TaskIsPlanned = achievement.IsPlanned,
@@ -189,7 +195,7 @@ namespace InSite.Admin.Records.Programs
 
             NavPanel.Visible = false;
 
-            Outline.Redirect(programId);
+            HttpResponseHelper.Redirect($"/ui/admin/learning/programs/outline?id={listIdentifier}");
         }
     }
 }

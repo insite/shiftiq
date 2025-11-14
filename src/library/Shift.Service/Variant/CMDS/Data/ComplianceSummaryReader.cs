@@ -92,7 +92,7 @@ public class ComplianceSummaryReader
 
     private Guid[] GetUsersInDepartments(Guid[] departments)
     {
-        if (departments == null)
+        if (departments == null || departments.Length == 0)
             return Array.Empty<Guid>();
 
         var csv = string.Empty;

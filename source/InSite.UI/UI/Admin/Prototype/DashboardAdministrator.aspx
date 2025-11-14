@@ -234,6 +234,15 @@
                     </div>
 
                     <div class="col">
+                        <a class="card card-hover card-tile border-1 shadow" href="/ui/admin/jobs/home">
+                            <div class="card-body text-center">
+                                <span id="ctl00_ctl00_BodyContent_BodyContent_ctl02_ToolkitRepeater_ctl05_CardIcon"><i class="far fa-user-hard-hat fa-3x mb-3"></i></span>
+                                <h3 class="h5 text-nowrap nav-heading mb-2 ">Jobs</h3>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col">
                         <a class="card card-hover card-tile border-1 shadow" href="/ui/admin/messages/home">
                             <div class="card-body text-center">
                                 <span id="ctl00_ctl00_BodyContent_BodyContent_ctl02_ToolkitRepeater_ctl06_CardIcon"><i class="fas fa-paper-plane fa-3x mb-3"></i></span>

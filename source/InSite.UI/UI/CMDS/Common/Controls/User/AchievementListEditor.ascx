@@ -3,9 +3,9 @@
 <%@ Register TagPrefix="uc" TagName="AchievementListGrid" Src="~/UI/CMDS/Common/Controls/User/AchievementListGrid.ascx" %>
 <%@ Register TagPrefix="uc" TagName="AchievementListGroup" Src="~/UI/CMDS/Common/Controls/User/AchievementListGroup.ascx" %>
 
-<insite:UpdatePanel runat="server" ID="CriteriaUpdatePanel">
 
-    <ContentTemplate>
+
+
 
         <div class="input-group mb-3">
             <insite:TextBox runat="server" ID="SearchText" />
@@ -81,9 +81,9 @@
 
 </insite:Nav>
 
-    </ContentTemplate>
 
-</insite:UpdatePanel>
+
+
 
 <insite:PageFooterContent runat="server">
     <script type="text/javascript">

@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
+using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Contract;
-
-using Shift.Common;
 
 namespace Shift.Service.Metadata;
 
@@ -14,8 +13,8 @@ public class TActionReader : IEntityReader
 
     public TActionReader(IDbContextFactory<TableDbContext> context, TActionAdapter adapter)
     {
-        _context = context;
-        _adapter = adapter;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _adapter = adapter ?? throw new ArgumentNullException(nameof(adapter));
     }
 
     public async Task<bool> AssertAsync(Guid action, CancellationToken cancellation = default)
@@ -26,9 +25,7 @@ public class TActionReader : IEntityReader
             .AnyAsync(x => x.ActionIdentifier == action, cancellation);
     }
 
-    public async Task<IEnumerable<TActionEntity>> DownloadAsync(
-        IActionCriteria criteria,
-        CancellationToken cancellation = default)
+    public async Task<IEnumerable<TActionEntity>> DownloadAsync(IActionCriteria criteria, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 

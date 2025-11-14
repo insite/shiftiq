@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace InSite.Admin.Records.Programs
+namespace InSite.UI.Admin.Records.Programs
 {
 
 

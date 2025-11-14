@@ -210,7 +210,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         private void LoadEmployees()
         {
             _employees = Department.Value.HasValue
-                ? ContactRepository3.SelectEmployeesByDepartmentId(Department.Value.Value)
+                ? ContactRepository3.SelectEmployeesByDepartmentID(Department.Value.Value)
                 : ContactRepository3.SelectEmployeesByOrganizationIdentifier(CurrentIdentityFactory.ActiveOrganizationIdentifier);
 
             _employeeMap = new Dictionary<Guid, int>();

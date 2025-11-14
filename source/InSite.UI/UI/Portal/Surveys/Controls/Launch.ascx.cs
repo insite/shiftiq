@@ -12,7 +12,6 @@ using InSite.Application.Surveys.Read;
 using InSite.Common.Web;
 using InSite.Domain.Surveys.Forms;
 using InSite.Portal.Surveys.Pages;
-using InSite.UI.Admin.Records.Programs.Utilities;
 
 using Shift.Common;
 using Shift.Constant;
@@ -188,8 +187,6 @@ namespace InSite.Portal.Surveys.Responses
 
         public static ICommand[] BuildCommandScript(string source, Guid session, SurveyForm form, Guid user)
         {
-            ProgramHelper.EnrollLearnerByObjectId(form.Tenant, user, form.Identifier);
-
             var script = new List<ICommand>
             {
                 new CreateResponseSession(session, source, form.Tenant, form.Identifier, user)

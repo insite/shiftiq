@@ -6,7 +6,7 @@
         <div id="toolbox" class="toolbox-section">
             <h4>Criteria</h4>
             <div class="row">
-                <div class="col-6">
+                <div class="col-12">
                     <div class="mb-2">
                         <insite:TextBox ID="ProductName" runat="server" EmptyMessage="Product Name" MaxLength="256" />
                     </div>
@@ -23,12 +23,7 @@
                         <insite:FilterButton runat="server" ID="SearchButton" />
                         <insite:ClearButton runat="server" ID="ClearButton" />
                     </div>
-                </div>    
-                <div class="col-6">
-                    <div class="mb-2">
-                        <insite:BooleanComboBox ID="ProductPublishedStatus" runat="server" EmptyMessage="Publication" TrueText="Published" FalseText="Unpublished" AllowBlank="true"/>
-                    </div>
-                </div>
+                </div>                
             </div> 
         </div>
     </div>

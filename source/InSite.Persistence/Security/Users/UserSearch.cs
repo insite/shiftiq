@@ -963,6 +963,29 @@ order by U.FullName
             }
         }
 
+        private static readonly Func<Person, bool>[] CompletionResumeChecks = new Func<Person, bool>[]
+        {
+            (c) => c.User.CandidateExperiences.Count > 0,
+            (c) => c.User.CandidateEducations.Count > 0,
+            (c) => c.User.PersonFields.Count(x => x.OrganizationIdentifier == c.OrganizationIdentifier && x.FieldName == "Industry Interest Area") > 0,
+            (c) => TCandidateLanguageProficiencySearch.Exists(c.UserIdentifier, c.OrganizationIdentifier),
+            (c) => c.CandidateIsActivelySeeking != null
+        };
+
+        public static int? GetCompletionResumePercent(Guid organizationId, Guid userId)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var contact = db.Persons.FirstOrDefault(x => x.OrganizationIdentifier == organizationId && x.UserIdentifier == userId);
+                if (contact == null)
+                    return null;
+
+                var checksCompleted = CompletionResumeChecks.Where(f => f(contact)).Count();
+
+                return (100 * checksCompleted) / CompletionResumeChecks.Length;
+            }
+        }
+
         public static string GetCompletionStatus(int percent)
         {
             if (percent <= 30) return "danger";

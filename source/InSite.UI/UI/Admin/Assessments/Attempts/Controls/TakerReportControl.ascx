@@ -33,7 +33,6 @@
             font-weight: bold;
             font-size: x-large;
             margin-bottom: 12px;
-            color: #000;
         }
 
         table.data {
@@ -52,13 +51,13 @@
         }
 
         table.data tr th {
-            background-color: #b9cfd9;
+            background-color: #C9DBE1;
             font-weight: bold;
             text-align: left;
         }
 
         table.data tr + tr th {
-            background-color: #d5e1e7;
+            background-color: #E7EEF1;
         }
 
         table.info td {
@@ -150,21 +149,25 @@
             <table class="data results">
                 <thead>
                     <tr>
-                        <th colspan="2"><%# Translate("Exam Results") %></th>
+                        <th colspan="4"><%# Translate("Exam Results") %></th>
                     </tr>
                     <tr>
                         <th><%# Translate("Field of Practice") %></th>
-                        <th><%# Translate("Exam Result") %></th>
+                        <th><%# Translate("Minimum Required Score") %></th>
+                        <th><%# Translate("Applicant Score") %></th>
+                        <th><%# Translate("Pass or Fail") %></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr runat="server" id="NoDataRow">
-                        <td colspan="2"><%# Translate("No scores") %></td>
+                        <td colspan="4"><%# Translate("No scores") %></td>
                     </tr>
                     <asp:Repeater runat="server" ID="FrameworkRepeater">
                         <ItemTemplate>
                             <tr>
                                 <td><%# Eval("FrameworkTitle") %></td>
+                                <td><%# Eval("PassingScore") %></td>
+                                <td><%# Eval("Score") %></td>
                                 <td><%# Eval("PassOrFail") %></td>
                             </tr>
                         </ItemTemplate>
@@ -172,7 +175,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2">
+                        <td colspan="4">
                             <b><%# Translate("Exam Passing Criteria") %>:</b>
                             <%# Translate("TakerReport.ExamPassingCriteria") %>
                         </td>

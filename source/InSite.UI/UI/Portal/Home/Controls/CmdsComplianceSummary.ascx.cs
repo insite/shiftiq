@@ -152,24 +152,28 @@ namespace InSite.UI.Portal.Home.Controls
             var copItem = new SummaryDataItem
             {
                 Title = AchievementTypes.Pluralize(AchievementTypes.CodeOfPractice, organization.Code),
+                ProgressText = "0 out of 0 completed",
                 ProgressUrl = string.Format("/ui/portal/learning/plan?userID={0}&achievementType={1}", employeeId,
                     HttpUtility.UrlEncode(AchievementTypes.CodeOfPractice))
             };
             var sopItem = new SummaryDataItem
             {
                 Title = AchievementTypes.Pluralize(AchievementTypes.SafeOperatingPractice, organization.Code),
+                ProgressText = "0 out of 0 completed",
                 ProgressUrl = string.Format("/ui/portal/learning/plan?userID={0}&achievementType={1}", employeeId,
                     HttpUtility.UrlEncode(AchievementTypes.SafeOperatingPractice))
             };
             var hrdItem = new SummaryDataItem
             {
                 Title = AchievementTypes.Pluralize(AchievementTypes.HumanResourcesDocument, organization.Code),
+                ProgressText = "0 out of 0 completed",
                 ProgressUrl = string.Format("/ui/portal/learning/plan?userID={0}&achievementType={1}", employeeId,
                     HttpUtility.UrlEncode(AchievementTypes.HumanResourcesDocument))
             };
             var hrmItem = new SummaryDataItem
             {
                 Title = AchievementTypes.Pluralize(AchievementTypes.HumanResourcesModule, organization.Code),
+                ProgressText = "0 out of 0 completed",
                 ProgressUrl = string.Format("/ui/portal/learning/plan?userID={0}&achievementType={1}", employeeId,
                     HttpUtility.UrlEncode(AchievementTypes.HumanResourcesModule))
             };

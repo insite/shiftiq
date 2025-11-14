@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 using Newtonsoft.Json;
 
@@ -8,14 +7,6 @@ using Shift.Common;
 
 namespace InSite.Common.Web.UI
 {
-    public enum DatePreset
-    {
-        None,
-        SinceStartOfDay,   
-        BeforeEndOfDay     
-    }
-
-
     public class DateTimeOffsetSelector : BaseDateTimeSelector<DateTimeOffset?>
     {
         #region Classes
@@ -110,14 +101,6 @@ namespace InSite.Common.Web.UI
             set => ViewState[nameof(ApplyUserTimezone)] = value;
         }
 
-        [Browsable(true)]
-        [DefaultValue(DatePreset.SinceStartOfDay)]
-        public DatePreset Preset
-        {
-            get => (DatePreset?)ViewState[nameof(Preset)] ?? DatePreset.SinceStartOfDay;
-            set => ViewState[nameof(Preset)] = value;
-        }
-
         public override DateTimeOffset? Value
         {
             get
@@ -163,20 +146,6 @@ namespace InSite.Common.Web.UI
             result.ShowTime = true;
             result.ShowTimeZone = true;
 
-
-            var presetExplicitlySet = ViewState[nameof(Preset)] != null;
-            var effective = Preset;
-
-            if (!presetExplicitlySet && ID != null)
-            {
-                var id = ID.ToLowerInvariant();
-                if (id.Contains("before"))
-                    effective = DatePreset.BeforeEndOfDay;
-                else if (id.Contains("since"))
-                    effective = DatePreset.SinceStartOfDay;
-            }
-
-            result.Preset = (effective == DatePreset.BeforeEndOfDay) ? "before" : "since";
             return result;
         }
 

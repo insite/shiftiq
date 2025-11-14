@@ -8,7 +8,7 @@
 
 <asp:Content ContentPlaceHolderID="BodyContent" runat="server">
   
-    <section class="pb-5 mb-md-2">
+    <section runat="server" id="FrequentlyUsedReports" class="pb-5 mb-md-2">
 
         <h2 class="h4 mb-3">Frequently used reports</h2>
 
@@ -16,16 +16,6 @@
             <div class="card-body">
 
                 <div class="row row-cols-1 row-cols-lg-4 g-4">
-
-                    <div runat="server" id="ReportCounter" class="col">
-                        <a runat="server" id="ReportLink" class="card card-hover card-tile border-0 shadow" href='#'>
-                            <span class="badge badge-floating badge-pill bg-primary"><asp:Literal runat="server" ID="ReportCount" /></span>
-                            <div class="card-body text-center">
-                                <i class='far fa-file-search fa-3x mb-3'></i>
-                                <h3 class='h5 nav-heading mb-2 text-break'>My Searches</h3>
-                            </div>
-                        </a>
-                    </div>
 
                     <div class="col">
                         <a class="card card-hover card-tile border-0 shadow" href='/ui/admin/reports/dashboards'>
@@ -72,8 +62,8 @@
 
                <div class="row mt-4">
                     <div class="col-lg-12">
-                        <a href="/ui/admin/reports/build"><i class="far fa-fw fa-file-alt me-1"></i>Build a custom report</a>
                         <a runat="server" id="DatabaseQueryRow" href="/ui/admin/reports/queries/sql"><i class="far fa-fw fa-database me-1 ms-2"></i>Run a dynamic SQL query</a>
+                        <a href="/ui/admin/reports/build"><i class="far fa-fw fa-file-alt me-1"></i>Build a custom report</a>
                     </div>
                 </div>
 
@@ -81,7 +71,7 @@
         </div>
     </section>
 
-    <section class="pb-5 mb-md-2">
+    <section runat="server" id="CurrentUserSessions" class="pb-5 mb-md-2">
         <h2 class="h4 mb-3">Current user sessions</h2>
         <div class="card border-0 shadow-lg">
             <div class="card-body">

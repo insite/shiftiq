@@ -87,24 +87,6 @@ namespace InSite.Cmds.Admin.Records.Programs
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl LearnersPanel;
 
         /// <summary>
-        /// NoLearnersPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl NoLearnersPanel;
-
-        /// <summary>
-        /// LearnersRepeater control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater LearnersRepeater;
-
-        /// <summary>
         /// SelectAllLearnersButton control.
         /// </summary>
         /// <remarks>
@@ -123,6 +105,24 @@ namespace InSite.Cmds.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.Button UnselectAllLearnersButton;
 
         /// <summary>
+        /// NoLearnersPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl NoLearnersPanel;
+
+        /// <summary>
+        /// LearnersRepeater control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater LearnersRepeater;
+
+        /// <summary>
         /// AssignStrategy_NoChange control.
         /// </summary>
         /// <remarks>
@@ -132,24 +132,6 @@ namespace InSite.Cmds.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.RadioButton AssignStrategy_NoChange;
 
         /// <summary>
-        /// AssignStrategy_PlanAndRequire control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.RadioButton AssignStrategy_PlanAndRequire;
-
-        /// <summary>
-        /// AssignStrategy_PlanAndRecommend control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.RadioButton AssignStrategy_PlanAndRecommend;
-
-        /// <summary>
         /// AssignStrategy_Unplan control.
         /// </summary>
         /// <remarks>
@@ -157,6 +139,15 @@ namespace InSite.Cmds.Admin.Records.Programs
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.RadioButton AssignStrategy_Unplan;
+
+        /// <summary>
+        /// AssignStrategy_Unassign control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.RadioButton AssignStrategy_Unassign;
 
         /// <summary>
         /// Step1NextButton control.

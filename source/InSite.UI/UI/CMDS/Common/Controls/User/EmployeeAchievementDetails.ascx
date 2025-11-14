@@ -214,7 +214,7 @@
                             Institution Name
                         </label>
                         <div>
-                            <insite:TextBox ID="AccreditorName" runat="server" MaxLength="256" />
+                            <insite:TextBox ID="AccreditorName" runat="server" MaxLength="50" />
                         </div>
                     </div>
                     <div class="form-group mb-3">

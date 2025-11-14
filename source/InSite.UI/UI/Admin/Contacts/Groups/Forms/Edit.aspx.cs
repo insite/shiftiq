@@ -25,6 +25,7 @@ namespace InSite.Admin.Contacts.Groups.Forms
         #region Constants
 
         private const string GroupSearchUrl = "/ui/admin/contacts/groups/search";
+        private const string EmployerSearchUrl = "/ui/admin/jobs/employers/search";
 
         #endregion
 
@@ -535,7 +536,7 @@ namespace InSite.Admin.Contacts.Groups.Forms
             => GetParent();
 
         protected override string GetReturnUrl()
-            => GroupSearchUrl;
+            => IsEmployer ? EmployerSearchUrl : GroupSearchUrl;
 
         #endregion
 

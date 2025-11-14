@@ -15,15 +15,6 @@ namespace InSite.UI.CMDS.Common.Controls.User
     {
 
         /// <summary>
-        /// CriteriaUpdatePanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.UpdatePanel CriteriaUpdatePanel;
-
-        /// <summary>
         /// SearchText control.
         /// </summary>
         /// <remarks>

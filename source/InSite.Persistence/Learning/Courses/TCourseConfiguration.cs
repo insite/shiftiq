@@ -23,7 +23,7 @@ namespace InSite.Persistence
             Property(x => x.CourseIsHidden).IsRequired();
             Property(x => x.CourseLabel).IsOptional().IsUnicode(false).HasMaxLength(20);
             Property(x => x.CourseLevel).IsOptional().IsUnicode(false).HasMaxLength(50);
-            Property(x => x.CourseName).IsRequired().IsUnicode(false).HasMaxLength(100);
+            Property(x => x.CourseName).IsRequired().IsUnicode(false).HasMaxLength(200);
             Property(x => x.CourseProgram).IsOptional().IsUnicode(false).HasMaxLength(50);
             Property(x => x.CourseSequence).IsOptional();
             Property(x => x.CourseSlug).IsOptional().IsUnicode(false).HasMaxLength(100);

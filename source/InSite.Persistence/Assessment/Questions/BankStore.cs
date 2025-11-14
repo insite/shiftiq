@@ -514,8 +514,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
                 var form = bank.FindForm(e.Form);
                 var summary = db.BankForms.Single(x => x.FormIdentifier == e.Form);
-
-                UpdateFormCounts(form, summary);
+                summary.FieldCount = form.Sections.Sum(x => x.Fields.Count);
 
                 var dbFieldType = CommentType.Field.GetName();
                 var dbQuestionType = CommentType.Question.GetName();
@@ -830,8 +829,6 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                         .SelectMany(x => x.EnumerateAllVersions())
                         .Where(x => x.Identifier != e.Question));
                 SyncQuestionSubCompetencies(db, question);
-
-                UpdateFormCounts(db, bank);
             });
         }
 
@@ -889,8 +886,6 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                 SyncQuestionSubCompetencies(db, question);
 
                 InsertOptions(db, bank, question.Options);
-
-                UpdateFormCounts(db, bank);
             });
         }
 
@@ -1062,8 +1057,6 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
             foreach (var oQuery in db.BankOptions.Where(x => x.QuestionIdentifier == question.Identifier).ToArray())
                 oQuery.CompetencyIdentifier = null;
-
-            UpdateFormCounts(db, bank);
         });
 
         public void Update(QuestionMovedIn e) => UpdateCursor(e, (db, bank) =>
@@ -1113,8 +1106,6 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                     BindCommentQuery(query, bank, comment);
                     db.QComments.Add(query);
                 }
-
-                UpdateFormCounts(db, bank);
             }
         });
 
@@ -1170,7 +1161,12 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
         private void OnQuestionRemoved(InternalDbContext db, BankState bank, Guid? questionId)
         {
-            UpdateFormCounts(db, bank);
+            foreach (var form in bank.Specifications.SelectMany(x => x.EnumerateAllForms()))
+            {
+                var summary = db.BankForms.Single(x => x.FormIdentifier == form.Identifier);
+                summary.SectionCount = form.Sections.Count;
+                summary.FieldCount = form.Sections.Sum(x => x.Fields.Count);
+            }
 
             if (questionId.HasValue)
             {
@@ -1221,8 +1217,6 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
             foreach (var oQuery in db.BankOptions.Where(x => questionIds.Contains(x.QuestionIdentifier)).ToArray())
                 oQuery.CompetencyIdentifier = null;
-
-            UpdateFormCounts(db, bank);
         });
 
 
@@ -1286,8 +1280,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             {
                 var form = bank.FindForm(e.Form);
                 var summary = db.BankForms.Single(x => x.FormIdentifier == form.Identifier);
-
-                UpdateFormCounts(form, summary);
+                summary.SectionCount = form.Sections.Count;
+                summary.FieldCount = form.Sections.Sum(x => x.Fields.Count);
             });
         }
 
@@ -1297,7 +1291,18 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             {
                 SyncGradeItems(db, bank);
 
-                UpdateFormCounts(db, bank);
+                foreach (var form in bank.Specifications.SelectMany(x => x.EnumerateAllForms()))
+                {
+                    var sectionCount = form.Sections.Count;
+                    var fieldCount = form.Sections.Sum(x => x.Fields.Count);
+                    var summary = db.BankForms.Single(x => x.FormIdentifier == form.Identifier);
+
+                    if (sectionCount != summary.SectionCount || fieldCount != summary.FieldCount)
+                    {
+                        summary.SectionCount = form.Sections.Count;
+                        summary.FieldCount = form.Sections.Sum(x => x.Fields.Count);
+                    }
+                }
             });
         }
 
@@ -1333,7 +1338,12 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
         {
             UpdateCursor(e, (db, bank) =>
             {
-                UpdateFormCounts(db, bank);
+                foreach (var formSummary in db.BankForms.Where(x => x.BankIdentifier == bank.Identifier))
+                {
+                    var form = bank.FindForm(formSummary.SpecIdentifier, formSummary.FormIdentifier);
+                    formSummary.SectionCount = form.Sections.Count;
+                    formSummary.FieldCount = form.Sections.Sum(x => x.Fields.Count);
+                }
 
                 var specs = db.BankSpecifications.Where(x => x.BankIdentifier == bank.Identifier);
                 foreach (var spec in specs)
@@ -1398,7 +1408,6 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                 var spec = db.BankSpecifications.Single(x => x.SpecIdentifier == e.Specification);
 
                 UpdateCounts(spec, bank);
-                UpdateFormCounts(db, bank);
             });
         }
 
@@ -1412,7 +1421,12 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             {
                 SyncGradeItems(db, bank);
 
-                UpdateFormCounts(db, bank);
+                foreach (var formSummary in db.BankForms.Where(x => x.BankIdentifier == bank.Identifier))
+                {
+                    var form = bank.FindForm(formSummary.SpecIdentifier, formSummary.FormIdentifier);
+                    formSummary.SectionCount = form.Sections.Count;
+                    formSummary.FieldCount = form.Sections.Sum(x => x.Fields.Count);
+                }
 
                 foreach (var spec in db.BankSpecifications.Where(x => x.BankIdentifier == bank.Identifier))
                     UpdateCounts(spec, bank);
@@ -1557,17 +1571,6 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
         #endregion
 
         #region Methods (other)
-
-        public void SyncFormCounts(BankState bank)
-        {
-            using (var db = CreateContext())
-            {
-                UpdateFormCounts(db, bank);
-
-                db.SaveChanges();
-            }
-        }
-
 
         private void SyncQuestionAttachments(InternalDbContext db, Question question)
         {
@@ -1897,7 +1900,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
             query.OrganizationIdentifier = bank.Tenant;
 
-            UpdateFormCounts(form, query);
+            query.SectionCount = form.Sections.Count;
+            query.FieldCount = form.Sections.Sum(x => x.Fields.Count);
 
             query.GradebookIdentifier = form.Gradebook;
 
@@ -2038,49 +2042,6 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
             query.EventStarted = comment.EventDate;
             query.EventFormat = comment.EventFormat;
-        }
-
-        private static void UpdateFormCounts(InternalDbContext db, BankState bank)
-        {
-            if (bank.Specifications == null)
-                return;
-
-            var forms = bank.Specifications.SelectMany(x => x.EnumerateAllForms());
-            var queryForms = db.BankForms.Where(x => x.BankIdentifier == bank.Identifier).ToList();
-
-            foreach (var form in forms)
-            {
-                var queryForm = queryForms.FirstOrDefault(x => x.FormIdentifier == form.Identifier);
-                if (queryForm != null)
-                    UpdateFormCounts(form, queryForm);
-            }
-        }
-
-        private static void UpdateFormCounts(Form form, QBankForm queryForm)
-        {
-            int sectionCount, fieldCount;
-
-            switch (form.Specification.Type)
-            {
-                case SpecificationType.Static:
-                    sectionCount = form.Sections.Count;
-                    fieldCount = form.Sections.Sum(x => x.Fields.Count);
-                    break;
-                case SpecificationType.Dynamic:
-                    sectionCount = form.Specification.Criteria.Count > 0 ? form.Specification.Criteria.Count : 1;
-                    fieldCount = form.Specification.Criteria.Count > 0
-                        ? form.Specification.Criteria.SelectMany(x => x.Sets.SelectMany(y => y.Questions)).Count()
-                        : form.Specification.Bank.Sets.SelectMany(x => x.Questions).Count();
-                    break;
-                default:
-                    throw new ArgumentException($"Unknown specification type: {form.Specification.Type}");
-            }
-
-            if (sectionCount != queryForm.SectionCount || fieldCount != queryForm.FieldCount)
-            {
-                queryForm.SectionCount = sectionCount;
-                queryForm.FieldCount = fieldCount;
-            }
         }
 
         #endregion

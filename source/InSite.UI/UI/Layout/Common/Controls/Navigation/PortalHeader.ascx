@@ -27,82 +27,31 @@
                 </div>
                 <div class="offcanvas-body">
                     <ul class="navbar-nav p-0">
-                        <li runat="server" id="CmdsHomeItem" visible="false" class="nav-item fs-sm">
+                        <li runat="server" id="CmdsHomeItem" visible="false" class="nav-item">
                             <a runat="server" id="CmdsHomeLink" class="nav-link" href="#">
-                                <i class="fa-fw fa-regular fa-home me-1"></i>
+                                <i class="fas fa-fw fa-home me-2"></i>
                                 CMDS
                             </a>
                         </li>
-                        <li runat="server" id="PortalHomeItem" class="nav-item fs-sm">
+                        <li runat="server" id="PortalHomeItem" class="nav-item">
                             <a runat="server" id="PortalHomeLink" class="nav-link" href="/ui/portal/home">
-                                <i class="fa-fw fa-regular fa-chalkboard-user me-1"></i>
-                                <%= Translate("Portal") %>
+                                <i class="fas fa-fw fa-home me-2"></i>
+                                <%= Translate("Home") %>
                             </a>
                         </li>
-                        <li runat="server" id="AdminMenu" class="nav-item dropdown fs-sm">
-
-                            <a runat="server" id="AdminMenuAnchor" href="#" class="nav-link dropdown-toggle"
-                                data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fa-fw far fa-grid-round me-1"></i><%= Translate("Admin") %></a>
-
-                            <div class="dropdown-menu dropdown-menu-end p-0">
-                                <div class="d-lg-flex">
-                                    <div class="mega-dropdown-column pt-1 pt-lg-3 pb-lg-4">
-
-                                        <ul class="list-unstyled mb-0">
-                                            <li><span class="fs-lg ms-3 text-info">Communication</span></li>
-                                            <li><a runat="server" id="A1" class="dropdown-item" href="/ui/admin/home"><i class="me-1 fa-fw far fa-grid-round"></i>Toolkits (Apps)</a></li>
-                                            <li><a runat="server" id="AdminContactsLink" class="dropdown-item" href="/ui/admin/contacts/home"><i class="me-1 fa-fw far fa-file-chart-line"></i>Contacts</a></li>
-                                            <li><a runat="server" id="AdminMessagesLink" class="dropdown-item" href="/ui/admin/messages/home"><i class="me-1 fa-fw far fa-paper-plane"></i>Messages</a></li>
-                                            <li><a runat="server" id="AdminSitesLink" class="dropdown-item" href="/ui/admin/sites/home"><i class="me-1 fa-fw far fa-clouds"></i>Sites</a></li>
-                                            <li><a runat="server" id="AdminSurveysLink" class="dropdown-item" href="/ui/admin/surveys/home"><i class="me-1 fa-fw far fa-check-square"></i>Surveys</a></li>
-                                        </ul>
-
-                                    </div>
-                                    <div class="mega-dropdown-column pb-2 pt-lg-3 pb-lg-4">
-
-                                        <ul class="list-unstyled mb-0">
-                                            <li><span class="fs-lg ms-3 text-info">Learning</span></li>
-                                            <li><a runat="server" id="CmdsAssessmentsLink" class="dropdown-item" href="/ui/admin/assessments/home"><i class="me-1 fa-fw far fa-balance-scale"></i>Assessments</a></li>
-                                            <li><a runat="server" id="CmdsCoursesLink" class="dropdown-item" href="/ui/admin/courses/home"><i class="me-1 fa-fw far fa-users-class"></i>Courses</a></li>
-                                            <li><a runat="server" id="CmdsEventsLink" class="dropdown-item" href="/ui/admin/events/home"><i class="me-1 fa-fw far fa-calendar-alt"></i>Events</a></li>
-                                            <li><a runat="server" id="CmdsRecordsLink" class="dropdown-item" href="/ui/admin/records/home"><i class="me-1 fa-fw far fa-pencil-ruler"></i>Records</a></li>
-                                            <li><a runat="server" id="AdminStandardsLink" class="dropdown-item" href="/ui/admin/standards/home"><i class="me-1 fa-fw far fa-ruler-triangle"></i>Standards</a></li>
-                                        </ul>
-
-                                    </div>
-                                    <div class="mega-dropdown-column pb-2 pt-lg-3 pb-lg-4">
-
-                                        <ul class="list-unstyled mb-0">
-                                            <li><span class="fs-lg ms-3 text-info">Management</span></li>
-                                            <li><a runat="server" id="AdminAssetsLink" class="dropdown-item" href="/ui/admin/assets/home"><i class="me-1 fa-fw far fa-inventory"></i>Assets</a></li>
-                                            <li><a runat="server" id="AdminReportsLink" class="dropdown-item" href="/ui/admin/reporting"><i class="me-1 fa-fw far fa-file-chart-line"></i>Reports</a></li>
-                                            <li><a runat="server" id="AdminSalesLink" class="dropdown-item" href="/ui/admin/sales/home"><i class="me-1 fa-fw far fa-file-invoice-dollar"></i>Sales</a></li>
-                                            <li><a runat="server" id="AdminWorkflowsLink" class="dropdown-item" href="/ui/admin/workflow/home"><i class="me-1 fa-fw far fa-arrow-progress"></i>Workflows</a></li>
-                                        </ul>
-
-                                    </div>
-                                    <div runat="server" id="AdminMenuUtilities" class="mega-dropdown-column pb-2 pt-lg-3 pb-lg-4">
-
-                                        <ul class="list-unstyled mb-0">
-                                            <li><span class="fs-lg ms-3 text-info">Utilities</span></li>
-                                            <li><a runat="server" id="AdminSetupLink" class="dropdown-item" href="/ui/admin/setup/home" visible="false"><i class="me-1 fa-fw far fa-cogs"></i>Platform</a></li>
-                                            <li><a runat="server" id="AdminSecurityLink" class="dropdown-item" href="/ui/admin/security/home" visible="false"><i class="me-1 fa-fw far fa-shield"></i>Security</a></li>
-                                            <li><a runat="server" id="AdminTimelineLink" class="dropdown-item" href="/ui/admin/timeline/home" visible="false"><i class="me-1 fa-fw far fa-timer"></i>Timeline</a></li>
-                                            <li><a runat="server" id="AdminIntegrationLink" class="dropdown-item" href="/ui/admin/integration/home" visible="false"><i class="me-1 fa-fw far fa-plug"></i>Integration</a></li>
-                                        </ul>
-
-                                    </div>
-                                </div>
-                            </div>
-
+                        <li runat="server" id="AdminHomeItem" class="nav-item">
+                            <a runat="server" id="AdminHomeLink" class="nav-link" href="/ui/admin/home">
+                                <i class="fas fa-fw fa-building me-2"></i>
+                                <%= Translate("Admin") %>
+                            </a>
                         </li>
-                        <li runat="server" id="ImpersonatorItem" class="nav-item fs-sm">
+                        <li runat="server" id="ImpersonatorItem" class="nav-item">
                             <a class="nav-link text-warning" href="/ui/portal/identity/impersonate">
-                                <i class="fa-fw fa-regular fa-user-secret me-1"></i>
+                                <i class="fas fa-fw fa-user-secret me-2"></i>
                                 <asp:Literal runat="server" ID="ImpersonatorName" />
                             </a>
                         </li>
-                        <li runat="server" id="CartItem" class="nav-item fs-sm pe-2" visible="false">
+                        <li runat="server" id="CartItem" class="nav-item pe-2" visible="false">
                             <a runat="server" id="CartLink" class="nav-link position-relative" href="#">
                             <i class="fas fa-shopping-cart fs-5"></i>
 
@@ -111,12 +60,12 @@
                                     visible="false">0</span>
                             </a>
                         </li>
-                        <li runat="server" id="UserNavItem" class="nav-item fs-sm dropdown">
+                        <li runat="server" id="UserNavItem" class="nav-item dropdown">
                             <uc:UserNavMenu runat="server" ID="UserNav"/>
                         </li>
-                        <li runat="server" id="HelpMenuItem" class="nav-item fs-sm dropdown">
+                        <li runat="server" id="HelpMenuItem" class="nav-item dropdown">
     
-                            <a runat="server" id="HelpMenuAnchor" href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fa-fw fa-regular fa-question-circle me-1"></i>Help</a>
+                            <a runat="server" id="HelpMenuAnchor" href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fas fa-question-circle me-2"></i>Help</a>
 
                             <ul class="dropdown-menu">
                                 <insite:Container runat="server" ID="ResourcesGroupContainer">
@@ -130,15 +79,15 @@
                             </ul>
 
                         </li>
-                        <li runat="server" id="LoginItem" class="nav-item fs-sm" visible="false">
+                        <li runat="server" id="LoginItem" class="nav-item" visible="false">
                             <a runat="server" id="LoginLink" class="nav-link" href="#">
-                                <i class="fa-fw fa-regular fa-sign-in-alt me-1"></i>Login
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
                             </a>
                         </li>
-                        <li runat="server" id="LanguageItem" class="nav-item fs-sm dropdown">
+                        <li runat="server" id="LanguageItem" class="nav-item dropdown">
             
                             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                <i class="fa-fw fa-regular fa-globe me-1"></i>
+                                <i class="fas fa-globe me-2"></i>
                                 <asp:Literal runat="server" ID="CurrentLanguageOutput" />
                             </a>
 

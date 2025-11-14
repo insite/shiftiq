@@ -18,7 +18,7 @@ namespace InSite.Persistence
             Property(x => x.CourseFlagText).IsUnicode(false).HasMaxLength(50);
             Property(x => x.CourseImage).IsUnicode(false).HasMaxLength(200);
             Property(x => x.CourseLabel).IsUnicode(false).HasMaxLength(20);
-            Property(x => x.CourseName).IsRequired().IsUnicode(false).HasMaxLength(100);
+            Property(x => x.CourseName).IsRequired().IsUnicode(false).HasMaxLength(200);
             Property(x => x.CourseSlug).IsUnicode(false).HasMaxLength(100);
             Property(x => x.CourseType).IsUnicode(false).HasMaxLength(20);
             Property(x => x.OrganizationCode).IsUnicode(false).HasMaxLength(30);

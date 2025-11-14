@@ -20,7 +20,7 @@ namespace InSite.Persistence
             Property(x => x.CourseImage).IsUnicode(false).HasMaxLength(200);
             Property(x => x.CourseLabel).IsUnicode(false).HasMaxLength(20);
             Property(x => x.CourseLevel).IsUnicode(false).HasMaxLength(50);
-            Property(x => x.CourseName).IsRequired().IsUnicode(false).HasMaxLength(100);
+            Property(x => x.CourseName).IsRequired().IsUnicode(false).HasMaxLength(200);
             Property(x => x.CourseProgram).IsUnicode(false).HasMaxLength(50);
             Property(x => x.CourseSlug).IsUnicode(false).HasMaxLength(100);
             Property(x => x.CourseStyle).IsUnicode(false);

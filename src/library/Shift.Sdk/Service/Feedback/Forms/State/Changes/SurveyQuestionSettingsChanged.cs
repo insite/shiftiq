@@ -6,7 +6,7 @@ namespace InSite.Domain.Surveys.Forms
 {
     public class SurveyQuestionSettingsChanged : Change
     {
-        public SurveyQuestionSettingsChanged(Guid question, bool isHidden, bool isRequired, bool isNested, string likertAnalysis, bool listEnableRandomization, bool listEnableOtherText, bool listEnableBranch, bool listEnableGroupMembership, bool listDisableColumnHeadingWrap, int? textLineCount, int? textCharacterLimit, bool numberEnableStatistics, bool numberEnableAutoCalc, Guid[] numberAutoCalcQuestions, bool numberEnableNotApplicable, SurveyQuestionListSelectionRange listSelectionRange, bool enableCreateCase)
+        public SurveyQuestionSettingsChanged(Guid question, bool isHidden, bool isRequired, bool isNested, string likertAnalysis, bool listEnableRandomization, bool listEnableOtherText, bool listEnableBranch, bool listEnableGroupMembership, bool listDisableColumnHeadingWrap, int? textLineCount, int? textCharacterLimit, bool numberEnableStatistics, bool numberEnableAutoCalc, Guid[] numberAutoCalcQuestions, bool numberEnableNotApplicable, SurveyQuestionListSelectionRange listSelectionRange)
         {
             Question = question;
             IsHidden = isHidden;
@@ -25,7 +25,6 @@ namespace InSite.Domain.Surveys.Forms
             NumberAutoCalcQuestions = numberAutoCalcQuestions;
             NumberEnableNotApplicable = numberEnableNotApplicable;
             ListSelectionRange = listSelectionRange;
-            EnableCreateCase = enableCreateCase;
         }
 
         public Guid Question { get; }
@@ -45,6 +44,5 @@ namespace InSite.Domain.Surveys.Forms
         public Guid[] NumberAutoCalcQuestions { get; }
         public bool NumberEnableNotApplicable { get; }
         public SurveyQuestionListSelectionRange ListSelectionRange { get; }
-        public bool EnableCreateCase { get; }
     }
 }

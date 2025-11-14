@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 
 using InSite.Persistence.Content;
 
@@ -11,16 +10,7 @@ namespace InSite.Persistence
     {
         public CourseCatalogItem(string title)
         {
-            var match = Regex.Match(title, @"(.+)\s*\(([^)]*)\)");
-            if (match.Success)
-            {
-                ItemTitle = StringHelper.TrimAndClean(match.Groups[1].Value);
-                ItemRequirement = StringHelper.TrimAndClean(match.Groups[2].Value);
-            }
-            else
-            {
-                ItemTitle = title;
-            }
+            ItemTitle = title;
         }
 
         public Guid ItemIdentifier { get; set; }
