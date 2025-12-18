@@ -101,7 +101,7 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                 var builder = new MessageBuilder(_contacts, _groups, _filePaths, _domain);
                 var alert = Notifications.Select(notificationName);
                 var email = builder.BuildRegistrationEmail(alert, @event, venueAddress, registration, form);
-                if (email == null)
+                if (email == null || email.IsDisabled)
                     return;
 
                 if (alert.Courier == "Mailgun")

@@ -1299,7 +1299,7 @@ SELECT cmdsPerson.*
         {
             const string query = @"
 SELECT cmdsPerson.*
-      ,P.FullName
+      ,P.FullName AS PersonFullName
       ,P.PhoneWork AS Phone
       ,cmdsPerson.Email AS EmailWork
       ,cmdsPerson.UtcArchived AS ArchiveDate
@@ -1322,7 +1322,7 @@ SELECT cmdsPerson.*
        INNER JOIN custom_cmds.[Profile] AS profiles ON profiles.ProfileStandardIdentifier = ep.ProfileStandardIdentifier
        LEFT JOIN contacts.QPerson AS P ON P.UserIdentifier = cmdsPerson.UserIdentifier AND P.OrganizationIdentifier = @PersonOrganizationIdentifier
   WHERE {1}
-  ORDER BY FullName, profiles.ProfileNumber";
+  ORDER BY PersonFullName, profiles.ProfileNumber";
 
             var profileWhere = new StringBuilder();
 

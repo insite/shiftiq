@@ -253,6 +253,12 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                 return true;
             }
 
+            if (draft.IsDisabled)
+            {
+                Comment(e, $"Notification {notification.Type} will not be sent because the message is disabled.");
+                return true;
+            }
+
             if (draft.Recipients.Count <= 0)
             {
                 Comment(e, $"Notification {notification.Type} will not be sent because the email draft has no recipients.");

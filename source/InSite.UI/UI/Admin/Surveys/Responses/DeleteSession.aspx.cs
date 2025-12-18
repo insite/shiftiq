@@ -66,10 +66,14 @@ namespace InSite.Admin.Surveys.Responses
         private void DeleteButton_OnClick(object sender, EventArgs e)
         {
             var response = ServiceLocator.SurveySearch.GetResponseSession(ResponseIdentifier);
-            var surveyForm = ServiceLocator.SurveySearch.GetSurveyForm(response.SurveyFormIdentifier);
-            DeleteSurveyInGradebook(response, surveyForm);
 
-            ServiceLocator.SendCommand(new DeleteResponseSession(ResponseIdentifier));
+            if (response != null)
+            {
+                var surveyForm = ServiceLocator.SurveySearch.GetSurveyForm(response.SurveyFormIdentifier);
+                DeleteSurveyInGradebook(response, surveyForm);
+
+                ServiceLocator.SendCommand(new DeleteResponseSession(ResponseIdentifier));
+            }
 
             RedirectBack();
         }

@@ -13,6 +13,7 @@ using InSite.Domain.Records;
 using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
+using Shift.Common.Events;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
@@ -37,18 +38,23 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             public List<string> Errors { get; set; } = new List<string>();
         }
 
+        public event AlertHandler Alert;
+
+        private void OnAlert(AlertType type, string message) =>
+            Alert?.Invoke(this, new AlertArgs(type, message));
+
         private const string AchievementType = "Time-Sensitive Safety Certificate";
 
         public Guid NewCredentialId
         {
-            get
-            {
-                return ViewState[nameof(NewCredentialId)] as Guid? ?? Guid.Empty;
-            }
-            set
-            {
-                ViewState[nameof(NewCredentialId)] = value;
-            }
+            get => (Guid?)ViewState[nameof(NewCredentialId)] ?? Guid.Empty;
+            set => ViewState[nameof(NewCredentialId)] = value;
+        }
+
+        public string HelpContent
+        {
+            get => (string)ViewState[nameof(HelpContent)];
+            set => ViewState[nameof(HelpContent)] = value;
         }
 
         protected override void OnInit(EventArgs e)
@@ -69,6 +75,31 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
             SaveButton.Click += SaveButton_Click;
             CancelButton.NavigateUrl = Page.Request.RawUrl;
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (HelpContent == null)
+            {
+                try
+                {
+                    HelpContent = GetEmbededHelpContent("#add-new-certificate");
+                }
+                catch (InvalidOperationException ioex)
+                {
+                    HelpContent = string.Empty;
+
+                    OnAlert(AlertType.Error, "Error loading embedded help content. " + ioex.Message);
+                }
+            }
+
+            if (HelpContent.Length > 0)
+            {
+                EmbeddedHelp.Clear();
+                EmbeddedHelp.AddMessage(AlertType.Information, Icons.EmbeddedHelp, HelpContent);
+            }
         }
 
         private void AchievementSelector_ValueChanged(object sender, Shift.Sdk.UI.FindEntityValueChangedEventArgs e)
@@ -100,18 +131,6 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             AchievementLifetime.ValueAsInt = lifetimeInMonths;
 
             AchievementLifetime.Enabled = false;
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-
-            if (IsPostBack)
-                return;
-
-            var html = GetEmbededHelpContent("#add-new-certificate");
-
-            EmbeddedHelp.AddMessage(AlertType.Information, Icons.EmbeddedHelp, html);
         }
 
         private void NextButton_Click(object sender, EventArgs e)

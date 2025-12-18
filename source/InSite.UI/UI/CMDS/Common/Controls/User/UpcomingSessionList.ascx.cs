@@ -17,22 +17,30 @@ namespace InSite.Custom.CMDS.User.Programs.Controls
             var filter = new QEventFilter
             {
                 OrganizationIdentifier = OrganizationIdentifiers.Keyera,
-                EventScheduledSince = now
+                EventScheduledSince = now,
+                EventPublicationStatus = PublicationStatus.Published.GetDescription(),
             };
 
             var events = ServiceLocator.EventSearch.GetEvents(filter, x => x.Registrations);
 
             var list = events.Select(x =>
             {
-                var isFull = x.CapacityMaximum.HasValue && x.CapacityMaximum.Value <= x.Registrations.Count
-                    || (x.CapacityMinimum ?? 0) == 0 && !x.CapacityMaximum.HasValue;
+                var hasMaximum = x.CapacityMaximum.HasValue;
+
+                var hasMaximumRegistrations = hasMaximum && x.CapacityMaximum.Value <= x.Registrations.Count;
+
+                var hasZeroMinimum = (x.CapacityMinimum ?? 0) == 0;
+
+                var isFull = hasMaximumRegistrations || (!hasMaximum && hasZeroMinimum);
+
+                var isRegistrationOpen = !x.RegistrationDeadline.HasValue || now <= x.RegistrationDeadline;
 
                 return new
                 {
                     Identifier = isFull ? Guid.Empty : x.EventIdentifier,
                     Title = x.EventTitle,
                     IsFull = isFull,
-                    IsClosed = x.RegistrationDeadline.HasValue && x.RegistrationDeadline < now
+                    IsClosed = !isRegistrationOpen
                 };
             }).ToArray();
 

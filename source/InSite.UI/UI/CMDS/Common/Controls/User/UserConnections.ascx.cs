@@ -7,6 +7,7 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 
 using Shift.Common;
+using Shift.Common.Events;
 using Shift.Constant;
 
 using CheckBox = System.Web.UI.WebControls.CheckBox;
@@ -20,6 +21,11 @@ namespace InSite.Custom.CMDS.Admin.People.Controls
             get => (Guid)(ViewState[nameof(UserIdentifier)] ?? Guid.Empty);
             set => ViewState[nameof(UserIdentifier)] = value;
         }
+
+        public event AlertHandler Alert;
+
+        private void OnAlert(AlertType type, string message) =>
+            Alert?.Invoke(this, new AlertArgs(type, message));
 
         protected override void OnInit(EventArgs e)
         {
@@ -99,7 +105,18 @@ namespace InSite.Custom.CMDS.Admin.People.Controls
 
         private void BindHelp()
         {
-            var html = GetEmbededHelpContent("#reporting-lines");
+            string html;
+
+            try
+            {
+                html = GetEmbededHelpContent("#reporting-lines");
+            }
+            catch (InvalidOperationException ioex)
+            {
+                html = null;
+
+                OnAlert(AlertType.Error, "Error loading embedded help content. " + ioex.Message);
+            }
 
             ReportingLineHelp.Visible = html != null;
 

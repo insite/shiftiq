@@ -141,13 +141,13 @@ namespace InSite.Cmds.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.RadioButton AssignStrategy_Unplan;
 
         /// <summary>
-        /// AssignStrategy_Unassign control.
+        /// AssignStrategy_Delete control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.RadioButton AssignStrategy_Unassign;
+        protected global::InSite.Common.Web.UI.RadioButton AssignStrategy_Delete;
 
         /// <summary>
         /// Step1NextButton control.

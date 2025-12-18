@@ -264,7 +264,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <insite:FileUploadV2 runat="server" ID="CourseImageUploadV2" LabelText="Upload New Course Image"/>
+                            <insite:FileUploadV2 runat="server" ID="CourseImageUploadV2" LabelText="Upload New Course Image" MaxFileSize="5242880" />
                         </div>
 
                         <div class="form-group mb-3">

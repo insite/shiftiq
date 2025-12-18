@@ -256,8 +256,13 @@ namespace InSite.Persistence
             result.Body = ReplaceTemplates(result.Body, language);
             result.Body = ReplacePlaceholdersForSmarterMail(draft.OrganizationIdentifier, draft.SenderIdentifier, draft.SurveyNumber, result.Body);
 
-            if (draft.MessageIdentifier != null)
+            if (draft.MessageIdentifier != null
+                && draft.ContentVariables.IsNotEmpty()
+                && TryGetVariableValue(draft.ContentVariables, MessageVariable.AppUrl, out var _)
+                )
+            {
                 result.Body = ReplaceLinks(draft.MessageIdentifier.Value, "$" + MessageVariable.AppUrl, result.Body);
+            }
 
             result.Body = ReplaceVariables(draft.ContentVariables, result.Body);
             result.Body = HtmlBuilder.MoveCssInline(result.Body);
@@ -717,31 +722,31 @@ namespace InSite.Persistence
             return RegexVariablePattern.Replace(value, m =>
             {
                 var name = m.Groups["FullName"].Value;
-                if (TryGetValue(name, out string dictionaryValue1))
+                if (TryGetVariableValue(variables, name, out string dictionaryValue1))
                     return dictionaryValue1;
 
                 name = m.Groups["VarName"].Value;
-                if (TryGetValue(name, out string dictionaryValue2))
+                if (TryGetVariableValue(variables, name, out string dictionaryValue2))
                     return dictionaryValue2;
 
                 return m.Value;
             });
+        }
 
-            bool TryGetValue(string key, out string dictionaryValue)
+        private static bool TryGetVariableValue(IDictionary<string, string> variables, string key, out string dictionaryValue)
+        {
+            dictionaryValue = null;
+
+            foreach (var dictionaryKey in variables.Keys)
             {
-                dictionaryValue = null;
-
-                foreach (var dictionaryKey in variables.Keys)
+                if (string.Equals(dictionaryKey, key, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (string.Equals(dictionaryKey, key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        dictionaryValue = variables[dictionaryKey];
-                        return true;
-                    }
+                    dictionaryValue = variables[dictionaryKey];
+                    return true;
                 }
-
-                return false;
             }
+
+            return false;
         }
 
         public static string CreateHtmlBody(string subject, string body, bool moveCssInline = true)

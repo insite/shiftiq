@@ -25,9 +25,12 @@ namespace Shift.Sdk.UI
                     return "<span class='badge bg-info'><i class='fa-solid fa-edit me-1'></i>Update</span>";
 
                 if (Action.StartsWith("Add"))
-                    return $"<span class='badge bg-warning'><i class='fa-solid fa-plus me-1'></i>{Action}</span>";
+                    return $"<span class='badge bg-warning'><i class='fa-solid fa-plus me-1'></i>Assign</span>";
 
-                return $"<span class='badge bg-danger'><i class='fa-solid fa-times me-1'></i>{Action}</span>";
+                if (Action.StartsWith("Make unplanned"))
+                    return $"<span class='badge bg-danger'><i class='fa-solid fa-times me-1'></i>Unassign</span>";
+
+                return $"<span class='badge bg-danger'><i class='fa-solid fa-trash-alt me-1'></i>Delete</span>";
             }
         }
     }

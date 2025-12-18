@@ -73,6 +73,8 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                     return null;
 
             var message = MessageRepository.GetEmail(OrganizationIdentifiers.SkilledTradesBC, notification.Type);
+            if (message.IsDisabled)
+                return message;
 
             var variables = new MessageVariableList($"https://ita.{_domain}", notification.Variables);
 
@@ -125,6 +127,9 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
         public EmailDraft BuildRegistrationEmail(Notification notification, QEvent @event, QGroupAddress venueAddress, QRegistration registration, Form form)
         {
             var message = MessageRepository.GetEmail(OrganizationIdentifiers.SkilledTradesBC, notification.Type);
+            if (message.IsDisabled)
+                return message;
+
             var variables = new MessageVariableList($"https://ita.{_domain}", notification.Variables);
 
             CreateEventVariables(variables, @event, venueAddress, new[] { registration }, new[] { registration.Attempt });

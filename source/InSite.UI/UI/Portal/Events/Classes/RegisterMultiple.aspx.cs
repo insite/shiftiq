@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Web.UI.WebControls;
 
 using Common.Timeline.Commands;
@@ -15,11 +14,11 @@ using InSite.Application.Registrations.Write;
 using InSite.Common;
 using InSite.Common.Web;
 using InSite.Domain.Invoices;
-using InSite.Domain.Messages;
 using InSite.Domain.Payments;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
+using InSite.UI.Portal.Billing.Utilities;
 using InSite.UI.Portal.Events.Classes.Controls;
 using InSite.UI.Portal.Events.Classes.Models;
 using InSite.Web.Data;
@@ -690,28 +689,7 @@ namespace InSite.UI.Portal.Events.Classes
 
         private void SendPaidInvocieInformation(VInvoice invoice)
         {
-            ServiceLocator.AlertMailer.Send(Organization.OrganizationIdentifier, User.UserIdentifier, new AlertInvoicePaid
-            {
-                InvoicePaidProperties = BuildVariableList()
-            });
-
-            StringDictionary BuildVariableList()
-            {
-                var dict = new StringDictionary();
-
-                var properties = typeof(VInvoice).GetProperties();
-                foreach (var property in properties)
-                {
-                    var value = property.GetValue(invoice) ?? string.Empty;
-
-                    var textValue = value.GetType().Equals(typeof(DateTimeOffset))
-                        ? TimeZones.Format((DateTimeOffset)value, User.TimeZone)
-                        : value.ToString();
-
-                    dict.Add(property.Name, textValue);
-                }
-                return dict;
-            }
+            ProductHelper.SendInvoicePaid(invoice, User.Identifier, User.TimeZone, false, false);
         }
 
         private List<Guid> SaveUsers(QGroup employer)

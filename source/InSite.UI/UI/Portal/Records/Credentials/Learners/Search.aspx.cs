@@ -19,6 +19,13 @@ namespace InSite.UI.Portal.Records.Credentials.Learners
             set => ViewState[nameof(Filter)] = value;
         }
 
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            AddCertificate.Alert += (s, a) => ScreenStatus.AddMessage(a);
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);

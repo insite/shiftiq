@@ -49,7 +49,7 @@ public static class SwaggerExtensions
                 Type = SecuritySchemeType.ApiKey,
                 In = ParameterLocation.Header,
                 Name = "Bearer",
-                Description = "blah blah blah"
+                Description = "-"
             });
 
             // Add security definition
@@ -59,7 +59,7 @@ public static class SwaggerExtensions
                 Type = SecuritySchemeType.ApiKey,
                 In = ParameterLocation.Cookie,
                 Name = "InSite.WebToken",
-                Description = "blah blah blah"
+                Description = "-"
             });
 
             // Add security definition
@@ -69,7 +69,7 @@ public static class SwaggerExtensions
                 Type = SecuritySchemeType.ApiKey,
                 In = ParameterLocation.Header,
                 Name = "Secret",
-                Description = "blah blah blah"
+                Description = "-"
             });
 
             // Add the custom operation filter to handle Authorize attributes

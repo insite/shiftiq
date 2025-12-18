@@ -95,7 +95,6 @@ namespace InSite.UI.Portal.Home.Controls
                 item.Total = total;
                 item.ProgressPercent = string.Format("{0:n1}%", CalculateScore(valid, total));
                 item.ProgressText = string.Format("{0} out of {1} completed", valid, total);
-                item.ProgressPercent = "-";
                 item.ProgressUrl = string.Format("/ui/portal/learning/plan?userID={0}&achievementType={1}",
                     userId, HttpUtility.UrlEncode(AchievementTypes.TrainingGuide));
 
@@ -143,7 +142,6 @@ namespace InSite.UI.Portal.Home.Controls
                 item.Total = total;
                 item.ProgressPercent = string.Format("{0:n1}%", CalculateScore(valid, total));
                 item.ProgressText = string.Format("{0} out of {1} completed", valid, total);
-                item.ProgressPercent = "-";
                 item.ProgressUrl = string.Format("/ui/portal/learning/plan?userID={0}&achievementType={1}",
                     userId, HttpUtility.UrlEncode(AchievementTypes.SiteSpecificOperatingProcedure));
 

@@ -9,7 +9,6 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Content;
 using InSite.Portal.Surveys.Pages;
-using InSite.UI.Layout.Portal;
 using InSite.UI.Portal.Sites;
 
 using Shift.Common;
@@ -102,10 +101,18 @@ namespace InSite.UI
         {
             base.OnPreRender(e);
 
-            if (Page.Master == null)
+            HtmlGenericControl body = null;
+
+            var master = Page.Master;
+            while (body == null && master != null)
+            {
+                body = (HtmlGenericControl)master.FindControl("HtmlBody");
+                master = master.Master;
+            }
+
+            if (body == null)
                 return;
 
-            var body = (HtmlGenericControl)Page.Master.FindControl("HtmlBody");
             if (UserSettings.WallpaperUrl.HasValue())
             {
                 body.Style["background"] = $"no-repeat center top fixed url('{UserSettings.WallpaperUrl}')";

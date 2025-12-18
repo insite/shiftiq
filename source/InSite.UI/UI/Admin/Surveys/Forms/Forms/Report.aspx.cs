@@ -189,6 +189,13 @@ namespace InSite.Admin.Surveys.Forms.Forms
 
         private void Control_Alert(object sender, AlertArgs args) => ScreenStatus.AddMessage(args);
 
+        protected override void LoadSearchedResults()
+        {
+            base.LoadSearchedResults();
+
+            ReloadSurvey(SearchCriteria.Filter);
+        }
+
         private void SearchCriteria_Searching(object sender, EventArgs e) => OnSearchCriteriaSearch();
 
         private void OnSearchCriteriaSearch()

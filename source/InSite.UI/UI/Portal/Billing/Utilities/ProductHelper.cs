@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using Common.Timeline.Changes;
 using Common.Timeline.Commands;
@@ -67,10 +68,21 @@ namespace InSite.UI.Portal.Billing.Utilities
 
         private static void SendPaidInvoiceInformation(VInvoice invoice, QPerson person)
         {
-            var invoiceFile = CreateInvoice(invoice.InvoiceIdentifier);
-            var attachments = invoice != null ? new string[] { invoiceFile } : null;
+            SendInvoicePaid(invoice, person.UserIdentifier, TimeZones.GetInfo(person.User.TimeZone), true, true);
+        }
 
-            ServiceLocator.AlertMailer.Send(person.OrganizationIdentifier, person.UserIdentifier, new AlertInvoicePaid
+        public static void SendInvoicePaid(VInvoice invoice, Guid userId, TimeZoneInfo timeZone, bool includeReport, bool createOrderInfo)
+        {
+            string[] attachments;
+            if (includeReport)
+            {
+                var invoiceFile = CreateInvoice(invoice.InvoiceIdentifier);
+                attachments = new string[] { invoiceFile };
+            }
+            else
+                attachments = null;
+
+            ServiceLocator.AlertMailer.Send(invoice.OrganizationIdentifier, userId, new AlertInvoicePaid
             {
                 InvoicePaidProperties = BuildVariableList()
             }, attachments);
@@ -86,12 +98,29 @@ namespace InSite.UI.Portal.Billing.Utilities
                     if (value == null) value = string.Empty;
 
                     if (value.GetType().Equals(typeof(DateTimeOffset)))
-                        dict.Add(property.Name, TimeZones.Format((DateTimeOffset)value, person.User.TimeZone));
+                        dict.Add(property.Name, TimeZones.Format((DateTimeOffset)value, timeZone));
                     else
                         dict.Add(property.Name, value.ToString());
                 }
+                if (createOrderInfo)
+                    dict.Add("OrderInfo", CreateOrderInfo(invoice.InvoiceIdentifier));
+
                 return dict;
             }
+        }
+
+        private static string CreateOrderInfo(Guid invoiceId)
+        {
+            var md = new StringBuilder();
+            md.AppendLine("Item | Quantity | Price");
+            md.AppendLine(":-- |:-- |:-- ");
+
+            var items = ServiceLocator.InvoiceSearch.GetInvoiceItems(invoiceId, x => x.Product);
+
+            foreach (var item in items)
+                md.AppendLine($"{item.Product.ProductName} | {item.ItemQuantity} | ${item.ItemPrice:n2}");
+
+            return Markdown.ToHtml(md.ToString());
         }
 
         public static string GetInvoiceStatus(string status)

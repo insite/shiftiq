@@ -113,7 +113,7 @@ determine how they should be handled.
 
                                             <insite:RadioButton runat="server" ID="AssignStrategy_Unplan" GroupName="ModifyStrategy" Text="<strong>Make all unplanned and optional</strong>. All previously assigned achievements will be set to Planned = No and Required = No. <small>(Use this if you want to remove any previous assignments from the learner's plan and mark them as not required.)</small>" />
 
-                                            <insite:RadioButton runat="server" ID="AssignStrategy_Unassign" GroupName="ModifyStrategy" Text="<strong>Remove all previously assigned achievements (outside the program)</strong>. All existing achievements outside this program will be removed from the learner's record. Only the achievements included in the new program will remain. <small>(This action cannot be undone.)</small>" />
+                                            <insite:RadioButton runat="server" ID="AssignStrategy_Delete" GroupName="ModifyStrategy" Text="<strong>Delete all previously assigned achievements (outside the program)</strong>. All existing achievements outside this program will be removed from the learner's record. Only the achievements included in the new program will remain. <small>(This action cannot be undone.)</small>" />
 
                                         </div>
 
@@ -157,6 +157,8 @@ determine how they should be handled.
                                 <dd class="col-sm-10">An achievement outside the program, already assigned to the learner, to be added to their training plan</dd>
                                 <dt class="col-sm-2 text-end"><span class='badge bg-danger'><i class='fa-solid fa-times me-1'></i>Unassign</span></dt>
                                 <dd class="col-sm-10">An achievement outside the program, already assigned to the learner, to be removed from their training plan</dd>
+                                <dt class="col-sm-2 text-end"><span class='badge bg-danger'><i class='fa-solid fa-trash-alt me-1'></i>Delete</span></dt>
+                                <dd class="col-sm-10">An achievement outside the program, already assigned to the learner, to be deleted from both their education and training plan <strong>(this cannot be undone)</strong></dd>
                             </dl>
 
                         </div>

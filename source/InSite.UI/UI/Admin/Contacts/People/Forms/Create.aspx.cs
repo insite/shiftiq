@@ -577,9 +577,12 @@ namespace InSite.Admin.Contacts.People.Forms
             user.MiddleName = OnePersonMiddleName.Text;
             user.LastName = OnePersonLastName.Text;
             user.Email = OnePersonEmail.Text;
-            person.EmailEnabled = true;
-            person.PersonCode = OnePersonCode.Text;
             user.TimeZone = Organization.TimeZone.Id;
+            person.EmailEnabled = true;
+
+            var personCode = OnePersonCode.Text.NullIfWhiteSpace();
+            if (personCode.IsNotEmpty())
+                person.PersonCode = personCode;
 
             if (OnePersonIsUserAccessGranted.Checked)
             {

@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Humanizer;
 
-using Shift.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shift.Api;
 
@@ -38,9 +38,12 @@ public class TokenController : ControllerBase
 
         var isWhitelisted = IsWhitelisted(ip, tokenSettings.Whitelist);
 
-        // A token request with a custom lifetime my be requested only on a whitelisted domain.
-        if (!isWhitelisted)
-            request.Lifetime = null;
+        // Disallow a custom lifetime that exceeds 90 days.
+
+        var ninetyDays = 7776000; // 90 days × 24 hours × 60 minutes × 60 seconds = 7,776,000 seconds
+
+        if (request.Lifetime != null && request.Lifetime > ninetyDays)
+            request.Lifetime = ninetyDays;
 
         var principal = _principalSearch.GetPrincipal(request, ip, isWhitelisted, tokenSettings.Lifetime, errors);
 
@@ -55,11 +58,16 @@ public class TokenController : ControllerBase
 
         var lifetimeInSeconds = principal.Claims.Lifetime ?? JwtRequest.DefaultLifetime;
 
+        var lifetimeDescription = TimeSpan.FromSeconds(lifetimeInSeconds).Humanize();
+
+        var lifetime = $"{lifetimeInSeconds:n0} seconds (~{lifetimeDescription})";
+
         var body = new
         {
             AccessToken = CreateToken(principal, lifetimeInSeconds, request.Debug),
             TokenType = "Bearer",
-            ExpiresIn = lifetimeInSeconds
+            ExpiresIn = lifetimeInSeconds,
+            Lifetime = lifetime
         };
 
         return Ok(body);

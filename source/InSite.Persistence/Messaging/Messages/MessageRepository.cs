@@ -158,6 +158,7 @@ namespace InSite.Persistence
             draft.ContentBody = content.Body.Text.Clone();
             draft.ContentPriority = GetEmailPriority(message.MessageName);
             draft.ContentSubject = content.Title.Text.Clone();
+            draft.IsDisabled = message.IsDisabled;
 
             return draft;
         }

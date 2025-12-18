@@ -2075,6 +2075,13 @@
       <DependentUpon>Reports.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Portal\Events\Classes\Models\PaymentMode.cs" />
+    <Compile Include="UI\Portal\Home\Search.aspx.cs">
+      <DependentUpon>Search.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Portal\Home\Search.aspx.designer.cs">
+      <DependentUpon>Search.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Portal\Identity\Controls\MFAAuthenticatorApp.ascx.cs">
       <DependentUpon>MFAAuthenticatorApp.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -7908,6 +7915,7 @@
     <Content Include="UI\Portal\Home\Programs.aspx" />
     <Content Include="UI\Portal\Home\Report.jpg" />
     <Content Include="UI\Portal\Home\Reports.aspx" />
+    <Content Include="UI\Portal\Home\Search.aspx" />
     <Content Include="UI\Portal\Identity\Controls\MFAAuthenticatorApp.ascx" />
     <Content Include="UI\Portal\Identity\Controls\MFAEmail.ascx" />
     <Content Include="UI\Portal\Identity\Controls\MFASelectMode.ascx" />

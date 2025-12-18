@@ -119,6 +119,8 @@ namespace InSite.Cmds.Admin.People.Forms
             UnarchiveButton.Click += (s, a) => ArchiveUnarchive(false);
 
             ResetPasswordButton.Click += ResetPasswordButton_Click;
+
+            UserConnections.Alert += (s, a) => ScreenStatus.AddMessage(a);
         }
 
         protected override void OnLoad(EventArgs e)

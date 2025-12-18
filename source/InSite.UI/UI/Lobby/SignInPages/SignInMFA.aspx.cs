@@ -188,9 +188,14 @@ namespace InSite.UI.Lobby.SignInPages
 
         private void ResendButton_Click(object sender, EventArgs e)
         {
+            if (MFA == null)
+            {
+                RedirectToSignIn();
+            }
+
             if (!DateTime.TryParse(lastSent.Value, out var time))
             {
-                RedirectToSignInErrorPage(SignInErrorCodes.General, false, "Something went wrong, please try again");
+                RedirectToSignIn();
             }
 
             if (time.AddMinutes(1) > DateTime.UtcNow)
@@ -222,6 +227,11 @@ namespace InSite.UI.Lobby.SignInPages
             errorView.Visible = false;
             resentmessageview.Visible = true;
             lastSent.Value = DateTime.UtcNow.ToString();
+
+            void RedirectToSignIn()
+            {
+                RedirectToSignInErrorPage(SignInErrorCodes.General, false, "Something went wrong, please try again");
+            }
         }
 
         private bool CheckConfirmationCode(string code)

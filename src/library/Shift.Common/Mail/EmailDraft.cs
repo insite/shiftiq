@@ -57,6 +57,8 @@ namespace Shift.Common
         public bool IgnoreSubscribers { get; set; }
         public bool MailoutSucceeded { get; set; }
 
+        public bool IsDisabled { get; set; }
+
         public DateTimeOffset? MailoutScheduled { get; set; }
         public DateTimeOffset? MailoutCompleted { get; set; }
         public DateTimeOffset? MailoutCancelled { get; set; }

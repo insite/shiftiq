@@ -139,7 +139,7 @@ namespace InSite.Cmds.Admin.Records.Programs
 
                 try
                 {
-                    if (item.Action == "Unassign from learner")
+                    if (item.Action == "Delete from learner")
                     {
                         var credential = credentials.FirstOrDefault(x => x.UserIdentifier == learner && x.AchievementIdentifier == achievement);
 
@@ -304,9 +304,9 @@ namespace InSite.Cmds.Admin.Records.Programs
 
                         changes.Add(change);
                     }
-                    else if (AssignStrategy_Unassign.Checked)
+                    else if (AssignStrategy_Delete.Checked)
                     {
-                        var action = "Unassign from learner";
+                        var action = "Delete from learner";
 
                         var change = new AssignLearnerItem
                         {

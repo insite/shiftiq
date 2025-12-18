@@ -35,6 +35,7 @@ namespace InSite.Admin.Events.Classes.Controls
             return ServiceLocator.EventSearch
                 .GetEvents(
                     filter,
+                    x => x.Achievement,
                     x => x.Registrations,
                     x => x.VenueLocation,
                     x => x.GradebookEvents.Select(y => y.Gradebook),

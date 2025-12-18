@@ -8,7 +8,7 @@ namespace InSite.UI.Admin.Surveys.Forms.Controls
 {
     public partial class ReportResponseSearchCriteria : SearchCriteriaController<QResponseSessionFilter>
     {
-        private Guid? DefaultSurveyThumbprint => Guid.TryParse(Request.QueryString["survey"], out var guid) ? guid : (Guid?)null;
+        private Guid? DefaultSurveyId => Guid.TryParse(Request.QueryString["survey"], out var guid) ? guid : (Guid?)null;
 
         public override QResponseSessionFilter Filter
         {
@@ -37,8 +37,8 @@ namespace InSite.UI.Admin.Surveys.Forms.Controls
             set
             {
                 SurveyID.Value = value.SurveyFormIdentifier;
-                if (!Page.IsPostBack && DefaultSurveyThumbprint.HasValue)
-                    SurveyID.Value = DefaultSurveyThumbprint.Value;
+                if (!Page.IsPostBack && DefaultSurveyId.HasValue)
+                    SurveyID.Value = DefaultSurveyId.Value;
 
                 OnSurveySelected();
 
@@ -80,8 +80,8 @@ namespace InSite.UI.Admin.Surveys.Forms.Controls
             if (Page.IsPostBack)
                 return;
 
-            if (DefaultSurveyThumbprint.HasValue)
-                SurveyID.Value = DefaultSurveyThumbprint.Value;
+            if (DefaultSurveyId.HasValue)
+                SurveyID.Value = DefaultSurveyId.Value;
 
             QuestionID.SurveyIdentifier = SurveyID.Value ?? Guid.Empty;
             QuestionID.RefreshData();
@@ -109,7 +109,7 @@ namespace InSite.UI.Admin.Surveys.Forms.Controls
 
         public override void Clear()
         {
-            SurveyID.Value = DefaultSurveyThumbprint;
+            SurveyID.Value = DefaultSurveyId;
 
             QuestionID.SurveyIdentifier = SurveyID.Value ?? Guid.Empty;
             QuestionID.RefreshData();

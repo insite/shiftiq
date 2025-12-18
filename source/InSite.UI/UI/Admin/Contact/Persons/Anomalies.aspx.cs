@@ -129,7 +129,7 @@ namespace InSite.UI.Admin.Contact.Persons
                     x.Phone,
                     x.User.Email,
 
-                    PersonFullName = x.FullName,
+                    PersonFullName = x.FullName ?? x.User.FullName,
                     PersonFullNameSuffix = x.EmployeeType,
                     x.Organization.PersonFullNamePolicy
                 },
@@ -150,7 +150,9 @@ namespace InSite.UI.Admin.Contact.Persons
                     name.LastName,
                     name.PersonFullNameSuffix);
 
-                if (!StringHelper.Equals(expectedPersonFullName, name.PersonFullName))
+                var isExpectedPersonName = StringHelper.Equals(expectedPersonFullName, name.PersonFullName);
+
+                if (!isExpectedPersonName)
                 {
                     var person = new PersonItem
                     {

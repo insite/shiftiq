@@ -776,7 +776,7 @@ ORDER BY
 
         private void ProcessMrProgramCumulativeColumnAnswers(List<Answer> answers, List<string> columnNames, List<string> fieldValues, ISurveyResponse response, int surveyYear)
         {
-            var MR164 = answers.Where(x => x.SurveyQuestionType == "Number" && (x.ReportColumn == "MR088" || x.ReportColumn == "MR107" || x.ReportColumn == "MR113") && x.ResponseAnswer.HasValue())
+            var MR164 = answers.Where(x => x.SurveyQuestionType == "Number" && (x.ReportColumn == "MR088" || x.ReportColumn == "MR107" || x.ReportColumn == "MR113" || x.ReportColumn == "MR171") && x.ResponseAnswer.HasValue())
                 .Select(x => double.Parse(x.ResponseAnswer, System.Globalization.CultureInfo.InvariantCulture)).AsQueryable().Sum();
             var MR165 = answers.Where(x => x.SurveyQuestionType == "Number" && (x.ReportColumn == "MR089" || x.ReportColumn == "MR108" || x.ReportColumn == "MR114") && x.ResponseAnswer.HasValue())
                 .Select(x => double.Parse(x.ResponseAnswer, System.Globalization.CultureInfo.InvariantCulture)).AsQueryable().Sum();

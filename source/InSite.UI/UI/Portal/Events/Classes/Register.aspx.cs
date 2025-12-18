@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -28,6 +27,7 @@ using InSite.Persistence;
 using InSite.UI.Admin.Events.Classes.Controls;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
+using InSite.UI.Portal.Billing.Utilities;
 using InSite.UI.Portal.Events.Classes.Models;
 using InSite.Web.Data;
 using InSite.Web.Helpers;
@@ -1083,12 +1083,13 @@ namespace InSite.UI.Portal.Events.Classes
             {
                 registrationIdentifier = UniqueIdentifier.Create();
                 commands.Add(new RequestRegistration(registrationIdentifier.Value, Organization.OrganizationIdentifier, EventIdentifier.Value, user.UserIdentifier, null, "Registered", null, null, null));
-                commands.Add(new IncludeRegistrationToT2202(registrationIdentifier.Value));
             }
             else
             {
                 commands.Add(new ChangeApproval(registrationIdentifier.Value, "Registered", null, null, registration.ApprovalStatus));
             }
+
+            commands.Add(new IncludeRegistrationToT2202(registrationIdentifier.Value));
 
             var workBasedHoursToDate = WorkBasedHoursToDate.ValueAsInt;
 
@@ -1125,30 +1126,7 @@ namespace InSite.UI.Portal.Events.Classes
         private void SendPaidInvoiceInformation(VInvoice invoice = null)
         {
             if (invoice != null)
-            {
-                ServiceLocator.AlertMailer.Send(Organization.OrganizationIdentifier, User.UserIdentifier, new AlertInvoicePaid
-                {
-                    InvoicePaidProperties = BuildVariableList()
-                });
-
-                StringDictionary BuildVariableList()
-                {
-                    var dict = new StringDictionary();
-
-                    var properties = typeof(VInvoice).GetProperties();
-                    foreach (var property in properties)
-                    {
-                        var value = property.GetValue(invoice);
-                        if (value == null) value = string.Empty;
-
-                        if (value.GetType().Equals(typeof(DateTimeOffset)))
-                            dict.Add(property.Name, TimeZones.Format((DateTimeOffset)value, User.TimeZone));
-                        else
-                            dict.Add(property.Name, value.ToString());
-                    }
-                    return dict;
-                }
-            }
+                ProductHelper.SendInvoicePaid(invoice, User.Identifier, User.TimeZone, false, false);
         }
 
         private void SendChangeRegistrantContactInformation(QUser user, string eventTitle, RegistrantChangedField[] changedFields)
