@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+
+    <h1>PivotTable Class</h1>
+
+    <img src="PivotTable.png" />
+
+    <hr />
+
+    In the example above we have 3 Row Dimensions and 2 Column dimensions.
+
+    Each dimension has at least one unit.
+
+    <h2>Row Dimensions</h2>
+
+    <ol>
+        <li>ClientAgeType { Adult, Youth }</li>
+        <li>ClientAge { 5-17 years, 18-64 years, 65+ years, 0-4 years, 0-17 years, 18+ }</li>
+        <li>PracticeSettingType { Care, School/School Board }</li>
+    </ol>
+
+    <h2>Column Dimensions</h2>
+
+    <ol>
+        <li>Taxonomy { Do, Know, Solve }</li>
+        <li>Difficulty { Very Easy, Easy, Moderate, Difficult, Very Difficult }</li>
+    </ol>
+
+    <h2>Cells</h2>
+
+    <p>Each cell is an integer value, indexed by row and column. </p>
+
+    <p>Row and column indexes looks like this: <strong>X|Y|Z</strong></p>
+
+    <p>... where vertical bars are used to separate units.</p>
+
+    <p>For example, the cell value "4" in the top left of the pivot table would have this row :: column index:</p>
+
+    <p>Adult|5-17 years|Care :: Do|Easy</p>
+
+</body>
+</html>

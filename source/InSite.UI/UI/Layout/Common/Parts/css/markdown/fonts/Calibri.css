@@ -1,0 +1,12 @@
+﻿body, p, li {
+    font-size: 12pt;
+    font-family: Calibri,Arial,sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-size: 24pt;
+}
+
+code, kbd, pre, samp {
+    font-family: monospace,monospace;
+}

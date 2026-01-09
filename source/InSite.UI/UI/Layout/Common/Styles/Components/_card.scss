@@ -1,0 +1,75 @@
+﻿$card-hover-border-color: rgba($primary, .35);
+
+a.card:hover, a.card-body:hover {
+    text-decoration: none;
+}
+
+/*.card-body:last-child {
+    border-radius: 0 0 var(--ar-card-inner-border-radius) var(--ar-card-inner-border-radius);
+}*/
+
+a.card .card-body {
+    --ar-card-color: rgba(var(--ar-link-color-rgb), var(--ar-link-opacity, 1));
+}
+
+.card.card-tile {
+    --ar-card-spacer-y: 1.5rem;
+    --ar-card-spacer-x: 1.5rem;
+
+    .card-body {
+        > ul:last-child,
+        > p:last-child,
+        > h1:last-child,
+        > h2:last-child,
+        > h3:last-child,
+        > h4:last-child,
+        > h5:last-child,
+        > h6:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.card.card-hover {
+    transition: $card-transition;
+
+    &:hover {
+        border-color: $card-hover-border-color;
+        box-shadow: $box-shadow-sm;
+    }
+
+    &.shadow-sm:hover {
+        box-shadow: $box-shadow !important;
+    }
+
+    &.shadow:hover {
+        box-shadow: $box-shadow-lg !important;
+    }
+
+    &.border-0 {
+        &::before {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity .2s ease-in-out;
+            border: $card-border-width solid $card-hover-border-color;
+            @include border-radius($card-border-radius);
+            content: '';
+            z-index: 3;
+            opacity: 0;
+        }
+
+        &:hover::before {
+            opacity: 1;
+        }
+
+        a.card-img,
+        a.card-img-top,
+        a.card-img-bottom {
+            z-index: 4;
+        }
+    }
+}

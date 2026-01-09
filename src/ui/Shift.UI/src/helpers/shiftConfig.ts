@@ -1,0 +1,17 @@
+export const shiftConfig = {
+    clientPrefix:       import.meta.env.VITE_CLIENT_PREFIX as string,
+    shiftCssUrl:        import.meta.env.VITE_SHIFT_CSS_URL as string,
+    fontAwesomeUrl:     import.meta.env.VITE_FONT_AWESOME_URL as string,
+    simplebarCssUrl:    import.meta.env.VITE_SIMPLEBAR_CSS_URL as string,
+    simplebarJsUrl:     import.meta.env.VITE_SIMPLEBAR_JS_URL as string,
+    loginPageUrl:       import.meta.env.VITE_LOGIN_PAGE_URL as string,
+    insiteLocalDomain:  import.meta.env.VITE_INSITE_LOCAL_DOMAIN as string,
+    localUser:          (import.meta.env.VITE_LOCAL_USER ?? null) as (string | null),
+    localOrganization:  (import.meta.env.VITE_LOCAL_ORGANIZATION ?? null) as (string | null),
+    pagesPerView:       parseInt(import.meta.env.VITE_PAGES_PER_VIEW),
+    tinymceScript:      import.meta.env.VITE_TINYMCE_SCRIPT as string,
+    localEnvApiLatency: parseInt(import.meta.env.VITE_LOCAL_ENV_API_LATENCY),
+    finderPageSize:     parseInt(import.meta.env.VITE_FINDER_PAGE_SIZE),
+    isLocal:            !!import.meta.env.VITE_IS_LOCAL && import.meta.env.VITE_IS_LOCAL.toLowerCase() === "true",
+    shiftApiHostUrl:    import.meta.env.VITE_SHIFT_API_HOST_URL as string,
+}

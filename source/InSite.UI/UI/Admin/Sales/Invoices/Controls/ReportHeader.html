@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+        body {
+            font-family: Calibri, Helvetica, Arial;
+            font-size: 12pt;
+            width: 930px;
+            margin: 0;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table td {
+            vertical-align: middle;
+        }
+        #logo {
+            max-height: 50px;
+            height: auto;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        #header_title {
+            font-size: xx-large;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <img id="logo" alt="Organization Logo" />
+        <div id="header_title"></div>
+    </div>
+
+    <script type="text/javascript">
+        (function () {
+            var variables = (function (a) {
+                if (a === '') return {};
+                var b = {};
+                for (var i = 0; i < a.length; ++i) {
+                    var p = a[i].split('=', 2);
+                    if (p.length !== 2) continue;
+                    b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+                }
+                return b;
+            })(window.location.search.substring(1).split('&'));
+
+            var title = String(variables.header_title || '');
+            var logo = String(variables.logo_url || '');
+
+            document.getElementById('header_title').innerText = title;
+
+            if (logo && logo !== 'null' && logo !== 'undefined') {
+                var img = document.getElementById('logo');
+                img.src = logo;
+                img.style.display = 'block';
+            } else {
+                document.getElementById('logo').style.display = 'none';
+            }
+        })();
+    </script>
+</body>
+</html>

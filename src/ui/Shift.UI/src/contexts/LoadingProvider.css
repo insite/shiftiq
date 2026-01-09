@@ -1,0 +1,32 @@
+.loading-provider {
+    position: relative;
+
+    .backdrop-panel {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgb(255 255 255 / 60%);
+        backdrop-filter: blur(4px);
+        transition: all 0.3s ease-in-out;
+        z-index: -50;
+        opacity: 0;
+
+        &[data-visible] {
+            z-index: 9999;
+            opacity: 1;
+        }
+
+        .loading-panel {
+            display: flex;
+            align-items: center;
+            border-radius: 0.5rem; /* 8px */
+            background-color: #fff;
+            padding: 1rem 1.75rem; /* 16px 28px */
+        }
+    }
+}

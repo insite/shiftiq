@@ -1,0 +1,50 @@
+﻿ul.nav-tabs {
+    margin-bottom: 0px;
+}
+
+.tab-pane div.settings h3 {
+    margin-top: 20px;
+}
+
+.table-metrics td:nth-child(2) {
+    text-align: right;
+}
+
+.question-standard {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #F5F5F5;
+}
+
+.question-trigger-incorrect {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #F2DEDE;
+}
+
+.question-trigger-range {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #F2DEDE;
+}
+
+.download-button .caret {
+    margin-left: 6px;
+}
+
+.download-button .caret {
+    margin-left: 6px;
+}
+
+.download-button ul.dropdown-menu a .text,
+.download-button ul.dropdown-menu i {
+    color: black;
+}
+
+.download-button ul.dropdown-menu a:hover {
+    text-decoration: none !important;
+}
+
+.download-button ul.dropdown-menu .text {
+    margin-left: 6px;
+}

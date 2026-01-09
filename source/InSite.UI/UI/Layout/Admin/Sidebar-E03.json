@@ -1,0 +1,154 @@
+{
+  "Home": {
+    "Icon": "fa-regular fa-home",
+    "Image": "/favicon-cmds.png",
+    "Text": "CMDS",
+    "Href": "/ui/home"
+  },
+  "Menu": [
+    {
+      "Category": "System",
+      "Links": [
+        {
+          "Icon": "fa-regular fa-file-chart-line",
+          "Text": "Reports",
+          "Href": "/ui/admin/reporting",
+          "Security": {
+            "Claim": "PermissionName",
+            "Value": "Custom/CMDS/Managers"
+          }
+        },
+        {
+          "Icon": "fa-regular fa-tools",
+          "Text": "Tools",
+          "Href": "/ui/admin/tools",
+          "Security": {
+            "Operator": "OR",
+            "Conditions": [
+              {
+                "Claim": "IsOperator",
+                "Value": "true"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "Admin Only Users"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "CMDS Programmers"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "CMDS System Administrators"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "CMDS Office Administrators"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "CMDS Field Administrators"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "CMDS Managers"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "CMDS Supervisors"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "CMDS Validators"
+              },
+              {
+                "Claim": "GroupName",
+                "Value": "TSSC Only Administrators"
+              }
+            ]
+          }
+        },
+        {
+          "Icon": "fa-regular fa-users",
+          "Text": "People",
+          "Href": "/ui/cmds/admin/users/search",
+          "Security": {
+            "Claim": "PermissionName",
+            "Value": "Custom/CMDS/Users"
+          }
+        },
+        {
+          "Icon": "fa-regular fa-city",
+          "Text": "Organizations",
+          "Href": "/ui/cmds/admin/organizations/search",
+          "Security": {
+            "Claim": "PermissionName",
+            "Value": "Custom/CMDS/Administrators"
+          }
+        }
+      ]
+    },
+    {
+      "Category": "My Development",
+      "Links": [
+        {
+          "Icon": "fa-regular fa-id-badge",
+          "Text": "Profiles",
+          "Href": "/ui/cmds/portal/validations/profiles/search",
+          "Security": {
+            "Claim": "GroupName",
+            "Value": "CMDS Workers"
+          }
+        },
+        {
+          "Icon": "fa-regular fa-ruler-triangle",
+          "Text": "Request Validation",
+          "Href": "/ui/cmds/portal/validations/competencies/submit",
+          "Security": {
+            "Claim": "GroupName",
+            "Value": "CMDS Workers"
+          }
+        },
+        {
+          "Icon": "fa-regular fa-balance-scale",
+          "Text": "Self-Assessments",
+          "Href": "/ui/cmds/portal/validations/competencies/search",
+          "Security": {
+            "Claim": "GroupName",
+            "Value": "CMDS Workers"
+          }
+        }
+      ]
+    },
+    {
+      "Category": "Management",
+      "Links": [
+        {
+          "Icon": "fa-regular fa-award",
+          "Text": "Achievements",
+          "Href": "/ui/cmds/admin/achievements/search"
+        },
+        {
+          "Icon": "fa-regular fa-ruler-triangle",
+          "Text": "Competencies",
+          "Href": "/ui/cmds/admin/standards/competencies/search"
+        },
+        {
+          "Icon": "fa-regular fa-id-badge",
+          "Text": "Profiles",
+          "Href": "/ui/cmds/admin/standards/profiles/search"
+        },
+        {
+          "Icon": "fa-regular fa-map-marked-alt",
+          "Text": "Programs",
+          "Href": "/ui/admin/learning/programs/search"
+        },
+        {
+          "Icon": "fa-regular fa-balance-scale",
+          "Text": "Validations",
+          "Href": "/ui/cmds/design/validations/competencies/start"
+        }
+      ]
+    }
+  ]
+}

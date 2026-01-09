@@ -1,0 +1,30 @@
+.search-download-columns {
+    & > div.header,
+    & > div.sortable > div {        
+        display: grid;
+        grid-template-columns: 2.5rem 1fr;
+        border-bottom: 1px solid rgb(227, 233, 239);
+        padding: 6px;
+        background-color: white;
+        cursor: default;
+
+        span:nth-child(2) {
+            cursor: grab;
+
+            &[data-not-selected] {
+                opacity: 0.6;
+            }
+        }
+
+        &[data-dragging] {
+            position: relative;
+            z-index: 9999;
+            border-top: 1px solid rgb(227, 233, 239);
+            background-color: #f6f6f6;
+
+            span:nth-child(2) {
+                cursor: grabbing;
+            }
+        }
+    }
+}

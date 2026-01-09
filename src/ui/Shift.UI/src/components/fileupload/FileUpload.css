@@ -1,0 +1,42 @@
+.fileupload {
+    --ar-btn-hover-bg: rgb(219.1818181818, 219.1818181818, 241.5681818182);
+
+    & > div:first-child {
+        position: relative;
+
+        & > input {
+            padding-right: 2.7rem;
+
+            &.is-invalid {
+                background-image: none;
+            }
+        }
+
+        & > button {
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            width: 2.7rem;
+            margin:1px;
+            border: none;
+            border-left: 1px solid var(--ar-gray-400);
+            background: transparent;
+            color: var(--ar-btn-color);
+            right: 0px;
+            border-top-right-radius: var(--ar-border-radius);
+            border-bottom-right-radius: var(--ar-border-radius);
+
+            &:disabled {
+                pointer-events: none;
+            }
+
+            &:hover {
+                background-color: var(--ar-btn-hover-bg);
+            }
+        }
+    }
+
+    & > div.progressbar {
+        margin-top: 0.375rem;
+    }
+}

@@ -1,0 +1,23 @@
+﻿.find-entity {
+}
+
+    .find-entity > .fe-ouput {
+        position: relative;
+    }
+
+        .find-entity > .fe-ouput a[data-action="open"] {
+            display: block;
+            position: absolute;
+            line-height: 44px;
+            padding: 0 11px;
+            right: 0;
+        }
+
+        .find-entity > .fe-ouput input[type="text"] {
+            width: calc(100% - 36px);
+        }
+
+    .find-entity .fe-paginator {
+        border-top: solid #e9e9f2 1px;
+        padding-top: 10px;
+    }

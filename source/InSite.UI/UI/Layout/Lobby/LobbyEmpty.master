@@ -1,0 +1,21 @@
+﻿<%@ Master Language="C#" CodeBehind="LobbyEmpty.master.cs" Inherits="InSite.UI.Layout.Lobby.LobbyEmpty" %>
+
+<!DOCTYPE html>
+
+<html>
+    <head runat="server">
+        <title></title>
+        <insite:FaviconLink runat="server" />
+        <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+        <style type="text/css">
+            body { background-color: #ffffff; }
+        </style>
+    </head>
+    <body runat="server" id="HtmlBody">
+        <form runat="server" id="BodyForm" autocomplete="off">
+            <%= InSite.Web.Helpers.AntiForgeryHelper.GetHtml() %>
+            <asp:ScriptManager runat="server" />
+            <asp:ContentPlaceHolder ID="BodyContent" runat="server" />
+        </form>
+    </body>
+</html>

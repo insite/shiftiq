@@ -1,0 +1,212 @@
+﻿.question-tags {
+    float: right;
+    font-size: 0.7rem;
+    color: #ececec;
+}
+
+.card-body, .card-header, .card-footer {
+    z-index: auto !important;
+}
+
+.card-question {
+}
+
+    .card-question.has-error {
+        border-color: #a94442;
+        box-shadow: 0px 0px 6px #ce8483;
+    }
+
+    .card-question > .card-header > .question-text img,
+    .card-question > .card-body img {
+        max-height: 500px;
+        max-width: 100%;
+    }
+
+    .card-question > .card-header > .question-text iframe,
+    .card-question > .card-body > .question-text iframe {
+        max-width: 100% !important;
+    }
+
+    .card-question > .card-body > .form-group {
+        position: relative;
+    }
+
+.table-option > tbody > tr > td.input .form-check-input,
+.table-boolean > tbody > tr > td.input .form-check-input,
+.table-likert > tbody > tr > td.input .form-check-input,
+.table-match > tbody > tr > td.answer .form-check-input {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0;
+    cursor: pointer;
+}
+
+.table-option {
+    width: initial;
+    background-color: transparent;
+    margin-bottom: 15px;
+}
+
+    .table-option > thead > tr > th {
+        border-bottom: none;
+    }
+
+    .table-option > tbody > tr > td {
+        border-bottom: none;
+    }
+
+        .table-option > thead > tr > th.text + th.text,
+        .table-option > tbody > tr > td.text + td.text {
+            padding-left: 30px;
+        }
+
+        .table-option > tbody > tr > td.text {
+            cursor: pointer;
+        }
+
+            .table-option > tbody > tr > td.text p {
+                margin-bottom: 0;
+            }
+
+
+.table-boolean {
+    background-color: transparent;
+}
+
+    .table-boolean > tbody > tr > td {
+        border-top-width: 0;
+        border-bottom-width: 0;
+    }
+
+        .table-boolean > tbody > tr > td.input {
+            width: 160px;
+        }
+
+            .table-boolean > tbody > tr > td.input .checkbox {
+                margin-bottom: 0;
+                margin-top: 0;
+            }
+
+            .table-boolean > tbody > tr > td.input .form-group {
+                margin: 0;
+            }
+
+                .table-boolean > tbody > tr > td.input .form-group:not(.has-error) .checkbox {
+                    color: inherit;
+                }
+
+        .table-boolean > thead > tr > td.text + td.text,
+        .table-boolean > tbody > tr > td.text + td.text {
+            padding-left: 30px;
+        }
+
+    .table-boolean > tbody > tr + tr > td {
+        border-top-width: 1px;
+    }
+
+    .table-boolean > tbody > tr > td.text p {
+        margin-bottom: 0;
+    }
+
+
+.table-likert {
+    width: 100%;
+    background-color: transparent;
+    margin-bottom: 15px;
+}
+
+    .table-likert > thead > tr > td {
+        border-bottom: none;
+        text-align: center;
+        vertical-align: bottom;
+    }
+
+    .table-likert > tbody > tr > td {
+        border-bottom: none;
+    }
+
+        .table-likert > tbody > tr > td.input {
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table-likert > tbody > tr > td.text {
+            vertical-align: middle;
+        }
+
+            .table-likert > thead > tr > td.text p,
+            .table-likert > tbody > tr > td.text p {
+                margin-bottom: 0;
+            }
+
+
+.composed-essay-input,
+.composed-voice-input {
+}
+
+    .composed-essay-input > ul > li,
+    .composed-voice-input > ul > li {
+        margin-bottom: 0.5rem;
+    }
+
+        .composed-essay-input > ul > li > div.rubric-text p,
+        .composed-voice-input > ul > li > div.rubric-text p {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+.table-match {
+    background-color: transparent;
+    table-layout: fixed;
+}
+
+    .table-match > tbody > tr > td {
+        border-top-width: 0;
+        border-bottom-width: 0;
+    }
+
+        .table-match > tbody > tr > td.right,
+        .table-match > tbody > tr > td.left {
+            width: 50%;
+        }
+
+            .table-match > tbody > tr > td.right .form-group {
+                margin: 0;
+            }
+
+    .table-match > tbody > tr + tr > td {
+        border-top-width: 1px;
+    }
+
+    .table-match > tbody > tr > td.left p {
+        margin-bottom: 0;
+    }
+
+table.table-markdown {
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+    table.table-markdown th {
+        background: white;
+        padding: 5px;
+        text-align: left;
+    }
+
+    table.table-markdown td {
+        border: 1px solid silver;
+        padding: 5px;
+    }
+
+    table.table-markdown tr:nth-child(odd) {
+        background: #F9F9F9;
+    }
+
+    table.table-markdown tr:nth-child(even) {
+        background: #F0F0F0;
+    }
+
+.ordering-list .ordering-list-container > div > p:last-child {
+    margin-bottom: 0;
+}

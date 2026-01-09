@@ -1,0 +1,148 @@
+﻿$widget-title-font-size: $font-size-lg !default;
+$widget-title-margin-bottom: 1.25rem !default;
+$widget-link-padding: .25rem 0 !default;
+$widget-link-font-weight: $font-weight-medium !default;
+$widget-link-color: $nav-link-color !default;
+$widget-link-hover-color: $nav-link-hover-color !default;
+$widget-link-active-color: $nav-link-active-color !default;
+$widget-link-transition: color .25s ease-in-out !default;
+
+.widget {
+    ul, ol {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        > li {
+            display: block;
+            margin-bottom: .375rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            ul, ol {
+                padding: .25rem 0 .25rem 1.375rem;
+
+                > li {
+                    position: relative;
+                    margin-bottom: 0;
+                    border-left: $border-width * 2 solid $border-color;
+
+                    > a {
+                        padding-left: 1.125rem !important;
+
+                        &::after {
+                            position: absolute;
+                            left: 0;
+                            top: 50%;
+                            width: .75rem;
+                            height: $border-width;
+                            background-color: darken($border-color, 6%);
+                            content: '';
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.widget-link {
+    display: block;
+    position: relative;
+    padding: $widget-link-padding;
+    transition: $widget-link-transition;
+    color: $widget-link-color;
+    font-weight: $widget-link-font-weight;
+    text-decoration: none;
+
+    &:hover {
+        color: $widget-link-hover-color;
+        text-decoration: none;
+    }
+
+    &.active,
+    .active > & {
+        color: $widget-link-active-color;
+        pointer-events: none;
+        cursor: default;
+    }
+
+    > small {
+        display: inline-block;
+
+        font: {
+            size: 75%;
+            weight: normal;
+        }
+    }
+
+    & + ul > li > .widget-link {
+        font-size: 87.5%;
+    }
+}
+
+.widget-categories {
+    .widget-link {
+        padding-left: 1.25rem;
+
+        &::before {
+            position: absolute;
+            top: .3rem;
+            left: .2rem;
+            transition: transform .25s ease-in-out, opacity .15s ease-in-out;
+
+            font: {
+                family: "Font Awesome 7 Pro";
+                size: 0.9rem;
+            }
+
+            content: "\f105";
+            opacity: .5;
+        }
+
+        &:hover::before,
+        &.active::before {
+            opacity: 1;
+        }
+
+        & + ul > li > .widget-link {
+            padding-left: inherit;
+
+            &::before {
+                display: none;
+            }
+        }
+    }
+
+    .active > .widget-link::before {
+        opacity: 1;
+    }
+
+    [data-bs-toggle='collapse'] {
+        color: $widget-link-active-color;
+
+        &::before {
+            transform: rotate(90deg);
+            opacity: 1;
+        }
+
+        &.collapsed {
+            color: $widget-link-color;
+
+            &::before {
+                transform: none;
+                opacity: .5;
+            }
+
+            &:hover {
+                color: $widget-link-hover-color;
+
+                &::before {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,108 @@
+﻿.accordion-header .accordion-button i {
+    padding-right: 8px;
+}
+
+.date-time-picker {
+    border-top-right-radius: 0 !important; 
+    border-bottom-right-radius: 0 !important;
+}
+
+.signin .signin-form-inner {
+    border: 1px solid #545454;
+    box-shadow: 5px 5px 5px 0px #333;
+}
+
+.btn-show-filter {
+    display: block;
+    position: absolute;
+    line-height: 44px;
+    padding: 0 11px;
+    right: -36px;
+}
+
+body.InternetExplorer11 {
+}
+
+    body.InternetExplorer11 main.page-wrapper > section.container {
+        padding-bottom: 180px !important;
+    }
+
+input + label {
+    margin-left: 4px;
+}
+
+div.form-group div span label + input {
+    margin-left: 12px;
+}
+
+.help-block {
+    font-size: 13px;
+    color: #999999;
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+header.header a.navbar-brand img {
+    max-width: none;
+}
+
+.modal .modal-body .filter-text {
+    padding-right: 110px;
+}
+
+.modal .modal-body .filter-button {
+    position: absolute;
+    top: 23px;
+    right: 75px;
+}
+
+.modal .modal-body .clear-button {
+    position: absolute;
+    top: 23px;
+    right: 24px;
+}
+
+body.input-md-fullscreen {
+    overflow: hidden;
+}
+
+    .editor-toolbar.fullscreen,
+    .CodeMirror-fullscreen,
+    body.input-md-fullscreen .editor-preview-side {
+        z-index: 1031;
+    }
+
+body.drag-active .upload-dropmessage {
+    display: block !important;
+}
+
+.upload-dropmessage,
+.upload-loadingmessage {
+    z-index: 501;
+}
+
+    .upload-dropmessage > div > div {
+        font-size: 1.1em;
+    }
+
+    .upload-dropmessage.drag-over > div > div {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+table.translation-list > tbody > tr > td.lang-name {
+    font-weight: bold;
+    width: 40px;
+    padding: 5px;
+    vertical-align: top;
+}
+
+    table.translation-list > tbody > tr > td.lang-name a {
+        text-transform: uppercase;
+    }
+
+table.translation-list > tbody > tr > td.lang-value {
+    padding: 5px;
+    word-break: break-word;
+}

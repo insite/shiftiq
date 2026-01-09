@@ -1,0 +1,57 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="AdminBase.master.cs" Inherits="InSite.UI.Layout.Admin.AdminBase" %>
+
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleCss.ascx" TagPrefix="uc" TagName="BundleCss" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleJsHeader.ascx" TagPrefix="uc" TagName="BundleJsHeader" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleJsFooter.ascx" TagPrefix="uc" TagName="BundleJsFooter" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    
+    <title></title>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+
+    <insite:FaviconLink runat="server" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+
+    <uc:BundleCss runat="server" />
+    <insite:StyleLink runat="server" />
+    <uc:BundleJsHeader runat="server" />
+
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+
+</head>
+<body runat="server" id="HtmlBody">
+
+    <insite:PageHeadContentRenderer runat="server" />
+
+    <form runat="server" id="BodyForm" autocomplete="off">
+
+        <%= InSite.Web.Helpers.AntiForgeryHelper.GetHtml() %>
+
+        <asp:ScriptManager runat="server" ID="ScriptManager"></asp:ScriptManager>
+
+        <asp:ContentPlaceHolder ID="BodyContent" runat="server" />
+
+        <a class="btn-scroll-top" href="#top" data-scroll="" aria-label="Scroll back to top">
+            <svg viewBox="0 0 40 40" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></circle>
+            </svg>
+            <i class="far fa-arrow-up"></i>
+        </a>
+        <div id="bottom"></div>
+
+        <uc:BundleJsFooter runat="server" />
+
+        <insite:PageFooterContentRenderer runat="server" />
+
+    </form>
+
+</body>
+</html>

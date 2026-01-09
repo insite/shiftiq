@@ -1,0 +1,153 @@
+﻿.insite-findentity {
+    display: inline-block;
+    position: relative;
+    min-height: 42px;
+}
+
+    .insite-findentity.no-output {
+        min-height: auto;
+    }
+
+    .insite-findentity td.fe-input,
+    .insite-findentity th.fe-input {
+        width: 35px;
+    }
+
+    .insite-findentity > .fe-buttons {
+    }
+
+        .insite-findentity > .fe-buttons .btn {
+            padding-left: 13px;
+            padding-right: 13px;
+            margin-right: 5px;
+        }
+
+    .insite-findentity > table {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+        .insite-findentity > table.disabled input[type="checkbox"] {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .insite-findentity > table.disabled td.fe-input {
+            cursor: not-allowed;
+            display: none;
+        }
+
+    .insite-findentity > button {
+        --ar-btn-hover-border-color: #dfdfeb;
+        --ar-btn-font-weight: normal;
+        --ar-btn-disabled-bg: var(--ar-gray-100);
+        --ar-btn-disabled-border-color: var(--ar-gray-300);
+        width: 100%;
+        cursor: default;
+        white-space: nowrap;
+        border-color: #dfdfeb;
+        background-color: #fff;
+    }
+
+        .insite-findentity > button.dropdown-toggle::after {
+            position: absolute;
+            top: 50%;
+            right: 18px;
+            margin-top: -11px;
+            color: var(--ar-gray-700);
+        }
+
+        .insite-findentity > button > div {
+            height: 100%;
+            width: 0;
+            min-width: 100%;
+            text-align: left;
+            overflow: hidden;
+            padding-right: 16px;
+        }
+
+            .insite-findentity > button > div > div {
+                overflow: hidden;
+                min-height: 1.5rem;
+                color: var(--ar-body-color);
+            }
+
+    .insite-findentity.fe-empty > button > div > div,
+    .insite-findentity.fe-empty > .fe-message {
+        color: var(--ar-gray-500);
+        font-weight: normal;
+    }
+
+    .insite-findentity > button.dropdown-toggle.disabled::after {
+        opacity: 0.5;
+    }
+
+    .insite-findentity > .fe-message {
+        border-radius: var(--ar-border-radius);
+        border: var(--ar-border-width) solid var(--ar-gray-400);
+        padding: 0.5625rem 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .insite-findentity.is-invalid > .btn {
+        border-color: var(--ar-form-invalid-border-color);
+    }
+
+    .insite-findentity input.form-check-input {
+        margin-top: 0.15625rem;
+    }
+
+div.modal.modal-findentity {
+}
+
+    div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > .fe-message {
+        border-radius: var(--ar-border-radius);
+        border: 1px solid #ddd;
+        padding: 15px;
+        text-align: center;
+        margin-top: 22px;
+    }
+
+    div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > .pagination {
+    }
+
+        div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > .pagination > li.disabled {
+            cursor: not-allowed;
+        }
+
+            div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > .pagination > li.disabled > a {
+                color: #ddd !important;
+            }
+
+        div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > .pagination > li.active > a {
+            cursor: default;
+        }
+
+    div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > table > thead .fe-group-indent {
+        width: 15px;
+    }
+
+    div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > table:not(.table-fe-grouped) > thead .fe-group-indent {
+        display: none;
+    }
+
+    div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > table > tbody > tr {
+        cursor: pointer;
+    }
+
+        div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > table > tbody > tr.group-header {
+            cursor: default;
+            color: #737491;
+        }
+
+            div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-body > table > tbody > tr.group-header > td {
+                box-shadow: none;
+                padding-top: 0.55rem;
+                padding-bottom: 0.55rem;
+                font-weight: lighter;
+                font-style: italic;
+            }
+
+    div.modal.modal-findentity > .modal-dialog > .modal-content > .modal-footer button + button {
+        margin-left: 0.5rem;
+    }

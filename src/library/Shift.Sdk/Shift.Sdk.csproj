@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>CS1573;CS1591</NoWarn>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <Compile Remove="Service\Content\Contents\Write\**" />
+    <Compile Remove="Service\Content\Sites\Process\Write\Interfaces\**" />
+    <EmbeddedResource Remove="Service\Content\Contents\Write\**" />
+    <EmbeddedResource Remove="Service\Content\Sites\Process\Write\Interfaces\**" />
+    <None Remove="Service\Content\Contents\Write\**" />
+    <None Remove="Service\Content\Sites\Process\Write\Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Service\Messaging\Messages\State\Notifications\NotificationTypes.json" />
+    <EmbeddedResource Include="Service\Reporting\State\DataSource\Templates\Groups.json" />
+    <EmbeddedResource Include="Service\Reporting\State\DataSource\Templates\People.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shift.Common\Shift.Common.csproj" />
+    <ProjectReference Include="..\Shift.Toolbox\Shift.Toolbox.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Service\Directory\Contacts\Process\Read\Queries\QUserFilter.extensions.cs">
+      <DependentUpon>QUserFilter.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

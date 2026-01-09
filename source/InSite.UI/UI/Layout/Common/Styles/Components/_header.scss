@@ -1,0 +1,16 @@
+﻿$nav-header-admin-height: 2.875rem;
+$nav-header-portal-height: 5rem;
+
+header {
+    height: var(--in-nav-header-height);
+}
+
+header.admin-navbar,
+aside.admin-sidebar,
+.offcanvas.admin-offcanvas {
+    --in-nav-header-height: #{$nav-header-admin-height};
+}
+
+header.portal-navbar {
+    --in-nav-header-height: #{$nav-header-portal-height};
+}

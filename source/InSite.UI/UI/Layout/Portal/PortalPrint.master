@@ -1,0 +1,162 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="PortalPrint.master.cs" Inherits="InSite.UI.Layout.Portal.PortalPrintMaster" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+
+    <title></title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <insite:FaviconLink runat="server" />
+
+    <link rel="stylesheet" href="/library/fonts/font-awesome/7.1.0/css/all.min.css">
+    <insite:StyleLink runat="server" />
+    <link rel="stylesheet" media="screen" href="/UI/Layout/common/parts/plugins/chartist/dist/chartist.min.css"/>
+
+    <style type="text/css">
+        body {
+            font-family: sans-serif;
+            padding: 0 10px;
+        }
+
+        .card-header:first-child {
+            border-radius: 15px 15px 0 0;
+        }
+    </style>
+
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+
+</head>
+<body runat="server" id="HtmlBody" autocomplete="off">
+    <insite:PageHeadContentRenderer runat="server" />
+
+    <form runat="server" id="BodyForm">
+        <%= InSite.Web.Helpers.AntiForgeryHelper.GetHtml() %>
+
+        <main class="page-wrapper">
+            <asp:ContentPlaceHolder ID="SideContent" runat="server" />
+            <asp:ContentPlaceHolder ID="BodyContent" runat="server" />
+        </main>
+    </form>
+
+    <insite:ResourceBundle runat="server" Type="JavaScript">
+        <Items>
+            <insite:ResourceBundleFile Url="/UI/Layout/common/parts/plugins/jquery/jquery.min.js" />
+            <insite:ResourceBundleFile Url="/UI/Layout/common/parts/plugins/chartist/dist/chartist.min.js" />
+        </Items>
+    </insite:ResourceBundle>
+
+    <script>
+        $(function () {
+
+            // Aleksey 2022-01-20: without this line charter doesn't work when printing
+            Function.prototype.bind = Function.prototype.bind || function (thisp) { var fn = this; return function () { return fn.apply(thisp, arguments); }; };
+
+            initChart();
+
+            function initChart() {
+                var lineChart = document.querySelectorAll('[data-line-chart]'),
+                    barChart = document.querySelectorAll('[data-bar-chart]'),
+                    pieChart = document.querySelectorAll('[data-pie-chart]');
+
+                var sum = function (a, b) { return a + b };
+
+                if (lineChart.length === 0 && barChart.length === 0 && pieChart.length === 0) return;
+
+                // Create <style> tag and put it to <head> for changing colors of charts via data attributes
+                var head = document.head || document.getElementsByTagName('head')[0],
+                    style = document.createElement('style'),
+                    css;
+                head.appendChild(style);
+
+                // Line chart
+                for (var i = 0; i < lineChart.length; i++) {
+
+                    var data = JSON.parse(lineChart[i].dataset.lineChart),
+                        options = (lineChart[i].dataset.options != undefined) ? JSON.parse(lineChart[i].dataset.options) : '',
+                        seriesColor = lineChart[i].dataset.seriesColor,
+                        userColors;
+
+                    lineChart[i].classList.add('line-chart-' + i);
+
+                    if (seriesColor != undefined) {
+
+                        userColors = JSON.parse(seriesColor);
+
+                        for (var n = 0; n < userColors.colors.length; n++) {
+                            css = '.line-chart-' + String(i) + ' .ct-series:nth-child(' + String(n + 1) + ') .ct-line,' +
+                              '.line-chart-' + String(i) + ' .ct-series:nth-child(' + string(n + 1) + ') .ct-point {' +
+                              ' stroke: ' + userColors.colors[n] + ' !important;' +
+                              '}'
+                            ;
+                            style.appendChild(document.createTextNode(css));
+                        }
+                    }
+
+                    new Chartist.Line(lineChart[i], data, options);
+                }
+
+                // Bar chart
+                for (var i = 0; i < barChart.length; i++) {
+
+                    var data = JSON.parse(barChart[i].dataset.barChart),
+                        options = (barChart[i].dataset.options != undefined) ? JSON.parse(barChart[i].dataset.options) : '',
+                        seriesColor = barChart[i].dataset.seriesColor,
+                        userColors;
+
+                    barChart[i].classList.add('bar-chart-' + i);
+
+                    if (seriesColor != undefined) {
+
+                        userColors = JSON.parse(seriesColor);
+
+                        for (var n = 0; n < userColors.colors.length; n++) {
+                            css = '.bar-chart-' + String(i) + ' .ct-series:nth-child(' + String(n + 1) + ') .ct-bar {' +
+                                  ' stroke: ' + userColors.colors[n] + ' !important;' +
+                                  '}'
+                                ;
+                            style.appendChild(document.createTextNode(css));
+                        }
+                    }
+
+                    new Chartist.Bar(barChart[i], data, options);
+                }
+
+                // Pie chart
+                for (var i = 0; i < pieChart.length; i++) {
+
+                    var data = JSON.parse(pieChart[i].dataset.pieChart),
+                        seriesColor = pieChart[i].dataset.seriesColor,
+                        userColors;
+
+                    pieChart[i].classList.add('cz-pie-chart-' + i);
+
+                    if (seriesColor != undefined) {
+
+                        userColors = JSON.parse(seriesColor);
+
+                        for (var n = 0; n < userColors.colors.length; n++) {
+                            css = '.cz-pie-chart-' + String(i) + ' .ct-series:nth-child(' + String(n + 1) + ') .ct-slice-pie {' +
+                                  ' fill: ' + userColors.colors[n] + ' !important;' +
+                                  '}'
+                                ;
+                            style.appendChild(document.createTextNode(css));
+                        }
+                    }
+
+                    new Chartist.Pie(pieChart[i], data, {
+                        labelInterpolationFnc: function (value) {
+                            return Math.round(value / data.series.reduce(sum) * 100) + '%';
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+
+    <insite:PageFooterContentRenderer runat="server" />
+</body>
+</html>

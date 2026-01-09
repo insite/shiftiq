@@ -1,0 +1,100 @@
+.richtexteditor {
+    --borderColor: #ddd;
+    --errorBorderColor: rgb(247, 79, 120);
+
+    &.is-invalid > div.markdown {
+        border-color: var(--errorBorderColor);
+    }
+
+    &.is-invalid > div.tox-tinymce {
+        border-color: var(--errorBorderColor);
+    }
+    
+    & > div.markdown {
+        border-radius: 0.25rem;
+        border: 1px solid var(--borderColor);
+
+        .mdxeditor {
+            --baseBg: #fff;
+
+            blockquote {
+                border-left: 0.25rem solid var(--borderColor);
+                padding-left: 1rem;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .mdxeditor-toolbar {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom: 1px solid var(--borderColor);
+            }
+        }
+    }
+
+    & > div.language {
+        margin-top: 0.25rem;
+    }
+
+    & > div.mode-switch {
+        --switch-width: 65px;
+        --handle-width: 7px;
+
+        display: flex;
+        justify-content: space-between;
+
+        & > div {
+            position: relative;
+            width: calc(var(--handle-width) + var(--switch-width));
+            margin-bottom: .3125rem;
+            padding: 0;
+            overflow: hidden;
+
+            & > span {
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: var(--switch-width);
+                transition: right 0.35s;
+            }
+            & > span.handle {
+                display: inline-block;
+                background-color: #fff;
+                width: calc(2 * var(--handle-width));
+                right: calc(-1 * var(--handle-width));
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+            }
+        }
+
+        &.markdown-mode > div {
+            & > span.html-switch {
+                right: calc(-1 * var(--switch-width));
+                pointer-events: none;
+            }
+            & > span.markdown-switch {
+                right: var(--handle-width);
+            }
+        }
+
+        &.html-mode > div {
+            & > span.markdown-switch {
+                right: calc(var(--switch-width) + var(--handle-width));
+                pointer-events: none;
+            }
+            & > span.handle {
+                right: var(--switch-width);
+            }
+        }
+    }
+}
+
+.mdxeditor-popup-container {
+    z-index: 1032;
+}

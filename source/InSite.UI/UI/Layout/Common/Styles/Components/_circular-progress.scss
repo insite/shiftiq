@@ -1,0 +1,38 @@
+﻿.circular-progress {
+    --#{$prefix}progress-thickness: #{$circular-progress-thickness};
+    --#{$prefix}progress-font-size: #{$circular-progress-font-size};
+    --#{$prefix}progress-bg: #{$circular-progress-bg};
+    --#{$prefix}progress-color: #{$circular-progress-color};
+    --#{$prefix}progress-bar-bg-primary: #{$circular-progress-bar-bg-primary};
+    --#{$prefix}progress-bar-bg-secondary: #{$circular-progress-bar-bg-secondary};
+    --#{$prefix}progress-value: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--#{$prefix}progress-bar-bg-primary) calc(var(--#{$prefix}progress-value) * 1%),
+        var(--#{$prefix}progress-bar-bg-secondary) calc(var(--ar-progress-value) / var(--ar-progress-value) * (var(--#{$prefix}progress-value) * 1% + 0.1%))
+    );
+}
+
+.circular-progress::before {
+    content: "";
+    position: absolute;
+
+    width: calc(100% - var(--#{$prefix}progress-thickness) * 2);
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background: var(--#{$prefix}progress-bg);
+}
+
+.circular-progress > span {
+    position: relative;
+    font-size: var(--#{$prefix}progress-font-size);
+    color: var(--#{$prefix}progress-color);
+}

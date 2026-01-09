@@ -1,0 +1,11 @@
+﻿body {
+    margin: 10px;
+}
+
+pre {
+    white-space: normal !important;
+}
+
+img {
+    max-width: 100%;
+}

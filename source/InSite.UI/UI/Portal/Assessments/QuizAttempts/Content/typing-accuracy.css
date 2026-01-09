@@ -1,0 +1,14 @@
+﻿.quiz-sample {
+    position: relative;
+}
+
+    .quiz-sample::before {
+        display: block;
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1500;
+    }

@@ -1,0 +1,73 @@
+﻿.insite-input-video {
+    display: block;
+    width: 100%;
+    min-width: 350px;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--ar-body-color);
+    background-color: var(--ar-body-bg);
+    border: var(--ar-border-width) solid var(--ar-gray-400);
+    border-radius: var(--ar-border-radius);
+    overflow: hidden;
+}
+
+    .insite-input-video > .iv-video.iv-active .iv-icon {
+        display: none;
+    }
+
+    .insite-input-video > .iv-video {
+        background-color: var(--ar-gray-100);
+        aspect-ratio: 4/3;
+        position: relative;
+        pointer-events: none;
+    }
+
+        .insite-input-video > .iv-video .iv-icon {
+            color: var(--ar-secondary-color);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
+            font-size: 2.5rem;
+        }
+
+        .insite-input-video > .iv-video video {
+            width: 100%;
+            max-height: 100%;
+            display: block;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    .insite-input-video > .iv-control {
+        padding: 0.5625rem 1.125rem;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+    }
+
+        .insite-input-video > .iv-control .btn {
+            --ar-btn-font-size: 1rem;
+            --ar-btn-padding-x: 0.74rem;
+        }
+
+        .insite-input-video > .iv-control .iv-timer {
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .insite-input-video > .iv-control .iv-label {
+            color: var(--ar-secondary-color);
+            font-size: 0.75rem;
+            display: block;
+            white-space: nowrap;
+        }
+
+        .insite-input-video > .iv-control .dropdown-menu {
+            font-size: 1rem;
+        }

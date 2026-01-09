@@ -1,0 +1,101 @@
+﻿<%@ Master Language="C#" CodeBehind="LobbyLogin.master.cs" Inherits="InSite.UI.Layout.Lobby.LobbyLogin" %>
+
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleCss.ascx" TagPrefix="uc" TagName="BundleCss" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleJsHeader.ascx" TagPrefix="uc" TagName="BundleJsHeader" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleJsFooter.ascx" TagPrefix="uc" TagName="BundleJsFooter" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+
+    <title></title>
+
+    <!-- Favicon and Touch Icons -->
+    <insite:FaviconLink runat="server" />
+    <link rel="apple-touch-icon" href="/library/images/icons/apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+
+    <uc:BundleCss runat="server" />
+    <insite:StyleLink runat="server" />
+    <uc:BundleJsHeader runat="server" ID="HeaderCurrentScripts" />
+
+    <!-- Overrides -->
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+
+    <style type="text/css">
+        
+        body { min-height: 100vh; }
+        form { margin-top: auto; margin-bottom: auto; }
+
+        table.login-toggle { width: 100%; }
+
+        table.login-toggle tr td {
+            width: 50%;
+            text-align: center;
+            border: 1px solid #848484;
+            padding: 4px;
+        }
+
+            table.login-toggle tr td.unselected a {
+                color: #545454;
+            }
+
+            table.login-toggle tr td.selected {
+                background-color: #848484;
+                color: white;
+                font-weight: bold;
+            }
+
+            a.navbar-brand img { max-width: 153px !important; }
+    </style>
+
+</head>
+<body runat="server" id="HtmlBody">
+
+    <insite:PageHeadContentRenderer runat="server" />
+
+    <form runat="server" id="BodyForm" autocomplete="off">
+
+        <%= InSite.Web.Helpers.AntiForgeryHelper.GetHtml() %>
+
+        <asp:ScriptManager runat="server" ID="ScriptManager">
+        </asp:ScriptManager>
+
+        <main class="page-wrapper">
+
+            <!-- Background image-->
+            <div runat="server" id="Wallpaper" class="d-none d-md-block position-absolute w-50 h-100 bg-size-cover"></div>
+
+            <!-- Actual content-->
+            <section class="container d-flex align-items-center pb-3 pb-md-4" style="flex: 1 0 auto;">
+                <div class="w-100">
+
+                    <div class="container px-0 px-xl-3 pt-3 pb-5">
+		                <a class="navbar-brand flex-shrink-0 order-lg-1 ms-lg-0 pe-lg-2 me-lg-4" href="/">
+                            <img runat="server" id="SignInLogo" class="d-none d-lg-block" src="/ui/templates/img/logo/logo-dark.png" alt="Logo" />
+                            <img runat="server" id="SignInIcon" class="d-lg-none" src="/ui/templates/img/logo/logo-icon.png" alt="Logo" />
+		                </a>
+	                </div>
+                    
+                    <asp:ContentPlaceHolder ID="BodyContent" runat="server" />
+
+                </div>
+            </section>
+
+        </main>
+        
+    </form>
+
+    <uc:BundleJsFooter runat="server" ID="FooterCurrentScripts" />
+
+    <insite:PageFooterContentRenderer runat="server" />
+
+</body>
+</html>

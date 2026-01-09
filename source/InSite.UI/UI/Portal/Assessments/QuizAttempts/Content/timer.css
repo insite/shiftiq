@@ -1,0 +1,28 @@
+﻿.quiz-timer {
+    font-size: 1.4rem;
+    cursor: default;
+    margin: 0 16px 0 12px;
+    color: #4a4b65;
+    text-align: right;
+    position: relative;
+    top: 4px;
+    display: none;
+}
+
+    .quiz-timer.inited {
+        display: inline-block;
+    }
+
+    .quiz-timer > div {
+        display: inline-block;
+    }
+
+        .quiz-timer > div.timer-minutes,
+        .quiz-timer > div.timer-seconds {
+            min-width: 28px;
+            text-align: left;
+        }
+
+        .quiz-timer > div.timer-separator {
+            padding: 0 4px 0 2px;
+        }

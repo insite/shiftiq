@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title><!-- TITLE --></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" media="screen" href="/library/fonts/font-awesome/7.1.0/css/all.min.css">
+    <link rel="stylesheet" href="/UI/Portal/assessments/attempts/content/result-print.css">
+    <link rel="stylesheet" href="/UI/Layout/Common/Parts/css/common.outputAudio.css">
+    <link rel="stylesheet" href="/UI/Portal/assessments/attempts/content/common.css">
+    <link rel="stylesheet" href="/UI/Portal/assessments/attempts/content/result.css">
+</head>
+<body>
+
+    <div class='logo-container ps-3 pb-3'>
+        <!-- LOGO_IMG -->
+    </div>
+
+    <h1><!-- TITLE --></h1>
+
+    <div class="mt-1 mb-4">
+        <div class="fw-bold mb-1"><!-- LEARNER_NAME --></div>
+        <div class="mb-1"><!-- LEARNER_EMAIL --></div>
+        <div class="mt-3">Date: <!-- EXAM_DATE --></div>
+    </div>
+
+    <!-- BODY -->
+
+    <script type="text/javascript">
+        (function () {
+            var likerts = document.querySelectorAll('table.table-likert');
+            for (var i = 0; i < likerts.length; i++) {
+                var table = likerts[i];
+                table.style.width = '830px';
+
+                calcWidth(table);
+                calcHeight(table);
+
+                table.style.width = '';
+            }
+
+            function calcWidth(table) {
+                var cells = table.tHead.rows[0].cells;
+                var minWidth = null;
+                var textCells = [];
+
+                for (var i = 0; i < cells.length; i++) {
+                    var cell = cells[i];
+                    if (!cell.classList.contains('text'))
+                        continue;
+
+                    cell.style.width = '1px';
+                    textCells.push(cell);
+
+                    var width = cell.offsetWidth;
+                    if (minWidth == null || minWidth < width)
+                        minWidth = Math.ceil(width);
+                }
+
+                var tableWidth = 0;
+                for (var i = 0; i < cells.length; i++)
+                    tableWidth += cells[i].offsetWidth;
+
+                var maxTotalWidthCoef = 0.6;
+                var totalMinWidth = minWidth * textCells.length;
+                var cellWidth = (totalMinWidth / tableWidth) < maxTotalWidthCoef
+                    ? Math.floor(tableWidth * maxTotalWidthCoef / cells.length)
+                    : minWidth;
+
+                for (var i = 0; i < textCells.length; i++)
+                    textCells[i].style.width = String(cellWidth) + 'px';
+            }
+
+            function calcHeight(table) {
+                var minHeight = null;
+                var rows = table.tBodies[0].rows;
+
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    row.style.height = '1px';
+
+                    var height = row.offsetHeight;
+                    if (minHeight == null || minHeight < height)
+                        minHeight = height;
+                }
+
+                for (var i = 0; i < rows.length; i++)
+                    rows[i].style.height = String(minHeight) + 'px';
+            }
+        })();
+    </script>
+</body>
+</html>

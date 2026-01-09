@@ -1,0 +1,16 @@
+{
+  "Name": "Groups",
+  "View": {
+    "Name": "reports.VGroup",
+    "Title": "Group",
+    "Alias": "G"
+  },
+  "Joins": [
+    {
+      "Name": "reports.VGroupPerson",
+      "Title": "Person",
+      "Alias": "P",
+      "Expression": "LEFT JOIN reports.VGroupPerson AS P ON G.GroupIdentifier = P.GroupIdentifier"
+    }
+  ]
+}

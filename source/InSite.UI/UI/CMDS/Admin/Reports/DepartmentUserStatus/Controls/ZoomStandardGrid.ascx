@@ -1,0 +1,72 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ZoomStandardGrid.ascx.cs" Inherits="InSite.Custom.CMDS.Reports.Controls.ZoomStandardGrid" %>
+
+<insite:Grid runat="server" ID="Grid" AllowPaging="false">
+    <Columns>
+
+        <asp:BoundField DataField="Index" />
+
+        <asp:TemplateField HeaderText="Statistic">
+            <ItemTemplate>
+                <%# Eval("StandardTitle") %>
+                <div class="form-text">
+                    <%# Eval("StandardIdentifier") != null ? string.Format("<a href='/ui/admin/standards/edit?id={0}'>{1}</a>", Eval("StandardIdentifier"), Eval("StandardMnemonic")) : (string)Eval("StandardMnemonic") %>
+                    <%# Eval("StandardMetadata") %>
+                </div>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="CP" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrIcon(Eval("CountCP"), Eval("StandardIdentifier") == null) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="EX" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrIcon(Eval("CountEX"), Eval("StandardIdentifier") == null) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="NC" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrIcon(Eval("CountNC"), Eval("StandardIdentifier") == null) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+            
+        <asp:TemplateField HeaderText="NA" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrEmpty(Eval("CountNA")) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="NT" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrEmpty(Eval("CountNT")) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="SA" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrEmpty(Eval("CountSA")) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="SV" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrEmpty(Eval("CountSV")) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="VA" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrEmpty(Eval("CountVA")) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="VN" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrEmpty(Eval("CountVN")) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="RQ" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
+            <ItemTemplate>
+                <%# NumberOrEmpty(Eval("CountRQ")) %> 
+            </ItemTemplate>
+        </asp:TemplateField>
+
+    </Columns>
+</insite:Grid>

@@ -1,0 +1,154 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Portal.master.cs" Inherits="InSite.UI.Layout.Portal.PortalMaster" %>
+
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleCss.ascx" TagPrefix="uc" TagName="BundleCss" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleJsHeader.ascx" TagPrefix="uc" TagName="BundleJsHeader" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/BundleJsFooter.ascx" TagPrefix="uc" TagName="BundleJsFooter" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/Navigation/PortalHeader.ascx" TagName="PortalHeader" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/Navigation/PortalBreadcrumbs.ascx" TagName="PortalBreadcrumbs" TagPrefix="uc" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+
+    <title></title>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+
+    <insite:FaviconLink runat="server" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+
+    <uc:BundleCss runat="server" />
+    <insite:StyleLink runat="server" />
+    <uc:BundleJsHeader runat="server" ID="HeaderCurrentScripts" />
+
+    <style type="text/css">
+        @media (min-width: 992px) {
+            main.portal-container .portal-sidebar {
+                min-width: 315px;
+                max-width: 315px;
+            }
+        }
+    </style>
+
+    <!-- Overrides -->
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+
+</head>
+<body runat="server" id="HtmlBody" style="background-color:var(--ar-default);">
+
+    <insite:PageHeadContentRenderer runat="server" />
+
+    <form runat="server" id="BodyForm" autocomplete="off">
+
+        <%= InSite.Web.Helpers.AntiForgeryHelper.GetHtml() %>
+
+        <asp:ScriptManager runat="server" ID="ScriptManager"></asp:ScriptManager>
+
+        <asp:UpdatePanel runat="server" ID="HeaderUpdatePanel" UpdateMode="Conditional" ChildrenAsTriggers="false">
+          <ContentTemplate>
+            <uc:PortalHeader runat="server" ID="PortalHeader" />
+          </ContentTemplate>
+        </asp:UpdatePanel>
+
+        <main class="container portal-container">
+            <div class="d-flex flex-column flex-lg-row pt-4 pb-4 mb-md-3">
+
+                <!-- Sidebar-->
+                <div runat="server" id="SideColumn" class="mb-4 mb-lg-0 me-lg-4 portal-sidebar position-relative" data-width="315" data-compact-width="65">
+                    <div class="bg-light rounded-3 shadow-lg">
+                        <div runat="server" id="SidebarToggle" visible="false" class="float-end d-none d-lg-block" style="min-height: 40px;">
+                            <div class="portal-sidebar-toggle">
+                                <div title="Toggle Sidebar">
+                                    <i class="fas fa-angle-left"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <insite:Container runat="server" id="MyAvatarContainer" Visible="false">
+                            <div class="hide-height">
+                                <div class="px-4 py-4 mb-1 text-center">
+                                    <a runat="server" id="MyAvatarLink" href="/ui/portal/home"><asp:Image runat="server" ID="MyAvatar" CssClass="d-block rounded-circle mx-auto my-2" Style="max-height:100px;max-width:100px;" /></a>
+                                    <a runat="server" id="MyNameLink" href="/ui/portal/home"><h6 runat="server" id="MyName" class="mb-0 pt-1"></h6></a>
+                                    <span runat="server" id="MyEmail" class="text-body-secondary fs-sm"></span> 
+                                    <insite:Container runat="server" ID="MyCodeContainer">
+                                        <br />
+                                        <span runat="server" id="MyCode" class="text-body-secondary fs-sm"></span>
+                                    </insite:Container>
+                                </div>
+                            </div>
+                            <div class="d-lg-none px-4 pb-4 text-center"><a class="btn btn-primary px-5 mb-2" href="#nav-menu" data-bs-toggle="collapse"><i class="far fa-bars me-2"></i>Menu</a></div>
+                        </insite:Container>
+                        <insite:Container runat="server" id="NoAvatarContainer">
+                            <div class="pb-4 mb-1 d-lg-none"></div>
+                            <div class="d-lg-none px-4 pb-4 pt-1 text-center"><a class="btn btn-primary px-5 mb-2" href="#nav-menu" data-bs-toggle="collapse"><i class="far fa-bars me-2"></i>Menu</a></div>
+                        </insite:Container>
+
+                        <div class="clearfix"></div>
+
+                        <div class="d-lg-block collapse rounded-bottom-3 overflow-hidden" id="nav-menu">
+
+                            <asp:ContentPlaceHolder runat="server" ID="SideContent" />
+
+                            <asp:Panel ID="HelpPanel" runat="server" CssClass="hide-height">
+                                <div>
+                                    <h3 runat="server" id="HelpHeading" class="d-block bg-secondary fs-sm fw-semibold text-body-secondary mb-0 px-4 py-3"><%= Translate("Help") %></h3>
+
+                                    <div class="d-block p-0">
+                                        <h3 runat="server" id="CoreAboutHeading" class="h5"></h3>
+                                        <div runat="server" id="CoreAboutBody"></div>
+                                        <p class="fs-xs text-body-secondary mt-2">
+                                            <asp:HyperLink runat="server" ID="CoreAboutEdit"></asp:HyperLink>
+                                        </p>
+                                    </div>
+
+                                    <div class="d-block p-4">
+                                        <h3 runat="server" id="CustomAboutHeading" class="h5"></h3>
+                                        <div runat="server" id="CustomAboutBody"></div>
+                                        <p class="fs-xs text-body-secondary mt-2">
+                                            <asp:LinkButton runat="server" ID="CustomAboutCreate" />
+                                            <asp:HyperLink runat="server" ID="CustomAboutEdit"></asp:HyperLink>
+                                        </p>
+                                    </div>
+                                </div>
+                            </asp:Panel>
+
+                        </div>
+                    </div>
+                </div>
+
+                <script type="text/javascript">inSite.common.portalSidebar.init();</script>
+
+                <!-- Content-->
+                <div class="flex-fill">
+                    <div class="h-100 bg-light rounded-3 shadow-lg p-4">
+                        <div class="py-2 p-md-3" style="position: relative;">
+                        
+                            <uc:PortalBreadcrumbs runat="server" ID="BodyBreadcrumbs" />
+                            <asp:ContentPlaceHolder ID="BodyContent" runat="server" />
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <a class="btn-scroll-top" href="#top" data-scroll="" aria-label="Scroll back to top">
+            <svg viewBox="0 0 40 40" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></circle>
+            </svg>
+            <i class="far fa-arrow-up"></i>
+        </a>
+        <div id="bottom"></div>
+
+        <uc:BundleJsFooter runat="server" ID="FooterCurrentScripts" />    
+
+        <insite:PageFooterContentRenderer runat="server" />
+
+    </form>
+
+</body>
+</html>

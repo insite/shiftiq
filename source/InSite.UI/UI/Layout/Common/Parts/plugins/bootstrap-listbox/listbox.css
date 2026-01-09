@@ -1,0 +1,106 @@
+﻿div.list-box {
+}
+
+    div.list-box > select {
+        position: absolute !important;
+        bottom: 0;
+        left: 50%;
+        display: block !important;
+        width: 0.5px !important;
+        height: 100% !important;
+        padding: 0 !important;
+        opacity: 0 !important;
+        border: none;
+    }
+
+    div.list-box > ul {
+        font-size: 14px;
+        padding: 0;
+        border: 1px solid #d4dbe0;
+        border-radius: 4px;
+        margin: 0;
+        list-style: none;
+        overflow-y: auto;
+        position: relative;
+    }
+
+        div.list-box > ul:focus {
+            outline: 0;
+        }
+
+            div.list-box > ul:focus > li.focused > span {
+                border: 1px dotted #000000;
+            }
+
+        div.list-box > ul > li {
+            position: relative;
+        }
+
+            div.list-box > ul > li > span {
+                font-weight: normal;
+                margin: 0;
+                padding: 0;
+                cursor: pointer;
+                color: #777777;
+                padding: 5px 20px;
+                display: block;
+                clear: both;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                border: 1px solid transparent;
+            }
+
+                div.list-box > ul > li > span span.keyword {
+                    background-color: #eee;
+                    font-weight: bold;
+                }
+
+            div .list-box > ul > li.checked > span, div.list-box > ul > li:hover > span {
+                text-decoration: none;
+                background-color: #f5f8fa;
+            }
+
+            div.list-box > ul > li.checked > span {
+                color: #172b36;
+            }
+
+            div.list-box > ul > li:first-child {
+                margin-top: 5px;
+            }
+
+            div.list-box > ul > li:last-child {
+                margin-bottom: 5px;
+            }
+
+        div.list-box > ul.multiple > li > span {
+            padding-right: 30px;
+        }
+
+            div.list-box > ul.multiple > li > span:before {
+                font-family: 'Font Awesome 7 Pro';
+                font-weight: 500;
+                font-size: 1.2em;
+                content: '\f00c';
+                display: none;
+                position: absolute;
+                right: 0;
+                top: 0;
+                line-height: 34px;
+                padding: 0 10px 0 5px;
+            }
+
+            div.list-box > ul.multiple > li.checked > span:before {
+                display: block;
+            }
+
+.has-error .list-box > ul {
+    border-color: #a94442;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+    .has-error .list-box > ul:focus {
+        border-color: #843534;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #ce8483;
+    }

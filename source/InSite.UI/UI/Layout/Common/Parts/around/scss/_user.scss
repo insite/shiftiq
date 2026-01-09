@@ -1,0 +1,52 @@
+//
+// user.scss
+// Use this to write your custom SCSS
+//
+
+// InputFilter styles
+
+.input-filter {
+    --ar-btn-hover-bg: rgb(219.1818181818, 219.1818181818, 241.5681818182);
+
+    position: relative;
+
+    & > input {
+        padding-right: 5.4rem;
+
+        &.is-invalid {
+            background-image: none;
+        }
+    }
+
+    & > button {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        width: 2.7rem;
+        margin: 1px;
+        border: none;
+        border-left: 1px solid var(--ar-gray-400);
+        background: transparent;
+        color: var(--ar-btn-color);
+
+        &:disabled {
+            color: var(--ar-btn-disabled-color);
+            opacity: var(--ar-btn-disabled-opacity);
+            pointer-events: none;
+        }
+
+        &:hover {
+            background-color: var(--ar-btn-hover-bg);
+        }
+
+        &.clear-button {
+            right: 2.7rem;
+        }
+
+        &.search-button {
+            right: 0px;
+            border-top-right-radius: var(--ar-border-radius);
+            border-bottom-right-radius: var(--ar-border-radius);
+        }
+    }
+}

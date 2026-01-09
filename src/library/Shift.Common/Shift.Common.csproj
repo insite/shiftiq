@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>1701;1702;IDE0130;CS1573;CS1591;NU1902;NU1903;</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="Collection\Pivots\PivotTable.html" />
+	  <Content Include="Collection\Pivots\PivotTable.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Markdig" Version="0.41.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
+		<PackageReference Include="Serilog" Version="4.2.0" />
+	</ItemGroup>
+
+</Project>

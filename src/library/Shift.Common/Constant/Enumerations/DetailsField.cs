@@ -1,0 +1,30 @@
+﻿namespace Shift.Constant
+{
+    public enum DetailsField
+    {
+        Specification,
+        Standard,
+        Name,
+        Asset,
+        Gradebook,
+        Code,
+        Source,
+        Identifier,
+        PublicationStatus,
+        FirstPublished,
+        Feedback,
+        Rationale,
+        Simulate,
+        SafeExamBrowser,
+        KioskMode,
+        ScheduleOpenDate,
+        ScheduleCloseDate,
+        TimeLimit,
+        AttemptLimit,
+        AttemptLimitPerSession,
+        TimeLimitPerSession,
+        TimeLimitPerLockout,
+        Instrument,
+        Theme
+    }
+}

@@ -1,0 +1,1 @@
+export type SelectedTab = "result" | "criteria" | "download";

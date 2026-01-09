@@ -1,0 +1,89 @@
+﻿ul.nav-tabs {
+    margin-bottom: 0px;
+}
+
+.tab-pane div.settings h3 {
+    margin-top: 20px;
+}
+
+.table-metrics td:nth-child(2) {
+    text-align: right;
+}
+
+.file-thumbnail {
+    background-color: #fff;
+}
+
+    .file-thumbnail > .file-preview {
+        cursor: default;
+    }
+
+        .file-thumbnail > .file-preview > .no-upload {
+            font-size: 80px;
+            margin: 10px 0;
+            text-align: center;
+            display: block;
+            color: #888888;
+        }
+
+    .file-thumbnail > table {
+        table-layout: fixed;
+    }
+
+        .file-thumbnail > table > tbody > tr > td.info-label {
+            white-space: nowrap;
+            width: 95px;
+        }
+
+        .file-thumbnail > table > tbody > tr > td.info-value {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+ul.attachments {
+    padding-left: 21px;
+}
+
+    ul.attachments .file-thumbnail {
+        padding-top: 10px;
+    }
+
+.question-standard {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #F5F5F5;
+}
+
+.question-trigger-incorrect {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #F2DEDE;
+}
+
+.question-trigger-range {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #F2DEDE;
+}
+
+.download-button .caret {
+    margin-left: 6px;
+}
+
+.download-button .caret {
+    margin-left: 6px;
+}
+
+.download-button ul.dropdown-menu a .text,
+.download-button ul.dropdown-menu i {
+    color: black;
+}
+
+.download-button ul.dropdown-menu a:hover {
+    text-decoration: none !important;
+}
+
+.download-button ul.dropdown-menu .text {
+    margin-left: 6px;
+}

@@ -1,0 +1,90 @@
+{
+  "Home": {
+    "Icon": "fa-regular fa-home",
+    "Image": "/favicon.png",
+    "Text": "Shift iQ",
+    "Href": "/ui/home"
+  },
+  "Menu": [
+    {
+      "Category": "Communication",
+      "Links": [
+        {
+          "Icon": "fa-regular fa-users",
+          "Text": "Contacts",
+          "Href": "/ui/admin/contacts/home"
+        },
+        {
+          "Icon": "fa-regular fa-paper-plane",
+          "Text": "Messages",
+          "Href": "/ui/admin/messages/home"
+        },
+        {
+          "Icon": "fa-regular fa-clouds",
+          "Text": "Sites",
+          "Href": "/ui/admin/sites/home"
+        },
+        {
+          "Icon": "fa-regular fa-check-square",
+          "Text": "Forms",
+          "Href": "/ui/admin/workflow/forms/home"
+        }
+      ]
+    },
+    {
+      "Category": "Learning",
+      "Links": [
+        {
+          "Icon": "fa-regular fa-balance-scale",
+          "Text": "Assessments",
+          "Href": "/ui/admin/assessments/home"
+        },
+        {
+          "Icon": "fa-regular fa-users-class",
+          "Text": "Courses",
+          "Href": "/ui/admin/courses/home"
+        },
+        {
+          "Icon": "fa-regular fa-calendar-alt",
+          "Text": "Events",
+          "Href": "/ui/admin/events/home"
+        },
+        {
+          "Icon": "fa-regular fa-pencil-ruler",
+          "Text": "Records",
+          "Href": "/ui/admin/records/home"
+        },
+        {
+          "Icon": "fa-regular fa-ruler-triangle",
+          "Text": "Standards",
+          "Href": "/ui/admin/standards/home"
+        }
+      ]
+    },
+    {
+      "Category": "Management",
+      "Links": [
+        {
+          "Icon": "fa-regular fa-inventory",
+          "Text": "Assets",
+          "Href": "/ui/admin/assets/home"
+        },
+        {
+          "Icon": "fa-regular fa-file-chart-line",
+          "Text": "Reports",
+          "Href": "/ui/admin/reporting"
+        },
+        {
+          "Icon": "fa-regular fa-file-invoice-dollar",
+          "Text": "Sales",
+          "Href": "/ui/admin/sales/home"
+        },
+        {
+          "Icon": "fa-regular fa-arrow-progress",
+          "Text": "Workflows",
+          "Href": "/ui/admin/workflow/home"
+        }
+      ]
+    }
+  ]
+}

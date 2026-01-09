@@ -1,0 +1,15 @@
+using System;
+
+using Shift.Common;
+
+namespace Shift.Contract
+{
+    public class CountGroupFields : Query<int>, IGroupFieldCriteria
+    {
+        public Guid? GroupIdentifier { get; set; }
+        public Guid? OrganizationIdentifier { get; set; }
+
+        public string SettingName { get; set; }
+        public string SettingValue { get; set; }
+    }
+}

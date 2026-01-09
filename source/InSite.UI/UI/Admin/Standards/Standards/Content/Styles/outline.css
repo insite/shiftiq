@@ -1,0 +1,97 @@
+﻿.tree-view-container .tree-view > li > div > div {
+    --in-tree-view-item-padding-end: 3.5rem;
+}
+
+.tree-view-container .tree-view li.outline-item > div > div .commands {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    padding-right: var(--in-tree-view-item-toggle-padding-x);
+}
+
+    .tree-view-container .tree-view li.outline-item > div > div .commands .cmd-select {
+        display: none;
+    }
+
+        .tree-view-container .tree-view li.outline-item > div > div .commands .cmd-select > input[type="radio"] {
+            display: none;
+        }
+
+            .tree-view-container .tree-view li.outline-item > div > div .commands .cmd-select > input[type="radio"] + label::after {
+                font-family: 'Font Awesome 7 Pro';
+                font-weight: 400;
+                display: block;
+                content: '\f111';
+                font-size: 20px;
+                cursor: pointer;
+                opacity: 0.8;
+            }
+
+            .tree-view-container .tree-view li.outline-item > div > div .commands .cmd-select > input[type="radio"]:checked + label::after {
+                content: '\f192';
+            }
+
+.tree-view-container .tree-view > li.outline-item > div > div > .node-title .badge.bg-custom-default {
+    background-color: #9da9b0;
+}
+
+    .tree-view-container .tree-view > li.outline-item > div > div > .node-title .badge.bg-custom-default.asset-code-gac {
+        background-color: #111;
+    }
+
+    .tree-view-container .tree-view > li.outline-item > div > div > .node-title .badge.bg-custom-default.asset-code-competency {
+        background-color: #666;
+    }
+
+    .tree-view-container .tree-view > li.outline-item > div > div > .node-title .badge.bg-custom-default.asset-code-task {
+        background-color: #CCC;
+    }
+
+.tree-view-container .tree-view > li.outline-item > div > div > .node-summary {
+    margin-left: 5px;
+    overflow: hidden;
+}
+
+.row-content.view-tree .editor-container {
+    display: none;
+}
+
+.row-content.view-edit .tree-view-container {
+    width: 50%;
+}
+
+    .row-content.view-edit .tree-view-container .tree-view li.outline-item > div > div .commands .cmd-info {
+        display: none;
+    }
+
+    .row-content.view-edit .tree-view-container .tree-view li.outline-item > div > div .commands .cmd-select {
+        display: inline-block;
+    }
+
+.row-content.view-edit .editor-container {
+    display: block;
+}
+
+.col-subtypes > label.radio {
+    margin-top: 0;
+}
+
+    .col-subtypes > label.radio + label.radio {
+        margin-left: 8px;
+    }
+
+ul[data-reorder] > li {
+    padding-left: 40px;
+    cursor: grab;
+}
+
+    ul[data-reorder] > li > .fa,
+    ul[data-reorder] > li > .fas,
+    ul[data-reorder] > li > .far,
+    ul[data-reorder] > li > .fab,
+    ul[data-reorder] > li > .fal {
+        position: absolute;
+        left: 15px;
+        margin-top: 6px;
+        opacity: 0.75;
+    }

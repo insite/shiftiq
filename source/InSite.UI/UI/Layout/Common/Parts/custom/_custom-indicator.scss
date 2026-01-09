@@ -1,0 +1,58 @@
+﻿ul.dot-indicator {
+    list-style: none;
+    margin: 30px 0 20px 0;
+    padding: 0;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+ul.dot-indicator > li {
+    position: relative;
+    display: table-cell;
+    text-align: center;
+    font-size: 0.8em;
+}
+
+ul.dot-indicator > li:before { 
+    content: attr(data-num);
+    display: block;
+    margin: 0 auto;
+    background: #edeff0;
+    width: 2.4em;
+    height: 2.4em;
+    text-align: center;
+    margin-bottom: 0.25em;
+    line-height: 2.4em;
+    border-radius: 100%;
+    position: relative;
+    font-size: 1.25em; 
+    z-index: 2;
+}
+
+ul.dot-indicator > li:after {
+    content: '';
+    position: absolute;
+    display: block;
+    background: #e4e6e7;
+    width: 100%;
+    height: 0.5em;
+    top: 1.25em;
+    right: 50%;
+    margin-left: 1.5em;
+    z-index: 1;
+}
+
+ul.dot-indicator > li:first-child:after {
+    display: none;
+}
+
+ul.dot-indicator > li.step-complete:before {
+    color: #FFF;
+    background-color: #92c250;
+    font-weight: bold;
+}
+
+ul.dot-indicator > li.step-complete:after {
+    background-color: #88b846;
+}

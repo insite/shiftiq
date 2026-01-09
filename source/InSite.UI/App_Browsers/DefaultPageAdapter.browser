@@ -1,0 +1,8 @@
+<browsers>
+	<browser refID="Default" >
+		<controlAdapters>
+			<adapter controlType="InSite.UI.Layout.Admin.AdminBasePage" adapterType="InSite.Web.Optimization.DefaultPageAdapter" />
+			<adapter controlType="InSite.UI.Layout.Lobby.LobbyBasePage" adapterType="InSite.Web.Optimization.DefaultPageAdapter" />
+		</controlAdapters>
+	</browser>
+</browsers>

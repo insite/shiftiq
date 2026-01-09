@@ -1,0 +1,18 @@
+﻿$nav-pills-link-bg: null !default;
+$nav-pills-link-color: null !default;
+$nav-pills-link-border-width: var(--ar-border-width) !default;
+$nav-pills-link-border-color: rgba($primary, 0.2) !default;
+
+.nav-pills {
+    --#{$prefix}nav-pills-link-bg: #{$nav-pills-link-bg};
+    --#{$prefix}nav-pills-link-color: #{$nav-pills-link-color};
+    --#{$prefix}nav-pills-link-border-width: #{$nav-pills-link-border-width};
+    --#{$prefix}nav-pills-link-border-color: #{$nav-pills-link-border-color};
+
+    .nav-link {
+        color: var(--#{$prefix}nav-pills-link-color);
+        background-color: var(--#{$prefix}nav-pills-link-bg);
+        border: var(--#{$prefix}nav-pills-link-border-width) solid var(--#{$prefix}nav-pills-link-border-color);
+        justify-content: center;
+    }
+}

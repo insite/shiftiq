@@ -1,0 +1,115 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="AdminHome.master.cs" Inherits="InSite.UI.Layout.Admin.AdminHome" MasterPageFile="~/UI/Layout/Admin/AdminBase.master" %>
+
+<%@ Register Src="~/UI/Layout/Common/Controls/Navigation/AdminNavigation.ascx" TagName="AdminNavigation" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Layout/Common/Controls/Navigation/AdminHeader.ascx" TagName="AdminHeader" TagPrefix="uc" %>
+
+<asp:Content runat="server" ContentPlaceHolderID="HeadContent">
+
+    <asp:ContentPlaceHolder runat="server" ID="HeadContent" />
+    
+    <!-- Properly implement the light/dark mode switcher when this is prioritized.
+    <!-- <script src="/ui/layout/common/parts/around/js/theme-switcher.js"></script> -->
+
+    <style runat="server" id="DarkStyle" visible="false">
+        header.admin-navbar,
+        aside.admin-sidebar,
+        .offcanvas.admin-offcanvas {
+            --in-nav-header-height: 2.875rem;
+            background-color: #2c2d3f !important;
+        }
+
+            header.admin-navbar nav.navbar-collapse > ul.navbar-nav > li.nav-item > a.nav-link {
+                --ar-text-opacity: 1;
+                color: rgba(var(--ar-light-rgb), var(--ar-text-opacity)) !important;
+            }
+    </style>
+
+    <style>
+        .navbar-expand-lg .mega-dropdown-column { width: 12rem; }
+    </style>
+
+</asp:Content>
+
+<asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:AdminNavigation runat="server" ID="AdminNavigation" />
+
+    <main class="admin-container">
+
+        <script type="text/javascript">inSite.common.adminSidebar.load();</script>
+
+        <div class="row pb-3 pb-md-4">
+            <div class="col-xxl-12">
+
+                <uc:AdminHeader runat="server" ID="AdminHeaderControl" />
+
+                <div class="row">
+                    <div runat="server" id="BodyColumn" class="col-lg-10">
+                        <asp:ContentPlaceHolder ID="BodyContent" runat="server" />
+                    </div>
+                    <div runat="server" id="HelpColumn" class="col-lg-2">
+
+                        <!-- Help Column: Begin -->
+
+                        <h3 runat="server" id="HelpColumnOrganizationTitle1" class="h5 mt-3"></h3>
+                        <div runat="server" id="HelpColumnOrganizationBody1">
+                            <p>Add your own custom help content by clicking the Edit button. Content will appear here as well as to the right of the screen below.</p>
+                        </div>
+                        <p class="fs-xs text-body-secondary mt-2">
+                            <asp:LinkButton runat="server" ID="HelpColumnOrganizationCreate1" />
+                            <asp:HyperLink runat="server" ID="HelpColumnOrganizationEdit1"></asp:HyperLink>
+                        </p>
+
+                        <!-- Help Column: End -->
+
+                    </div>
+                </div>
+                
+                <!-- Help Modal: Begin -->
+
+                <div id="modal-help" class="modal fade" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Help</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+
+                            <asp:ContentPlaceHolder ID="HelpContent" runat="server"></asp:ContentPlaceHolder>
+
+                          <div runat="server" id="PlatformHelpPanel" class="mb-3">
+                            <h3 runat="server" id="HelpColumnOrganizationTitle2" class="h5"></h3>
+                            <div runat="server" id="HelpColumnOrganizationBody2">
+                                <p>Add your own custom help content by clicking the Edit button. Content will appear here as well as to the right of the screen below.</p>
+                            </div>
+                            <p class="fs-xs text-body-secondary mt-2">
+                                <asp:LinkButton runat="server" ID="HelpColumnOrganizationCreate2" />
+                                <asp:HyperLink runat="server" ID="HelpColumnOrganizationEdit2"></asp:HyperLink>
+                            </p>
+                          </div>
+
+                            <h3 runat="server" id="HelpColumnPlatformTitle2" class="h5">About</h3>
+                            <div runat="server" id="HelpColumnPlatformBody2">
+                                <p>Click the Help Portal link above to access the Shift iQ online help documentation portal.</p>
+                            </div>
+                            <p class="fs-xs text-body-secondary mt-2">
+                                <asp:HyperLink runat="server" ID="HelpColumnPlatformEdit2" Visible="false" CssClass="me-3" />
+                                <a runat="server" id="HomeHelpLink" href="#" target="_blank" class="me-3"><i class='fas fa-arrow-up-right-from-square me-1'></i>More</a>
+                            </p>
+
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Help Modal: End -->
+
+            </div>
+        </div>
+    </main>
+
+</asp:Content>

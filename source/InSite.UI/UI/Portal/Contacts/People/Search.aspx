@@ -1,0 +1,26 @@
+﻿<%@ Page Language="C#" CodeBehind="Search.aspx.cs" Inherits="InSite.UI.Portal.Contacts.People.Search" MasterPageFile="~/UI/Layout/Portal/Portal.master" %>
+
+<%@ Register Src="~/UI/Portal/Home/Management/Controls/DashboardNavigation.ascx" TagName="DashboardNavigation" TagPrefix="uc" %>
+<%@ Register TagPrefix="uc" TagName="SearchCriteria" Src="./Controls/SearchCriteria.ascx" %> 
+<%@ Register TagPrefix="uc" TagName="SearchResults" Src="./Controls/SearchResults.ascx" %>
+
+<asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
+
+<asp:Content runat="server" ContentPlaceHolderID="SideContent">
+    <uc:DashboardNavigation runat="server" ID="DashboardNavigation" />
+</asp:Content>
+
+<asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <insite:Alert runat="server" ID="StatusAlert" />
+
+    <insite:Nav runat="server">
+        <insite:NavItem ID="SearchResultsTab" runat="server" Title="Results" Icon="fas fa-database">
+            <uc:SearchResults runat="server" ID="SearchResults" />
+        </insite:NavItem>
+        <insite:NavItem ID="SearchCriteriaTab" runat="server" Title="Criteria" Icon="fas fa-filter">
+            <uc:SearchCriteria runat="server" ID="SearchCriteria" />
+        </insite:NavItem>
+    </insite:Nav>
+
+</asp:Content>

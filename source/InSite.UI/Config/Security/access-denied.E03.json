@@ -1,0 +1,113 @@
+[
+  {
+    "Resource": "ui/home#college-certificates",
+    "Permissions": [
+      {
+        "Roles": [
+          "Admin Only Users",
+          "TSSC Only Administrators",
+          "TSSC Only Users"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#competencies",
+    "Permissions": [
+      {
+        "Roles": [
+          "Admin Only Users",
+          "TSSC Only Administrators"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#elearning",
+    "Permissions": [
+      {
+        "Roles": [
+          "Admin Only Users",
+          "TSSC Only Administrators",
+          "TSSC Only Users"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#training-plan",
+    "Permissions": [
+      {
+        "Roles": [
+          "Admin Only Users",
+          "TSSC Only Administrators"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#education-and-training",
+    "Permissions": [
+      {
+        "Roles": [
+          "Admin Only Users"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#dashboard",
+    "Permissions": [
+      {
+        "Roles": [
+          "Admin Only Users",
+          "TSSC Only Administrators",
+          "TSSC Only Users"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#learning-portal",
+    "Permissions": [
+      {
+        "Roles": [
+          "TSSC Only Users"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#safety-achievements-only",
+    "Permissions": [
+      {
+        "Roles": [
+          "TSSC Only Administrators",
+          "TSSC Only Users"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#profiles",
+    "Permissions": [
+      {
+        "Roles": [
+          "Admin Only Users",
+          "TSSC Only Administrators",
+          "TSSC Only Users"
+        ]
+      }
+    ]
+  },
+  {
+    "Resource": "ui/home#progress",
+    "Permissions": [
+      {
+        "Roles": [
+          "Admin Only Users"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,8 @@
+﻿body, p, li {
+    font-size: 12pt;
+    font-family: 'Segoe UI',sans-serif;
+}
+
+code, kbd, pre, samp {
+    font-family: monospace,monospace;
+}

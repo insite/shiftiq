@@ -1,0 +1,209 @@
+﻿h1 {
+    margin-bottom: 0px;
+}
+
+h2 {
+    margin-top: 0px;
+}
+
+h3 {
+    color: #457897;
+    margin-top: 0px;
+}
+
+.readonly-value {
+    padding-top: 4px;
+}
+
+.questions {
+}
+
+    .questions > div {
+        padding-bottom: 20px;
+    }
+
+        .questions > div + div {
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .questions > div > div.sequence {
+            padding: 0 20px;
+            width: 85px;
+            font-size: 27px;
+            color: #265F9F;
+            text-align: center;
+            white-space: nowrap;
+            position: absolute;
+        }
+
+        .questions > div > div.question {
+            padding-left: 85px;
+            padding-top: 8px;
+        }
+
+    .questions.questions-boolean > div > div.question > div.answer > table > tbody > tr > td > div,
+    .questions.questions-matching > div > div.question > div.answer > table > tbody > tr > td > div {
+        position: relative;
+        margin-top: -10px;
+    }
+
+    .questions.questions-radiobutton > div > div.question > div.options,
+    .questions.questions-checkbox > div > div.question > div.options,
+    .questions.questions-hotspot > div > div.question > div.options {
+        padding-left: 20px;
+    }
+
+        .questions.questions-radiobutton > div > div.question > div.options > div,
+        .questions.questions-checkbox > div > div.question > div.options > div,
+        .questions.questions-hotspot > div > div.question > div.options > div {
+            padding: 9px 0 0 50px;
+            position: relative;
+            margin-top: 15px;
+        }
+
+            .questions.questions-radiobutton > div > div.question > div.options > div::before,
+            .questions.questions-checkbox > div > div.question > div.options > div::before,
+            .questions.questions-boolean > div > div.question > div.answer > table > tbody > tr > td > div::before,
+            .questions.questions-matching > div > div.question > div.answer > table > tbody > tr > td > div::before,
+            .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td.answer > div > div:before,
+            .questions.questions-hotspot > div > div.question > div.options > div::before,
+            .questions.questions-ordering > div > div.question > div.options > div.answer::before {
+                font-family: 'Font Awesome 7 Pro';
+                font-weight: 300;
+                display: block;
+                position: absolute;
+                font-size: 29px;
+                opacity: 0.2;
+            }
+
+            .questions.questions-radiobutton > div > div.question > div.options > div::before,
+            .questions.questions-boolean > div > div.question > div.answer > table > tbody > tr > td > div::before,
+            .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td.answer > div > div:before,
+            .questions.questions-hotspot > div > div.question > div.options,
+            .questions.questions-hotspot > div > div.question > div.options > div::before,
+            .questions.questions-ordering > div > div.question > div.options > div.answer::before {
+                top: 0;
+                left: 6px;
+                content: '\f111';
+            }
+
+            .questions.questions-checkbox > div > div.question > div.options > div::before,
+            .questions.questions-matching > div > div.question > div.answer > table > tbody > tr > td > div::before,
+            .questions.questions-ordering > div > div.question > div.options > div.answer::before {
+                top: 0;
+                left: 8px;
+                content: '\f0c8';
+            }
+
+            .questions.questions-radiobutton > div > div.question > div.options > div > i.fa-check,
+            .questions.questions-radiobutton > div > div.question > div.options > div > i.fa-times,
+            .questions.questions-checkbox > div > div.question > div.options > div > i.fa-check,
+            .questions.questions-checkbox > div > div.question > div.options > div > i.fa-times,
+            .questions.questions-boolean > div > div.question > div.answer > table > tbody > tr > td > div > i.fa-check,
+            .questions.questions-boolean > div > div.question > div.answer > table > tbody > tr > td > div > i.fa-times,
+            .questions.questions-matching > div > div.question > div.answer > table > tbody > tr > td > div > i.fa-check,
+            .questions.questions-matching > div > div.question > div.answer > table > tbody > tr > td > div > i.fa-times,
+            .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td.answer > div > div > i.fa-check,
+            .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td.answer > div > div > i.fa-times,
+            .questions.questions-hotspot > div > div.question > div.options > div > i.fa-check,
+            .questions.questions-hotspot > div > div.question > div.options > div > i.fa-times,
+            .questions.questions-ordering > div > div.question > div.options > div.answer > i.fa-check,
+            .questions.questions-ordering > div > div.question > div.options > div.answer > i.fa-times {
+                position: absolute;
+                left: 6px;
+                top: 0;
+                width: 30px;
+                text-align: center;
+                line-height: 43px;
+            }
+
+            .questions.questions-radiobutton > div > div.question > div.options > div > i.fa-check,
+            .questions.questions-checkbox > div > div.question > div.options > div > i.fa-check,
+            .questions.questions-boolean > div > div.question > div.answer > table > tbody > tr > td > div > i.fa-check,
+            .questions.questions-matching > div > div.question > div.answer > table > tbody > tr > td > div > i.fa-check,
+            .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td.answer > div > div > i.fa-check,
+            .questions.questions-hotspot > div > div.question > div.options > div > i.fa-check,
+            .questions.questions-ordering > div > div.question > div.options > div.answer > i.fa-check {
+                color: #27AE60;
+            }
+
+            .questions.questions-radiobutton > div > div.question > div.options > div > i.fa-times,
+            .questions.questions-checkbox > div > div.question > div.options > div > i.fa-times,
+            .questions.questions-boolean > div > div.question > div.answer > table > tbody > tr > td > div > i.fa-times,
+            .questions.questions-matching > div > div.question > div.answer > table > tbody > tr > td > div > i.fa-times,
+            .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td.answer > div > div > i.fa-times,
+            .questions.questions-hotspot > div > div.question > div.options > div > i.fa-times,
+            .questions.questions-ordering > div > div.question > div.options > div.answer > i.fa-times {
+                color: #C0392B;
+            }
+
+    .questions.questions-ordering > div > div.question > div.options .answer-option > div > p:last-child {
+        margin-bottom: 0;
+    }
+
+    .questions.questions-ordering > div > div.question > div.options > div.answer {
+        width: 35px;
+        height: 35px;
+    }
+
+        .questions.questions-ordering > div > div.question > div.options > div.answer::before {
+            line-height: 1;
+        }
+
+        .questions.questions-ordering > div > div.question > div.options > div.answer > i.fa-check {
+            line-height: 1.9;
+        }
+
+        .questions.questions-ordering > div > div.question > div.options > div.answer > i.fa-times {
+            line-height: 1.9;
+        }
+
+    .questions.questions-likert > div > div.question > div.rows > .table-likert {
+        background-color: transparent;
+    }
+
+        .questions.questions-likert > div > div.question > div.rows > .table-likert > thead > tr > td {
+            border-bottom: none;
+            text-align: center;
+            vertical-align: bottom;
+        }
+
+        .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td {
+            vertical-align: middle;
+        }
+
+            .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td.answer {
+                white-space: nowrap;
+                text-align: center;
+            }
+
+                .questions.questions-likert > div > div.question > div.rows > .table-likert > tbody > tr > td.answer > div {
+                    display: inline-block;
+                    position: relative;
+                    width: 42px;
+                    height: 42px;
+                }
+
+    .questions.questions-text > div > div.question {
+    }
+
+        .questions.questions-text > div > div.question > div.title {
+            margin-bottom: 15px;
+        }
+
+        .questions.questions-text > div > div.question div.question-answer {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+            .questions.questions-text > div > div.question div.question-answer img {
+                max-width: 100%;
+                max-height: 300px;
+            }
+
+            .questions.questions-text > div > div.question div.question-answer > div.rubric > table.table-rubric > tbody > tr > td > span.text {
+                padding-top: 6px;
+                display: block;
+            }

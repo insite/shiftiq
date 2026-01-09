@@ -1,0 +1,64 @@
+.datepicker {
+    --ar-btn-hover-bg: rgb(219.1818181818, 219.1818181818, 241.5681818182);
+    --ar-btn-disabled-color: rgb(115, 116, 145);
+    --ar-btn-disabled-opacity: 0.65;
+
+    position: relative;
+
+    & > input {
+        padding-right: 2.7rem;
+
+        &[data-showtime] {
+            padding-right: 5.4rem;
+        }
+
+        &.is-invalid {
+            background-image: none;
+        }
+    }
+
+    & > button {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        width: 2.7rem;
+        border: none;
+        border-left: 1px solid var(--ar-gray-400);
+        background: transparent;
+        color: var(--ar-btn-color);
+
+        &:disabled {
+            color: var(--ar-btn-disabled-color);
+            opacity: var(--ar-btn-disabled-opacity);
+            pointer-events: none;
+        }
+
+        &:hover {
+            background-color: var(--ar-btn-hover-bg);
+        }
+
+        &.open-timezone {
+            right: 2.7rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            i {
+                margin-top: 0.1rem;
+            }
+
+            span {
+                font-size: 0.5rem;
+                font-weight: bold;
+                margin-top: 0.1rem;
+            }
+        }
+
+        &.open-calendar {
+            right: 0px;
+            border-top-right-radius: var(--ar-border-radius);
+            border-bottom-right-radius: var(--ar-border-radius);
+        }
+    }
+}

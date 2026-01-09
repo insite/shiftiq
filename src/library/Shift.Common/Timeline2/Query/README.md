@@ -1,0 +1,1 @@
+﻿CQRS+ES: This folder contains code related to Queries.

@@ -1,0 +1,34 @@
+﻿.badge {
+    vertical-align: middle;
+}
+
+.badge.bg-secondary {
+    --ar-badge-color: #{$white};
+}
+
+.badge-floating {
+    position: absolute;
+    top: 1.5rem;
+    left: 0;
+    z-index: 5;
+
+    .card:not(.border-0):not(.card-category) & {
+        left: -$card-border-width;
+    }
+
+    &:not(.badge-floating-end) {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+    }
+
+    &.badge-floating-end {
+        left: auto !important;
+        right: 0;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+
+        .card:not(.border-0):not(.card-category) & {
+            right: -$card-border-width;
+        }
+    }
+}

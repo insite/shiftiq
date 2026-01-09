@@ -1,0 +1,26 @@
+<%@ Page Language="C#" CodeBehind="Create.aspx.cs" Inherits="InSite.Admin.Identities.Departments.Forms.Create" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
+
+<%@ Register TagPrefix="uc" TagName="Details" Src="../Controls/Details.ascx" %>
+
+<asp:Content runat="server" ContentPlaceHolderID="HeadContent">
+
+</asp:Content>
+
+<asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+    <insite:Alert runat="server" ID="ScreenStatus" />
+    <insite:ValidationSummary runat="server" ValidationGroup="Department" />
+
+    <div class="row mb-3">
+        <div class="col-lg-12">
+            <uc:Details runat="server" ID="DepartmentDetails" />
+        </div>
+    </div>
+        
+    <div class="row">
+        <div class="col-lg-6">
+            <insite:SaveButton runat="server" ID="SaveButton" ValidationGroup="Department" />
+            <insite:CancelButton runat="server" ID="CancelButton" />
+        </div>
+    </div>
+
+</asp:Content>

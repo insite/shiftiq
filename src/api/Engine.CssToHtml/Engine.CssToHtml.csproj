@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\config\EngineSettings.json">
+      <Link>AppSettings.json</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\config\EngineSettings.Local.json" Condition="Exists('..\..\..\config\EngineSettings.Local.json')">
+      <Link>AppSettings.Local.json</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\public\api\swagger-ui\cmds.png">
+      <Link>Public\swagger-ui\cmds.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\public\api\swagger-ui\custom.css">
+      <Link>Public\swagger-ui\custom.css</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\public\api\swagger-ui\shift.png">
+      <Link>Public\swagger-ui\shift.png</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PreMailer.Net" Version="2.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\library\Engine.Common\Engine.Common.csproj" />
+    <ProjectReference Include="..\..\library\Shift.Common\Shift.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Analyzer Include="..\..\..\build\references\EyeSpy.dll" />
+  </ItemGroup>
+	
+</Project>

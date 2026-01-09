@@ -1,0 +1,26 @@
+﻿[
+  {
+    "outputFile": "UI/Layout/Common/Styles/Cmds.css",
+    "inputFile": "UI/Layout/Common/Styles/Cmds.scss",
+    "options": {
+      "relativeUrls": false,
+      "lineFeed": "crlf"
+    }
+  },
+  {
+    "outputFile": "UI/Layout/Common/Styles/Shift.css",
+    "inputFile": "UI/Layout/Common/Styles/Shift.scss",
+    "options": {
+      "relativeUrls": false,
+      "lineFeed": "crlf"
+    }
+  },
+  {
+    "outputFile": "UI/Layout/Common/Styles/Skills.css",
+    "inputFile": "UI/Layout/Common/Styles/Skills.scss",
+    "options": {
+      "relativeUrls": false,
+      "lineFeed": "crlf"
+    }
+  }
+]

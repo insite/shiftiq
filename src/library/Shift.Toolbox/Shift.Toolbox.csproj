@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<NoWarn>CS1573;CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Assessment\**" />
+    <EmbeddedResource Remove="Assessment\**" />
+    <None Remove="Assessment\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Reporting\PerformanceReport\NCAS\Inspire_Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Reporting\PerformanceReport\NCAS\Inspire_Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.1.0" />
+    <PackageReference Include="EPPlus" Version="8.0.8" />
+    <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+    <PackageReference Include="Otp.NET" Version="1.4.0" />
+    <PackageReference Include="QuestPDF" Version="2025.5.1" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="SkiaSharp" Version="3.119.0" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.7" />
+    <ProjectReference Include="..\Shift.Common\Shift.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Analyzer Include="..\..\..\build\references\EyeSpy.dll" />
+  </ItemGroup>
+	
+</Project>

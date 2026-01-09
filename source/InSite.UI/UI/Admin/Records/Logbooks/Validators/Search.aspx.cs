@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+
+using InSite.Application.Records.Read;
+using InSite.Common.Web.UI;
+using InSite.Domain.Reports;
+using InSite.UI.Layout.Admin;
+
+using Shift.Constant;
+
+namespace InSite.UI.Admin.Records.Validators
+{
+    public partial class Search : SearchPage<QJournalSetupFilter>
+    {
+        public override string EntityName => "Logbook";
+
+        protected override IEnumerable<DownloadColumn> GetExportColumns()
+        {
+            return new[]
+            {
+                new DownloadColumn("Identifier", "Identifier", null, 15, HorizontalAlignment.Right),
+                new DownloadColumn("LogbookName", "Logbook Name", null, 60),
+                new DownloadColumn("AchievementTitle", "Achievement", null, 60),
+                new DownloadColumn("ClassTitle", "Class", null, 60),
+                new DownloadColumn("ClassScheduledStartDate", "Class Start","MMM dd, yyyy", 15),
+                new DownloadColumn("ClassScheduledEndDate", "Class End","MMM dd, yyyy", 15)
+            };
+        }
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            PageHelper.AutoBindHeader(this);
+        }
+    }
+}

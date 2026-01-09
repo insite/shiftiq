@@ -1,0 +1,62 @@
+﻿using System;
+
+using InSite.Application.Events.Read;
+using InSite.Application.Issues.Read;
+using InSite.Application.Registrations.Read;
+using InSite.UI.Layout.Admin;
+
+namespace InSite.UI.Admin.Prototype
+{
+    public partial class DashboardOhs : AdminBasePage
+    {
+        protected string CalendarDate
+        {
+            get
+            {
+                if (!DateTime.TryParse(Request.QueryString["date"], out var date))
+                    date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, User.TimeZone);
+
+                return date.ToShortDateString();
+            }
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            PageHelper.AutoBindHeader(this);
+
+            if (IsPostBack)
+                return;
+
+            BindActivities();
+            BindCalendar();
+            BindNotifications();
+        }
+
+        private QEventFilter CreateEventFilter(string eventType)
+            => new QEventFilter { OrganizationIdentifier = Organization.OrganizationIdentifier, EventType = eventType };
+
+        private QRegistrationFilter CreateRegistrationFilter()
+            => new QRegistrationFilter { OrganizationIdentifier = Organization.OrganizationIdentifier };
+
+        private QIssueFilter CreateCaseFilter()
+            => new QIssueFilter { OrganizationIdentifier = Organization.OrganizationIdentifier };
+
+        private void BindActivities()
+        {
+            RecentGradebooks.LoadData(7);
+            RecentCredentials.LoadData(7);
+        }
+
+        private void BindCalendar()
+        {
+            CalendarPanel.Visible = true;
+        }
+
+        private void BindNotifications()
+        {
+            RecentCases.LoadData(CreateCaseFilter(), 7);
+        }
+    }
+}

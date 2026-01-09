@@ -1,0 +1,87 @@
+﻿.insite-output-audio {
+    flex-wrap: nowrap !important;
+}
+
+    .insite-output-audio > .input-group-text {
+        display: block;
+        padding-top: 0;
+        cursor: default;
+        user-select: none;
+        text-align: left;
+    }
+
+        .insite-output-audio > .input-group-text > span {
+            font-size: 0.75rem;
+            margin: 0.45rem 0 0.1rem;
+            color: var(--ar-secondary-color) !important;
+            display: block;
+        }
+
+        .insite-output-audio > .input-group-text > div {
+            display: flex;
+            align-items: center;
+        }
+
+    .insite-output-audio .progress {
+        height: 14px;
+        cursor: pointer;
+    }
+
+        .insite-output-audio .progress > .progress-bar {
+            transition: none;
+        }
+
+    .insite-output-audio .oa-position {
+        flex-grow: 4;
+        max-width: 145px;
+    }
+
+        .insite-output-audio .oa-position .oa-progress {
+            flex-grow: 1;
+        }
+
+        .insite-output-audio .oa-position .oa-from,
+        .insite-output-audio .oa-position .oa-thru {
+            min-width: 48px;
+        }
+
+    .insite-output-audio .oa-volume {
+        flex-grow: 2;
+        padding-left: 0;
+        max-width: 65px;
+    }
+
+        .insite-output-audio .oa-volume .oa-progress {
+            flex-grow: 1;
+        }
+
+        .insite-output-audio .oa-volume .oa-mute {
+            cursor: pointer;
+        }
+
+            .insite-output-audio .oa-volume .oa-mute > i {
+                width: 20px;
+            }
+
+                .insite-output-audio .oa-volume .oa-mute > i.fa-volume {
+                    margin-left: -1px;
+                    margin-right: 1px;
+                }
+
+        .insite-output-audio .oa-attempts {
+            padding-left: 0;
+        }
+
+    .insite-output-audio > button {
+        min-width: 60px;
+    }
+
+@media (min-width: 768px) {
+    .insite-output-audio .oa-position {
+        max-width: 300px;
+    }
+
+    .insite-output-audio .oa-volume {
+        max-width: 130px;
+    }
+}

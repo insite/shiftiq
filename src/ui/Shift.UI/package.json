@@ -1,0 +1,51 @@
+{
+  "name": "shift.ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node copyCss.cjs && node tinymceSetup.js & vite",
+    "build": "eslint ./src --max-warnings 0 && tsc && node tinymceSetup.js && vite build --emptyOutDir",
+    "lint": "eslint ./src",
+    "preview": "vite preview",
+    "test": "vitest --config vitest.local.config.ts",
+    "test:rt": "vitest run --config vitest.rt.config.ts"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/modifiers": "^9.0.0",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@mdxeditor/editor": "^3.42.0",
+    "@tinymce/tinymce-react": "^6.3.0",
+    "bootstrap": "^5.3.3",
+    "react": "^19.0.0",
+    "react-bootstrap": "^2.10.7",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "react-router": "^7.1.1",
+    "showdown": "^2.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@types/node": "^22.10.6",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "@types/showdown": "^2.0.6",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.18.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.18",
+    "fs-extra": "^11.3.1",
+    "globals": "^16.2.0",
+    "happy-dom": "^20.0.11",
+    "tinymce": "^8.0.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.34.1",
+    "vite": "^6.3.5",
+    "vite-plugin-static-copy": "^3.0.0",
+    "vitest": "^4.0.15"
+  }
+}

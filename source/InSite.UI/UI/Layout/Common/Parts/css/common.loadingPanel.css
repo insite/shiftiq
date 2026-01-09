@@ -1,0 +1,41 @@
+﻿.loading-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1500;
+    display: none;
+    cursor: wait;
+}
+
+    .loading-panel.show {
+        display: block;
+    }
+
+    .loading-panel > div {
+        display: table;
+        width: 100%;
+        height: 100%;
+    }
+
+        .loading-panel > div > div {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.65);
+        }
+
+            .loading-panel > div > div > span {
+                margin-top: 8px;
+                display: block;
+            }
+
+            .loading-panel > div > div > p {
+                margin-top: 8px;
+                font-size: 1.2em;
+            }
+
+.modal > .modal-dialog > .modal-content > .loading-panel > div > div {
+    border-radius: var(--ar-modal-border-radius);
+}

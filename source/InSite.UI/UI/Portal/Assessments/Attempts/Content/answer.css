@@ -1,0 +1,304 @@
+﻿body.drag-active .upload-dropmessage {
+    display: block !important;
+}
+
+.fancybox-caption__body {
+    font-size: 20px;
+}
+
+.upload-dropmessage,
+.upload-loadingmessage {
+    z-index: 501;
+}
+
+    .upload-dropmessage > div > div {
+        font-size: 1.1em;
+    }
+
+    .upload-dropmessage.drag-over > div > div {
+        font-weight: bold;
+    }
+
+label[for] {
+    cursor: pointer;
+}
+
+.lock-panel {
+    position: fixed;
+}
+
+.exam-locked {
+    visibility: hidden;
+}
+
+.hidden-field {
+    position: absolute !important;
+    bottom: 0;
+    left: 50%;
+    display: block !important;
+    width: 0.5px !important;
+    height: 100% !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    border: none;
+    visibility: hidden;
+}
+
+a.btn-icon {
+    font-size: .75em;
+    margin-left: 10px;
+    padding: 0;
+    text-decoration: none !important;
+}
+
+a.glossary-term {
+    text-decoration: underline double;
+}
+
+.question-right-commands {
+    float: right;
+    font-size: 0.7em;
+    margin-right: 15px;
+}
+
+.growl {
+    position: fixed;
+    top: 85px;
+    right: 15px;
+    z-index: 1090;
+    width: 575px;
+}
+
+.img-zoom {
+    cursor: zoom-in;
+}
+
+.lg-outer .lg-item .lg-img-wrap {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.feedbacks {
+}
+
+    .feedbacks .q-text {
+        font-size: 0.875rem;
+    }
+
+        .feedbacks .q-text a {
+            pointer-events: none;
+        }
+
+        .feedbacks .q-text p {
+            margin-bottom: 0.75rem;
+        }
+
+    .feedbacks img {
+        max-height: 200px;
+    }
+
+    .feedbacks .commands {
+        float: right;
+    }
+
+        .feedbacks .commands a {
+            text-decoration: none;
+            margin-left: 1rem;
+        }
+
+.insite-combobox {
+}
+
+    .insite-combobox > .btn-combobox {
+        border-color: #dfdfeb;
+        padding: 0.5625rem 1.25rem;
+    }
+
+        .insite-combobox > .btn-combobox::after {
+            color: #4a4b65;
+        }
+
+        .insite-combobox > .btn-combobox > .filter-option > .filter-option-inner > .filter-option-inner-inner {
+            color: #737491;
+            min-height: 24px;
+        }
+
+    .insite-combobox > .dropdown-menu .dropdown-menu > li > a {
+        white-space: normal;
+    }
+
+.navbar > .container {
+    position: relative;
+}
+
+    .navbar > .container #attempt-commands {
+        right: 45px;
+        bottom: 0;
+        margin-bottom: -106px;
+    }
+
+.navbar.navbar-stuck > .container #attempt-commands {
+    right: 45px;
+    bottom: 0;
+    margin-bottom: -72px;
+}
+
+.attempt-commands {
+    display: none;
+}
+
+#attempt-commands {
+    position: absolute;
+    z-index: 1031;
+    right: 0;
+}
+
+    #attempt-commands > div {
+        width: 465px;
+        text-align: right;
+        margin-left: -465px;
+        margin-top: -5px;
+    }
+
+        #attempt-commands > div:after {
+            content: ' ';
+            display: block;
+            clear: both;
+        }
+
+        #attempt-commands > div:after {
+            content: ' ';
+            display: block;
+            clear: both;
+        }
+
+    #attempt-commands #timer {
+        font-size: 1.4rem;
+        min-width: 100px;
+        cursor: default;
+        margin: 0 16px 0 12px;
+        display: inline-block;
+        color: #4a4b65;
+        text-align: right;
+        position: relative;
+        top: 4px;
+    }
+
+        #attempt-commands #timer > div {
+            display: inline-block;
+        }
+
+            #attempt-commands #timer > div.timer-separator {
+                padding: 0 4px;
+            }
+
+            #attempt-commands #timer > div.timer-seconds {
+                font-size: 0.6em;
+                padding-left: 6px;
+                line-height: 42px;
+                min-width: 24px;
+                text-align: left;
+            }
+
+
+#addendum-dialog > .modal-dialog > .modal-content > .modal-body table {
+    background-color: #fff;
+    table-layout: fixed;
+}
+
+    #addendum-dialog > .modal-dialog > .modal-content > .modal-body table > tbody > tr > td {
+        border-top: none;
+    }
+
+    #addendum-dialog > .modal-dialog > .modal-content > .modal-body table > tbody > tr + tr > td {
+        border-top: 1px solid #dddddd;
+    }
+
+    #addendum-dialog > .modal-dialog > .modal-content > .modal-body table > tbody > tr > td.addendum-title {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    #addendum-dialog > .modal-dialog > .modal-content > .modal-body table > tbody > tr > td.addendum-size {
+        text-align: right;
+        white-space: nowrap;
+        width: 120px;
+    }
+
+    #addendum-dialog > .modal-dialog > .modal-content > .modal-body table > tbody > tr > td.addendum-cmd {
+        text-align: right;
+        width: 75px;
+        white-space: nowrap;
+    }
+
+    #addendum-dialog > .modal-dialog > .modal-content > .modal-body table > tbody > tr > td.addendum-icon {
+        width: 45px;
+    }
+
+.accordion-bookmarks {
+}
+
+    .accordion-bookmarks > .accordion-item > .accordion-collapse > .accordion-body table {
+        margin-bottom: 0;
+    }
+
+        .accordion-bookmarks > .accordion-item > .accordion-collapse > .accordion-body table > tbody > tr > td:first-child {
+            width: 40px;
+        }
+
+        .accordion-bookmarks > .accordion-item > .accordion-collapse > .accordion-body table > tbody > tr > td:last-child {
+            width: 35px;
+        }
+
+@media (max-width: 1000px) {
+    .growl {
+        top: 68px;
+    }
+
+    .navbar > .container #attempt-commands {
+        top: -20px;
+    }
+
+    .navbar > .container .navbar-brand img {
+        max-height: 51px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .growl {
+        width: 400px;
+    }
+}
+
+.integer-part {
+    padding-right: 0 !important;
+}
+
+.fractional-part {
+    padding-left: 0 !important;
+}
+
+.no-right-pad {
+    padding-right: 0 !important;
+}
+
+.no-left-pad {
+    padding-left: 0 !important;
+}
+
+.small-right-pad {
+    padding-right: 0.25em !important;
+}
+
+.small-left-pad {
+    padding-left: 0.25em !important;
+}
+
+.x-wide {
+    padding-right: 5em !important;
+}
+
+.ordering-list > .ordering-list-container > div[data-id] {
+    cursor: grab;
+}

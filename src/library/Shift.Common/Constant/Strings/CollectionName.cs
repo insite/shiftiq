@@ -1,0 +1,72 @@
+﻿namespace Shift.Constant
+{
+    public static class CollectionName
+    {
+        public const string Accounts_Organizations_WebApp_MetaTag = "Accounts/Organizations/WebApp/MetaTag";
+        public const string Achievements_Credentials_Necessity_Status = "Achievements/Credentials/Necessity/Status";
+        public const string Achievements_Credentials_Priority_Status = "Achievements/Credentials/Priority/Status";
+        public const string Achievements_Credentials_Validity_Status = "Achievements/Credentials/Validity/Status";
+        public const string Achievements_Templates_Types_Name = "Achievements/Templates/Types/Name";
+        public const string Actions_Fields_FieldGroup_Advanced = "Actions/Fields/FieldGroup/Advanced";
+        public const string Actions_Fields_FieldGroup_Basic = "Actions/Fields/FieldGroup/Basic";
+        public const string Activities_Appointments_Appointment_Type = "Activities/Appointments/Appointment/Type";
+        public const string Activities_Classes_Publication_Status = "Activities/Classes/Publication/Status";
+        public const string Activities_Classes_Scheduling_Status = "Activities/Classes/Scheduling/Status";
+        public const string Activities_Exams_Accommodation_Type = "Activities/Exams/Accommodation/Type";
+        public const string Activities_Exams_Billing_Type = "Activities/Exams/Billing/Type";
+        public const string Activities_Exams_Publication_Status = "Activities/Exams/Publication/Status";
+        public const string Activities_Exams_Requisition_Status = "Activities/Exams/Requisition/Status";
+        public const string Activities_Exams_Scheduling_Status = "Activities/Exams/Scheduling/Status";
+        public const string Assessments_Banks_Classification_Level = "Assessments/Banks/Classification/Level";
+        public const string Assessments_Questions_Classification_Difficulty = "Assessments/Questions/Classification/Difficulty";
+        public const string Assessments_Questions_Classification_Taxonomy = "Assessments/Questions/Classification/Taxonomy";
+        public const string Assets_Files_Document_Status = "Assets/Files/Document/Status";
+        public const string Assets_Files_Document_SubType = "Assets/Files/Document/SubType";
+        public const string Assets_Files_Document_Type = "Assets/Files/Document/Type";
+        public const string Cases_Classification_Type = "Cases/Classification/Type";
+        public const string Cases_Comments_Categorization_Name = "Cases/Comments/Categorization/Name";
+        public const string Cases_Comments_Categorization_Tag = "Cases/Comments/Categorization/Tag";
+        public const string Cases_Comments_Subcategorization_CompetencyAssessment = "Cases/Comments/Subcategorization/Competency Assessment";
+        public const string Cases_Comments_Subcategorization_Decision = "Cases/Comments/Subcategorization/Decision";
+        public const string Cases_Comments_Subcategorization_Reporting = "Cases/Comments/Subcategorization/Reporting";
+        public const string Cases_Resolution_Status = "Cases/Resolution/Status";
+        public const string Contacts_Classification_Type = "Contacts/Classification/Type";
+        public const string Contacts_Groups_Classification_Tag = "Contacts/Groups/Classification/Tag";
+        public const string Contacts_Groups_Status_Name = "Contacts/Groups/Status/Name";
+        public const string Contacts_Memberships_Membership_Type = "Contacts/Memberships/Membership/Type";
+        public const string Contacts_People_Gender_Type = "Contacts/People/Gender/Type";
+        public const string Contacts_People_Location_Region = "Contacts/People/Location/Region";
+        public const string Contacts_People_Membership_Status = "Contacts/People/Membership/Status";
+        public const string Contacts_Settings_Industries_Name = "Contacts/Settings/Industries/Name";
+        public const string Contacts_Settings_Languages_Name = "Contacts/Settings/Languages/Name";
+        public const string Contacts_Settings_Languages_Proficiency = "Contacts/Settings/Languages/Proficiency";
+        public const string Contacts_Settings_Referrers_Name = "Contacts/Settings/Referrers/Name";
+        public const string Jobs_Candidates_Education_Qualification = "Jobs/Candidates/Education/Qualification";
+        public const string Learning_Catalogs_Category_Name = "Learning/Catalogs/Category/Name";
+        public const string Logs_Commands_Execution_Status = "Logs/Commands/Execution/Status";
+        public const string Messages_Communications_Office = "Messages/Communications/Office";
+        public const string Quizzes_Banks_Classification_Status = "Quizzes/Banks/Classification/Status";
+        public const string Records_Achievements_Classification_Type = "Records/Achievements/Classification/Type";
+        public const string Records_Logbooks_Entry_TrainingType = "Records/Logbooks/Entry/TrainingType";
+        public const string Records_Programs_UserRole_Type = "Records/Programs/UserRole/Type";
+        public const string Registrations_Approval_Status = "Registrations/Approval/Status";
+        public const string Registrations_Attendance_Status = "Registrations/Attendance/Status";
+        public const string Registrations_Eligibility_Status = "Registrations/Eligibility/Status";
+        public const string Registrations_Exams_Candidate_Type = "Registrations/Exams/Candidate/Type";
+        public const string Registrations_Grading_Status = "Registrations/Grading/Status";
+        public const string Registrations_Synchronization_Status = "Registrations/Synchronization/Status";
+        public const string Sales_Industry_Name = "Sales/Industry/Name";
+        public const string Sales_Level_Name = "Sales/Level/Name";
+        public const string Sales_Occupation_Name = "Sales/Occupation/Name";
+        public const string Settings_Toolkits_Name = "Settings/Toolkits/Name";
+        public const string Skills_Standards_Classification_Level = "Skills/Standards/Classification/Level";
+        public const string Standards_Classification_Status = "Standards/Classification/Status";
+        public const string Standards_Document_Content = "Standards/Document/Content";
+        public const string Standards_Document_Type = "Standards/Document/Type";
+        public const string Standards_Organizations_Classification_Flag = "Standards/Organizations/Classification/Flag";
+        public const string Standards_Standards_Category_Name = "Standards/Standards/Category/Name";
+        public const string Utilities_Defaults_Classification_Status = "Utilities/Defaults/Classification/Status";
+        public const string Validations_SelfAssessment_Status = "Validations/SelfAssessment/Status";
+        public const string Validations_Verification_Status = "Validations/Verification/Status";
+    }
+}

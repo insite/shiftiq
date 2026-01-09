@@ -1,0 +1,143 @@
+﻿.insite-output-video {
+    display: block;
+    width: 100%;
+    min-width: 360px;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--ar-body-color);
+    background-color: var(--ar-body-bg);
+    border: var(--ar-border-width) solid var(--ar-gray-400);
+    border-radius: var(--ar-border-radius);
+    overflow: hidden;
+}
+
+    .insite-output-video > .ov-video.ov-active .ov-icon {
+        display: none;
+    }
+
+    .insite-output-video > .ov-video.ov-active video {
+        display: block;
+    }
+
+    .insite-output-video > .ov-video.ov-active.ov-fullscreen {
+        pointer-events: all;
+    }
+
+    .insite-output-video > .ov-video {
+        background-color: var(--ar-gray-100);
+        aspect-ratio: 4/3;
+        position: relative;
+        pointer-events: none;
+    }
+
+        .insite-output-video > .ov-video .ov-icon {
+            color: var(--ar-secondary-color);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
+            font-size: 2.5rem;
+        }
+
+        .insite-output-video > .ov-video video {
+            width: 100%;
+            max-height: 100%;
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    .insite-output-video > .ov-control {
+        padding: 0.5625rem 1.125rem;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+    }
+
+        .insite-output-video > .ov-control .btn {
+            --ar-btn-font-size: 1rem;
+            --ar-btn-padding-x: 0.74rem;
+        }
+
+        .insite-output-video > .ov-control .ov-position,
+        .insite-output-video > .ov-control .ov-volume {
+            font-weight: 500;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+            .insite-output-video > .ov-control .ov-position > div,
+            .insite-output-video > .ov-control .ov-volume > div {
+                display: flex;
+                align-items: center;
+            }
+
+        .insite-output-video > .ov-control .ov-position {
+            flex-grow: 4;
+            max-width: 120px;
+        }
+
+        .insite-output-video > .ov-control .ov-volume {
+            flex-grow: 2;
+            max-width: 50px;
+        }
+
+        .insite-output-video > .ov-control .ov-label {
+            color: var(--ar-secondary-color);
+            font-size: 0.75rem;
+            display: block;
+            white-space: nowrap;
+            margin-bottom: 0.1rem;
+        }
+
+        .insite-output-video > .ov-control .ov-progress {
+            flex-grow: 1;
+        }
+
+            .insite-output-video > .ov-control .ov-progress > .progress {
+                height: 14px;
+                cursor: pointer;
+            }
+
+                .insite-output-video > .ov-control .ov-progress > .progress > .progress-bar {
+                    transition: none;
+                }
+
+        .insite-output-video > .ov-control .ov-position .ov-from,
+        .insite-output-video > .ov-control .ov-position .ov-thru {
+            display: inline-block;
+            min-width: 48px;
+        }
+
+        .insite-output-video > .ov-control .ov-volume .ov-mute {
+            cursor: pointer;
+        }
+
+            .insite-output-video > .ov-control .ov-volume .ov-mute > i {
+                width: 20px;
+            }
+
+                .insite-output-video > .ov-control .ov-volume .ov-mute > i.fa-volume {
+                    margin-left: -1px;
+                    margin-right: 1px;
+                }
+
+
+@media (min-width: 768px) {
+    .insite-output-video {
+        min-width: 380px;
+    }
+
+        .insite-output-video > .ov-control .ov-position {
+            max-width: 260px;
+        }
+
+        .insite-output-video > .ov-control .ov-volume {
+            max-width: 115px;
+        }
+}

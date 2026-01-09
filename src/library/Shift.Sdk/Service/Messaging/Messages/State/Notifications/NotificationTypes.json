@@ -1,0 +1,725 @@
+[
+  {
+    "Slug": "AchievementCredentialsExpiredToday",
+    "Subject": "Time-Sensitive Items Now Expired",
+    "Purpose": "This notification is sent when one or more credentials are now expired.",
+    "Variables": "SignInUrl",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ],
+    "RecipientVariables": "FirstName,CredentialsMarkdown"
+  },
+  {
+    "Slug": "AchievementCredentialsExpiringInOneMonth",
+    "Subject": "Time-Sensitive Items Expiring Within 1 Month",
+    "Purpose": "This notification is sent when one or more credentials are set to expire within the next month.",
+    "Variables": "SignInUrl",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ],
+    "RecipientVariables": "FirstName,CredentialsMarkdown"
+  },
+  {
+    "Slug": "AchievementCredentialsExpiringInThreeMonths",
+    "Subject": "Time-Sensitive Items Expiring Within 3 Months",
+    "Purpose": "This notification is sent when one or more credentials are set to expire within the next 3 months.",
+    "Variables": "SignInUrl",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ],
+    "RecipientVariables": "FirstName,CredentialsMarkdown"
+  },
+  {
+    "Slug": "AchievementCredentialsExpiringInTwoMonths",
+    "Subject": "Time-Sensitive Items Expiring Within 2 Months",
+    "Purpose": "This notification is sent when one or more credentials are set to expire within the next 2 months.",
+    "Variables": "SignInUrl",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ],
+    "RecipientVariables": "FirstName,CredentialsMarkdown"
+  },
+  {
+    "Slug": "AddedToWaitingList",
+    "Subject": "Added To Waiting List",
+    "Purpose": "This notification is automatically sent to the person who completes any waitlist request for any class.",
+    "Variables": "WaitlistedBy,CandidateFullName,CandidateEmail,ClassTitle,ClassStartTime,ClassAchievement,Employer,Organization",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ApplicationAccessGranted",
+    "Subject": "Application Access Granted",
+    "Purpose": "This notification is sent to a user when access is granted to the platform after being requested.",
+    "Variables": "ApproverEmail,ApproverName,Organization,UserAccess,UserFirstName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ApplicationAccessRequested",
+    "Subject": "Application Access Requested",
+    "Purpose": "This notification is sent to admin subscribers when a user requests access to the platform.",
+    "Variables": "AppUrl,Organization,SourceUrl,UserEmail,UserIdentifier,UserName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "AssessmentAttemptCompleted",
+    "Subject": "Assessment Attempt Completed",
+    "Purpose": "This notification is sent to admin subscribers when any learner completes any assessment attempt.",
+    "Variables": "LearnerEmail,LearnerName,AssessmentFormName,AssessmentAttemptScore",
+    "Courier": "Mailgun",
+    "Aggregate": "Attempt"
+  },
+  {
+    "Slug": "AssessmentAttemptStarted",
+    "Subject": "Assessment Attempt Started",
+    "Purpose": "This notification is sent to admin subscribers when any learner starts any assessment attempt.",
+    "Variables": "LearnerEmail,LearnerName,AssessmentFormName",
+    "Courier": "Mailgun",
+    "Aggregate": "Attempt"
+  },
+  {
+    "Slug": "AuthenticationAlarmTriggered",
+    "Subject": "Authentication Failed (Brute-Force Login Attempt)",
+    "Purpose": "This alert is sent to admin subscribers when a user fails multiple attempts to sign in to the platform.",
+    "Variables": "FailedLoginCount,Organization,SignInUrl,UserEmail,UserHostAddress",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "BankNotification",
+    "Purpose": "This notification is sent after correctly configuring notification notice for bank form.",
+    "Variables": "LearnerEmail,LearnerName,LearnerPersonCode,AssessmentFormName,AssessmentAttemptScore",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ClassReminderLearner",
+    "Subject": "Class Reminder",
+    "Purpose": "This notification is sent to a learner and/or admin subscribers before X days of a learner's class to start. (Configured in each event.)",
+    "Variables": "EventTitle,EventDate,EventTime,VenueName,VenueStreet1,VenueCity,VenueProvince,VenuePostalCode,ClassURL",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ClassReminderInstructor",
+    "Subject": "Class Reminder",
+    "Purpose": "This notification is sent to an instructor and/or admin subscribers before X days of a instructor's class to start. (Configured in each event.)",
+    "Variables": "EventTitle,EventDate,EventTime,VenueName,VenueStreet1,VenueCity,VenueProvince,VenuePostalCode,GradebookURL",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "CmdsBlogSubscriptionRequested",
+    "Subject": "CMDS Blog Subscription",
+    "Purpose": "n/a",
+    "Variables": "FirstName,LastName,Email",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ]
+  },
+  {
+    "Slug": "CmdsCollegeCertificationRequested",
+    "Subject": "College Certification Requested",
+    "Purpose": "This notification is sent when a user requests certification.",
+    "Variables": "Name,Email,ProfileNumber,ProfileTitle,Institution,CoreHoursRequired,CoreHoursCompleted,NonCoreHoursRequired,NonCoreHoursCompleted",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ]
+  },
+  {
+    "Slug": "CmdsCompetenciesExpired",
+    "Subject": "Time-Sensitive Competencies: Expiration Notice",
+    "Purpose": "This notification is sent after one or more competencies have expired.",
+    "Variables": "SignInUrl",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ],
+    "RecipientVariables": "FirstName,ResourceMarkdown"
+  },
+  {
+    "Slug": "CmdsCompetencyChanged",
+    "Subject": "CMDS Competency Changed",
+    "Purpose": "This notification is sent to an administrator when a CMDS competency is created or modified.",
+    "Variables": "ChangeMarkdown",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ]
+  },
+  {
+    "Slug": "CmdsCompetencyValidationRequested",
+    "Subject": "Validation Requested",
+    "Purpose": "This notification is sent when a user requests validation on completed assignments from another user.",
+    "Variables": "Name,Email,Phone,Company,CompetencyCount,CompetencyMarkdown",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ]
+  },
+  {
+    "Slug": "CmdsResourceChanged",
+    "Subject": "Time-Sensitive Safety Certificate: $ChangeType",
+    "Purpose": "This notification is sent to an administrator when a CMDS Global or Keyera (company-specific) time-sensitive safety certificate is created or modified.",
+    "Variables": "ChangeType,AuthorName,AuthorEmail,ResourceTitle,ResourceDescription,ResourceHours,ResourceLifetime",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ]
+  },
+  {
+    "Slug": "CmdsTrainingRegistrationSubmitted",
+    "Subject": "Validator Training Session Registration",
+    "Purpose": "n/a",
+    "Variables": "SessionIdentifier,SessionTitle,RegistrantName,RegistrantEmail,RegistrantCompany,Comment",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "cmds"
+    ]
+  },
+  {
+    "Slug": "CourseCompleted",
+    "Subject": "Course Completed",
+    "Purpose": "This notification is sent to a learner and/or admin subscribers when a course is completed. (Configured in each course.)",
+    "Variables": "AppUrl,CourseName,CourseStarted,LearnerIdentifier,LearnerFirstName,LearnerLastName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "CourseStalled",
+    "Subject": "Course Stalled",
+    "Purpose": "This notification is sent to a learner and/or admin subscribers when a learner hasn't made progress on a course for the specified time. (Configured in each course.)",
+    "Variables": "AppUrl,CourseName,CourseStarted,LearnerIdentifier,LearnerFirstName,LearnerLastName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "CredentialCreated",
+    "Subject": "Credential Created",
+    "Purpose": "This notification is sent to any user that is assigned or granted an achievement.",
+    "Variables": "AchievementName,AchievementType,LearnerEmail,LearnerFirstName,LearnerIdentifier,LearnerLastName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "EmployerGroupCreated",
+    "Subject": "Employer Group Created",
+    "Purpose": "This notification is sent to admin subscribers when an Employer group is created.",
+    "Variables": "GroupName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "EmployerOpportunityApplicationSubmitted",
+    "Subject": "Employer Opportunity Application Submitted",
+    "Purpose": "OBSOLETE ALERT",
+    "Variables": "CandidateFirstName,CandidateLastName,CandidatePhoneNumber,CandidateEmailAddress,CandidateUrl,JobPosition,EmployerEmailAddress,Attachments",
+    "Courier": "Mailgun",
+    "IsObsolete": true
+  },
+  {
+    "Slug": "EventVenueChanged",
+    "Subject": "Event Venue Changed",
+    "Purpose": "This notification is sent to admin subscribers when a group is selected or changed as the venue for an event.",
+    "Variables": "GroupIdentifier, GroupName, EventIdentifier, EventDate, EventName, EventNumber",
+    "Courier": "Mailgun",
+    "Aggregate": "Event"
+  },
+  {
+    "Slug": "HelpRequested",
+    "Subject": "Workflow Assignment - Help Requested",
+    "Purpose": "This notification is sent to admin subscribers when a portal user completes the Shift iQ Support request form.",
+    "Variables": "BrowserAddress,BrowserName,Organization,RequestDescription,RequestSummary,RequestUrl,UserEmail,UserEmployer,UserName,UserPhone",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "JobsCandidateContactRequested",
+    "Subject": "Jobs Candidate Contact Requested",
+    "Purpose": "This notification is sent to the Candidate when an Employer asks to be connected with them.",
+    "Variables": "CompanyName,CandidateFirstName,CandidateLastName,EmployerName,EmailAddress,Message",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "JobsCandidateAppliedForOpportunity",
+    "Subject": "Job Application Submitted",
+    "Purpose": "This notification is sent to admin subscribers when a Candidate applies for an opportunity.",
+    "Variables": "JobPosition,CandidateFirstName,CandidateLastName,CandidatePhoneNumber,CandidateEmailAddress,CandidateUrl",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "InvoicePaid",
+    "Subject": "Invoice Paid",
+    "Purpose": "This notification is sent to any user who completes any payment transaction. ",
+    "Variables": "CustomerEmail,CustomerFullName,InvoiceAmount,InvoiceDrafted,InvoicePaid,InvoiceStatus,InvoiceSubmitted,InvoiceNumber,LoginUrl,DashboardUrl,OrderInfo",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ClassScheduled",
+    "Subject": "Class Scheduled",
+    "Purpose": "This notification is sent to any user who purchases an online class product. (SkillsCheck only.)",
+    "Variables": "CustomerEmail,CustomerFullName,ClassEventUrl,ClassEventName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "IssueOwnerChanged",
+    "Subject": "Issue Owner Changed",
+    "Purpose": "This notification is sent to admin subscribers when a case owner is assigned or changed on any case.",
+    "Variables": "IssueNumber,IssueType,IssueStatus,IssueSummary,OwnerFirstName,OwnerLastName,OwnerEmail",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ITA001",
+    "Subject": "ITA {ActivityTitle} - {ActivityDate} - for session {ActivityClassCode} has been scheduled",
+    "Purpose": "Training Provider Notice - Class Event",
+    "Variables": "ActivityBillingCode,ActivityClassCode,ActivityDate,ActivityFormat,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTitle,CandidateRegistrationTable,DistributionExpected,FormTitle,MaterialsPermittedToCandidates,TrainingProviderList,VenueLocationPhysical,VenueName,VenueRoom,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Activity",
+    "RecipientFunction": "Training Provider, Instructor, Accessibility and Resource Centre (ARC):Invigilating Office/Invigilator",
+    "RecipientVariables": "RecipientName"
+  },
+  {
+    "Slug": "ITA003",
+    "Subject": "ITA Exam Passwords for $ActivityNumber - $ActivityTitle, $ActivityDate",
+    "Purpose": "Invigilator Notice - Online Only - Class Event",
+    "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTitle,CandidateAuthenticationTable,MaterialsPermittedToCandidates,TrainingProviderList003,VenueLocationPhysical,VenueName,VenueRoom,DistributionExpected,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Activity",
+    "RecipientFunction": "Invigilator",
+    "RecipientVariables": "RecipientName"
+  },
+  {
+    "Slug": "ITA004",
+    "Subject": "ITA {FormTitle} - scheduled on {ActivityDate} at {VenueName}",
+    "Purpose": "Candidate Notice - Class Event",
+    "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateCode,CandidateInstructionEligibility,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,RecipientAttachment",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate"
+  },
+  {
+    "Slug": "ITA005",
+    "Subject": "Reminder - ITA {FormTitle} scheduled on {ActivityDate} at {VenueName}",
+    "Purpose": "Candidate Reminder - Class Event",
+    "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateCode,CandidateInstructionEligibility,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,RecipientAttachment",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate"
+  },
+  {
+    "Slug": "ITA006",
+    "Subject": "ITA {FormTitle} - scheduled on {ActivityDate} at {VenueName}",
+    "Purpose": "Candidate Notice - Sitting Event",
+    "Variables": "ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityScheduledCountdownDays,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateFirstName,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected,FormTitle,RecipientAttachment,VenueLocationPhysical,VenueName,VenueRoom,",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate"
+  },
+  {
+    "Slug": "ITA007",
+    "Subject": "Reminder - ITA {FormTitle} - scheduled on {ActivityDate} at {VenueName}",
+    "Purpose": "Candidate Reminder - Sitting Event",
+    "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityScheduledCountdownDays,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateInstructionEligibility,CandidateFirstName,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,ActivityInstructionUrl,RecipientAttachment,ActivityNumber",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate"
+  },
+  {
+    "Slug": "ITA008",
+    "Subject": "ITA {FormTitle} scheduled at {VenueName}",
+    "Purpose": "Candidate Notice - Individual Event",
+    "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTimeLimit,CandidateAccommodation,CandidateAccommodationName,CandidateAccommodationTimeExtension,CandidateAddress,CandidateCode,CandidateFirstName,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected,FormTitle,VenueLocationPhysical,VenueName,VenuePhone,ActivityInstructionUrl,RecipientAttachment,ActivityDate,ActivityFormat",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate, Reader/Translator"
+  },
+  {
+    "Slug": "ITA009",
+    "Subject": "Reminder - ITA {FormTitle} at {VenueName}",
+    "Purpose": "Candidate Reminder - Individual Event",
+    "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTimeLimit,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateFirstName,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,ActivityInstructionUrl,RecipientAttachment,ActivityDate,ActivityFormat",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate, Reader/Translator"
+  },
+  {
+    "Slug": "ITA013",
+    "Subject": "ITA Exam Review Required - Results withheld for {ActivityType} {ActivityNumber}-{ActivityBillingCode}",
+    "Purpose": "Administrator Notice - Exam Results Failed Validation",
+    "Variables": "ActivityBillingCode,ActivityDate,ActivityInstructionUrl,ActivityNumber,ActivityTimeLess30Minutes,ActivityType,CandidateCompetencyTable,CandidatePublicationTable,CandidateSubmissionTable,DistributionExpected,EventIdentifier,FolderCompetencyTable,FormTitle,RecipientAttachment,VenueName,WarningList",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Activity",
+    "RecipientFunction": "Administrator"
+  },
+  {
+    "Slug": "ITA014",
+    "Subject": "Reminder - ITA Exam Review Required - Results withheld for {ActivityType} {ActivityNumber}-{ActivityBillingCode}",
+    "Purpose": "Administrator Reminder - Exam Results Failed Validation",
+    "Variables": "ActivityBillingCode,ActivityNumber,ActivityType,CandidatePublicationTable,WarningList,DistributionExpected,ActivityTimeLess30Minutes,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Activity",
+    "RecipientFunction": "Administrator"
+  },
+  {
+    "Slug": "ITA016",
+    "Subject": "ITA Exam Results for session {ActivityClassCode} - {FormTitle}, {ActivityDate}",
+    "Purpose": "Training Provider Notice - Class Event Results",
+    "Variables": "ActivityBillingCode,ActivityClassCode,ActivityDate,ActivityNumber,ActivityType,CandidateCompetencyTable,CandidateSubmissionTable,FolderCompetencyTable,FormTitle,VenueName,DistributionExpected,ActivityTimeLess30Minutes,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Activity",
+    "RecipientFunction": "Training Provider, Instructor",
+    "RecipientVariables": "RecipientName"
+  },
+  {
+    "Slug": "ITA017",
+    "Subject": "Outstanding Exam Materials Reminder",
+    "Purpose": "Invigilator Notice - Outstanding Exam Materials Reminder: 5 Days/10 Days",
+    "Variables": "ActivityBillingCode,ActivityNumber,ActivityTitle,ExamMaterialReturnShipmentReceived,VenueOffice,DistributionExpected,ActivityTimeLess30Minutes,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Activity",
+    "RecipientFunction": "Invigilator"
+  },
+  {
+    "Slug": "ITA020",
+    "Subject": "Reminder - ITA {FormTitle} at {VenueName}",
+    "Purpose": "Candidate Reminder - Individual Event",
+    "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTimeLimit,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateFirstName,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,ActivityInstructionUrl,RecipientAttachment,ActivityDate,ActivityFormat",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate, Reader/Translator"
+  },
+  {
+    "Slug": "ITA021",
+    "Subject": "ITA {FormTitle} - Candidate Not Eligible",
+    "Purpose": "Candidate Notice - Class Event",
+    "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityTime,CandidateAccommodation,CandidateCode,CandidateInstructionEligibility,CandidateName,CandidateTimeLimit,CurrentDate,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,DistributionExpected,ActivityTimeLess30Minutes,RecipientAttachment",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate"
+  },
+  {
+    "Slug": "ITA022",
+    "Subject": "ITA {FormTitle} - Candidate Removed",
+    "Purpose": "Candidate Notice - Class Event",
+    "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityTime,CandidateAccommodation,CandidateCode,CandidateInstructionEligibility,CandidateName,CandidateTimeLimit,CurrentDate,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,DistributionExpected,ActivityTimeLess30Minutes,RecipientAttachment",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate"
+  },
+  {
+    "Slug": "ITA023",
+    "Subject": "ITA {ActivityTitle} - {ActivityDate} - for session {ActivityClassCode} has been scheduled",
+    "Purpose": "Training Provider Notice - Class Event",
+    "Variables": "ActivityBillingCode,ActivityClassCode,ActivityDate,ActivityFormat,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTitle,CandidateRegistrationTable,DistributionExpected,FormTitle,MaterialsPermittedToCandidates,TrainingProviderList,VenueLocationPhysical,VenueName,VenueRoom,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Activity",
+    "RecipientFunction": "Training Provider, Instructor",
+    "RecipientVariables": "RecipientName"
+  },
+  {
+    "Slug": "ITA024",
+    "Subject": "ITA {FormTitle} scheduled at {VenueName}",
+    "Purpose": "Candidate Notice - Individual Event.",
+    "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTimeLimit,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateFirstName,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected,FormTitle,VenueLocationPhysical,VenueName,VenuePhone,ActivityInstructionUrl,RecipientAttachment,ActivityDate,ActivityFormat",
+    "Courier": "DirectAccess",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate, Reader/Translator"
+  },
+  {
+    "Slug": "ITA025",
+    "Subject": "ITA {ActivityTitle} - {ActivityDate} - for session {ActivityClassCode} has been approved",
+    "Purpose": "Candidate and Training Provider Notice - Class Event",
+    "Variables": "ActivityBillingCode,ActivityClassCode,ActivityDate,ActivityFormat,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTitle,VenueLocationPhysical,VenueName,VenueRoom,CandidateName,CandidateCode,CandidateAccommodation,CandidateTimeLimit,EventIdentifier,EventNumber",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Exam Candidate, Reader/Translator, Training Provider"
+  },
+  {
+    "Slug": "ITA026",
+    "Subject": "No Return Shipment Received",
+    "Purpose": "Invigilator Notice - No Return Shipment Received Reminder: 14/60 days",
+    "Variables": "ActivityBillingCode,ActivityNumber,ActivityTitle,ExamMaterialReturnShipmentReceived,DistributionExpected,DistributionReturn,ExamType,VenueOffice",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Activity",
+    "RecipientFunction": "Invigilator"
+  },
+  {
+    "Slug": "ITA027",
+    "Subject": "Event Number {ActivityNumber} - SkilledTradesBC {FormTitle} scheduled at {VenueName}",
+    "Purpose": "This notification is sent to the Invigilating Office/Invigilator contact when an Individual (Accommodated) exam event is modified with a candidate who has accommodations.",
+    "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateAccommodationName,CandidateAccommodationTimeExtension,CandidateAccommodationTable,CandidateAddress,CandidateCode,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected,FormTitle,VenueLocationPhysical,VenueName,VenuePhone,RecipientAttachment,ActivityDate,ActivityFormat",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ],
+    "Aggregate": "Registration",
+    "RecipientFunction": "Invigilating Office/Invigilator"
+  },
+  {
+    "Slug": "LearningWelcomeEmail",
+    "Subject": "A new SkillsCheck was assigned to you!",
+    "Purpose": "This notification is sent to a learner when they are invited to complete a SkillsCheck and provides instructions for accessing their account and dashboard.",
+    "Variables": "AppUrl,FirstName,Email,Password,LoginUrl,DashboardUrl",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "LogbookJoined",
+    "Subject": "Logbook Joined",
+    "Purpose": "This notification is sent to a learner when they join a logbook.(Configured in each logbook.)",
+    "Variables": "ActorName,AppUrl,LogbookTitle,LogbookUrl,ModificationType,OrganizationCode,OrganizationName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "LogbookModified",
+    "Subject": "Logbook Modified",
+    "Purpose": "This notification is sent to a learner and/or admin subscribers when a logbook entry is created or modified.(Configured in each logbook.)",
+    "Variables": "ActorName,AppUrl,LogbookTitle,LogbookUrl,ModificationType,OrganizationCode,OrganizationName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ManagementWelcomeEmail",
+    "Subject": "Manager - Welcome!",
+    "Purpose": "This notification is sent to a manager when he purchase a SkillsCheck for the first time.",
+    "Variables": "FirstName,Email,SignInUrl,Password,CustomerEmail,CustomerFullName,InvoiceAmount,InvoiceDrafted,InvoicePaid,InvoiceStatus,InvoiceSubmitted,InvoiceNumber,LoginUrl,DashboardUrl,OrderInfo",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "MembershipEnded",
+    "Subject": "Group Membership Ended",
+    "Purpose": "This notification is sent to a learner and/or admin subscribers when a person is removed from a group.(Configured in each group.)",
+    "Variables": "GroupIdentifier,GroupName,UserIdentifier,UserName,UserEmail,AppUrl,EditPersonUrl,Reason",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "MembershipStarted",
+    "Subject": "Group Membership Started",
+    "Purpose": "This notification is sent to a learner and/or admin subscribers when a person is added to a group. (Configured in each group.)",
+    "Variables": "GroupIdentifier,GroupName,UserIdentifier,UserName,UserEmail,AppUrl,EditPersonUrl,Reason",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "PasswordChanged",
+    "Subject": "Password Changed",
+    "Purpose": "This alert is sent to any user that changes their password.",
+    "Variables": "UserEmail,EventTime,BrowserAddress",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "PasswordResetRequested",
+    "Subject": "Password Reset Requested",
+    "Purpose": "This alert is sent to any user that requests a password reset.",
+    "Variables": "ResetUrl",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "PersonCodeNotEntered",
+    "Subject": "Person Code Was Not Entered",
+    "Purpose": "This notification is sent to admin subscribers when a class registration was completed without a Person Code.",
+    "Variables": "EventTitle,CandidateName,CandidateEmail,CandidatePhone,RegistrantEmail,RegistrantName,RegistrantPhone",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "PersonCommentFlagged",
+    "Subject": "Person Flagged on Comment",
+    "Purpose": "This notification is sent to admin subscribers when a flag is added to any comment on any contact record.",
+    "Variables": "AuthorFirstName,AuthorLastName,AuthorEmail,TopicFirstName,TopicLastName,TopicEmail,CommentText",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ProgramCompleted",
+    "Subject": "Program Completed",
+    "Purpose": "This notification is sent to a learner and/or admin subscribers when a program is completed. (Configured in each program.)",
+    "Variables": "LearnerFirstName,LearnerLastName,ProgramName,ProgramStarted",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ProgramStalled",
+    "Subject": "Program Stalled",
+    "Purpose": "This notification is sent to a learner and/or admin subscribers when a learner hasn't made progress on a program for the specified time. (Configured in each program.)",
+    "Variables": "LearnerFirstName,LearnerLastName,ProgramName,ProgramStarted",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ProgressCompleted",
+    "Subject": "Progress Completed",
+    "Purpose": "This notification is sent to admin subscribers when a grade item is completed. (Configured in each grade item.)",
+    "Variables": "LearnerEmail,LearnerName,GradeItemName,GradeItemScore",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "RegistrantContactInformationChanged",
+    "Subject": "Registrant Contact Information Changed",
+    "Purpose": "This notification is sent to admin subscribers when any contact information is updated during a class registration.",
+    "Variables": "ContactLoginName,ContactEmail,EventName,ContactChangedFields",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "RegistrationComplete",
+    "Subject": "Registration Complete",
+    "Purpose": "This notification is sent to the person who completed a class registration and to the registrant as well, if different.",
+    "Variables": "CandidateName,CandidateEmail,CandidateStreet1,CandidateCity,CandidateProvince,CandidatePostalCode,EmployerStatus,CandidateBirthdate,CandidateTradeworkerNumber,CandidateWorkBasedHoursToDate,CandidatePhone,CandidateIsEnglishFirstLanguage,EmergencyContactName,EmergencyContactPhone,EmergencyContactRelationship,EmployerName,EmployerContactName,EmployerContactPhone,EmployerContactEmail,EmployerStreet1,EmployerCity,EmployerProvince,EmployerPostalCode,InvoiceNumber,EventTitle,EventDate,EventTime,VenueName,VenueStreet1,VenueCity,VenueProvince,VenuePostalCode,SeatTitle,SeatPrice,RegistrantEmail,RegistrantName,RegistrantPhone,CandidateAuthenticationDetails,PersonCode",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "RegistrationInvitation",
+    "Subject": "Invitation for Registration",
+    "Purpose": "This notification is sent to the person who requested a class waitlist spot when the Send Invitation button is clicked.",
+    "Variables": "CandidateFullName,ClassTitle,RegistrationEndTime,ClassRegistrationLink,ClassStartTime,ClassAchievement",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "RegistrationInvitationExpired",
+    "Subject": "Registration Invitation Expired",
+    "Purpose": "This notification is sent to the person who requested a class waitlist spot when the registration invitation has expired or been marked as declined.",
+    "Variables": "CandidateFirstName,CandidateLastName,CandidateEmail,ClassTitle,ClassRegistrationLink",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ResponseCompleted",
+    "Subject": "Response Completed",
+    "Purpose": "This notification is sent to admin subscribers when a survey response is completed. (Configured in each survey.)",
+    "Variables": "AppUrl,CurrentYear,OrganizationName,SurveyFormName,Tenant,UserEmail,UserFullName,UserIdentifier,UtcNow",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ResponseConfirmed",
+    "Subject": "Response Confirmed",
+    "Purpose": "This notification is sent to a survey respondent when they submit their survey response. (Configured in each survey.)",
+    "Variables": "AppUrl,CurrentYear,OrganizationName,SurveyFormName,Tenant,UserEmail,UserFullName,UserIdentifier,UtcNow",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ResponseStarted",
+    "Subject": "Response Started",
+    "Purpose": "This notification is sent to admin subscribers when a survey response is started. (Configured in each survey.)",
+    "Variables": "AppUrl,CurrentYear,OrganizationName,SurveyFormName,Tenant,UserEmail,UserFullName,UserIdentifier,UtcNow",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "UnhandledExceptionIntercepted",
+    "Subject": "Unhandled Exception Intercepted",
+    "Purpose": "This alert is sent to admin subscribers after an unhandled exception is intercepted (and NOT sent to Sentry).",
+    "Variables": "ExceptionMessage",
+    "Courier": "Mailgun",
+    "Organizations": [
+      "ita"
+    ]
+  },
+  {
+    "Slug": "UserAccountArchived",
+    "Subject": "Account Archived",
+    "Purpose": "This notification is sent to admin subscribers each time a contact record is archived.",
+    "Variables": "Name,Email,Status",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "UserAccountCreated",
+    "Subject": "Account Created",
+    "Purpose": "This notification is sent to admin subscribers after a new user account is created by another administrator.",
+    "Variables": "Name,Email,Phone,City,Province,CompanyTitle",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "UserAccountWelcomed",
+    "Subject": "User Account Approved - Welcome!",
+    "Purpose": "This notification is sent to a user when an admin grants them access to the platform. It can also be sent manually to the user at any time.",
+    "Variables": "FirstName,Email,CompanyTitle,SignInUrl,PasswordInstruction,PasswordInstruction:en,PasswordInstruction:fr,Password",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "UserEmailSubscriptionModified",
+    "Subject": "Mailing List Subscriptions Modified",
+    "Body": "Hi $RecipientName,\n\nThis is an automated notification to confirm your email subscriptions have been updated.\n\n$RecipientMemberships",
+    "Purpose": "This notification is sent to any user who modifies their own mailing list group memberships. (Configured in each List group.)",
+    "Variables": "$RecipientName,$RecipientMemberships",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "UserEmailVerificationRequested",
+    "Subject": "Email Verification Requested",
+    "Purpose": "This notification is sent to every user that self registers for their own account that is automatically granted access.",
+    "Variables": "AppUrl,Organization,UserEmail,UserIdentifier,VerifyEmailUrl",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "UserOTPActivationCode",
+    "Subject": "Your verification code from InSite",
+    "Purpose": "This alert is sent to any user who has multi-factor authentication enabled and is logging in, and it includes a one-time use code.",
+    "Variables": "ConfirmationCode,Organization",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "UserRegistrationSubmitted",
+    "Subject": "User Account Registered",
+    "Purpose": "This notification is sent to any user who self-registers for a new account, confirming receipt of the registration information.",
+    "Variables": "ApprovalUrl,City,Email,FirstName,LastName,Name,Organization,Phone,Province,RegistrationUrl,Thumbprint",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "UnsubscribeSuccess",
+    "Subject": "Successfully Unsubscribed",
+    "Purpose": "This notification is sent to any user who unsubscribes themselves from all marketing emails from an organization.",
+    "Variables": "UserEmail,Organization,ResubscribeUrl",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "WelcomeLearner",
+    "Subject": "A new SkillsCheck was assigned to you!",
+    "Purpose": "This notification is sent to a learner when they are invited to complete a SkillsCheck and provides instructions for accessing their account and dashboard.",
+    "Variables": "AppUrl,FirstName,LoginUrl,DashboardUrl",
+    "Courier": "Mailgun"
+  }
+]

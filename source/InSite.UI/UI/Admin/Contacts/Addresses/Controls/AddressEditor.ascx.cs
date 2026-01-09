@@ -1,0 +1,350 @@
+using System;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+using InSite.Application.Contacts.Read;
+using InSite.Common.Web.UI;
+using InSite.Domain.Contacts;
+using InSite.Web.Helpers;
+
+using Shift.Common;
+using Shift.Constant;
+
+namespace InSite.Admin.Contacts.Addresses.Controls
+{
+    public partial class AddressEditor : UserControl
+    {
+        #region Classes
+
+        [Serializable]
+        private class AddressModel
+        {
+            public Guid AddressIdentifier { get; set; }
+            public string City { get; set; }
+            public string Country { get; set; }
+            public string Description { get; set; }
+            public string PostalCode { get; set; }
+            public string Province { get; set; }
+            public string Street1 { get; set; }
+            public string Street2 { get; set; }
+            public Guid? CountryId { get; set; }
+
+            public AddressModel(QPersonAddress address)
+            {
+                AddressIdentifier = address.AddressIdentifier;
+                City = address.City;
+                Country = address.Country;
+                Description = address.Description;
+                PostalCode = address.PostalCode;
+                Province = address.Province;
+                Street1 = address.Street1;
+                Street2 = address.Street2;
+                CountryId = address.Country.HasNoValue()
+                            ? null
+                            : ServiceLocator.CountrySearch.SelectByName(address.Country)?.Identifier;
+            }
+
+            public AddressModel(QGroupAddress address)
+            {
+                City = address.City;
+                Country = address.Country;
+                Description = address.Description;
+                PostalCode = address.PostalCode;
+                Province = address.Province;
+                Street1 = address.Street1;
+                Street2 = address.Street2;
+                CountryId = address.Country.HasNoValue()
+                            ? null
+                            : ServiceLocator.CountrySearch.SelectByName(address.Country)?.Identifier;
+            }
+        }
+
+        #endregion
+
+        #region Properties
+
+        public Unit FieldsWidth
+        {
+            get
+            {
+                EnsureChildControls();
+
+                return Street1.Width;
+            }
+            set
+            {
+                EnsureChildControls();
+
+                Description.Width = value;
+                Street1.Width = value;
+                Street2.Width = value;
+                City.Width = value;
+                Province.Width = value;
+                PostalCode.Width = value;
+            }
+        }
+
+        public AddressField HiddenFields
+        {
+            get { return (AddressField)(ViewState[nameof(HiddenFields)] ?? AddressField.None); }
+            set { ViewState[nameof(HiddenFields)] = value; }
+        }
+
+        public bool ReadOnly
+        {
+            get { return ViewState[nameof(ReadOnly)] != null && (bool)ViewState[nameof(ReadOnly)]; }
+            set { ViewState[nameof(ReadOnly)] = value; }
+        }
+
+        public AddressField RequiredFields
+        {
+            get { return (AddressField)(ViewState[nameof(RequiredFields)] ?? AddressField.None); }
+            set { ViewState[nameof(RequiredFields)] = value; }
+        }
+
+        public string ValidationGroup
+        {
+            get { return DescriptionRequired.ValidationGroup; }
+            set
+            {
+                DescriptionRequired.ValidationGroup = value;
+                Street1Required.ValidationGroup = value;
+                Street2Required.ValidationGroup = value;
+                CityRequired.ValidationGroup = value;
+                PostalCodeRequired.ValidationGroup = value;
+                CountryValidator.ValidationGroup = value;
+            }
+        }
+
+        private AddressModel AddressData
+        {
+            get => Session[UniqueID + nameof(AddressModel)] as AddressModel;
+            set => Session[UniqueID + nameof(AddressModel)] = value;
+        }
+
+        private AddressModel EmployerAddressData
+        {
+            get => Session[UniqueID + nameof(EmployerAddressData)] as AddressModel;
+            set => Session[UniqueID + nameof(EmployerAddressData)] = value;
+        }
+
+        private AddressModel HomeAddressData
+        {
+            get => Session[UniqueID + nameof(HomeAddressData)] as AddressModel;
+            set => Session[UniqueID + nameof(HomeAddressData)] = value;
+        }
+        #endregion
+
+        #region Setting and getting input values
+
+        private void SetInputValues(AddressModel address, string type = null)
+        {
+            if (type != null)
+                AddressHeading.InnerText = ((IAdminPage)Page).Translator.Translate($"{type} Address");
+
+            Description.Text = address.Description;
+            Street1.Text = address.Street1;
+            Street2.Text = address.Street2;
+
+            City.Text = address.City;
+            Province.Text = address.Province;
+            PostalCode.Text = address.PostalCode;
+
+            if(address.CountryId.HasValue)
+                CountrySelector.Value = address.CountryId;
+
+            var countryName = address.CountryId.HasValue
+                ? ServiceLocator.CountrySearch.SelectById(address.CountryId.Value)?.Name ?? string.Empty
+                : string.Empty;
+
+            var gMapUrl = LocationHelper.GetGMapsAddressLink(address.Street1, address.Street2, address.City, address.Province, address.Country, address.PostalCode);
+            MapURL.Visible = gMapUrl.IsNotEmpty();
+            MapURL.NavigateUrl = gMapUrl;
+
+            SetNamesPerCountry(countryName);
+        }
+
+        public void SetUserInputValues(string type, QPersonAddress address, QGroupAddress employerAddress = null, string employerName = null, QPersonAddress homeAddress = null)
+        {
+            if (address == null)
+                address = new QPersonAddress { AddressIdentifier = UniqueIdentifier.Create() };
+
+            AddressData = new AddressModel(address);
+            if (employerAddress != null)
+                EmployerAddressData = new AddressModel(employerAddress);
+
+            if (homeAddress != null)
+                HomeAddressData = new AddressModel(homeAddress);
+
+            SetInputValues(AddressData, type);
+
+            if (employerAddress != null &&
+                (
+                    employerAddress.Street1.HasValue() ||
+                    employerAddress.Street2.HasValue() ||
+                    employerAddress.City.HasValue() ||
+                    employerAddress.Province.HasValue() ||
+                    employerAddress.PostalCode.HasValue() ||
+                    employerAddress.Country.HasValue())
+                )
+            {
+                EmployerAddressPanel.Visible = true;
+                EmployerAddressTitle.Text = $"Employer {type} Address";
+                EmployerName.Text = employerName;
+                EmployerAddress.NavigateUrl = employerAddress.GetGMapsAddressLink();
+                EmployerAddress.Text = LocationHelper.ToHtml(employerAddress.Street1, employerAddress.Street2, employerAddress.City, employerAddress.Province, employerAddress.PostalCode, employerAddress.Country, null, null);
+            }
+
+            if (homeAddress != null &&
+                (
+                    homeAddress.Street1.HasValue() ||
+                    homeAddress.Street2.HasValue() ||
+                    homeAddress.City.HasValue() ||
+                    homeAddress.Province.HasValue() ||
+                    homeAddress.PostalCode.HasValue() ||
+                    homeAddress.Country.HasValue())
+                )
+            {
+                HomeAddress.NavigateUrl = homeAddress.GetGMapsAddressLink();
+                HomeAddress.Text = homeAddress.ToHtml();
+            }
+        }
+
+        public void SetGroupInputValues(string type, QGroupAddress address, Guid? group)
+        {
+            if (address == null)
+            {
+                address = new QGroupAddress();
+                address.AddressIdentifier = UniqueIdentifier.Create();
+            }
+
+            AddressData = new AddressModel(address);
+
+            SetInputValues(AddressData, type);
+        }
+
+        public void GetInputValues(QPersonAddress address)
+        {
+            address.Description = Description.Text;
+            address.Street1 = Street1.Text;
+            address.Street2 = Street2.Text;
+            address.City = City.Text;
+            address.Province = Province.Text;
+            address.PostalCode = PostalCode.Text;
+            address.Country = ServiceLocator.CountrySearch.SelectById(CountrySelector.Value)?.Name ?? string.Empty;
+        }
+
+        public void GetInputValues(GroupAddress address)
+        {
+            address.Description = Description.Text;
+            address.Street1 = Street1.Text;
+            address.Street2 = Street2.Text;
+            address.City = City.Text;
+            address.Province = Province.Text;
+            address.PostalCode = PostalCode.Text;
+            address.Country = ServiceLocator.CountrySearch.SelectById(CountrySelector.Value)?.Name ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Initialization and loading
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            CountryValidator.ServerValidate += CountryValidator_ServerValidate;
+
+            CopyEmployerAddress.Click += CopyEmployerAddress_Click;
+            CopyHomeAddress.Click += CopyHomeAddress_Click;
+        }
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            SetReadOnly(ReadOnly);
+            SetVisible(HiddenFields);
+            SetRequired(RequiredFields);
+
+            base.OnPreRender(e);
+        }
+
+        #endregion
+
+        private void SetReadOnly(bool isReadOnly)
+        {
+            Street1.ReadOnly = isReadOnly;
+            Street2.ReadOnly = isReadOnly;
+            City.ReadOnly = isReadOnly;
+            Province.Visible = !isReadOnly;
+            CountrySelector.Visible = !isReadOnly;
+
+            PostalCode.ReadOnly = isReadOnly;
+        }
+
+        private void SetVisible(AddressField hidden)
+        {
+            DescriptionField.Visible = !hidden.HasFlag(AddressField.Description);
+            Street1Field.Visible = !hidden.HasFlag(AddressField.Street1);
+            Street2Field.Visible = !hidden.HasFlag(AddressField.Street2);
+            CityField.Visible = !hidden.HasFlag(AddressField.City);
+            CountryField.Visible = !hidden.HasFlag(AddressField.Country);
+            ProvinceField.Visible = !hidden.HasFlag(AddressField.Province);
+            PostalCodeField.Visible = !hidden.HasFlag(AddressField.PostalCode);
+        }
+
+        private void SetRequired(AddressField required)
+        {
+            DescriptionRequired.Visible = required.HasFlag(AddressField.Description);
+            Street1Required.Visible = required.HasFlag(AddressField.Street1);
+            Street2Required.Visible = required.HasFlag(AddressField.Street2);
+            CityRequired.Visible = required.HasFlag(AddressField.City);
+            PostalCodeRequired.Visible = required.HasFlag(AddressField.PostalCode);
+        }
+
+        private void SetNamesPerCountry(string country)
+        {
+            if (country == "United States")
+            {
+                ProvinceFieldLabel.InnerHtml = "State";
+                PostalCodeFieldLabel.InnerHtml = "ZIP Code";
+            }
+            else if (country == "Canada")
+            {
+                ProvinceFieldLabel.InnerHtml = "Province";
+                PostalCodeFieldLabel.InnerHtml = "Postal Code";
+            }
+            else
+            {
+                ProvinceFieldLabel.InnerHtml = "State/Province";
+                PostalCodeFieldLabel.InnerHtml = "Zip/Postal Code";
+            }
+        }
+
+        #region Event handlers
+
+        private void CountryValidator_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            args.IsValid = CountrySelector.Value.HasValue
+                || (
+                    string.IsNullOrWhiteSpace(Description.Text)
+                    && string.IsNullOrWhiteSpace(Street1.Text)
+                    && string.IsNullOrWhiteSpace(Street2.Text)
+                    && string.IsNullOrWhiteSpace(City.Text)
+                    && string.IsNullOrWhiteSpace(Province.Text)
+                    && string.IsNullOrWhiteSpace(PostalCode.Text)
+                );
+        }
+
+        private void CopyEmployerAddress_Click(object sender, EventArgs e)
+        {
+            SetInputValues(EmployerAddressData);
+        }
+
+        private void CopyHomeAddress_Click(object sender, EventArgs e)
+        {
+            SetInputValues(HomeAddressData);
+        }
+
+        #endregion
+    }
+}
