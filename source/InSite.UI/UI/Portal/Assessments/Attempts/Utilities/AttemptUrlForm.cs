@@ -3,6 +3,7 @@ using System.IO;
 
 using InSite.Common.Web;
 
+using Shift.Common;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Assessments.Attempts.Utilities
@@ -66,7 +67,11 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             }
             catch (Exception ex)
             {
-                AppSentry.SentryError(ex);
+                var isSkip = ex.Message == "Invalid data" && ex is ApplicationError
+                    || ex.Message == "Invalid length for a Base-64 char array or string." && ex is FormatException;
+
+                if (!isSkip)
+                    AppSentry.SentryError(ex);
             }
 
             return null;

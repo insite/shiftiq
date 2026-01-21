@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Web;
 using System.Web.SessionState;
 
@@ -36,16 +37,22 @@ namespace InSite.UI.Portal.Records.Certificates
                 else
                     GeneratePng(model.Request, model.Variables);
             }
+            catch (ApplicationError apperr)
+            {
+                WriteErrorResponse(HttpStatusCode.BadRequest, apperr.Message);
+            }
             catch (Exception ex)
             {
                 var action = Global.HandleException(ex);
-                if (action.Type != ExceptionActionType.Ignore)
-                {
-                    if (action.Type == ExceptionActionType.Warning)
-                        AppSentry.SentryWarning(ex);
-                    else
-                        AppSentry.SentryError(ex);
-                }
+                if (action.Type == ExceptionActionType.Ignore)
+                    return;
+
+                if (action.Type == ExceptionActionType.Warning)
+                    AppSentry.SentryWarning(ex);
+                else
+                    AppSentry.SentryError(ex);
+
+                WriteErrorResponse(HttpStatusCode.InternalServerError, "An error occurred while generating a certificate.");
             }
         }
 
@@ -73,14 +80,14 @@ namespace InSite.UI.Portal.Records.Certificates
         {
             var bytes = CertificateBuilder.CreatePdf(request.ImagePath, request.Elements, variables);
 
-            WriteResponse(bytes, "application/pdf", "Certificate.pdf");
+            WriteFileResponse(bytes, "application/pdf", "Certificate.pdf");
         }
 
         protected void GeneratePng(CertificateRequest request, CertificateVariables variables)
         {
             byte[] bytes = CertificateBuilder.CreateImage(request.ImagePath, request.Elements, variables, 1200);
 
-            WriteResponse(bytes, "image/png", request.FileName != null ? request.FileName : "Certificate.png");
+            WriteFileResponse(bytes, "image/png", request.FileName != null ? request.FileName : "Certificate.png");
         }
 
         public static byte[] CreateImage(string json)
@@ -92,7 +99,7 @@ namespace InSite.UI.Portal.Records.Certificates
             return CertificateBuilder.CreateImage(request.ImagePath, request.Elements, variables, 1200);
         }
 
-        private void WriteResponse(byte[] bytes, string contentType, string filename)
+        private void WriteFileResponse(byte[] bytes, string contentType, string filename)
         {
             Response.Clear();
             Response.ClearHeaders();
@@ -101,6 +108,16 @@ namespace InSite.UI.Portal.Records.Certificates
             Response.AddHeader("Content-Length", bytes.Length.ToString());
             Response.OutputStream.Write(bytes, 0, bytes.Length);
             Response.Flush();
+            Response.End();
+        }
+
+        private void WriteErrorResponse(HttpStatusCode status, string text)
+        {
+            Response.Clear();
+            Response.ClearHeaders();
+            Response.StatusCode = (int)status;
+            Response.ContentType = "text/plain";
+            Response.Write(text);
             Response.End();
         }
     }

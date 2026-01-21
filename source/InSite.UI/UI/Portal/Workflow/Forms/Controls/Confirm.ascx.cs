@@ -58,9 +58,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
         private void Continue()
         {
-            var session = ServiceLocator.SurveySearch.GetResponseSession(Current.SessionIdentifier);
-
-            if(session != null && string.Equals(session.ResponseSessionStatus, ResponseSessionStatus.Completed.ToString(), StringComparison.OrdinalIgnoreCase))
+            if(Current.Session.ResponseIsLocked)
                 HttpResponseHelper.Redirect("/");
 
             var dateCompleted = DateTimeOffset.UtcNow;

@@ -38,12 +38,12 @@ public class TokenController : ControllerBase
 
         var isWhitelisted = IsWhitelisted(ip, tokenSettings.Whitelist);
 
-        // Disallow a custom lifetime that exceeds 90 days.
+        // Disallow a custom lifetime that exceeds 365 days.
 
-        var ninetyDays = 7776000; // 90 days × 24 hours × 60 minutes × 60 seconds = 7,776,000 seconds
+        var oneYear = 365 * 24 * 60 * 60; // 365 days × 24 hours × 60 minutes × 60 seconds = 31,536,000 seconds
 
-        if (request.Lifetime != null && request.Lifetime > ninetyDays)
-            request.Lifetime = ninetyDays;
+        if (request.Lifetime != null && request.Lifetime > oneYear)
+            request.Lifetime = oneYear;
 
         var principal = _principalSearch.GetPrincipal(request, ip, isWhitelisted, tokenSettings.Lifetime, errors);
 

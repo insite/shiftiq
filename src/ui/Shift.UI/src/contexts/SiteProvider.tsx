@@ -100,7 +100,7 @@ export default function SiteProvider({ children }: Props) {
                 });
                 urlHelper.setOrg(newSiteSetting.OrganizationCode);
                 if (newSiteSetting.StylePath) {
-                    cssHelper.setCustomCssFile(newSiteSetting.StylePath);
+                    cssHelper.setShiftCssFile(newSiteSetting.StylePath);
                 }
             } catch (err) {
                 setState({

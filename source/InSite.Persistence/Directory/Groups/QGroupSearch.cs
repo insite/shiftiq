@@ -736,6 +736,16 @@ namespace InSite.Persistence
             }
         }
 
+        public QGroupConnection GetConnection(Guid parentGroupIdentifier, Guid childGroupIdentifier)
+        {
+            using (var db = CreateContext())
+            {
+                return db.QGroupConnections
+                    .Where(x => x.ParentGroupIdentifier == parentGroupIdentifier && x.ChildGroupIdentifier == childGroupIdentifier)
+                    .FirstOrDefault();
+            }
+        }
+
         public int CountParentConnections(Guid childGroupIdentifier)
         {
             using (var db = CreateContext())

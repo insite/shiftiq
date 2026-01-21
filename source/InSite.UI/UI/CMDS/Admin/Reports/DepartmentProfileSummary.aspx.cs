@@ -231,7 +231,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
 
                     var competencyCountCell = sheet.Cells[rowNumber, 1, rowNumber, 3];
                     competencyCountCell.Merge = true;
-                    competencyCountCell.Value = $"{department.CompetencyCount} Competencies as at {DateTime.Today.ToString("MMM d, yyy")}";
+                    competencyCountCell.Value = $"{department.CompetencyCount} competencies as at {DateTime.Today.ToString("MMM d, yyy")}";
 
                     rowNumber++;
                     sheet.Row(rowNumber++).Height = 10;

@@ -4,8 +4,6 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Admin.Contacts.People.Utilities;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Courses.Read;
@@ -26,6 +24,7 @@ using InSite.Web.Security;
 
 using Shift.Common;
 using Shift.Common.Events;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Home.Management
@@ -561,7 +560,7 @@ namespace InSite.UI.Portal.Home.Management
                     return "<i class=\"far fa-circle\"></i> Unassigned";
                 case CourseDistributionGridItem.StatusType.NotStarted:
                 case CourseDistributionGridItem.StatusType.Assigned:
-                    return "<i class=\"fas fa-circle text-info\"></i> Not Started";
+                    return "<i class=\"fas fa-circle text-primary\"></i> Not Started";
                 case CourseDistributionGridItem.StatusType.InProgress:
                     return "<i class=\"fas fa-circle text-warning\"></i> In Progress";
                 case CourseDistributionGridItem.StatusType.Completed:

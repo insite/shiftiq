@@ -9,10 +9,6 @@
     <insite:Nav runat="server" ID="NavPanel">
         <insite:NavItem runat="server" ID="CriteriaTab" Title="Criteria" Icon="far fa-search" IconPosition="BeforeText">
 
-            <h2 class="h4 my-3">
-                Criteria
-            </h2>
-
             <div class="row">
                 <div class="col-lg-6">
                     <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="ReportUpdatePanel" />
@@ -58,10 +54,6 @@
         </insite:NavItem>
         <insite:NavItem runat="server" ID="ReportTab" Title="Report" Icon="far fa-chart-bar" IconPosition="BeforeText" Visible="false">
 
-            <h2 class="h4 my-3">
-                Report
-            </h2>
-
             <div class="card border-0 shadow-lg">
                 <div class="card-body">
 
@@ -77,7 +69,7 @@
                                 <h3><%# Eval("ProfileTitle") %></h3>
                                 <div class="mb-2">
                                     <%# Eval("CompetencyCount") %>
-                                    Competencies as at
+                                    competencies as at
                                     <%# DateTime.Today.ToString("MMM d, yyy") %>
                                 </div>
                                 <asp:Repeater runat="server" ID="EmployeeRepeater">

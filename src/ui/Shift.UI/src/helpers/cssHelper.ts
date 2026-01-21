@@ -7,19 +7,11 @@ export const cssHelper = {
         (document.getElementById("simplebar_stylesheet") as HTMLLinkElement).href = shiftConfig.simplebarCssUrl;
         (document.getElementById("simplebar_script") as HTMLScriptElement).src = shiftConfig.simplebarJsUrl;
     },
-    setCustomCssFile(customCssUrl: string)  {
+    setShiftCssFile(cssUrl: string)  {
         if (shiftConfig.isLocal) {
-            switch (customCssUrl.toLowerCase()) {
-                case "/ui/layout/common/styles/cmds.css":
-                    customCssUrl = "/ui/Cmds.css";
-                    break;
-                case "/ui/layout/common/styles/skills.css":
-                    customCssUrl = "/ui/Skills.css";
-                    break;
-                default:
-                    throw new Error(`Unsupported custom css url: ${customCssUrl}`);
-            }
+            const index = cssUrl.lastIndexOf("/");
+            cssUrl = `/ui${cssUrl.substring(index)}`;
         }
-        (document.getElementById("custom_stylesheet") as HTMLLinkElement).href = customCssUrl;
+        (document.getElementById("shift_stylesheet") as HTMLLinkElement).href = cssUrl;
     }
 }

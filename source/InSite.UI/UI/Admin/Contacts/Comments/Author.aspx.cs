@@ -38,6 +38,8 @@ namespace InSite.Admin.Contacts.Comments.Forms
         private void SaveButton_Click(object sender, EventArgs e)
         {
             var comment = Get();
+            if (comment == null)
+                return;
 
             var organizationId = GetOrganizationId();
 

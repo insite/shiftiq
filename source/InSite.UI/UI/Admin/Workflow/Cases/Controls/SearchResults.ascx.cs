@@ -174,7 +174,7 @@ namespace InSite.Admin.Issues.Controls
 
             var issueIdentifier = (Guid)DataBinder.Eval(e.Row.DataItem, "IssueIdentifier");
 
-            var lastComment = _comments.OrderBy(x => x.CommentPosted).LastOrDefault();
+            var lastComment = _comments.Where(x => x.IssueIdentifier == issueIdentifier).OrderBy(x => x.CommentPosted).LastOrDefault();
             if (lastComment != null)
             {
                 var lastCommentDate = (ITextControl)e.Row.FindControl("LastCommentDate");

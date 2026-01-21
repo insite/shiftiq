@@ -375,7 +375,7 @@ namespace InSite.Api.Controllers
                 if (registrationEntity.ExamFormIdentifier.HasValue)
                     AddAssessmentFormToEvent(exam.Value, registrationEntity.ExamFormIdentifier.Value);
 
-                var cancelEmptyEvent = registrationEntity.Event?.EventType == "Exam";
+                var cancelEmptyEvent = IsCancelEmptyEvent(registrationEntity.Event.EventType, registrationEntity.Event.VenueLocationIdentifier);
 
                 SendCommand(new ChangeEvent(registration, exam.Value, transfer.Reason, cancelEmptyEvent));
 
@@ -418,8 +418,8 @@ namespace InSite.Api.Controllers
                 if (registrationEntity == null || registrationEntity.Event.OrganizationIdentifier != organization)
                     return JsonError($"Registration Not Found: {registration}", HttpStatusCode.BadRequest);
 
-                var cancelEmptyEvent = registrationEntity.Event?.EventType == "Exam"
-                    && cancel.Reason == "Cancel request";
+                var cancelEmptyEvent = cancel.Reason == "Cancel request"
+                    && IsCancelEmptyEvent(registrationEntity.Event.EventType, registrationEntity.Event.VenueLocationIdentifier);
 
                 if (organization == OrganizationIdentifiers.SkilledTradesBC)
                     SendCommand(new Application.Registrations.Write.DeleteRegistration(
@@ -434,6 +434,17 @@ namespace InSite.Api.Controllers
             {
                 return HandleError(ex);
             }
+        }
+
+        static Guid SBCGroupId = Guid.Parse("6562b766-2f21-48ac-a210-ad350140f21b");
+        private static bool IsCancelEmptyEvent(string eventType, Guid? venueLocationIdentifier)
+        {
+            if (eventType != "Exam" || venueLocationIdentifier == null)
+                return false;
+
+            var connection = ServiceLocator.GroupSearch.GetConnection(SBCGroupId, venueLocationIdentifier.Value);
+
+            return connection != null;
         }
 
         /// <summary>

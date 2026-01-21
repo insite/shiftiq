@@ -81,7 +81,7 @@ namespace InSite.Persistence
         public static readonly IDictionary<string, IDictionary<string, string>> Templates = new Dictionary<string, IDictionary<string, string>>
         {
             {
-                "Survey-Link",
+                "Forms-Link",
                 new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["en"] = $@"
@@ -97,7 +97,7 @@ namespace InSite.Persistence
                                     <tbody>
                                         <tr>
                                             <td style=""padding: 12px 12px 12px 12px; text-align: center;"" align=""center"" bgcolor=""#ffa500"" width=""100%"">
-                                                <a href=""${MessageVariable.AppUrl}/$SurveyPath"" style=""color: #FFFFFF; font-family: verdana,sans-serif; font-size: 16px; font-weight: bold; text-decoration: none;"">Begin Survey</a>
+                                                <a href=""${MessageVariable.AppUrl}/$WorkflowFormPath"" style=""color: #FFFFFF; font-family: verdana,sans-serif; font-size: 16px; font-weight: bold; text-decoration: none;"">Begin Survey</a>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -109,7 +109,7 @@ namespace InSite.Persistence
                         </tr>
                         <tr>
                             <td style=""color: #ffa500; font-family: verdana,sans-serif; font-size: 12px; line-height: 22px;"" align=""left"" width=""100%"">
-                                <a style=""color: #ffa500;"" href=""${MessageVariable.AppUrl}/$SurveyPath"">${MessageVariable.AppUrl}/$SurveyPath</a>
+                                <a style=""color: #ffa500;"" href=""${MessageVariable.AppUrl}/$WorkflowFormPath"">${MessageVariable.AppUrl}/$WorkflowFormPath</a>
                             </td>
                         </tr>
                     </tbody>
@@ -132,7 +132,7 @@ namespace InSite.Persistence
                                     <tbody>
                                         <tr>
                                             <td style=""padding: 12px 12px 12px 12px; text-align: center;"" align=""center"" bgcolor=""#ffa500"" width=""100%"">
-                                                <a href=""${MessageVariable.AppUrl}/$SurveyPath"" style=""color: #FFFFFF; font-family: verdana,sans-serif; font-size: 16px; font-weight: bold; text-decoration: none;"">Commencer le sondage</a>
+                                                <a href=""${MessageVariable.AppUrl}/$WorkflowFormPath"" style=""color: #FFFFFF; font-family: verdana,sans-serif; font-size: 16px; font-weight: bold; text-decoration: none;"">Commencer le sondage</a>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -144,7 +144,7 @@ namespace InSite.Persistence
                         </tr>
                         <tr>
                             <td style=""color: #ffa500; font-family: verdana,sans-serif; font-size: 12px; line-height: 22px;"" align=""left"" width=""100%"">
-                                <a style=""color: #ffa500;"" href=""${MessageVariable.AppUrl}/$SurveyPath"">${MessageVariable.AppUrl}/$SurveyPath</a>
+                                <a style=""color: #ffa500;"" href=""${MessageVariable.AppUrl}/$WorkflowFormPath"">${MessageVariable.AppUrl}/$WorkflowFormPath</a>
                             </td>
                         </tr>
                     </tbody>
@@ -310,7 +310,7 @@ namespace InSite.Persistence
             ReplaceBodyPlaceholder("$RecipientLastName", envelope.RecipientNameLast);
             ReplaceBodyPlaceholder("$RecipientPersonCode", envelope.RecipientCode);
 
-            ReplaceBodyPlaceholder("$SurveyPath", $"surveys/{surveyNumber ?? 0}/{envelope.RecipientIdentifier}");
+            ReplaceBodyPlaceholder("$WorkflowFormPath", $"form/{surveyNumber ?? 0}/{envelope.RecipientIdentifier}");
 
             body = ReplacePlaceholder(body, "social-media-links", content =>
             {
@@ -383,7 +383,7 @@ namespace InSite.Persistence
             ReplaceBodyPlaceholder("$Recipient-First-Name", "$RecipientFirstName");
             ReplaceBodyPlaceholder("$Recipient-Last-Name", "$RecipientLastName");
             ReplaceBodyPlaceholder("$Recipient-Person-Code", "$RecipientPersonCode");
-            ReplaceBodyPlaceholder("$SurveyPath", $"surveys/{surveyFormAsset ?? 0}/$RecipientIdentifier");
+            ReplaceBodyPlaceholder("$WorkflowFormPath", $"form/{surveyFormAsset ?? 0}/$RecipientIdentifier");
 
             return body;
 

@@ -1410,18 +1410,20 @@ ORDER BY CompanyName,
             const string query = @"
 SELECT DISTINCT ep.ProfileStandardIdentifier AS ProfileStandardIdentifier
               , u.UserIdentifier
-              , P.FullName AS PersonFullName
+              , P.FullName                   AS PersonFullName
+              , m.MembershipFunction
+
 FROM custom_cmds.UserProfile AS ep
-         INNER JOIN contacts.Membership AS m ON m.UserIdentifier = ep.UserIdentifier
+         INNER JOIN contacts.QMembership AS m
+                    ON m.UserIdentifier = ep.UserIdentifier AND m.MembershipFunction = 'Department'
          INNER JOIN contacts.QGroup AS G ON G.GroupIdentifier = m.GroupIdentifier
          INNER JOIN accounts.QOrganization AS O ON O.OrganizationIdentifier = G.OrganizationIdentifier
          INNER JOIN custom_cmds.ActiveUser AS u ON u.UserIdentifier = m.UserIdentifier
          INNER JOIN contacts.QPerson AS P
                     ON P.UserIdentifier = u.UserIdentifier AND P.OrganizationIdentifier = O.OrganizationIdentifier
 
-WHERE
-    ep.ProfileStandardIdentifier = @ProfileStandardIdentifier
-    AND m.GroupIdentifier = @DepartmentIdentifier
+WHERE ep.ProfileStandardIdentifier = @ProfileStandardIdentifier
+  AND m.GroupIdentifier = @DepartmentIdentifier
 
 ORDER BY PersonFullName
 ;";
@@ -1450,26 +1452,26 @@ ORDER BY PersonFullName
             var query = @"
 SELECT COUNT(q.CompetencyStandardIdentifier) AS CompetencyCount
 FROM identities.Department AS s
-     OUTER APPLY
-(
-    SELECT DISTINCT
-           ep.UserIdentifier
-         , ec.CompetencyStandardIdentifier
-    FROM custom_cmds.UserProfile                            AS ep
-         INNER JOIN custom_cmds.ProfileCompetency           AS pc ON pc.ProfileStandardIdentifier = ep.ProfileStandardIdentifier
-         INNER JOIN custom_cmds.UserCompetency              AS ec ON ec.CompetencyStandardIdentifier = pc.CompetencyStandardIdentifier
-                                                                     AND ec.UserIdentifier = ep.UserIdentifier
-         INNER JOIN custom_cmds.DepartmentProfileCompetency AS cs ON cs.CompetencyStandardIdentifier = pc.CompetencyStandardIdentifier
-                                                                     AND cs.ProfileStandardIdentifier = ep.ProfileStandardIdentifier
-         INNER JOIN contacts.Membership                     AS m ON m.UserIdentifier = ec.UserIdentifier
-                                                                     AND m.GroupIdentifier = cs.DepartmentIdentifier
-         INNER JOIN identities.[User]                       AS CmdsContact ON CmdsContact.UserIdentifier = m.UserIdentifier
-         INNER JOIN contacts.Person                         AS P ON P.UserIdentifier = CmdsContact.UserIdentifier
-                                                                    AND P.UserAccessGranted IS NOT NULL
-    WHERE cs.DepartmentIdentifier = @DepartmentIdentifier
-          AND ep.ProfileStandardIdentifier = @ProfileStandardIdentifier
-          AND CmdsContact.UtcArchived IS NULL
-)                          AS q
+         OUTER APPLY (SELECT DISTINCT ep.UserIdentifier, ec.CompetencyStandardIdentifier
+                      FROM custom_cmds.UserProfile AS ep
+                               INNER JOIN custom_cmds.ProfileCompetency AS pc
+                                          ON pc.ProfileStandardIdentifier = ep.ProfileStandardIdentifier
+                               INNER JOIN custom_cmds.UserCompetency AS ec
+                                          ON ec.CompetencyStandardIdentifier = pc.CompetencyStandardIdentifier AND
+                                             ec.UserIdentifier = ep.UserIdentifier
+                               INNER JOIN custom_cmds.DepartmentProfileCompetency AS cs
+                                          ON cs.CompetencyStandardIdentifier = pc.CompetencyStandardIdentifier AND
+                                             cs.ProfileStandardIdentifier = ep.ProfileStandardIdentifier
+                               INNER JOIN contacts.QMembership AS m ON m.UserIdentifier = ec.UserIdentifier AND
+                                                                       m.GroupIdentifier = cs.DepartmentIdentifier AND
+                                                                       m.MembershipFunction = 'Department'
+                               INNER JOIN identities.QUser AS CmdsContact
+                                          ON CmdsContact.UserIdentifier = m.UserIdentifier
+                               INNER JOIN contacts.QPerson AS P ON P.UserIdentifier = CmdsContact.UserIdentifier AND
+                                                                   P.UserAccessGranted IS NOT NULL
+                      WHERE cs.DepartmentIdentifier = @DepartmentIdentifier
+                        AND ep.ProfileStandardIdentifier = @ProfileStandardIdentifier
+                        AND CmdsContact.UtcArchived IS NULL) AS q
 WHERE s.DepartmentIdentifier = @DepartmentIdentifier";
 
             var sqlParameters = new[]

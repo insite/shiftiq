@@ -12,7 +12,7 @@ namespace Shift.Sdk.UI
             _query = query;
         }
 
-        public Guid Survey => Guid.TryParse(_query["survey"], out var value) ? value : Guid.Empty;
+        public Guid Survey => Guid.TryParse(_query["form"], out var value) ? value : Guid.Empty;
 
         public Guid Question => Guid.TryParse(_query["question"], out var value) ? value : Guid.Empty;
     }

@@ -8,11 +8,6 @@
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent">
     <style type="text/css">
 
-        .form-check-input:checked {
-            background-color: var(--ar-info);
-            border-color: var(--ar-info);
-        }
-
         .navbar .nav-item:hover>.nav-link:not(.disabled), .navbar .nav-item .nav-link.show:not(.disabled) {
             color: var(--ar-info);
         }

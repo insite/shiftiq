@@ -19,7 +19,7 @@
     <asp:Panel runat="server" ID="SpecificationPanel" CssClass="bg-secondary rounded-3 p-4">
 
         <div class="row">
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="card">
                     
                     <div class="card-body">

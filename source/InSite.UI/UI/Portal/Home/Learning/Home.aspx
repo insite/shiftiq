@@ -123,8 +123,8 @@
             <ItemTemplate>
                 <tr>
                     <td><%# Eval("ProductName") %></td>
-                    <td><%# LocalizeDate(Eval("DistributionAssigned")) %></td>
-                    <td><%# LocalizeDate(Eval("AttemptSubmitted")) %></td>
+                    <td class="text-nowrap"><%# LocalizeDate(Eval("DistributionAssigned")) %></td>
+                    <td class="text-nowrap"><%# LocalizeDate(Eval("AttemptSubmitted")) %></td>
                     <td>
                         <insite:Button runat="server" Text="Start" Size="ExtraSmall" ButtonStyle="Default"
                             NavigateUrl='<%# GetGridAttemptStartUrl() %>'

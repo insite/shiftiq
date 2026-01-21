@@ -159,6 +159,9 @@ namespace InSite.Application.Contacts.Write
         {
             _repository.LockAndRun<PersonAggregate>(c.AggregateIdentifier, aggregate =>
             {
+                if (c.Comment == null)
+                    return;
+
                 aggregate.ModifyPersonComment(c.CommentActionType, c.Comment);
                 Commit(aggregate, c);
             });

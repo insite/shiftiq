@@ -168,7 +168,7 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
                 return html;
             }
 
-            if (ServiceLocator.Partition.IsE03() && layout.IsNotEmpty())
+            if (ServiceLocator.Partition.IsE03() || layout.IsNotEmpty())
             {
                 var html = $"<a title='Download Certificate' target='_blank' href='/ui/portal/records/credentials/certificate?credential={id}'><i class='fa-solid fa-download'></i></a>";
                 return html;

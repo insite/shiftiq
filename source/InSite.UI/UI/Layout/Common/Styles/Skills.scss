@@ -175,7 +175,7 @@ $circular-progress-thickness: 1rem !default;
 $circular-progress-font-size: $font-size-base !default;
 $circular-progress-bg: var(--#{$prefix}body-bg) !default;
 $circular-progress-color: var(--#{$prefix}body-color) !default;
-$circular-progress-bar-bg-primary: $primary !default;
+$circular-progress-bar-bg-primary: $success !default;
 $circular-progress-bar-bg-secondary: var(--#{$prefix}secondary-bg) !default;
 
 // User custom styles

@@ -17796,7 +17796,7 @@ ul.tree-view.search-mode li.match-search > div > div a {
   --ar-progress-font-size: 1rem;
   --ar-progress-bg: var(--ar-body-bg);
   --ar-progress-color: var(--ar-body-color);
-  --ar-progress-bar-bg-primary: #457897;
+  --ar-progress-bar-bg-primary: #63b24e;
   --ar-progress-bar-bg-secondary: var(--ar-secondary-bg);
   --ar-progress-value: 0;
   display: flex;

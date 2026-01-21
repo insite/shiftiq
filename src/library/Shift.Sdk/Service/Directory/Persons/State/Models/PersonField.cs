@@ -115,7 +115,6 @@ namespace InSite.Domain.Contacts
             "EthereumNonceSignature",
             "AccountStatusName",
             "MembershipStatusItemKey"
-
         };
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

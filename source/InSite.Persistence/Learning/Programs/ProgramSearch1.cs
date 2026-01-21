@@ -139,6 +139,9 @@ namespace InSite.Persistence
             if (!string.IsNullOrEmpty(filter.ProgramName))
                 query = query.Where(x => x.ProgramName.Contains(filter.ProgramName));
 
+            if (!string.IsNullOrEmpty(filter.ProgramCode))
+                query = query.Where(x => x.ProgramCode.Contains(filter.ProgramCode));
+
             if (!string.IsNullOrEmpty(filter.ProgramDescription))
                 query = query.Where(x => x.ProgramDescription.Contains(filter.ProgramDescription));
 

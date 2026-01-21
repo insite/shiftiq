@@ -8,9 +8,9 @@ if (!fs.existsSync(uiFolder)) {
 
 fs.cpSync("local-assets", "public", { recursive: true });
 
-copyFile("/../../../source/InSite.UI/UI/Layout/Common/Styles/Shift.min.css");
 copyFile("/../../../source/InSite.UI/UI/Layout/Common/Parts/around/js/vendor/simplebar/dist/simplebar.css");
 copyFile("/../../../source/InSite.UI/UI/Layout/Common/Parts/around/js/vendor/simplebar/dist/simplebar.js");
+copyFile("/../../../source/InSite.UI/UI/Layout/Common/Styles/Shift.css");
 copyFile("/../../../source/InSite.UI/UI/Layout/Common/Styles/Skills.css");
 copyFile("/../../../source/InSite.UI/UI/Layout/Common/Styles/Cmds.css");
 

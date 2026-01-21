@@ -279,7 +279,7 @@ namespace InSite.Admin.Messages.Messages.Forms
 
                 modelContent.Body.Text.Default = @"Please complete this form by clicking the **Begin Form** button.
 
-{Survey-Link}
+$Forms-Link
 
 Thank you!"
                 ;

@@ -166,6 +166,8 @@ namespace InSite.Cmds.Admin.Departments.Forms
             PersonGrid.LoadData(personFilter);
             PersonGrid.ShowFilterPanel();
 
+            ProfileEditor.LoadProfiles(OrganizationIdentifier, DepartmentIdentifier);
+
             DepartmentSkillEditorLink.NavigateUrl = PrioritiesUrl + $"?id={department.DepartmentIdentifier}";
         }
 

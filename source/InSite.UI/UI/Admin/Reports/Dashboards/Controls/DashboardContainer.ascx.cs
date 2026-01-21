@@ -149,22 +149,25 @@ namespace InSite.UI.Admin.Reports.Dashboards
                         throw ApplicationError.Create("The archive is missing a JSON file");
 
                     if (jsonFiles.Length > 1)
-                        throw ApplicationError.Create("The archive should contain only one JSON file");
+                        throw ApplicationError.Create("The archive must contain only one JSON file");
 
                     jsonFile = jsonFiles[0];
                 }
 
                 var sqlFiles = archive.Entries.Where(x => x.Name.EndsWith(".sql")).ToArray();
+
                 if (sqlFiles.Length == 0)
-                    throw ApplicationError.Create("The archive is missing the SQL files");
+                    throw ApplicationError.Create("The archive must contain at least one SQL query file");
 
                 var jsonFilePath = Path.Combine(_folderPath, jsonFile.Name);
+
                 if (File.Exists(jsonFilePath))
-                    throw ApplicationError.Create($"The file with the name '{jsonFile.Name}' already exist.");
+                    File.Delete(jsonFilePath);
 
                 title = Path.GetFileNameWithoutExtension(jsonFile.Name);
 
                 var sqlFolderPath = Path.Combine(_folderPath, title);
+
                 if (Directory.Exists(sqlFolderPath))
                     Directory.Delete(sqlFolderPath, true);
 
@@ -173,7 +176,11 @@ namespace InSite.UI.Admin.Reports.Dashboards
                 jsonFile.ExtractToFile(jsonFilePath);
 
                 foreach (var sqlFile in sqlFiles)
-                    sqlFile.ExtractToFile(sqlFolderPath + sqlFile.Name);
+                {
+                    var sqlFilePath = Path.Combine(sqlFolderPath, sqlFile.Name);
+
+                    sqlFile.ExtractToFile(sqlFilePath, true);
+                }
             }
 
             var parser = new DashboardParser(_folderPath);

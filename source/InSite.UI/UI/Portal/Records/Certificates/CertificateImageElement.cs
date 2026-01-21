@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Web;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
+using Shift.Common;
 using Shift.Sdk.UI;
 
 namespace InSite.UI.Portal.Records.Certificates
@@ -89,16 +91,17 @@ namespace InSite.UI.Portal.Records.Certificates
 
         internal static Bitmap LoadImage(string path)
         {
-            if (string.IsNullOrEmpty(path))
+            if (path.IsEmpty())
                 throw new ArgumentNullException(nameof(path));
 
             if (StartsWithAny(path, new[] { "/library/", "~/library/" }))
             {
                 var physicalPath = HttpContext.Current.Server.MapPath(path);
-                return (Bitmap)Image.FromFile(physicalPath);
+                if (File.Exists(physicalPath))
+                    return (Bitmap)Image.FromFile(physicalPath);
             }
 
-            throw new Exception("File not found: " + path);
+            throw new ApplicationError("File not found: " + path);
         }
     }
 }

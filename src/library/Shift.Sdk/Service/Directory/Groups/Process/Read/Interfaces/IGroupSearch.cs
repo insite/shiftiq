@@ -47,6 +47,8 @@ namespace InSite.Application.Contacts.Read
 
         // Connections
 
+        QGroupConnection GetConnection(Guid parentGroupIdentifier, Guid childGroupIdentifier);
+
         int CountParentConnections(Guid childGroupIdentifier);
         List<QGroupConnection> GetParentConnections(Guid childGroupIdentifier, params Expression<Func<QGroupConnection, object>>[] includes);
 
