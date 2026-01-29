@@ -16,8 +16,10 @@ namespace InSite.Admin.Assessments.Attempts.Models
         #region Properties
 
         public Guid ID { get; }
-        public string Name { get; }
+        public string Name => Type + (Code.IsEmpty() ? " " : $" {Code}. ") + Title;
+        public string Type { get; }
         public string Code { get; }
+        public string Title { get; }
         public int Count { get; set; }
 
         public decimal QuestionPoints
@@ -61,16 +63,20 @@ namespace InSite.Admin.Assessments.Attempts.Models
 
         #region Construction
 
-        public StandardSummary(Guid id, string name, string code)
+        public StandardSummary(Guid id, string title, string code)
         {
             ID = id;
-            Name = name;
-            Code = code;
+            Type = string.Empty;
+            Code = code.EmptyIfNull();
+            Title = title;
         }
 
         public StandardSummary(Guid id, string type, string code, string title)
-            : this(id, type + (code.IsEmpty() ? " " : $" {code}. ") + title, (code.IsEmpty() ? " " : $"{code}"))
         {
+            ID = id;
+            Type = type.EmptyIfNull();
+            Code = code.EmptyIfNull();
+            Title = title.EmptyIfNull();
         }
 
         #endregion

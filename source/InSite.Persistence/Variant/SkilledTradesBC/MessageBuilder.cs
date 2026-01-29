@@ -5,8 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Attempts.Read;
 using InSite.Application.Banks.Read;
 using InSite.Application.Contacts.Read;
@@ -17,6 +15,7 @@ using InSite.Domain.Banks;
 using InSite.Domain.Messages;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Persistence.Plugin.SkilledTradesBC
@@ -142,6 +141,7 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
 
             var recipients = GetRegistrationEmailRecipients(
                 notification.Type,
+                message.MessageIdentifier.Value,
                 registration.CandidateIdentifier,
                 registration.OrganizationIdentifier,
                 registration.RegistrationInstructors,
@@ -177,11 +177,11 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
 
         private EmailAddressList GetRegistrationEmailRecipients(
             NotificationType notificationType,
+            Guid messageId,
             Guid candidateId,
             Guid organizationId,
             ICollection<QRegistrationInstructor> registrationInstructors,
-            ICollection<QEventAttendee> attendees
-            )
+            ICollection<QEventAttendee> attendees)
         {
             var recipients = new EmailAddressList();
 
@@ -204,6 +204,17 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                     var emails = _contacts.GetEmailAddresses(invigilators, organizationId);
                     foreach (var address in emails)
                         recipients.Add(address);
+                }
+
+                var subscribers = MessageRepository.GetSubscribers(organizationId, messageId);
+                foreach (var subscriber in subscribers)
+                {
+                    recipients.Add(new EmailAddress(
+                        subscriber.UserIdentifier,
+                        subscriber.UserEmail,
+                        subscriber.UserFullName,
+                        subscriber.PersonCode,
+                        subscriber.Language));
                 }
 
                 return recipients;

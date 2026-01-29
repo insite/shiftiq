@@ -357,6 +357,24 @@ namespace InSite.UI.Layout.Admin
         protected global::InSite.Common.Web.UI.Container CmdsContainer;
 
         /// <summary>
+        /// KeyeraHeading control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl KeyeraHeading;
+
+        /// <summary>
+        /// KeyeraLinks control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl KeyeraLinks;
+
+        /// <summary>
         /// ActionHelpAnchor control.
         /// </summary>
         /// <remarks>

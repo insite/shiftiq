@@ -1,6 +1,7 @@
 ﻿using System;
 
 using InSite.UI.Layout.Admin;
+using InSite.Web.Integration;
 
 using Shift.Constant;
 
@@ -44,22 +45,17 @@ namespace InSite.UI.CMDS
 
             ScoopLibraryLink.Visible = false;
 
-            var scoopBaseUrl = ServiceLocator.AppSettings.Engine?.Api?.Scoop?.BaseUrl;
+            var linkGenerator = new ScoopLinkGenerator();
 
-            if (scoopBaseUrl != null)
-            {
-                var baseUri = new Uri(scoopBaseUrl);
+            var scoopUrl = linkGenerator.GenerateLibraryUrl(Identity, Request.Url.Host, Organization.Code, Request.RawUrl);
 
-                var libraryUrl = new Uri(baseUri, Organization.Code);
+            ScoopLibraryLink.Text = $"<i class='fas fa-building-columns me-1'></i>{Organization.Name} SCO Library";
 
-                ScoopLibraryLink.Text = $"<i class='fas fa-building-columns me-1'></i>{Organization.Name} SCO Library";
+            ScoopLibraryLink.NavigateUrl = scoopUrl;
 
-                ScoopLibraryLink.NavigateUrl = libraryUrl.AbsoluteUri.ToString();
+            ScoopLibraryLink.Visible = true;
 
-                ScoopLibraryLink.Visible = true;
-
-                ScoopLibraryLink.Target = "_blank";
-            }
+            ScoopLibraryLink.Target = "_blank";
 
             CompareProfilesLink.Visible = isGrantedAdministrators;
 

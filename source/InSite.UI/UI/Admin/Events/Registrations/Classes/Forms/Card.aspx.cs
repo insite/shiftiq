@@ -52,11 +52,16 @@ namespace InSite.Admin.Events.Registrations.Forms
             ClassLocationInfo.Bind(@event);
 
             var candidateUser = UserSearch.Select(registration.CandidateIdentifier);
-            var candidatePerson = candidateUser != null
-                ? PersonSearch.Select(Organization.OrganizationIdentifier, candidateUser.UserIdentifier, x => x.HomeAddress)
-                : null;
+            if (candidateUser != null)
+            {
+                var candidatePerson = PersonSearch.Select(Organization.OrganizationIdentifier, candidateUser.UserIdentifier, x => x.HomeAddress);
+                BindPerson(candidateUser, candidatePerson);
+            }
+            else
+            {
+                ScreenStatus.AddMessage(AlertType.Error, $"User record not found.");
+            }
 
-            BindPerson(candidateUser, candidatePerson);
             BindCompanyDetails(registration.EmployerIdentifier);
 
             NumberWorkHoursToDate.Text = registration.WorkBasedHoursToDate.HasValue ? registration.WorkBasedHoursToDate.ToString() : "N/A";
@@ -71,45 +76,54 @@ namespace InSite.Admin.Events.Registrations.Forms
             CancelButton.NavigateUrl = GetReturnUrl();
         }
 
-        private void BindPerson(User candidateUser, Person candidatePerson)
+        private void BindPerson(User user, Person person)
         {
+            const string NoneValue = "None";
+
+            var hasPerson = person != null;
+            if (!hasPerson)
+                ScreenStatus.AddMessage(AlertType.Warning, $"{user.FullName} is not a member of {Organization.CompanyName}.");
+
             LearnerIdNumberField.Visible = Organization.OrganizationIdentifier == OrganizationIdentifiers.RCABC;
 
-            FullName.Text = $"<a href=\"/ui/admin/contacts/people/edit?contact={candidateUser.UserIdentifier}\">{candidateUser.FullName}</a>";
-            Email.Text = string.IsNullOrEmpty(candidateUser.Email) ? string.Empty : $"<a href=\"mailto:{candidateUser.Email.ToLower()}\">{candidateUser.Email.ToLower()}</a>";
-            Birthdate.Text = $"{candidatePerson.Birthdate:MMM d, yyyy}";
+            FullName.Text = hasPerson
+                ? $"<a href=\"/ui/admin/contacts/people/edit?contact={user.UserIdentifier}\">{user.FullName}</a>"
+                : user.FullName;
+            Email.Text = $"<a href=\"mailto:{user.Email.ToLower()}\">{user.Email.ToLower()}</a>";
+            Birthdate.Text = hasPerson && person.Birthdate.HasValue ? $"{person.Birthdate:MMM d, yyyy}" : NoneValue;
 
-            PersonCode.Text = string.IsNullOrEmpty(candidatePerson.PersonCode) ? "None" : candidatePerson.PersonCode;
-            ESL.Checked = string.Equals(candidatePerson.FirstLanguage, "Not English", StringComparison.OrdinalIgnoreCase) ? true : false;
+            PersonCode.Text = hasPerson ? person.PersonCode.IfNullOrEmpty(NoneValue) : NoneValue;
+            ESL.Checked = hasPerson && string.Equals(person.FirstLanguage, "Not English", StringComparison.OrdinalIgnoreCase) ? true : false;
 
-            EmergencyContactName.Text = string.IsNullOrEmpty(candidatePerson.EmergencyContactName) ? "None" : candidatePerson.EmergencyContactName;
-            EmergencyContactPhoneNumber.Text = string.IsNullOrEmpty(candidatePerson.EmergencyContactPhone) ? "None" : candidatePerson.EmergencyContactPhone;
-            EmergencyContactRelationship.Text = string.IsNullOrEmpty(candidatePerson.EmergencyContactRelationship) ? "None" : candidatePerson.EmergencyContactRelationship;
-
+            EmergencyContactName.Text = hasPerson ? person.EmergencyContactName.IfNullOrEmpty(NoneValue) : NoneValue;
+            EmergencyContactPhoneNumber.Text = hasPerson ? person.EmergencyContactPhone.IfNullOrEmpty(NoneValue) : NoneValue;
+            EmergencyContactRelationship.Text = hasPerson ? person.EmergencyContactRelationship.IfNullOrEmpty(NoneValue) : NoneValue;
 
             var phones = new StringBuilder();
 
-            if (candidatePerson.Phone.HasValue())
-                phones.AppendLine($"<div>Preferred: {candidatePerson.Phone}</div>");
-            if (candidatePerson.PhoneHome.HasValue())
-                phones.AppendLine($"<div>Home: {candidatePerson.PhoneHome}</div>");
-            if (candidatePerson.PhoneWork.HasValue())
-                phones.AppendLine($"<div>Work: {candidatePerson.PhoneWork}</div>");
-            if (candidateUser.PhoneMobile.HasValue())
-                phones.AppendLine($"<div>Cell: {candidateUser.PhoneMobile}</div>");
-            if (candidatePerson.PhoneOther.HasValue())
-                phones.AppendLine($"<div>Other: {candidatePerson.PhoneOther}</div>");
-
+            if (hasPerson)
+            {
+                if (person.Phone.HasValue())
+                    phones.AppendLine($"<div>Preferred: {person.Phone}</div>");
+                if (person.PhoneHome.HasValue())
+                    phones.AppendLine($"<div>Home: {person.PhoneHome}</div>");
+                if (person.PhoneWork.HasValue())
+                    phones.AppendLine($"<div>Work: {person.PhoneWork}</div>");
+                if (user.PhoneMobile.HasValue())
+                    phones.AppendLine($"<div>Cell: {user.PhoneMobile}</div>");
+                if (person.PhoneOther.HasValue())
+                    phones.AppendLine($"<div>Other: {person.PhoneOther}</div>");
+            }
 
             if (phones.Length > 0)
                 PhoneNumbers.Text = phones.ToString();
             else
-                PhoneNumbers.Text = "None";
+                PhoneNumbers.Text = NoneValue;
 
-            if (candidatePerson.HomeAddress != null)
-                HomeAddress.Text = ClassVenueAddressInfo.GetAddress(candidatePerson.HomeAddress);
+            if (!hasPerson || person.HomeAddress == null)
+                HomeAddress.Text = NoneValue;
             else
-                HomeAddress.Text = "None";
+                HomeAddress.Text = ClassVenueAddressInfo.GetAddress(person.HomeAddress);
         }
 
         private void BindCompanyDetails(Guid? employerIdentifier)

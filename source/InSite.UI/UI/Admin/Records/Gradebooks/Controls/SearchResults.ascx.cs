@@ -15,6 +15,9 @@ namespace InSite.Admin.Records.Gradebooks.Controls
 {
     public partial class SearchResults : SearchResultsGridViewController<QGradebookFilter>
     {
+        private List<QGradebook> _gradebooks;
+        private Dictionary<Guid, int> _gradebookCredentials;
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -41,9 +44,8 @@ namespace InSite.Admin.Records.Gradebooks.Controls
 
         protected override IListSource SelectData(QGradebookFilter filter)
         {
-            return ServiceLocator.RecordSearch
-                .GetGradebooks(filter, x => x.Event, x => x.Achievement, x => x.Enrollments, x => x.Courses)
-                .ToSearchResult();
+            _gradebooks = ServiceLocator.RecordSearch.GetGradebooks(filter, x => x.Event, x => x.Achievement, x => x.Enrollments, x => x.Courses);
+            return _gradebooks.ToSearchResult();
         }
 
         protected static string GetLocalTime(object item)
@@ -52,21 +54,15 @@ namespace InSite.Admin.Records.Gradebooks.Controls
             return when.FormatDateOnly(User.TimeZone, nullValue: string.Empty);
         }
 
-        protected int GrantedAchievements(Guid? gradebookIdentifier, Guid? achievementIdentifier)
+        protected int GrantedAchievements(Guid gradebookIdentifier)
         {
-            if (!gradebookIdentifier.HasValue || !achievementIdentifier.HasValue)
-                return 0;
-
-            var filter = new VCredentialFilter
+            if (_gradebookCredentials == null)
             {
-                OrganizationIdentifier = Organization.Identifier,
-                ItemGradebookIdentifier = gradebookIdentifier,
-                UserGradebookIdentifier = gradebookIdentifier,
-                IsGranted = true,
-                AchievementIdentifier = null,
-            };
+                var gradebookIds = _gradebooks.Select(x => x.GradebookIdentifier).ToArray();
+                _gradebookCredentials = ServiceLocator.AchievementSearch.CountGradebookCredentials(gradebookIds);
+            }
 
-            return ServiceLocator.AchievementSearch.CountCredentials(filter);
+            return _gradebookCredentials.TryGetValue(gradebookIdentifier, out var count) ? count : 0;
         }
 
         #region Export

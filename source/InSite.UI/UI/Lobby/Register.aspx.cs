@@ -283,7 +283,7 @@ namespace InSite.UI.Lobby
             _state.ServerFormKey.IsSubmitted = isRegistrationSubmitted;
 
             if (isRegistrationSubmitted && autoApprove)
-                ServiceLocator.SendCommand(new GrantPersonAccess(factory.Person.PersonIdentifier, DateTimeOffset.UtcNow, factory.User.FullName));
+                ServiceLocator.SendCommand(new GrantPersonAccess(factory.Person.PersonIdentifier, DateTimeOffset.UtcNow, $"{factory.User.FirstName} {factory.User.LastName}"));
 
             if (ReturnVerifiedUrl.HasValue() && secret != null)
                 RedirectReturnVerifiedUrl(factory.User, factory.Person, secret);
@@ -317,7 +317,7 @@ namespace InSite.UI.Lobby
                 SourceUrl = Request.Url.Host + Request.RawUrl,
                 UserEmail = factory.User.Email,
                 UserIdentifier = factory.User.UserIdentifier,
-                UserName = factory.User.FullName
+                UserName = $"{factory.User.FirstName} {factory.User.LastName}"
             });
         }
 

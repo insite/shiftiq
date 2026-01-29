@@ -118,6 +118,20 @@ namespace InSite.Persistence
             }
         }
 
+        public void ModifySubProduct(Guid courseDistributionId, Guid productId, Guid courseId)
+        {
+            using (var db = CreateContext())
+            {
+                var entity = db.TCourseDistributions.Single(x => x.CourseDistributionIdentifier == courseDistributionId);
+
+                entity.SubProductIdentifier = productId;
+                entity.CourseIdentifier = courseId;
+                entity.Modified = DateTimeOffset.UtcNow;
+
+                db.SaveChanges();
+            }
+        }
+
         public void DeleteCourseDistribution(Guid courseDistributionId)
         {
             using (var db = CreateContext())

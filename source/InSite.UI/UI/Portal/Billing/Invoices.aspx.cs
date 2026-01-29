@@ -36,9 +36,6 @@ namespace InSite.UI.Portal.Billing
         {
             base.OnInit(e);
 
-            InvoicesRepeater.ItemDataBound += Repeater_ItemDataBound;
-            InvoicesRepeater.ItemCreated += Repeater_ItemCreated;
-
             ReceiptsRepeater.ItemDataBound += Repeater_ItemDataBound;
             ReceiptsRepeater.ItemCreated += Repeater_ItemCreated;
         }
@@ -49,43 +46,6 @@ namespace InSite.UI.Portal.Billing
 
             if (!IsPostBack)
                 LoadData();
-        }
-
-        private bool LoadInvoices()
-        {
-            var invoiceFilter = new VInvoiceFilter
-            {
-                OrganizationIdentifier = CurrentSessionState.Identity.Organization.Identifier,
-                CustomerIdentifier = User.UserIdentifier,
-                ExcludeInvoiceStatuses = new[] { InvoiceStatus.Paid.ToString() },
-            };
-
-            var invoices = ServiceLocator
-                .InvoiceSearch
-                .GetInvoices(invoiceFilter)
-                .Select(x => new SearchResultPacket()
-                {
-                    InvoiceAmount = x.InvoiceAmount,
-                    InvoiceDrafted = GetDateString(x.InvoiceDrafted),
-                    InvoiceIdentifier = x.InvoiceIdentifier,
-                    InvoicePaid = GetDateString(x.InvoicePaid),
-                    InvoiceSubmitted = GetDateString(x.InvoiceSubmitted),
-                    InvoiceStatus = x.InvoiceStatus,
-                    ItemsHtml = GetInvoiceItemsHtml(x.InvoiceIdentifier)
-                })
-                .ToList();
-
-            if (invoices.Count > 0)
-            {
-                InvoicesRepeater.DataSource = invoices;
-                InvoicesRepeater.DataBind();
-            }
-            else
-            {
-                StatusAlert.AddMessage(AlertType.Warning, Translate("There are no invoices for you"));
-            }
-
-            return invoices.Count > 0;
         }
 
         private bool LoadReceipts()
@@ -147,9 +107,7 @@ namespace InSite.UI.Portal.Billing
             else
                 PortalMaster.SidebarVisible(false);
 
-            var invoicesVisible = LoadInvoices();
-            var receiptsVisible = LoadReceipts();
-            MainAccordion.Visible = invoicesVisible || receiptsVisible;
+            LoadReceipts();
         }
 
         private string GetInvoiceItemsHtml(Guid invoice)

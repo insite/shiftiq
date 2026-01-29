@@ -15,6 +15,39 @@ namespace InSite.Persistence
     {
         internal InternalDbContext CreateContext() => new InternalDbContext(false);
 
+        public int CountCredits(Guid organizationId, Guid managerUserId)
+        {
+            using (var db = new InternalDbContext())
+            {
+                return db.TCourseDistributions
+                    .Where(x =>
+                        x.Product.OrganizationIdentifier == organizationId
+                        && x.Product.ProductType == "Package"
+                        && x.ManagerUserIdentifier == managerUserId
+                        && x.SubProductIdentifier == null
+                    )
+                    .Count();
+            }
+        }
+
+        public List<TCourseDistribution> GetCreditDistributions(Guid organizationId, Guid managerUserId, int take)
+        {
+            using (var db = new InternalDbContext())
+            {
+                return db.TCourseDistributions
+                    .Where(x =>
+                        x.Product.OrganizationIdentifier == organizationId
+                        && x.Product.ProductType == "Package"
+                        && x.ManagerUserIdentifier == managerUserId
+                        && x.SubProductIdentifier == null
+                    )
+                    .OrderBy(x => x.Created)
+                    .ThenByDescending(x => x.CourseDistributionIdentifier)
+                    .Take(take)
+                    .ToList();
+            }
+        }
+
         public List<CourseDistributionGridItem> GetCourseDistributionsByManager(Guid organizationId, Guid managerUserId)
         {
             return GetCourseDistributionGridItems(organizationId, managerUserId, null);
@@ -73,7 +106,7 @@ namespace InSite.Persistence
                         AttemptGraded = a.AttemptGraded,
                         AttemptScore = a.AttemptScore,
                         CourseDistributionIdentifier = x.Distribution.CourseDistributionIdentifier,
-                        ProductIdentifier = x.Distribution.ProductIdentifier,
+                        ProductIdentifier = x.Distribution.SubProductIdentifier ?? x.Distribution.ProductIdentifier,
                         CourseIdentifier = x.Distribution.CourseIdentifier,
                         EventIdentifier = x.Distribution.EventIdentifier,
                         ManagerUserIdentifier = x.Distribution.ManagerUserIdentifier,
@@ -85,8 +118,9 @@ namespace InSite.Persistence
                         DistributionRedeemed = x.Distribution.DistributionRedeemed,
                         DistributionExpiry = x.Distribution.DistributionExpiry,
                         DistributionComment = x.Distribution.DistributionComment,
-                        ProductName = x.Distribution.Product.ProductName,
-                        ProductImageUrl = x.Distribution.Product.ProductImageUrl
+                        ProductType = x.Distribution.SubProduct.ProductType ?? x.Distribution.Product.ProductType,
+                        ProductName = x.Distribution.SubProduct.ProductName ?? x.Distribution.Product.ProductName,
+                        ProductImageUrl = x.Distribution.SubProduct.ProductImageUrl ?? x.Distribution.Product.ProductImageUrl
                     }))
                     .OrderByDescending(x => x.Created)
                     .ThenBy(x => x.CourseDistributionIdentifier)

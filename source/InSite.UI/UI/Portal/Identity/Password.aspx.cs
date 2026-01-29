@@ -80,7 +80,7 @@ namespace InSite.UI.Portal.Accounts.Users
 
             UserStore.Update(user, null);
 
-            CurrentIdentityFactory.Rebind(User.Email, Organization.Identifier);
+            CurrentIdentityFactory.Rebind(user.Email, Organization.Identifier);
 
             Open();
 
@@ -89,7 +89,7 @@ namespace InSite.UI.Portal.Accounts.Users
             ContentPanel.Visible = false;
             ButtonPanel.Visible = false;
             HomePanel.Visible = true;
-            HomeButton.NavigateUrl = ServiceLocator.Urls.GetHomeUrl(Identity.User.AccessGrantedToCmds, ServiceLocator.Partition.IsE03(), Identity.IsAdministrator);
+            HomeButton.NavigateUrl = ServiceLocator.Urls.GetHomeUrl(user.AccessGrantedToCmds, ServiceLocator.Partition.IsE03(), Identity.IsAdministrator);
         }
     }
 }

@@ -154,17 +154,15 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
             LinkTargetField.Visible = isCloud;
 
-            var scoopBaseUrl = ServiceLocator.AppSettings.Engine?.Api?.Scoop?.BaseUrl;
-
-            if (isScoop && scoopBaseUrl != null)
+            if (isScoop)
             {
-                var baseUri = new Uri(scoopBaseUrl);
+                var linkGenerator = new ScoopLinkGenerator();
 
-                var libraryUrl = new Uri(baseUri, Organization.Code);
+                var scoopUrl = linkGenerator.GenerateLibraryUrl(Identity, Request.Url.Host, Organization.Code, Request.RawUrl);
 
                 ScoopLibraryUrl.Text = $"{Organization.Name} SCO Library";
 
-                ScoopLibraryUrl.NavigateUrl = libraryUrl.AbsoluteUri.ToString();
+                ScoopLibraryUrl.NavigateUrl = scoopUrl;
 
                 ScoopLibraryUrl.Visible = true;
 

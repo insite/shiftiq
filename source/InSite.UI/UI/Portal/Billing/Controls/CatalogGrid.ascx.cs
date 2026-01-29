@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 using InSite.Application.Invoices.Read;
@@ -8,6 +9,8 @@ using InSite.Application.Invoices.Read;
 using Shift.Common;
 
 using static InSite.UI.Portal.Billing.Models.PriceSelectionModel;
+
+using InSiteButton = InSite.Common.Web.UI.Button;
 
 namespace InSite.UI.Portal.Billing.Controls
 {
@@ -70,11 +73,20 @@ namespace InSite.UI.Portal.Billing.Controls
             var subPack = (Literal)e.Item.FindControl("SubPack");
             var qtyPh = (PlaceHolder)e.Item.FindControl("QtyContainer");
             var addBtn = e.Item.FindControl("AddButton") as InSite.Common.Web.UI.Button;
+            var selectedSpan = (HtmlGenericControl)e.Item.FindControl("SelectedSpan");
+            var qtyInput = (TextBox)e.Item.FindControl("QtyInput");
             bool isSubscribe = (CurrentMode == PriceSelectionMode.Subscribe);
 
-            if (defaultTitle != null) defaultTitle.Visible = !isSubscribe;
-            if (subscribeTitle != null) subscribeTitle.Visible = isSubscribe;
-            if (qtyPh != null) qtyPh.Visible = !isSubscribe;
+            if (defaultTitle != null)
+                defaultTitle.Visible = !isSubscribe;
+
+            if (subscribeTitle != null)
+                subscribeTitle.Visible = isSubscribe;
+
+            if (qtyPh != null)
+                qtyPh.Visible = !isSubscribe;
+
+            qtyInput.Text = CurrentMode == PriceSelectionMode.Select ? "0" : "1";
 
             if (isSubscribe)
                 SetSubscribeModeText(product, subName, subPack);
@@ -83,6 +95,8 @@ namespace InSite.UI.Portal.Billing.Controls
                 return;
 
             SetButtonText(addBtn, CurrentMode);
+
+            addBtn.Visible = CurrentMode != PriceSelectionMode.Select;
         }
 
         protected void ProductRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
@@ -93,8 +107,12 @@ namespace InSite.UI.Portal.Billing.Controls
 
             var qtyBox = (TextBox)e.Item.FindControl("QtyInput");
             int qty = 0;
-            if (qtyBox != null) int.TryParse(qtyBox.Text, out qty);
-            if (qty < 0) qty = 0;
+
+            if (qtyBox != null)
+                int.TryParse(qtyBox.Text, out qty);
+
+            if (qty < 0)
+                qty = 0;
 
             if (CurrentMode == PriceSelectionMode.Subscribe)
                 qty = 1;
@@ -148,6 +166,25 @@ namespace InSite.UI.Portal.Billing.Controls
         #endregion
 
         #region Helper Functions
+
+        public Dictionary<Guid, int> GetSelectedProducts()
+        {
+            var result = new Dictionary<Guid, int>();
+
+            foreach (RepeaterItem item in ProductRepeater.Items)
+            {
+                var qtyInput = (TextBox)item.FindControl("QtyInput");
+                if (!int.TryParse(qtyInput.Text, out var quantity) || quantity == 0)
+                    continue;
+
+                var addButton = (InSiteButton)item.FindControl("AddButton");
+                var productId = Guid.Parse(addButton.CommandArgument);
+
+                result.Add(productId, quantity);
+            }
+
+            return result;
+        }
 
         private static void SetButtonText(Common.Web.UI.Button addBtn, PriceSelectionMode mode)
         {

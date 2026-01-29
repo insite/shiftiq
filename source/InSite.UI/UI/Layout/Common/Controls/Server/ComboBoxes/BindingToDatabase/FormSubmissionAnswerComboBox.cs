@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 
 using Shift.Common;
 
@@ -27,6 +28,19 @@ namespace InSite.Common.Web.UI
             set => ViewState[nameof(ShowEllipsisOnTextCut)] = value;
         }
 
+        public override string Value
+        {
+            get
+            {
+                var value = base.Value;
+                return value.IsNotEmpty() ? HttpUtility.HtmlDecode(value) : null;
+            }
+            set
+            {
+                base.Value = value.IsNotEmpty() ? HttpUtility.HtmlEncode(value) : null;
+            }
+        }
+
         #endregion
 
         #region Selecting data
@@ -39,23 +53,29 @@ namespace InSite.Common.Web.UI
                 return result;
 
             var data = ServiceLocator.SurveySearch.GetResponseAnswersText(SurveyQuestionIdentifier.Value);
+
             foreach (var value in data)
             {
-                string text;
+                var text = MaxTextLength.HasValue
+                    ? value.MaxLength(MaxTextLength.Value, ShowEllipsisOnTextCut)
+                    : value;
 
-                if (MaxTextLength.HasValue && value.Length > MaxTextLength.Value)
-                {
-                    text = value.Substring(0, MaxTextLength.Value);
-                    if (ShowEllipsisOnTextCut)
-                        text += "...";
-                }
-                else
-                    text = value;
-
-                result.Add(value, text);
+                result.Add(HttpUtility.HtmlEncode(value), HttpUtility.HtmlEncode(text));
             }
 
             return result;
+        }
+
+        #endregion
+
+        #region IPostBackDataHandler
+
+        protected override bool LoadPostData(string value)
+        {
+            if (value.IsNotEmpty())
+                value = HttpUtility.HtmlDecode(value);
+
+            return base.LoadPostData(value);
         }
 
         #endregion

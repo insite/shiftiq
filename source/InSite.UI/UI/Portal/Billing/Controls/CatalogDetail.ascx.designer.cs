@@ -42,6 +42,42 @@ namespace InSite.UI.Portal.Billing.Controls
         protected global::System.Web.UI.WebControls.Panel SubscribeBanner;
 
         /// <summary>
+        /// SelectBanner control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel SelectBanner;
+
+        /// <summary>
+        /// CreditCountSpan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label CreditCountSpan;
+
+        /// <summary>
+        /// CreditText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal CreditText;
+
+        /// <summary>
+        /// SaveButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.SaveButton SaveButton;
+
+        /// <summary>
         /// CatalogGrid control.
         /// </summary>
         /// <remarks>

@@ -328,7 +328,9 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                     else if (GroupIsIn(venue.Value, "SBC"))
                     {
                         StartRegistrationNotificationTimer(cause, regId, NotificationType.ITA008, now, $"Immediately send ITA008 to {to}");
-                        StartRegistrationNotificationTimer(cause, regId, NotificationType.ITA027, now, $"Immediately send ITA027 to Invigilating Office/Invigilator");
+
+                        if (EventExamType.IndividualA.Value == examType)
+                            StartRegistrationNotificationTimer(cause, regId, NotificationType.ITA027, now, $"Immediately send ITA027 to Invigilating Office/Invigilator");
                     }
                     else if (GroupIsIn(venue.Value, "ITA/DRC"))
                     {

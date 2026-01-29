@@ -886,7 +886,7 @@ namespace InSite.UI.Portal.Learning
 
                     href = scormPackageSlug.IsEmpty() || StringHelper.Equals(scormPackageSlug, activityId.ToString())
                         ? BlankHref
-                        : Launch.GetScoopLaunchUrl(scormPackageSlug, courseId, activityId);
+                        : Launch.GetScoopLaunchUrl(Request.Url.Host, scormPackageSlug, courseId, activityId);
                 }
 
                 ScormStartUrl.HRef = href;

@@ -482,10 +482,10 @@ namespace InSite.UI.Portal.Home.Management
 
         private void BindSkillsChecksProgress(CourseDistributionGridItem[] distributions)
         {
-            ProductProgress.Text = GetProgressHtml(
+            ProductProgress.Text = GetSkillsCheckProgressHtml(
                 distributions.Length,
-                distributions.Where(x => x.CourseEnrollmentIdentifier != null).Count(),
-                true, true);
+                distributions.Where(x => x.CourseEnrollmentIdentifier != null).Count()
+            );
             ProductUpdatePanel.Update();
         }
 
@@ -549,6 +549,21 @@ namespace InSite.UI.Portal.Home.Management
             return distributionQuery.ToArray();
         }
 
+        protected string GetProductName()
+        {
+            var item = (CourseDistributionGridItem)Page.GetDataItem();
+
+            return string.Equals(item.ProductType, "Package", StringComparison.OrdinalIgnoreCase)
+                ? "Subscribe & Choose Later"
+                : item.ProductName;
+        }
+
+        protected bool IsPackage()
+        {
+            var item = (CourseDistributionGridItem)Page.GetDataItem();
+            return string.Equals(item.ProductType, "Package", StringComparison.OrdinalIgnoreCase);
+        }
+
         protected string GetGridStatusHtml()
         {
             var item = (CourseDistributionGridItem)Page.GetDataItem();
@@ -576,19 +591,26 @@ namespace InSite.UI.Portal.Home.Management
             return !item.AttemptGraded.HasValue ? string.Empty : $"{item.AttemptScore:p0}";
         }
 
-        protected string GetProgressHtml(int total, int value, bool showValue, bool showTotal)
+        protected string GetSkillsCheckProgressHtml(int total, int value)
         {
             var progressValue = total == 0
                 ? 0
                 : Number.CheckRange(Math.Round((decimal)value / total * 100m, 0), 0, 100);
 
-            var text = showValue && showTotal
-                ? $"<span>{value:n0}/{total:n0}</span>"
-                : showValue
-                    ? $"<span>{value:n0}</span>"
-                    : showTotal
-                        ? $"<span>{total:n0}</span>"
-                        : string.Empty;
+            var text = $"<span>{(total - value):n0}/{total:n0}</span>";
+
+            return $"<div class=\"circular-progress skills-progress\" style=\"--ar-progress-value:{progressValue};\">"
+                 + text
+                 + $"</div>";
+        }
+
+        protected string GetStatusProgressHtml(int total, int value)
+        {
+            var progressValue = total == 0
+                ? 0
+                : Number.CheckRange(Math.Round((decimal)value / total * 100m, 0), 0, 100);
+
+            var text = $"<span>{value:n0}</span>";
 
             return $"<div class=\"circular-progress skills-progress\" style=\"--ar-progress-value:{progressValue};\">"
                  + text

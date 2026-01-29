@@ -140,15 +140,19 @@
                             <li><a class="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/validator.pdf">Validator guide</a></li>
                             <li><a class="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/administrator.pdf">Administrator guide</a></li>
                             <li>
-                                <h6 class="dropdown-header pb-1">Orientation (Skills Passport) Guides</h6>
+                                <h6 class="dropdown-header pb-1">Orientation Guides (Skills Passport)</h6>
                             </li>
                             <li><a class="dropdown-item ms-2" href="https://hub.cmds.app/lobby/docs/guides/orientation.pdf">Orientations and certificates</a></li>
+                            <li runat="server" id="KeyeraHeading">
+                                <h6 class="dropdown-header pb-1">Course Registration Guides</h6>
+                            </li>
+                            <li runat="server" id="KeyeraLinks"><a class="dropdown-item ms-2" href="https://hub.cmds.app/lobby/docs/guides/learning-catalogue-and-registration.pdf">Keyera's learning catalogue &amp; registration guide</a></li>
                         </insite:Container>
 
                         <li><h6 class="dropdown-header pt-2 pb-1">Resources</h6></li>
                         <li><a runat="server" id="ActionHelpAnchor" class="dropdown-item ms-2" href="#" data-bs-toggle="modal" data-bs-target="#modal-help">Help</a></li>
-                        <li><a runat="server" id="HelpCenterAnchor" class="dropdown-item ms-2 disabled" href="#" onclick="return false;">Help Center</a></li>
-                        <li><a runat="server" id="DocumentationAnchor" class="dropdown-item ms-2 disabled" href="#" onclick="return false;">Documentation</a></li>
+                        <li><a runat="server" id="HelpCenterAnchor" class="dropdown-item ms-2" href="https://docs.shiftiq.com/help">Help center</a></li>
+                        <li><a runat="server" id="DocumentationAnchor" class="dropdown-item ms-2" href="https://docs.shiftiq.com/">Documentation</a></li>
 
                         <insite:Container runat="server" ID="ShiftContainer">
                             <li><h6 class="dropdown-header pb-1">Get Help</h6></li>

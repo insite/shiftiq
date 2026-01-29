@@ -5,7 +5,7 @@ namespace InSite.UI.Portal.Billing.Models
     public class PriceSelectionModel
 
     {
-        public enum PriceSelectionMode { ALaCarte, Package, Subscribe }
+        public enum PriceSelectionMode { ALaCarte, Package, Subscribe, Select }
 
         public sealed class PriceSelectionChangedEventArgs : EventArgs
         {

@@ -50,6 +50,7 @@ namespace InSite.Application.Courses.Read
         public DateTimeOffset? DistributionRedeemed { get; set; }
         public DateTimeOffset? DistributionExpiry { get; set; }
         public string DistributionComment { get; set; }
+        public string ProductType { get; set; }
         public string ProductName { get; set; }
         public string ProductImageUrl { get; set; }
 

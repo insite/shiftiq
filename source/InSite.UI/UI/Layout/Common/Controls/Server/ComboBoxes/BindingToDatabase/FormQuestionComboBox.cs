@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Web;
 
 using InSite.Application.Surveys.Read;
 
@@ -70,69 +70,59 @@ namespace InSite.Common.Web.UI
 
         protected override ListItemArray CreateDataSource()
         {
-            var data = new List<ListItem>();
-            var questions = SurveyIdentifier.HasValue
-                ? ServiceLocator.SurveySearch.GetSurveyQuestions(new QSurveyQuestionFilter
-                {
-                    SurveyFormIdentifier = SurveyIdentifier.Value,
-                    HasResponseAnswer = HasResponseAnswer,
-                    ExcludeQuestionsID = ExcludeQuestionsID,
-                    ExcludeQuestionsTypes = ExcludeSpecialQuestions
-                        ? new[]
-                        {
-                            SurveyQuestionType.BreakPage
-                        }
-                        : null,
-                    IncludeQuestionsTypes = QuestionType,
-                    HasOptions = HasOptions
-                })
-                : null;
+            if (!SurveyIdentifier.HasValue)
+                return new ListItemArray();
 
-            if (questions != null)
+            var questions = ServiceLocator.SurveySearch.GetSurveyQuestions(new QSurveyQuestionFilter
             {
-                if (ExcludeHiddenMaskingOptionID.HasValue)
-                {
-                    var option = ServiceLocator.SurveySearch.GetSurveyOptionItem(ExcludeHiddenMaskingOptionID.Value, x => x.SurveyOptionList.SurveyQuestion);
+                SurveyFormIdentifier = SurveyIdentifier.Value,
+                HasResponseAnswer = HasResponseAnswer,
+                ExcludeQuestionsID = ExcludeQuestionsID,
+                ExcludeQuestionsTypes = ExcludeSpecialQuestions
+                    ? new[] { SurveyQuestionType.BreakPage }
+                    : null,
+                IncludeQuestionsTypes = QuestionType,
+                HasOptions = HasOptions
+            });
 
-                    var surveyQuestionSequence = option?.SurveyOptionList?.SurveyQuestion?.SurveyQuestionSequence;
+            if (questions.IsEmpty())
+                return new ListItemArray();
 
-                    if (surveyQuestionSequence.HasValue)
-                        questions = questions.Where(x => x.SurveyQuestionSequence > surveyQuestionSequence).ToList();
-                }
+            if (ExcludeHiddenMaskingOptionID.HasValue)
+            {
+                var option = ServiceLocator.SurveySearch.GetSurveyOptionItem(ExcludeHiddenMaskingOptionID.Value, x => x.SurveyOptionList.SurveyQuestion);
 
-                foreach (var question in questions)
-                {
-                    data.Add(new ListItem
-                    {
-                        Value = question.SurveyQuestionIdentifier.ToString(),
-                        Text = GetText(question)
-                    });
-                }
+                var surveyQuestionSequence = option?.SurveyOptionList?.SurveyQuestion?.SurveyQuestionSequence;
+
+                if (surveyQuestionSequence.HasValue)
+                    questions = questions.Where(x => x.SurveyQuestionSequence > surveyQuestionSequence).ToList();
             }
 
-            return new ListItemArray(data);
-        }
-
-        private string GetText(QSurveyQuestion question)
-        {
-            var title = string.Empty;
-
-            var content = ServiceLocator.ContentSearch.GetBlock(
-                question.SurveyQuestionIdentifier,
+            var result = new ListItemArray();
+            var contents = ServiceLocator.ContentSearch.GetBlocks(
+                questions.Select(x => x.SurveyQuestionIdentifier),
                 ContentContainer.DefaultLanguage,
                 new[] { ContentLabel.Title });
+            var maxLength = MaxTextLength ?? 100;
 
-            if (content != null)
-                title = content.Title.GetSnip();
+            foreach (var question in questions)
+            {
+                var title = string.Empty;
 
-            if (MaxTextLength.HasValue && title.Length > MaxTextLength.Value)
-                title = title.Substring(0, MaxTextLength.Value - 3) + "...";
+                var content = contents.GetOrDefault(question.SurveyQuestionIdentifier);
+                if (content != null)
+                    title = content.Title.Html.Default.IfNullOrEmpty(content.Title.Text.Default).MaxLength(maxLength, true);
 
-            var prefix = question.SurveyQuestionCode.IfNullOrEmpty(() => question.SurveyQuestionSequence.ToString()) + ".";
+                var prefix = question.SurveyQuestionCode.IfNullOrEmpty(() => question.SurveyQuestionSequence.ToString()) + ".";
 
-            return title.HasValue()
-                ? $"{prefix} {title}"
-                : $"Question {prefix} {question.SurveyQuestionType}";
+                result.Add(new ListItem
+                {
+                    Value = question.SurveyQuestionIdentifier.ToString(),
+                    Text = title.IsNotEmpty() ? $"{prefix} {HttpUtility.HtmlEncode(title)}" : $"Question {prefix} {question.SurveyQuestionType}"
+                });
+            }
+
+            return result;
         }
 
         #endregion

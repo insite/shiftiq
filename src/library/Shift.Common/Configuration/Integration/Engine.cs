@@ -20,7 +20,7 @@
         public ApiSettings Google { get; set; }
         public ApiSettings Premailer { get; set; }
         public ApiSettings Scorm { get; set; }
-        public ApiSettings Scoop { get; set; }
+        public ScoopSettings Scoop { get; set; }
         public ApiSettings ImageMagick { get; set; }
     }
 

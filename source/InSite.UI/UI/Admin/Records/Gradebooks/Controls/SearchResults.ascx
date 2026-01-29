@@ -41,7 +41,7 @@
 
         <asp:TemplateField HeaderText="Achievements Granted" ItemStyle-Wrap="False">
             <ItemTemplate>
-               <%# GrantedAchievements((Guid?)Eval("GradebookIdentifier"),(Guid?)Eval("AchievementIdentifier")) %>
+               <%# GrantedAchievements((Guid)Eval("GradebookIdentifier")) %>
             </ItemTemplate>
         </asp:TemplateField>
 

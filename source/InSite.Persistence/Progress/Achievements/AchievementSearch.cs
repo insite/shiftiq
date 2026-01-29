@@ -611,6 +611,54 @@ namespace InSite.Persistence
             return query;
         }
 
+        public Dictionary<Guid, int> CountGradebookCredentials(Guid[] gradebookIds)
+        {
+            using (var db = CreateContext())
+            {
+                var itemQuery = db.QGradeItems
+                    .Where(x => gradebookIds.Contains(x.GradebookIdentifier))
+                    .Join(db.QCredentials.Where(x => x.CredentialGranted != null),
+                        i => i.AchievementIdentifier,
+                        c => c.AchievementIdentifier,
+                        (i, c) => c
+                    )
+                    .Join(db.QEnrollments.Where(x => gradebookIds.Contains(x.GradebookIdentifier)),
+                        c => c.UserIdentifier,
+                        e => e.LearnerIdentifier,
+                        (c, e) => new
+                        {
+                            e.GradebookIdentifier,
+                            c.AchievementIdentifier,
+                            c.UserIdentifier
+                        }
+                    );
+
+                var gradebookQuery = db.QGradebooks
+                    .Where(x => gradebookIds.Contains(x.GradebookIdentifier))
+                    .Join(db.QCredentials.Where(x => x.CredentialGranted != null),
+                        i => i.AchievementIdentifier,
+                        c => c.AchievementIdentifier,
+                        (i, c) => c
+                    )
+                    .Join(db.QEnrollments.Where(x => gradebookIds.Contains(x.GradebookIdentifier)),
+                        c => c.UserIdentifier,
+                        e => e.LearnerIdentifier,
+                        (c, e) => new
+                        {
+                            e.GradebookIdentifier,
+                            c.AchievementIdentifier,
+                            c.UserIdentifier
+                        }
+                    );
+
+                var result = itemQuery.Union(gradebookQuery);
+
+                return result
+                    .GroupBy(x => x.GradebookIdentifier)
+                    .ToDictionary(x => x.Key, x => x.Count());
+            }
+        }
+
         public Guid GetCredentialIdentifier(Guid? credential, Guid achievement, Guid user)
         {
             using (var db = new InternalDbContext())

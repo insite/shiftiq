@@ -31,5 +31,11 @@ namespace InSite.UI.Portal.Contacts.People.Controls
         {
             return PersonCriteria.SelectSearchResults(filter).ToSearchResult();
         }
+
+        protected string GetInitials()
+        {
+            var item = (PersonSearchResultItem)Page.GetDataItem();
+            return $"{item.FirstName[0]}{item.LastName[0]}".ToUpper();
+        }
     }
 }

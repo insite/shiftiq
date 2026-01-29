@@ -6113,6 +6113,8 @@
     <Compile Include="Web\Injection\DependencyInjector.cs" />
     <Compile Include="Web\Instrumentation\AppState.cs" />
     <Compile Include="Web\Instrumentation\PageDownloadTimer.cs" />
+    <Compile Include="Web\Integration\RelayToken.cs" />
+    <Compile Include="Web\Integration\ScoopLinkGenerator.cs" />
     <Compile Include="Web\Integration\ScormIntegrator.cs" />
     <Compile Include="Web\Localization\IHasTranslator.cs" />
     <Compile Include="Web\Localization\LabelHelper.cs" />

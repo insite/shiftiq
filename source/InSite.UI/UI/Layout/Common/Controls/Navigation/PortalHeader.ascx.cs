@@ -189,12 +189,18 @@ namespace InSite.UI.Layout.Portal.Controls
 
         private void BindSalesLink(ISecurityFramework security)
         {
-            var cartUrl = $"/ui/portal/billing/cart";
+            const string signinUrl = "/ui/lobby/signin";
+            const string cartUrl = "/ui/portal/billing/cart";
+            const string catalogUrl = "/ui/portal/billing/catalog";
+            const string managerHomeUrl = "/ui/portal/management/dashboard/home";
 
             BindDefaultSalesHeaderNavigation(cartUrl);
 
-            var returnUrl = HttpUtility.UrlEncode(Request.RawUrl);
-            var loginUrl = $"/ui/lobby/signin?ReturnUrl={returnUrl}";
+            var returnUrl = IsSalesReady && string.Equals(Request.RawUrl, catalogUrl, StringComparison.OrdinalIgnoreCase)
+                ? managerHomeUrl
+                : HttpUtility.UrlEncode(Request.RawUrl);
+
+            var loginUrl = $"{signinUrl}?ReturnUrl={returnUrl}";
 
             LoginItem.Visible = !security.IsAuthenticated;
             LoginLink.HRef = loginUrl;

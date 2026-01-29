@@ -9,6 +9,7 @@ namespace InSite.Application.Courses.Read
     {
         public Guid CourseDistributionIdentifier { get; set; }
         public Guid ProductIdentifier { get; set; }
+        public Guid? SubProductIdentifier { get; set; }
         public Guid? CourseIdentifier { get; set; }
         public Guid? EventIdentifier { get; set; }
         public Guid ManagerUserIdentifier { get; set; }
@@ -22,6 +23,7 @@ namespace InSite.Application.Courses.Read
         public string DistributionComment { get; set; }
 
         public virtual TProduct Product { get; set; }
+        public virtual TProduct SubProduct { get; set; }
         public virtual QCourse Course { get; set; }
         public virtual QCourseEnrollment CourseEnrollment { get; set; }
         public virtual VUser Manager { get; set; }

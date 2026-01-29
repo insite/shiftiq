@@ -9,6 +9,8 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 
+    <insite:Alert runat="server" ID="ScreenStatus" />
+
     <section class="mb-3">
         <h2 class="h4 mt-4 mb-3">
             <i class="far fa-user me-1"></i>

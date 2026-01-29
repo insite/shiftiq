@@ -29,6 +29,7 @@ namespace InSite.Application.Records.Read
         int CountCredentials(VCredentialFilter filter);
         List<VCredential> GetCredentials(VCredentialFilter filter);
         List<VCredential> GetRecentCredentials(VCredentialFilter filter, int count);
+        Dictionary<Guid, int> CountGradebookCredentials(Guid[] gradebookIds);
         Guid[] GetLearnerProgramCredentials(Guid program);
         Guid[] GetLearnerTaskAndProgramCredentials(Guid program);
         VCredential GetCredential(Guid achievement, Guid user);

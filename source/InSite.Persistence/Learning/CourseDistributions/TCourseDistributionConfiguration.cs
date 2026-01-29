@@ -23,6 +23,10 @@ namespace InSite.Persistence
                 .WithMany(x => x.CourseDistributions)
                 .HasForeignKey(x => x.ProductIdentifier);
 
+            HasOptional(x => x.SubProduct)
+                .WithMany(x => x.SubCourseDistributions)
+                .HasForeignKey(x => x.SubProductIdentifier);
+
             HasOptional(x => x.Course)
                 .WithMany(x => x.CourseDistributions)
                 .HasForeignKey(x => x.CourseIdentifier);

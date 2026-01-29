@@ -98,7 +98,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
             {
                 var occupation = new Occupation
                 {
-                    Title = sourceOccupation.Name,
+                    Title = sourceOccupation.Title,
                     Score = sourceOccupation.Score,
                     Frameworks = new List<Framework>()
                 };
@@ -118,7 +118,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
             {
                 var framework = new Framework
                 {
-                    Title = sourceFramework.Name,
+                    Title = sourceFramework.Title,
                     Areas = new List<Area>()
                 };
                 frameworks.Add(framework);
@@ -152,7 +152,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
             {
                 var area = new Area
                 {
-                    Title = sourceArea.Name,
+                    Title = sourceArea.Title,
                     Competencies = new List<Competency>()
                 };
                 areas.Add(area);
@@ -185,7 +185,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
             {
                 var competency = new Competency
                 {
-                    Title = sourceCompetency.Name,
+                    Title = sourceCompetency.Title,
                     Status = sourceCompetency.AnswerPoints >= sourceCompetency.QuestionPoints ? StandardStatus.Satisfied : StandardStatus.NotSatisfied
                 };
                 competencies.Add(competency);

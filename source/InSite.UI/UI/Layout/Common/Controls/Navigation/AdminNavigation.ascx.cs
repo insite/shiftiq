@@ -32,7 +32,6 @@ namespace InSite.UI.Layout.Admin
         {
             try
             {
-
                 var request = WebRequest.Create(url);
                 request.Method = "HEAD";
                 using (var response = (HttpWebResponse)request.GetResponse())
@@ -67,6 +66,8 @@ namespace InSite.UI.Layout.Admin
 
             if (IsPostBack)
                 return;
+
+            LoadPermissionMatrix();
 
             var sidebar = _navigationRoot;
             if (sidebar?.Home != null)
@@ -215,5 +216,20 @@ namespace InSite.UI.Layout.Admin
             itemRepeater.DataSource = items;
             itemRepeater.DataBind();
         }
+
+        #region Access Control (improved)
+
+        private void LoadPermissionMatrix()
+        {
+            if (!ServiceLocator.Partition.IsE03())
+                return;
+
+            // TODO: Use the new permission matrix in v26.1 to grant permission to users in the Keyera organization.
+            var isKeyera = Organization.Code == "keyera";
+            KeyeraHeading.Visible = isKeyera;
+            KeyeraLinks.Visible = isKeyera;
+        }
+
+        #endregion
     }
 }

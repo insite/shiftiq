@@ -56,7 +56,7 @@ namespace InSite.Persistence
         public static OrganizationState Select(Guid id)
         {
             if (Cache.TryGetValue(id, out var state))
-                return state;
+                return state.CloneJson();
 
             return null;
         }
@@ -68,7 +68,7 @@ namespace InSite.Persistence
 
             code = code.ToLower();
 
-            return Cache.Values.FirstOrDefault(x => x.Code == code);
+            return Cache.Values.FirstOrDefault(x => x.Code == code)?.CloneJson();
         }
 
         #endregion

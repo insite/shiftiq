@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
@@ -473,8 +474,21 @@ namespace InSite
         private static string CreateValidationKey(CookieToken token)
         {
             var secret = GetSecret();
-            string text = $"{token.UserEmail}/{token.ImpersonatorOrganization}/{token.ImpersonatorUser}/{secret}/{token.ID}";
-            return HashText(text);
+
+            var parts = new List<string>
+            {
+                token.Environment,
+                token.UserEmail,
+                token.ImpersonatorUser,
+                secret,
+                token.ID.ToString()
+            };
+
+            var text = string.Join("/", parts.Where(part => !string.IsNullOrWhiteSpace(part)));
+
+            var hash = HashText(text);
+
+            return hash;
         }
 
         private static string GetSecret()
@@ -483,6 +497,7 @@ namespace InSite
         private static string HashText(string text)
         {
             var hash = EncryptionHelper.ComputeHashSha256(text);
+
             return StringHelper.ByteArrayToHex(hash);
         }
 

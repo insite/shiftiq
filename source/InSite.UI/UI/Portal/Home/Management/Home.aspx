@@ -109,7 +109,7 @@
                                         <insite:CheckBox runat="server" ID="IsSelected" AutoPostBack="true" Value='<%# Eval("Value") %>' Checked='<%# Eval("Checked") %>' />
                                     </div>
                                     <div class="px-2">
-                                        <%# GetProgressHtml((int)Eval("Total"), (int)Eval("Count"), true, false) %>
+                                        <%# GetStatusProgressHtml((int)Eval("Total"), (int)Eval("Count")) %>
                                     </div>
                                     <div class="mt-2 text-center">
                                         <%# Eval("Title") %>
@@ -153,14 +153,24 @@
                             <%# Eval("LearnerUserName") ?? "None" %>
                         </td>
                         <td>
-                            <div class="mb-2"><%# Eval("ProductName") %></div>
+                            <div class="mb-2"><%# GetProductName() %></div>
                             <small><%# GetGridStatusHtml() %></small>
                         </td>
                         <td class="text-end"><%# GetGridScoreHtml() %></td>
                         <td class="text-center">
-                            <insite:Button runat="server" Text="Assign" Size="ExtraSmall" ButtonStyle="Success"
+                            <insite:Button runat="server"
+                                Text="Assign"
+                                Size="ExtraSmall"
+                                ButtonStyle="Success"
                                 OnClientClick="dashboardHome.assign(this); return false;"
-                                Visible='<%# Eval("LearnerUserIdentifier") == null %>'
+                                Visible='<%# !IsPackage() && Eval("LearnerUserIdentifier") == null %>'
+                            />
+                            <insite:Button runat="server"
+                                Text="Select"
+                                Size="ExtraSmall"
+                                ButtonStyle="Success"
+                                NavigateUrl="/ui/portal/management/dashboard/catalog?chooseLater=1"
+                                Visible='<%# IsPackage() && Eval("LearnerUserIdentifier") == null %>'
                             />
                             <insite:Container runat="server" Visible='<%# Eval("LearnerUserIdentifier") != null && Eval("AttemptImported") == null && Eval("AttemptStarted") == null %>'>
                                 <insite:Button runat="server" Text="Resend" CommandName="Resend"

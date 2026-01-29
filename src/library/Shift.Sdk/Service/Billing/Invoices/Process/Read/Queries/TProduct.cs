@@ -42,6 +42,7 @@ namespace InSite.Application.Invoices.Read
         public virtual ICollection<QGroup> MembershipGroups { get; set; } = new HashSet<QGroup>();
         public virtual ICollection<TOrderItem> OrderItems { get; set; } = new HashSet<TOrderItem>();
         public virtual ICollection<TCourseDistribution> CourseDistributions { get; set; } = new HashSet<TCourseDistribution>();
+        public virtual ICollection<TCourseDistribution> SubCourseDistributions { get; set; } = new HashSet<TCourseDistribution>();
     }
 
     public class QueryProduct
