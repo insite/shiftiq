@@ -36,8 +36,11 @@ namespace InSite.UI.Portal.Billing
         {
             base.OnInit(e);
 
-            ReceiptsRepeater.ItemDataBound += Repeater_ItemDataBound;
-            ReceiptsRepeater.ItemCreated += Repeater_ItemCreated;
+            UnpaidInvoiceRepeater.ItemDataBound += Repeater_ItemDataBound;
+            UnpaidInvoiceRepeater.ItemCreated += Repeater_ItemCreated;
+
+            PaidInvoiceRepeater.ItemDataBound += Repeater_ItemDataBound;
+            PaidInvoiceRepeater.ItemCreated += Repeater_ItemCreated;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -48,7 +51,42 @@ namespace InSite.UI.Portal.Billing
                 LoadData();
         }
 
-        private bool LoadReceipts()
+        private bool LoadUnpaidInvoices()
+        {
+            var invoiceFilter = new VInvoiceFilter
+            {
+                OrganizationIdentifier = CurrentSessionState.Identity.Organization.Identifier,
+                CustomerIdentifier = User.UserIdentifier,
+                ExcludeInvoiceStatuses = new[] { InvoiceStatus.Paid.ToString() },
+            };
+
+            var invoices = ServiceLocator
+                .InvoiceSearch
+                .GetInvoices(invoiceFilter)
+                .Select(x => new SearchResultPacket()
+                {
+                    InvoiceAmount = x.InvoiceAmount,
+                    InvoiceDrafted = GetDateString(x.InvoiceDrafted),
+                    InvoiceIdentifier = x.InvoiceIdentifier,
+                    InvoicePaid = GetDateString(x.InvoicePaid),
+                    InvoiceSubmitted = GetDateString(x.InvoiceSubmitted),
+                    InvoiceStatus = x.InvoiceStatus,
+                    ItemsHtml = GetInvoiceItemsHtml(x.InvoiceIdentifier)
+                })
+                .ToList();
+
+            if (invoices.Count > 0)
+            {
+                UnpaidInvoiceRepeater.DataSource = invoices;
+                UnpaidInvoiceRepeater.DataBind();
+            }
+
+            UnpaidInvoicePanel.Visible = invoices.Count > 0;
+
+            return invoices.Count > 0;
+        }
+
+        private bool LoadPaidInvoices()
         {
             var receiptFilter = new VInvoiceFilter
             {
@@ -57,7 +95,7 @@ namespace InSite.UI.Portal.Billing
                 InvoiceStatus = InvoiceStatus.Paid.ToString()
             };
 
-            var receipts = ServiceLocator
+            var invoices = ServiceLocator
                .InvoiceSearch
                .GetInvoices(receiptFilter)
                .Select(x => new SearchResultPacket()
@@ -72,17 +110,15 @@ namespace InSite.UI.Portal.Billing
                })
                .ToList();
 
-            if (receipts.Count > 0)
+            if (invoices.Count > 0)
             {
-                ReceiptsRepeater.DataSource = receipts;
-                ReceiptsRepeater.DataBind();
-            }
-            else
-            {
-                StatusAlert.AddMessage(AlertType.Warning, Translate("There are no receipts for you"));
+                PaidInvoiceRepeater.DataSource = invoices;
+                PaidInvoiceRepeater.DataBind();
             }
 
-            return receipts.Count > 0;
+            PaidInvoicePanel.Visible = invoices.Count > 0;
+
+            return invoices.Count > 0;
         }
 
         private void LoadData()
@@ -107,7 +143,13 @@ namespace InSite.UI.Portal.Billing
             else
                 PortalMaster.SidebarVisible(false);
 
-            LoadReceipts();
+            var hasUnpaidInvoices = LoadUnpaidInvoices();
+            var hasPaidInvoices = LoadPaidInvoices();
+
+            MainAccordion.Visible = hasUnpaidInvoices || hasPaidInvoices;
+
+            if (!hasUnpaidInvoices && !hasPaidInvoices)
+                StatusAlert.AddMessage(AlertType.Warning, Translate("There are no invoices for you"));
         }
 
         private string GetInvoiceItemsHtml(Guid invoice)

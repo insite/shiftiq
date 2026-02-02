@@ -33,12 +33,48 @@ namespace InSite.UI.Portal.Billing
         protected global::InSite.Common.Web.UI.Alert StatusAlert;
 
         /// <summary>
-        /// ReceiptsRepeater control.
+        /// MainAccordion control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater ReceiptsRepeater;
+        protected global::InSite.Common.Web.UI.Accordion MainAccordion;
+
+        /// <summary>
+        /// UnpaidInvoicePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.AccordionPanel UnpaidInvoicePanel;
+
+        /// <summary>
+        /// UnpaidInvoiceRepeater control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater UnpaidInvoiceRepeater;
+
+        /// <summary>
+        /// PaidInvoicePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.AccordionPanel PaidInvoicePanel;
+
+        /// <summary>
+        /// PaidInvoiceRepeater control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater PaidInvoiceRepeater;
     }
 }
