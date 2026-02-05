@@ -125,6 +125,8 @@ namespace InSite.UI.Portal.Billing.Controls
                 desired = Math.Min(desired, maxForThis);
             }
 
+            desired = Math.Min(desired, 9999);
+
             if (desired == 0) cart.Items.Remove(productId);
             else cart.Items[productId] = desired;
 

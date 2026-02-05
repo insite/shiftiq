@@ -143,7 +143,8 @@ namespace InSite.UI.Portal.Billing.Controls
                         {
                             OrganizationIdentifier = orgId,
                             IsPublished = true,
-                            ProductType = "Package"
+                            ProductType = "Package",
+                            HasPrice = true
                         })
                         .OrderBy(x => x.ProductPrice);
                     break;
@@ -153,7 +154,8 @@ namespace InSite.UI.Portal.Billing.Controls
                         {
                             OrganizationIdentifier = CurrentSessionState.Identity.Organization.OrganizationIdentifier,
                             IsPublished = true,
-                            ProductType = "Online Course"
+                            ProductType = "Online Course",
+                            HasPrice = true
                         })
                         .OrderBy(x => x.ProductName);
                     break;

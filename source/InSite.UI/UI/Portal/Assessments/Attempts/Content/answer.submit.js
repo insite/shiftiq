@@ -396,6 +396,11 @@
     }
 
     function onSubmitComplete() {
+        if (this['_xhr'] && this._xhr.responseURL && this._xhr.responseURL !== window.location.href) {
+            window.location.href = this._xhr.responseURL;
+            return;
+        }
+
         requestState.isSubmit = false;
         setSubmitTimeout();
         if (typeof this.custom.completeCallback === 'function')
@@ -738,6 +743,11 @@
 
         const ajaxOptions = {
             type: 'POST',
+            xhr: function () {
+                const result = $.ajaxSettings.xhr();
+                this._xhr = result;
+                return result;
+            },
             custom: {
                 uniqueQueue: null,
                 completeCallback: complete

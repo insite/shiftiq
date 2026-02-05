@@ -77,6 +77,12 @@ $('#{ClientID}_tab').on('hide.bs.tab', {onHideHandler});",
             set => ViewState[nameof(Identifier)] = value;
         }
 
+        public bool IsDisabled
+        {
+            get => (bool)(ViewState[nameof(IsDisabled)] ?? false);
+            set => ViewState[nameof(IsDisabled)] = value;
+        }
+
         #endregion
 
         #region Render
@@ -91,7 +97,8 @@ $('#{ClientID}_tab').on('hide.bs.tab', {onHideHandler});",
             if (!Visible)
                 return;
 
-            var isSelected = IsSelected;
+            var isDisabled = IsDisabled;
+            var isSelected = IsSelected && !isDisabled;
 
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "nav-item");
             writer.AddAttribute("role", "presentation");
@@ -99,7 +106,7 @@ $('#{ClientID}_tab').on('hide.bs.tab', {onHideHandler});",
 
             #region BUTTON
 
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, isSelected ? "nav-link active" : "nav-link");
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, isDisabled ? "nav-link disabled" : isSelected ? "nav-link active" : "nav-link");
             writer.AddAttribute(HtmlTextWriterAttribute.Id, ClientID + "_tab");
             writer.AddAttribute("data-identifier", Identifier);
 
@@ -164,7 +171,7 @@ $('#{ClientID}_tab').on('hide.bs.tab', {onHideHandler});",
 
         void INavItem.RenderContent(HtmlTextWriter writer)
         {
-            if (!Visible)
+            if (!Visible || IsDisabled)
                 return;
 
             var tabClass = "tab-pane";

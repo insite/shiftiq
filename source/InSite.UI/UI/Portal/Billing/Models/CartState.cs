@@ -4,6 +4,8 @@ using System.Linq;
 
 using static InSite.UI.Portal.Billing.Models.PriceSelectionModel;
 
+using Shift.Common;
+
 namespace InSite.UI.Portal.Billing.Models
 {
     [Serializable]
@@ -39,8 +41,12 @@ namespace InSite.UI.Portal.Billing.Models
                 if (qty > remainder) qty = remainder;
             }
 
-            Items[productId] = (Items.ContainsKey(productId) ? Items[productId] : 0) + qty;
-            actuallyAdded = qty;
+            var curQty = Items.GetOrDefault(productId, 0);
+            var newQty = Number.CheckRange(curQty + qty, maxValue: 9999);
+
+            Items[productId] = newQty;
+            actuallyAdded = newQty - curQty;
+
             return TotalSelected;
         }
     }

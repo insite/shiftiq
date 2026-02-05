@@ -16,6 +16,7 @@ namespace InSite.Application.Invoices.Read
         public bool IsAvailableForSale { get; set; }
         public int? ProductQuantity { get; set; }
         public decimal? ProductPrice { get; set; }
+        public bool? HasPrice { get; set; }
 
         public TProductFilter Clone() => (TProductFilter)MemberwiseClone();
     }

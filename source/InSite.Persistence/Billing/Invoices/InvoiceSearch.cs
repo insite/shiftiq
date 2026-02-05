@@ -263,6 +263,14 @@ namespace InSite.Persistence
             if (filter.ProductPrice.HasValue)
                 query = query.Where(x => x.ProductPrice == filter.ProductPrice.Value);
 
+            if (filter.HasPrice.HasValue)
+            {
+                if (filter.HasPrice.Value)
+                    query = query.Where(x => x.ProductPrice > 0);
+                else
+                    query = query.Where(x => !x.ProductPrice.HasValue || x.ProductPrice <= 0);
+            }
+
             return query;
         }
 

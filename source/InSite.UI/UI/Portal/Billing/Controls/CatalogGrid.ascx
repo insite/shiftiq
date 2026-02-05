@@ -88,7 +88,12 @@
                 const input = group.querySelector('.qty-input');
                 const step = parseInt(btn.dataset.step, 10) || 1;
                 const current = parseInt(input.dataset.current ?? defaultCurrent);
-                const next = checkCredit(input, current, Math.max(0, current + step));
+                let next = checkCredit(input, current, Math.max(0, current + step));
+
+                if (next < 1)
+                    next = 1;
+                else if (next > 9999)
+                    next = 9999;
 
                 input.value = String(next);
                 input.dataset.current = input.value || "0";
@@ -101,7 +106,14 @@
                 }
 
                 const current = parseInt(input.dataset.current ?? defaultCurrent);
-                const next = checkCredit(input, current, parseInt(input.value.replace(/[^0-9]/g, '')));
+                let next = checkCredit(input, current, parseInt(input.value.replace(/[^0-9]/g, '')));
+
+                if (!isNaN(next)) {
+                    if (next < 1)
+                        next = 1;
+                    else if (next > 9999)
+                        next = 9999;
+                }
 
                 input.value = isNaN(next) ? "" : String(next);
                 input.dataset.current = input.value || "0";

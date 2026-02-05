@@ -22,7 +22,8 @@ namespace InSite.Common.Web.UI
                     { 
                         OrganizationIdentifier = CurrentSessionState.Identity.Organization.OrganizationIdentifier,
                         IsPublished = true,
-                        ProductType = "Package"
+                        ProductType = "Package",
+                        HasPrice = true
                     })
                 .OrderBy(x => x.ProductPrice);
 

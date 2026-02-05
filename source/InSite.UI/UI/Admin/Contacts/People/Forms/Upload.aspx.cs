@@ -575,7 +575,9 @@ namespace InSite.Admin.Contacts.People.Forms
 
         private void FileNextButton_Click(object sender, EventArgs e)
         {
+            FieldsTab.IsDisabled = false;
             FieldsTab.Visible = false;
+            DuplicatesTab.IsDisabled = false;
             DuplicatesTab.Visible = false;
             CompleteTab.Visible = false;
 
@@ -669,9 +671,9 @@ namespace InSite.Admin.Contacts.People.Forms
                     item.Person = result[item.Email].Person;
                     item.Person.User = null;
                     item.User.Persons = null;
-
                 }
             }
+
             if (ReturnUrl.HasValue())
             {
                 Create.SavedIdentifiers = data.Rows
@@ -688,10 +690,15 @@ namespace InSite.Admin.Contacts.People.Forms
             }
             else
             {
+                FieldsTab.IsDisabled = true;
+                DuplicatesTab.IsDisabled = true;
+
                 CompleteTab.Visible = true;
                 CompleteTab.IsSelected = true;
 
                 LoadPreviewData(data);
+
+                Duplicates = null;
             }
         }
 

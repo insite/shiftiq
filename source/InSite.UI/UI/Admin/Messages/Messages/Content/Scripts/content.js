@@ -359,10 +359,10 @@
 
     function createPlaceholderMenu(editor) {
         var $menu = $('<ul class="dropdown-menu dd-placeholder">').append(
-            $('<li><a data-value="$Recipient-First-Name" class="dropdown-item">Recipient First Name</a></li>'),
-            $('<li><a data-value="$Recipient-Last-Name" class="dropdown-item">Recipient Last Name</a></li>'),
+            $('<li><a data-value="$RecipientFirstName" class="dropdown-item">Recipient First Name</a></li>'),
+            $('<li><a data-value="$RecipientLastName" class="dropdown-item">Recipient Last Name</a></li>'),
             $('<li><a data-value="$RecipientEmail" class="dropdown-item">Recipient Email</a></li>'),
-            $('<li><a data-value="$Recipient-Person-Code" class="dropdown-item">Recipient Person Code</a></li>'),
+            $('<li><a data-value="$RecipientPersonCode" class="dropdown-item">Recipient Person Code</a></li>'),
             $('<li><hr class="dropdown-divider"></li>'),
             $('<li><a data-type="block" data-value="$Unsubscribe-Link" class="dropdown-item">Unsubscribe Link</a></li>'),
             $('<li><a data-type="block" data-value="$Social-Media-Links" class="dropdown-item">Social Media Links</a></li>')

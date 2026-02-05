@@ -161,7 +161,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 
             ServiceLocator.ProgramStore.TaskViewed(learnerId, organizationId, bankForm.Identifier);
 
-            if(bankForm.WhenAttemptStartedNotifyAdminMessageIdentifier.HasValue)
+            if (bankForm.WhenAttemptStartedNotifyAdminMessageIdentifier.HasValue)
                 SendBankNotification(organizationId, bankForm, bankForm.WhenAttemptStartedNotifyAdminMessageIdentifier.Value, learnerId);
 
             return attemptId;
@@ -405,11 +405,14 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             if (!isFormOpened || isFormClosed)
                 return new ActionRedirect(url.GetResultUrl());
 
-            var entity = ServiceLocator.AttemptSearch.GetAttempt(url.AttemptID.Value, x=>x.Form, x=>x.Form.Bank);
+            var entity = ServiceLocator.AttemptSearch.GetAttempt(url.AttemptID.Value, x => x.Form, x => x.Form.Bank);
             if (entity == null)
                 return ActionInvalidAttemptKey();
 
             var user = CurrentSessionState.Identity.User;
+            if (user == null)
+                return GetErrorResult("Session Expired", $"<p>Your session has expired. Please sign in again.</p>");
+
             if (entity.AssessorUserIdentifier != user.UserIdentifier && entity.LearnerUserIdentifier != user.UserIdentifier)
                 return ActionInvalidAttemptKey();
 
