@@ -7,12 +7,14 @@ namespace InSite.Domain.Organizations
         public string InlineInstructionsUrl { get; set; }
         public string InlineLabelsUrl { get; set; }
         public string SafeExamBrowserUserAgentSuffix { get; set; }
+        public bool RequireEmailVerification { get; set; }
 
-        public OrganizationPlatformSettingsModified(string inlineInstructionsUrl, string inlineLabelsUrl, string safeExamBrowserUserAgentSuffix)
+        public OrganizationPlatformSettingsModified(string inlineInstructionsUrl, string inlineLabelsUrl, string safeExamBrowserUserAgentSuffix, bool requireEmailVerification)
         {
             InlineInstructionsUrl = inlineInstructionsUrl;
             InlineLabelsUrl = inlineLabelsUrl;
             SafeExamBrowserUserAgentSuffix = safeExamBrowserUserAgentSuffix;
+            RequireEmailVerification = requireEmailVerification;
         }
     }
 }

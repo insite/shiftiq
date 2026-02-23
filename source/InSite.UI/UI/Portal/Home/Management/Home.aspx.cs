@@ -159,7 +159,7 @@ namespace InSite.UI.Portal.Home.Management
         {
             var organization = CurrentSessionState.Identity.Organization;
 
-            var portalName = $"{organization.Code}.{ServiceLocator.AppSettings.Security.Domain}";
+            var portalName = $"{organization.Code}.{ServiceLocator.AppSettings.Partition.Domain}";
 
             return ServiceLocator.SiteSearch.BindFirst(x => x, x => x.SiteDomain == portalName);
         }

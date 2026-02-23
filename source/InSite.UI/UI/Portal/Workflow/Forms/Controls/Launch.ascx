@@ -10,37 +10,63 @@
 
 </style>
 
-<div class="row">
-    <div class="col-lg-12">
-        <h1 runat="server" id="SurveyFormTitle" class="py-1 my-2 pb-2 mb-4"></h1>
-    </div>
-</div>
+<h1 runat="server" id="SurveyFormTitle" class="py-1 my-2 pb-2 mb-4"></h1>
 
 <div class="alert">
     <insite:Alert runat="server" ID="ErrorAlert" />
+    <insite:ValidationSummary runat="server" ValidationGroup="SelectLearner" />
 </div>
 
-<asp:Panel runat="server" ID="SessionPanel" Visible="false">
+<asp:MultiView runat="server" ID="MultiView">
 
-    <div runat="server" ID="SurveyFormInstructions" class="mb-4">
+    <asp:View runat="server" ID="LaunchView">
+        <div runat="server" ID="SurveyFormInstructions" class="mb-4">
         
-    </div>
+        </div>
 
-    <div class="mb-5">
-        <insite:Button runat="server" ID="StartButton" ButtonStyle="Default" Text="Start Form" Icon="fas fa-rocket-launch" />
-    </div>
+        <div class="mb-5">
+            <insite:Button runat="server" ID="StartButton" ButtonStyle="Default" Text="Start Form" Icon="fas fa-rocket-launch" />
+        </div>
     
-    <asp:Panel runat="server" ID="ResponsePanel" CssClass="mb-4">
+        <asp:Panel runat="server" ID="ResponsePanel" CssClass="mb-4">
 
-        <hr />
-        <h3 class="mb-0"><%= Translate("Form Submissions") %></h3>
-        <p><small class="text-body-secondary"><asp:Literal runat="server" ID="ResponseCount" /></small></p>
+            <hr />
+            <h2 class="mb-0"><%= Translate("Form Submissions") %></h2>
+            <p class="text-body-secondary"><asp:Literal runat="server" ID="ResponseCount" /></p>
 
-        <uc:SubmissionRepeater runat="server" ID="SubmissionRepeater" />
+            <uc:SubmissionRepeater runat="server" ID="SubmissionRepeater" />
 
-    </asp:Panel>
+        </asp:Panel>
+    </asp:View>
 
-</asp:Panel>
+    <asp:View runat="server" ID="SelectLearnerView">
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h2><%= Translate("Select Learner") %></h2>
+                        <p class="text-body-secondary"><%= Translate("Please select the person you are assessing:") %></p>
+                        
+                        <insite:FindPerson runat="server" ID="LearnerIdentifier" />
+                        <insite:RequiredValidator runat="server" ControlToValidate="LearnerIdentifier" Display="None" RenderMode="Dot"
+                            FieldName="Learner" ValidationGroup="SelectLearner" />
+                    </div>
+                </div>
+
+                <div class="mt-3 text-end">
+                    <insite:Button runat="server" ID="SelectLearnerContinue" ButtonStyle="Primary" Text="Continue" 
+                        Icon="fas fa-right" IconPosition="AfterText" 
+                        ValidationGroup="SelectLearner" />
+                </div>
+
+            </div>
+        </div>
+
+    </asp:View>
+
+</asp:MultiView>
 
 <asp:Panel runat="server" ID="DebugPanel" Visible="false">
 

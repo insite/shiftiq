@@ -17,9 +17,9 @@ public class FileActivityService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid activity, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid activity, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(activity, cancellation);
+        return await _reader.AssertAsync(activity, organization, cancellation);
     }
 
     public async Task<IEnumerable<FileActivityModel>> CollectAsync(IFileActivityCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class FileActivityService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyFileActivity modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.ActivityIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.ActivityId, cancellation);
 
         if (entity == null)
             return false;

@@ -7,9 +7,9 @@ public class FileClaimAdapter : IEntityAdapter
 {
     public void Copy(ModifyFileClaim modify, FileClaimEntity entity)
     {
-        entity.FileIdentifier = modify.FileIdentifier;
+        entity.FileIdentifier = modify.FileId;
         entity.ObjectType = modify.ObjectType;
-        entity.ObjectIdentifier = modify.ObjectIdentifier;
+        entity.ObjectIdentifier = modify.ObjectId;
         entity.ClaimGranted = modify.ClaimGranted;
     }
 
@@ -24,10 +24,10 @@ public class FileClaimAdapter : IEntityAdapter
     {
         var entity = new FileClaimEntity
         {
-            FileIdentifier = create.FileIdentifier,
-            ClaimIdentifier = create.ClaimIdentifier,
+            FileIdentifier = create.FileId,
+            ClaimIdentifier = create.ClaimId,
             ObjectType = create.ObjectType,
-            ObjectIdentifier = create.ObjectIdentifier,
+            ObjectIdentifier = create.ObjectId,
             ClaimGranted = create.ClaimGranted
         };
         return entity;
@@ -42,10 +42,10 @@ public class FileClaimAdapter : IEntityAdapter
     {
         var model = new FileClaimModel
         {
-            FileIdentifier = entity.FileIdentifier,
-            ClaimIdentifier = entity.ClaimIdentifier,
+            FileId = entity.FileIdentifier,
+            ClaimId = entity.ClaimIdentifier,
             ObjectType = entity.ObjectType,
-            ObjectIdentifier = entity.ObjectIdentifier,
+            ObjectId = entity.ObjectIdentifier,
             ClaimGranted = entity.ClaimGranted
         };
 
@@ -61,7 +61,7 @@ public class FileClaimAdapter : IEntityAdapter
     {
         var match = new FileClaimMatch
         {
-            ClaimIdentifier = entity.ClaimIdentifier
+            ClaimId = entity.ClaimIdentifier
 
         };
 

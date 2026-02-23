@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class AchievementController : ShiftControllerBase
 {
     private readonly AchievementService _achievementService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public AchievementController(AchievementService achievementService)
+    public AchievementController(AchievementService achievementService, IPrincipalProvider principalProvider)
     {
         _achievementService = achievementService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class AchievementController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific achievement
     /// </summary>
-    [HttpHead("progress/achievements/{achievement:guid}")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Assert)]
+    [HttpHead("api/progress/achievements/{achievement:guid}")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertAchievement")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid achievement, CancellationToken cancellation = default)
     {
-        var exists = await _achievementService.AssertAsync(achievement, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _achievementService.AssertAsync(achievement, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class AchievementController : ShiftControllerBase
     /// <summary>
     /// Collects the list of achievements that match specific criteria
     /// </summary>
-    [HttpPost("progress/achievements/collect")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Collect)]
+    [HttpPost("api/progress/achievements/collect")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<AchievementModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectAchievements")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectAchievements query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class AchievementController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("progress/achievements")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Collect)]
+    [HttpGet("api/progress/achievements")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<AchievementModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectAchievements_get")]
     [AliasFor("collectAchievements")]
@@ -56,6 +62,10 @@ public class AchievementController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectAchievements query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _achievementService.CollectAsync(query, cancellation);
 
         var count = await _achievementService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class AchievementController : ShiftControllerBase
     /// <summary>
     /// Counts the achievements that match specific criteria
     /// </summary>
-    [HttpPost("progress/achievements/count")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Count)]
+    [HttpPost("api/progress/achievements/count")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countAchievements")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountAchievements query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class AchievementController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("progress/achievements/count")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Count)]
+    [HttpGet("api/progress/achievements/count")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countAchievements_get")]
     [AliasFor("countAchievements")]
@@ -90,6 +100,10 @@ public class AchievementController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountAchievements query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _achievementService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class AchievementController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of achievements that match specific criteria
     /// </summary>    
-    [HttpPost("progress/achievements/download")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Download)]
+    [HttpPost("api/progress/achievements/download")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadAchievements")]
@@ -108,8 +122,8 @@ public class AchievementController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("progress/achievements/download")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Download)]
+    [HttpGet("api/progress/achievements/download")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadAchievements_get")]
@@ -122,6 +136,10 @@ public class AchievementController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectAchievements query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Progress", "Achievements", query.Filter.Format, User);
 
         var models = await _achievementService
@@ -142,22 +160,33 @@ public class AchievementController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific achievement
     /// </summary>
-    [HttpGet("progress/achievements/{achievement:guid}")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Retrieve)]
+    [HttpGet("api/progress/achievements/{achievement:guid}")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType<AchievementModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveAchievement")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid achievement, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _achievementService.RetrieveAsync(achievement, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        // If the achievement exists in another organization then we could return Unauthorized here - but this would
+        // reveal that the ID exists. Returning Not Found is more secure and also helps to prevent enumeration attacks.
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of achievements that match specific criteria
     /// </summary>
-    [HttpPost("progress/achievements/search")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Search)]
+    [HttpPost("api/progress/achievements/search")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<AchievementMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchAchievements")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchAchievements query, CancellationToken cancellation = default)
@@ -165,8 +194,8 @@ public class AchievementController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("progress/achievements/search")]
-    [HybridAuthorize(Policies.Progress.Achievements.Achievement.Search)]
+    [HttpGet("api/progress/achievements/search")]
+    [HybridPermission("progress/achievements", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<AchievementMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchAchievements_get")]
     [AliasFor("searchAchievements")]
@@ -178,6 +207,10 @@ public class AchievementController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchAchievements query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _achievementService.SearchAsync(query, cancellation);
 
         var count = await _achievementService.CountAsync(query, cancellation);

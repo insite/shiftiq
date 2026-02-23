@@ -318,7 +318,7 @@ namespace InSite.Admin.Sites.Utilities
 
         public static QPage GetCustomHelpPage(string actionUrl, Domain.Foundations.User user, OrganizationState organization, bool isHidden = false)
         {
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var siteName = $"{organization.Code}.{domain}";
             var site = ServiceLocator.SiteSearch.BindFirst(x => x, x => x.SiteDomain == siteName && x.OrganizationIdentifier == organization.Identifier);
             if (site == null)
@@ -341,7 +341,7 @@ namespace InSite.Admin.Sites.Utilities
 
         public static Guid CreateCustomHelpPage(string actionUrl, Domain.Foundations.User user, OrganizationState organization, bool isHidden = false)
         {
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var siteName = $"{organization.Code}.{domain}";
             var site = ServiceLocator.SiteSearch.BindFirst(x => x, x => x.SiteDomain == siteName && x.OrganizationIdentifier == organization.Identifier);
             if (site == null)

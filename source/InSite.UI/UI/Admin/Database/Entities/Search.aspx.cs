@@ -23,8 +23,8 @@ namespace InSite.UI.Admin.Database.Entities
             {
                 var entities = TEntitySearch.Select(SearchCriteria.Filter);
 
+                SummarizeSubsystems(entities);
                 SummarizeComponents(entities);
-                SummarizeFeatures(entities);
                 SummarizeHierarchy(entities);
 
                 SummarizeDuplicates();
@@ -41,42 +41,42 @@ namespace InSite.UI.Admin.Database.Entities
             };
         }
 
+        private void SummarizeSubsystems(List<TEntity> entities)
+        {
+            var subsystems = entities
+                .GroupBy(x => new { x.SubsystemType, x.SubsystemName })
+                .Select(x => new
+                {
+                    x.Key.SubsystemType,
+                    x.Key.SubsystemName,
+                    Count = x.Count()
+                })
+                .OrderBy(x => x.SubsystemType)
+                .ThenBy(x => x.SubsystemName)
+                ;
+
+            SubsystemSummary.DataSource = subsystems;
+            SubsystemSummary.DataBind();
+        }
+
         private void SummarizeComponents(List<TEntity> entities)
         {
             var components = entities
-                .GroupBy(x => new { x.ComponentType, x.ComponentName })
+                .GroupBy(x => new { x.SubsystemType, x.SubsystemName, x.SubsystemComponent })
                 .Select(x => new
                 {
-                    x.Key.ComponentType,
-                    x.Key.ComponentName,
+                    x.Key.SubsystemType,
+                    x.Key.SubsystemName,
+                    x.Key.SubsystemComponent,
                     Count = x.Count()
                 })
-                .OrderBy(x => x.ComponentType)
-                .ThenBy(x => x.ComponentName)
+                .OrderBy(x => x.SubsystemType)
+                .ThenBy(x => x.SubsystemName)
+                .ThenBy(x => x.SubsystemComponent)
                 ;
 
             ComponentSummary.DataSource = components;
             ComponentSummary.DataBind();
-        }
-
-        private void SummarizeFeatures(List<TEntity> entities)
-        {
-            var subcomponents = entities
-                .GroupBy(x => new { x.ComponentType, x.ComponentName, x.ComponentPart })
-                .Select(x => new
-                {
-                    x.Key.ComponentType,
-                    x.Key.ComponentName,
-                    x.Key.ComponentPart,
-                    Count = x.Count()
-                })
-                .OrderBy(x => x.ComponentType)
-                .ThenBy(x => x.ComponentName)
-                .ThenBy(x => x.ComponentPart)
-                ;
-
-            SubcomponentSummary.DataSource = subcomponents;
-            SubcomponentSummary.DataBind();
         }
 
         private void SummarizeDuplicates()
@@ -142,7 +142,7 @@ namespace InSite.UI.Admin.Database.Entities
             var sb = new StringBuilder();
 
             var groupedByType = items
-                .GroupBy(i => i.ComponentType)
+                .GroupBy(i => i.SubsystemType)
                 .OrderBy(g => g.Key);
 
             foreach (var typeGroup in groupedByType)
@@ -152,7 +152,7 @@ namespace InSite.UI.Admin.Database.Entities
                 sb.AppendLine("      <table class='table table-striped'>");
 
                 var groupedByComponent = typeGroup
-                    .GroupBy(i => i.ComponentName)
+                    .GroupBy(i => i.SubsystemName)
                     .OrderBy(g => g.Key);
 
                 foreach (var componentGroup in groupedByComponent)
@@ -164,7 +164,7 @@ namespace InSite.UI.Admin.Database.Entities
                     sb.AppendLine("<tr><th>Subcomponent</th><th>Entity</th><th>Current Table</th><th>Future Table</th></tr>");
 
                     var groupedByPart = componentGroup
-                        .GroupBy(i => i.ComponentPart)
+                        .GroupBy(i => i.SubsystemComponent)
                         .OrderBy(g => g.Key);
 
                     foreach (var partGroup in groupedByPart)

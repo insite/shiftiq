@@ -40,7 +40,7 @@ namespace Shift.Common
             foreach (var item in collection)
             {
                 if (_dict.ContainsKey(item.PropertyName))
-                    throw new ApplicationError($"The property already exists in collection: {item.PropertyName}");
+                    throw new ArgumentException($"The property already exists in collection: {item.PropertyName}");
 
                 _list.Add(item);
                 _dict.Add(item.PropertyName, item);

@@ -77,11 +77,9 @@
             </ItemTemplate>
         </asp:TemplateField>
 
-        <asp:TemplateField HeaderText="Region">
-            <ItemTemplate>
-                <%# Eval("EmployerGroupRegion") %>
-            </ItemTemplate>
-        </asp:TemplateField>
+        <asp:BoundField HeaderText="Region" DataField="EmployerGroupRegion" />
+
+        <asp:BoundField HeaderText="Department" DataField="Department" />
 
     </Columns>
 

@@ -368,6 +368,7 @@ namespace InSite.UI.Admin.Contacts.People.Forms
             email.Variables.Add("Email", email.Recipient.Email);
             email.Variables.Add("RecipientEmail", email.Recipient.Email);
             email.Variables.Add("RecipientCode", email.Recipient.PersonCode);
+            email.Variables.Add("PersonCode", email.Recipient.PersonCode);
             email.Variables.Add("CompanyTitle", Organization.CompanyName);
             email.Variables.Add("SignInUrl", HttpRequestHelper.CurrentRootUrl + "/ui/lobby/signin");
         }
@@ -401,7 +402,7 @@ namespace InSite.UI.Admin.Contacts.People.Forms
                 Variables =
                 {
                     ["FirstName"] = recipient.FirstName,
-                    ["LastName"] = recipient.LastName
+                    ["LastName"] = recipient.LastName,
                 }
             });
 
@@ -440,8 +441,9 @@ namespace InSite.UI.Admin.Contacts.People.Forms
             draft.ContentBody[email.Recipient.Language] = ComposeEmailBody.Value;
 
             var message = MessageHelper.BuildMessage(draft, email.Recipient.Language);
-            var recipientData = DeliveryAdapter.ToDataTable(Organization.Identifier, draft.Recipients);
-            var (subject, body) = EmailOutbox.ReplaceSmarterMailVariables(recipientData, 0, message.Subject, message.Body);
+            var envelope = EmailOutbox.CreateEmailVariables(draft, email.Recipient.UserIdentifier, email.Recipient.Email);
+            var subject = MessageHelper.ReplacePlaceholdersForMailgun(draft.OrganizationIdentifier, draft.SenderIdentifier, draft.SurveyNumber, message.Subject, envelope);
+            var body = MessageHelper.ReplacePlaceholdersForMailgun(draft.OrganizationIdentifier, draft.SenderIdentifier, draft.SurveyNumber, message.Body, envelope);
 
             email.EmailSubject = subject;
             email.EmailBody = body;

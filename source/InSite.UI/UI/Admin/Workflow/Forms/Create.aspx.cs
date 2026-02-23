@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Admin.Workflow.Forms.Utilities;
 using InSite.Application.Surveys.Write;
 using InSite.Common.Web;
@@ -15,6 +13,7 @@ using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Admin.Workflow.Forms
@@ -49,7 +48,7 @@ namespace InSite.Admin.Workflow.Forms
         {
             base.OnLoad(e);
 
-            if (!CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/admin/workflow/forms/search");
 
             if (IsPostBack)
@@ -157,16 +156,18 @@ namespace InSite.Admin.Workflow.Forms
 
                 HttpResponseHelper.Redirect($"/ui/admin/workflow/forms/outline?form={id}");
             }
-            catch (Newtonsoft.Json.JsonReaderException ex)
+            catch (Newtonsoft.Json.JsonException jsonex)
             {
-                CreatorStatus.AddMessage(AlertType.Error, $"Your uploaded file has an unexpected format. {ex.Message}");
+                var message = "Your uploaded file has an unexpected format.";
+
+                if (jsonex is Newtonsoft.Json.JsonReaderException)
+                    message += " " + jsonex.Message;
+
+                CreatorStatus.AddMessage(AlertType.Error, message);
             }
             catch (ApplicationError apperr)
             {
-                if (apperr.Message == "Unexpected JSON object type")
-                    CreatorStatus.AddMessage(AlertType.Error, $"Your uploaded file is of a wrong type.");
-                else
-                    throw;
+                CreatorStatus.AddMessage(AlertType.Error, apperr.Message);
             }
         }
 

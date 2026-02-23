@@ -27,7 +27,7 @@ namespace InSite.Admin.Assessments.Sets.Forms
 
         protected override void OnLoad(EventArgs e)
         {
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 RedirectToSearch();
 
             if (!IsPostBack)

@@ -349,14 +349,14 @@
                                     IconType="Regular" IconName="plus-circle"
                                     Text="Add" ToolTip="Add a new multiple choice question to selected set">
                                     <Items>
-                                        <insite:DropDownButtonItem Name="QuickMultipleChoice" IconType="Regular" IconName="check-circle" Text="Multiple Choice" ToolTip="Add a new multiple choice question to selected set" />
-                                        <insite:DropDownButtonItem Name="QuickMultipleCorrect" IconType="Regular" IconName="check-square" Text="Multiple Correct" ToolTip="Add a new multiple correct question to selected set" />
-                                        <insite:DropDownButtonItem Name="QuickComposedEssay" IconType="Regular" IconName="file-lines" Text="Composed Essay" ToolTip="Add a new composed essay response question to selected set" />
-                                        <insite:DropDownButtonItem Name="QuickComposedVoice" IconType="Regular" IconName="microphone" Text="Composed Voice" ToolTip="Add a new composed voice response question to selected set" />
-                                        <insite:DropDownButtonItem Name="QuickBooleanTable" IconType="Regular" IconName="th" Text="Multiple True/False List" ToolTip="Add a new multiple true/false list question to selected set" />
-                                        <insite:DropDownButtonItem Name="QuickMatching" IconType="Regular" IconName="exchange" Text="Matching" ToolTip="Add a new matching question to selected set" />
-                                        <insite:DropDownButtonSeparatorItem />
-                                        <insite:DropDownButtonItem Name="Creator" IconType="Solid" IconName="plus-circle" Text="Go To Creator" ToolTip="Add a new question to selected set using Question Creator" />
+                                        <sdk:DropDownButtonItem Name="QuickMultipleChoice" IconType="Regular" IconName="check-circle" Text="Multiple Choice" ToolTip="Add a new multiple choice question to selected set" />
+                                        <sdk:DropDownButtonItem Name="QuickMultipleCorrect" IconType="Regular" IconName="check-square" Text="Multiple Correct" ToolTip="Add a new multiple correct question to selected set" />
+                                        <sdk:DropDownButtonItem Name="QuickComposedEssay" IconType="Regular" IconName="file-lines" Text="Composed Essay" ToolTip="Add a new composed essay response question to selected set" />
+                                        <sdk:DropDownButtonItem Name="QuickComposedVoice" IconType="Regular" IconName="microphone" Text="Composed Voice" ToolTip="Add a new composed voice response question to selected set" />
+                                        <sdk:DropDownButtonItem Name="QuickBooleanTable" IconType="Regular" IconName="th" Text="Multiple True/False List" ToolTip="Add a new multiple true/false list question to selected set" />
+                                        <sdk:DropDownButtonItem Name="QuickMatching" IconType="Regular" IconName="exchange" Text="Matching" ToolTip="Add a new matching question to selected set" />
+                                        <sdk:DropDownButtonSeparatorItem />
+                                        <sdk:DropDownButtonItem Name="Creator" IconType="Solid" IconName="plus-circle" Text="Go To Creator" ToolTip="Add a new question to selected set using Question Creator" />
                                     </Items>
                                 </insite:DropDownButton>
                             </div>

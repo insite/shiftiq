@@ -69,6 +69,10 @@
                             <insite:ItemNameComboBox runat="server" ID="CommentTag" EmptyMessage="Tag" MaxLength="200" />
                         </div>
 
+                        <div class="mb-2">
+                            <insite:TextBox runat="server" ID="CommentText" EmptyMessage="Comment" MaxLength="100" />
+                        </div>
+
                         <h4 class="mt-3">Contacts</h4>
 
                         <div class="mb-2">
@@ -103,6 +107,10 @@
 
                     <div class="mb-2">
                         <insite:TextBox runat="server" ID="AssigneeOrganization" EmptyMessage="Organization(s)" MaxLength="100" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:FindDepartment runat="server" ID="TopicDepartmentIdentifier" EmptyMessage="Department" />
                     </div>
 
                     <div class="mb-2">

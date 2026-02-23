@@ -4,11 +4,17 @@ namespace Shift.Hub.Integration.IIS
 {
     public class AddMissingBindings
     {
-        public void Execute(string? connectionString, string? siteName, string? protocolsText, string? ipAddress, string? certificateStoreName, string? certificateHash)
+        public void Execute(string? connectionString, string? hostName, string? siteName, string? protocolsText, string? ipAddress, string? certificateStoreName, string? certificateHash)
         {
             if (string.IsNullOrEmpty(connectionString))
             {
                 Console.Error.WriteLine("ConnectionString is a required input parameter for this command.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(hostName))
+            {
+                Console.Error.WriteLine("HostName is a required input parameter for this command.");
                 return;
             }
 
@@ -67,7 +73,7 @@ namespace Shift.Hub.Integration.IIS
 
             try
             {
-                missingBindings = BindingHelper.GetMissingBindings(site, db, protocols, true);
+                missingBindings = BindingHelper.GetMissingBindings(site, db, hostName, protocols, true);
             }
             catch (InternalException intex)
             {

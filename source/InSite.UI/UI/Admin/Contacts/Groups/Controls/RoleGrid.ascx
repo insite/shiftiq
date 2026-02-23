@@ -19,11 +19,11 @@
         <insite:Button runat="server" ID="AddButton" ButtonStyle="OutlinePrimary" Text="Add People" Icon="fas fa-plus-circle" />
         <insite:DropDownButton runat="server" ID="DownloadBtn" CssClass="d-inline-block" ButtonStyle="OutlinePrimary" DefaultAction="None" IconName="download" Text="Download">
             <Items>
-                <insite:DropDownButtonItem Name="Contacts" IconName="users" Text="Contacts" ToolTip="Download group contacts" />
-                <insite:DropDownButtonItem Name="ShippingMailingLabels" IconName="mail-bulk" Text="Shipping Mailing Labels" ToolTip="Download group shipping mailing labels" />
-                <insite:DropDownButtonItem Name="BillingMailingLabels" IconName="mail-bulk" Text="Billing Mailing Labels" ToolTip="Download group billing mailing labels" />
-                <insite:DropDownButtonItem Name="WorkMailingLabels" IconName="mail-bulk" Text="Work Mailing Labels" ToolTip="Download group work mailing labels" />
-                <insite:DropDownButtonItem Name="HomeMailingLabels" IconName="mail-bulk" Text="Home Mailing Labels" ToolTip="Download group home mailing labels" />
+                <sdk:DropDownButtonItem Name="Contacts" IconName="users" Text="Contacts" ToolTip="Download group contacts" />
+                <sdk:DropDownButtonItem Name="ShippingMailingLabels" IconName="mail-bulk" Text="Shipping Mailing Labels" ToolTip="Download group shipping mailing labels" />
+                <sdk:DropDownButtonItem Name="BillingMailingLabels" IconName="mail-bulk" Text="Billing Mailing Labels" ToolTip="Download group billing mailing labels" />
+                <sdk:DropDownButtonItem Name="WorkMailingLabels" IconName="mail-bulk" Text="Work Mailing Labels" ToolTip="Download group work mailing labels" />
+                <sdk:DropDownButtonItem Name="HomeMailingLabels" IconName="mail-bulk" Text="Home Mailing Labels" ToolTip="Download group home mailing labels" />
             </Items>
         </insite:DropDownButton>
     </div>

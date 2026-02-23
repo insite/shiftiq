@@ -101,7 +101,7 @@ namespace InSite.Cmds.Actions.BulkTool.Expiry
             OrganizationFinder.Filter.AchievementForEmployeeId = AchievementIdentifier.Value;
             OrganizationFinder.Filter.IncludeOrganizationIdentifiers =
                 !FinderSecurityInfo.CanSeeAllCompanies && !Identity.HasAccessToAllCompanies
-                    ? new[] { CurrentIdentityFactory.ActiveOrganizationIdentifier }
+                    ? new[] { Organization.Identifier }
                     : null;
             OrganizationFinder.Value = null;
             OrganizationFinder.Enabled = true;

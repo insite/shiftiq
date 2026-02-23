@@ -13,6 +13,8 @@
         Credential,
         Course,
         Program,
-        ProgramTask
+        ProgramTask,
+        Standard,
+        Page
     }
 }

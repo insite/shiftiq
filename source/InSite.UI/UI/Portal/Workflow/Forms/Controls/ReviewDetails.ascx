@@ -14,19 +14,19 @@
                 <h2 class="mb-0"><insite:Literal runat="server" Text="Summary Chart" /></h2>
             </div>
 
-            <div runat="server" id="BarChartCardBody" class="card-body bg-white">
+            <div class="card-body bg-white">
                 <div class="d-flex flex-wrap justify-content-center fs-sm">
                     <asp:Repeater runat="server" ID="ChartLegend">
                         <ItemTemplate>
                             <div class="border rounded-1 py-1 px-2 me-2 mb-2">
-                                <div class="d-inline-block align-middle me-1" style="width:.75rem; height:.75rem; background-color:<%# Eval("Item2") %>;"></div>
-                                <span class="d-inline-block align-middle"><%# Eval("Item1") %></span>
+                                <div class="d-inline-block align-middle me-1" style="width:.75rem; height:.75rem; background-color:<%# Eval("Color") %>;"></div>
+                                <span class="d-inline-block align-middle"><%# Eval("Category") %></span>
                             </div>
                         </ItemTemplate>
                     </asp:Repeater>
                 </div>
 
-                <asp:Literal runat="server" ID="Chart" />
+                <asp:Literal runat="server" ID="ChartBody" />
             </div>
 
         </div>

@@ -351,5 +351,15 @@ namespace InSite.Common.Web.UI
         }
 
         #endregion
+
+        #region Methods (helpers)
+
+        public Control FindHeaderControl(string id) => _headerContent?.FindControl(id);
+
+        public Control FindContentControl(string id) => _bodyContent?.FindControl(id);
+
+        public Control FindFooterControl(string id) => _footerContent?.FindControl(id);
+
+        #endregion
     }
 }

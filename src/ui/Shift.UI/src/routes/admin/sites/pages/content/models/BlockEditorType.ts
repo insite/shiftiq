@@ -1,0 +1,1 @@
+export type BlockEditorType = "Html" | "Image" | "ImageList" | "Text";

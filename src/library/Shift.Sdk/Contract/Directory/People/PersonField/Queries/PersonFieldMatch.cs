@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public partial class PersonFieldMatch
     {
-        public Guid FieldIdentifier { get; set; }
+        public Guid FieldId { get; set; }
     }
 }

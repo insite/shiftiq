@@ -4,19 +4,19 @@ namespace Shift.Contract
 {
     public class CreatePerson
     {
-        public Guid? BillingAddressIdentifier { get; set; }
+        public Guid? BillingAddressId { get; set; }
         public Guid CreatedBy { get; set; }
-        public Guid? EmployerGroupIdentifier { get; set; }
-        public Guid? HomeAddressIdentifier { get; set; }
-        public Guid? IndustryItemIdentifier { get; set; }
-        public Guid? MembershipStatusItemIdentifier { get; set; }
+        public Guid? EmployerGroupId { get; set; }
+        public Guid? HomeAddressId { get; set; }
+        public Guid? IndustryItemId { get; set; }
+        public Guid? MembershipStatusItemId { get; set; }
         public Guid ModifiedBy { get; set; }
-        public Guid? OccupationStandardIdentifier { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid PersonIdentifier { get; set; }
-        public Guid? ShippingAddressIdentifier { get; set; }
-        public Guid UserIdentifier { get; set; }
-        public Guid? WorkAddressIdentifier { get; set; }
+        public Guid? OccupationStandardId { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid PersonId { get; set; }
+        public Guid? ShippingAddressId { get; set; }
+        public Guid UserId { get; set; }
+        public Guid? WorkAddressId { get; set; }
 
         public bool? CandidateIsActivelySeeking { get; set; }
         public bool? CandidateIsWillingToRelocate { get; set; }

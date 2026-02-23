@@ -1,14 +1,17 @@
 import { useSiteProvider } from "@/contexts/SiteProvider";
 import { Language, languageNames } from "../../helpers/language";
 import { Spinner } from "react-bootstrap";
+import Icon from "../icon/Icon";
 
 interface Props {
+    disabled: boolean;
     isTranslating: boolean;
     language: Language;
     onTranslate: () => void;
 }
 
 export default function RichTextEditor_Translate({
+    disabled,
     isTranslating,
     language,
     onTranslate
@@ -27,7 +30,7 @@ export default function RichTextEditor_Translate({
     }
 
     function handleTranslateClick() {
-        if (isTranslating) {
+        if (isTranslating || disabled) {
             return;
         }
 
@@ -61,7 +64,7 @@ export default function RichTextEditor_Translate({
 
                 ) : (
                     <>
-                        <i className="fas fa-globe me-2"></i>
+                    <Icon style="Solid" name="globe" className="me-2" />
                         Translate
                     </>
                 )}

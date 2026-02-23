@@ -9,7 +9,6 @@ using Shift.Service;
 using Shift.Service.Content;
 using Shift.Service.Metadata;
 using Shift.Service.Presentation;
-using Shift.Service.Security;
 using Shift.Service.Workspace;
 
 namespace Shift.Test
@@ -41,21 +40,24 @@ namespace Shift.Test
             services.AddSingleton<IActionService, ActionService>();
             services.AddSingleton<ILabelService, LabelService>();
             services.AddSingleton<IPageService, PageService>();
-            services.AddSingleton<PartitionFieldService, PartitionFieldService>();
             services.AddSingleton<INavigationService, TestNavigationService>();
+
+            services.AddSingleton<PermissionListLoader>();
+            services.AddSingleton<PermissionMatrixLoader>();
+            services.AddSingleton<PermissionCache>();
 
             ServiceProvider = services.BuildServiceProvider();
         }
 
         private void AddAuthentication(ServiceCollection services)
         {
-            var testIdentityService = new TestIdentityService();
-            services.AddSingleton<IShiftIdentityService>(testIdentityService);
+            services.AddSingleton<TestIdentityService>();
         }
 
         void AddSettings(IServiceCollection services)
         {
-            Settings = AppSettingsHelper.GetAllSettings<AppSettings>();
+            Settings = AppSettingsHelper.GetAllSettings<AppSettings>("appsettings");
+            Settings.RouteSettings = new RouteSettings();
 
             OrganizationIdentifiers.Initialize(Settings.Application.Organizations);
 
@@ -63,6 +65,7 @@ namespace Shift.Test
             services.AddSingleton<Platform>(Settings.Platform);
             services.AddSingleton<ReleaseSettings>(Settings.Release);
             services.AddSingleton<SecuritySettings>(Settings.Security);
+            services.AddSingleton<RouteSettings>(Settings.RouteSettings);
 
             services.AddSingleton<ReactStartupOptions>();
         }

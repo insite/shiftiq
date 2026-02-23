@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI.WebControls;
 
-using InSite.Persistence;
-
+using Shift.Common;
 using Shift.Contract;
 
 namespace InSite.UI.Layout.Admin
@@ -32,44 +31,10 @@ namespace InSite.UI.Layout.Admin
 
         private NavigationList[] GetNavigationGroups()
         {
-            var isOperator = Identity.IsOperator;
-            Func<string, bool> isGrantedByName = name => Identity.IsGranted(name);
-            Func<Guid?, bool> isGrantedById = id => Identity.IsGranted(id);
-            Func<string, bool> isInGroup = group => Identity.IsInGroup(group);
-
-            Func<string, List<MenuHelper.ActionModel>> searchActions = startsWith =>
-            {
-                var startsWith1 = startsWith + "/";
-                var startsWith2 = "ui/" + startsWith + "/";
-                return TActionSearch
-                    .Search(x => x.ActionUrl.StartsWith(startsWith1) || x.ActionUrl.StartsWith(startsWith2))
-                    .Select(ToModel)
-                    .ToList();
-            };
-
-            Func<string, MenuHelper.ActionModel> retrieveActionByUrl = url => TActionSearch
-                .Search(x => x.ActionUrl == url)
-                .Select(ToModel)
-                .FirstOrDefault();
-
-            return new MenuHelper(
-                isOperator,
-                isGrantedByName,
-                isGrantedById,
-                isInGroup,
-                searchActions,
-                retrieveActionByUrl
-            ).GetNavigationGroups(Navigator?.IsCmds ?? false).ToArray();
-
-            MenuHelper.ActionModel ToModel(TAction action) => new MenuHelper.ActionModel
-            {
-                ActionList = action.ActionList,
-                ActionUrl = action.ActionUrl,
-                ActionNameShort = action.ActionNameShort,
-                ActionName = action.ActionName,
-                ActionIcon = action.ActionIcon,
-                PermissionParentActionIdentifier = action.PermissionParentActionIdentifier,
-            };
+            return MenuHelperFactory
+                .Create()
+                .GetNavigationGroups(new NavigationIdentity(Identity, ServiceLocator.Partition.Slug), Navigator?.IsCmds ?? false)
+                .ToArray();
         }
 
         private void ToolkitRepeater_DataBinding(object sender, EventArgs e)
@@ -91,7 +56,7 @@ namespace InSite.UI.Layout.Admin
             var item = (NavigationItem)e.Item.DataItem;
 
             var iconHtml = $"<i class='{item.Icon} fa-3x mb-3'></i>";
-            if (item.PermissionActionIdentifier.HasValue && Identity.Claims.IsTrial(item.PermissionActionIdentifier.Value))
+            if (item.PermissionActionUrl != null && Identity.Claims.IsGranted(item.PermissionActionUrl, FeatureAccess.Trial))
                 iconHtml = "<span class=\"badge border border-warning text-warning fs-xl bg-white badge-trial\">Trial</span>" + iconHtml;
 
             var icon = (Label)e.Item.FindControl("CardIcon");
@@ -126,7 +91,7 @@ namespace InSite.UI.Layout.Admin
         {
             // Synchronize code with NavigationService.SearchShortcuts
 
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var pages = ServiceLocator.PageSearch.Select(x => x.Site.SiteDomain == Organization.Code + "." + domain && x.Parent.PageSlug == "admin" && x.Parent.PageType == "Folder");
             var tiles = pages
                 .Where(x => x.NavigateUrl != null)
@@ -141,7 +106,7 @@ namespace InSite.UI.Layout.Admin
 
             var list = new List<NavigationItem>();
             foreach (var tile in tiles)
-                if (tile.Url.StartsWith("http") || Identity.IsActionAuthorized(tile.Url))
+                if (tile.Url.StartsWith("http") || Identity.IsGranted(tile.Url))
                     list.Add(tile);
 
             return list.OrderBy(x => x.Title).ToList();

@@ -7,8 +7,8 @@ public class FileActivityAdapter : IEntityAdapter
 {
     public void Copy(ModifyFileActivity modify, FileActivityEntity entity)
     {
-        entity.FileIdentifier = modify.FileIdentifier;
-        entity.UserIdentifier = modify.UserIdentifier;
+        entity.FileIdentifier = modify.FileId;
+        entity.UserIdentifier = modify.UserId;
         entity.ActivityTime = modify.ActivityTime;
         entity.ActivityChanges = modify.ActivityChanges;
     }
@@ -24,9 +24,9 @@ public class FileActivityAdapter : IEntityAdapter
     {
         var entity = new FileActivityEntity
         {
-            FileIdentifier = create.FileIdentifier,
-            UserIdentifier = create.UserIdentifier,
-            ActivityIdentifier = create.ActivityIdentifier,
+            FileIdentifier = create.FileId,
+            UserIdentifier = create.UserId,
+            ActivityIdentifier = create.ActivityId,
             ActivityTime = create.ActivityTime,
             ActivityChanges = create.ActivityChanges
         };
@@ -42,9 +42,9 @@ public class FileActivityAdapter : IEntityAdapter
     {
         var model = new FileActivityModel
         {
-            FileIdentifier = entity.FileIdentifier,
-            UserIdentifier = entity.UserIdentifier,
-            ActivityIdentifier = entity.ActivityIdentifier,
+            FileId = entity.FileIdentifier,
+            UserId = entity.UserIdentifier,
+            ActivityId = entity.ActivityIdentifier,
             ActivityTime = entity.ActivityTime,
             ActivityChanges = entity.ActivityChanges
         };
@@ -61,7 +61,7 @@ public class FileActivityAdapter : IEntityAdapter
     {
         var match = new FileActivityMatch
         {
-            ActivityIdentifier = entity.ActivityIdentifier
+            ActivityId = entity.ActivityIdentifier
 
         };
 

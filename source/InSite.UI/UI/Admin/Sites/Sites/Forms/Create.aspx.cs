@@ -95,7 +95,7 @@ namespace InSite.Admin.Sites.Sites.Forms
             public void Add(LineDataItem item)
             {
                 if (item.Parent != null)
-                    throw new ApplicationError("Parent != null");
+                    throw new InvalidOperationException("Parent != null");
 
                 item.Parent = this;
 
@@ -627,7 +627,7 @@ namespace InSite.Admin.Sites.Sites.Forms
             {
                 var organization = CurrentSessionState.Identity.Organization;
                 var user = CurrentSessionState.Identity.User;
-                ServiceLocator.PageSearch.LoadSite(organization.ParentOrganizationIdentifier, organization.OrganizationIdentifier, user.UserIdentifier, JsonData, entity);
+                ServiceLocator.PageSearch.LoadSite(organization.OrganizationIdentifier, user.UserIdentifier, JsonData, entity);
             }
 
             foreach (var command in commands)

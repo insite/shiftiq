@@ -72,7 +72,7 @@ namespace InSite.UI.Portal.Standards.Documents
             {
                 if (_allowManageFields == null)
                 {
-                    _allowManageFields = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure)
+                    _allowManageFields = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure)
                         || Document.CreatedBy == User.UserIdentifier;
                 }
 
@@ -133,7 +133,7 @@ namespace InSite.UI.Portal.Standards.Documents
                 || entity.OrganizationIdentifier != Organization.Identifier
                 || entity.StandardPrivacyScope.IfNullOrEmpty("Tenant") == "User"
                     && entity.CreatedBy != User.UserIdentifier
-                    && !CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure)
+                    && !CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure)
                 )
             {
                 HttpResponseHelper.Redirect("/ui/portal/standards/documents/search", true);
@@ -186,7 +186,7 @@ namespace InSite.UI.Portal.Standards.Documents
 
             StandardAdditionPanel.Visible = !Document.IsTemplate && AllowManageFields;
             RelatedOccProfPanel.Visible = Document.DocumentType == DocumentType.OccupationProfile
-                || Document.DocumentType == DocumentType.JobDescription && Organization.OrganizationIdentifier == Shift.Constant.OrganizationIdentifiers.EHRC;
+                || Document.DocumentType == DocumentType.JobDescription && Organization.Toolkits.Standards.EnableOccupationProfileForJobDescription;
 
             SetupRelatedStandardSelectors();
             BindRelatedStandards();

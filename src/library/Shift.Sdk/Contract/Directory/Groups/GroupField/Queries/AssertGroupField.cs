@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class AssertGroupField : Query<bool>
     {
-        public Guid SettingIdentifier { get; set; }
+        public Guid SettingId { get; set; }
     }
 }

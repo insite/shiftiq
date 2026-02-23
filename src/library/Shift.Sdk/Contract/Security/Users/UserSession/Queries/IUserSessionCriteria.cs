@@ -4,12 +4,11 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IUserSessionCriteria
+    public interface IUserSessionCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? UserIdentifier { get; set; }
+
+        Guid? UserId { get; set; }
 
         bool? SessionIsAuthenticated { get; set; }
 

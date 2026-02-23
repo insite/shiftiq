@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteGroupField
     {
-        public Guid SettingIdentifier { get; set; }
+        public Guid SettingId { get; set; }
     }
 }

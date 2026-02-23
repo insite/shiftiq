@@ -254,7 +254,7 @@ namespace Shift.Common
                     return id;
             }
 
-            throw new Exception($"The system cannot generate more than {Capacity} unique identifiers for this type: {t.FullName}");
+            throw new InvalidOperationException($"The system cannot generate more than {Capacity} unique identifiers for this type: {t.FullName}");
 
         }
 

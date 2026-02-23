@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.SqlClient;
 using System.Linq;
 
 using InSite.Application.Organizations.Read;
@@ -16,26 +15,11 @@ namespace InSite.Persistence
 {
     public class OrganizationSearch : IOrganizationSearch
     {
-        #region Classes
-
-        public class OrganizationHierarchyInfo
-        {
-            public Guid OrganizationIdentifier { get; set; }
-            public Guid? ParentOrganizationIdentifier { get; set; }
-            public string PathCode { get; set; }
-            public int PathDepth { get; set; }
-            public string OrganizationName { get; set; }
-            public DateTimeOffset? AccountClosed { get; set; }
-            public string PathIndent { get; set; }
-
-            public OrganizationHierarchyInfo Parent { get; set; }
-            public List<OrganizationHierarchyInfo> Children { get; } = new List<OrganizationHierarchyInfo>();
-        }
-
-        #endregion
-
-        private static readonly ConcurrentDictionary<Guid, OrganizationState> Cache
+        private static readonly ConcurrentDictionary<Guid, OrganizationState> CacheById
             = new ConcurrentDictionary<Guid, OrganizationState>();
+
+        private static readonly ConcurrentDictionary<string, OrganizationState> CacheByCode
+            = new ConcurrentDictionary<string, OrganizationState>();
 
         internal InternalDbContext CreateContext() => new InternalDbContext(false);
 
@@ -55,7 +39,7 @@ namespace InSite.Persistence
 
         public static OrganizationState Select(Guid id)
         {
-            if (Cache.TryGetValue(id, out var state))
+            if (CacheById.TryGetValue(id, out var state))
                 return state.CloneJson();
 
             return null;
@@ -66,9 +50,10 @@ namespace InSite.Persistence
             if (code.IsEmpty())
                 return null;
 
-            code = code.ToLower();
+            if (CacheByCode.TryGetValue(code, out var state))
+                return state.CloneJson();
 
-            return Cache.Values.FirstOrDefault(x => x.Code == code)?.CloneJson();
+            return null;
         }
 
         #endregion
@@ -108,9 +93,23 @@ namespace InSite.Persistence
                 return db.QOrganizations.SingleOrDefault(x => x.OrganizationIdentifier == organization);
         }
 
+        public bool CodeExists(string code, Guid? excludeOrganization = null)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var query = db.QOrganizations.AsQueryable().Where(x => x.OrganizationCode == code);
+
+                if (excludeOrganization.HasValue)
+                    query = query.Where(x => x.OrganizationIdentifier != excludeOrganization.Value);
+
+                return query.Any();
+            }
+        }
+
         public static void Refresh()
         {
-            Cache.Clear();
+            CacheById.Clear();
+            CacheByCode.Clear();
 
             using (var db = new InternalDbContext())
             {
@@ -120,7 +119,8 @@ namespace InSite.Persistence
                 {
                     var organization = OrganizationAdapter.CreatePacket(entity);
 
-                    Cache.TryAdd(organization.Identifier, organization);
+                    CacheById.TryAdd(organization.Identifier, organization);
+                    CacheByCode.TryAdd(organization.Code, organization);
                 }
             }
         }
@@ -133,8 +133,11 @@ namespace InSite.Persistence
 
                 var model = OrganizationAdapter.CreatePacket(entity);
 
-                if (Cache.TryRemove(organizationId, out _))
-                    Cache.TryAdd(organizationId, model);
+                if (CacheById.TryRemove(organizationId, out _))
+                    CacheById.TryAdd(organizationId, model);
+
+                if (CacheByCode.TryRemove(model.Code, out _))
+                    CacheByCode.TryAdd(model.Code, model);
             }
         }
 
@@ -219,52 +222,11 @@ SELECT t.* FROM accounts.QOrganization AS t WHERE
             }
         }
 
-        public static OrganizationHierarchyInfo SelectHierarchyDescendents(Guid organization)
-        {
-            const string query = @"
-SELECT
-    Organizations.*
-FROM
-    accounts.QOrganizationHierarchy AS [Root]
-    INNER JOIN accounts.QOrganizationHierarchy AS Organizations ON Organizations.PathCode = [Root].PathCode OR Organizations.PathCode LIKE [Root].PathCode + '/%'
-WHERE
-    [Root].OrganizationIdentifier = @OrganizationIdentifier;";
-
-            using (var db = new InternalDbContext())
-            {
-                var dataItems = db.Database.SqlQuery<OrganizationHierarchyInfo>(
-                    query,
-                    new SqlParameter("@OrganizationIdentifier", organization)).ToArray();
-                var itemsIndex = dataItems.ToDictionary(x => x.OrganizationIdentifier);
-
-                OrganizationHierarchyInfo result = null;
-
-                foreach (var item in dataItems)
-                {
-                    if (item.ParentOrganizationIdentifier.HasValue && itemsIndex.TryGetValue(item.ParentOrganizationIdentifier.Value, out var parent))
-                    {
-                        parent.Children.Add(item);
-                        item.Parent = parent;
-                    }
-                    else
-                    {
-                        result = item;
-                    }
-                }
-
-                return result;
-            }
-        }
-
         private static IQueryable<VOrganization> CreateQuery(OrganizationFilter filter, InternalDbContext db)
         {
             var query = db.Organizations
                 .AsNoTracking()
                 .AsQueryable();
-
-            if (!string.IsNullOrEmpty(filter.CompanyDomain))
-                query = query.Where(x =>
-                    x.CompanyDomain.IndexOf(filter.CompanyDomain) >= 0);
 
             if (!string.IsNullOrEmpty(filter.OrganizationCode))
                 query = query.Where(x =>

@@ -7,10 +7,18 @@
             <h4>Criteria</h4>
             <div class="row">
                 <div class="col-6">
-                    <div class="mb-2">
-                        <insite:FindJournalSetup runat="server" ID="JournalSetupIdentifier" EmptyMessage="Logbook" />
-                    </div>
+                    <insite:UpdatePanel runat="server">
+                        <ContentTemplate>
+                            <div class="mb-2">
+                                <insite:FindJournalSetup runat="server" ID="JournalSetupIdentifier" EmptyMessage="Logbook" />
+                            </div>
     
+                            <div class="mb-2">
+                                <insite:FindStandard runat="server" ID="CompetencyIdentifier" EmptyMessage="Competency" Enabled="false" />
+                            </div>
+                        </ContentTemplate>
+                    </insite:UpdatePanel>
+
                     <div class="mb-2">
                         <insite:FindPerson runat="server" ID="UserIdentifier" EmptyMessage="Learner" />
                     </div>                    

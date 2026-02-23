@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Domain.Organizations;
+
+using Shift.Common.Timeline.Commands;
 
 namespace InSite.Application.Organizations.Write
 {
@@ -14,7 +14,7 @@ namespace InSite.Application.Organizations.Write
             var result = new List<ICommand>();
 
             if (isNew)
-                result.Add(new CreateOrganization(state.OrganizationIdentifier, null));
+                result.Add(new CreateOrganization(state.OrganizationIdentifier, state.OrganizationCode, state.CompanyName));
 
             result.Add(new ModifyOrganizationAccountSettings(state.OrganizationIdentifier, state.Toolkits.Accounts));
             result.Add(new ModifyOrganizationAchievementSettings(state.OrganizationIdentifier, state.Toolkits.Achievements));
@@ -28,18 +28,18 @@ namespace InSite.Application.Organizations.Write
             result.Add(new ModifyOrganizationFields(state.OrganizationIdentifier, state.Fields));
             result.Add(new ModifyOrganizationGlossary(state.OrganizationIdentifier, state.GlossaryIdentifier));
             result.Add(new ModifyOrganizationGradebookSettings(state.OrganizationIdentifier, state.Toolkits.Gradebooks));
-            result.Add(new ModifyOrganizationIdentification(state.OrganizationIdentifier, state.OrganizationCode, state.CompanyName, state.CompanyDomain));
+            result.Add(new ModifyOrganizationIdentification(state.OrganizationIdentifier, state.OrganizationCode, state.CompanyName));
             result.Add(new ModifyOrganizationIntegrationSettings(state.OrganizationIdentifier, state.Integrations));
             result.Add(new ModifyOrganizationIssueSettings(state.OrganizationIdentifier, state.Toolkits.Issues));
             result.Add(new ModifyOrganizationLocalization(state.OrganizationIdentifier, state.Languages.Select(x => x.TwoLetterISOLanguageName).ToArray(), state.TimeZone.Id));
             result.Add(new ModifyOrganizationLocation(state.OrganizationIdentifier, state.PlatformCustomization.TenantLocation));
             result.Add(new ModifyOrganizationNCSHASettings(state.OrganizationIdentifier, state.Toolkits.NCSHA));
-            result.Add(new ModifyOrganizationParent(state.OrganizationIdentifier, state.ParentOrganizationIdentifier));
             result.Add(new ModifyOrganizationPlatformSettings(
                 state.OrganizationIdentifier,
                 state.PlatformCustomization.InlineInstructionsUrl,
                 state.PlatformCustomization.InlineLabelsUrl,
-                state.PlatformCustomization.SafeExamBrowserUserAgentSuffix));
+                state.PlatformCustomization.SafeExamBrowserUserAgentSuffix,
+                state.PlatformCustomization.RequireEmailVerification));
             result.Add(new ModifyOrganizationPlatformUrl(state.OrganizationIdentifier, state.PlatformCustomization.PlatformUrl));
             result.Add(new ModifyOrganizationPortalSettings(state.OrganizationIdentifier, state.Toolkits.Portal));
             result.Add(new ModifyOrganizationRegistrationSettings(state.OrganizationIdentifier, state.PlatformCustomization.UserRegistration));

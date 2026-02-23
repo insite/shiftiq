@@ -103,7 +103,7 @@ namespace Shift.Common
                 if (ch == '&')
                     return "&amp;";
 
-                throw new ApplicationError("Invalid input char: " + ch);
+                throw new ArgumentException("Invalid input char: " + ch);
             });
 
         public static string RemovePotentiallyDangerousInclusions(string input) => 

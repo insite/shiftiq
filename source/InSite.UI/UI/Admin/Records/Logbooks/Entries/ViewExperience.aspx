@@ -67,6 +67,7 @@
 
             </section>
         </insite:NavItem>
+
         <insite:NavItem runat="server" ID="LogbookPanel" Title="Entry" Icon="far fa-pencil-ruler" IconPosition="BeforeText">
             <section>
                 <h2 class="h4 mt-4 mb-3">
@@ -84,6 +85,7 @@
                 </div>
             </section>
         </insite:NavItem>
+
         <insite:NavItem runat="server" ID="CompetenciesPanel" Title="Competencies" Icon="far fa-ruler-triangle" IconPosition="BeforeText">
             <section>
                 <h2 class="h4 mt-4 mb-3">
@@ -97,6 +99,7 @@
                 </div>
             </section>
         </insite:NavItem>
+
         <insite:NavItem runat="server" ID="CommentsPanel" Title="Comments" Icon="far fa-comments" IconPosition="BeforeText">
             <section>
                 <h2 class="h4 mt-4 mb-3">

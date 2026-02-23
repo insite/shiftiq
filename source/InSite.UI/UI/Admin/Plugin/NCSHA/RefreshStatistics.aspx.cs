@@ -44,7 +44,7 @@ namespace InSite.Custom.NCSHA.Analytics.Forms
         {
             base.OnLoad(e);
 
-            if (Organization.Identifier != OrganizationIdentifiers.NCSHA || !CurrentSessionState.Identity.IsGranted("Custom/NCSHA/Analytics", PermissionOperation.Configure))
+            if (Organization.Identifier != OrganizationIdentifiers.NCSHA || !CurrentSessionState.Identity.IsGranted("Custom/NCSHA/Analytics", DataAccess.Configure))
                 HttpResponseHelper.Redirect("/");
 
             if (!IsPostBack)

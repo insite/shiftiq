@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Commands;
-
 using Humanizer;
 
 using InSite.Application.Responses.Write;
@@ -15,6 +13,7 @@ using InSite.UI.Admin.Records.Programs.Utilities;
 using InSite.UI.Portal.Workflow.Forms.Models;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Workflow.Forms.Controls
@@ -29,6 +28,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
             StartButton.Click += (s, a) => Continue();
             DebugButton.Click += (s, a) => Continue();
+            SelectLearnerContinue.Click += (s, a) => Continue();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -42,6 +42,9 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 HttpResponseHelper.Redirect(RelativeUrl.PortalHomeUrl, true);
 
             SurveyFormTitle.InnerText = Current.Survey.Content?.Title?.Text[Current.Language];
+
+            LearnerIdentifier.Filter.AlwaysIncludeUserIdentifiers = new[] { User.Identifier };
+            LearnerIdentifier.Filter.UpstreamUserIdentifiers = new[] { User.Identifier };
 
             if (!IsSurveyOpen())
                 return;
@@ -74,7 +77,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 return;
             }
 
-            SessionPanel.Visible = true;
+            MultiView.SetActiveView(LaunchView);
 
             var instructions = Current.Survey.Content != null
                 ? Current.Survey.Content.GetHtml(ContentLabel.StartingInstructions, Current.Language)
@@ -138,64 +141,85 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
         private void Continue()
         {
-            var action = ResponseVerb.Answer;
-            Guid? mostRecent = null;
+            (ResponseVerb action, Guid sessionId) info;
 
             try
             {
-                var mutex = _mutexes.GetOrAdd(Current.UserIdentifier, key => new object());
+                var mutex = _mutexes.GetOrAdd(User.Identifier, key => new object());
 
                 lock (mutex)
                 {
-                    if (Current.Survey.ResponseLimitPerUser == 1)
-                        mostRecent = GetMostRecentSession();
+                    var mostRecent = Current.Survey.ResponseLimitPerUser == 1 ? GetMostRecentSession() : null;
 
                     if (mostRecent.HasValue)
-                        action = ResponseVerb.Resume;
+                    {
+                        info = (ResponseVerb.Resume, mostRecent.Value);
+                    }
+                    else if (Current.Survey.EnableThirdPartyForms && !LearnerIdentifier.Value.HasValue)
+                    {
+                        info = default;
+                        MultiView.SetActiveView(SelectLearnerView);
+                    }
                     else
-                        mostRecent = CreateNewSession();
+                    {
+                        var respondent = Current.Survey.EnableThirdPartyForms
+                            ? LearnerIdentifier.Value.Value
+                            : Current.RespondentUserIdentifier;
+                        info = (ResponseVerb.Answer, CreateNewSession(respondent));
+                    }
                 }
             }
             finally
             {
-                _mutexes.TryRemove(Current.UserIdentifier, out _);
+                _mutexes.TryRemove(User.Identifier, out _);
             }
 
-            if (action == ResponseVerb.Answer)
-                SubmissionSessionNavigator.RedirectToStart(mostRecent.Value);
+            if (info == default)
+                return;
+
+            if (info.action == ResponseVerb.Answer)
+                SubmissionSessionNavigator.RedirectToStart(info.sessionId);
             else
-                SubmissionSessionNavigator.RedirectTo(action, mostRecent.Value);
+                SubmissionSessionNavigator.RedirectTo(info.action, info.sessionId);
         }
 
         private Guid? GetMostRecentSession()
         {
-            var filter = new QResponseSessionFilter
+            var sessions = ServiceLocator.SurveySearch.GetResponseSessions(new QResponseSessionFilter
             {
-                RespondentUserIdentifier = Current.UserIdentifier,
+                AssessorUserIdentifier = User.Identifier,
                 SurveyFormIdentifier = Current.FormIdentifier
-            };
-            var sessions = ServiceLocator.SurveySearch.GetResponseSessions(filter);
+            });
+
+            if (sessions.Count == 0)
+                sessions = ServiceLocator.SurveySearch.GetResponseSessions(new QResponseSessionFilter
+                {
+                    RespondentUserIdentifier = User.Identifier,
+                    SurveyFormIdentifier = Current.FormIdentifier
+                });
+
             if (sessions.Count > 0)
                 return sessions.First().ResponseSessionIdentifier;
+
             return null;
         }
 
-        private Guid CreateNewSession()
+        private Guid CreateNewSession(Guid respondent)
         {
             var session = UniqueIdentifier.Create();
-            var commands = BuildCommandScript("Launched", session, Current.Survey, Current.UserIdentifier);
+            var commands = BuildCommandScript("Launched", session, Current.Survey, User.Identifier, respondent);
             foreach (var command in commands)
                 ServiceLocator.SendCommand(command);
             return session;
         }
 
-        public static ICommand[] BuildCommandScript(string source, Guid session, SurveyForm form, Guid user)
+        public static ICommand[] BuildCommandScript(string source, Guid session, SurveyForm form, Guid assessor, Guid respondent)
         {
-            ProgramHelper.EnrollLearnerByObjectId(form.Tenant, user, form.Identifier);
+            ProgramHelper.EnrollLearnerByObjectId(form.Tenant, respondent, form.Identifier);
 
             var script = new List<ICommand>
             {
-                new CreateResponseSession(session, source, form.Tenant, form.Identifier, user)
+                new CreateResponseSession(session, source, form.Tenant, form.Identifier, assessor, respondent)
             };
 
             // Notice we add every question and every option to the submission.

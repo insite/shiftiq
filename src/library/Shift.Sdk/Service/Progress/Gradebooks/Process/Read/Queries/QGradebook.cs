@@ -37,6 +37,7 @@ namespace InSite.Application.Records.Read
         public virtual ICollection<QGradeItemCompetency> Competencies { get; set; } = new HashSet<QGradeItemCompetency>();
         public virtual ICollection<QCourse> Courses { get; set; } = new HashSet<QCourse>();
         public virtual ICollection<QGradeItem> Items { get; set; } = new HashSet<QGradeItem>();
+        public virtual ICollection<QGroupEnrollment> GroupEnrollments { get; set; } = new HashSet<QGroupEnrollment>();
         public virtual ICollection<QEnrollment> Enrollments { get; set; } = new HashSet<QEnrollment>();
         public virtual ICollection<QProgress> Progresses { get; set; } = new HashSet<QProgress>();
         public virtual ICollection<QGradebookCompetencyValidation> Validations { get; set; } = new HashSet<QGradebookCompetencyValidation>();

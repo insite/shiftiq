@@ -14,7 +14,7 @@ public class FileController : ShiftControllerBase
 {
     private readonly IMonitor _monitor;
     private readonly FileService _fileService;
-    private readonly IShiftIdentityService _identityService;
+    private readonly IPrincipalProvider _identityService;
     private readonly IStorageServiceAsync _storageService;
     private readonly ResponseService _responseService;
 
@@ -23,7 +23,7 @@ public class FileController : ShiftControllerBase
     public FileController(
         IMonitor monitor,
         FileService fileService,
-        IShiftIdentityService identityService,
+        IPrincipalProvider identityService,
         IStorageServiceAsync storageService,
         ResponseService responseService
         )
@@ -40,13 +40,17 @@ public class FileController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific file
     /// </summary>
-    [HttpHead("content/files/{file:guid}")]
-    [HybridAuthorize(Policies.Content.Files.File.Assert)]
+    [HttpHead("api/content/files/{file:guid}")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertFile")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid file, CancellationToken cancellation = default)
     {
-        var exists = await _fileService.AssertAsync(file, cancellation);
+        var principal = _identityService.GetPrincipal();
+
+        var organizationId = _identityService.GetOrganizationId(principal);
+
+        var exists = await _fileService.AssertAsync(file, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -54,8 +58,8 @@ public class FileController : ShiftControllerBase
     /// <summary>
     /// Collects the list of files that match specific criteria
     /// </summary>
-    [HttpPost("content/files/collect")]
-    [HybridAuthorize(Policies.Content.Files.File.Collect)]
+    [HttpPost("api/content/files/collect")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectFiles")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectFiles query, CancellationToken cancellation = default)
@@ -63,8 +67,8 @@ public class FileController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("content/files")]
-    [HybridAuthorize(Policies.Content.Files.File.Collect)]
+    [HttpGet("api/content/files")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectFiles_get")]
     [AliasFor("collectFiles")]
@@ -76,6 +80,10 @@ public class FileController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectFiles query, CancellationToken cancellation)
     {
+        var principal = _identityService.GetPrincipal();
+
+        _identityService.ValidateOrganizationId(principal, query);
+
         var models = await _fileService.CollectAsync(query, cancellation);
 
         var count = await _fileService.CountAsync(query, cancellation);
@@ -88,8 +96,8 @@ public class FileController : ShiftControllerBase
     /// <summary>
     /// Counts the files that match specific criteria
     /// </summary>
-    [HttpPost("content/files/count")]
-    [HybridAuthorize(Policies.Content.Files.File.Count)]
+    [HttpPost("api/content/files/count")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countFiles")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountFiles query, CancellationToken cancellation = default)
@@ -97,8 +105,8 @@ public class FileController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("content/files/count")]
-    [HybridAuthorize(Policies.Content.Files.File.Count)]
+    [HttpGet("api/content/files/count")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countFiles_get")]
     [AliasFor("countFiles")]
@@ -110,6 +118,10 @@ public class FileController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountFiles query, CancellationToken cancellation)
     {
+        var principal = _identityService.GetPrincipal();
+
+        _identityService.ValidateOrganizationId(principal, query);
+
         var count = await _fileService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -118,8 +130,8 @@ public class FileController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of files that match specific criteria
     /// </summary>    
-    [HttpPost("content/files/download")]
-    [HybridAuthorize(Policies.Content.Files.File.Download)]
+    [HttpPost("api/content/files/download")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadFiles")]
@@ -128,8 +140,8 @@ public class FileController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("content/files/download")]
-    [HybridAuthorize(Policies.Content.Files.File.Download)]
+    [HttpGet("api/content/files/download")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadFiles_get")]
@@ -142,6 +154,10 @@ public class FileController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectFiles query, CancellationToken cancellation)
     {
+        var principal = _identityService.GetPrincipal();
+
+        _identityService.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Content", "Files", query.Filter.Format, User);
 
         var models = await _fileService
@@ -162,22 +178,30 @@ public class FileController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific file
     /// </summary>
-    [HttpGet("content/files/{file:guid}")]
-    [HybridAuthorize(Policies.Content.Files.File.Retrieve)]
+    [HttpGet("api/content/files/{file:guid}")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType<FileModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveFile")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid file, CancellationToken cancellation = default)
     {
+        var principal = _identityService.GetPrincipal();
+
         var model = await _fileService.RetrieveAsync(file, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_identityService.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of files that match specific criteria
     /// </summary>
-    [HttpPost("content/files/search")]
-    [HybridAuthorize(Policies.Content.Files.File.Search)]
+    [HttpPost("api/content/files/search")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchFiles")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchFiles query, CancellationToken cancellation = default)
@@ -185,8 +209,8 @@ public class FileController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("content/files/search")]
-    [HybridAuthorize(Policies.Content.Files.File.Search)]
+    [HttpGet("api/content/files/search")]
+    [HybridPermission("content/files", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchFiles_get")]
     [AliasFor("searchFiles")]
@@ -198,6 +222,10 @@ public class FileController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchFiles query, CancellationToken cancellation)
     {
+        var principal = _identityService.GetPrincipal();
+
+        _identityService.ValidateOrganizationId(principal, query);
+
         var matches = await _fileService.SearchAsync(query, cancellation);
 
         var count = await _fileService.CountAsync(query, cancellation);
@@ -211,8 +239,8 @@ public class FileController : ShiftControllerBase
 
     #region Commands
 
-    [HttpPost("content/files")]
-    [HybridAuthorize(Policies.Content.Files.File.Create)]
+    [HttpPost("api/content/files")]
+    [HybridPermission("content/files", DataAccess.Update)]
     [ProducesResponseType<FileModel>(StatusCodes.Status201Created, "application/json")]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
     [EndpointName("createFile")]
@@ -221,15 +249,15 @@ public class FileController : ShiftControllerBase
         var created = await _fileService.CreateAsync(create, cancellation);
 
         if (!created)
-            return BadRequest($"Duplicate not permitted: FileIdentifier {create.FileIdentifier}. You cannot insert a duplicate object with the same primary key.");
+            return BadRequest($"Duplicate not permitted: FileIdentifier {create.FileId}. You cannot insert a duplicate object with the same primary key.");
 
-        var model = await _fileService.RetrieveAsync(create.FileIdentifier, cancellation);
+        var model = await _fileService.RetrieveAsync(create.FileId, cancellation);
 
         return CreatedAtAction(nameof(CreateAsync), model);
     }
 
-    [HttpDelete("content/files/{file:guid}")]
-    [HybridAuthorize(Policies.Content.Files.File.Delete)]
+    [HttpDelete("api/content/files/{file:guid}")]
+    [HybridPermission("content/files", DataAccess.Delete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointName("deleteFile")]
@@ -243,8 +271,8 @@ public class FileController : ShiftControllerBase
         return Ok();
     }
 
-    [HttpPut("content/files/{file:guid}")]
-    [HybridAuthorize(Policies.Content.Files.File.Modify)]
+    [HttpPut("api/content/files/{file:guid}")]
+    [HybridPermission("content/files", DataAccess.Update)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
@@ -254,7 +282,7 @@ public class FileController : ShiftControllerBase
         var model = await _fileService.RetrieveAsync(file, cancellation);
 
         if (model is null)
-            return NotFound($"File not found: FileIdentifier {modify.FileIdentifier}. You cannot modify an object that is not in the database.");
+            return NotFound($"File not found: FileIdentifier {modify.FileId}. You cannot modify an object that is not in the database.");
 
         var modified = await _fileService.ModifyAsync(modify, cancellation);
 
@@ -280,12 +308,12 @@ public class FileController : ShiftControllerBase
     /// - 401 Unauthorized if user is not authenticated and survey session is invalid
     /// - 400 Bad Request if no files are provided in the request
     /// </returns>
-    [HttpPost("content/files/temp")]
+    [HttpPost("api/content/files/temp")]
     public async Task<IActionResult> UploadTempFileAsync(string? responseId = null)
     {
         var principal = _identityService.GetPrincipal();
 
-        if (principal.OrganizationId == null || (!principal.IsAuthenticated && !ValidateSurveyResponse()))
+        if (principal.OrganizationId == Guid.Empty || (!principal.IsAuthenticated && !ValidateSurveyResponse()))
         {
             return Unauthorized();
         }
@@ -294,7 +322,7 @@ public class FileController : ShiftControllerBase
         if (files.Count == 0)
             return BadRequest("No Files");
 
-        var userId = principal.UserId ?? Constant.UserIdentifiers.Someone;
+        var userId = principal.UserId != Guid.Empty ? principal.UserId : Constant.UserIdentifiers.Someone;
         var organizationId = principal.OrganizationId;
         var result = new List<UploadFileInfo>();
 
@@ -307,7 +335,7 @@ public class FileController : ShiftControllerBase
             var model = await _storageService.CreateAsync(
                 stream,
                 file.FileName,
-                organizationId ?? Guid.Empty,
+                organizationId,
                 userId,
                 ObjectIdentifiers.Temporary,
                 FileObjectType.Temporary,
@@ -317,7 +345,7 @@ public class FileController : ShiftControllerBase
 
             result.Add(new UploadFileInfo
             {
-                FileIdentifier = model.FileIdentifier,
+                FileId = model.FileIdentifier,
                 DocumentName = model.Properties.DocumentName,
                 FileName = model.FileName,
                 FileSize = model.FileSize
@@ -352,7 +380,7 @@ public class FileController : ShiftControllerBase
     /// - 401 Unauthorized if user lacks permission to access the file
     /// - 304 Not Modified if file hasn't changed since If-Modified-Since header date
     /// </returns>
-    [HttpGet("content/files/{id:guid}/{name}")]
+    [HttpGet("api/content/files/{id:guid}/{name}")]
     public async Task<IActionResult> RetrieveFileContentAsync(Guid id, string name, string? download = null)
     {
         var principal = _identityService.GetPrincipal();
@@ -457,7 +485,7 @@ public class FileController : ShiftControllerBase
         }
     }
 
-    private async Task<IActionResult> CreateFileResultAsync(FileStorageModel file, Stream stream, bool download)
+    private static async Task<IActionResult> CreateFileResultAsync(FileStorageModel file, Stream stream, bool download)
     {
         var contentType = MimeMapping.GetContentType(file.FileName);
 

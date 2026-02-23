@@ -1,12 +1,26 @@
 import { Language } from "@/helpers/language";
 import { TimeZoneId } from "@/helpers/date/timeZones";
 
+interface NavigationGroup {
+    Title: string;
+    MenuItems: {
+        Url: string;
+        Text: string;
+        Icon: string;
+    }[];
+}
+
 export interface ApiSiteSetting {
     TimeZoneId: TimeZoneId;
     OrganizationCode?: string | null;
     CompanyName: string;
     IsCmds: boolean;
-    CmdsHomeLink: string;
+    Home: {
+        Text: string;
+        Icon: string;
+        Image: string | null | undefined;
+        Url: string;
+    },
     UserName?: string;
     IsAdministrator: boolean;
     IsOperator: boolean;
@@ -24,26 +38,21 @@ export interface ApiSiteSetting {
     Environment: {
         Name: string;
         Version: string;
+        Color: string;
     };
-    PlatformLogoSrc: string;
-    StylePath?: string | null;
+    StylePath: string;
     AdminNavigationLogo: string;
     UserHostAddress: string;
     SessionTimeoutMinutes: number;
-    NavigationGroups: {
-        Title: string;
-        MenuItems: {
-            Url: string;
-            Text: string;
-            Icon: string;
-        }[];
-    }[];
+    NavigationGroups: NavigationGroup[];
     ShortcutGroups?: {
             Url: string;
             Text: string;
             Icon: string;
     }[];
+    AdminNavigationGroups: NavigationGroup[];
     PlatformSearchDownloadMaximumRows: number;
     PartitionEmail: string;
+    CurrentLanguage: Language;
     SupportedLanguages: Language[];
 }

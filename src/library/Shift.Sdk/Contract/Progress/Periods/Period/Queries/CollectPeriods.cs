@@ -7,7 +7,7 @@ namespace Shift.Contract
 {
     public class CollectPeriods : Query<IEnumerable<PeriodModel>>, IPeriodCriteria
     {
-        public Guid OrganizationId { get; set; }
+        public Guid? OrganizationId { get; set; }
 
         public string Name { get; set; }
 

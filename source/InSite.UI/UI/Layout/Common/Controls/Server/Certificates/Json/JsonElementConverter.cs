@@ -49,7 +49,7 @@ namespace InSite.Common.Web.UI.Certificates.Json
             if (type == "image")
                 return jObj.ToObject<CertificateImageElement>(inSerializer);
 
-            throw new ApplicationError("Unexpected certificate element type: " + type);
+            throw new FormatException("Unexpected certificate element type: " + type);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -61,7 +61,7 @@ namespace InSite.Common.Web.UI.Certificates.Json
             else if (value is CertificateImageElement)
                 type = "image";
             else
-                throw new ApplicationError("Unexpected certificate element type: " + value.GetType());
+                throw new InvalidOperationException("Unexpected certificate element type: " + value.GetType());
 
             var inSerializer = new InternalJsonSerializer();
             var jObj = JObject.FromObject(value, inSerializer);

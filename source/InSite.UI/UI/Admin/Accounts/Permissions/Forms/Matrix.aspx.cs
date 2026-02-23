@@ -43,13 +43,13 @@ namespace InSite.Admin.Accounts.Permissions.Forms
             }
 
             var visibleColumns = new List<DownloadColumn>();
-            
+
             var groupNameColumn = args.Columns.FirstOrDefault(x => !x.Hidden && string.Equals(x.Info.Name, GroupNameColumn, StringComparison.OrdinalIgnoreCase))?.Info;
             if (groupNameColumn != null)
                 visibleColumns.Add(groupNameColumn);
 
             var columns = SearchResults.ActionItems.Select(x => x.DataField).ToHashSet();
-            var toolkits = TActionSearch.Search(x => x.ActionType == "Permission");
+            var toolkits = TActionSearch.Search(x => x.ActionType == "Resource");
 
             foreach (var tool in toolkits)
             {

@@ -7,7 +7,7 @@ namespace Shift.Contract
     public class CountForms : Query<int>, IFormCriteria
     {
         public Guid? LastChangeUser { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
         public Guid? SurveyMessageInvitation { get; set; }
         public Guid? SurveyMessageResponseCompleted { get; set; }
         public Guid? SurveyMessageResponseConfirmed { get; set; }

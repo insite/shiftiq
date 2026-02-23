@@ -4,10 +4,10 @@ namespace Shift.Contract
 {
     public class ModifySubmissionOption
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid ResponseSessionIdentifier { get; set; }
-        public Guid SurveyOptionIdentifier { get; set; }
-        public Guid SurveyQuestionIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid ResponseSessionId { get; set; }
+        public Guid SurveyOptionId { get; set; }
+        public Guid SurveyQuestionId { get; set; }
 
         public bool ResponseOptionIsSelected { get; set; }
 

@@ -1,0 +1,6 @@
+.PageContent_Editor_ImageList {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: 2rem 1fr auto;
+    align-items: center;
+}

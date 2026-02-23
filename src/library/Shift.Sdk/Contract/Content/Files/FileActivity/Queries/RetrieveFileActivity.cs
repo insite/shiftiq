@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveFileActivity : Query<FileActivityModel>
     {
-        public Guid ActivityIdentifier { get; set; }
+        public Guid ActivityId { get; set; }
     }
 }

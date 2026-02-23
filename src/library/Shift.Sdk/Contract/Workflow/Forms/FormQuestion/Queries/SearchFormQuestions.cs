@@ -7,8 +7,8 @@ namespace Shift.Contract
 {
     public class SearchFormQuestions : Query<IEnumerable<FormQuestionMatch>>, IFormQuestionCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? SurveyFormIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? SurveyFormId { get; set; }
 
         public bool? SurveyQuestionIsNested { get; set; }
         public bool? SurveyQuestionIsRequired { get; set; }

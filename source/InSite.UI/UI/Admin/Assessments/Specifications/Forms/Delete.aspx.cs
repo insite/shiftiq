@@ -35,7 +35,7 @@ namespace InSite.Admin.Assessments.Specifications.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 RedirectToSearch();
 
             if (!IsPostBack)

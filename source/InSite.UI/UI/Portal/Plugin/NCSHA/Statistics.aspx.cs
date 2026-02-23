@@ -625,7 +625,7 @@ namespace InSite.Custom.NCSHA.Analytics.Chart
         {
             if (Organization.Identifier != OrganizationIdentifiers.NCSHA
              || UserIdentifier == null
-             || !CurrentSessionState.Identity.IsGranted("Custom/NCSHA/Analytics", PermissionOperation.Read))
+             || !CurrentSessionState.Identity.IsGranted("Custom/NCSHA/Analytics", DataAccess.Read))
                 HttpResponseHelper.Redirect("/");
 
             HandleAjaxRequest();
@@ -671,7 +671,7 @@ namespace InSite.Custom.NCSHA.Analytics.Chart
             if (Model.FilterId.HasValue)
                 OnHistoryEventOccurred(new ChartFilterLoadedEvent(Model.FilterId.Value, Model.FilterName), Model.FilterData);
 
-            RefreshPanel.Visible = CurrentSessionState.Identity.IsGranted("Custom/NCSHA/Analytics", PermissionOperation.Configure);
+            RefreshPanel.Visible = CurrentSessionState.Identity.IsGranted("Custom/NCSHA/Analytics", DataAccess.Configure);
             WelcomeWindowPanel.Visible = Model.WelcomeModel != null;
         }
 

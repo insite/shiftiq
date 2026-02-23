@@ -36,7 +36,7 @@ namespace InSite.Cmds.Admin.Uploads.Forms
 
             if (IsNewCompetenciesSearched)
             {
-                var newCompetencies = CompetencyRepository.SelectNewCompanyUploadCompetencies(UploadID.Value, CurrentIdentityFactory.ActiveOrganizationIdentifier, SearchText.Text);
+                var newCompetencies = CompetencyRepository.SelectNewCompanyUploadCompetencies(UploadID.Value, Organization.Identifier, SearchText.Text);
                 NewCompetencies.DataSource = newCompetencies;
                 NewCompetencies.DataBind();
 
@@ -203,7 +203,7 @@ namespace InSite.Cmds.Admin.Uploads.Forms
 
         private void DeleteButton_Click(object sender, EventArgs e)
         {
-            CompanyAchievementHelper.Delete(UploadID.Value, CurrentIdentityFactory.ActiveOrganizationIdentifier, User);
+            CompanyAchievementHelper.Delete(UploadID.Value, Organization.Identifier, User);
 
             HttpResponseHelper.Redirect(SearchUrl);
         }
@@ -249,7 +249,7 @@ namespace InSite.Cmds.Admin.Uploads.Forms
             // && x.User.TenantIdentifier == Identity.Tenant.Identifier);
 
             if (entity.ContainerType == UploadContainerType.Oganization)
-                return OrganizationSearch.Select(entity.ContainerIdentifier)?.OrganizationIdentifier == CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                return OrganizationSearch.Select(entity.ContainerIdentifier)?.OrganizationIdentifier == Organization.Identifier;
 
             return false;
         }
@@ -285,7 +285,7 @@ namespace InSite.Cmds.Admin.Uploads.Forms
 
         private void SetInputValues(Upload entity)
         {
-            var organization = OrganizationSearch.Select(CurrentIdentityFactory.ActiveOrganizationIdentifier);
+            var organization = OrganizationSearch.Select(Organization.Identifier);
 
             PageHelper.AutoBindHeader(this, null, $"{entity.Title} ({organization.CompanyName})");
 

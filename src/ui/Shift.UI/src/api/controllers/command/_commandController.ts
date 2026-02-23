@@ -2,8 +2,6 @@ import { fetchHelper } from "@/api/fetchHelper";
 import { ApiCommand, ApiCommandName } from "./ApiCommand";
 import { cache } from "@/cache/cache";
 
-const _baseUrl = "/timeline/commands";
-
 function updateCache(commandName: ApiCommandName) {
     switch (commandName) {
         case "LockGradebook":
@@ -21,11 +19,11 @@ function updateCache(commandName: ApiCommandName) {
 export const _commandController = {
     async send(command: ApiCommand) {
         const body = {
-            AggregateIdentifier: command.aggregateIdentifier,
+            AggregateId: command.aggregateId,
             ...command.data
         };
 
-        const result = await fetchHelper.post<string>(`${_baseUrl}`, body, [{
+        const result = await fetchHelper.post<string>("/api/timeline/commands", body, [{
             name: "command",
             value: command.commandName
         }]);

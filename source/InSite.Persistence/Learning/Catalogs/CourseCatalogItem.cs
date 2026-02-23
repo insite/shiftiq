@@ -93,5 +93,6 @@ namespace InSite.Persistence
         public string ThumbnailImageUrl { get; set; }
         public string CourseFlagColor { get; set; }
         public string CourseFlagText { get; set; }
+        public bool IsOverview { get; set; }
     }
 }

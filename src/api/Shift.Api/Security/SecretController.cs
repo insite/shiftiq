@@ -6,16 +6,16 @@ namespace Shift.Api;
 [ApiExplorerSettings(GroupName = "Security API")]
 public class SecretController : ControllerBase
 {
-    private readonly IShiftIdentityService _identityService;
+    private readonly IPrincipalProvider _identityService;
 
-    public SecretController(IShiftIdentityService identityService)
+    public SecretController(IPrincipalProvider identityService)
     {
         _identityService = identityService;
     }
 
-    [HttpGet("security/secrets/introspect")]
+    [HttpGet("api/security/secrets/introspect")]
     [EndpointName("introspectSecret")]
-    [SecretAuthorize()]
+    [SecretAuthorize]
     public IActionResult IntrospectAsync()
     {
         var principal = _identityService.GetPrincipal();

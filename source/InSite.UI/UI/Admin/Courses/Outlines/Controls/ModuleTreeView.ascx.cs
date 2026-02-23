@@ -181,7 +181,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
             }
             else
             {
-                throw new ApplicationError("Unexpected command name: " + e.CommandName);
+                throw new InvalidOperationException("Unexpected command name: " + e.CommandName);
             }
         }
 

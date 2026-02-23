@@ -14,11 +14,12 @@ import { _caseStatusController } from "./controllers/caseStatus/_caseStatusContr
 import { fetchHelper } from "./fetchHelper";
 import { ApiSiteSetting } from "./models/ApiSiteSetting";
 import { _translationController } from "./controllers/translation/_translationController";
+import { _pageContentController } from "./controllers/pageContent/_pageContentController";
 
 export const shiftClient = {
     me: {
         async context(refresh: boolean): Promise<ApiSiteSetting> {
-            const result = await fetchHelper.get<ApiSiteSetting>("/me/context", [{ name: "refresh", value: refresh ? "true" : "false" }]);
+            const result = await fetchHelper.get<ApiSiteSetting>("/api/me/context", [{ name: "refresh", value: refresh ? "true" : "false" }]);
             for (const language of result.SupportedLanguages) {
                 if (!(language in languageNames)) {
                     throw new Error(`This language is not supported: ${language}`);
@@ -40,6 +41,7 @@ export const shiftClient = {
     cookie: _cookieController,
     caseStatus: _caseStatusController,
     translation: _translationController,
+    pageContent: _pageContentController,
 
     command: _commandController,
 }

@@ -12,6 +12,12 @@
                 </ItemTemplate>
             </asp:TemplateField>
 
+            <asp:TemplateField HeaderText="Achievement">
+                <ItemTemplate>
+                    <a href='/ui/cmds/admin/achievements/edit?id=<%# Eval("AchievementIdentifier") %>'><%# Eval("AchievementTitle") %></a>
+                </ItemTemplate>
+            </asp:TemplateField>
+
             <asp:TemplateField HeaderText="Code" ItemStyle-Wrap="false">
                 <ItemTemplate>
                     <%# Eval("ProgramCode") %>
@@ -25,6 +31,8 @@
             </asp:TemplateField>
 
             <asp:BoundField HeaderText="Department" DataField="GroupName" ItemStyle-Wrap="false" />
+
+            <asp:BoundField HeaderText="Tag" DataField="ProgramTag" />
 
             <asp:BoundField HeaderText="Categories" DataField="CategoryCount" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end" />
 

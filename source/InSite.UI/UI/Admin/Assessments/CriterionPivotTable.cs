@@ -240,7 +240,7 @@ namespace InSite.Admin.Assessments.Web.UI
                         }
 
                         else
-                            throw new ApplicationError("Unexpected dimension name: " + n.Dimension);
+                            throw new ArgumentException("Unexpected dimension name: " + n.Dimension);
                     }
                 }
 

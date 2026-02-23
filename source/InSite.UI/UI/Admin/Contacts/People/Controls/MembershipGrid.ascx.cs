@@ -147,7 +147,7 @@ namespace InSite.Admin.Contacts.People.Controls
                     name = name.Substring(separatorIndex, name.Length - separatorIndex);
             }
 
-            var allowEditGroup = Identity.IsActionAuthorized("ui/admin/contacts/groups/edit") && Organization.OrganizationIdentifier == organizationIdentifier;
+            var allowEditGroup = Identity.IsGranted("ui/admin/contacts/groups/edit") && Organization.OrganizationIdentifier == organizationIdentifier;
 
             var groupEditorLink = (HyperLink)e.Row.FindControl("GroupEditorLink");
             groupEditorLink.Visible = allowEditGroup;

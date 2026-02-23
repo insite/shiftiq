@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public class RetrieveCredential : Query<CredentialModel>
     {
-        public Guid CredentialIdentifier { get; set; }
+        public Guid CredentialId { get; set; }
     }
 }

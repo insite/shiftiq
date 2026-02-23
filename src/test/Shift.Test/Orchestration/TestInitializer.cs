@@ -29,7 +29,7 @@ internal static class TestInitializer
 
     static TestInitializer()
     {
-        Settings = AppSettingsHelper.GetAllSettings<AppSettings>();
+        Settings = AppSettingsHelper.GetAllSettings<AppSettings>("appsettings");
 
         TempConnectionString = Settings.Database.ConnectionStrings.Shift;
 
@@ -102,7 +102,7 @@ internal static class TestInitializer
 
         var scriptFiles = Directory.GetFiles(scriptsPath, "*.sql", SearchOption.AllDirectories)
             .Where(f => string.Compare(Path.GetFileName(f), LastUpgradeScript, StringComparison.OrdinalIgnoreCase) > 0)
-            .OrderBy(f => Path.GetFileName(f))
+            .OrderBy(f => f)
             .ToArray();
 
         using var connection = new SqlConnection(TestConnectionString);

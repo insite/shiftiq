@@ -4,9 +4,9 @@ namespace Shift.Contract
 {
     public class CreateFileActivity
     {
-        public Guid ActivityIdentifier { get; set; }
-        public Guid FileIdentifier { get; set; }
-        public Guid UserIdentifier { get; set; }
+        public Guid ActivityId { get; set; }
+        public Guid FileId { get; set; }
+        public Guid UserId { get; set; }
 
         public string ActivityChanges { get; set; }
 

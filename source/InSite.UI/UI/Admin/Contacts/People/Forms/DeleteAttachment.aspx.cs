@@ -31,7 +31,7 @@ namespace InSite.UI.Admin.Contacts.People.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(PermissionIdentifiers.Admin_Contacts, PermissionOperation.Delete))
+            if (!Identity.IsGranted(PermissionIdentifiers.Admin_Contacts, DataAccess.Delete))
                 RedirectToSearch();
 
             if (!IsPostBack)

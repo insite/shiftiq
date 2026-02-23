@@ -108,7 +108,7 @@ namespace InSite.Domain
                 else if (fieldType == StateFieldType.Decimal)
                     readFn = ReadDecimal;
                 else
-                    throw new ApplicationError("Unexpected state field type: " + fieldType.GetName());
+                    throw new InvalidOperationException("Unexpected state field type: " + fieldType.GetName());
 
                 result.Add(field.Key, readFn);
             }

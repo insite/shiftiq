@@ -24,6 +24,15 @@ namespace InSite.UI.Admin.Courses
         protected global::InSite.Common.Web.UI.Alert ScreenStatus;
 
         /// <summary>
+        /// TrackChangesAlert control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel TrackChangesAlert;
+
+        /// <summary>
         /// NavPanel control.
         /// </summary>
         /// <remarks>
@@ -166,5 +175,14 @@ namespace InSite.UI.Admin.Courses
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Admin.Courses.Outlines.Controls.CourseSetup CourseSetup;
+
+        /// <summary>
+        /// TrackChangesState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField TrackChangesState;
     }
 }

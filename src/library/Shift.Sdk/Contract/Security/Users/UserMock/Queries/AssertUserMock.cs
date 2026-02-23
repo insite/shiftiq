@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class AssertUserMock : Query<bool>
     {
-        public Guid MockIdentifier { get; set; }
+        public Guid MockId { get; set; }
     }
 }

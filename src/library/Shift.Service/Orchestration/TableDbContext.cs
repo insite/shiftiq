@@ -1,14 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 
+using Shift.Common;
 using Shift.Service.Assessment;
 using Shift.Service.Booking;
 using Shift.Service.Cases;
 using Shift.Service.Competency;
 using Shift.Service.Content;
 using Shift.Service.Directory;
+using Shift.Service.Evaluation;
 using Shift.Service.Metadata;
 using Shift.Service.Progress;
 using Shift.Service.Security;
+using Shift.Service.Setup;
 using Shift.Service.Workflow;
 using Shift.Service.Workspace;
 
@@ -21,35 +24,20 @@ public class TableDbContext : DbContext
     #region Storage Tables
 
     // Feature: Assessment
+    internal DbSet<AssessmentEntity> Assessment { get; set; }
     internal DbSet<AttemptEntity> Attempt { get; set; }
-    internal DbSet<AttemptMatchEntity> AttemptMatch { get; set; }
-    internal DbSet<AttemptOptionEntity> AttemptOption { get; set; }
-    internal DbSet<AttemptPinEntity> AttemptPin { get; set; }
-    internal DbSet<AttemptQuestionEntity> AttemptQuestion { get; set; }
-    internal DbSet<AttemptSectionEntity> AttemptSection { get; set; }
-    internal DbSet<AttemptSolutionEntity> AttemptSolution { get; set; }
     internal DbSet<BankEntity> Bank { get; set; }
-    internal DbSet<BankFormEntity> BankForm { get; set; }
-    internal DbSet<BankFormQuestionGradeitemEntity> BankFormQuestionGradeitem { get; set; }
-    internal DbSet<BankOptionEntity> BankOption { get; set; }
-    internal DbSet<BankQuestionAttachmentEntity> BankQuestionAttachment { get; set; }
-    internal DbSet<BankQuestionEntity> BankQuestion { get; set; }
-    internal DbSet<BankSpecificationEntity> BankSpecification { get; set; }
-    internal DbSet<QuizAttemptEntity> QuizAttempt { get; set; }
-    internal DbSet<QuizEntity> Quiz { get; set; }
 
     // Feature: Booking
     internal DbSet<EventEntity> QEvent { get; set; }
     internal DbSet<EventUserEntity> QEventUser { get; set; }
-    internal DbSet<RegistrationAccommodationEntity> QRegistrationAccommodation { get; set; }
     internal DbSet<RegistrationEntity> QRegistration { get; set; }
-    internal DbSet<RegistrationInstructorEntity> QRegistrationInstructor { get; set; }
-    internal DbSet<RegistrationTimerEntity> QRegistrationTimer { get; set; }
 
     // Feature: Competency
     internal DbSet<StandardEntity> QStandard { get; set; }
 
     // Feature: Contact
+    internal DbSet<AddressEntity> QPersonAddress { get; set; }
     internal DbSet<GroupEntity> QGroup { get; set; }
     internal DbSet<MembershipEntity> QMembership { get; set; }
     internal DbSet<PersonEntity> QPerson { get; set; }
@@ -79,26 +67,23 @@ public class TableDbContext : DbContext
     internal DbSet<CaseGroupEntity> QCaseGroup { get; set; }
     internal DbSet<CaseUserEntity> QCaseUser { get; set; }
     internal DbSet<TCaseStatusEntity> TCaseStatus { get; set; }
-    internal DbSet<FormConditionEntity> FormCondition { get; set; }
     internal DbSet<FormEntity> Form { get; set; }
-    internal DbSet<FormOptionItemEntity> FormOptionItem { get; set; }
-    internal DbSet<FormOptionListEntity> FormOptionList { get; set; }
-    internal DbSet<FormQuestionEntity> FormQuestion { get; set; }
-    internal DbSet<SubmissionAnswerEntity> SubmissionAnswer { get; set; }
     internal DbSet<SubmissionEntity> Submission { get; set; }
-    internal DbSet<SubmissionOptionEntity> SubmissionOption { get; set; }
 
     // Utility: Metadata
     internal DbSet<TActionEntity> TAction { get; set; }
 
     // Utility: Security
     internal DbSet<OrganizationEntity> Organization { get; set; }
+    internal DbSet<OrganizationPermissionEntity> OrganizationPermission { get; set; }
     internal DbSet<UserConnectionEntity> QUserConnection { get; set; }
     internal DbSet<UserEntity> QUser { get; set; }
-    internal DbSet<TPartitionFieldEntity> TPartitionSetting { get; set; }
     internal DbSet<TPermissionEntity> TPermission { get; set; }
     internal DbSet<UserSessionEntity> TUserSession { get; set; }
     internal DbSet<TUserFieldEntity> TUserSetting { get; set; }
+
+    // Utility: Setup
+    internal DbSet<RouteEndpoint> RouteEndpoint { get; set; }
 
     #endregion
 
@@ -113,35 +98,20 @@ public class TableDbContext : DbContext
     private void ApplyConfigurations(ModelBuilder builder)
     {
         // Feature: Assessment
+        builder.ApplyConfiguration(new AssessmentConfiguration());
         builder.ApplyConfiguration(new AttemptConfiguration());
-        builder.ApplyConfiguration(new AttemptMatchConfiguration());
-        builder.ApplyConfiguration(new AttemptOptionConfiguration());
-        builder.ApplyConfiguration(new AttemptPinConfiguration());
-        builder.ApplyConfiguration(new AttemptQuestionConfiguration());
-        builder.ApplyConfiguration(new AttemptSectionConfiguration());
-        builder.ApplyConfiguration(new AttemptSolutionConfiguration());
         builder.ApplyConfiguration(new BankConfiguration());
-        builder.ApplyConfiguration(new BankFormConfiguration());
-        builder.ApplyConfiguration(new BankFormQuestionGradeitemConfiguration());
-        builder.ApplyConfiguration(new BankOptionConfiguration());
-        builder.ApplyConfiguration(new BankQuestionAttachmentConfiguration());
-        builder.ApplyConfiguration(new BankQuestionConfiguration());
-        builder.ApplyConfiguration(new BankSpecificationConfiguration());
-        builder.ApplyConfiguration(new QuizAttemptConfiguration());
-        builder.ApplyConfiguration(new QuizConfiguration());
 
         // Feature: Booking
         builder.ApplyConfiguration(new EventConfiguration());
         builder.ApplyConfiguration(new EventUserConfiguration());
-        builder.ApplyConfiguration(new RegistrationAccommodationConfiguration());
         builder.ApplyConfiguration(new RegistrationConfiguration());
-        builder.ApplyConfiguration(new RegistrationInstructorConfiguration());
-        builder.ApplyConfiguration(new RegistrationTimerConfiguration());
 
         // Feature: Competency
         builder.ApplyConfiguration(new StandardConfiguration());
 
         // Feature: Contact
+        builder.ApplyConfiguration(new AddressConfiguration());
         builder.ApplyConfiguration(new GroupConfiguration());
         builder.ApplyConfiguration(new MembershipConfiguration());
         builder.ApplyConfiguration(new PersonConfiguration());
@@ -171,26 +141,23 @@ public class TableDbContext : DbContext
         builder.ApplyConfiguration(new CaseGroupConfiguration());
         builder.ApplyConfiguration(new CaseUserConfiguration());
         builder.ApplyConfiguration(new TCaseStatusConfiguration());
-        builder.ApplyConfiguration(new FormConditionConfiguration());
         builder.ApplyConfiguration(new FormConfiguration());
-        builder.ApplyConfiguration(new FormOptionItemConfiguration());
-        builder.ApplyConfiguration(new FormOptionListConfiguration());
-        builder.ApplyConfiguration(new FormQuestionConfiguration());
-        builder.ApplyConfiguration(new SubmissionAnswerConfiguration());
         builder.ApplyConfiguration(new SubmissionConfiguration());
-        builder.ApplyConfiguration(new SubmissionOptionConfiguration());
 
         // Utility: Metadata
         builder.ApplyConfiguration(new TActionConfiguration());
 
         // Utility: Security
         builder.ApplyConfiguration(new QOrganizationConfiguration());
+        builder.ApplyConfiguration(new OrganizationPermissionConfiguration());
         builder.ApplyConfiguration(new UserConfiguration());
         builder.ApplyConfiguration(new UserConnectionConfiguration());
-        builder.ApplyConfiguration(new TPartitionFieldConfiguration());
         builder.ApplyConfiguration(new TPermissionConfiguration());
         builder.ApplyConfiguration(new UserSessionConfiguration());
         builder.ApplyConfiguration(new TUserFieldConfiguration());
+
+        // Utility: Setup
+        builder.ApplyConfiguration(new RouteEndpointConfiguration());
     }
 
     /// <remarks>
@@ -205,6 +172,12 @@ public class TableDbContext : DbContext
 
     private void ConfigureEntities(ModelBuilder builder)
     {
+        builder.Entity<AttemptEntity>()
+            .HasOne(e => e.Assessment)
+            .WithMany()
+            .HasForeignKey(e => e.FormIdentifier)
+            .HasPrincipalKey(e => e.FormIdentifier);
+
         builder.Entity<AchievementEntity>()
             .HasMany(e => e.Credentials)
             .WithOne(e => e.Achievement)
@@ -217,23 +190,11 @@ public class TableDbContext : DbContext
             .HasForeignKey(e => e.AchievementIdentifier)
             .HasPrincipalKey(e => e.AchievementIdentifier);
 
-        builder.Entity<AttemptEntity>()
-            .HasMany(e => e.Pins)
-            .WithOne(e => e.Attempt)
-            .HasForeignKey(e => e.AttemptIdentifier)
-            .HasPrincipalKey(e => e.AttemptIdentifier);
-
-        builder.Entity<AttemptEntity>()
-            .HasMany(e => e.Sections)
-            .WithOne(e => e.Attempt)
-            .HasForeignKey(e => e.AttemptIdentifier)
-            .HasPrincipalKey(e => e.AttemptIdentifier);
-
-        builder.Entity<AttemptEntity>()
-            .HasMany(e => e.Solutions)
-            .WithOne(e => e.Attempt)
-            .HasForeignKey(e => e.AttemptIdentifier)
-            .HasPrincipalKey(e => e.AttemptIdentifier);
+        builder.Entity<TActionEntity>()
+            .HasMany(e => e.PermissionChildren)
+            .WithOne(e => e.PermissionParent)
+            .HasForeignKey(e => e.PermissionParentActionIdentifier)
+            .HasPrincipalKey(e => e.ActionIdentifier);
 
         builder.Entity<EventEntity>()
             .HasMany(e => e.Gradebooks)
@@ -270,6 +231,26 @@ public class TableDbContext : DbContext
             .WithOne(e => e.Parent)
             .HasForeignKey(e => e.ParentPageIdentifier)
             .HasPrincipalKey(e => e.PageIdentifier);
+
+        builder.Entity<PersonEntity>()
+            .HasOne(e => e.BillingAddress)
+            .WithMany()
+            .HasForeignKey(e => e.BillingAddressIdentifier);
+
+        builder.Entity<PersonEntity>()
+            .HasOne(e => e.HomeAddress)
+            .WithMany()
+            .HasForeignKey(e => e.HomeAddressIdentifier);
+
+        builder.Entity<PersonEntity>()
+            .HasOne(e => e.ShippingAddress)
+            .WithMany()
+            .HasForeignKey(e => e.ShippingAddressIdentifier);
+
+        builder.Entity<PersonEntity>()
+            .HasOne(e => e.WorkAddress)
+            .WithMany()
+            .HasForeignKey(e => e.WorkAddressIdentifier);
 
         builder.Entity<OrganizationEntity>()
            .HasMany(e => e.Permissions)

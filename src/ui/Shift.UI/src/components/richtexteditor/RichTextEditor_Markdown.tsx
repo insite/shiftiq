@@ -36,7 +36,7 @@ export interface RichTextEditor_MarkdownRef {
 
 interface Props {
     ref?: ForwardedRef<RichTextEditor_MarkdownRef>;
-    isTranslating: boolean;
+    disabled: boolean;
     markdown: string;
     disableUploadFile: boolean;
     onUploadFile(file: File): Promise<ApiUploadFileInfo | null>;
@@ -46,7 +46,7 @@ interface Props {
 
 export default function RichTextEditor_Markdown({
     ref,
-    isTranslating,
+    disabled,
     markdown,
     disableUploadFile,
     onUploadFile,
@@ -101,7 +101,7 @@ export default function RichTextEditor_Markdown({
                 return;
             }
 
-            const { FileIdentifier: fileId, FileName: fileName, DocumentName: documentName } = apiFile;
+            const { FileId: fileId, FileName: fileName, DocumentName: documentName } = apiFile;
             const text = `[${documentName}](${urlHelper.getFileUrl(fileId, fileName)})`;
 
             markdownRef.current.insertMarkdown(text);
@@ -130,7 +130,7 @@ export default function RichTextEditor_Markdown({
             return null as unknown as string;
         }
 
-        const { FileIdentifier: fileId, FileName: fileName } = result;
+        const { FileId: fileId, FileName: fileName } = result;
 
         setUploadedFileIds([...uploadedFileIds, fileId]);
 
@@ -147,7 +147,7 @@ export default function RichTextEditor_Markdown({
         <div ref={wrapperRef} className="markdown">
             <MDXEditor
                 ref={markdownRef}
-                readOnly={isTranslating}
+                readOnly={disabled}
                 markdown={markdown}
                 plugins={[
                     headingsPlugin(),

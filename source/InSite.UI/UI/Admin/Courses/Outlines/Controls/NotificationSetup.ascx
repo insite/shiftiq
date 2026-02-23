@@ -3,7 +3,7 @@
 <div class="row mb-3">
     <div class="col-md-6">
 
-        <div class="card border-0 shadow-lg h-100">
+        <div class="card h-100">
             <div class="card-body">
                 <h3>Course Stalled Notifications</h3>
 
@@ -41,7 +41,7 @@
 
     <div class="col-md-6">
 
-        <div class="card border-0 shadow-lg h-100">
+        <div class="card h-100">
             <div class="card-body">
                 <h3>Course Completed Notifications</h3>
 
@@ -70,9 +70,7 @@
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col-md-12">
-        <insite:SaveButton runat="server" ID="SaveButton" ValidationGroup="NotificationSetup" />
-        <insite:CancelButton runat="server" ID="CancelButton" />
-    </div>
+<div class="mt-3">
+    <insite:SaveButton runat="server" ID="SaveButton" ValidationGroup="NotificationSetup" />
+    <insite:CancelButton runat="server" ID="CancelButton" />
 </div>

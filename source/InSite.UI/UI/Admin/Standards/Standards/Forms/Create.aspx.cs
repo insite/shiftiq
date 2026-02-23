@@ -215,7 +215,7 @@ namespace InSite.Admin.Standards.Standards.Forms
             public void Add(MarkdownDataItem item)
             {
                 if (item.Parent != null)
-                    throw new ApplicationError("Parent != null");
+                    throw new InvalidOperationException("Parent != null");
 
                 item.Parent = this;
 
@@ -418,7 +418,7 @@ namespace InSite.Admin.Standards.Standards.Forms
             if (IsPostBack)
                 return;
 
-            if (!Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update))
                 HttpResponseHelper.Redirect(SearchUrl);
 
             PageHelper.AutoBindHeader(this, null, "[New Standard]");
@@ -890,7 +890,7 @@ namespace InSite.Admin.Standards.Standards.Forms
                     else if (hasParent)
                         rootList.Add(item);
                     else
-                        throw new ApplicationError("Parent not found");
+                        throw new InvalidOperationException("Parent not found");
                 }
 
                 currentItem = item;

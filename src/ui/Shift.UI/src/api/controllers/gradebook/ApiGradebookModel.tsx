@@ -1,10 +1,10 @@
 export interface ApiGradebookModel {
-    AchievementIdentifier: string | null | undefined;
-    EventIdentifier: string | null | undefined;
-    FrameworkIdentifier: string | null | undefined;
-    GradebookIdentifier: string;
-    OrganizationIdentifier: string;
-    PeriodIdentifier: string | null | undefined;
+    AchievementId: string | null | undefined;
+    EventId: string | null | undefined;
+    FrameworkId: string | null | undefined;
+    GradebookId: string;
+    OrganizationId: string;
+    PeriodId: string | null | undefined;
     IsLocked: boolean;
     GradebookTitle: string;
     GradebookType: string;

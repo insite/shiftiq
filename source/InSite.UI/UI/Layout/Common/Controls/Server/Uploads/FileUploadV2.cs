@@ -233,7 +233,7 @@ namespace InSite.Common.Web.UI
         public string ReadFileText(Encoding encoding)
         {
             if (!HasFile)
-                throw new ApplicationError("File is not uploaded");
+                throw new InvalidOperationException("File is not uploaded");
 
             var (_, stream) = ServiceLocator.StorageService.GetFileStream(File.FileIdentifier);
 
@@ -572,7 +572,7 @@ namespace InSite.Common.Web.UI
                     ImageHelper.AdjustImage(
                         input,
                         output,
-                        format, 
+                        format,
                         keepAspectRatio,
                         messages,
                         width,

@@ -4,8 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Contacts.Read;
 using InSite.Application.Contents.Read;
 using InSite.Application.Events.Read;
@@ -15,6 +13,7 @@ using InSite.Persistence.Foundation;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Persistence
@@ -507,6 +506,33 @@ namespace InSite.Persistence
             }
         }
 
+        public List<QEvent> GetExamEventsToValidateAndPublish(
+            DateTimeOffset now,
+            int onlineEventWindowHours,
+            int paperEventWindowMonths,
+            params Expression<Func<QEvent, object>>[] includes)
+        {
+            using (var db = CreateContext())
+            {
+                return db.Events.AsNoTracking().AsQueryable()
+                    .ApplyIncludes(includes)
+                    .Where(e => e.EventSchedulingStatus.StartsWith("Approved")
+                             && e.EventPublicationStatus == "Published"
+                             && e.EventType == "Exam"
+                             && e.ExamType != "Test"
+                             && (e.EventScheduledEnd ?? e.EventScheduledStart) < now
+                             && (
+                                e.EventFormat == "Online" && DbFunctions.DiffHours((e.EventScheduledEnd ?? e.EventScheduledStart), now) <= onlineEventWindowHours
+                                || e.EventFormat == "Paper" && DbFunctions.DiffMonths((e.EventScheduledEnd ?? e.EventScheduledStart), now) <= paperEventWindowMonths)
+                             && e.Registrations.Any(r => r.GradingStatus == null
+                                                      || r.GradingStatus == "Unassigned"
+                                                      || r.GradingStatus == "Assigned"
+                                                      || r.GradingStatus == "Released")
+                    )
+                    .ToList();
+            }
+        }
+
         public List<QEvent> GetEventsForCandidate(Guid candidate)
         {
             using (var db = CreateContext())
@@ -742,6 +768,9 @@ namespace InSite.Persistence
             if (filter.WithholdDistribution.HasValue)
                 query = query.Where(x => x.IntegrationWithholdDistribution == filter.WithholdDistribution.Value);
 
+            if (filter.DisplayOnCalendar.HasValue && filter.DisplayOnCalendar.Value)
+                query = query.Where(x => x.DisplayOnCalendar == filter.DisplayOnCalendar.Value);
+
             if (filter.UndistributedExamsInclusion == InclusionType.Only)
                 query = query.Where(x => !x.DistributionOrdered.HasValue && !x.IntegrationWithholdDistribution);
             else if (filter.UndistributedExamsInclusion == InclusionType.Exclude)
@@ -757,7 +786,7 @@ namespace InSite.Persistence
 
         private static IQueryable<QEvent> GetAvailabilityQuery(QEventFilter filter, IQueryable<QEvent> query)
         {
-            if (!filter.Availability.HasValue) 
+            if (!filter.Availability.HasValue)
                 return query;
 
             switch (filter.Availability.Value)

@@ -1,0 +1,13 @@
+.content-editor {
+    ul.nav-tabs {
+        margin-bottom: 0;
+    }
+
+    div.tab-pane {
+        margin-top: 0.75rem;
+
+        &.markdown-and-html {
+            margin-top: -0.875rem;
+        }
+    }
+}

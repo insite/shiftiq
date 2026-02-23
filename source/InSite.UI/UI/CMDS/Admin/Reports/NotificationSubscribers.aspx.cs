@@ -89,7 +89,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         private void LoadDepartmentSelector()
         {
             DepartmentIdentifier.Value = null;
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 DepartmentIdentifier.Filter.UserIdentifier = User.UserIdentifier;
@@ -135,7 +135,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
                                    && membershipTypes.Contains(u.MembershipType))
                 : LinqExtensions1.Expr(
                     (Membership u) => u.Group.GroupType == GroupTypes.Department
-                                   && u.Group.OrganizationIdentifier == CurrentIdentityFactory.ActiveOrganizationIdentifier
+                                   && u.Group.OrganizationIdentifier == Organization.Identifier
                                    && membershipTypes.Contains(u.MembershipType));
         }
 

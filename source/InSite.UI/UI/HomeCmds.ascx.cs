@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Web.UI;
 
@@ -10,8 +9,6 @@ using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 using InSite.UI.CMDS.Common.Models;
 using InSite.UI.Layout.Admin;
-
-using Newtonsoft.Json;
 
 using Shift.Common;
 using Shift.Constant;
@@ -60,8 +57,6 @@ namespace InSite.UI
             if (Page is AdminBasePage admin)
                 if (admin.Navigator != null)
                     admin.Navigator.IsCmds = true;
-
-            LoadPermissionMatrix();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -78,9 +73,7 @@ namespace InSite.UI
         {
             base.OnPreRender(e);
 
-            var organization = GetPartitionOrganizationCode();
-
-            ApplyPermissionMatrix(organization);
+            ApplyPermissionMatrix();
 
             ProgressRepeater.DataSource = ProgressItems;
             ProgressRepeater.DataBind();
@@ -113,7 +106,7 @@ namespace InSite.UI
         {
             var filter = new EmployeeCompetencyFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 UserIdentifier = User.UserIdentifier,
                 Statuses = new[] { ValidationStatuses.SelfAssessed }
             };
@@ -145,7 +138,7 @@ namespace InSite.UI
             })
                 .ToList();
 
-            if (ShowSafetyAchievementsOnly())
+            if (InSite.UI.Portal.Learning.Plan.ShowSafetyAchievementsOnly())
                 ProgressItems = ProgressItems.Where(x => x.Title == "Time-Sensitive Safety Certificates").ToList();
         }
 
@@ -171,14 +164,16 @@ namespace InSite.UI
                 CustomCatalogLink.InnerHtml = "<i class='fa-solid fa-books me-2'></i>" + catalog.CatalogName;
             }
 
-            var skillsPassportGroups = new string[]
+            var orientationRoles = new string[]
             {
                 "Skills Passport Administrators",
                 "Skills Passport Developers",
                 "Skills Passport Users"
             };
 
-            OrientationAnchor.Visible = Identity.IsInGroup(skillsPassportGroups);
+            var isAssignedToOrientationRole = orientationRoles.Any(x => Identity.IsInRole(x));
+
+            OrientationAnchor.Visible = isAssignedToOrientationRole;
         }
 
         private void BindProfilesTab()
@@ -192,7 +187,7 @@ namespace InSite.UI
 
             void LoadDepartments()
             {
-                var data = ContactRepository3.SelectPersonDepartments(CurrentIdentityFactory.ActiveOrganizationIdentifier, User.UserIdentifier,
+                var data = ContactRepository3.SelectPersonDepartments(Organization.Identifier, User.UserIdentifier,
                     new[] { MembershipType.Organization, MembershipType.Department });
                 Departments.DataSource = data;
                 Departments.DataBind();
@@ -201,7 +196,7 @@ namespace InSite.UI
 
             void LoadPrimaryProfile()
             {
-                var info = UserProfileRepository.SelectPrimaryProfile(User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+                var info = UserProfileRepository.SelectPrimaryProfile(User.UserIdentifier, Organization.Identifier);
                 var hasPrimary = info != null;
                 PrimaryProfile.Visible = PrimaryProfileLink.Visible = hasPrimary;
                 NoPrimaryProfile.Visible = !hasPrimary;
@@ -224,7 +219,7 @@ namespace InSite.UI
 
             void LoadSecondaryProfiles()
             {
-                var tableForCompliance = UserProfileRepository.SelectSecondaryProfiles(User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier, true);
+                var tableForCompliance = UserProfileRepository.SelectSecondaryProfiles(User.UserIdentifier, Organization.Identifier, true);
                 var hasData = tableForCompliance.Rows.Count != 0;
                 NoSecondaryProfilesForCompliance.Visible = !hasData;
                 SecondaryProfilesForCompliance.Visible = hasData;
@@ -241,7 +236,7 @@ namespace InSite.UI
 
             void LoadTertiaryProfiles()
             {
-                var tableNotForCompliance = UserProfileRepository.SelectSecondaryProfiles(User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier, false);
+                var tableNotForCompliance = UserProfileRepository.SelectSecondaryProfiles(User.UserIdentifier, Organization.Identifier, false);
                 var hasData = tableNotForCompliance.Rows.Count != 0;
                 NoSecondaryProfilesNotForCompliance.Visible = !hasData;
                 SecondaryProfilesNotForCompliance.Visible = hasData;
@@ -302,55 +297,9 @@ namespace InSite.UI
 
         #region Access Control (improved)
 
-        private static PermissionMatrix PermissionMatrix { get; set; }
         private static readonly object _lock = new object();
 
-        private void LoadPermissionMatrix()
-        {
-            // In v25.7 this new feature is implemented and tested for E03 only.
-
-            if (!ServiceLocator.Partition.IsE03())
-                return;
-
-            if (PermissionMatrix != null)
-                return;
-
-            lock (_lock)
-            {
-                PermissionMatrix = new PermissionMatrix();
-
-                var accessDeniedConfigPath = ServiceLocator.AppSettings.Application.SecurityConfigurationPath;
-
-                if (string.IsNullOrEmpty(accessDeniedConfigPath))
-                    return;
-
-                // FIXME: Settings in the PartitionSetting table should be moved to AppSettings, now that we have 
-                // partition-specific transformation rules working correctly.
-
-                var partition = ServiceLocator.Partition.Slug;
-
-                var relativePathToConfigFile = Path.Combine(
-                    accessDeniedConfigPath,
-                    $"access-denied.{partition}.json");
-
-                var physicalPathToConfigFile = Server.MapPath(relativePathToConfigFile);
-
-                if (!File.Exists(physicalPathToConfigFile))
-                    throw new FileNotFoundException(physicalPathToConfigFile);
-
-                var json = File.ReadAllText(physicalPathToConfigFile);
-
-                var resourcePermissions = JsonConvert.DeserializeObject<ResourcePermissions[]>(json);
-
-                var organization = GetPartitionOrganizationCode();
-
-                PermissionMatrix.AddPermissions(AccessOperation.Deny, resourcePermissions, organization);
-
-                ApplyPermissionMatrix(organization);
-            }
-        }
-
-        private void ApplyPermissionMatrix(string organization)
+        private void ApplyPermissionMatrix()
         {
             var isObserver = User.UserIdentifier != PersonID;
             var isDeveloper = Identity.IsInRole(CmdsRole.Programmers);
@@ -374,11 +323,6 @@ namespace InSite.UI
             SearchUploadsLink.Visible = isGrantedFields;
             ManageUploadsLink.Visible = isGrantedFields;
 
-            if (PermissionMatrix == null)
-                return;
-
-            var permissions = PermissionMatrix.GetOrCreatePermissions(organization);
-
             var roles = Identity.Groups.Select(x => x.Name).ToList();
 
             var denials = new[]
@@ -395,33 +339,11 @@ namespace InSite.UI
                 new ControlHandle("ui/home#training-plan", TrainingPlanLink2)
             };
 
+            var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
+
             foreach (var denial in denials)
                 if (permissions.IsDenied(denial.Resource, roles))
                     denial.Control.Visible = false;
-        }
-
-        private bool ShowSafetyAchievementsOnly()
-        {
-            if (PermissionMatrix == null)
-                return false;
-
-            var organization = GetPartitionOrganizationCode();
-
-            var permissions = PermissionMatrix.GetOrCreatePermissions(organization);
-
-            var roles = Identity.Groups.Select(x => x.Name).ToList();
-
-            var safetyAchievementsOnly = permissions.IsDenied("ui/home#safety-achievements-only", roles);
-
-            return safetyAchievementsOnly;
-        }
-
-        private string GetPartitionOrganizationCode()
-        {
-            // FIXME: TEC-363 is required before we can make CMDS the organization account that represents the
-            // partition-wide (global) data set in the system. Until then, e03 and cmds are (confusingly) separate.
-
-            return "cmds";
         }
 
         private class ControlHandle

@@ -97,7 +97,7 @@ namespace Shift.Toolbox
 
             if (value.StartsWith("/"))
             {
-                var domain = settings.Security.Domain;
+                var domain = settings.Partition.Domain;
 
                 var environment = settings.Environment;
 

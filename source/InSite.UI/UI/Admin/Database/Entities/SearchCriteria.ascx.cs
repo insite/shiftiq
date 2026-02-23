@@ -11,9 +11,9 @@ namespace InSite.UI.Admin.Database.Entities
             {
                 var filter = new TEntityFilter()
                 {
-                    ComponentType = ComponentType.Text,
-                    ComponentName = ComponentName.Text,
-                    ComponentPart = ComponentPart.Text,
+                    SubsystemType = SubsystemType.Text,
+                    SubsystemName = SubsystemName.Text,
+                    SubsystemComponent = SubsystemComponent.Text,
                     EntityName = EntityName.Text,
 
                     StorageStructure = StorageStructure.Text,
@@ -31,9 +31,9 @@ namespace InSite.UI.Admin.Database.Entities
             }
             set
             {
-                ComponentType.Text = value.ComponentType;
-                ComponentName.Text = value.ComponentName;
-                ComponentPart.Text = value.ComponentPart;
+                SubsystemType.Text = value.SubsystemType;
+                SubsystemName.Text = value.SubsystemName;
+                SubsystemComponent.Text = value.SubsystemComponent;
                 EntityName.Text = value.EntityName;
 
                 StorageStructure.Text = value.StorageStructure;
@@ -48,9 +48,9 @@ namespace InSite.UI.Admin.Database.Entities
 
         public override void Clear()
         {
-            ComponentType.Text = null;
-            ComponentName.Text = null;
-            ComponentPart.Text = null;
+            SubsystemType.Text = null;
+            SubsystemName.Text = null;
+            SubsystemComponent.Text = null;
             EntityName.Text = null;
 
             StorageStructure.Text = null;

@@ -100,7 +100,7 @@ namespace InSite.Admin.Messages.Messages.Forms
             var modeEnum = modeStr.ToEnum<NotificationMode>();
 
             if (!Enum.IsDefined(typeof(NotificationMode), modeEnum))
-                throw new ApplicationError("Unexpected notification mode: " + modeStr);
+                throw new ArgumentException("Unexpected notification mode: " + modeStr);
 
             var notice = Notifications.Select(TriggerModel.MessageName);
 
@@ -248,7 +248,7 @@ namespace InSite.Admin.Messages.Messages.Forms
 
         private System.Web.UI.Control GetControl(string id)
         {
-            return ControlHelper.GetControl(_container, id) ?? throw new ApplicationError("Control not found: " + id);
+            return ControlHelper.GetControl(_container, id) ?? throw new InvalidOperationException("Control not found: " + id);
         }
 
         private T GetControl<T>(string id)
@@ -257,7 +257,7 @@ namespace InSite.Admin.Messages.Messages.Forms
             if (ctrl is T t)
                 return t;
 
-            throw new ApplicationError($"Unexpected type of control ({id}): {typeof(T)}");
+            throw new InvalidOperationException($"Unexpected type of control ({id}): {typeof(T)}");
         }
 
         public static string MetadataToHtml(Dictionary<string, string> dictionary)

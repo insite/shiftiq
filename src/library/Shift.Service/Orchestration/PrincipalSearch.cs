@@ -1,11 +1,9 @@
-﻿using System.Reflection;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 using Microsoft.EntityFrameworkCore;
 
 using Shift.Common;
 using Shift.Constant;
-using Shift.Service.Directory;
 
 namespace Shift.Service;
 
@@ -14,25 +12,30 @@ public class PrincipalSearch : IPrincipalSearch
     private const string DefaultLanguage = "en";
     private const string DefaultTimeZone = "Mountain Standard Time";
 
+    private readonly AppSettings _appSettings;
     private readonly IClaimConverter _converter;
     private readonly IDbContextFactory<TableDbContext> _dbContextFactory;
 
     private static MemoryCache<Guid, string> SecretCache = new MemoryCache<Guid, string>();
 
-    public PrincipalSearch(IDbContextFactory<TableDbContext> dbContextFactory, IClaimConverter converter)
+    public PrincipalSearch(AppSettings appSettings, IDbContextFactory<TableDbContext> dbContextFactory, IClaimConverter converter)
     {
+        _appSettings = appSettings;
         _dbContextFactory = dbContextFactory;
         _converter = converter;
     }
 
-    public IShiftPrincipal? GetPrincipal(string secret)
+    public IPrincipal GetPrincipal(string secret)
     {
         using var db = _dbContextFactory.CreateDbContext();
 
         var personSecret = db.QPersonSecret.FirstOrDefault(x => x.SecretValue == secret);
 
         if (personSecret == null)
-            return null;
+            throw new SecretNotFoundException();
+
+        if (personSecret.SecretExpiry < DateTimeOffset.Now)
+            throw new SecretExpiredException();
 
         var person = db.QPerson.AsNoTracking()
             .Include(x => x.Organization)
@@ -40,7 +43,7 @@ public class PrincipalSearch : IPrincipalSearch
             .FirstOrDefault(x => x.PersonIdentifier == personSecret.PersonIdentifier);
 
         if (person?.User == null)
-            return null;
+            throw new UserNotFoundException();
 
         var principal = new Principal();
 
@@ -72,15 +75,11 @@ public class PrincipalSearch : IPrincipalSearch
 
         AddAuthority(principal, person);
 
-        var partitionSettings = db.TPartitionSetting.ToList();
-        var partitionId = partitionSettings.FirstOrDefault(x => x.SettingName == "Partition:Identifier")?.SettingValue;
-        var partitionSlug = partitionSettings.FirstOrDefault(x => x.SettingName == "Partition:Slug")?.SettingValue;
-        if (partitionId != null && partitionSlug != null)
-            principal.Partition = new Model
-            {
-                Identifier = Guid.Parse(partitionId),
-                Slug = partitionSlug
-            };
+        principal.Partition = new Model
+        {
+            Identifier = _appSettings.Partition.Identifier,
+            Slug = _appSettings.Partition.Slug
+        };
 
         var organizations = new List<Guid> { principal.Organization.Identifier };
 
@@ -105,18 +104,13 @@ public class PrincipalSearch : IPrincipalSearch
         return principal;
     }
 
-    public IShiftPrincipal? GetPrincipal(JwtRequest request, string ipAddress, bool isWhitelisted, int? lifetime, List<string> errors)
+    public IPrincipal GetPrincipal(JwtRequest request, string ipAddress, bool isWhitelisted, int? lifetime, List<string> errors)
     {
-        IShiftPrincipal? principal = null;
+        var isSentinel = _converter.IsSentinel(request.Secret);
 
-        if (isWhitelisted)
-            principal = _converter.ToSentinel(request);
-
-        if (principal == null)
-            principal = GetPrincipal(request.Secret);
-
-        if (principal == null)
-            return null;
+        var principal = (isSentinel && isWhitelisted)
+            ? _converter.ToSentinel(request)
+            : GetPrincipal(request.Secret);
 
         principal.IPAddress = ipAddress;
 
@@ -128,7 +122,11 @@ public class PrincipalSearch : IPrincipalSearch
     public string? GetSecret(IEnumerable<Claim> claims)
     {
         var principal = _converter.ToPrincipal(claims);
+        return GetSecret(principal);
+    }
 
+    public string? GetSecret(IPrincipal principal)
+    {
         var personId = principal.Person?.Identifier ?? Guid.Empty;
 
         if (personId != Guid.Empty && SecretCache.Exists(personId))
@@ -164,7 +162,7 @@ public class PrincipalSearch : IPrincipalSearch
 
     public static (AuthorityAccess, List<Role>) GetAuthority(ISystemRoles person)
     {
-        var access = AuthorityAccess.None;
+        var access = AuthorityAccess.Unspecified;
         var roles = new List<Role>();
 
         if (person.IsAdministrator)

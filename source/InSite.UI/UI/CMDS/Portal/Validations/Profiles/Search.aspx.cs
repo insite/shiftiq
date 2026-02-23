@@ -171,7 +171,7 @@ namespace InSite.Cmds.Actions.Profile.Employee.Profile
 
             NewDepartment.AutoPostBack = true;
             NewDepartment.ValueChanged += NewDepartment_ValueChanged;
-            NewDepartment.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            NewDepartment.Filter.OrganizationIdentifier = Organization.Identifier;
 
             EmploymentGrid.Deleted += EmploymentGrid_Deleted;
 
@@ -242,7 +242,7 @@ namespace InSite.Cmds.Actions.Profile.Employee.Profile
 
         private void Grid_DataBinding(object source, EventArgs e)
         {
-            var table = UserProfileRepository.SelectGridWithCompetencyCount(PersonID, CurrentIdentityFactory.ActiveOrganizationIdentifier, false, Grid.PageIndex, Grid.PageSize);
+            var table = UserProfileRepository.SelectGridWithCompetencyCount(PersonID, Organization.Identifier, false, Grid.PageIndex, Grid.PageSize);
 
             Grid.DataSource = table;
         }
@@ -441,11 +441,11 @@ namespace InSite.Cmds.Actions.Profile.Employee.Profile
             OtherGrid.Visible = false;
             OtherOrganizationHelp.InnerText = $"{firstName} has no active profiles in other organizations.";
 
-            var hasOtherProfiles = UserProfileRepository.HasOtherProfiles(CurrentIdentityFactory.ActiveOrganizationIdentifier, PersonID);
+            var hasOtherProfiles = UserProfileRepository.HasOtherProfiles(Organization.Identifier, PersonID);
 
             if (hasOtherProfiles)
             {
-                var table = UserProfileRepository.SelectOtherProfiles(CurrentIdentityFactory.ActiveOrganizationIdentifier, PersonID);
+                var table = UserProfileRepository.SelectOtherProfiles(Organization.Identifier, PersonID);
 
                 if (table != null)
                 {
@@ -464,7 +464,7 @@ namespace InSite.Cmds.Actions.Profile.Employee.Profile
 
         private void LoadProfiles()
         {
-            var profileCount = UserProfileRepository.SelectGridWithCompetencyCount(PersonID, CurrentIdentityFactory.ActiveOrganizationIdentifier, false, null, null).Rows.Count;
+            var profileCount = UserProfileRepository.SelectGridWithCompetencyCount(PersonID, Organization.Identifier, false, null, null).Rows.Count;
 
             ActiveOrganizationHelp.Visible = profileCount == 0;
             ActiveOrganizationHelp.InnerText = $"{_firstName} has no active profiles in this organization.";

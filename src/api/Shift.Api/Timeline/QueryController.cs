@@ -24,8 +24,8 @@ public class QueryController : ControllerBase
         _builder = new QueryBuilder(queryTypes, serializer);
     }
 
-    [HttpPost("timeline/queries")]
-    [HybridAuthorize(Policies.Timeline.Queries)]
+    [HttpPost("api/timeline/queries")]
+    [HybridPermission("timeline/queries")]
     public async Task<IActionResult> RunQueryAsync([FromQuery] string q, [FromQuery] QueryFilter filter)
     {
         try
@@ -73,7 +73,7 @@ public class QueryController : ControllerBase
 
         var resourceName = _reflector.GetResourceName(queryType);
 
-        if (IsGranted(principal, resourceName, roles, Common.SwitchAccess.On))
+        if (IsGranted(principal, resourceName, roles, Common.FeatureAccess.Use))
             return;
 
         var roleList = string.Join(", ", roles);
@@ -84,7 +84,7 @@ public class QueryController : ControllerBase
         throw new Common.AccessDeniedException(message);
     }
 
-    private bool IsGranted(IShiftPrincipal principal, string resourceSlug, IEnumerable<string> roles, Common.SwitchAccess access)
+    private bool IsGranted(IPrincipal principal, string resourceSlug, IEnumerable<string> roles, Common.FeatureAccess access)
     {
         var permissionList = _authorizationService.GetPermissions(principal.Organization.Slug);
 

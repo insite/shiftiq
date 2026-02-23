@@ -13,6 +13,7 @@ namespace InSite.Domain.Messages
             set => Slug = value.ToString();
         }
 
+        public NotificationMessageType MessageType { get; set; }
         public string Slug { get; set; }
         public string Purpose { get; set; }
         public string Subject { get; set; }
@@ -33,6 +34,8 @@ namespace InSite.Domain.Messages
         public Guid? OriginOrganization { get; set; }
         public Guid? OriginUser { get; set; }
         public Guid? MessageIdentifier { get; set; }
+
+        public DateTimeOffset? Scheduled { get; set; }
 
         public bool IsSafetyOff()
         {

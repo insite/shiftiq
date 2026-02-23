@@ -7,9 +7,10 @@ namespace Shift.Contract
 {
     public class CollectFiles : Query<IEnumerable<FileModel>>, IFileCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? UserIdentifier { get; set; }
-        public Guid? ObjectIdentifier { get; set; }
+        public Guid? ObjectId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? UserId { get; set; }
+        public Guid[] FileIds { get; set; }
 
         public string ObjectTypeExact { get; set; }
         public string ObjectIdentifierContains { get; set; }

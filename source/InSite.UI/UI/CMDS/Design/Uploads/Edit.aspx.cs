@@ -28,7 +28,7 @@ namespace InSite.Cmds.Design.Uploads
 
         public override void ApplyAccessControl()
         {
-            if (!IsAchievementUploader || OrganizationIdentifier != CurrentIdentityFactory.ActiveOrganizationIdentifier)
+            if (!IsAchievementUploader || OrganizationIdentifier != Organization.Identifier)
             {
                 if (!Identity.IsGranted(PermissionNames.Custom_CMDS_Administrators))
                     CreateAccessDeniedException();
@@ -89,7 +89,7 @@ namespace InSite.Cmds.Design.Uploads
             var containerId = UploadSearch.BindFirst(x => x.ContainerIdentifier, x => x.UploadIdentifier == UploadID.Value);
             var organizationId = OrganizationSearch.Select(containerId)?.OrganizationIdentifier;
 
-            _organizationId = organizationId ?? CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            _organizationId = organizationId ?? Organization.Identifier;
             _isCompanySpecific = organizationId.HasValue;
         }
 

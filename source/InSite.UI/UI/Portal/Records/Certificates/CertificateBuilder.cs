@@ -167,7 +167,7 @@ namespace InSite.UI.Portal.Records.Certificates
             }
             catch (ExternalException ex)
             {
-                throw new Exception("Unable to build a certificate image.", ex);
+                throw new InvalidOperationException("Unable to build a certificate image.", ex);
             }
         }
 

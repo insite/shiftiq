@@ -1,15 +1,15 @@
 export interface ApiFileMatch {
-    OrganizationIdentifier: string;
+    OrganizationId: string;
     OrganizationCode: string;
     ObjectType: string;
-    ObjectIdentifier: string;
-    FileIdentifier: string;
+    ObjectId: string;
+    FileId: string;
     FileLocation: string;
     FileName: string;
     DocumentName: string;
     FileSize: number;
     FileUploaded: string;
-    UserIdentifier: string;
+    UserId: string;
     UserFullName: string;
     HasClaims: boolean;
 }

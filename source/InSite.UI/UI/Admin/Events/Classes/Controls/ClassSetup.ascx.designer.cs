@@ -402,6 +402,24 @@ namespace InSite.UI.Admin.Events.Classes.Controls
         protected global::System.Web.UI.WebControls.Literal ClassCalendarColorName;
 
         /// <summary>
+        /// DisplayOnCalendarField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DisplayOnCalendarField;
+
+        /// <summary>
+        /// DisplayOnCalendar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox DisplayOnCalendar;
+
+        /// <summary>
         /// AssignInstructors control.
         /// </summary>
         /// <remarks>

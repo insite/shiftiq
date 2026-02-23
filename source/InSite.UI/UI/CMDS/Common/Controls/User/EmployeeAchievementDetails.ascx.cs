@@ -1,8 +1,10 @@
 using System;
-using System.Web.UI;
+using System.Linq;
 using System.Web.UI.WebControls;
 
 using InSite.Common.Web.Cmds;
+using InSite.Common.Web.UI;
+using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
@@ -11,7 +13,7 @@ using Shift.Constant.CMDS;
 
 namespace InSite.Custom.CMDS.User.Progressions.Controls
 {
-    public partial class EmployeeAchievementDetails : UserControl
+    public partial class EmployeeAchievementDetails : BaseUserControl
     {
         #region Classes
 
@@ -81,8 +83,6 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
             EnableSignOff.Enabled = canEditGrades && !isImpersonation;
 
             GradePercent.Enabled = canEditGrades;
-
-            DownloadGrid.AllowEdit = canEdit;
 
             Title.Enabled = hasValidationAccess;
             IsRequired.Enabled = hasValidationAccess;
@@ -284,7 +284,7 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
             SubType.EnsureDataBound();
 
             AchievementSelector.Filter.AchievementType = SubType.Value;
-            AchievementSelector.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            AchievementSelector.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementSelector.Filter.GlobalOrCompanySpecific = SubType.Value == "Module";
             AchievementSelector.Value = null;
 
@@ -368,11 +368,13 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
 
             DownloadGrid.LoadData(containerGuid, containerType);
 
-            DownloadGrid.AllowEdit =
-                webUser.IsInRole(CmdsRole.Programmers)
-                || webUser.IsInRole(CmdsRole.SystemAdministrators)
-                || webUser.IsInRole(CmdsRole.OfficeAdministrators)
-                || webUser.IsInRole(CmdsRole.FieldAdministrators);
+            var roleNames = Identity.Groups.Select(x => x.Name).ToArray();
+
+            var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
+
+            var allowAdmin = permissions.IsAllowed(PermissionNames.Custom_CMDS_Workers, roleNames, DataAccess.Administrate);
+
+            DownloadGrid.AllowEdit = allowAdmin;
 
             ToggleSignOff();
 
@@ -408,7 +410,7 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
             var isOther = string.IsNullOrEmpty(SubType.Value) || SubType.Value == "Other Achievements";
 
             AchievementSelector.Filter.AchievementType = SubType.Value;
-            AchievementSelector.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            AchievementSelector.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementSelector.Filter.GlobalOrCompanySpecific = SubType.Value == "Module" || (achievementOrganizationId == OrganizationIdentifiers.CMDS);
             AchievementSelector.Value = null;
 
@@ -468,8 +470,21 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
 
         private void ToggleSignOff()
         {
-            EnableSignOff.Enabled = EmployeeAchievementHelper.TypeAllowsSignOff(SubType.Value) && AchievementSelector.HasValue;
-            EnableSignOff.Text = EnableSignOff.Enabled ? string.Empty : "Sign off cannot be enabled for this type of achievement";
+            bool hasAchievement = AchievementSelector.HasValue;
+
+            bool typeSupportsSignOff = hasAchievement
+                && EmployeeAchievementHelper.AllowSignOff(AchievementSelector.Value.Value);
+
+            bool signOffAvailable = typeSupportsSignOff
+                && hasAchievement;
+
+            EnableSignOff.Enabled = signOffAvailable;
+
+            EnableSignOff.Text = !hasAchievement
+                ? "Select an achievement to enable sign-off"
+                : !typeSupportsSignOff
+                    ? "Sign-off is not available for this achievement"
+                    : "Learners can sign off on this achievement themselves";
         }
 
         #endregion

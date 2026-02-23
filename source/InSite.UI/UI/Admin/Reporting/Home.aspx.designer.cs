@@ -123,22 +123,13 @@ namespace InSite.UI.Admin.Reporting
         protected global::System.Web.UI.HtmlControls.HtmlAnchor DatabaseQueryRow;
 
         /// <summary>
-        /// CurrentUserSessions control.
+        /// CurrentUserSessionsLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CurrentUserSessions;
-
-        /// <summary>
-        /// CurrentSessionGrid control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.UI.Admin.Reporting.Controls.OnlineUsersGrid CurrentSessionGrid;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor CurrentUserSessionsLink;
 
         /// <summary>
         /// SystemAdministrationPanel control.

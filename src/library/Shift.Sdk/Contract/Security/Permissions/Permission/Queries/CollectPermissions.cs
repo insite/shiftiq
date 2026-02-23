@@ -7,9 +7,9 @@ namespace Shift.Contract
 {
     public class CollectPermissions : Query<IEnumerable<PermissionModel>>, IPermissionCriteria
     {
-        public Guid? GroupIdentifier { get; set; }
-        public Guid? ObjectIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? GroupId { get; set; }
+        public Guid? ObjectId { get; set; }
+        public Guid? OrganizationId { get; set; }
         public Guid? PermissionGrantedBy { get; set; }
         public bool? AllowAdministrate { get; set; }
         public bool? AllowConfigure { get; set; }

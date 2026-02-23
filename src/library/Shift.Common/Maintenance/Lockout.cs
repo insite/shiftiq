@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common;
-
 namespace Shift.Common
 {
     public class Lockout : Model
@@ -94,19 +92,28 @@ namespace Shift.Common
         public bool IsValid()
             => !Validate().Any();
 
-        public IEnumerable<ValidationError> Validate()
+        public IEnumerable<Problem> Validate()
         {
             var errors = Interval.Validate().ToList();
 
             foreach (var i in Environments)
                 if (i.MatchesNone(Shift.Common.Environments.Names))
-                    errors.Add(new ValidationError { Property = nameof(Environments), Summary = $"Environments can contain only items in this list: {string.Join("; ", Shift.Common.Environments.Names)}" });
+                    AddProblem(errors, nameof(Environments), $"Environments can contain only items in this list: {string.Join("; ", Shift.Common.Environments.Names)}");
 
             foreach (var i in Interfaces)
                 if (i.MatchesNone(new[] { "api", "ui" }))
-                    errors.Add(new ValidationError { Property = nameof(Environments), Summary = "Interfaces can contain only items in this list: API; UI" });
+                    AddProblem(errors, nameof(Environments), "Interfaces can contain only items in this list: API; UI");
 
             return errors;
+        }
+
+        private void AddProblem(List<Problem> problems, string property, string detail)
+        {
+            var problem = new Problem(422, detail);
+
+            problem.Extensions.Add("Property", property);
+
+            problems.Add(problem);
         }
     }
 }

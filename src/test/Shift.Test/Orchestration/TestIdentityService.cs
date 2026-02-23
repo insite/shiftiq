@@ -4,13 +4,14 @@ using System.Security.Principal;
 using Shift.Common;
 using Shift.Contract;
 using Shift.Contract.Presentation;
+using Shift.Sdk.UI.Navigation;
 
 namespace Shift.Test
 {
     public class TestOrganization : Model
     {
-        private static Guid TestId = Guid.Parse("657B5405-68D3-4A7A-95A3-C4E19D101352"); // Keyera
-        private static string TestSlug = "keyera";
+        private static Guid TestId = Guid.Parse("4d22c740-88ed-4dde-9de1-ac3a011805cf"); // Demo
+        private static string TestSlug = "demo";
 
         public TestOrganization()
         {
@@ -22,8 +23,8 @@ namespace Shift.Test
 
     public class TestPartition : Model
     {
-        private static Guid TestId = Guid.Parse("8258CB0A-D1E8-4BC1-94B3-E70652503437"); // CMDS
-        private static string TestSlug = "E03";
+        private static Guid TestId = Guid.Parse("0c071b03-6fe1-400f-82f4-78ff6f751ae7"); // E01
+        private static string TestSlug = "e01";
 
         public TestPartition()
         {
@@ -33,7 +34,7 @@ namespace Shift.Test
         }
     }
 
-    public class TestIdentityService : IShiftIdentityService
+    public class TestIdentityService
     {
         public Guid OrganizationId
         {
@@ -45,7 +46,22 @@ namespace Shift.Test
             }
         }
 
-        public IShiftPrincipal GetPrincipal()
+        public bool AllowOrganizationAccess(Shift.Common.IPrincipal principal, Guid organization)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ClearCacheByUserId(Guid userId)
+        {
+
+        }
+
+        public Guid? GetOrganizationId(Shift.Common.IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Shift.Common.IPrincipal GetPrincipal()
         {
             return new TestPrincipal();
         }
@@ -54,9 +70,14 @@ namespace Shift.Test
         {
             return TimeZones.Mountain;
         }
+
+        public void ValidateOrganizationId(Shift.Common.IPrincipal principal, IQueryByOrganization query)
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    public class TestPrincipal : IShiftPrincipal
+    public class TestPrincipal : Shift.Common.IPrincipal
     {
         private Actor _actor;
         private Model _organization;
@@ -91,6 +112,12 @@ namespace Shift.Test
 
             if (IsOperator)
                 Roles.Add(new Role(SystemRole.Operator));
+        }
+
+        public Guid CookieId
+        {
+            get => Guid.Empty;
+            set { }
         }
 
         public IJwt Claims { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -145,9 +172,27 @@ namespace Shift.Test
 
         public IIdentity? Identity => throw new NotImplementedException();
 
-        public Guid? OrganizationId => _organization.Identifier;
+        public Guid OrganizationId => _organization.Identifier;
 
-        public Guid? UserId => _actor.Identifier;
+        public Guid UserId => _actor.Identifier;
+
+        public TimeZoneInfo TimeZone
+        {
+            get
+            {
+                if (User?.TimeZone == null)
+                    return TimeZoneInfo.Utc;
+
+                try
+                {
+                    return TimeZoneInfo.FindSystemTimeZoneById(User.TimeZone);
+                }
+                catch (TimeZoneNotFoundException)
+                {
+                    return TimeZoneInfo.Utc;
+                }
+            }
+        }
 
         public Guid[] RoleIds => _roles.Select(x => x.Identifier).ToArray();
 
@@ -165,21 +210,30 @@ namespace Shift.Test
 
     public class TestNavigationService : INavigationService
     {
-        public List<BreadcrumbItem> CollectBreadcrumbs(ActionModel action)
+        public NavigationHome? GetHome(Shift.Common.IPrincipal principal) => null;
+
+        public List<BreadcrumbItem> CollectBreadcrumbs(ActionModel action, Shift.Common.IPrincipal principal)
         {
             var list = new List<BreadcrumbItem>();
 
             return list;
         }
 
-        public List<NavigationList> SearchMenus(IShiftPrincipal principal, bool isCmds)
+        public List<NavigationList> SearchMenus(Shift.Common.IPrincipal principal, bool isCmds)
         {
             var list = new List<NavigationList>();
 
             return list;
         }
 
-        public Task<List<NavigationItem>> SearchShortcutsAsync(IShiftPrincipal principal)
+        public List<NavigationList> SearchAdminMenus(Shift.Common.IPrincipal principal, bool isCmds)
+        {
+            var list = new List<NavigationList>();
+
+            return list;
+        }
+
+        public Task<List<NavigationItem>> SearchShortcutsAsync(Shift.Common.IPrincipal principal)
         {
             var list = new List<NavigationItem>();
 

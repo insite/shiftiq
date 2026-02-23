@@ -35,6 +35,17 @@ namespace InSite.Persistence
             }
         }
 
+        public string GetGroupName(Guid groupId)
+        {
+            using (var db = CreateContext())
+            {
+                var query = db.QGroups
+                    .FirstOrDefault(x => x.GroupIdentifier == groupId);
+
+                return query?.GroupName;
+            }
+        }
+
         public int CountGroups(QGroupFilter filter)
         {
             using (var db = CreateContext())
@@ -255,9 +266,6 @@ namespace InSite.Persistence
             if (filter.UserIdentifier.HasValue)
                 query = query.Where(x => x.VMemberships.FirstOrDefault(y => y.UserIdentifier == filter.UserIdentifier) != null);
 
-            if (filter.MembershipUserIdentifier.HasValue)
-                query = query.Where(x => x.VMemberships.Any(y => y.UserIdentifier == filter.MembershipUserIdentifier));
-
             if (filter.UtcCreatedSince.HasValue)
                 query = query.Where(x => x.GroupCreated >= filter.UtcCreatedSince.Value);
 
@@ -349,6 +357,20 @@ namespace InSite.Persistence
 
             if (filter.OnlyOperatorCanAddUser.HasValue)
                 query = query.Where(x => x.OnlyOperatorCanAddUser == filter.OnlyOperatorCanAddUser);
+
+            {
+                var membershipQuery = db.QMemberships.AsQueryable();
+                var hasMembershipFilter = false;
+
+                if (filter.MembershipUserIdentifiers.IsNotEmpty())
+                    membershipQuery = membershipQuery.Where(x => filter.MembershipUserIdentifiers.Contains(x.UserIdentifier));
+
+                if (filter.MembershipFunction.IsNotEmpty())
+                    membershipQuery = membershipQuery.Where(x => x.MembershipFunction == filter.MembershipFunction);
+
+                if (hasMembershipFilter)
+                    query = query.Where(x => membershipQuery.Select(y => y.GroupIdentifier).Contains(x.GroupIdentifier));
+            }
 
             return query;
         }

@@ -32,7 +32,7 @@ namespace InSite.UI.Portal.Integrations.Scorm
                 var organization = Identity.Organization;
                 var organizationId = CourseSearch.BindActivityFirst(x => x.Module.Unit.Course.OrganizationIdentifier, x => x.ActivityIdentifier == activityId);
 
-                if (organizationId != organization.Identifier && organizationId != organization.ParentOrganizationIdentifier)
+                if (organizationId != organization.Identifier && organizationId != ServiceLocator.Partition.Identifier)
                 {
                     var org = OrganizationSearch.Select(organizationId);
                     HandleError($"This activity belongs to another organization account ({org.Name}).");
@@ -91,13 +91,18 @@ namespace InSite.UI.Portal.Integrations.Scorm
 
             activityUrl = HttpRequestHelper.GetAbsoluteUrl(activityUrl);
 
-            var exitUrl = StringHelper.EncodeBase64(activityUrl);
+            var encodedExitUrl = StringHelper.EncodeBase64(activityUrl);
+
+            var progressUrl = StringHelper.Replace(
+                PathHelper.GetAbsoluteUrl(scoop.CallbackPath), "{activity}", activityId.ToString());
+
+            var encodedProgressUrl = StringHelper.EncodeBase64(progressUrl);
 
             if (scoop.Relay.Enabled)
             {
                 var linkGenerator = new ScoopLinkGenerator();
 
-                var scoopUrl = linkGenerator.GenerateCourseUrl(Identity, host, Organization.Code, package, exitUrl);
+                var scoopUrl = linkGenerator.GenerateCourseUrl(Identity, host, Organization.Code, package, encodedProgressUrl, encodedExitUrl);
 
                 return scoopUrl;
             }
@@ -112,7 +117,7 @@ namespace InSite.UI.Portal.Integrations.Scorm
 
                 var relativePath = $"{Organization.Code}/{package}";
 
-                var queryString = $"exitUrl={exitUrl}";
+                var queryString = $"progressUrl={encodedProgressUrl}&exitUrl={encodedExitUrl}";
 
                 var launchUri = new Uri(baseUri, relativePath + "?" + queryString);
 

@@ -1,13 +1,13 @@
 import { Control, Path, useController } from "react-hook-form";
 import Finder, { FinderProps } from "./Finder";
-import { fieldRequiredMessage } from "@/helpers/errorHelper";
+import { errorHelper } from "@/helpers/errorHelper";
 
 export interface ControlledFinderProps<Criteria extends object>
     extends Omit<FinderProps, "ref" | "value" | "error" | "onChange" | "onBlur">
 {
     name: Path<Criteria>;
     control: Control<Criteria>;
-    required?: boolean;
+    required?: boolean | string;
     validate?: (value: string | null) => string | undefined;
 }
 
@@ -25,7 +25,7 @@ export default function ControlledFinder<Criteria extends object>({
             ? {
                 validate: (value: string | null | undefined) => {
                     if (required && !value) {
-                        return fieldRequiredMessage;
+                        return errorHelper.createFieldRequiredMessage(required);
                     }
                     return validate?.(value ?? null);
                 }

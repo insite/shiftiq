@@ -6,7 +6,7 @@ namespace Shift.Contract
 {
     public class CountSites : Query<int>, ISiteCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
 
         public string LastChangeType { get; set; }
         public string LastChangeUser { get; set; }

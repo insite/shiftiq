@@ -28,7 +28,7 @@ namespace InSite.UI.Portal.Home
                 if (_programSearch == null)
                 {
                     var groupIds = Identity.Groups.Select(x => x.Identifier).ToArray();
-                    _programSearch = VCatalogProgramSearch.Create(Identity.Organization.Identifier, null, groupIds, true);
+                    _programSearch = VCatalogProgramSearch.Create(Identity.Organization.Identifier, null, groupIds, true, ServiceLocator.Partition);
                 }
 
                 return _programSearch;

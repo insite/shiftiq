@@ -12,21 +12,18 @@ public class UserReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "FullName, UserIdentifier";
 
-    public UserReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public UserReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid user, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid user, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db);
+            var query = BuildQueryable(db, organization);
 
             return query.AnyAsync(x => x.UserIdentifier == user, cancellation);
 
@@ -70,14 +67,14 @@ public class UserReader : IEntityReader
         }
     }
 
-    public Task<UserEntity?> RetrieveAsync(Guid user, CancellationToken cancellation = default)
+    public Task<UserEntity?> RetrieveAsync(Guid user, Guid? organization = null, CancellationToken cancellation = default)
     {
         if (user == Guid.Empty)
             return Task.FromResult<UserEntity?>(null);
 
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db);
+            var query = BuildQueryable(db, organization);
 
             return query.FirstOrDefaultAsync(x => x.UserIdentifier == user, cancellation);
 
@@ -107,19 +104,19 @@ public class UserReader : IEntityReader
     /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
     /// ordering fully unique, otherwise the result set is non-deterministic.
     /// </remarks>
-    private IQueryable<UserEntity> BuildQueryable(TableDbContext db)
+    private IQueryable<UserEntity> BuildQueryable(TableDbContext db, Guid? organization)
     {
-        ValidateOrganizationContext();
+        var query = db.QUser.AsNoTracking();
 
-        var principal = _auth.GetPrincipal();
+        if (organization != null)
+        {
+            var organizationUsers = db.QPerson
+                .Where(x => x.OrganizationIdentifier == organization.Value)
+                .Select(x => x.UserIdentifier);
 
-        var organizationUsers = db.QPerson
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId)
-            .Select(x => x.UserIdentifier);
-
-        var query = db.QUser
-            .AsNoTracking()
-            .Join(organizationUsers, u => u.UserIdentifier, user => user, (u, user) => u);
+            query = query
+                .Join(organizationUsers, u => u.UserIdentifier, user => user, (u, user) => u);
+        }
 
         return query;
     }
@@ -128,7 +125,7 @@ public class UserReader : IEntityReader
     {
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
-        var query = BuildQueryable(db);
+        var query = BuildQueryable(db, criteria.OrganizationId);
 
         if (criteria.UserEmailExact.IsNotEmpty())
             query = query.Where(x => x.Email == criteria.UserEmailExact);
@@ -151,7 +148,7 @@ public class UserReader : IEntityReader
         var matches = await queryable
             .Select(entity => new UserMatch
             {
-                UserIdentifier = entity.UserIdentifier,
+                UserId = entity.UserIdentifier,
                 FullName = entity.FullName
             })
             .ToListAsync(cancellation);
@@ -159,9 +156,4 @@ public class UserReader : IEntityReader
         return matches;
     }
 
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
-    }
 }

@@ -9,5 +9,7 @@ namespace InSite.Application.Organizations.Read
         QOrganization Get(Guid organization);
 
         OrganizationState GetModel(Guid organization);
+
+        bool CodeExists(string code, Guid? excludeOrganization = null);
     }
 }

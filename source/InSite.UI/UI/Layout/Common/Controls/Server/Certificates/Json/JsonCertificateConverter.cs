@@ -53,7 +53,7 @@ namespace InSite.Common.Web.UI.Certificates.Json
             if (type == "iecbc-2")
                 return jObj.ToObject<iecbcCertificate2>(inSerializer);
 
-            throw new ApplicationError("Unexpected certificate element type: " + (type ?? "null"));
+            throw new FormatException("Unexpected certificate element type: " + (type ?? "null"));
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -69,7 +69,7 @@ namespace InSite.Common.Web.UI.Certificates.Json
             else if (value is iecbcCertificate2)
                 type = "iecbc-2";
             else
-                throw new ApplicationError("Unexpected certificate type: " + value.GetType());
+                throw new InvalidOperationException("Unexpected certificate type: " + value.GetType());
 
             var inSerializer = new InternalJsonSerializer();
             var jObj = JObject.FromObject(value, inSerializer);

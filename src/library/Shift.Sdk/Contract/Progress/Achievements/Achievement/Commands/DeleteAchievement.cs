@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteAchievement
     {
-        public Guid AchievementIdentifier { get; set; }
+        public Guid AchievementId { get; set; }
     }
 }

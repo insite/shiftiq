@@ -39,12 +39,11 @@ namespace Shift.Common
                 {
                     var values = SplitCsvLine(line, columnCount, separator.Value);
 
-                    // if (lineNumber > 1 || !firstRowContainsColumnNames)
                     list.Add(values);
                 }
                 catch (ApplicationError ex)
                 {
-                    throw ApplicationError.Create(ex, "Unexpected Error on Line {0}: {1}", lineNumber, ex.Message);
+                    throw new FormatException(string.Format("An unexpected error occurred on line {0}: {1}", lineNumber, ex.Message), ex);
                 }
 
                 lineNumber++;

@@ -144,10 +144,11 @@ namespace InSite.Admin.Achievements.Achievements.Controls
             return GetCredentialExpiry((VCredential)item);
         }
 
-        public static string GetCredentialExpiryDate(VCredential credential, string dateTimeFormat = null)
+        public static string GetCredentialExpiryDate(VCredential credential, string dateTimeFormat = null) =>
+            GetCredentialExpiryDate(credential.CredentialExpirationExpected, credential.CredentialExpired, dateTimeFormat);
+
+        public static string GetCredentialExpiryDate(DateTimeOffset? expected, DateTimeOffset? actual, string dateTimeFormat = null)
         {
-            var expected = credential.CredentialExpirationExpected;
-            var actual = credential.CredentialExpired;
             var now = DateTimeOffset.UtcNow;
             var userTimeZone = User.TimeZone;
 
@@ -168,24 +169,27 @@ namespace InSite.Admin.Achievements.Achievements.Controls
                 : adjustedDate.ToString(dateTimeFormat);
         }
 
-        public static string GetCredentialExpiry(VCredential credential)
+        public static string GetCredentialExpiry(VCredential credential) =>
+            GetCredentialExpiry(credential.CredentialExpirationExpected, credential.CredentialExpired);
+
+        public static string GetCredentialExpiry(DateTimeOffset? expected, DateTimeOffset? actual)
         {
-            var age = GetCredentialExpiryDate(credential);
+            var age = GetCredentialExpiryDate(expected, actual);
             var now = DateTimeOffset.UtcNow;
 
-            if (credential.CredentialExpirationExpected.HasValue && credential.CredentialExpirationExpected.Value > now)
+            if (expected.HasValue && expected.Value > now)
             {
-                var span = credential.CredentialExpirationExpected.Value - now;
+                var span = expected.Value - now;
                 var days = span.TotalDays;
 
                 if (days > 90)
                     return $"<div>{age}</div><div class='badge bg-success'>{span.Humanize(1, true, CultureInfo.CurrentCulture, TimeUnit.Month)} from now</div>";
                 else
-                    return $"<div>{age}</div><div class='badge bg-warning'>{credential.CredentialExpirationExpected.Value.Humanize()}</div>";
+                    return $"<div>{age}</div><div class='badge bg-warning'>{expected.Value.Humanize()}</div>";
             }
-            else if (credential.CredentialExpired.HasValue || (credential.CredentialExpirationExpected.HasValue && credential.CredentialExpirationExpected.Value < now))
+            else if (actual.HasValue || (expected.HasValue && expected.Value < now))
             {
-                var expired = credential.CredentialExpired ?? credential.CredentialExpirationExpected.Value;
+                var expired = actual ?? expected.Value;
                 return $"<div>{age}</div><div class='badge bg-danger'>{expired.Humanize()}</div>";
             }
 

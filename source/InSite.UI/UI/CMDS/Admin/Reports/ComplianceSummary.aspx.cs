@@ -155,8 +155,11 @@ namespace InSite.Cmds.Admin.Reports.Forms
             if (IsPostBack)
                 return;
 
-            PageHelper.AutoBindHeader(this);
-            PageHelper.OverrideTitle(this, GetReportTitle(false));
+            var title = GetReportTitle(false);
+
+            PageHelper.AutoBindHeader(this, null, null, title);
+
+            PageHelper.OverrideTitle(this, title);
 
             EnsureAchievementDisplayMapping();
             LoadReportType();
@@ -170,6 +173,8 @@ namespace InSite.Cmds.Admin.Reports.Forms
                     AlertType.Warning,
                     "The data for the compliance summary report is being refreshed. Please wait a few minutes and try again.");
             }
+
+            ScreenStatus.AddMessage(AlertType.Information, CmdsReportHelper.SnapshotStatusHtml(User.TimeZone));
         }
 
         private void LoadReportType()
@@ -501,7 +506,7 @@ $(window).one('load', function () {{
             var result = new SearchParameters
             {
                 ReportType = ReportType.SelectedValue,
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 Departments = DepartmentIdentifier.Values,
                 Employees = EmployeeIdentifier.Values,
                 MembershipType = MembershipEnum.None,

@@ -6,7 +6,6 @@ using InSite.Application.Files.Read;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.UI.Layout.Admin;
-using InSite.Web.Helpers;
 
 using Shift.Common;
 using Shift.Constant;
@@ -19,11 +18,30 @@ namespace InSite.UI.Admin.Assets.Files
 
         private Guid? CaseIdentifier => Guid.TryParse(Request.QueryString["case"], out var id) ? id : (Guid?)null;
 
-        private FileObjectType ObjectType => UserIdentifier.HasValue
-            ? FileObjectType.User
-            : FileObjectType.Issue;
+        private Guid? StandardIdentifier => Guid.TryParse(Request.QueryString["standard"], out var id) ? id : (Guid?)null;
 
-        private Guid ObjectIdentifier => UserIdentifier ?? CaseIdentifier ?? Guid.Empty;
+        private FileObjectType ObjectType
+        {
+            get
+            {
+                if (UserIdentifier.HasValue)
+                    return FileObjectType.User;
+
+                if (StandardIdentifier.HasValue)
+                    return FileObjectType.Standard;
+
+                if (CaseIdentifier.HasValue)
+                    return FileObjectType.Issue;
+
+                throw new ArgumentException("ObjectId is not defined");
+            }
+        }
+
+        private Guid ObjectIdentifier =>
+            UserIdentifier
+            ?? StandardIdentifier
+            ?? CaseIdentifier
+            ?? throw new ArgumentException("ObjectId is not defined");
 
         protected override void OnLoad(EventArgs e)
         {
@@ -54,8 +72,8 @@ namespace InSite.UI.Admin.Assets.Files
         {
             var parent = GetParent();
 
-            if (!Identity.IsActionAuthorized(parent.Name)
-                || !Identity.IsGranted(parent.ToolkitNumber, PermissionOperation.Write))
+            if (!Identity.IsGranted(parent.Name)
+                || !Identity.IsGranted(parent.ToolkitNumber, DataAccess.Update))
             {
                 CreateAccessDeniedException();
             }
@@ -96,6 +114,8 @@ namespace InSite.UI.Admin.Assets.Files
                     return parent.Name.EndsWith("/edit") ? $"contact={ObjectIdentifier}&panel=attachments" : null;
                 case FileObjectType.Issue:
                     return parent.Name.EndsWith("/outline") ? $"case={ObjectIdentifier}&panel=attachments#case-attachments" : null;
+                case FileObjectType.Standard:
+                    return parent.Name.EndsWith("/edit") ? $"id={ObjectIdentifier}&panel=attachments" : null;
                 default:
                     throw new NotImplementedException($"Support for {ObjectType} is not implemented");
             }
@@ -112,6 +132,9 @@ namespace InSite.UI.Admin.Assets.Files
                     break;
                 case FileObjectType.Issue:
                     actionName = "ui/admin/workflow/cases/outline";
+                    break;
+                case FileObjectType.Standard:
+                    actionName = "ui/admin/standards/edit";
                     break;
                 default:
                     throw new NotImplementedException($"Support for {ObjectType} is not implemented");

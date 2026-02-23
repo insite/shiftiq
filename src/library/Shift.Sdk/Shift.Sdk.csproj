@@ -14,6 +14,11 @@
     <None Remove="Service\Content\Contents\Write\**" />
     <None Remove="Service\Content\Sites\Process\Write\Interfaces\**" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <EmbeddedResource Include="UI\Navigation\sidebar-cmds.json" />
+    <EmbeddedResource Include="UI\Navigation\sidebar.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Service\Messaging\Messages\State\Notifications\NotificationTypes.json" />
@@ -34,6 +39,10 @@
     <Compile Update="Service\Directory\Contacts\Process\Read\Queries\QUserFilter.extensions.cs">
       <DependentUpon>QUserFilter.cs</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Service\Security\Partitions\State\" />
   </ItemGroup>
 
 </Project>

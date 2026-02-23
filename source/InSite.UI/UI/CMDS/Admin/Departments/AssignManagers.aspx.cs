@@ -81,7 +81,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         {
             PageHelper.AutoBindHeader(this);
 
-            Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Department.Filter.OrganizationIdentifier = Organization.Identifier;
             Department.Filter.UserIdentifier =
                 FinderSecurityInfo.CanSeeAllDepartments || Identity.HasAccessToAllCompanies
                     ? (Guid?)null

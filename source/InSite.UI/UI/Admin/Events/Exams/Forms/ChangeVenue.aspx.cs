@@ -10,8 +10,6 @@ using InSite.UI.Layout.Admin;
 using Shift.Common;
 using Shift.Constant;
 
-using PermissionOperation = Shift.Constant.PermissionOperation;
-
 namespace InSite.Admin.Events.Exams.Forms
 {
     public partial class ChangeVenue : AdminBasePage, IHasParentLinkParameters
@@ -40,7 +38,7 @@ namespace InSite.Admin.Events.Exams.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 NavigateToSearch();
 
             LoadEvent();

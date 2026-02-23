@@ -8,9 +8,9 @@ namespace Shift.Contract
     {
         QueryFilter Filter { get; set; }
 
-        Guid? NavigationParentActionIdentifier { get; set; }
+        Guid? NavigationParentActionId { get; set; }
 
-        Guid? PermissionParentActionIdentifier { get; set; }
+        Guid? PermissionParentActionId { get; set; }
 
         string ActionIcon { get; set; }
 

@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveSite : Query<SiteModel>
     {
-        public Guid SiteIdentifier { get; set; }
+        public Guid SiteId { get; set; }
     }
 }

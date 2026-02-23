@@ -351,7 +351,7 @@ namespace InSite.Admin.Records.Programs
         {
             var organization = CurrentSessionState.Identity.Organization;
 
-            var taskObjectData = ProgramHelper.GetTaskObjectData(organization.OrganizationIdentifier, organization.ParentOrganizationIdentifier);
+            var taskObjectData = ProgramHelper.GetTaskObjectData(organization.OrganizationIdentifier);
 
             var filter = new TTaskFilter
             {

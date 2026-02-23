@@ -77,7 +77,7 @@ namespace Shift.Common.Linq
                 case ExpressionType.ListInit:
                     return VisitListInit((ListInitExpression) exp);
                 default:
-                    throw new Exception($"Unhandled expression type: '{exp.NodeType}'");
+                    throw new NotSupportedException($"Unhandled expression type: '{exp.NodeType}'");
             }
         }
 
@@ -107,7 +107,7 @@ namespace Shift.Common.Linq
                 case MemberBindingType.ListBinding:
                     return VisitMemberListBinding((MemberListBinding) binding);
                 default:
-                    throw new Exception($"Unhandled binding type '{binding.BindingType}'");
+                    throw new NotSupportedException($"Unhandled binding type '{binding.BindingType}'");
             }
         }
 

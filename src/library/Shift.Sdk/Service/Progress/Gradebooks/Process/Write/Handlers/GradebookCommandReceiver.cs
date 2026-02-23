@@ -37,7 +37,9 @@ namespace InSite.Application.Records.Write
             commander.Subscribe<CalculateGradebook>(Handle);
             commander.Subscribe<ChangeGradebookAchievement>(Handle);
             commander.Subscribe<AddGradebookEvent>(Handle);
+            commander.Subscribe<AddGradebookGroupEnrollment>(Handle);
             commander.Subscribe<RemoveGradebookEvent>(Handle);
+            commander.Subscribe<RemoveGradebookGroupEnrollment>(Handle);
             commander.Subscribe<ChangeGradebookPeriod>(Handle);
             commander.Subscribe<ChangeGradebookType>(Handle);
             commander.Subscribe<ChangeGradebookUserPeriod>(Handle);
@@ -162,6 +164,23 @@ namespace InSite.Application.Records.Write
             });
         }
 
+        public void Handle(AddGradebookGroupEnrollment c)
+        {
+            _repository.LockAndRun<GradebookAggregate>(c.AggregateIdentifier, (aggregate) =>
+            {
+                ValidateLocked(aggregate);
+
+                var data = aggregate.Data;
+
+                if (data.GroupEnrollments.Any(x => x.Enrollment == c.Enrollment || x.Group == c.Group))
+                    return;
+
+                aggregate.AddGradebookGroupEnrollment(c.Enrollment, c.Group);
+
+                Commit(aggregate, c);
+            });
+        }
+
         public void Handle(RemoveGradebookEvent c)
         {
             _repository.LockAndRun<GradebookAggregate>(c.AggregateIdentifier, (aggregate) =>
@@ -180,6 +199,25 @@ namespace InSite.Application.Records.Write
                     : (Guid?)null;
 
                 aggregate.RemoveGradebookEvent(c.Event, newPrimaryEvent);
+                Commit(aggregate, c);
+            });
+        }
+
+        public void Handle(RemoveGradebookGroupEnrollment c)
+        {
+            _repository.LockAndRun<GradebookAggregate>(c.AggregateIdentifier, (aggregate) =>
+            {
+                var data = aggregate.Data;
+                if (!data.IsOpen)
+                    return;
+
+                ValidateLocked(aggregate);
+
+                if (!data.GroupEnrollments.Any(x => x.Enrollment == c.Enrollment))
+                    return;
+
+                aggregate.RemoveGradebookGroupEnrollment(c.Enrollment);
+
                 Commit(aggregate, c);
             });
         }

@@ -1,11 +1,10 @@
 ﻿using System;
 
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Exceptions;
-
 using InSite.Domain.Contacts;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Exceptions;
 
 namespace InSite.Application.Contacts.Read
 {
@@ -196,6 +195,9 @@ namespace InSite.Application.Contacts.Read
                         break;
                     case UserField.UserPasswordChanged:
                         x.UserPasswordChanged = e.Value;
+                        break;
+                    case UserField.EmailVerificationTokenIssued:
+                        x.EmailVerificationTokenIssued = e.Value;
                         break;
                     default:
                         throw new ArgumentException($"Unsupported date offset user field: {e.UserField}");

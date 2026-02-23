@@ -17,9 +17,9 @@ public class SubmissionService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid responseSession, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid responseSession, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(responseSession, cancellation);
+        return await _reader.AssertAsync(responseSession, organization, cancellation);
     }
 
     public async Task<IEnumerable<SubmissionModel>> CollectAsync(ISubmissionCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class SubmissionService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifySubmission modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.ResponseSessionIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.ResponseSessionId, cancellation);
 
         if (entity == null)
             return false;

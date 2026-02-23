@@ -7,7 +7,8 @@ namespace Shift.Contract
 {
     public class CollectCaseStatuses : Query<IEnumerable<CaseStatusModel>>, ICaseStatusCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+
         public string CaseTypeContains { get; set; }
         public string CaseTypeExact { get; set; }
         public string StatusNameContains { get; set; }
@@ -16,6 +17,7 @@ namespace Shift.Contract
         public string StatusCategoryExact { get; set; }
         public string ReportCategoryContains { get; set; }
         public string ReportCategoryExact { get; set; }
+
         public int? StatusSequenceSince { get; set; }
         public int? StatusSequenceBefore { get; set; }
     }

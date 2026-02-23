@@ -12,6 +12,7 @@ using InSite.UI.Layout.Admin;
 
 using Newtonsoft.Json;
 
+using Shift.Common;
 using Shift.Common.Events;
 using Shift.Constant;
 
@@ -89,7 +90,7 @@ namespace InSite.UI.Admin.Standards
                 RootKey = StandardSearch.GetStandardRootKey(standard.StandardIdentifier) ?? standard.StandardIdentifier,
             };
 
-            EditViewButtons.Visible = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write);
+            EditViewButtons.Visible = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update);
 
             if (standard.StandardIdentifier != CurrentData.RootKey)
                 standard = StandardSearch.Select(CurrentData.RootKey);
@@ -123,7 +124,7 @@ namespace InSite.UI.Admin.Standards
                 var editor = EditorContainer.GetControl() as OutlineEdit
                     ?? (OutlineEdit)EditorContainer.LoadControl("~/UI/Admin/Standards/Standards/Controls/OutlineEdit.ascx");
 
-                var canDelete = Identity.IsGranted(PermissionIdentifiers.Admin_Standards, PermissionOperation.Delete);
+                var canDelete = Identity.IsGranted(PermissionIdentifiers.Admin_Standards, DataAccess.Delete);
 
                 if (!editor.LoadData(args.StandardAsset, canDelete))
                 {

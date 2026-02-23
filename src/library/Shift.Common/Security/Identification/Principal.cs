@@ -4,8 +4,10 @@ using System.Linq;
 
 namespace Shift.Common
 {
-    public class Principal : IShiftPrincipal, ISimplePrincipal
+    public class Principal : IPrincipal, ISimplePrincipal
     {
+        public Guid CookieId { get; set; }
+
         public Actor User { get; set; }
         public Model Person { get; set; }
         public Proxy Proxy { get; set; }
@@ -33,7 +35,7 @@ namespace Shift.Common
 
         public bool IsAuthenticated { get; set; }
 
-        public string Name => User.Email;
+        public string Name => User?.Email;
 
         public bool IsInRole(string role)
         {
@@ -57,9 +59,9 @@ namespace Shift.Common
 
         #region ISimplePrincipal
 
-        public Guid? OrganizationId => Organization?.Identifier;
+        public Guid OrganizationId => Organization?.Identifier ?? Guid.Empty;
 
-        public Guid? UserId => User?.Identifier;
+        public Guid UserId => User?.Identifier ?? Guid.Empty;
 
         public bool IsAdministrator => Authority.HasFlag(AuthorityAccess.Administrator);
 
@@ -77,6 +79,24 @@ namespace Shift.Common
                 return Roles
                     .Select(x => x.Identifier)
                     .ToArray();
+            }
+        }
+
+        public TimeZoneInfo TimeZone
+        {
+            get
+            {
+                if (User?.TimeZone == null)
+                    return TimeZoneInfo.Utc;
+
+                try
+                {
+                    return TimeZoneInfo.FindSystemTimeZoneById(User.TimeZone);
+                }
+                catch (TimeZoneNotFoundException)
+                {
+                    return TimeZoneInfo.Utc;
+                }
             }
         }
 

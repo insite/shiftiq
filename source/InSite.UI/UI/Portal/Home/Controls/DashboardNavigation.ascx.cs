@@ -85,7 +85,7 @@ namespace InSite.UI.Portal.Home.Controls
         {
             MasterPage m = Page?.Master;
             while (m != null && !(m is PortalMaster))
-                m = m.Master; 
+                m = m.Master;
             return m as PortalMaster;
         }
 

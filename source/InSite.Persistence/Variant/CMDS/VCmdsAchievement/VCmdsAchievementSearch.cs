@@ -194,10 +194,10 @@ namespace InSite.Persistence.Plugin.CMDS
             {
                 db.Database.CommandTimeout = 90;
 
-                var query = db.VCredentials
-                    .Where(x => x.UserEmailEnabled && (
-                        x.OrganizationIdentifier == OrganizationIdentifiers.CMDS || x.ParentOrganizationIdentifier == OrganizationIdentifiers.CMDS
-                    ));
+                var query = db.VCredentials.AsQueryable().Where(x => x.UserEmailEnabled);
+
+                if (!ServiceLocator.Partition.IsE03())
+                    query = query.Where(x => false);
 
                 if (reminderType == ReminderType.Today)
                     query = query.Where(x => twoWeeksAgo <= x.CredentialExpirationReminderRequested0 && x.CredentialExpirationReminderRequested0 <= now && !x.CredentialExpirationReminderDelivered0.HasValue);

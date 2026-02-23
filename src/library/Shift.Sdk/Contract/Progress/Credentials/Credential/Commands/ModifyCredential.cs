@@ -4,12 +4,12 @@ namespace Shift.Contract
 {
     public class ModifyCredential
     {
-        public Guid AchievementIdentifier { get; set; }
-        public Guid? AuthorityIdentifier { get; set; }
-        public Guid CredentialIdentifier { get; set; }
-        public Guid? EmployerGroupIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid UserIdentifier { get; set; }
+        public Guid AchievementId { get; set; }
+        public Guid? AuthorityId { get; set; }
+        public Guid CredentialId { get; set; }
+        public Guid? EmployerGroupId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid UserId { get; set; }
 
         public string AuthorityLocation { get; set; }
         public string AuthorityName { get; set; }

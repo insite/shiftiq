@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 using InSite.Application.Records.Read;
 using InSite.Common.Web;
@@ -25,7 +26,10 @@ namespace InSite.Admin.Records.Scores.Controls
                 .RecordSearch
                 .GetGradebookScores(
                     filter,
-                    x => x.Gradebook.Event, x => x.Gradebook.Achievement, x => x.Learner, x => x.GradeItem, x => x.Gradebook)
+                    x => x.Gradebook.Event,
+                    x => x.Gradebook.Achievement.Departments.Select(y => y.Department),
+                    x => x.Learner.Memberships,
+                    x => x.GradeItem)
                 .ToSearchResult();
         }
 
@@ -35,10 +39,28 @@ namespace InSite.Admin.Records.Scores.Controls
             return when.FormatDateOnly(User.TimeZone, nullValue: string.Empty);
         }
 
-        protected string GetScoreValue(object score)
+        protected string GetScoreValue() => GetScoreValue((QProgress)Page.GetDataItem());
+
+        private string GetScoreValue(QProgress entity) => GradebookHelper.GetScoreValue(entity, entity.GradeItem?.GradeItemFormat);
+
+        protected string GetDepartments() => GetDepartments((QProgress)Page.GetDataItem());
+
+        private string GetDepartments(QProgress entity)
         {
-            var progress = (QProgress)score;
-            return GradebookHelper.GetScoreValue(progress, progress.GradeItem?.GradeItemFormat);
+            var achievementDepartments = entity.Gradebook?.Achievement?.Departments;
+            if (achievementDepartments.IsEmpty())
+                return string.Empty;
+
+            var learnerDepartments = entity.Learner.Memberships
+                .Where(x => x.MembershipType == "Department")
+                .Select(x => x.GroupIdentifier)
+                .ToHashSet();
+
+            return string.Join(
+                ", ", 
+                achievementDepartments
+                    .Where(x => learnerDepartments.Contains(x.DepartmentIdentifier))
+                    .Select(x => x.Department.GroupName));
         }
 
         #region Export
@@ -57,13 +79,17 @@ namespace InSite.Admin.Records.Scores.Controls
             public DateTimeOffset? ClassScheduledEndDate { get; internal set; }
             public string AchievementTitle { get; internal set; }
             public string Score { get; internal set; }
+            public string Department { get; internal set; }
         }
 
         public override IListSource GetExportData(QProgressFilter filter, bool empty)
         {
             var data = ServiceLocator.RecordSearch.GetGradebookScores(
                 filter,
-                x => x.Gradebook.Event, x => x.Gradebook.Achievement, x => x.Learner, x => x.GradeItem
+                x => x.Gradebook.Event, 
+                x => x.Gradebook.Achievement.Departments.Select(y => y.Department), 
+                x => x.Learner.Memberships, 
+                x => x.GradeItem
             );
 
             CallUpdateDateTimeOffsets(data, User.TimeZoneId);
@@ -86,7 +112,7 @@ namespace InSite.Admin.Records.Scores.Controls
                     exportItem.GradebookItemName = dataItem.GradeItem.GradeItemName;
                     exportItem.GradeItemType = dataItem.GradeItem.GradeItemType;
                     exportItem.GradeItemFormat = dataItem.GradeItem.GradeItemFormat;
-                    exportItem.Score = GradebookHelper.GetScoreValue(dataItem, dataItem.GradeItem.GradeItemFormat);
+                    exportItem.Score = GetScoreValue(dataItem);
                 }
 
                 if (dataItem.Learner != null)
@@ -97,7 +123,7 @@ namespace InSite.Admin.Records.Scores.Controls
                         {
                             OrganizationIdentifier = Organization.Identifier,
                             UserIdentifier = dataItem.UserIdentifier
-                        }); 
+                        });
                     exportItem.LearnerEmail = dataItem.Learner.UserEmail;
                     exportItem.LearnerName = dataItem.Learner.UserFullName;
                 }
@@ -112,6 +138,7 @@ namespace InSite.Admin.Records.Scores.Controls
                 if (dataItem.Gradebook.Achievement != null)
                 {
                     exportItem.AchievementTitle = dataItem.Gradebook.Achievement.AchievementTitle;
+                    exportItem.Department = GetDepartments(dataItem);
                 }
 
                 result.Add(exportItem);

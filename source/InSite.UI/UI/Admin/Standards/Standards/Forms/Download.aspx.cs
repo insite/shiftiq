@@ -182,7 +182,7 @@ namespace InSite.Admin.Standards.Standards.Forms
             if (HasDependencyCycle())
                 return;
 
-            DocumentLanguageSelector.Settings.IncludeLanguage = new[] { "en", "fr" };
+            DocumentLanguageSelector.Settings.IncludeLanguage = Organization.Languages.Select(x => x.TwoLetterISOLanguageName).ToArray();
             DocumentLanguageSelector.RefreshData();
 
             StandardDetails.BindStandard(standard);

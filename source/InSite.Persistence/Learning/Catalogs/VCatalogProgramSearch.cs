@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Web;
 
+using InSite.Domain;
+
 using Shift.Common;
 
 namespace InSite.Persistence
@@ -29,9 +31,9 @@ namespace InSite.Persistence
             _catalogs = catalogs;
         }
 
-        public static VCatalogProgramSearch Create(Guid organizationId, string catalog, Guid[] groupIds, bool viewEntireCatalog)
+        public static VCatalogProgramSearch Create(Guid organizationId, string catalog, Guid[] groupIds, bool viewEntireCatalog, IPartitionModel partition)
         {
-            var datasource = GetCatalogPrograms(organizationId, catalog, groupIds, viewEntireCatalog);
+            var datasource = GetCatalogPrograms(organizationId, catalog, groupIds, viewEntireCatalog, partition);
             var catalogs = GetCatalogs(datasource);
 
             return new VCatalogProgramSearch(datasource, catalogs);
@@ -167,9 +169,9 @@ namespace InSite.Persistence
             return html.ToString();
         }
 
-        private static List<VCatalogProgram> GetCatalogPrograms(Guid organizationId, string catalog, Guid[] groupIds, bool viewEntireCatalog)
+        private static List<VCatalogProgram> GetCatalogPrograms(Guid organizationId, string catalog, Guid[] groupIds, bool viewEntireCatalog, IPartitionModel partition)
         {
-            var organizationIds = GetOrganizationIds(organizationId);
+            var organizationIds = GetOrganizationIds(organizationId, partition);
 
             using (var db = new InternalDbContext(false))
             {
@@ -198,17 +200,11 @@ namespace InSite.Persistence
             }
         }
 
-        private static List<Guid> GetOrganizationIds(Guid childOrganizationId)
+        private static Guid[] GetOrganizationIds(Guid organizationId, IPartitionModel partition)
         {
-            var result = new List<Guid>();
-            result.Add(childOrganizationId);
-
-            var organization = OrganizationSearch.Select(childOrganizationId);
-
-            if (organization.ParentOrganizationIdentifier.HasValue)
-                result.Add(organization.ParentOrganizationIdentifier.Value);
-
-            return result;
+            return organizationId != partition.Identifier
+                ? new[] { partition.Identifier, organizationId }
+                : new[] { organizationId };
         }
 
         private static List<CatalogMenu> GetCatalogs(List<VCatalogProgram> datasource)

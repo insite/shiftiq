@@ -6,8 +6,6 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Credentials.Write;
 using InSite.Common.Web;
 using InSite.Common.Web.Cmds;
@@ -19,6 +17,7 @@ using InSite.UI.Layout.Admin;
 using InSite.Web.Infrastructure;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -34,6 +33,8 @@ namespace InSite.Cmds.Admin.Records.Programs
 
             DepartmentIdentifier.AutoPostBack = true;
             DepartmentIdentifier.ValueChanged += DepartmentIdentifier_ValueChanged;
+
+            SearchButton.Click += SearchButton_Click;
 
             Step1NextButton.Click += Step1NextButton_Click;
 
@@ -92,36 +93,61 @@ namespace InSite.Cmds.Admin.Records.Programs
         {
             var departmentId = DepartmentIdentifier.Value;
 
-            TemplateField.Visible = departmentId.HasValue;
-
             ProgramIdentifier.DepartmentIdentifier = departmentId ?? Guid.Empty;
             ProgramIdentifier.Value = null;
+            ProgramIdentifier.Enabled = departmentId.HasValue;
 
-            LearnersPanel.Visible = departmentId.HasValue;
+            LearnersRepeater.DataSource = null;
+            LearnersRepeater.DataBind();
 
-            if (departmentId.HasValue)
-            {
-                var persons = UserSearch.Bind(
-                    x => new
+            LearnersPanel.Visible = false;
+            Step1NextButton.Visible = false;
+        }
+
+        private void SearchButton_Click(object sender, EventArgs e)
+        {
+            var departmentId = DepartmentIdentifier.Value;
+            var hasValue = departmentId.HasValue;
+
+            LearnersPanel.Visible = hasValue;
+            Step1NextButton.Visible = hasValue;
+
+            if (!hasValue)
+                return;
+
+            var persons = UserSearch.Bind(
+                x => new
+                {
+                    x.UserIdentifier,
+                    x.FullName,
+                },
+                new UserFilter
+                {
+                    ContactName = LearnerName.Text,
+                    Memberships = new[]
                     {
-                        x.UserIdentifier,
-                        x.FullName,
-                    },
-                    new UserFilter
-                    {
-                        MembershipGroupIdentifier = departmentId,
-                        MembershipType = "Department",
-                        MembershipTypeAnd = true
-                    },
-                    "FullName"
-                );
+                        new UserFilterMembership
+                        {
+                            MembershipGroupIdentifier = departmentId,
+                            MembershipType = "Department",
+                            MembershipTypeAnd = true,
+                        },
+                        new UserFilterMembership
+                        {
+                            MembershipGroupIdentifier = GroupIdentifier.Value
+                        }
+                    }
+                },
+                "FullName"
+            );
+            var hasData = persons.Length > 0;
 
-                LearnersRepeater.Visible = persons.Length > 0;
-                LearnersRepeater.DataSource = persons;
-                LearnersRepeater.DataBind();
+            LearnersRepeater.Visible = hasData;
+            LearnersRepeater.DataSource = persons;
+            LearnersRepeater.DataBind();
 
-                NoLearnersPanel.Visible = persons.Length == 0;
-            }
+            NoLearnersPanel.Visible = !hasData;
+            Step1NextButton.Visible = hasData;
         }
 
         private void Step1NextButton_Click(object sender, EventArgs e)
@@ -135,6 +161,8 @@ namespace InSite.Cmds.Admin.Records.Programs
             var count = LoadAssignLearnerItems();
 
             Step2.SetTitle("Pending Changes", count);
+
+            DownloadAlert.Visible = AssignStrategy_Delete.Checked;
         }
 
         private void DownloadButton_Click(object sender, EventArgs e)
@@ -199,7 +227,7 @@ namespace InSite.Cmds.Admin.Records.Programs
 
                         var necessity = item.IsRequired ? "Mandatory" : "Optional";
                         var priority = item.IsPlanned ? "Planned" : "Unplanned";
-                        var authority = EmployeeAchievementHelper.TypeAllowsSignOff(label) ? "Self" : null;
+                        var authority = EmployeeAchievementHelper.AllowSignOff(label) ? "Self" : null;
 
                         if (credential == null)
                         {
@@ -248,7 +276,7 @@ namespace InSite.Cmds.Admin.Records.Programs
             DepartmentIdentifier.Value = null;
 
             ProgramIdentifier.Value = null;
-            TemplateField.Visible = false;
+            ProgramIdentifier.Enabled = false;
 
             LearnersPanel.Visible = false;
         }

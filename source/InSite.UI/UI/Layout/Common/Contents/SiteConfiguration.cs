@@ -59,10 +59,10 @@ namespace InSite.UI.Layout.Common.Contents
         internal void OnSerializingMethod(StreamingContext context)
         {
             if (string.IsNullOrEmpty(Tenant))
-                throw new ApplicationError("Organization is required property.");
+                throw new InvalidOperationException("Organization is required property.");
 
             if (string.IsNullOrEmpty(Domain))
-                throw new ApplicationError("Domain is required property.");
+                throw new InvalidOperationException("Domain is required property.");
         }
 
         [OnDeserialized]

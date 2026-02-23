@@ -29,6 +29,8 @@ namespace InSite.Admin.Achievements.Achievements.Forms
 
             LockButton.Click += LockButton_Click;
             UnlockButton.Click += UnlockButton_Click;
+
+            NotificationsDetails.Alert += (s, a) => StatusAlert.AddMessage(a);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -123,6 +125,8 @@ namespace InSite.Admin.Achievements.Achievements.Forms
 
             ViewHistoryLink.NavigateUrl = AggregateOutline.GetUrl(AchievementID.Value, $"/ui/admin/records/achievements/outline?id={AchievementID}");
             DeleteLink.NavigateUrl = $"/ui/admin/records/achievements/delete?id={AchievementID}";
+
+            NotificationsDetails.BindModelToControls(achievement);
         }
 
         private void BindModelToControls(IEnumerable<QAchievementPrerequisite> prerequisites)
@@ -198,7 +202,6 @@ namespace InSite.Admin.Achievements.Achievements.Forms
 
             return achievementExpiration.ToString(User.TimeZone);
         }
-
 
         protected string GetLabelContentText()
         {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -8,6 +10,8 @@ using InSite.Domain.Organizations;
 using InSite.Persistence;
 
 using Newtonsoft.Json;
+
+using Shift.Common;
 
 namespace InSite.UI.Admin.Accounts.Organizations.Controls
 {
@@ -26,6 +30,7 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
 
             SnapshotValidator.ServerValidate += SnapshotValidator_ServerValidate;
 
+            DownloadPermissionMatrix.Click += DownloadPermissionMatrix_Click;
             base.OnInit(e);
         }
 
@@ -67,10 +72,45 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
 
             if (selectedPanel == "configuration")
             {
+                if (selectedTab == "security")
+                    SecurityTab.IsSelected = true;
+
                 if (selectedTab == "url")
                     UrlTab.IsSelected = true;
             }
+
+            BindSecurityModelToControls(organization);
         }
+
+        private void BindSecurityModelToControls(OrganizationState organization)
+        {
+            var resourcePermissions = TActionSearch.SearchPermissionsGroupedByResource(organization.Code);
+
+            var json = JsonConvert.SerializeObject(resourcePermissions, CreateJsonSerializerSettings());
+
+            AccessGrantedToActions.Text = json;
+
+            var organizationPermission = TGroupPermissionStore.GetAccess(organization.Identifier);
+
+            AccessGranted.Text = organizationPermission.AccessGranted;
+
+            AccessDenied.Text = organizationPermission.AccessDenied;
+        }
+
+        private JsonSerializerSettings CreateJsonSerializerSettings()
+            => new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                Formatting = Formatting.Indented,
+                ContractResolver = new SkipEmptyCollectionsContractResolver(),
+                Converters = new List<JsonConverter>
+                    {
+                        new FlagsEnumConverter<FeatureAccess>(),
+                        new FlagsEnumConverter<DataAccess>(),
+                        new FlagsEnumConverter<AuthorityAccess>()
+                    }
+            };
 
         public void GetInputValues(OrganizationState organization)
         {
@@ -82,6 +122,39 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
             DetailUpload.GetInputValues(organization);
 
             Snapshot.Text = JsonConvert.SerializeObject(organization);
+
+            TGroupPermissionStore.SaveAccess(
+                organization.Identifier,
+                AccessGrantedToActions.Text,
+                AccessGranted.Text,
+                AccessDenied.Text);
         }
+
+        private void DownloadPermissionMatrix_Click(object sender, EventArgs e)
+        {
+            var organization = OrganizationSearch.Select(OrganizationId.Value);
+
+            var permissions = PermissionCache.Matrix.GetPermissions(organization.Code);
+
+            var json = JsonConvert.SerializeObject(permissions, _settings);
+
+            var data = Encoding.UTF8.GetBytes(json);
+
+            HttpResponseHelper.SendFile(Response, $"permission-matrix-{organization.Code}.json", data);
+        }
+
+        private JsonSerializerSettings _settings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            Formatting = Formatting.Indented,
+            ContractResolver = new SkipEmptyCollectionsContractResolver(),
+            Converters = new List<JsonConverter>
+            {
+                new FlagsEnumConverter<FeatureAccess>(),
+                new FlagsEnumConverter<DataAccess>(),
+                new FlagsEnumConverter<AuthorityAccess>()
+            }
+        };
     }
 }

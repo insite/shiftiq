@@ -7,10 +7,10 @@ public class FileAdapter : IEntityAdapter
 {
     public void Copy(ModifyFile modify, FileEntity entity)
     {
-        entity.UserIdentifier = modify.UserIdentifier;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.UserIdentifier = modify.UserId;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.ObjectType = modify.ObjectType;
-        entity.ObjectIdentifier = modify.ObjectIdentifier;
+        entity.ObjectIdentifier = modify.ObjectId;
         entity.FileName = modify.FileName;
         entity.FileSize = modify.FileSize;
         entity.FileLocation = modify.FileLocation;
@@ -27,11 +27,11 @@ public class FileAdapter : IEntityAdapter
         entity.FileReceived = modify.FileReceived;
         entity.FileAlternated = modify.FileAlternated;
         entity.LastActivityTime = modify.LastActivityTime;
-        entity.LastActivityUserIdentifier = modify.LastActivityUserIdentifier;
+        entity.LastActivityUserIdentifier = modify.LastActivityUserId;
         entity.ReviewedTime = modify.ReviewedTime;
-        entity.ReviewedUserIdentifier = modify.ReviewedUserIdentifier;
+        entity.ReviewedUserIdentifier = modify.ReviewedUserId;
         entity.ApprovedTime = modify.ApprovedTime;
-        entity.ApprovedUserIdentifier = modify.ApprovedUserIdentifier;
+        entity.ApprovedUserIdentifier = modify.ApprovedUserId;
     }
 
     public string Serialize<T>(IEnumerable<T> models, string format, string includes)
@@ -45,11 +45,11 @@ public class FileAdapter : IEntityAdapter
     {
         var entity = new FileEntity
         {
-            UserIdentifier = create.UserIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
+            UserIdentifier = create.UserId,
+            OrganizationIdentifier = create.OrganizationId,
             ObjectType = create.ObjectType,
-            ObjectIdentifier = create.ObjectIdentifier,
-            FileIdentifier = create.FileIdentifier,
+            ObjectIdentifier = create.ObjectId,
+            FileIdentifier = create.FileId,
             FileName = create.FileName,
             FileSize = create.FileSize,
             FileLocation = create.FileLocation,
@@ -66,11 +66,11 @@ public class FileAdapter : IEntityAdapter
             FileReceived = create.FileReceived,
             FileAlternated = create.FileAlternated,
             LastActivityTime = create.LastActivityTime,
-            LastActivityUserIdentifier = create.LastActivityUserIdentifier,
+            LastActivityUserIdentifier = create.LastActivityUserId,
             ReviewedTime = create.ReviewedTime,
-            ReviewedUserIdentifier = create.ReviewedUserIdentifier,
+            ReviewedUserIdentifier = create.ReviewedUserId,
             ApprovedTime = create.ApprovedTime,
-            ApprovedUserIdentifier = create.ApprovedUserIdentifier
+            ApprovedUserIdentifier = create.ApprovedUserId
         };
         return entity;
     }
@@ -84,10 +84,11 @@ public class FileAdapter : IEntityAdapter
     {
         var model = new FileModel
         {
-            UserIdentifier = entity.UserIdentifier,
+            UserId = entity.UserIdentifier,
             ObjectType = entity.ObjectType,
-            ObjectIdentifier = entity.ObjectIdentifier,
-            FileIdentifier = entity.FileIdentifier,
+            ObjectId = entity.ObjectIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            FileId = entity.FileIdentifier,
             FileName = entity.FileName,
             FileSize = entity.FileSize,
             FileLocation = entity.FileLocation,
@@ -104,11 +105,11 @@ public class FileAdapter : IEntityAdapter
             FileReceived = entity.FileReceived,
             FileAlternated = entity.FileAlternated,
             LastActivityTime = entity.LastActivityTime,
-            LastActivityUserIdentifier = entity.LastActivityUserIdentifier,
+            LastActivityUserId = entity.LastActivityUserIdentifier,
             ReviewedTime = entity.ReviewedTime,
-            ReviewedUserIdentifier = entity.ReviewedUserIdentifier,
+            ReviewedUserId = entity.ReviewedUserIdentifier,
             ApprovedTime = entity.ApprovedTime,
-            ApprovedUserIdentifier = entity.ApprovedUserIdentifier
+            ApprovedUserId = entity.ApprovedUserIdentifier
         };
 
         return model;
@@ -123,17 +124,17 @@ public class FileAdapter : IEntityAdapter
     {
         var match = new FileMatch
         {
-            OrganizationIdentifier = entity.OrganizationIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
             OrganizationCode = entity.Organization.OrganizationCode,
             ObjectType = entity.ObjectType,
-            ObjectIdentifier = entity.ObjectIdentifier,
-            FileIdentifier = entity.FileIdentifier,
+            ObjectId = entity.ObjectIdentifier,
+            FileId = entity.FileIdentifier,
             FileLocation = entity.FileLocation,
             FileName = entity.FileName,
             DocumentName = entity.DocumentName,
             FileSize = entity.FileSize,
             FileUploaded = entity.FileUploaded,
-            UserIdentifier = entity.UserIdentifier,
+            UserId = entity.UserIdentifier,
             UserFullName = entity.User.FullName,
             HasClaims = entity.Claims.Any()
         };

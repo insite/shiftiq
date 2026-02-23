@@ -17,9 +17,9 @@ public class RegistrationService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid registration, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid registration, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(registration, cancellation);
+        return await _reader.AssertAsync(registration, organization, cancellation);
     }
 
     public async Task<IEnumerable<RegistrationModel>> CollectAsync(IRegistrationCriteria criteria, CancellationToken cancellation = default)

@@ -54,10 +54,10 @@ namespace InSite.Persistence.Plugin.NCSHA
                     throw new ArgumentNullException(nameof(title));
 
                 if (_codes.ContainsKey(code))
-                    throw new ApplicationError($"The collection already contains this program code: {code}.");
+                    throw new ArgumentException($"The collection already contains this program code: {code}.");
 
                 if (code.Length != 2)
-                    throw new ApplicationError($"Invalid program code: {code}.");
+                    throw new ArgumentException($"Invalid program code: {code}.");
 
                 var program = new ProgramInfo(this, code, title);
                 program.FieldAdded += Program_FieldAdded;

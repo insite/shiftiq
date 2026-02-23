@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteCredential
     {
-        public Guid CredentialIdentifier { get; set; }
+        public Guid CredentialId { get; set; }
     }
 }

@@ -132,6 +132,10 @@ namespace InSite.Admin.Assessments.Banks.Forms
             if (Bank == null)
                 RedirectToSearch();
 
+
+            if (Organization.Toolkits.Assessments.LockPublishedStandards && Bank.GetAllQuestions().Any(x => x.FirstPublished.HasValue))
+                RedirectToReader();
+
             SetInputValues(Bank);
         }
 

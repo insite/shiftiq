@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public partial class GradebookEnrollmentMatch
     {
-        public Guid EnrollmentIdentifier { get; set; }
+        public Guid EnrollmentId { get; set; }
     }
 }

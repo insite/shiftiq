@@ -275,7 +275,7 @@ namespace InSite.Admin.Events.Registrations.Forms
             {
                 RegistrationInvitationHelper.DeleteInvitation(
                     registration.RegistrationIdentifier,
-                    ServiceLocator.AppSettings.Security.Domain,
+                    ServiceLocator.AppSettings.Partition.Domain,
                     ServiceLocator.AppSettings.Environment,
                     ServiceLocator.RegistrationSearch,
                     ServiceLocator.AlertMailer

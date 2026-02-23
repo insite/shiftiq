@@ -4,12 +4,11 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IFormCriteria
+    public interface IFormCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
+
         Guid? LastChangeUser { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
         Guid? SurveyMessageInvitation { get; set; }
         Guid? SurveyMessageResponseCompleted { get; set; }
         Guid? SurveyMessageResponseConfirmed { get; set; }

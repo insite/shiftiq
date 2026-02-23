@@ -403,7 +403,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             }
             else
             {
-                throw new Exception($"Unexpected item type: {sender.GetType()}");
+                throw new NotSupportedException($"Unexpected item type: {sender.GetType()}");
             }
         }
 

@@ -6,16 +6,16 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Contents.Read;
 using InSite.Application.Sites.Read;
+using InSite.Domain;
 using InSite.Domain.Foundations;
 
 using Newtonsoft.Json;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Persistence
@@ -154,11 +154,13 @@ namespace InSite.Persistence
 
         private readonly IChangeRepository _repository;
         private readonly IContentSearch _contentSearch;
+        private readonly IPartitionModel _partition;
 
-        public PageSearch(IChangeRepository repo, IContentSearch contentSearch)
+        public PageSearch(IChangeRepository repo, IContentSearch contentSearch, IPartitionModel partition)
         {
             _repository = repo;
             _contentSearch = contentSearch;
+            _partition = partition;
         }
 
         internal InternalDbContext CreateContext() => new InternalDbContext(false);
@@ -602,21 +604,21 @@ namespace InSite.Persistence
 
         #region Deserialize
 
-        public void LoadSite(Guid? parentOrganization, Guid organization, Guid user, QSiteExport exportSite, QSite site)
+        public void LoadSite(Guid organization, Guid user, QSiteExport exportSite, QSite site)
         {
-            if (exportSite.Pages.IsNotEmpty())
-            {
-                var pages = site.Pages.ToArray();
-                for (int i = 0; i < exportSite.Pages.Count; i++)
-                    LoadPage(parentOrganization, organization, user, exportSite.Pages[i], pages[i], site.SiteIdentifier);
-            }
+            if (exportSite.Pages.IsEmpty())
+                return;
+
+            var pages = site.Pages.ToArray();
+            for (int i = 0; i < exportSite.Pages.Count; i++)
+                LoadPage(organization, user, exportSite.Pages[i], pages[i], site.SiteIdentifier);
         }
 
-        private Guid? GetGroupId(string name, Guid organization, Guid? parentOrganization)
+        private Guid? GetGroupId(string name, Guid organization)
         {
-            var organizations = new List<Guid> { organization };
-            if (parentOrganization.HasValue)
-                organizations.Add(parentOrganization.Value);
+            var organizations = organization != _partition.Identifier
+                ? new[] { _partition.Identifier, organization }
+                : new[] { organization };
 
             using (var db = new InternalDbContext())
             {
@@ -627,7 +629,7 @@ namespace InSite.Persistence
             }
         }
 
-        public void LoadPage(Guid? parentOrganization, Guid organization, Guid user, QPageExport exportPage, QPage page, Guid? webSiteIdentifier, Dictionary<string, Guid?> groups = null)
+        public void LoadPage(Guid organization, Guid user, QPageExport exportPage, QPage page, Guid? webSiteIdentifier, Dictionary<string, Guid?> groups = null)
         {
             if (page.ParentPageIdentifier == null)
             {
@@ -653,7 +655,7 @@ namespace InSite.Persistence
                 {
                     if (!groups.TryGetValue(groupName, out var groupIdentifier))
                     {
-                        groupIdentifier = GetGroupId(groupName, organization, parentOrganization);
+                        groupIdentifier = GetGroupId(groupName, organization);
 
                         groups.Add(groupName, groupIdentifier);
                     }
@@ -664,7 +666,7 @@ namespace InSite.Persistence
             {
                 var pageChildren = page.Children.ToArray();
                 for (int i = 0; i < exportPage.Children.Count; i++)
-                    LoadPage(parentOrganization, organization, user, exportPage.Children[i], pageChildren[i], webSiteIdentifier, groups);
+                    LoadPage(organization, user, exportPage.Children[i], pageChildren[i], webSiteIdentifier, groups);
             }
         }
 

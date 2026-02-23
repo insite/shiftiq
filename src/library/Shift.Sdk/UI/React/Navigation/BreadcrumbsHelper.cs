@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Shift.Common;
 
@@ -9,23 +10,25 @@ namespace Shift.Contract
         public static List<BreadcrumbItem> CollectBreadcrumbs(
             IWebRoute pageRoute,
             string linkTitle,
-            ITranslator translator,
+            ITranslatorService translator,
+            string language,
+            Guid organization,
             IOverrideWebRouteParent overrideWebRouteParent,
             IHasParentLinkParameters hasParentLinkParameters
             )
         {
             var breadcrumbs = new List<BreadcrumbItem>();
 
-            AddBreadcrumbParentItems(pageRoute, breadcrumbs, translator, overrideWebRouteParent, hasParentLinkParameters);
+            AddBreadcrumbParentItems(pageRoute, breadcrumbs, translator, language, organization, overrideWebRouteParent, hasParentLinkParameters);
 
             if (!string.IsNullOrWhiteSpace(pageRoute.ExtraBreadcrumb))
             {
-                var extra = translator != null ? translator.Translate(pageRoute.ExtraBreadcrumb) : pageRoute.ExtraBreadcrumb;
+                var extra = translator != null ? translator.Translate(pageRoute.ExtraBreadcrumb, language, organization) : pageRoute.ExtraBreadcrumb;
                 breadcrumbs.Add(new BreadcrumbItem(extra, null));
             }
 
             if (string.IsNullOrEmpty(linkTitle))
-                linkTitle = translator != null ? translator.Translate(pageRoute.LinkTitle) : pageRoute.LinkTitle;
+                linkTitle = translator != null ? translator.Translate(pageRoute.LinkTitle, language, organization) : pageRoute.LinkTitle;
 
             breadcrumbs.Add(new BreadcrumbItem(linkTitle, null, null, "active"));
 
@@ -35,7 +38,9 @@ namespace Shift.Contract
         public static void AddBreadcrumbParentItems(
             IWebRoute route,
             List<BreadcrumbItem> breadcrumbs,
-            ITranslator translator,
+            ITranslatorService translator,
+            string language,
+            Guid organization,
             IOverrideWebRouteParent overrideWebRouteParent,
             IHasParentLinkParameters hasParentLinkParameters
             )
@@ -46,25 +51,25 @@ namespace Shift.Contract
             var links = new Stack<BreadcrumbItem>();
 
             while (parentRoute != null)
-                parentRoute = AddParentItem(parentParams, links, parentRoute, translator);
+                parentRoute = AddParentItem(parentParams, links, parentRoute, translator, language, organization);
 
             while (links.Count > 0)
                 breadcrumbs.Add(links.Pop());
         }
 
-        private static IWebRoute AddParentItem(string parentParams, Stack<BreadcrumbItem> links, IWebRoute parentRoute, ITranslator translator)
+        private static IWebRoute AddParentItem(string parentParams, Stack<BreadcrumbItem> links, IWebRoute parentRoute, ITranslatorService translator, string language, Guid organization)
         {
             var href = "/" + parentRoute.Name;
             if (!string.IsNullOrEmpty(parentParams))
                 href += "?" + parentParams;
 
-            var linkTitle = translator != null ? translator.Translate(parentRoute.LinkTitle) : parentRoute.LinkTitle;
+            var linkTitle = translator != null ? translator.Translate(parentRoute.LinkTitle, language, organization) : parentRoute.LinkTitle;
 
             links.Push(new BreadcrumbItem(linkTitle, href));
 
             if (!string.IsNullOrWhiteSpace(parentRoute.ExtraBreadcrumb))
             {
-                var extra = translator != null ? translator.Translate(parentRoute.ExtraBreadcrumb) : parentRoute.ExtraBreadcrumb;
+                var extra = translator != null ? translator.Translate(parentRoute.ExtraBreadcrumb, language, organization) : parentRoute.ExtraBreadcrumb;
                 links.Push(new BreadcrumbItem(extra, null));
             }
 

@@ -31,11 +31,21 @@ namespace InSite.Admin.Workflow.Forms.Utilities
         public Result Deserialize(string file)
         {
             _sourceSurvey = JsonConvert.DeserializeObject<SurveySerialized>(file);
+
+            if (_sourceSurvey.Name.HasNoValue())
+                throw ApplicationError.Create("Survey.Name is required field.");
+
+            if (_sourceSurvey.Language.IsEmpty())
+                throw ApplicationError.Create("Survey.Language is required field.");
+
+            if (!Language.CodeExists(_sourceSurvey.Language))
+                throw ApplicationError.Create("'{0}' is an unknown language code.", _sourceSurvey.Language);
+
             _identity = CurrentSessionState.Identity;
             _result = new Result();
 
             var indexMapping = new Dictionary<int, Guid>();
-            foreach (var q in _sourceSurvey.Questions)
+            foreach (var q in _sourceSurvey.Questions.EmptyIfNull())
             {
                 if (!q.Index.HasValue)
                     continue;
@@ -83,7 +93,7 @@ namespace InSite.Admin.Workflow.Forms.Utilities
         private void CreateQuestions()
         {
             _result.Questions = new List<SurveyQuestion>();
-            foreach (var question in _sourceSurvey.Questions)
+            foreach (var question in _sourceSurvey.Questions.EmptyIfNull())
             {
                 var questionId = question.Index.HasValue && _questionIndexMapping.ContainsKey(question.Index.Value)
                     ? _questionIndexMapping[question.Index.Value]
@@ -124,7 +134,7 @@ namespace InSite.Admin.Workflow.Forms.Utilities
         private SurveyOptionTable AddOptions(List<OptionSerialized> options)
         {
             var surveyOptionsTable = new SurveyOptionTable();
-            foreach (var option in options)
+            foreach (var option in options.EmptyIfNull())
             {
                 surveyOptionsTable.Add(AddSurveyOptionList(option));
             }
@@ -147,7 +157,7 @@ namespace InSite.Admin.Workflow.Forms.Utilities
         private List<SurveyOptionItem> AddOptionItems(List<OptionItemSerialized> items)
         {
             var results = new List<SurveyOptionItem>();
-            foreach (var item in items)
+            foreach (var item in items.EmptyIfNull())
             {
                 results.Add(new SurveyOptionItem
                 {
@@ -170,7 +180,7 @@ namespace InSite.Admin.Workflow.Forms.Utilities
         private List<SurveyScale> AddScales(List<ScaleSerialized> scales)
         {
             var results = new List<SurveyScale>();
-            foreach (var scale in scales)
+            foreach (var scale in scales.EmptyIfNull())
             {
                 results.Add(new SurveyScale
                 {
@@ -184,7 +194,7 @@ namespace InSite.Admin.Workflow.Forms.Utilities
         private List<SurveyScaleItem> AddScaleItems(List<ScaleItemSerialized> items)
         {
             var results = new List<SurveyScaleItem>();
-            foreach (var item in items)
+            foreach (var item in items.EmptyIfNull())
             {
                 results.Add(new SurveyScaleItem
                 {
@@ -202,7 +212,7 @@ namespace InSite.Admin.Workflow.Forms.Utilities
 
         private void AddContent(Guid containerIdentifier, string containerType, List<SurveyContentSerialized> contentList)
         {
-            foreach (var content in contentList)
+            foreach (var content in contentList.EmptyIfNull())
                 AddContent(content.Label, content.Language, content.Text, content.Html);
 
             void AddContent(string label, string lang, string text, string html)
@@ -227,7 +237,7 @@ namespace InSite.Admin.Workflow.Forms.Utilities
         private ContentContainer AddContentContainer(string containerType, List<SurveyContentSerialized> contentList)
         {
             var container = new List<TContent>();
-            foreach (var contentItem in contentList)
+            foreach (var contentItem in contentList.EmptyIfNull())
             {
                 container.Add(new TContent
                 {

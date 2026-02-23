@@ -3,6 +3,7 @@ using System.Web.UI;
 
 using InSite.Common.Web.UI;
 
+using Shift.Common;
 using Shift.Constant;
 
 namespace InSite.UI.Layout.Admin
@@ -44,9 +45,9 @@ namespace InSite.UI.Layout.Admin
         {
             base.ApplyAccessControl();
 
-            CanCreate = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write);
-            CanEdit = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write);
-            CanDelete = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Delete);
+            CanCreate = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update);
+            CanEdit = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update);
+            CanDelete = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, DataAccess.Delete);
         }
 
         protected void SetStatus(Alert alertControl, StatusType status)

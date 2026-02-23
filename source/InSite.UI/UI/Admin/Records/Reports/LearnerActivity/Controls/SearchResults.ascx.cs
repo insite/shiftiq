@@ -2,36 +2,30 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Web;
 using System.Web.UI.WebControls;
 
-using InSite.Admin.Records.Reports.LearnerActivity.Models;
 using InSite.Common;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
-using Shift.Common;
 using Shift.Common.Linq;
 
 namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
 {
     public partial class SearchResults : SearchResultsGridViewController<VLearnerActivityFilter>
     {
-        #region Events
-
-        public event EventHandler Updated;
-
-        #endregion
-
-        #region Properties
-
-        internal IList<SearchResultDataItem> DataSource
+        public class ExportDataItem
         {
-            get => (IList<SearchResultDataItem>)ViewState[nameof(DataSource)];
-            set => ViewState[nameof(DataSource)] = value;
+            public string UserFullName { get; set; }
+            public string UserEmail { get; set; }
+            public string UserGender { get; set; }
+            public string UserPhone { get; set; }
+            public DateTime? UserBirthdate { get; set; }
+            public string PersonCode { get; set; }
+            public string ProgramName { get; set; }
+            public string Gradebook { get; set; }
+            public string AchievementGranted { get; set; }
         }
-
-        #endregion
 
         protected override void OnInit(EventArgs e)
         {
@@ -42,14 +36,6 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
 
         private void Grid_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            SetContentLabelHeaders(e);
-
-            if (!IsContentItem(e.Row))
-                return;
-        }
-
-        private void SetContentLabelHeaders(GridViewRowEventArgs e)
-        {
             if (e.Row.RowType == DataControlRowType.Header)
             {
                 for (var i = 0; i < e.Row.Cells.Count; i++)
@@ -58,103 +44,54 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
                         e.Row.Cells[i].Text = LabelHelper.GetLabelContentText("Person Code");
                 }
             }
-        }
-
-        protected string GetProgramsHtml()
-        {
-            var dataItem = (SearchResultDataItem)Page.GetDataItem();
-
-            if (dataItem.Programs.IsEmpty())
-                return null;
-
-            if (dataItem.Programs.Length == 1)
-                return HttpUtility.HtmlEncode(dataItem.Programs[0].Name);
-
-            return
-                "<ul>" +
-                string.Concat(dataItem.Programs.Select(x => "<li>" + HttpUtility.HtmlEncode(x.Name) + "</li>")) +
-                "</ul>";
-        }
-
-        #region Searching
-
-        public override void Search(VLearnerActivityFilter filter, bool refreshLastSearched = false)
-        {
-            DataSource = null;
-
-            base.Search(filter, refreshLastSearched);
-        }
-
-        protected override void Search(VLearnerActivityFilter filter, int pageIndex)
-        {
-            var isUpdated = DataSource == null;
-
-            if (isUpdated)
+            else if (e.Row.RowType == DataControlRowType.DataRow)
             {
-                var dataItems = VLearnerActivitySearch.Select(filter)
-                    .OrderByDescending(x => x.LearnerCreated).ToArray();
+                var item = (VLearnerActivityUserProgram)e.Row.DataItem;
+                
+                var gradebookRepeater = (Repeater)e.Row.FindControl("GradebookRepeater");
+                gradebookRepeater.Visible = item.Gradebooks.Count > 0;
+                gradebookRepeater.DataSource = item.Gradebooks;
+                gradebookRepeater.DataBind();
 
-                if (filter.IsSummaryCountStrategy)
-                {
-                    DataSource = VLearnerActivitySearch.Summarize(dataItems)
-                        .OrderByDescending(x => x.LearnerCreated)
-                        .Select(x => new SearchResultDataItem(x))
-                        .ToArray();
-                }
-                else
-                {
-                    DataSource = dataItems.Select(x => new SearchResultDataItem(x)).ToArray();
-                }
-
-                var programMapping = VLearnerActivitySearch.SelectProgramEnrollments(filter)
-                    .GroupBy(x => x.UserIdentifier)
-                    .ToDictionary(x => x.Key, x => x.OrderBy(y => y.ProgramName).Select(y => new SearchResultProgramInfo(y)).ToArray());
-
-                foreach (var item in DataSource)
-                {
-                    if (programMapping.TryGetValue(item.LearnerIdentifier, out var programs))
-                        item.Programs = programs;
-                }
+                var achievementRepeater = (Repeater)e.Row.FindControl("AchievementRepeater");
+                achievementRepeater.Visible = item.Credentials.Count > 0;
+                achievementRepeater.DataSource = item.Credentials;
+                achievementRepeater.DataBind();
             }
-
-            base.Search(filter, pageIndex);
-
-            if (isUpdated)
-                Updated?.Invoke(this, EventArgs.Empty);
         }
 
         protected override int SelectCount(VLearnerActivityFilter filter)
         {
-            return DataSource.Count;
+            return VLearnerActivitySearch.Count(filter);
         }
 
         protected override IListSource SelectData(VLearnerActivityFilter filter)
         {
-            return DataSource.ApplyPaging(filter).ToList().ToSearchResult();
+            return VLearnerActivitySearch.GetUserPrograms(filter).ToSearchResult();
         }
-
-        #endregion
-
-        #region Export
 
         public override IListSource GetExportData(VLearnerActivityFilter filter, bool empty)
         {
             if (empty)
-                return new List<SearchResultDataItem>().ToSearchResult();
+                return new List<ExportDataItem>().ToSearchResult();
 
-            var data = VLearnerActivitySearch.Select(filter)
-                .OrderByDescending(x => x.LearnerCreated).ToArray();
+            var data = VLearnerActivitySearch.GetUserPrograms(filter);
 
-            if (!filter.IsSummaryCountStrategy)
-                return data.Select(x => new SearchResultDataItem(x)).ToList().ToSearchResult();
-
-            return VLearnerActivitySearch.Summarize(data)
-                .OrderByDescending(x => x.LearnerCreated)
-                .Select(x => new SearchResultDataItem(x))
+            return data
+                .Select(x => new ExportDataItem
+                {
+                    UserFullName = x.UserFullName,
+                    UserEmail = x.UserEmail,
+                    UserGender = x.UserGender,
+                    UserPhone = x.UserPhone,
+                    UserBirthdate = x.UserBirthdate,
+                    PersonCode = x.PersonCode,
+                    ProgramName = x.ProgramName,
+                    Gradebook = string.Join(", ", x.Gradebooks.Select(y => y.GradebookTitle)),
+                    AchievementGranted = string.Join(", ", x.Credentials.Select(y => LocalizeDate(y.CredentialGranted)))
+                })
                 .ToList()
                 .ToSearchResult();
         }
-
-        #endregion
     }
 }

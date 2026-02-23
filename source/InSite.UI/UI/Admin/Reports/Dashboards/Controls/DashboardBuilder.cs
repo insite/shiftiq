@@ -27,7 +27,7 @@ namespace InSite.UI.Admin.Reports.Dashboards
             if (widget.Type == "Table")
                 return CreateTableWidgetHtml(widget);
 
-            throw new Exception("Unknown widget type");
+            throw new NotSupportedException("Unknown widget type");
         }
 
         public void BindWidget(DashboardWidget widget, Control control)

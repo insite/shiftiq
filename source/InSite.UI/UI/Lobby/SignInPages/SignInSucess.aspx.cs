@@ -65,7 +65,13 @@ namespace InSite.UI.Lobby.SignInPages
 
                 var personId = person.PersonIdentifier;
 
-                TokenHelper.GetClientSecret(personId, false);
+                var tokenSettings = ServiceLocator.AppSettings.Security.Token;
+
+                var tokenLifetimeInMinutes = tokenSettings.Lifetime;
+
+                var secretExpiryInDays = tokenSettings.GetClientSecretLifetimeInDays();
+
+                TokenHelper.GetClientSecret(personId, false, secretExpiryInDays, tokenLifetimeInMinutes);
 
                 return true;
             }

@@ -48,7 +48,7 @@ switch (partition) {
 }
 
 const apiUrl = environment === "local"
-    ? "https://localhost:5000"
+    ? "http://localhost:5000"
     : `https://${prefix}api.${domain}/v2/${partition}`;
 
 console.log(`API Url: ${apiUrl}`);

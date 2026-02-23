@@ -67,7 +67,7 @@ public class UserAdapter : IEntityAdapter
             FullName = create.FullName,
             SoundexFirstName = create.SoundexFirstName,
             SoundexLastName = create.SoundexLastName,
-            UserIdentifier = create.UserIdentifier,
+            UserIdentifier = create.UserId,
             TimeZone = create.TimeZone,
             UserLicenseAccepted = create.UserLicenseAccepted,
             UserPasswordChanged = create.UserPasswordChanged,
@@ -113,7 +113,7 @@ public class UserAdapter : IEntityAdapter
             FullName = entity.FullName,
             SoundexFirstName = entity.SoundexFirstName,
             SoundexLastName = entity.SoundexLastName,
-            UserIdentifier = entity.UserIdentifier,
+            UserId = entity.UserIdentifier,
             TimeZone = entity.TimeZone,
             UserLicenseAccepted = entity.UserLicenseAccepted,
             UserPasswordChanged = entity.UserPasswordChanged,
@@ -146,7 +146,7 @@ public class UserAdapter : IEntityAdapter
     {
         var match = new UserMatch
         {
-            UserIdentifier = entity.UserIdentifier,
+            UserId = entity.UserIdentifier,
             FullName = entity.FullName
         };
 

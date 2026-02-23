@@ -223,7 +223,7 @@ namespace InSite.Admin.Assessments.Sets.Forms
             catch (ApplicationError ex)
             {
                 ClearUploads();
-                CreatorStatus.AddMessage(AlertType.Error, $@"An unexpected error occurred. " + ex.Message);
+                CreatorStatus.AddMessage(AlertType.Error, $@"The uploaded file could not be parsed. " + ex.Message);
             }
 
             OnQuestionsUploaded();

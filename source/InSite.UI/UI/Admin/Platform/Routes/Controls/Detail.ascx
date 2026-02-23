@@ -35,12 +35,17 @@
                 
             </div>
             <div class="row">
-                <div class="col-md-8">
-                    <insite:RouteTypeComboBox runat="server" ID="ActionType" AllowBlank="False" />
+                <div class="col-md-6">
+                    <insite:ActionTypeComboBox runat="server" ID="ActionType" AllowBlank="False" />
                 </div>
-                <div class="col-md-4">
-                    <insite:RouteAuthorityComboBox runat="server" ID="AuthorityType" AllowBlank="True" />
+                <div class="col-md-6">
+                    <insite:ActionAuthorityComboBox runat="server" ID="AuthorityType" AllowBlank="True" EmptyMessage="System Role (Authority)" />
                 </div>
+            </div>
+            <div class="form-text">
+                An action to which permissions are assigned is a <strong>Resource</strong>.
+                An action that represents a specific page in the user interface is a <strong>Route</strong>.
+                (Permissions assigned only to resources. Permissions are not assigned to routes.)
             </div>
         </div>
 
@@ -78,7 +83,7 @@
             <div>
                 <insite:TextBox runat="server" ID="ActionIcon" />
             </div>
-            <div class="form-text">Refer to the <a target="_blank" href="https://fontawesome.com/icons">Font Awesome</a> icon library.</div>
+            <div class="form-text">Refer to the icon library <a target="_blank" href="https://fontawesome.com/icons">Font Awesome</a> (version 7.1.0)</div>
         </div>
 
         <div class="form-group mb-3">

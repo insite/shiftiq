@@ -95,11 +95,7 @@ public class ExceptionHandlingMiddleware
 
             response.ContentType = "application/json";
 
-            var error = new Error
-            {
-                Summary = $"Authentication Failed",
-                Description = message
-            };
+            var error = new Problem((int)HttpStatusCode.Unauthorized, message);
 
             await response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(error));
         }

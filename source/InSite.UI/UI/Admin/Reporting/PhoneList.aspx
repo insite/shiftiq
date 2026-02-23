@@ -73,7 +73,7 @@
 
             <div class="mt-3">
                 <insite:DownloadButton runat="server" ID="DownloadXlsx" Text="Download XLSX" ButtonStyle="Primary" ValidationGroup="Report" CausesValidation="true" />
-                <insite:CloseButton runat="server" NavigateUrl="/ui/cmds/reports" />
+                <insite:CloseButton runat="server" NavigateUrl="/ui/admin/reporting" />
             </div>
 
         </ContentTemplate>

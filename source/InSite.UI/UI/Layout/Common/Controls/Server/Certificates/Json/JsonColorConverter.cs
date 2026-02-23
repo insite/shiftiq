@@ -13,7 +13,7 @@ namespace InSite.Common.Web.UI.Certificates.Json
         public override object ReadJson(JsonReader reader, Type type, object value, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
-                throw new ApplicationError("Unexpected token type: " + reader.TokenType);
+                throw new FormatException("Unexpected token type: " + reader.TokenType);
 
             var str = (string)reader.Value;
 

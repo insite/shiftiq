@@ -43,7 +43,7 @@ namespace InSite.UI.Layout.Common.Controls.Editor
         protected override void OnPreRender(EventArgs e)
         {
             if (string.IsNullOrEmpty(UploadPath))
-                throw new ApplicationError("UploadPath is null");
+                throw new InvalidOperationException("UploadPath is null");
 
             base.OnPreRender(e);
         }

@@ -4,11 +4,11 @@ namespace Shift.Contract
 {
     public class ModifyMembership
     {
-        public Guid GroupIdentifier { get; set; }
-        public Guid MembershipIdentifier { get; set; }
+        public Guid GroupId { get; set; }
+        public Guid MembershipId { get; set; }
         public Guid ModifiedBy { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid UserIdentifier { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid UserId { get; set; }
 
         public string MembershipFunction { get; set; }
 

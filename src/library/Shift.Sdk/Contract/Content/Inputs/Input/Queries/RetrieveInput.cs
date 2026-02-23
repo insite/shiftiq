@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public class RetrieveInput : Query<InputModel>
     {
-        public Guid ContentIdentifier { get; set; }
+        public Guid ContentId { get; set; }
     }
 }

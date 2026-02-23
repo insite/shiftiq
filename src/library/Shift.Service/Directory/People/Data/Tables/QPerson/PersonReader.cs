@@ -12,23 +12,25 @@ public class PersonReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "User.FullName, PersonIdentifier";
 
-    public PersonReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public PersonReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid person, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid person, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, _auth.OrganizationId);
+            var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.PersonIdentifier == person, cancellation);
+            if (organization != null)
+                query = query.Where(x => x.OrganizationIdentifier == organization.Value);
+
+            var exists = query.AnyAsync(x => x.PersonIdentifier == person, cancellation);
+
+            return exists;
 
         }, cancellation);
     }
@@ -74,7 +76,7 @@ public class PersonReader : IEntityReader
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, _auth.OrganizationId);
+            var query = BuildQueryable(db);
 
             return query.FirstOrDefaultAsync(x => x.PersonIdentifier == person, cancellation);
 
@@ -104,13 +106,15 @@ public class PersonReader : IEntityReader
     /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
     /// ordering fully unique, otherwise the result set is non-deterministic.
     /// </remarks>
-    private IQueryable<PersonEntity> BuildQueryable(TableDbContext db, Guid organizationId)
+    private IQueryable<PersonEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext(organizationId);
-
         var query = db.QPerson
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == organizationId);
+            .Include(x => x.User)
+            .Include(x => x.BillingAddress)
+            .Include(x => x.HomeAddress)
+            .Include(x => x.ShippingAddress)
+            .Include(x => x.WorkAddress)
+            .AsNoTracking();
 
         return query;
     }
@@ -119,7 +123,7 @@ public class PersonReader : IEntityReader
     {
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
-        var query = BuildQueryable(db, criteria.OrganizationIdentifier ?? _auth.OrganizationId);
+        var query = BuildQueryable(db);
 
         if (!string.IsNullOrEmpty(criteria.EmailExact))
             query = query.Where(x => x.User!.Email == criteria.EmailExact);
@@ -130,8 +134,11 @@ public class PersonReader : IEntityReader
         if (!string.IsNullOrEmpty(criteria.FullName))
             query = query.Where(x => x.User!.FullName.Contains(criteria.FullName));
 
-        if (criteria.UserIdentifier != null)
-            query = query.Where(x => x.UserIdentifier == criteria.UserIdentifier);
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
+
+        if (criteria.UserId != null)
+            query = query.Where(x => x.UserIdentifier == criteria.UserId);
 
         return query;
     }
@@ -145,29 +152,12 @@ public class PersonReader : IEntityReader
 
     public static async Task<List<PersonMatch>> ToMatchesAsync(IQueryable<PersonEntity> queryable, CancellationToken cancellation = default)
     {
+        var adapter = new PersonAdapter();
+
         var matches = await queryable
-            .Select(entity => new PersonMatch
-            {
-                PersonId = entity.PersonIdentifier,
-                UserId = entity.UserIdentifier,
-
-                UserEmail = entity.User != null ? entity.User.Email : "-",
-                UserName = entity.User != null ? entity.User.FullName : "-",
-
-                IsAdministrator = entity.IsAdministrator,
-                IsDeveloper = entity.IsDeveloper,
-                IsOperator = entity.IsOperator,
-
-                TimeZone = entity.User!.TimeZone
-            })
+            .Select(entity => adapter.ToMatch(entity))
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext(Guid organizationId)
-    {
-        if (organizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

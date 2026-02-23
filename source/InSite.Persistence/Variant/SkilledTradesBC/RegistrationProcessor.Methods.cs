@@ -153,7 +153,7 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
             foreach (var recipient in email.Recipients)
             {
                 if (recipient.Identifier == null)
-                    throw new Exception($"The identifier for this recipient ({recipient.Address}) cannot be null.");
+                    throw new InvalidOperationException($"The identifier for this recipient ({recipient.Address}) cannot be null.");
 
                 email.RecipientListTo.Add(recipient.Identifier.Value, recipient.Address);
             }

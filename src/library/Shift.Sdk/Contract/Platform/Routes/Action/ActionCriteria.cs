@@ -8,8 +8,8 @@ namespace Shift.Contract
     {
         public QueryFilter Filter { get; set; }
 
-        public Guid? NavigationParentActionIdentifier { get; set; }
-        public Guid? PermissionParentActionIdentifier { get; set; }
+        public Guid? NavigationParentActionId { get; set; }
+        public Guid? PermissionParentActionId { get; set; }
 
         public string ActionIcon { get; set; }
         public string ActionList { get; set; }

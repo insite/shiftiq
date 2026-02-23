@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using InSite.Application.Files.Read;
 
 using Shift.Common;
-using Shift.Toolbox;
 
 namespace Shift.Service.Content
 {
@@ -13,6 +12,7 @@ namespace Shift.Service.Content
     {
         private static readonly Encoding LatinEncoding = Encoding.GetEncoding("ISO-8859-1");
         private static readonly Regex FileUrlRegex = RelativePathToRetrieveFile();
+        private static readonly Regex FileUrlRegex2 = RelativePathToRetrieveFile2();
 
         private readonly IFileSearchAsync _fileSearch;
         private readonly IFileStoreAsync _fileStore;
@@ -64,6 +64,29 @@ namespace Shift.Service.Content
                 fileName = null;
 
             return (fileIdentifier, fileName);
+        }
+
+        public List<(Guid FileIdentifier, string FileName)> ExtractAndParseFileUrls(string text)
+        {
+            var result = new List<(Guid FileIdentifier, string FileName)>();
+
+            if (string.IsNullOrEmpty(text))
+                return result;
+
+            var matches = FileUrlRegex.Matches(text);
+            foreach (Match match in matches)
+            {
+                if (!Guid.TryParse(match.Groups["fileId"].Value, out var fileId))
+                    continue;
+
+                var fileName = match.Groups["fileName"].Value;
+                if (string.IsNullOrEmpty(fileName))
+                    continue;
+
+                result.Add((fileId, fileName));
+            }
+
+            return result;
         }
 
         public List<(Guid FileIdentifier, string? FileName)> ParseSurveyResponseAnswer(string responseAnswerText)
@@ -142,7 +165,7 @@ namespace Shift.Service.Content
         public async Task ChangeObjectAsync(Guid fileIdentifier, Guid objectIdentifier, FileObjectType objectType)
         {
             var model = await GetFileAsync(fileIdentifier)
-                ?? throw new Exception($"File not found: {fileIdentifier}");
+                ?? throw new FileNotFoundException($"File not found: {fileIdentifier}");
 
             model.ObjectIdentifier = objectIdentifier;
 
@@ -156,7 +179,7 @@ namespace Shift.Service.Content
         public async Task RenameFileAsync(Guid fileIdentifier, Guid userIdentifier, string newFileName)
         {
             var model = await GetFileAsync(fileIdentifier)
-                ?? throw new Exception($"File not found: {fileIdentifier}");
+                ?? throw new FileNotFoundException($"File not found: {fileIdentifier}");
 
             var oldFileName = model.FileName;
 
@@ -178,7 +201,7 @@ namespace Shift.Service.Content
         public async Task ChangePropertiesAsync(Guid fileIdentifier, Guid userIdentifier, FileProperties properties, bool updateActivityChanges)
         {
             var model = await GetFileAsync(fileIdentifier)
-                ?? throw new Exception($"File not found: {fileIdentifier}");
+                ?? throw new FileNotFoundException($"File not found: {fileIdentifier}");
 
             model.Properties = properties.Clone();
 
@@ -192,7 +215,7 @@ namespace Shift.Service.Content
         public async Task ChangeClaimsAsync(Guid fileIdentifier, IEnumerable<FileClaim> claims)
         {
             var model = await GetFileAsync(fileIdentifier)
-                ?? throw new Exception($"File not found: {fileIdentifier}");
+                ?? throw new FileNotFoundException($"File not found: {fileIdentifier}");
 
             model.Claims = FileClaim.CloneList(claims);
 
@@ -249,7 +272,7 @@ namespace Shift.Service.Content
         public async Task<(FileStorageModel, Stream)> GetFileStreamAsync(Guid fileIdentifier)
         {
             var model = await GetFileAsync(fileIdentifier)
-                ?? throw new Exception($"File not found: {fileIdentifier}");
+                ?? throw new FileNotFoundException($"File not found: {fileIdentifier}");
 
             var stream = await _fileManagerService.ReadFileStreamAsync(model.OrganizationIdentifier, model.FileIdentifier, model.FileName, model.FilePath);
 
@@ -273,7 +296,7 @@ namespace Shift.Service.Content
         public async Task<(FileGrantStatus, FileStorageModel?, Stream?)> GetFileStreamAndAuthorizeAsync(ISimplePrincipal identity, Guid fileIdentifier)
         {
             var model = await GetFileAsync(fileIdentifier)
-                ?? throw new Exception($"File not found: {fileIdentifier}");
+                ?? throw new FileNotFoundException($"File not found: {fileIdentifier}");
 
             var status = Authorize(identity, model);
 
@@ -406,7 +429,7 @@ namespace Shift.Service.Content
 
             var groups = identity.RoleIds ?? [];
 
-            if (identity.UserId == null || groups.Length == 0)
+            if (identity.UserId == Guid.Empty || groups.Length == 0)
             {
                 return FileGrantStatus.Denied;
             }
@@ -424,5 +447,8 @@ namespace Shift.Service.Content
 
         [GeneratedRegex("^content/files/(?<fileId>[^/]+)/(?<fileName>[^/]+)$")]
         public static partial Regex RelativePathToRetrieveFile();
+
+        [GeneratedRegex("/content/files/(?<fileId>[0-9a-fA-F-]+)/(?<fileName>[0-9a-fA-F-.]+)")]
+        public static partial Regex RelativePathToRetrieveFile2();
     }
 }

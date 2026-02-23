@@ -121,7 +121,7 @@ namespace InSite.Cmds.Admin.Organizations.Forms
                     Organization = organization.CompanyName,
                     Uploaded = info.Uploaded,
                     Uploader = info.Uploader,
-                    Url = $"https://{organization.OrganizationCode}.{ServiceLocator.AppSettings.Security.Domain}/cmds/uploads/{info.ContainerIdentifier}/{Uri.EscapeDataString(info.Name)}"
+                    Url = $"https://{organization.OrganizationCode}.{ServiceLocator.AppSettings.Partition.Domain}/cmds/uploads/{info.ContainerIdentifier}/{Uri.EscapeDataString(info.Name)}"
                 };
 
                 list.Add(item);
@@ -262,7 +262,7 @@ namespace InSite.Cmds.Admin.Organizations.Forms
         private void Save()
         {
             var organization = OrganizationSearch.Select(OrganizationIdentifier)
-                ?? throw new ApplicationError("Organization not found: " + OrganizationIdentifier);
+                ?? throw new KeyNotFoundException("Organization not found: " + OrganizationIdentifier);
 
             CompanyDetail.GetInputValues(organization);
             CompanyTimeSensitiveCompetencies.GetInputValues(organization);

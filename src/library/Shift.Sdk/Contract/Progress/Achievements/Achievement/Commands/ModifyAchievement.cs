@@ -4,8 +4,8 @@ namespace Shift.Contract
 {
     public class ModifyAchievement
     {
-        public Guid AchievementIdentifier { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
+        public Guid AchievementId { get; set; }
+        public Guid OrganizationId { get; set; }
         public bool AchievementAllowSelfDeclared { get; set; }
         public bool AchievementIsEnabled { get; set; }
         public bool AchievementReportingDisabled { get; set; }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using System.Web.UI.WebControls;
 
 using InSite.Persistence;
 
@@ -10,7 +9,7 @@ using Shift.Constant;
 
 namespace InSite.Custom.CMDS.Common.Controls.Server
 {
-    public class SelfAssessmentStatusInput : RadioButtonList
+    public class SelfAssessmentStatusInput : InSite.Common.Web.UI.RadioButtonList
     {
         #region Loading
 
@@ -20,14 +19,14 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
 
             var organization = CurrentSessionState.Identity.Organization;
             if (!Page.IsPostBack)
-                LoadData(organization.Identifier, organization.ParentOrganizationIdentifier);
+                LoadData(organization.Identifier);
         }
 
         #endregion
 
         #region Load data
 
-        public void LoadData(Guid organization, Guid? enterprise)
+        public void LoadData(Guid organization)
         {
             if (Items.Count > 0)
                 return;
@@ -43,10 +42,10 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
                 CollectionName = CollectionName.Validations_SelfAssessment_Status
             });
 
-            if (data.Count == 0 && enterprise.HasValue)
+            if (data.Count == 0 && organization != ServiceLocator.Partition.Identifier)
                 data = TCollectionItemCache.Select(new TCollectionItemFilter
                 {
-                    OrganizationIdentifier = enterprise.Value,
+                    OrganizationIdentifier = ServiceLocator.Partition.Identifier,
                     CollectionName = CollectionName.Validations_SelfAssessment_Status
                 });
 

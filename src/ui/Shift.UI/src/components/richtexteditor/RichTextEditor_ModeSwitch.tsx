@@ -1,5 +1,6 @@
 import { translate } from "@/helpers/translate";
 import { RichTextEditorMode } from "./RichTextEditorMode";
+import Icon from "../icon/Icon";
 
 interface Props {
     mode: RichTextEditorMode;
@@ -23,11 +24,11 @@ export default function RichTextEditor_ModeSwitch({
                 title={translate("Change Mode")}
             >
                 <span className="markdown-switch">
-                    <i className="fab fa-markdown me-1"></i>
+                    <Icon style="Brands" name="markdown" className="me-1" />
                     MD
                 </span>
                 <span className="html-switch">
-                    <i className="far fa-code me-1 me-1"></i>
+                    <Icon style="Regular" name="code" className="me-1" />
                     HTML
                 </span>
                 <span className="handle">

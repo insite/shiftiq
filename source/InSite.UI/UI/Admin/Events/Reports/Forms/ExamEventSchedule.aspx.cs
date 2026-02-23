@@ -5,7 +5,7 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
-using Shift.Constant;
+using Shift.Common;
 
 namespace InSite.Admin.Events.Reports.Forms
 {
@@ -20,7 +20,7 @@ namespace InSite.Admin.Events.Reports.Forms
             if (IsPostBack)
                 return;
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/admin/events/reports/dashboard");
 
             PageHelper.AutoBindHeader(this);

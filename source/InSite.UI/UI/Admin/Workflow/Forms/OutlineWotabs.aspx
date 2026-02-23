@@ -77,10 +77,10 @@
     <div class="mb-3">
         <insite:DropDownButton runat="server" Text="Jump To" ButtonStyle="OutlinePrimary">
             <Items>
-                <insite:DropDownButtonLinkItem NavigateUrl="#Top" Text="Form" />
-                <insite:DropDownButtonLinkItem NavigateUrl="#QuestionsAnchor" Text="Questions" />
-                <insite:DropDownButtonLinkItem NavigateUrl="#ContentAnchor" Text="Content" />
-                <insite:DropDownButtonLinkItem NavigateUrl="#MessagesAnchor" Text="Messages" />
+                <sdk:DropDownButtonLinkItem NavigateUrl="#Top" Text="Form" />
+                <sdk:DropDownButtonLinkItem NavigateUrl="#QuestionsAnchor" Text="Questions" />
+                <sdk:DropDownButtonLinkItem NavigateUrl="#ContentAnchor" Text="Content" />
+                <sdk:DropDownButtonLinkItem NavigateUrl="#MessagesAnchor" Text="Messages" />
             </Items>
         </insite:DropDownButton>
     </div>

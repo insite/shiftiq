@@ -106,7 +106,7 @@ namespace InSite.Persistence.Plugin.NCSHA
                     queryBuilder.Append("UNION ");
 
                 if (field.Code.Length < 5)
-                    throw new ApplicationError("Invalid field code: " + field.Code);
+                    throw new ArgumentException("Invalid field code: " + field.Code);
 
                 var tableCode = field.Code.Substring(0, 2);
 

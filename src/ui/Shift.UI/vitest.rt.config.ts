@@ -17,6 +17,7 @@ export default defineConfig({
                 }
             },
         },
-        setupFiles: ["./src/test/setup.rt.ts"]
+        setupFiles: ["./src/test/setup.rt.ts"],
+        testTimeout: 10000,
     },
 })

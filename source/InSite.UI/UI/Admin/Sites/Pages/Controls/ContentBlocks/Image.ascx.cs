@@ -66,7 +66,7 @@ namespace InSite.Admin.Sites.Pages.Controls.ContentBlocks
         protected override void OnPreRender(EventArgs e)
         {
             if (string.IsNullOrEmpty(UploadPath))
-                throw new ApplicationError("UploadPath is null");
+                throw new InvalidOperationException("UploadPath is null");
 
             FileUploadButton.Visible = IsBrowsable;
 

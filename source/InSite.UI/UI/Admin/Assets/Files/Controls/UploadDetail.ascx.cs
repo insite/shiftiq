@@ -252,6 +252,8 @@ namespace InSite.UI.Admin.Assets.Files.Controls
                     return ValidateIssue(objectIdentifier);
                 case FileObjectType.Response:
                     return ValidateResponse(objectIdentifier);
+                case FileObjectType.Standard:
+                    return ValidateStandard(objectIdentifier);
                 default:
                     return (false, null);
             }
@@ -285,6 +287,15 @@ namespace InSite.UI.Admin.Assets.Files.Controls
                 return (false, null);
 
             return (true, response.SurveyForm.SurveyFormName);
+        }
+
+        private (bool, string) ValidateStandard(Guid objectIdentifier)
+        {
+            var standard = ServiceLocator.StandardSearch.GetStandard(objectIdentifier);
+            if (standard == null || standard.OrganizationIdentifier != Organization.Identifier)
+                return (false, null);
+
+            return (true, standard.ContentTitle);
         }
     }
 }

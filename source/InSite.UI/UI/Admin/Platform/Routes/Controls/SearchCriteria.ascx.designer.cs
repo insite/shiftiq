@@ -48,7 +48,7 @@ namespace InSite.Admin.Utilities.Actions.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.RouteTypeComboBox ActionType;
+        protected global::InSite.Common.Web.UI.ActionTypeComboBox ActionType;
 
         /// <summary>
         /// AuthorityType control.
@@ -57,7 +57,7 @@ namespace InSite.Admin.Utilities.Actions.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.RouteAuthorityComboBox AuthorityType;
+        protected global::InSite.Common.Web.UI.ActionAuthorityComboBox AuthorityType;
 
         /// <summary>
         /// ActionList control.

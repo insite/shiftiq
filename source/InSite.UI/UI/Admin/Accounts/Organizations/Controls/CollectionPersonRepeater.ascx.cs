@@ -358,7 +358,7 @@ namespace InSite.Admin.Accounts.Organizations.Controls
                     .ToArray();
 
                 if (persons.Count != itemsOrder.Length)
-                    throw new ApplicationError("Invalid collection tags count: " + inputValue);
+                    throw new FormatException("Invalid collection tags count: " + inputValue);
 
                 var itemMapping = new Dictionary<int, PersonInfo>();
                 for (var i = 0; i < persons.Count; i++)

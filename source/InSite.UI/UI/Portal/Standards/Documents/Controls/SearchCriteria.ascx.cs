@@ -3,6 +3,7 @@
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
+using Shift.Common;
 using Shift.Constant;
 
 using DocumentTypeConst = Shift.Sdk.UI.DocumentType;
@@ -31,7 +32,7 @@ namespace InSite.UI.Portal.Standards.Documents.Controls
                     },
                     IsTemplate = IsTemplate.ValueAsBoolean,
 
-                    IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure),
+                    IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure),
                     CreatedBy = User.UserIdentifier
                 };
                 GetCheckedShowColumns(filter);

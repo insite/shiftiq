@@ -17,9 +17,9 @@ public class FormService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid surveyForm, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid surveyForm, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(surveyForm, cancellation);
+        return await _reader.AssertAsync(surveyForm, organization, cancellation);
     }
 
     public async Task<IEnumerable<FormModel>> CollectAsync(IFormCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class FormService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyForm modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.SurveyFormIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.SurveyFormId, cancellation);
 
         if (entity == null)
             return false;

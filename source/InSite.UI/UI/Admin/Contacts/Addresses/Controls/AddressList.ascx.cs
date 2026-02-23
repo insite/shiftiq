@@ -88,7 +88,7 @@ namespace InSite.Admin.Contacts.Addresses.Controls
         public void SetInputValues(QPerson person)
         {
             if (ContactType != EntityType.User)
-                throw new ApplicationError("Unexpected entity type");
+                throw new InvalidOperationException("Unexpected entity type");
 
             AddPills();
 
@@ -119,7 +119,7 @@ namespace InSite.Admin.Contacts.Addresses.Controls
         public void SetInputValues(QGroup group)
         {
             if (ContactType != EntityType.Group)
-                throw new ApplicationError("Unexpected entity type");
+                throw new InvalidOperationException("Unexpected entity type");
 
             var addresses = ServiceLocator.GroupSearch.GetAddresses(group.GroupIdentifier);
 
@@ -138,7 +138,7 @@ namespace InSite.Admin.Contacts.Addresses.Controls
         public void GetInputValues(QPerson person)
         {
             if (ContactType != EntityType.User)
-                throw new ApplicationError("Unexpected entity type");
+                throw new InvalidOperationException("Unexpected entity type");
 
             foreach (var addressType in CurrentAddressTypes)
             {
@@ -151,7 +151,7 @@ namespace InSite.Admin.Contacts.Addresses.Controls
         public void GetInputValues(Dictionary<AddressType, GroupAddress> addresses)
         {
             if (ContactType != EntityType.Group)
-                throw new ApplicationError("Unexpected entity type");
+                throw new InvalidOperationException("Unexpected entity type");
 
             foreach (var addressType in CurrentAddressTypes)
             {

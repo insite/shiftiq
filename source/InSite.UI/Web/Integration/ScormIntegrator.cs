@@ -36,7 +36,7 @@ namespace InSite.Web.Integration
 
                 var error = $"SCORM Cloud integration settings are missing from this organization account: {org}. API calls to {url} will fail with this error: Authorization Required. Additional context: {context}";
 
-                throw new Exception(error);
+                throw new InvalidOperationException(error);
             }
 
             var serializer = new JsonSerializer2();

@@ -8,7 +8,7 @@ using System.Web.UI.WebControls;
 using InSite.Application.Events.Read;
 using InSite.Common.Web.UI;
 
-using Shift.Constant;
+using Shift.Common;
 
 namespace InSite.Admin.Events.Attendees.Controls
 {
@@ -158,7 +158,7 @@ namespace InSite.Admin.Events.Attendees.Controls
             CanWrite = canWrite;
 
             AddButton.NavigateUrl = $"/ui/admin/events/attendees/add?event={EventIdentifier}";
-            AddButton.Visible = Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write);
+            AddButton.Visible = Identity.IsGranted(Route.ToolkitName, DataAccess.Update);
 
             PersonAttendeeRepeater.DataBind();
 

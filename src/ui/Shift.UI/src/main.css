@@ -18,3 +18,8 @@
 .gap-6 {
     gap: 1.5rem;
 }
+
+.home-image {
+    width: 24px;
+    max-height: 24px;
+}

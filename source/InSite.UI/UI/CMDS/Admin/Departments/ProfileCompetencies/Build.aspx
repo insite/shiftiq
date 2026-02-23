@@ -62,31 +62,31 @@
 
                                 <asp:TemplateField>
                                     <ItemTemplate>
-                                        <uc:DepartmentCompetencyField ID="Department1" runat="server" DepartmentCompetency='<%# (DepartmentCompetency)Eval("Department1") %>' />
+                                        <uc:DepartmentCompetencyField ID="Department1" runat="server" DepartmentCompetency='<%# (Shift.Sdk.UI.DepartmentCompetency)Eval("Department1") %>' />
                                     </ItemTemplate>
                                 </asp:TemplateField>
 
                                 <asp:TemplateField>
                                     <ItemTemplate>
-                                        <uc:DepartmentCompetencyField ID="Department2" runat="server" DepartmentCompetency='<%# (DepartmentCompetency)Eval("Department2") %>' />
+                                        <uc:DepartmentCompetencyField ID="Department2" runat="server" DepartmentCompetency='<%# (Shift.Sdk.UI.DepartmentCompetency)Eval("Department2") %>' />
                                     </ItemTemplate>
                                 </asp:TemplateField>
 
                                 <asp:TemplateField>
                                     <ItemTemplate>
-                                        <uc:DepartmentCompetencyField ID="Department3" runat="server" DepartmentCompetency='<%# (DepartmentCompetency)Eval("Department3") %>' />
+                                        <uc:DepartmentCompetencyField ID="Department3" runat="server" DepartmentCompetency='<%# (Shift.Sdk.UI.DepartmentCompetency)Eval("Department3") %>' />
                                     </ItemTemplate>
                                 </asp:TemplateField>
 
                                 <asp:TemplateField>
                                     <ItemTemplate>
-                                        <uc:DepartmentCompetencyField ID="Department4" runat="server" DepartmentCompetency='<%# (DepartmentCompetency)Eval("Department4") %>' />
+                                        <uc:DepartmentCompetencyField ID="Department4" runat="server" DepartmentCompetency='<%# (Shift.Sdk.UI.DepartmentCompetency)Eval("Department4") %>' />
                                     </ItemTemplate>
                                 </asp:TemplateField>
 
                                 <asp:TemplateField>
                                     <ItemTemplate>
-                                        <uc:DepartmentCompetencyField ID="Department5" runat="server" DepartmentCompetency='<%# (DepartmentCompetency)Eval("Department5") %>' />
+                                        <uc:DepartmentCompetencyField ID="Department5" runat="server" DepartmentCompetency='<%# (Shift.Sdk.UI.DepartmentCompetency)Eval("Department5") %>' />
                                     </ItemTemplate>
                                 </asp:TemplateField>
 

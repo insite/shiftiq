@@ -7,17 +7,17 @@
         
         <asp:TemplateField HeaderText="Type">
             <ItemTemplate>
-                <%# Eval("ComponentType") %>
+                <%# Eval("SubsystemType") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+        <asp:TemplateField HeaderText="Subsystem">
+            <ItemTemplate>
+                <%# Eval("SubsystemName") %>
             </ItemTemplate>
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Component">
             <ItemTemplate>
-                <%# Eval("ComponentName") %>
-            </ItemTemplate>
-        </asp:TemplateField>
-        <asp:TemplateField HeaderText="Subcomponent">
-            <ItemTemplate>
-                <%# Eval("ComponentPart") %>
+                <%# Eval("SubsystemComponent") %>
             </ItemTemplate>
         </asp:TemplateField>
         <asp:TemplateField HeaderText="Entity">

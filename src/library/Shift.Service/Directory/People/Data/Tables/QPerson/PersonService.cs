@@ -17,9 +17,9 @@ public class PersonService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid person, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid person, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(person, cancellation);
+        return await _reader.AssertAsync(person, organization, cancellation);
     }
 
     public async Task<IEnumerable<PersonModel>> CollectAsync(IPersonCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class PersonService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyPerson modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.PersonIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.PersonId, cancellation);
 
         if (entity == null)
             return false;

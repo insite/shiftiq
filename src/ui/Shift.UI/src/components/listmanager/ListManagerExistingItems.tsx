@@ -2,6 +2,7 @@ import { ListItem } from "@/models/listItem";
 import ComboBox from "../combobox/ComboBox";
 import { useMemo, useState } from "react";
 import Button from "../Button";
+import Icon from "../icon/Icon";
 
 interface Props {
     items: ListItem[];
@@ -79,7 +80,7 @@ export default function ListManagerExistingItems({
                 title={deleteTooltip ?? undefined}
                 onClick={handleDelete}
             >
-                <i className="fas fa-trash-alt"></i>
+                <Icon style="Solid" name="trash-alt" />
             </button>
         </div>
     );

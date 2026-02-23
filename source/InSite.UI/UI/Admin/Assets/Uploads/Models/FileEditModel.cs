@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
 using InSite.Persistence;
-
-using Shift.Common;
 
 namespace InSite.Admin.Assets.Uploads.Models
 {
@@ -39,7 +38,7 @@ namespace InSite.Admin.Assets.Uploads.Models
 
             var path = request["path"];
             if (string.IsNullOrEmpty(path))
-                throw new ApplicationError("The path is undefined");
+                throw new ArgumentException("The path is undefined");
 
             var extension = FileModel.GetExtension(path);
             var name = (request["name"] ?? string.Empty).Trim(' ').TrimEnd('.');

@@ -155,6 +155,9 @@ namespace InSite.Application.Contacts.Write
 
             if (_old?.UserLicenseAccepted != _new.UserLicenseAccepted)
                 _result.Add(new ModifyUserFieldDateOffset(_new.UserIdentifier, UserField.UserLicenseAccepted, _new.UserLicenseAccepted));
+
+            if (_old?.EmailVerificationTokenIssued != _new.EmailVerificationTokenIssued)
+                _result.Add(new ModifyUserFieldDateOffset(_new.UserIdentifier, UserField.EmailVerificationTokenIssued, _new.EmailVerificationTokenIssued));
         }
     }
 }

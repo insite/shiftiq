@@ -6,12 +6,12 @@ namespace Shift.Contract
 {
     public class CountGradebooks : Query<int>, IGradebookCriteria
     {
-        public Guid? AchievementIdentifier { get; set; }
-        public Guid? ClassIdentifier { get; set; }
-        public Guid? ClassInstructorIdentifier { get; set; }
-        public Guid? FrameworkIdentifier { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid? PeriodIdentifier { get; set; }
+        public Guid? AchievementId { get; set; }
+        public Guid? ClassId { get; set; }
+        public Guid? ClassInstructorId { get; set; }
+        public Guid? FrameworkId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? PeriodId { get; set; }
 
         public bool? IsLocked { get; set; }
 

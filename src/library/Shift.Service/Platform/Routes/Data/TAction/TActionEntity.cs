@@ -2,6 +2,9 @@ namespace Shift.Service.Metadata;
 
 public partial class TActionEntity
 {
+    public TActionEntity? PermissionParent { get; set; }
+    public ICollection<TActionEntity> PermissionChildren { get; set; } = new List<TActionEntity>();
+
     public Guid ActionIdentifier { get; set; }
     public Guid? NavigationParentActionIdentifier { get; set; }
     public Guid? PermissionParentActionIdentifier { get; set; }

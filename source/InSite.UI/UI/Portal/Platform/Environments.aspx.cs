@@ -34,7 +34,7 @@ namespace InSite.UI.Portal.Settings.Environments
 
             var url = Page.Request.Url;
             var organization = UrlHelper.GetOrganizationCode(url);
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
 
             GoToDevelopment.NavigateUrl = $"https://dev-{organization}.{domain}";
             GoToSandbox.NavigateUrl = $"https://sandbox-{organization}.{domain}";

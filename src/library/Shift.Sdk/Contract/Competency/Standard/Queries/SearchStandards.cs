@@ -14,7 +14,7 @@ namespace Shift.Contract
         public Guid? DepartmentGroupId { get; set; }
         public Guid? IndustryItemId { get; set; }
         public Guid? ModifiedBy { get; set; }
-        public Guid OrganizationId { get; set; }
+        public Guid? OrganizationId { get; set; }
         public Guid? ParentStandardId { get; set; }
         public Guid? StandardStatusLastUpdateUser { get; set; }
 

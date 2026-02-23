@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public partial class CredentialMatch
     {
-        public Guid CredentialIdentifier { get; set; }
+        public Guid CredentialId { get; set; }
     }
 }

@@ -7,8 +7,8 @@ namespace Shift.Contract
 {
     public class SearchSubmissionAnswers : Query<IEnumerable<SubmissionAnswerMatch>>, ISubmissionAnswerCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? RespondentUserIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? RespondentUserId { get; set; }
 
         public string ResponseAnswerText { get; set; }
     }

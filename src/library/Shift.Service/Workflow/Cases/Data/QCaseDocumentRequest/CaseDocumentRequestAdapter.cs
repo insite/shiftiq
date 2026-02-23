@@ -7,9 +7,9 @@ public class CaseDocumentRequestAdapter : IEntityAdapter
 {
     public void Copy(ModifyCaseDocumentRequest modify, CaseDocumentRequestEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.RequestedTime = modify.RequestedTime;
-        entity.RequestedUserIdentifier = modify.RequestedUserIdentifier;
+        entity.RequestedUserIdentifier = modify.RequestedUserId;
         entity.RequestedFrom = modify.RequestedFrom;
         entity.RequestedFileSubcategory = modify.RequestedFileSubcategory;
         entity.RequestedFileDescription = modify.RequestedFileDescription;
@@ -27,11 +27,11 @@ public class CaseDocumentRequestAdapter : IEntityAdapter
     {
         var entity = new CaseDocumentRequestEntity
         {
-            CaseIdentifier = create.CaseIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
+            CaseIdentifier = create.CaseId,
+            OrganizationIdentifier = create.OrganizationId,
             RequestedFileCategory = create.RequestedFileCategory,
             RequestedTime = create.RequestedTime,
-            RequestedUserIdentifier = create.RequestedUserIdentifier,
+            RequestedUserIdentifier = create.RequestedUserId,
             RequestedFrom = create.RequestedFrom,
             RequestedFileSubcategory = create.RequestedFileSubcategory,
             RequestedFileDescription = create.RequestedFileDescription
@@ -48,11 +48,11 @@ public class CaseDocumentRequestAdapter : IEntityAdapter
     {
         var model = new CaseDocumentRequestModel
         {
-            CaseIdentifier = entity.CaseIdentifier,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
+            CaseId = entity.CaseIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
             RequestedFileCategory = entity.RequestedFileCategory,
             RequestedTime = entity.RequestedTime,
-            RequestedUserIdentifier = entity.RequestedUserIdentifier,
+            RequestedUserId = entity.RequestedUserIdentifier,
             RequestedFrom = entity.RequestedFrom,
             RequestedFileSubcategory = entity.RequestedFileSubcategory,
             RequestedFileDescription = entity.RequestedFileDescription
@@ -70,7 +70,7 @@ public class CaseDocumentRequestAdapter : IEntityAdapter
     {
         var match = new CaseDocumentRequestMatch
         {
-            CaseIdentifier = entity.CaseIdentifier,
+            CaseId = entity.CaseIdentifier,
             RequestedFileCategory = entity.RequestedFileCategory
 
         };

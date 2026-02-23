@@ -28,7 +28,7 @@ namespace Shift.Common
             public InlineResourceInfo(string url, string name, byte[] data)
             {
                 if (url.IsEmpty())
-                    throw new ApplicationError("URL is null");
+                    throw new ArgumentNullException("url", "URL is null");
 
                 Url = url;
                 Name = name.NullIfEmpty();
@@ -61,7 +61,7 @@ namespace Shift.Common
                         tries -= 1;
 
                         if (tries == 0)
-                            throw new ApplicationError("Can't generate unqiue CID");
+                            throw new InvalidOperationException("Can't generate unqiue CID");
                     }
 
                     item.ContentId = cid;
@@ -99,7 +99,7 @@ namespace Shift.Common
             var d = _mailgun.Domains.FirstOrDefault(x => x.Domain == domain) ?? _mailgun.Domains.First();
 
             if (d == null)
-                throw new Exception("The application configuration settings for Mailgun are missing.");
+                throw new InvalidOperationException("The application configuration settings for Mailgun are missing.");
 
             return d;
         }
@@ -262,10 +262,10 @@ namespace Shift.Common
             // and only one item.
 
             if (email.RecipientListTo == null || email.RecipientListTo.Count == 0)
-                throw new Exception($"An empty recipient list is not permitted.");
+                throw new InvalidOperationException("An empty recipient list is not permitted.");
 
             if (email.RecipientListTo.Count != 1)
-                throw new Exception($"The recipient list for an email sent using Mailgun is restricted to one item. This list contains {email.RecipientListTo.Count} items.");
+                throw new InvalidOperationException($"The recipient list for an email sent using Mailgun is restricted to one item. This list contains {email.RecipientListTo.Count} items.");
 
             var to = email.RecipientListTo.Single();
 

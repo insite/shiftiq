@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteCaseGroup
     {
-        public Guid JoinIdentifier { get; set; }
+        public Guid JoinId { get; set; }
     }
 }

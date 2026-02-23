@@ -5,7 +5,6 @@ using InSite.Common.Web;
 using InSite.Persistence;
 using InSite.UI.Layout.Portal;
 using InSite.Web.Security;
-using InSite.Web.SignIn;
 
 using Shift.Common;
 using Shift.Constant;
@@ -76,7 +75,11 @@ namespace InSite.UI.Portal.Accounts.Users
                 && Identity?.Organization?.Toolkits?.Sales?.LearnerGroup != null
                 )
             {
-                if (Identity.IsInGroup(Identity.Organization.Toolkits.Sales.ManagerGroup.Value))
+                var managerRoleId = Identity.Organization.Toolkits.Sales.ManagerGroup.Value;
+
+                var managerRoleName = ServiceLocator.GroupSearch.GetGroupName(managerRoleId);
+
+                if (Identity.IsInRole(managerRoleName))
                 {
                     var hasPayments = ServiceLocator.PaymentSearch.CountPayments(new QPaymentFilter { CreatedBy = User.Identifier }) > 0;
                     return hasPayments
@@ -84,7 +87,11 @@ namespace InSite.UI.Portal.Accounts.Users
                         : RelativeUrl.ManagerPortalHomeUrl;
                 }
 
-                if (Identity.IsInGroup(Identity.Organization.Toolkits.Sales.LearnerGroup.Value))
+                var learnerRoleId = Identity.Organization.Toolkits.Sales.LearnerGroup.Value;
+
+                var learnerRoleName = ServiceLocator.GroupSearch.GetGroupName(learnerRoleId);
+
+                if (Identity.IsInRole(learnerRoleName))
                     return RelativeUrl.LearnerPortalHomeUrl;
             }
 

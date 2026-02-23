@@ -73,8 +73,8 @@ namespace InSite.UI.Portal.Learning.Programs.Controls
 
             _filter.AddOrganization(Organization.Identifier);
 
-            if (Organization.ParentOrganizationIdentifier.HasValue)
-                _filter.AddOrganization(Organization.ParentOrganizationIdentifier.Value);
+            if (Organization.Identifier != ServiceLocator.Partition.Identifier)
+                _filter.AddOrganization(ServiceLocator.Partition.Identifier);
 
             FilterButtonRepeater.DataBind();
 

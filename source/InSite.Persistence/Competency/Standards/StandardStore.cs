@@ -352,7 +352,7 @@ namespace InSite.Persistence
                 }
             }
 
-            throw new ApplicationError("Unable to generate a unique integration hook");
+            throw new InvalidOperationException("Unable to generate a unique integration hook");
         }
 
         #endregion

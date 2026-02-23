@@ -94,5 +94,13 @@ namespace InSite.Domain.Records
 
         public void DisableAchievementReporting()
             => Apply(new AchievementReportingDisabled());
+
+        public void ChangeAchievementNotification(NotificationSettings settings)
+        {
+            if (Data.NotificationSettings.IsEqual(settings))
+                return;
+
+            Apply(new AchievementNotificationChanged(settings));
+        }
     }
 }

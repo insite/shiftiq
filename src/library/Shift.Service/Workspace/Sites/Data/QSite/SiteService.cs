@@ -17,9 +17,9 @@ public class SiteService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid site, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid site, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(site, cancellation);
+        return await _reader.AssertAsync(site, organization, cancellation);
     }
 
     public async Task<IEnumerable<SiteModel>> CollectAsync(ISiteCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class SiteService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifySite modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.SiteIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.SiteId, cancellation);
 
         if (entity == null)
             return false;

@@ -18,7 +18,7 @@ using UserProfileRepository = InSite.Persistence.Plugin.CMDS.UserProfileReposito
 
 namespace InSite.Cmds.Controls.BulkTool.Assign
 {
-    public partial class AssignProfileToSelectedEmployees : UserControl
+    public partial class AssignProfileToSelectedEmployees : BaseUserControl
     {
         #region Events
 
@@ -55,7 +55,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
 
         public void LoadData(PersonFinderSecurityInfoWrapper finderSecurityInfo)
         {
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             DepartmentIdentifier.Filter.UserIdentifier = finderSecurityInfo.CanSeeAllDepartments || CurrentSessionState.Identity.HasAccessToAllCompanies
                 ? (Guid?)null
                 : CurrentSessionState.Identity.User.UserIdentifier;
@@ -80,7 +80,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
             if (ProfileType.Value != "Primary")
                 return;
 
-            var profile = UserProfileRepository.SelectPrimaryProfile(contactID, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+            var profile = UserProfileRepository.SelectPrimaryProfile(contactID, Organization.Identifier);
             if (profile == null || profile.ProfileStandardIdentifier == ProfileIdentifier.Value)
                 return;
 
@@ -163,7 +163,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
                 var isSelected = checkbox.Checked;
 
                 var employeeProfileInfo = DepartmentProfileUserSearch.SelectFirst(x => x.UserIdentifier == userIdentifier && x.DepartmentIdentifier == departmentIdentifier && x.ProfileStandardIdentifier == profileStandardIdentifier);
-                var primaryUserProfile = DepartmentProfileUserSearch.SelectFirst(x => x.UserIdentifier == userIdentifier && x.Department.OrganizationIdentifier == CurrentIdentityFactory.ActiveOrganizationIdentifier && x.IsPrimary);
+                var primaryUserProfile = DepartmentProfileUserSearch.SelectFirst(x => x.UserIdentifier == userIdentifier && x.Department.OrganizationIdentifier == Organization.Identifier && x.IsPrimary);
 
                 if (isSelected && employeeProfileInfo == null)
                 {
@@ -183,7 +183,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
                     }
 
                     employeeProfileInfo = DepartmentProfileUserSearch.SelectFirst(x => x.UserIdentifier == userIdentifier && x.DepartmentIdentifier == departmentIdentifier && x.ProfileStandardIdentifier == profileStandardIdentifier);
-                    primaryUserProfile = DepartmentProfileUserSearch.SelectFirst(x => x.UserIdentifier == userIdentifier && x.Department.OrganizationIdentifier == CurrentIdentityFactory.ActiveOrganizationIdentifier && x.IsPrimary);
+                    primaryUserProfile = DepartmentProfileUserSearch.SelectFirst(x => x.UserIdentifier == userIdentifier && x.Department.OrganizationIdentifier == Organization.Identifier && x.IsPrimary);
                 }
 
                 if (isPrimaryProfile)

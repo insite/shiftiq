@@ -4,19 +4,18 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IGroupCriteria
+    public interface IGroupCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
-        Guid? MembershipProductIdentifier { get; set; }
+
+        Guid? MembershipProductId { get; set; }
         Guid? MessageToAdminWhenEventVenueChanged { get; set; }
         Guid? MessageToAdminWhenMembershipEnded { get; set; }
         Guid? MessageToAdminWhenMembershipStarted { get; set; }
         Guid? MessageToUserWhenMembershipEnded { get; set; }
         Guid? MessageToUserWhenMembershipStarted { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? ParentGroupIdentifier { get; set; }
-        Guid? SurveyFormIdentifier { get; set; }
+        Guid? ParentGroupId { get; set; }
+        Guid? SurveyFormId { get; set; }
 
         bool? AddNewUsersAutomatically { get; set; }
         bool? AllowJoinGroupUsingLink { get; set; }

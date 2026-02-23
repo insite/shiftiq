@@ -77,7 +77,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void InitSelectors()
         {
-            Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Department.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 Department.Filter.UserIdentifier = User.UserIdentifier;
@@ -112,6 +112,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     PrimaryProfileName = x.PrimaryProfileName,
                     SecondaryRequiredProfiles = x.SecondaryRequiredProfiles?.Replace("• ", ""),
                     SecondaryProfiles = x.SecondaryProfiles?.Replace("• ", ""),
+                    Leaders = x.Leaders?.Replace("• ", ""),
                     Managers = x.Managers?.Replace("• ", ""),
                     Supervisors = x.Supervisors?.Replace("• ", ""),
                     Validators = x.Validators?.Replace("• ", "")
@@ -123,6 +124,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             helper.Map("PrimaryProfileName", "Primary Profile", null, 24, HorizontalAlignment.Left);
             helper.Map("SecondaryRequiredProfiles", "Secondary Required for Compliance Profile(s)", null, 30, HorizontalAlignment.Left);
             helper.Map("SecondaryProfiles", "Secondary Not Required for Compliance Profile(s)", null, 30, HorizontalAlignment.Left);
+            helper.Map("Leaders", "Leader(s)", null, 30, HorizontalAlignment.Left);
             helper.Map("Managers", "Manager(s)", null, 30, HorizontalAlignment.Left);
             helper.Map("Supervisors", "Supervisor(s)", null, 30, HorizontalAlignment.Left);
             helper.Map("Validators", "Validator(s)", null, 30, HorizontalAlignment.Left);
@@ -153,7 +155,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             CurrentParameters = new SearchParameters
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 DepartmentIdentifier = Department.Value.Value,
                 RoleType = GetRoleType()
             };
@@ -165,6 +167,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             {
                 item.SecondaryRequiredProfiles = item.SecondaryRequiredProfiles?.Replace("\r\n", "<br />");
                 item.SecondaryProfiles = item.SecondaryProfiles?.Replace("\r\n", "<br />");
+                item.Leaders = item.Leaders?.Replace("\r\n", "<br />");
                 item.Managers = item.Managers?.Replace("\r\n", "<br />");
                 item.Supervisors = item.Supervisors?.Replace("\r\n", "<br />");
                 item.Validators = item.Validators?.Replace("\r\n", "<br />");
@@ -178,7 +181,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             DataRepeater.DataSource = dataSource;
             DataRepeater.DataBind();
 
-            CompanyName.Text = OrganizationSearch.Select(CurrentIdentityFactory.ActiveOrganizationIdentifier).Name;
+            CompanyName.Text = OrganizationSearch.Select(Organization.Identifier).Name;
             DepartmentName.Text = DepartmentSearch.Select(Department.Value.Value).DepartmentName;
         }
 

@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Web.UI.WebControls;
 
+using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
@@ -54,7 +55,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
                 if (filter == null)
                 {
                     filter = new VCmdsAchievementFilter();
-                    filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                    filter.OrganizationIdentifier = Organization.Identifier;
 
                     ViewState[nameof(AchievementFilter)] = filter;
                 }
@@ -232,7 +233,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         private void LoadDepartments()
         {
             DepartmentFilter filter = new DepartmentFilter();
-            filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            filter.OrganizationIdentifier = Organization.Identifier;
 
             DataTable table = ContactRepository3.SelectDepartments(filter);
 

@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;
-
-using Shift.Common;
 
 namespace InSite.Admin.Assessments.Sets.Utilities
 {
@@ -38,7 +37,7 @@ namespace InSite.Admin.Assessments.Sets.Utilities
             }
             catch (XmlException)
             {
-                throw new ApplicationError("File has unsupported format");
+                throw new FormatException("File has unsupported format");
             }
 
             if (root?.Element("tblExam")?.Elements("tblBlock") != null)
@@ -55,7 +54,7 @@ namespace InSite.Admin.Assessments.Sets.Utilities
                     Groups = IcemsQuestionGroup.ReadV2(root.Element("Exam").Elements("Section"))
                 };
 
-            throw new ApplicationError("File has unsupported format");
+            throw new FormatException("File has unsupported format");
         }
 
         #endregion

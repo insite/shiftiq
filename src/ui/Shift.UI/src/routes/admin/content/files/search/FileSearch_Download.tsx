@@ -9,17 +9,17 @@ export default function FileSearch_Download() {
     return (
         <SearchDownload
             columns={[
-                { value: "OrganizationIdentifier", text: "Organization Identifier" },
+                { value: "OrganizationId", text: "Organization Id" },
                 { value: "OrganizationCode", text: "Organization Code" },
                 { value: "ObjectType", text: "Object Type" },
-                { value: "ObjectIdentifier", text: "Object Identifier" },
-                { value: "FileIdentifier", text: "File Identifier" },
+                { value: "ObjectId", text: "Object Id" },
+                { value: "FileId", text: "File Id" },
                 { value: "FileLocation", text: "File Location" },
                 { value: "FileName", text: "File Name" },
                 { value: "DocumentName", text: "Document Name" },
                 { value: "FileSize", text: "File Size" },
                 { value: "FileUploaded", text: "File Uploaded" },
-                { value: "UserIdentifier", text: "User Identifier" },
+                { value: "UserId", text: "User Id" },
                 { value: "Visibility", text: "Visibility" }
             ]}
             onDownload={(format, visibleColumns) => shiftClient.file.download(toApiSearchFiles(criteria), format, visibleColumns)}

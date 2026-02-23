@@ -7,7 +7,7 @@ import { ApiUploadFileInfo } from "../controllers/file/ApiUploadFileInfo";
 const fileText = "My test text";
 const fileName = "test-text.txt";
 
-test("/content/files: non-authenticated", async () => {
+test("/api/content/files: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.file.count({})).rejects.toThrowError(new ApiError(401, ""));
@@ -17,7 +17,7 @@ test("/content/files: non-authenticated", async () => {
     await expect(shiftClient.file.uploadTempFile(createFile())).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("/content/files: authenticated", async () => {
+test("/api/content/files: authenticated", async () => {
     await global.login();
 
     // Happy Dom, XMLHttpRequest, and cookies seems are not friends, so am using workaround
@@ -25,7 +25,7 @@ test("/content/files: authenticated", async () => {
     const formData = new FormData();
     formData.append(file.name, file);
 
-    const uploadResult = (await fetchHelper.postForm("/content/files/temp", formData)) as ApiUploadFileInfo[];
+    const uploadResult = (await fetchHelper.postForm("/api/content/files/temp", formData)) as ApiUploadFileInfo[];
 
     expect(uploadResult).not.toBe(null);
     expect(uploadResult!.length).toBe(1);
@@ -53,7 +53,7 @@ test("/content/files: authenticated", async () => {
     expect(downloadResult!.filename.toLowerCase()).toBeTypeOf("string");
     expect(downloadResult!.data.type).toBe("text/csv");
 
-    const retrieveResult = await shiftClient.file.retrieve(uploadResult![0].FileIdentifier);
+    const retrieveResult = await shiftClient.file.retrieve(uploadResult![0].FileId);
 
     expect(retrieveResult).not.toBe(null);
     expect(retrieveResult!.ObjectType).toBe("Temporary");

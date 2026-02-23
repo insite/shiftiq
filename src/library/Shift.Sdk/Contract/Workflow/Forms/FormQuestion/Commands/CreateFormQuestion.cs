@@ -4,9 +4,9 @@ namespace Shift.Contract
 {
     public class CreateFormQuestion
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid SurveyFormIdentifier { get; set; }
-        public Guid SurveyQuestionIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid SurveyFormId { get; set; }
+        public Guid SurveyQuestionId { get; set; }
 
         public bool SurveyQuestionIsNested { get; set; }
         public bool SurveyQuestionIsRequired { get; set; }

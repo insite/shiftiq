@@ -12,23 +12,20 @@ public class FileActivityReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "ActivityIdentifier";
 
-    public FileActivityReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public FileActivityReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid activity, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid activity, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.ActivityIdentifier == activity, cancellation);
+            return query.AnyAsync(x => x.ActivityIdentifier == activity && (organization == null || organization == x.File.OrganizationIdentifier), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,8 @@ public class FileActivityReader : IEntityReader
     /// </remarks>
     private IQueryable<FileActivityEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.TFileActivity
-            .AsNoTracking()
-            .Where(x => x.File.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -122,6 +116,9 @@ public class FileActivityReader : IEntityReader
         var query = BuildQueryable(db);
 
         // TODO: Apply criteria
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.File.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         return query;
     }
@@ -138,17 +135,11 @@ public class FileActivityReader : IEntityReader
         var matches = await queryable
             .Select(entity => new FileActivityMatch
             {
-                ActivityIdentifier = entity.ActivityIdentifier
+                ActivityId = entity.ActivityIdentifier
 
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

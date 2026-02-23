@@ -55,7 +55,7 @@ namespace InSite.Cmds.Admin.Uploads.Forms
 
         #region Properties
 
-        private Guid OrganizationIdentifier => CurrentIdentityFactory.ActiveOrganizationIdentifier;
+        private Guid OrganizationIdentifier => Organization.Identifier;
 
         #endregion
 

@@ -33,7 +33,7 @@ export const urlHelper = {
     },
 
     getFileUrl(fileId: string, fileName: string) {
-        return `${shiftConfig.shiftApiHostUrl}/content/files/${fileId}/${encodeURIComponent(fileName)}`;
+        return `${shiftConfig.shiftApiHostUrl}/api/content/files/${fileId}/${encodeURIComponent(fileName)}`;
     },
 
     getOrg,

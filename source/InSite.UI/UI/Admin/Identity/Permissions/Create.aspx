@@ -37,7 +37,9 @@
                                 <asp:CheckBox runat="server" ID="AllowDelete" Text="Delete" /><br />
 
                                 <asp:CheckBox runat="server" ID="AllowAdministrate" Text="Administrate" /><br />
-                                <asp:CheckBox runat="server" ID="AllowConfigure" Text="Configure (Full Control)" />
+                                <asp:CheckBox runat="server" ID="AllowConfigure" Text="Configure (Full Control)" /><br />
+
+                                <asp:CheckBox runat="server" ID="AllowTrialAccess" Text="Trial Access" />
                             </div>
                         </div>
 

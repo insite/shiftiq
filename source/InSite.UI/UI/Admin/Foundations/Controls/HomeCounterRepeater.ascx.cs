@@ -25,7 +25,7 @@ namespace InSite.UI.Admin.Foundations.Controls
 
         public void LoadData(IEnumerable<DataItem> items)
         {
-            Repeater.DataSource = items.Where(x => x.Url.IsNotEmpty() && Identity.IsActionAuthorized(x.Url));
+            Repeater.DataSource = items.Where(x => x.Url.IsNotEmpty() && Identity.IsGranted(x.Url));
             Repeater.DataBind();
         }
 
@@ -45,8 +45,8 @@ namespace InSite.UI.Admin.Foundations.Controls
                 return false;
 
             return action != null
-                && action.Permission.HasValue
-                && Identity.Claims.IsTrial(action.Permission.Value);
+                && action.Permission != null
+                && Identity.Claims.IsGranted(action.Permission, FeatureAccess.Trial);
         }
     }
 }

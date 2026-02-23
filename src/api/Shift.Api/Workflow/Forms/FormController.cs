@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common;
 using Shift.Service.Workflow;
 
 namespace Shift.Api;
@@ -9,10 +10,12 @@ namespace Shift.Api;
 public class FormController : ShiftControllerBase
 {
     private readonly FormService _formService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public FormController(FormService formService)
+    public FormController(FormService formService, IPrincipalProvider principalProvider)
     {
         _formService = formService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +23,17 @@ public class FormController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific form
     /// </summary>
-    [HttpHead("workflow/forms/{form:guid}")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Assert)]
+    [HttpHead("api/workflow/forms/{form:guid}")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertForm")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid surveyForm, CancellationToken cancellation = default)
     {
-        var exists = await _formService.AssertAsync(surveyForm, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _formService.AssertAsync(surveyForm, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +41,8 @@ public class FormController : ShiftControllerBase
     /// <summary>
     /// Collects the list of forms that match specific criteria
     /// </summary>
-    [HttpPost("workflow/forms/collect")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Collect)]
+    [HttpPost("api/workflow/forms/collect")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FormModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectForms")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectForms query, CancellationToken cancellation = default)
@@ -43,8 +50,8 @@ public class FormController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/forms")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Collect)]
+    [HttpGet("api/workflow/forms")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FormModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectForms_get")]
     [AliasFor("collectForms")]
@@ -56,6 +63,10 @@ public class FormController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectForms query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _formService.CollectAsync(query, cancellation);
 
         var count = await _formService.CountAsync(query, cancellation);
@@ -68,8 +79,8 @@ public class FormController : ShiftControllerBase
     /// <summary>
     /// Counts the forms that match specific criteria
     /// </summary>
-    [HttpPost("workflow/forms/count")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Count)]
+    [HttpPost("api/workflow/forms/count")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countForms")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountForms query, CancellationToken cancellation = default)
@@ -77,8 +88,8 @@ public class FormController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/forms/count")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Count)]
+    [HttpGet("api/workflow/forms/count")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countForms_get")]
     [AliasFor("countForms")]
@@ -90,6 +101,10 @@ public class FormController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountForms query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _formService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +113,8 @@ public class FormController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of forms that match specific criteria
     /// </summary>    
-    [HttpPost("workflow/forms/download")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Download)]
+    [HttpPost("api/workflow/forms/download")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadForms")]
@@ -108,8 +123,8 @@ public class FormController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/forms/download")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Download)]
+    [HttpGet("api/workflow/forms/download")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadForms_get")]
@@ -122,6 +137,10 @@ public class FormController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectForms query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Workflow", "Forms", query.Filter.Format, User);
 
         var models = await _formService
@@ -142,22 +161,30 @@ public class FormController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific form
     /// </summary>
-    [HttpGet("workflow/forms/{form:guid}")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Retrieve)]
+    [HttpGet("api/workflow/forms/{form:guid}")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType<FormModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveForm")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid surveyForm, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _formService.RetrieveAsync(surveyForm, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of forms that match specific criteria
     /// </summary>
-    [HttpPost("workflow/forms/search")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Search)]
+    [HttpPost("api/workflow/forms/search")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FormMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchForms")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchForms query, CancellationToken cancellation = default)
@@ -165,8 +192,8 @@ public class FormController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/forms/search")]
-    [HybridAuthorize(Policies.Workflow.Forms.Form.Search)]
+    [HttpGet("api/workflow/forms/search")]
+    [HybridPermission("workflow/forms", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FormMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchForms_get")]
     [AliasFor("searchForms")]
@@ -178,6 +205,10 @@ public class FormController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchForms query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _formService.SearchAsync(query, cancellation);
 
         var count = await _formService.CountAsync(query, cancellation);

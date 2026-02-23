@@ -7,8 +7,9 @@ namespace Shift.Contract
 {
     public class CollectUserSessions : Query<IEnumerable<UserSessionModel>>, IUserSessionCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? UserIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+
+        public Guid? UserId { get; set; }
 
         public bool? SessionIsAuthenticated { get; set; }
 

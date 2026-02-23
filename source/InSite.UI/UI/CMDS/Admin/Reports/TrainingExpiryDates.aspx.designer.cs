@@ -24,24 +24,6 @@ namespace InSite.Cmds.Actions.Reporting.Report
         protected global::InSite.Common.Web.UI.Alert ScreenStatus;
 
         /// <summary>
-        /// DepartmentIdentifierValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.CustomValidator DepartmentIdentifierValidator;
-
-        /// <summary>
-        /// AchievementSelectorValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.CustomValidator AchievementSelectorValidator;
-
-        /// <summary>
         /// NavPanel control.
         /// </summary>
         /// <remarks>
@@ -69,13 +51,22 @@ namespace InSite.Cmds.Actions.Reporting.Report
         protected global::InSite.Common.Web.UI.UpdatePanel ReportUpdatePanel;
 
         /// <summary>
-        /// DepartmentIdentifier control.
+        /// FindDepartment control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Custom.CMDS.Common.Controls.Server.FindDepartment DepartmentIdentifier;
+        protected global::InSite.Custom.CMDS.Common.Controls.Server.FindDepartment FindDepartment;
+
+        /// <summary>
+        /// FindLearner control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindPerson FindLearner;
 
         /// <summary>
         /// IsRequired control.
@@ -87,13 +78,22 @@ namespace InSite.Cmds.Actions.Reporting.Report
         protected global::System.Web.UI.WebControls.RadioButtonList IsRequired;
 
         /// <summary>
-        /// AchievementSelector control.
+        /// FindProgram control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Cmds.Controls.Reporting.Report.AchievementCriteriaSelector AchievementSelector;
+        protected global::InSite.Common.Web.UI.FindProgram FindProgram;
+
+        /// <summary>
+        /// FindAchievement control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindAchievement FindAchievement;
 
         /// <summary>
         /// ReportButton control.
@@ -103,6 +103,15 @@ namespace InSite.Cmds.Actions.Reporting.Report
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.SearchButton ReportButton;
+
+        /// <summary>
+        /// CloseButton1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CloseButton CloseButton1;
 
         /// <summary>
         /// ReportTab control.
@@ -148,5 +157,14 @@ namespace InSite.Cmds.Actions.Reporting.Report
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater EmployeeRepeater;
+
+        /// <summary>
+        /// CloseButton2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CloseButton CloseButton2;
     }
 }

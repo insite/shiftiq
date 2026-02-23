@@ -22,7 +22,7 @@ namespace InSite.Cmds.Admin.Workflows.Profiles.Forms
         private ProfileFilter ProfileFilter => (ProfileFilter)(ViewState[nameof(ProfileFilter)]
             ?? (ViewState[nameof(ProfileFilter)] = new ProfileFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier
+                OrganizationIdentifier = Organization.Identifier
             }));
 
         #endregion
@@ -161,7 +161,7 @@ namespace InSite.Cmds.Admin.Workflows.Profiles.Forms
         {
             Departments.DataSource = ContactRepository3.SelectDepartments(new DepartmentFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier
+                OrganizationIdentifier = Organization.Identifier
             });
             Departments.DataBind();
         }

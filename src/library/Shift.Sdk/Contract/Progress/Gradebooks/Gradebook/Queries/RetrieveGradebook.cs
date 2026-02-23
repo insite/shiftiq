@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveGradebook : Query<GradebookModel>
     {
-        public Guid GradebookIdentifier { get; set; }
+        public Guid GradebookId { get; set; }
     }
 }

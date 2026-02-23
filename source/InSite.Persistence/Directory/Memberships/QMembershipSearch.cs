@@ -127,6 +127,12 @@ namespace InSite.Persistence
         {
             var query = db.QMemberships.AsNoTracking().AsQueryable();
 
+            if (filter.GroupOrganizationIdentifier.HasValue)
+                query = query.Where(x => x.Group.OrganizationIdentifier == filter.GroupOrganizationIdentifier.Value);
+
+            if (filter.MembershipFunction.IsNotEmpty())
+                query = query.Where(x => x.MembershipFunction == filter.MembershipFunction);
+
             if (filter.GroupIdentifiers.IsNotEmpty())
             {
                 if (filter.GroupIdentifiers.Length == 1)

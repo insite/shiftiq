@@ -20,15 +20,15 @@ public class PageAdapter : IEntityAdapter
         entity.Hook = modify.Hook;
         entity.IsNewTab = modify.IsNewTab;
         entity.PageSlug = modify.PageSlug;
-        entity.SiteIdentifier = modify.SiteIdentifier;
-        entity.ParentPageIdentifier = modify.ParentPageIdentifier;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.SiteIdentifier = modify.SiteId;
+        entity.ParentPageIdentifier = modify.ParentPageId;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.LastChangeTime = modify.LastChangeTime;
         entity.LastChangeType = modify.LastChangeType;
         entity.LastChangeUser = modify.LastChangeUser;
         entity.IsAccessDenied = modify.IsAccessDenied;
         entity.ObjectType = modify.ObjectType;
-        entity.ObjectIdentifier = modify.ObjectIdentifier;
+        entity.ObjectIdentifier = modify.ObjectId;
 
     }
 
@@ -43,7 +43,7 @@ public class PageAdapter : IEntityAdapter
     {
         var entity = new PageEntity
         {
-            PageIdentifier = create.PageIdentifier,
+            PageIdentifier = create.PageId,
             PageType = create.PageType,
             Title = create.Title,
             Sequence = create.Sequence,
@@ -57,15 +57,15 @@ public class PageAdapter : IEntityAdapter
             Hook = create.Hook,
             IsNewTab = create.IsNewTab,
             PageSlug = create.PageSlug,
-            SiteIdentifier = create.SiteIdentifier,
-            ParentPageIdentifier = create.ParentPageIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
+            SiteIdentifier = create.SiteId,
+            ParentPageIdentifier = create.ParentPageId,
+            OrganizationIdentifier = create.OrganizationId,
             LastChangeTime = create.LastChangeTime,
             LastChangeType = create.LastChangeType,
             LastChangeUser = create.LastChangeUser,
             IsAccessDenied = create.IsAccessDenied,
             ObjectType = create.ObjectType,
-            ObjectIdentifier = create.ObjectIdentifier
+            ObjectIdentifier = create.ObjectId
         };
         return entity;
     }
@@ -79,7 +79,7 @@ public class PageAdapter : IEntityAdapter
     {
         var model = new PageModel
         {
-            PageIdentifier = entity.PageIdentifier,
+            PageId = entity.PageIdentifier,
             PageType = entity.PageType,
             Title = entity.Title,
             Sequence = entity.Sequence,
@@ -93,15 +93,15 @@ public class PageAdapter : IEntityAdapter
             Hook = entity.Hook,
             IsNewTab = entity.IsNewTab,
             PageSlug = entity.PageSlug,
-            SiteIdentifier = entity.SiteIdentifier,
-            ParentPageIdentifier = entity.ParentPageIdentifier,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
+            SiteId = entity.SiteIdentifier,
+            ParentPageId = entity.ParentPageIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
             LastChangeTime = entity.LastChangeTime,
             LastChangeType = entity.LastChangeType,
             LastChangeUser = entity.LastChangeUser,
             IsAccessDenied = entity.IsAccessDenied,
             ObjectType = entity.ObjectType,
-            ObjectIdentifier = entity.ObjectIdentifier
+            ObjectId = entity.ObjectIdentifier
         };
 
         return model;
@@ -116,7 +116,7 @@ public class PageAdapter : IEntityAdapter
     {
         var match = new PageMatch
         {
-            PageIdentifier = entity.PageIdentifier,
+            PageId = entity.PageIdentifier,
             PageIcon = entity.PageIcon,
             PageTitle = entity.Title,
             PageUrl = entity.NavigateUrl

@@ -12,23 +12,25 @@ public class AchievementReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "AchievementIdentifier";
 
-    public AchievementReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public AchievementReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid achievement, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid achievement, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.AchievementIdentifier == achievement, cancellation);
+            if (organization != null)
+                query = query.Where(x => x.OrganizationIdentifier == organization.Value);
+
+            var exists = query.AnyAsync(x => x.AchievementIdentifier == achievement, cancellation);
+
+            return exists;
 
         }, cancellation);
     }
@@ -106,11 +108,8 @@ public class AchievementReader : IEntityReader
     /// </remarks>
     private IQueryable<AchievementEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.QAchievement
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -123,6 +122,9 @@ public class AchievementReader : IEntityReader
 
         if (criteria.AchievementTitle != null)
             query = query.Where(x => x.AchievementTitle.Contains(criteria.AchievementTitle));
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         return query;
     }
@@ -145,11 +147,5 @@ public class AchievementReader : IEntityReader
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

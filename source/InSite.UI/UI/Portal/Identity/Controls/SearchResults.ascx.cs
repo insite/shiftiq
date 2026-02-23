@@ -8,9 +8,10 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Lobby;
 
+using Shift.Common;
+using Shift.Common.Events;
 using Shift.Common.Linq;
 using Shift.Constant;
-using Shift.Common.Events;
 
 namespace InSite.UI.Desktops.Design.Users.Controls
 {
@@ -163,8 +164,10 @@ namespace InSite.UI.Desktops.Design.Users.Controls
             if (!AllowImpersonation)
                 return string.Empty;
 
+            var url = Urls.StartImpersonation + $"?user={user}";
+
             return isApproved
-                ? $"<a class='btn btn-sm btn-default' title='{Translate("Impersonate")}' href='/ui/portal/identity/impersonate?user={user}'><i class='fas fa-user-secret'></i></a>"
+                ? $"<a class='btn btn-sm btn-default' title='{Translate("Impersonate")}' href='{url}'><i class='fas fa-user-secret'></i></a>"
                 : $"<span class='btn btn-sm btn-default' title='{Translate("Not Approved")}' class='text-danger'><i class='fas fa-user-secret'></i></span>";
         }
 

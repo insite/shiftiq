@@ -294,7 +294,7 @@ namespace InSite.Admin.Accounts.Permissions.Controls
 
         private void LoadToolkits(MatrixFilter filter, DataTable table)
         {
-            ActionItems = TActionSearch.Search(x => x.ActionType == "Permission")
+            ActionItems = TActionSearch.Search(x => x.ActionType == "Resource")
                 .Where(x => filter.ActionIdentifier == null || x.ActionIdentifier == filter.ActionIdentifier)
                 .Select(x => new ActionItem
                 {

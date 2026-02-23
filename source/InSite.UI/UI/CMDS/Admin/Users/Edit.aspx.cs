@@ -246,8 +246,9 @@ namespace InSite.Cmds.Admin.People.Forms
             CompetenciesLinkButton.Visible = isGrantedUsers;
             TrainingPlanLinkButton.Visible = isGrantedUsers;
 
-            ImpersonateLink.NavigateUrl = "/ui/portal/identity/impersonate?user=" + user.UserIdentifier +
-                          "&ReturnUrl=" + HttpUtility.UrlEncode(Urls.CmdsHomeUrl);
+            ImpersonateLink.NavigateUrl = Urls.StartImpersonation
+                + $"?user={user.UserIdentifier}"
+                + "&ReturnUrl=" + HttpUtility.UrlEncode(Urls.HomeUrl);
 
             ImpersonateLink.Visible = !Identity.IsImpersonating                 // A user who is already impersonating someone is not allowed to impersonate someone else.
                                       && Identity.IsInRole(CmdsRole.Impersonators)

@@ -124,7 +124,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
             ReportTitle.InnerText = PageTitle.InnerText = data.Title;
 
             if (data.LogoImageUrl.IsEmpty())
-                LogoContainer.InnerText = ServiceLocator.Partition.GetPlatformName();
+                LogoContainer.InnerText = ServiceLocator.Partition.Name;
             else
                 LogoContainer.InnerHtml = $"<img alt='' src='{HttpUtility.UrlEncode(data.LogoImageUrl)}' />";
 
@@ -142,7 +142,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
 
             if (!_isDefaultLang)
             {
-                var translator = new InputTranslator(_data.OrganizationIdentifier, _data.Language);
+                var translator = new InputTranslator(_data.Language, _data.OrganizationIdentifier);
                 attemptLangName = translator.Translate(attemptLangName);
             }
 

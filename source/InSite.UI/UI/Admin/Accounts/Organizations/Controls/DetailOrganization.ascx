@@ -2,17 +2,8 @@
 
 <div class="row">
     <div class="col-md-6">
-                                    
-        <h3>Identification</h3>
 
-        <div class="form-group mb-3">
-            <label class="form-label">
-                Parent Organization
-                <insite:IconLink runat="server" ID="ParentLink" Name="pencil" ToolTip="Edit " />
-            </label>
-            <insite:FindOrganization runat="server" ID="ParentOrganizationIdentifier" />
-            <div class="form-text">You can select another organization as the container for this organization. This is optional, and it allows you to nest organizations into suborganizations. </div>
-        </div>
+        <h3>Identification</h3>
 
         <div class="form-group mb-3">
             <label class="form-label">
@@ -35,16 +26,6 @@
             </label>
             <insite:TextBox runat="server" ID="CompanyName" MaxLength="50" />
             <div class="form-text">The name of the client organization that owns this organization account.</div>
-        </div>
-
-        <div class="form-group mb-3">
-            <label class="form-label">
-                Organization Domain
-                <insite:RequiredValidator runat="server" ControlToValidate="CompanyDomain" FieldName="Organization Domain" ValidationGroup="Organization" />
-                <insite:PatternValidator runat="server" ID="DomainPatternValidator" ControlToValidate="CompanyDomain" ValidationGroup="Organization" ErrorMessage="Incorrect domain format" />
-            </label>
-            <insite:TextBox runat="server" ID="CompanyDomain" MaxLength="50" />
-            <div class="form-text">The Internet domain name registered by the organization for its corporate web site and email.</div>
         </div>
 
         <insite:Container runat="server" ID="SetupContainer">
@@ -73,7 +54,7 @@
             </div>
         </insite:Container>
     </div>
-                                
+
     <div class="col-md-6">
         <h3>Description</h3>
 

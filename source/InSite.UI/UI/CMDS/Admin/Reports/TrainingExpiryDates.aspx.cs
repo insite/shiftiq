@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity.Core;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Web.UI.WebControls;
@@ -26,6 +28,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             public Guid[] Departments { get; set; }
             public Guid[] Achievements { get; set; }
+            public Guid[] Learners { get; set; }
             public bool? IsRequired { get; set; }
         }
 
@@ -147,14 +150,14 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             base.OnInit(e);
 
-            DepartmentIdentifierValidator.ServerValidate += (s, a) => a.IsValid = DepartmentIdentifier.Enabled;
-            AchievementSelectorValidator.ServerValidate += (s, a) => a.IsValid = AchievementSelector.HasValue();
+            FindDepartment.AutoPostBack = true;
+            FindDepartment.ValueChanged += (s, a) => OnDepartmentChanged();
 
-            DepartmentIdentifier.AutoPostBack = true;
-            DepartmentIdentifier.ValueChanged += (s, a) => LoadAchievements();
+            FindProgram.AutoPostBack = true;
+            FindProgram.ValueChanged += (s, a) => SetupFindAchievement();
 
             IsRequired.AutoPostBack = true;
-            IsRequired.SelectedIndexChanged += (s, a) => LoadAchievements();
+            IsRequired.SelectedIndexChanged += (s, a) => SetupFindAchievement();
 
             DownloadXlsx.Click += DownloadXlsx_Click;
 
@@ -173,22 +176,40 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             PageHelper.AutoBindHeader(this);
 
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            FindDepartment.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
-                DepartmentIdentifier.Filter.UserIdentifier = User.UserIdentifier;
+                FindDepartment.Filter.UserIdentifier = User.UserIdentifier;
 
-            var hasDepartments = DepartmentIdentifier.GetCount() > 0;
+            OnDepartmentChanged();
 
-            DepartmentIdentifier.Enabled = hasDepartments;
-            DepartmentIdentifier.EmptyMessage = hasDepartments ? "All Departments" : "None";
-
-            LoadAchievements();
+            var closeUrl = "/ui/admin/reporting";
+            CloseButton1.NavigateUrl = closeUrl;
+            CloseButton2.NavigateUrl = closeUrl;
         }
 
         #endregion
 
         #region Event handlers
+
+        private void OnDepartmentChanged()
+        {
+            FindLearner.Enabled = FindDepartment.HasValue;
+            FindLearner.Filter.OrganizationIdentifier = Organization.Identifier;
+            FindLearner.Filter.GroupDepartmentIdentifiers = FindDepartment.Values;
+            FindLearner.Value = null;
+
+            SetupFindAchievement();
+        }
+
+        private void SetupFindAchievement()
+        {
+            FindAchievement.Enabled = FindDepartment.HasValue;
+            FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
+            FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
+            FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
+            FindAchievement.Value = null;
+        }
 
         private void ReportButton_Click(object sender, EventArgs e)
         {
@@ -308,7 +329,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void EmployeeRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            if (!IsContentItem(e))
                 return;
 
             var employeeGroup = (DefaultGroupNode<DefaultGroupLeaf>)e.Item.DataItem;
@@ -319,7 +340,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void EmployeeRepeater_ItemCreated(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            if (!IsContentItem(e))
                 return;
 
             var departmentRepeater = (Repeater)e.Item.FindControl("DepartmentRepeater");
@@ -328,7 +349,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void DepartmentRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            if (!IsContentItem(e))
                 return;
 
             var departmentGroup = (DefaultGroupLeaf)e.Item.DataItem;
@@ -346,13 +367,11 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             CurrentParameters = new SearchParameters
             {
-                Departments = DepartmentIdentifier.Values,
-                Achievements = AchievementSelector.GetSelectedAchievements(),
+                Departments = FindDepartment.Values,
+                Achievements = FindAchievement.Values,
+                Learners = FindLearner.Values,
                 IsRequired = GetIsRequired()
             };
-
-            if (CurrentParameters.Departments.Length == 0)
-                CurrentParameters.Departments = DepartmentIdentifier.GetDataItems().Select(x => x.Value).ToArray();
 
             if (CurrentParameters.Departments.Length == 0 || CurrentParameters.Achievements.Length == 0)
             {
@@ -360,7 +379,25 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 return;
             }
 
-            var dataSource = GetReportDataSource();
+            ReportDataSource dataSource;
+
+            try
+            {
+                dataSource = GetReportDataSource();
+            }
+            catch (EntityCommandExecutionException ecex)
+            {
+                if (ecex.InnerException is SqlException sqex && sqex.Number == -2)
+                {
+                    ScreenStatus.AddMessage(
+                        AlertType.Error,
+                        "The report generation took too long to complete. Please try selecting fewer items.");
+                    return;
+                }
+
+                throw ecex;
+            }
+
             if (!dataSource.HasData)
             {
                 ScreenStatus.AddMessage(AlertType.Error, "There is no data matching your criteria.");
@@ -382,7 +419,12 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private ReportDataSource GetReportDataSource()
         {
-            var rows = CmdsReportHelper.SelectTrainingExpiryDates(CurrentParameters.Departments, CurrentParameters.Achievements, CurrentParameters.IsRequired, Constants.DefaultPassingGrade);
+            var rows = CmdsReportHelper.SelectTrainingExpiryDates(
+                CurrentParameters.Departments,
+                CurrentParameters.Achievements,
+                CurrentParameters.Learners,
+                CurrentParameters.IsRequired,
+                Constants.DefaultPassingGrade);
 
             var result = new ReportDataSource();
 
@@ -414,26 +456,6 @@ namespace InSite.Cmds.Actions.Reporting.Report
             }
 
             return result;
-        }
-
-        private void LoadAchievements()
-        {
-            Guid[] departments = null;
-
-            if (DepartmentIdentifier.Enabled)
-            {
-                departments = DepartmentIdentifier.Values;
-
-                if (departments.Length == 0)
-                    departments = DepartmentIdentifier.GetDataItems().Select(x => x.Value).ToArray();
-            }
-
-            var hasAchievements = AchievementSelector.LoadData(departments, GetIsRequired());
-
-            AchievementSelector.Visible = hasAchievements;
-
-            if (!hasAchievements)
-                ScreenStatus.AddMessage(AlertType.Error, "The departments you have selected do not have any training achievements.");
         }
 
         #endregion

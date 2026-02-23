@@ -10,10 +10,10 @@ public class CaseDocumentAdapter : IEntityAdapter
         entity.FileName = modify.FileName;
         entity.AttachmentPosted = modify.AttachmentPosted;
         entity.FileType = modify.FileType;
-        entity.IssueIdentifier = modify.CaseIdentifier;
-        entity.PosterIdentifier = modify.PosterIdentifier;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.FileIdentifier = modify.FileIdentifier;
+        entity.IssueIdentifier = modify.CaseId;
+        entity.PosterIdentifier = modify.PosterId;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.FileIdentifier = modify.FileId;
 
     }
 
@@ -31,11 +31,11 @@ public class CaseDocumentAdapter : IEntityAdapter
             FileName = create.FileName,
             AttachmentPosted = create.AttachmentPosted,
             FileType = create.FileType,
-            IssueIdentifier = create.CaseIdentifier,
-            PosterIdentifier = create.PosterIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            FileIdentifier = create.FileIdentifier,
-            AttachmentIdentifier = create.AttachmentIdentifier
+            IssueIdentifier = create.CaseId,
+            PosterIdentifier = create.PosterId,
+            OrganizationIdentifier = create.OrganizationId,
+            FileIdentifier = create.FileId,
+            AttachmentIdentifier = create.AttachmentId
         };
         return entity;
     }
@@ -52,11 +52,11 @@ public class CaseDocumentAdapter : IEntityAdapter
             FileName = entity.FileName,
             AttachmentPosted = entity.AttachmentPosted,
             FileType = entity.FileType,
-            CaseIdentifier = entity.IssueIdentifier,
-            PosterIdentifier = entity.PosterIdentifier,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            FileIdentifier = entity.FileIdentifier,
-            AttachmentIdentifier = entity.AttachmentIdentifier
+            CaseId = entity.IssueIdentifier,
+            PosterId = entity.PosterIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            FileId = entity.FileIdentifier,
+            AttachmentId = entity.AttachmentIdentifier
         };
 
         return model;
@@ -71,7 +71,7 @@ public class CaseDocumentAdapter : IEntityAdapter
     {
         var match = new CaseDocumentMatch
         {
-            AttachmentIdentifier = entity.AttachmentIdentifier
+            AttachmentId = entity.AttachmentIdentifier
 
         };
 

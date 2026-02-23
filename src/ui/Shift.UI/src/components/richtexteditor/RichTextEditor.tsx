@@ -27,9 +27,10 @@ export interface RichTextEditorProps {
     enableModeSwitch?: boolean;
     htmlTitle?: string;
     markdownTitle?: string;
+    disabled?: boolean;
     error?: FieldError;
     onChange?: (value: RichTextEditorValue) => void;
-    onBlur?: () => void;
+    onBlur?: (value: RichTextEditorValue) => void;
 }
 
 export default function RichTextEditor ({
@@ -42,6 +43,7 @@ export default function RichTextEditor ({
     enableModeSwitch = false,
     htmlTitle = "Body HTML",
     markdownTitle = "Body Text (Markdown)",
+    disabled = false,
     error,
     onChange,
     onBlur
@@ -93,28 +95,29 @@ export default function RichTextEditor ({
             {mode === "markdown" && (
                 <RichTextEditor_Markdown
                     ref={markdownRef}
-                    isTranslating={isTranslating}
+                    disabled={isTranslating || disabled}
                     markdown={currentValue?.markdown?.[currentLanguage] ?? ""}
                     disableUploadFile={disableUploadFile}
                     onUploadFile={handleUploadFile}
                     onChange={handleMarkdownChange}
-                    onBlur={onBlur}
+                    onBlur={() => onBlur?.(currentValue ?? {})}
                 />
             )}
             {mode === "html" && (
                 <RichTextEditor_Html
                     ref={htmlRef}
-                    isTranslating={isTranslating}
+                    disabled={isTranslating || disabled}
                     html={currentValue?.html?.[currentLanguage] ?? ""}
                     disableUploadFile={disableUploadFile}
                     supportedImageFileTypes={_supportedImageFileTypes}
                     onUploadFile={handleUploadFile}
                     onChange={handleHtmlChange}
-                    onBlur={onBlur}
+                    onBlur={() => onBlur?.(currentValue ?? {})}
                 />
             )}
 
             <RichTextEditor_Translate
+                disabled={disabled}
                 isTranslating={isTranslating}
                 language={currentLanguage}
                 onTranslate={handleTranslate}
@@ -122,6 +125,7 @@ export default function RichTextEditor ({
 
             {!disableUploadFile && (
                 <RichTextEditor_FileTypes
+                    disabled={disabled}
                     supportedFileTypes={_supportedFileTypes}
                     onUploadFile={handleUploadFileAndInsert}
                 />

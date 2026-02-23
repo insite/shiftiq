@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class CaseDocumentController : ShiftControllerBase
 {
     private readonly CaseDocumentService _caseDocumentService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public CaseDocumentController(CaseDocumentService caseDocumentService)
+    public CaseDocumentController(CaseDocumentService caseDocumentService, IPrincipalProvider principalProvider)
     {
         _caseDocumentService = caseDocumentService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class CaseDocumentController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific case document
     /// </summary>
-    [HttpHead("workflow/cases-documents/{document:guid}")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Assert)]
+    [HttpHead("api/workflow/cases-documents/{document:guid}")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertCaseDocument")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid attachment, CancellationToken cancellation = default)
     {
-        var exists = await _caseDocumentService.AssertAsync(attachment, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _caseDocumentService.AssertAsync(attachment, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class CaseDocumentController : ShiftControllerBase
     /// <summary>
     /// Collects the list of case documents that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-documents/collect")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Collect)]
+    [HttpPost("api/workflow/cases-documents/collect")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseDocumentModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectCaseDocuments")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectCaseDocuments query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class CaseDocumentController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-documents")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Collect)]
+    [HttpGet("api/workflow/cases-documents")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseDocumentModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectCaseDocuments_get")]
     [AliasFor("collectCaseDocuments")]
@@ -56,6 +62,10 @@ public class CaseDocumentController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectCaseDocuments query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _caseDocumentService.CollectAsync(query, cancellation);
 
         var count = await _caseDocumentService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class CaseDocumentController : ShiftControllerBase
     /// <summary>
     /// Counts the case documents that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-documents/count")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Count)]
+    [HttpPost("api/workflow/cases-documents/count")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countCaseDocuments")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountCaseDocuments query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class CaseDocumentController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-documents/count")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Count)]
+    [HttpGet("api/workflow/cases-documents/count")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countCaseDocuments_get")]
     [AliasFor("countCaseDocuments")]
@@ -90,6 +100,10 @@ public class CaseDocumentController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountCaseDocuments query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _caseDocumentService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class CaseDocumentController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of case documents that match specific criteria
     /// </summary>    
-    [HttpPost("workflow/cases-documents/download")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Download)]
+    [HttpPost("api/workflow/cases-documents/download")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadCaseDocuments")]
@@ -108,8 +122,8 @@ public class CaseDocumentController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-documents/download")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Download)]
+    [HttpGet("api/workflow/cases-documents/download")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadCaseDocuments_get")]
@@ -122,6 +136,10 @@ public class CaseDocumentController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectCaseDocuments query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Workflow", "CaseDocuments", query.Filter.Format, User);
 
         var models = await _caseDocumentService
@@ -142,22 +160,33 @@ public class CaseDocumentController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific case document
     /// </summary>
-    [HttpGet("workflow/cases-documents/{document:guid}")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Retrieve)]
+    [HttpGet("api/workflow/cases-documents/{document:guid}")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType<CaseDocumentModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveCaseDocument")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid attachment, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _caseDocumentService.RetrieveAsync(attachment, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        // If the document exists in another organization then we could return Unauthorized here - but this would
+        // reveal that the ID exists. Returning Not Found is more secure and also helps to prevent enumeration attacks.
+
+        if (model.OrganizationId.HasValue && !_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId.Value))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of case documents that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-documents/search")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Search)]
+    [HttpPost("api/workflow/cases-documents/search")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseDocumentMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchCaseDocuments")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchCaseDocuments query, CancellationToken cancellation = default)
@@ -165,8 +194,8 @@ public class CaseDocumentController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-documents/search")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseDocument.Search)]
+    [HttpGet("api/workflow/cases-documents/search")]
+    [HybridPermission("workflow/cases-documents", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseDocumentMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchCaseDocuments_get")]
     [AliasFor("searchCaseDocuments")]
@@ -178,6 +207,10 @@ public class CaseDocumentController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchCaseDocuments query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _caseDocumentService.SearchAsync(query, cancellation);
 
         var count = await _caseDocumentService.CountAsync(query, cancellation);

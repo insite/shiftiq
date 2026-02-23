@@ -9,6 +9,7 @@ using System.Web.Http;
 using InSite.Api.Settings;
 using InSite.Application;
 using InSite.Application.Events.Write;
+using InSite.Application.Records.Write;
 using InSite.Application.Users.Write;
 using InSite.Persistence;
 using InSite.Persistence.Integration.DirectAccess;
@@ -78,14 +79,7 @@ namespace InSite.UI.Api
                 if (!partition.IsE03())
                     return JsonSuccess($"Skipped. CMDS daily jobs do not run on {partition.Slug.ToUpper()}.");
 
-                var serviceIdentity = new ServiceIdentity
-                {
-                    Organization = OrganizationIdentifiers.CMDS,
-                    User = UserIdentifiers.Maintenance,
-                    Name = "Maintenance"
-                };
-
-                ServiceLocator.IdentityService.SetCurrentService(serviceIdentity);
+                SetServiceIdentity(OrganizationIdentifiers.CMDS, UserIdentifiers.Maintenance, "Maintenance");
 
                 var runner = new RunDailyJobs();
 
@@ -124,14 +118,7 @@ namespace InSite.UI.Api
                 if (!partition.IsE04())
                     return JsonSuccess($"Skipped. STBC email notifications do not run on {partition.Slug.ToUpper()}.");
 
-                var serviceIdentity = new ServiceIdentity
-                {
-                    Organization = OrganizationIdentifiers.SkilledTradesBC,
-                    User = UserIdentifiers.Maintenance,
-                    Name = "Maintenance"
-                };
-
-                ServiceLocator.IdentityService.SetCurrentService(serviceIdentity);
+                SetServiceIdentity(OrganizationIdentifiers.SkilledTradesBC, UserIdentifiers.Maintenance, "Maintenance");
 
                 var m2 = new DirectAccessMailer(
                     ServiceLocator.Logger,
@@ -160,7 +147,7 @@ namespace InSite.UI.Api
             return ExecuteMaintenanceRoutine(() =>
             {
                 RegistrationInvitationHelper.DeleteExpiredInvitations(
-                    ServiceLocator.AppSettings.Security.Domain,
+                    ServiceLocator.AppSettings.Partition.Domain,
                     ServiceLocator.AppSettings.Environment,
                     ServiceLocator.SendCommand,
                     ServiceLocator.RegistrationSearch,
@@ -184,14 +171,7 @@ namespace InSite.UI.Api
             {
                 _mutex.WaitOne(); // Wait until it is safe to enter.
 
-                var serviceIdentity = new ServiceIdentity
-                {
-                    Organization = identity.Organization.Identifier,
-                    User = identity.User.Identifier,
-                    Name = $"API Developer {identity.User.Name}"
-                };
-
-                ServiceLocator.IdentityService.SetCurrentService(serviceIdentity);
+                SetServiceIdentity(identity);
 
                 return routine();
             }
@@ -205,6 +185,62 @@ namespace InSite.UI.Api
             {
                 _mutex.ReleaseMutex(); // Release the mutual-exclusion lock.
             }
+        }
+
+        private static void SetServiceIdentity(Principal identity) =>
+            SetServiceIdentity(identity.Organization.Identifier, identity.User.Identifier, $"API Developer {identity.User.Name}");
+
+        private static void SetServiceIdentity(Guid organizationId, Guid userId, string userName)
+        {
+            ServiceLocator.IdentityService.SetCurrentService(new ServiceIdentity
+            {
+                Organization = organizationId,
+                User = userId,
+                Name = $"API Developer {userName}"
+            });
+        }
+
+        [HttpPost]
+        [Route("api/maintenance/send-achievement-notifications")]
+        public HttpResponseMessage AchievementNotifications()
+        {
+            return ExecuteMaintenanceRoutine(() =>
+            {
+                var helper = new CredentialNotificationHelper(
+                    ServiceLocator.AchievementSearch,
+                    ServiceLocator.SendCommand,
+                    ServiceLocator.AlertMailer);
+
+                var count = helper.CreateNotifications();
+
+                return JsonSuccess(count);
+            });
+        }
+
+        [HttpPost]
+        [Route("api/maintenance/validate-and-publish-exams")]
+        public HttpResponseMessage ValidateAndPublishExams()
+        {
+            return ExecuteMaintenanceRoutine(() =>
+            {
+                var partition = ServiceLocator.Partition;
+                if (!partition.IsE04())
+                    return JsonSuccess($"Skipped. Automated upload of online exam results to DirectAccess run on {partition.Slug.ToUpper()}.");
+
+                SetServiceIdentity(OrganizationIdentifiers.SkilledTradesBC, UserIdentifiers.Maintenance, "Maintenance");
+
+                var classReminder = new ExamAutomation(
+                    ServiceLocator.EventSearch,
+                    ServiceLocator.RegistrationSearch,
+                    ServiceLocator.OrganizationSearch,
+                    ServiceLocator.IdentityService,
+                    ServiceLocator.SendCommand
+                );
+
+                var count = classReminder.ValidateAndPublishGrades();
+
+                return JsonSuccess(count);
+            });
         }
 
         private static string GetDescription(Exception ex)

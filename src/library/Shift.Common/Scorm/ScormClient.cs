@@ -19,7 +19,7 @@ namespace Shift.Common.Scorm
         {
             var result = _client.HttpPost("registrations", request);
             if (result.Problem != null)
-                throw new ApplicationError(result.Problem.Detail);
+                throw new InvalidOperationException(result.Problem.Detail);
         }
 
         public Course RetrieveCourse(string courseSlug)

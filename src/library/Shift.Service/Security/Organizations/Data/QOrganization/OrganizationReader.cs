@@ -143,8 +143,7 @@ public class OrganizationReader : IEntityReader
         var matches = await queryable
             .Select(entity => new OrganizationMatch
             {
-                OrganizationIdentifier = entity.OrganizationIdentifier,
-                ParentOrganizationIdentifier = entity.ParentOrganizationIdentifier,
+                OrganizationId = entity.OrganizationIdentifier,
                 CompanyName = entity.CompanyName
             })
             .ToListAsync(cancellation);

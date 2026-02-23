@@ -8,7 +8,6 @@ namespace InSite.Application.Records.Read
     {
         public Guid AchievementIdentifier { get; set; }
         public Guid CredentialIdentifier { get; set; }
-        public Guid? ParentOrganizationIdentifier { get; set; }
         public Guid OrganizationIdentifier { get; set; }
         public Guid UserIdentifier { get; set; }
         public Guid? EmployerGroupStatusItemIdentifier { get; set; }

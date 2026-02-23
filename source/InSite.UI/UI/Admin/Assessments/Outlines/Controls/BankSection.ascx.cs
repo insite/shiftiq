@@ -149,12 +149,14 @@ namespace InSite.Admin.Assessments.Outlines.Controls
                 }
             }
 
-            SetPermissions(canWrite);
+            SetPermissions(bank, canWrite);
         }
 
-        private void SetPermissions(bool canWrite)
+        private void SetPermissions(BankState bank, bool canWrite)
         {
-            ChangeBankStandard.Visible = canWrite;
+            ChangeBankStandard.Visible = canWrite && (
+                !Organization.Toolkits.Assessments.LockPublishedStandards
+                || !bank.GetAllQuestions().Any(x => x.FirstPublished.HasValue));
             RenameBankLink2.Visible = canWrite;
             ChangeBankLevel.Visible = canWrite;
             ChangeBankEdition.Visible = canWrite;

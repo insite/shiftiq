@@ -7,7 +7,7 @@ public class FormAdapter : IEntityAdapter
 {
     public void Copy(ModifyForm modify, FormEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.SurveyFormStatus = modify.SurveyFormStatus;
         entity.SurveyFormLanguage = modify.SurveyFormLanguage;
         entity.SurveyFormLanguageTranslations = modify.SurveyFormLanguageTranslations;
@@ -50,8 +50,8 @@ public class FormAdapter : IEntityAdapter
     {
         var entity = new FormEntity
         {
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            SurveyFormIdentifier = create.SurveyFormIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            SurveyFormIdentifier = create.SurveyFormId,
             SurveyFormStatus = create.SurveyFormStatus,
             SurveyFormLanguage = create.SurveyFormLanguage,
             SurveyFormLanguageTranslations = create.SurveyFormLanguageTranslations,
@@ -93,8 +93,8 @@ public class FormAdapter : IEntityAdapter
     {
         var model = new FormModel
         {
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            SurveyFormIdentifier = entity.SurveyFormIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            SurveyFormId = entity.SurveyFormIdentifier,
             SurveyFormStatus = entity.SurveyFormStatus,
             SurveyFormLanguage = entity.SurveyFormLanguage,
             SurveyFormLanguageTranslations = entity.SurveyFormLanguageTranslations,
@@ -137,7 +137,7 @@ public class FormAdapter : IEntityAdapter
     {
         var match = new FormMatch
         {
-            SurveyFormIdentifier = entity.SurveyFormIdentifier
+            SurveyFormId = entity.SurveyFormIdentifier
 
         };
 

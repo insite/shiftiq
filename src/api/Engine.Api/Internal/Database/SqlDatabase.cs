@@ -64,7 +64,7 @@ namespace Engine.Api.Internal
             }
             catch (Exception ex)
             {
-                throw new Exception("An unexpected error occurred executing this script: " + script, ex);
+                throw new InvalidOperationException("An unexpected error occurred executing this script: " + script, ex);
             }
         }
 

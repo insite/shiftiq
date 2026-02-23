@@ -31,6 +31,10 @@ namespace InSite.Admin.Workflow.Forms.Submissions
                 new DownloadColumn("RespondentName", "RespondentName", null, 40),
                 new DownloadColumn("RespondentEmail", "RespondentEmail", null, 40),
 
+                new DownloadColumn("AssessorUserIdentifier", "AssessorIdentifier", null, 40),
+                new DownloadColumn("AssessorName", "AssessorName", null, 40),
+                new DownloadColumn("AssessorEmail", "AssessorEmail", null, 40),
+
                 new DownloadColumn("FirstSelection", "FirstSelection", null, 50),
                 new DownloadColumn("FirstComment", "FirstComment", null, 50)
             };

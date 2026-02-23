@@ -44,16 +44,13 @@ namespace InSite.Cmds.Admin.Organizations.Forms
 
         private void Save()
         {
-            var parent = OrganizationSearch.Select("cmds");
             var organization = new OrganizationState
             {
-                ParentOrganizationIdentifier = parent.OrganizationIdentifier,
                 OrganizationIdentifier = UniqueIdentifier.Create(),
                 AccountStatus = AccountStatus.Opened,
                 AccountOpened = DateTimeOffset.UtcNow,
                 AccountClosed = null,
                 CompanyName = null,
-                CompanyDomain = null,
                 CompanyDescription =
                 {
                     CompanySummary = null,
@@ -63,10 +60,19 @@ namespace InSite.Cmds.Admin.Organizations.Forms
                 PlatformCustomization = new PlatformCustomization(),
                 Languages = new CultureInfo[] { new CultureInfo("en") },
             };
+            organization.PlatformCustomization.RequireEmailVerification = true;
 
             GetInputValues(organization);
 
             organization.OrganizationCode = OrganizationSearch.CreateNewOrganizationCode(organization.OrganizationCode);
+
+            if (ServiceLocator.OrganizationSearch.CodeExists(organization.OrganizationCode))
+            {
+                ScreenStatus.AddMessage(
+                    AlertType.Error,
+                    $@"The account code <strong>{organization.OrganizationCode}</strong> is already assigned to another organization.");
+                return;
+            }
 
             OrganizationStore.Insert(organization);
 
@@ -81,7 +87,7 @@ namespace InSite.Cmds.Admin.Organizations.Forms
             organization.CompanyName = Acronym.Text;
             organization.OrganizationCode = OrganizationCode.Text;
             organization.CompanyDescription.CompanySummary = Description.Text;
-            organization.CompanyDomain = WebSiteUrl.Text;
+            organization.PlatformCustomization.TenantUrl.WebSite = WebSiteUrl.Text;
         }
     }
 }

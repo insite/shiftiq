@@ -1,9 +1,9 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 
 using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
 
-using Shift.Common;
 using Shift.Constant;
 
 namespace InSite.Admin.Assessments.Banks.Controls
@@ -86,7 +86,7 @@ namespace InSite.Admin.Assessments.Banks.Controls
                 }
             }
             else
-                throw new ApplicationError("Unexpected comment type: " + comment.Type.GetName());
+                throw new InvalidOperationException("Unexpected comment type: " + comment.Type.GetName());
         }
 
         #endregion

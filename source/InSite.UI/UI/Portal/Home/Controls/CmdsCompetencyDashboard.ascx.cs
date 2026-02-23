@@ -92,8 +92,8 @@ namespace InSite.UI.Portal.Home.Controls
             }
             else
             {
-                CmdsPrimaryCompetencySummary.BindModelToControls(LearnerIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier, CompetencySummaryType.EmployeeComplianceProfiles);
-                CmdsComplianceSummary.BindModelToControls(LearnerIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+                CmdsPrimaryCompetencySummary.BindModelToControls(LearnerIdentifier, Organization.Identifier, CompetencySummaryType.EmployeeComplianceProfiles);
+                CmdsComplianceSummary.BindModelToControls(LearnerIdentifier, Organization.Identifier);
             }
         }
 
@@ -107,7 +107,7 @@ namespace InSite.UI.Portal.Home.Controls
 
         private UserProfileKey LoadPrimaryProfile()
         {
-            var info = UserProfileRepository.SelectPrimaryProfile(LearnerIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+            var info = UserProfileRepository.SelectPrimaryProfile(LearnerIdentifier, Organization.Identifier);
 
             if (info != null)
             {

@@ -281,7 +281,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         {
             CurrentParameters = new SearchParameters
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier
+                OrganizationIdentifier = Organization.Identifier
             };
 
             var dataSource = CmdsReportHelper.SelectCompanySummary(CurrentParameters.OrganizationIdentifier);

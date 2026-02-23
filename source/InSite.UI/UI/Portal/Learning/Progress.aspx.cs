@@ -53,7 +53,7 @@ namespace InSite.UI.Portal.Learning
             if (org == null)
                 return false;
 
-            if (org == Organization.Identifier || org == Organization.ParentOrganizationIdentifier)
+            if (org == Organization.Identifier || org == ServiceLocator.Partition.Identifier)
                 return true;
 
             return false;

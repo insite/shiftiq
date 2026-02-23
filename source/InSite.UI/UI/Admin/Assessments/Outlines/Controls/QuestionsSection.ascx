@@ -18,21 +18,21 @@
 
         <insite:DropDownButton runat="server" ID="AddButton" IconName="plus-circle" Text="Add" CssClass="d-inline-block">
             <Items>
-                <insite:DropDownButtonItem Name="AddQuestion" ToolTip="Add a new question to this set" IconName="question" Text="Question" />
-                <insite:DropDownButtonItem Name="AddSet" ToolTip="Add a new set to the bank" IconName="th-list" Text="Set"  />
+                <sdk:DropDownButtonItem Name="AddQuestion" ToolTip="Add a new question to this set" IconName="question" Text="Question" />
+                <sdk:DropDownButtonItem Name="AddSet" ToolTip="Add a new set to the bank" IconName="th-list" Text="Set"  />
             </Items>
         </insite:DropDownButton>
 
         <insite:DropDownButton runat="server" ID="SortButton" IconName="sort" Text="Reorder" CssClass="d-inline-block">
             <Items>
-                <insite:DropDownButtonItem Name="SortQuestions" ToolTip="Reorder the questions in this set" IconName="question" Text="Questions" />
-                <insite:DropDownButtonItem Name="SortSets" ToolTip="Reorder the sets in this bank" IconName="th-list" Text="Sets"  />
+                <sdk:DropDownButtonItem Name="SortQuestions" ToolTip="Reorder the questions in this set" IconName="question" Text="Questions" />
+                <sdk:DropDownButtonItem Name="SortSets" ToolTip="Reorder the sets in this bank" IconName="th-list" Text="Sets"  />
             </Items>
         </insite:DropDownButton>
 
         <insite:DropDownButton runat="server" ID="DownloadButton" IconName="download" Text="Download" CssClass="d-inline-block" MenuCssClass="dropdown-menu-end">
             <Items>
-                <insite:DropDownButtonItem Name="SetMarkdown" ToolTip="Add a new question to this set" IconName="hashtag" Text="Shift iQ Markdown Outline (*.md)" />
+                <sdk:DropDownButtonItem Name="SetMarkdown" ToolTip="Add a new question to this set" IconName="hashtag" Text="Shift iQ Markdown Outline (*.md)" />
             </Items>
         </insite:DropDownButton>
     </div>

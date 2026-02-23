@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 
+using InSite.Application.Records.Read;
+
 using Shift.Common;
 
 namespace InSite.Persistence

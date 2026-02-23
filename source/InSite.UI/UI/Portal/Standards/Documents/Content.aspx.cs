@@ -79,7 +79,7 @@ namespace InSite.UI.Portal.Standards.Documents
                 || entity.OrganizationIdentifier != Organization.Identifier
                 || entity.StandardPrivacyScope.IfNullOrEmpty("Tenant") == "User"
                     && entity.CreatedBy != User.UserIdentifier
-                    && !CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure)
+                    && !CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure)
                 )
             {
                 RedirectToSearch();

@@ -93,7 +93,7 @@ namespace InSite.Common.Web.UI
 
             Type = ResourceType.Css;
 
-            Url = ServiceLocator.AppSettings.Application.StylePath;
+            Url = ServiceLocator.AppSettings.CssFileUrl;
         }
     }
 

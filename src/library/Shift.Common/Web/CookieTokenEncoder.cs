@@ -15,17 +15,17 @@ namespace Shift.Common
 
     public class CookieTokenEncoder
     {
-        public string Serialize(CookieToken token, bool encrypt, string secret)
+        public string Serialize(CookieToken token, bool encrypt, string secret, bool manualUrlEncode)
         {
             if (token == null)
                 return null;
 
             var keyHash = GetKeyHash(secret, encrypt);
 
-            return Serialize(token, keyHash);
+            return Serialize(token, keyHash, manualUrlEncode);
         }
 
-        private string Serialize(CookieToken token, byte[] hash)
+        private string Serialize(CookieToken token, byte[] hash, bool manualUrlEncode)
         {
             var encrypt = hash != null;
 
@@ -33,10 +33,10 @@ namespace Shift.Common
 
             return encrypt
                 ? EncodeBase64(result, hash)
-                : EncodeForCookie(result);
+                : manualUrlEncode ? EncodeForCookie(result) : result;
         }
 
-        public CookieToken Deserialize(string token, bool encrypt, string secret)
+        public CookieToken Deserialize(string token, bool encrypt, string secret, bool manualUrlEncode)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace Shift.Common
 
                 var keyHash = GetKeyHash(secret, encrypt);
 
-                return Deserialize(token, keyHash);
+                return Deserialize(token, keyHash, manualUrlEncode);
             }
             catch (Exception inner)
             {
@@ -54,13 +54,13 @@ namespace Shift.Common
             }
         }
 
-        private CookieToken Deserialize(string data, byte[] hash)
+        private CookieToken Deserialize(string data, byte[] hash, bool manualUrlEncode)
         {
             var encrypt = hash != null;
 
             var decoded = encrypt
                 ? DecodeBase64(data, hash)
-                : DecodeFromCookie(data);
+                : manualUrlEncode ? DecodeFromCookie(data) : data;
 
             return JsonConvert.DeserializeObject<CookieToken>(decoded);
         }
@@ -68,7 +68,7 @@ namespace Shift.Common
         private static byte[] GetKeyHash(string key, bool encrypt)
             => encrypt && key.IsNotEmpty() ? EncryptionHelper.ComputeHashSha256(key, null) : null;
 
-        public static string DecodeFromCookie(string cookieValue)
+        private static string DecodeFromCookie(string cookieValue)
             => Uri.UnescapeDataString(cookieValue);
 
         private static string DecodeBase64(string encrypted, byte[] keyHash)
@@ -86,7 +86,7 @@ namespace Shift.Common
             });
         }
 
-        public static string EncodeForCookie(string json)
+        private static string EncodeForCookie(string json)
             => Uri.EscapeDataString(json);
 
         private static string EncodeBase64(string data, byte[] keyHash)

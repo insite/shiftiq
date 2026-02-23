@@ -7,6 +7,7 @@ import { ListItem } from "@/models/listItem";
 import { useStatusProvider } from "@/contexts/StatusProvider";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { FinderSearchWindowData } from "./FinderSearchWindowData";
+import Icon from "../icon/Icon";
 
 interface Criteria {
     keyword: string;
@@ -145,7 +146,7 @@ export default function FinderSearchWindow({
 function FinderCancelButton({ disabled, className, onClick }: ButtonProps) {
     return (
         <Button disabled={disabled} variant="default" size="sm" className={className} onClick={onClick}>
-            <i className="fas fa-ban me-1"></i>
+            <Icon style="Solid" name="ban" className="me-1" />
             Cancel
         </Button>
     );
@@ -154,7 +155,7 @@ function FinderCancelButton({ disabled, className, onClick }: ButtonProps) {
 function FinderClearButton({ disabled, className, onClick }: ButtonProps) {
     return (
         <Button disabled={disabled} variant="default" size="sm" className={className} onClick={onClick}>
-            <i className="fas fa-undo me-1"></i>
+            <Icon style="Solid" name="undo" className="me-1" />
             Clear
         </Button>
     );

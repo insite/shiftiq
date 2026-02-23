@@ -6,101 +6,275 @@ namespace Shift.Common
 {
     public class Resource
     {
-        public string Name { get; set; }
+        public string Path { get; set; }
 
-        public Guid Identifier { get; set; }
+        public List<string> Routes { get; set; }
 
-        public List<string> Aliases { get; set; }
-
-        public Resource(string name, Guid? id)
+        public Resource(string path)
         {
-            Name = name;
-            Identifier = id ?? (!string.IsNullOrEmpty(name) ? UuidFactory.CreateV5(name) : Guid.Empty);
-            Aliases = new List<string>();
-        }
+            Routes = new List<string>();
 
-        public Resource(string name) : this(name, null) { }
-
-        public Resource(Guid id) : this(id.ToString(), id) { }
-
-        public void AddAliases(List<string> aliases)
-        {
-            foreach (string alias in aliases)
+            if (path != null)
             {
-                if (!Aliases.Contains(alias))
-                {
-                    Aliases.Add(alias);
-                }
+                Path = path.ToLower();
             }
         }
+
+        public void AddRoute(string route)
+        {
+            if (route == null)
+                throw new ArgumentNullException(nameof(route));
+
+            var item = route.ToLower();
+
+            if (Routes.Contains(item))
+                return;
+
+            Routes.Add(item);
+        }
+
+        public void AddRoutes(List<string> routes)
+        {
+            foreach (string route in routes)
+            {
+                AddRoute(route);
+            }
+        }
+
+        public Guid GetIdentifier()
+        {
+            if (!string.IsNullOrWhiteSpace(Path))
+                return UuidFactory.CreateV5(Path);
+
+            return Guid.Empty;
+        }
+    }
+
+    public class ResourceAccessBundle
+    {
+        public List<string> Resources { get; set; } = new List<string>();
+        public AccessSet Access { get; set; } = new AccessSet();
+    }
+
+    public class RouteEndpoint
+    {
+        public Guid RouteId { get; set; }
+        public string RouteType { get; set; }
+        public string RouteUrl { get; set; }
+        public int RouteDepth { get; set; }
+        public Guid? ParentRouteId { get; set; }
+        public string ResourcePath { get; set; }
+    }
+
+    public class RouteNavigationNode
+    {
+        public int RouteDepth { get; set; }
+        public string RouteIcon { get; set; }
+        public Guid RouteId { get; set; }
+        public string RouteList { get; set; }
+        public string RouteName { get; set; }
+        public string RouteNameShort { get; set; }
+        public string RouteType { get; set; }
+        public string RouteUrl { get; set; }
+        public string AuthorityType { get; set; }
+        public string AuthorizationRequirement { get; set; }
+        public string ControllerPath { get; set; }
+        public string ExtraBreadcrumb { get; set; }
+        public string HelpUrl { get; set; }
+        public Guid? ParentRouteId { get; set; }
+        public string SubsystemName { get; set; }
+        public string ResourcePath { get; set; }
+        public string SortPath { get; set; }
+    }
+
+    public class RoutePermissionNode
+    {
+        public int RouteDepth { get; set; }
+        public string RouteIcon { get; set; }
+        public Guid RouteId { get; set; }
+        public string RouteList { get; set; }
+        public string RouteName { get; set; }
+        public string RouteNameShort { get; set; }
+        public string RouteType { get; set; }
+        public string RouteUrl { get; set; }
+        public string AuthorityType { get; set; }
+        public string AuthorizationRequirement { get; set; }
+        public string ControllerPath { get; set; }
+        public string ExtraBreadcrumb { get; set; }
+        public string HelpUrl { get; set; }
+        public Guid? ParentRouteId { get; set; }
+        public string SubsystemName { get; set; }
+        public string ResourcePath { get; set; }
+    }
+
+    public struct ResourceDescriptor
+    {
+        public string Component { get; set; }
+        public string Part { get; set; }
+        public string Verb { get; set; }
+    }
+
+    public class ResourcePermissions
+    {
+        public string Resource { get; set; }
+        public List<string> Routes { get; set; } = new List<string>();
+        public List<RoleAccessBundle> Permissions { get; set; } = new List<RoleAccessBundle>();
+
+        /// <summary>
+        /// Indicates this entry was created through wildcard expansion (implied by other permissions).
+        /// </summary>
+        public bool IsExpanded { get; set; }
     }
 
     public class ResourceReflector
     {
-        public List<Resource> BuildResourceList(Type type)
+        public List<Resource> BuildResourceList(List<RoutePermissionNode> nodes, string routePrefix)
         {
             var resources = new List<Resource>();
 
             var reflector = new Shift.Common.Reflector();
 
-            var hardcodedResourceNames = reflector.FindConstants(type, '.');
-
-            foreach (var hardcodedResourceName in hardcodedResourceNames)
+            foreach (var node in nodes)
             {
-                var policy = CreateResource(hardcodedResourceName.Value);
+                Resource resource = null;
 
-                var item = resources.Find(x => x.Name == policy.Name);
+                var path = node.ResourcePath;
 
-                if (item == null)
+                if (path != null)
                 {
-                    resources.Add(policy);
+                    resource = resources.Find(x => x.Path == node.ResourcePath);
                 }
                 else
                 {
-                    item.Aliases.Add(hardcodedResourceName.Value);
+                    var descriptor = Describe(node.RouteUrl);
+
+                    path = descriptor.Part;
+
+                    if (descriptor.Component != null)
+                        path = descriptor.Component + "/" + path;
+
+                    resource = resources.Find(x => x.Path == path);
+                }
+
+                if (resource == null)
+                {
+                    resource = new Resource(path);
+
+                    resources.Add(resource);
+                }
+
+                path = node.RouteUrl
+                    .Replace(routePrefix, string.Empty)
+                    .TrimStart(new[] { '/' });
+
+                resource.Routes.Add($"{routePrefix}/{path}");
+            }
+
+            CreateImplicitResources(resources);
+
+            foreach (var resource in resources)
+            {
+                resource.Routes.Sort();
+            }
+
+            return resources
+                .OrderBy(x => x.Path)
+                .ToList();
+        }
+
+        public List<Resource> BuildResourceList(Type type, string routePrefix)
+        {
+            var resources = new List<Resource>();
+
+            var reflector = new Shift.Common.Reflector();
+
+            var hardcodedConstants = reflector.FindConstants(type, '.');
+
+            foreach (var hardcodedConstant in hardcodedConstants)
+            {
+                var descriptor = Describe(hardcodedConstant.Value);
+
+                var resource = resources.Find(x => x.Path == descriptor.Part);
+
+                if (resource == null)
+                {
+                    resource = new Resource(descriptor.Part);
+
+                    resources.Add(resource);
+                }
+
+                var name = hardcodedConstant.Value
+                    .Replace(routePrefix, string.Empty)
+                    .TrimStart(new[] { '/' });
+
+                resource.Routes.Add($"{routePrefix}/{name}");
+            }
+
+            CreateImplicitResources(resources);
+
+            foreach (var resource in resources)
+            {
+                resource.Routes.Sort();
+            }
+
+            return resources
+                .OrderBy(x => x.Path)
+                .ToList();
+        }
+
+        private ResourceDescriptor Describe(string name)
+        {
+            var descriptor = new ResourceDescriptor();
+
+            descriptor.Part = name;
+
+            var segments = name.Split('/');
+
+            if (segments.Length > 0)
+            {
+                var first = segments.First();
+
+                var component = ComponentHelper.Resolve(first);
+
+                if (component != null)
+                {
+                    descriptor.Component = component;
+                }
+
+                var last = segments.LastOrDefault();
+
+                if (DataAccessHelper.IsRecognized(last))
+                {
+                    descriptor.Part = string.Join("/", segments.Take(segments.Count() - 1));
                 }
             }
 
-            var list = new List<Resource>();
-
-            foreach (var resource in resources.OrderBy(x => x.Name))
-            {
-                var item = new Resource(resource.Name);
-
-                item.Aliases = resource.Aliases.OrderBy(x => x).ToList();
-
-                list.Add(item);
-            }
-
-            return list;
+            return descriptor;
         }
 
-        public Resource CreateResource(string name)
+        private void CreateImplicitResources(List<Resource> resources)
         {
-            if (string.IsNullOrEmpty(name))
-                return null;
+            var implicitNames = new HashSet<string>();
 
-            var resource = new Resource(name);
+            foreach (var resource in resources)
+            {
+                var segments = resource.Path.Split('/');
 
-            var resourceName = name;
+                for (int i = 1; i < segments.Length; i++)
+                {
+                    var implicitName = string.Join("/", segments.Take(i));
 
-            if (PathImpliesRead(name))
-                resourceName = ReplaceLastPathSegment(name, OperationAccess.Read);
+                    implicitNames.Add(implicitName);
+                }
+            }
 
-            else if (PathImpliesWrite(name))
-                resourceName = ReplaceLastPathSegment(name, OperationAccess.Write);
-
-            else if (PathImpliesDelete(name))
-                resourceName = ReplaceLastPathSegment(name, OperationAccess.Delete);
-
-            resource.Name = resourceName;
-
-            // If the implicit policy slug differs from the explicit policy input then store the original as an alias.
-
-            if (!StringHelper.Equals(resourceName, name))
-                resource.Aliases.Add(name);
-
-            return resource;
+            foreach (var implicitName in implicitNames)
+            {
+                if (!resources.Any(x => x.Path == implicitName))
+                {
+                    resources.Add(new Resource(implicitName));
+                }
+            }
         }
 
         public bool PathImpliesRead(string path)
@@ -133,7 +307,7 @@ namespace Shift.Common
                 StringHelper.EndsWithAny(path, legacyCommandVerbs);
         }
 
-        private string ReplaceLastPathSegment(string input, OperationAccess access)
+        private string ReplaceLastPathSegment(string input, DataAccess access)
         {
             if (string.IsNullOrEmpty(input))
                 return input;
@@ -149,15 +323,15 @@ namespace Shift.Common
         }
     }
 
-    public class ResourceAccessBundle
+    public class RoleAccessBundle
     {
-        public List<string> Resources { get; set; } = new List<string>();
-        public List<string> Access { get; set; } = new List<string>();
+        public List<string> Roles { get; set; } = new List<string>();
+        public AccessSet Access { get; set; } = new AccessSet();
     }
 
-    public class ResourcePermissions
+    public class RolePermissions
     {
-        public string Resource { get; set; }
-        public List<RoleAccessBundle> Permissions { get; set; } = new List<RoleAccessBundle>();
+        public string Role { get; set; }
+        public List<ResourceAccessBundle> Permissions { get; set; } = new List<ResourceAccessBundle>();
     }
 }

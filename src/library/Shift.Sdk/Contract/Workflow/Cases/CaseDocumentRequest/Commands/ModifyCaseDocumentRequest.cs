@@ -4,9 +4,9 @@ namespace Shift.Contract
 {
     public class ModifyCaseDocumentRequest
     {
-        public Guid CaseIdentifier { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid RequestedUserIdentifier { get; set; }
+        public Guid CaseId { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid RequestedUserId { get; set; }
 
         public string RequestedFileCategory { get; set; }
         public string RequestedFileDescription { get; set; }

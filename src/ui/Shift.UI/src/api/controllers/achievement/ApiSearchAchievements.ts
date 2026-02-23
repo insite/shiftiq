@@ -1,6 +1,6 @@
 export interface ApiSearchAchievements {
-    OrganizationIdentifier?: string | null;
-    AchievementIdentifier?: string | null;
+    OrganizationId?: string | null;
+    AchievementId?: string | null;
     AchievementIsEnabled?: boolean | null;
     AchievementReportingDisabled?: boolean | null;
     HasBadgeImage?: boolean | null;

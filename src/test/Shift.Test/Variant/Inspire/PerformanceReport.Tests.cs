@@ -300,7 +300,7 @@ namespace Shift.Test.Variant.Inspire
 
     public class TestFixture : IDisposable
     {
-        public AppSettings Settings = AppSettingsHelper.GetAllSettings<AppSettings>();
+        public AppSettings Settings = AppSettingsHelper.GetAllSettings<AppSettings>("appsettings");
 
         public IDbContextFactory<TableDbContext>? TableDbContextFactory { get; private set; }
         public IDbContextFactory<ViewDbContext>? ViewDbContextFactory { get; private set; }
@@ -350,7 +350,7 @@ namespace Shift.Test.Variant.Inspire
 
         public void SendCommand(CreateResponseSession createResponseSession)
         {
-            var client = new TimelineClient(Settings.Shift.Api.Hosting.V2, Settings.Security);
+            var client = new TimelineClient(Settings.v2ApiBaseUrl, Settings.Security);
 
             client.QueueCommand(createResponseSession);
         }

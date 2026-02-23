@@ -28,9 +28,7 @@ namespace InSite.Admin.Records.Programs.Controls
 
             if (task != null)
             {
-                var taskObjectData = ProgramHelper.GetTaskObjectData(
-                    Organization.OrganizationIdentifier,
-                    Organization.ParentOrganizationIdentifier);
+                var taskObjectData = ProgramHelper.GetTaskObjectData(Organization.OrganizationIdentifier);
                 var taskInfo = ProgramHelper.GetTaskInfo(taskObjectData, task);
 
                 TaskInProgram.Text = GetEntityName(taskInfo.DisplayTitle);

@@ -13,16 +13,19 @@ namespace InSite.Application.Organizations.Write
         private readonly IChangeRepository _repository;
         private readonly IChangeQueue _publisher;
         private readonly IOrganizationStore _organizationStore;
+        private readonly IOrganizationSearch _organizationSearch;
 
         public OrganizationCommandReceiver(
             ICommandQueue commander,
             IChangeQueue publisher,
             IChangeRepository repository,
-            IOrganizationStore organizationStore)
+            IOrganizationStore organizationStore,
+            IOrganizationSearch organizationSearch)
         {
             _repository = repository;
             _publisher = publisher;
             _organizationStore = organizationStore;
+            _organizationSearch = organizationSearch;
 
             commander.Subscribe<RunCommands>(Handle);
 
@@ -47,7 +50,6 @@ namespace InSite.Application.Organizations.Write
             commander.Subscribe<ModifyOrganizationLocalization>(Handle);
             commander.Subscribe<ModifyOrganizationLocation>(Handle);
             commander.Subscribe<ModifyOrganizationNCSHASettings>(Handle);
-            commander.Subscribe<ModifyOrganizationParent>(Handle);
             commander.Subscribe<ModifyOrganizationPlatformSettings>(Handle);
             commander.Subscribe<ModifyOrganizationPlatformUrl>(Handle);
             commander.Subscribe<ModifyOrganizationPortalSettings>(Handle);
@@ -72,6 +74,9 @@ namespace InSite.Application.Organizations.Write
 
             if (runCommands.Commands[0] is IHasAggregate create)
             {
+                if (create is IHasValidation validation)
+                    validation.Validate(_organizationSearch);
+
                 if (((IHasRun)create).Run(null))
                     RunCommands(create.Aggregate, runCommands, 1);
             }
@@ -93,6 +98,9 @@ namespace InSite.Application.Organizations.Write
                 if (command.AggregateIdentifier != aggregate.AggregateIdentifier)
                     throw new ArgumentException($"The command has wrong AggregateIdentifier: {command.AggregateIdentifier}");
 
+                if (command is IHasValidation validation)
+                    validation.Validate(_organizationSearch);
+
                 if (!((IHasRun)command).Run(aggregate))
                     return false;
             }
@@ -113,6 +121,9 @@ namespace InSite.Application.Organizations.Write
 
         private void Handle<T>(T c) where T : Command, IHasRun
         {
+            if (c is IHasValidation validation)
+                validation.Validate(_organizationSearch);
+
             if (c is IHasAggregate create)
             {
                 if (c.Run(null))

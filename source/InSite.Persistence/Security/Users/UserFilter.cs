@@ -37,10 +37,7 @@ namespace InSite.Persistence
         }
         public bool? PersonEmailEnabled { get; set; }
 
-        public Guid? MembershipGroupIdentifier { get; set; }
-        public string MembershipGroupName { get; set; }
-        public string MembershipType { get; set; }
-        public bool MembershipTypeAnd { get; set; }
+        public UserFilterMembership[] Memberships { get; set; }
 
         public DateTimeOffsetRange LastAuthenticated { get; set; }
         public DateTimeOffsetRange AccessGranted { get; set; }

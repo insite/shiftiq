@@ -123,7 +123,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             var parameters = new SearchParameters
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 Departments = GetDepartments(),
                 Status = Status.SelectedValue
             };
@@ -328,7 +328,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             var filter = new DepartmentFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier
+                OrganizationIdentifier = Organization.Identifier
             };
 
             if (!Identity.HasAccessToAllCompanies)

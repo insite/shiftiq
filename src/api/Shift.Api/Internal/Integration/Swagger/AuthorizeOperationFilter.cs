@@ -22,18 +22,32 @@ public class AuthorizeOperationFilter : IOperationFilter
         var allBearerAuthorizeAttributes = GetAllAttributes<BearerAuthorizeAttribute>();
         var allCookieAuthorizeAttributes = GetAllAttributes<CookieAuthorizeAttribute>();
         var allSecretAuthorizeAttributes = GetAllAttributes<SecretAuthorizeAttribute>();
+        var allPermissionAttributes = GetAllAttributes<RequirePermissionAttribute>();
 
         var allAuthorizationAttributes = allHybridAuthorizeAttributes.Cast<Attribute>()
             .Concat(allBearerAuthorizeAttributes.Cast<Attribute>())
             .Concat(allCookieAuthorizeAttributes.Cast<Attribute>())
             .Concat(allSecretAuthorizeAttributes.Cast<Attribute>())
+            .Concat(allPermissionAttributes.Cast<Attribute>())
             .ToList();
 
         // Initialize OpenApiOperation security requirements
         var securityRequirements = new List<OpenApiSecurityRequirement>();
 
+        // Check which schemes are used by permission attributes
+        var permissionSchemes = allPermissionAttributes
+            .Select(attr => attr.AuthenticationSchemes)
+            .Where(s => !string.IsNullOrEmpty(s))
+            .Distinct()
+            .ToList();
+
+        var hasHybridPermission = permissionSchemes.Contains(AuthenticationSchemeNames.Hybrid);
+        var hasBearerPermission = permissionSchemes.Contains(AuthenticationSchemeNames.Bearer);
+        var hasCookiePermission = permissionSchemes.Contains(AuthenticationSchemeNames.Cookie);
+        var hasSecretPermission = permissionSchemes.Contains(AuthenticationSchemeNames.Secret);
+
         // Add security requirements based on attribute types
-        if (allHybridAuthorizeAttributes.Any() || allBearerAuthorizeAttributes.Any())
+        if (allHybridAuthorizeAttributes.Any() || allBearerAuthorizeAttributes.Any() || hasHybridPermission || hasBearerPermission)
         {
             securityRequirements.Add(new OpenApiSecurityRequirement
             {
@@ -48,7 +62,7 @@ public class AuthorizeOperationFilter : IOperationFilter
             });
         }
 
-        if (allHybridAuthorizeAttributes.Any() || allCookieAuthorizeAttributes.Any())
+        if (allHybridAuthorizeAttributes.Any() || allCookieAuthorizeAttributes.Any() || hasHybridPermission || hasCookiePermission)
         {
             securityRequirements.Add(new OpenApiSecurityRequirement
             {
@@ -63,7 +77,7 @@ public class AuthorizeOperationFilter : IOperationFilter
             });
         }
 
-        if (allSecretAuthorizeAttributes.Any())
+        if (allSecretAuthorizeAttributes.Any() || hasSecretPermission)
         {
             securityRequirements.Add(new OpenApiSecurityRequirement
             {
@@ -106,11 +120,18 @@ public class AuthorizeOperationFilter : IOperationFilter
             .Distinct()
             .ToList();
 
+        var permissionPolicies = allPermissionAttributes
+            .Select(attr => attr.Policy)
+            .Where(policy => !string.IsNullOrEmpty(policy))
+            .Distinct()
+            .ToList();
+
         // Combine all policies and add to extensions
         var allPolicies = hybridPolicies
             .Concat(bearerPolicies)
             .Concat(cookiePolicies)
             .Concat(secretPolicies)
+            .Concat(permissionPolicies)
             .Distinct()
             .ToList();
 
@@ -126,13 +147,13 @@ public class AuthorizeOperationFilter : IOperationFilter
 
         // Add extension with attribute types present
         var attributeTypes = new OpenApiArray();
-        if (allHybridAuthorizeAttributes.Any())
+        if (allHybridAuthorizeAttributes.Any() || hasHybridPermission)
             attributeTypes.Add(new OpenApiString("Hybrid"));
-        if (allBearerAuthorizeAttributes.Any())
+        if (allBearerAuthorizeAttributes.Any() || hasBearerPermission)
             attributeTypes.Add(new OpenApiString("Bearer"));
-        if (allCookieAuthorizeAttributes.Any())
+        if (allCookieAuthorizeAttributes.Any() || hasCookiePermission)
             attributeTypes.Add(new OpenApiString("Cookie"));
-        if (allSecretAuthorizeAttributes.Any())
+        if (allSecretAuthorizeAttributes.Any() || hasSecretPermission)
             attributeTypes.Add(new OpenApiString("Secret"));
 
         if (attributeTypes.Any())

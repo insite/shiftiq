@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public partial class CaseUserMatch
     {
-        public Guid JoinIdentifier { get; set; }
+        public Guid JoinId { get; set; }
     }
 }

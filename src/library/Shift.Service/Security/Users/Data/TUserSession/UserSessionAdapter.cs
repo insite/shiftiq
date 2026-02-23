@@ -14,13 +14,13 @@ public class UserSessionAdapter : IEntityAdapter
         entity.SessionStarted = modify.SessionStarted;
         entity.SessionStopped = modify.SessionStopped;
         entity.SessionMinutes = modify.SessionMinutes;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.UserAgent = modify.UserAgent;
         entity.UserBrowser = modify.UserBrowser;
         entity.UserBrowserVersion = modify.UserBrowserVersion;
         entity.UserEmail = modify.UserEmail;
         entity.UserHostAddress = modify.UserHostAddress;
-        entity.UserIdentifier = modify.UserIdentifier;
+        entity.UserIdentifier = modify.UserId;
         entity.UserLanguage = modify.UserLanguage;
         entity.AuthenticationSource = modify.AuthenticationSource;
 
@@ -44,15 +44,15 @@ public class UserSessionAdapter : IEntityAdapter
             SessionStarted = create.SessionStarted,
             SessionStopped = create.SessionStopped,
             SessionMinutes = create.SessionMinutes,
-            OrganizationIdentifier = create.OrganizationIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
             UserAgent = create.UserAgent,
             UserBrowser = create.UserBrowser,
             UserBrowserVersion = create.UserBrowserVersion,
             UserEmail = create.UserEmail,
             UserHostAddress = create.UserHostAddress,
-            UserIdentifier = create.UserIdentifier,
+            UserIdentifier = create.UserId,
             UserLanguage = create.UserLanguage,
-            SessionIdentifier = create.SessionIdentifier,
+            SessionIdentifier = create.SessionId,
             AuthenticationSource = create.AuthenticationSource
         };
         return entity;
@@ -74,15 +74,15 @@ public class UserSessionAdapter : IEntityAdapter
             SessionStarted = entity.SessionStarted,
             SessionStopped = entity.SessionStopped,
             SessionMinutes = entity.SessionMinutes,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
             UserAgent = entity.UserAgent,
             UserBrowser = entity.UserBrowser,
             UserBrowserVersion = entity.UserBrowserVersion,
             UserEmail = entity.UserEmail,
             UserHostAddress = entity.UserHostAddress,
-            UserIdentifier = entity.UserIdentifier,
+            UserId = entity.UserIdentifier,
             UserLanguage = entity.UserLanguage,
-            SessionIdentifier = entity.SessionIdentifier,
+            SessionId = entity.SessionIdentifier,
             AuthenticationSource = entity.AuthenticationSource
         };
 
@@ -98,7 +98,7 @@ public class UserSessionAdapter : IEntityAdapter
     {
         var match = new UserSessionMatch
         {
-            SessionIdentifier = entity.SessionIdentifier
+            SessionId = entity.SessionIdentifier
 
         };
 

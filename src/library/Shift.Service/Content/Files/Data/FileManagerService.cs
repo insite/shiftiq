@@ -37,7 +37,7 @@ namespace Shift.Service.Content
             var newFilePath = GetFilePath(organizationIdentifier, fileIdentifier, fileName);
 
             var folder = Path.GetDirectoryName(newFilePath)
-                ?? throw new ApplicationError($"Failed to determine a valid directory for file path: {newFilePath}");
+                ?? throw new InvalidOperationException($"Failed to determine a valid directory for file path: {newFilePath}");
 
             int newFileSize;
 
@@ -56,7 +56,7 @@ namespace Shift.Service.Content
             }
             catch (Exception ex)
             {
-                throw new ApplicationError($"The error for the file path: '{newFilePath}'", ex);
+                throw new InvalidOperationException($"A problem occurred saving the file '{newFilePath}'", ex);
             }
 
             if (newFileSize > 0)
@@ -64,7 +64,7 @@ namespace Shift.Service.Content
 
             File.Delete(newFilePath);
 
-            throw new ApplicationError("File cannot be empty");
+            throw new InvalidOperationException("File cannot be empty");
         }
 
         private (bool, int) CheckSavedPreviously(string? filePath, Stream file)

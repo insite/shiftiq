@@ -305,7 +305,7 @@ namespace InSite.Admin.Assessments.Criteria.Controls
                         .ToArray();
                 }
                 else
-                    throw new ApplicationError("Unexpected dimension name: " + name);
+                    throw new ArgumentException("Unexpected dimension name: " + name);
             }
         }
 
@@ -562,7 +562,7 @@ namespace InSite.Admin.Assessments.Criteria.Controls
                 else if (n.Dimension == "Competency")
                     query = query.Where(x => x.Competency == nValue);
                 else
-                    throw new ApplicationError("Unexpected dimension name: " + n.Dimension);
+                    throw new ArgumentException("Unexpected dimension name: " + n.Dimension);
             }
 
             return query.ToArray();

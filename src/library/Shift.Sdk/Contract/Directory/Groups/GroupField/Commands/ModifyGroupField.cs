@@ -4,9 +4,9 @@ namespace Shift.Contract
 {
     public class ModifyGroupField
     {
-        public Guid GroupIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid SettingIdentifier { get; set; }
+        public Guid GroupId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid SettingId { get; set; }
 
         public string SettingName { get; set; }
         public string SettingValue { get; set; }

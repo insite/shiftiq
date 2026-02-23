@@ -61,12 +61,12 @@ namespace InSite.Admin.Events.Appointments.Forms
                 return;
             }
 
-            var canWrite = Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write);
-            var canDelete = Identity.IsGranted(Route.ToolkitName, PermissionOperation.Delete);
+            var canWrite = Identity.IsGranted(Route.ToolkitName, DataAccess.Update);
+            var canDelete = Identity.IsGranted(Route.ToolkitName, DataAccess.Delete);
 
             PageHelper.AutoBindHeader(
-                this, 
-                new BreadcrumbItem("Add New Appointment", "/ui/admin/events/appointments/create", null, null), 
+                this,
+                new BreadcrumbItem("Add New Appointment", "/ui/admin/events/appointments/create", null, null),
                 $"{ev.EventTitle} <span class='form-text'>scheduled {ev.EventScheduledStart.FormatDateOnly(User.TimeZone)}</span>");
 
             EventTitle.Text = ev.EventTitle;

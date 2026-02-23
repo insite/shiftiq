@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveFormQuestion : Query<FormQuestionModel>
     {
-        public Guid SurveyQuestionIdentifier { get; set; }
+        public Guid SurveyQuestionId { get; set; }
     }
 }

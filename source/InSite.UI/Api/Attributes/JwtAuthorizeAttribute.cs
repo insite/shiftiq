@@ -51,7 +51,7 @@ namespace InSite.Api
                 HttpContext.Current.User = p;
         }
 
-        private bool ValidatePrincipal(IShiftPrincipal principal)
+        private bool ValidatePrincipal(IPrincipal principal)
         {
             // TODO: Check the cache for a validation result for this principal
 

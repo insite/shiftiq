@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveSubmission : Query<SubmissionModel>
     {
-        public Guid ResponseSessionIdentifier { get; set; }
+        public Guid ResponseSessionId { get; set; }
     }
 }

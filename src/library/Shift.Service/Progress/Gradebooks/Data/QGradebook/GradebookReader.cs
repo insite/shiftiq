@@ -12,30 +12,22 @@ public class GradebookReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "GradebookTitle, GradebookIdentifier";
 
-    public GradebookReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public GradebookReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid gradebook, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid gradebook, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.GradebookIdentifier == gradebook, cancellation);
+            return query.AnyAsync(x => x.GradebookIdentifier == gradebook && (organization == null || organization == x.OrganizationIdentifier), cancellation);
 
         }, cancellation);
-    }
-
-    public TimeZoneInfo GetTimeZone()
-    {
-        return _auth.GetTimeZone();
     }
 
     public Task<List<GradebookEntity>> CollectAsync(IGradebookCriteria criteria, CancellationToken cancellation = default)
@@ -111,13 +103,10 @@ public class GradebookReader : IEntityReader
     /// </remarks>
     private IQueryable<GradebookEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.QGradebook
             .AsNoTracking()
             .Include(x => x.Achievement)
-            .Include(x => x.Event)
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .Include(x => x.Event);
 
         return query;
     }
@@ -137,15 +126,15 @@ public class GradebookReader : IEntityReader
         if (criteria.GradebookCreatedBefore != null)
             query = query.Where(x => x.GradebookCreated < criteria.GradebookCreatedBefore);
 
-        if (criteria.PeriodIdentifier != null)
-            query = query.Where(x => x.PeriodIdentifier == criteria.PeriodIdentifier);
+        if (criteria.PeriodId != null)
+            query = query.Where(x => x.PeriodIdentifier == criteria.PeriodId);
 
 
-        if (criteria.AchievementIdentifier != null)
-            query = query.Where(x => x.AchievementIdentifier == criteria.AchievementIdentifier);
+        if (criteria.AchievementId != null)
+            query = query.Where(x => x.AchievementIdentifier == criteria.AchievementId);
 
-        if (criteria.FrameworkIdentifier != null)
-            query = query.Where(x => x.FrameworkIdentifier == criteria.FrameworkIdentifier);
+        if (criteria.FrameworkId != null)
+            query = query.Where(x => x.FrameworkIdentifier == criteria.FrameworkId);
 
         if (criteria.IsLocked != null)
             query = query.Where(x => x.IsLocked == criteria.IsLocked);
@@ -160,11 +149,11 @@ public class GradebookReader : IEntityReader
         if (criteria.ClassStartedBefore != null)
             query = query.Where(x => x.Event != null && x.Event.EventTitle != null && x.Event.EventScheduledStart < criteria.ClassStartedBefore);
 
-        if (criteria.ClassIdentifier != null)
-            query = query.Where(x => x.EventIdentifier == criteria.ClassIdentifier);
+        if (criteria.ClassId != null)
+            query = query.Where(x => x.EventIdentifier == criteria.ClassId);
 
-        if (criteria.ClassInstructorIdentifier != null)
-            query = query.Where(x => x.Event != null && x.Event.Users.Any(y => y.UserIdentifier == criteria.ClassInstructorIdentifier && y.AttendeeRole == "Instructor"));
+        if (criteria.ClassInstructorId != null)
+            query = query.Where(x => x.Event != null && x.Event.Users.Any(y => y.UserIdentifier == criteria.ClassInstructorId && y.AttendeeRole == "Instructor"));
 
 
         if (criteria.GradebookType != null)
@@ -185,6 +174,9 @@ public class GradebookReader : IEntityReader
         if (criteria.LastChangeBefore != null)
             query = query.Where(x => x.LastChangeTime < criteria.LastChangeBefore);
 
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
+
         return query;
     }
 
@@ -200,27 +192,21 @@ public class GradebookReader : IEntityReader
         var matches = await queryable
             .Select(entity => new GradebookMatch
             {
-                GradebookIdentifier = entity.GradebookIdentifier,
+                GradebookId = entity.GradebookIdentifier,
                 GradebookTitle = entity.GradebookTitle,
                 GradebookCreated = entity.GradebookCreated,
                 GradebookEnrollmentCount = entity.Enrollments.Count,
 
-                ClassIdentifier = entity.EventIdentifier,
+                ClassId = entity.EventIdentifier,
                 ClassTitle = entity.Event != null ? entity.Event.EventTitle : null,
                 ClassStarted = entity.Event != null ? entity.Event.EventScheduledStart : null,
                 ClassEnded = entity.Event != null ? entity.Event.EventScheduledEnd : null,
 
-                AchievementIdentifier = entity.AchievementIdentifier,
+                AchievementId = entity.AchievementIdentifier,
                 AchievementTitle = entity.Achievement != null ? entity.Achievement.AchievementTitle : null
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

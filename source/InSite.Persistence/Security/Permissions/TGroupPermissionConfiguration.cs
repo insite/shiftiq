@@ -17,7 +17,6 @@ namespace InSite.Persistence
             Property(x => x.AllowConfigure).IsRequired();
             Property(x => x.AllowCreate).IsRequired();
             Property(x => x.AllowDelete).IsRequired();
-            Property(x => x.AllowExecute).IsRequired();
             Property(x => x.AllowRead).IsRequired();
             Property(x => x.AllowWrite).IsRequired();
             Property(x => x.GroupIdentifier).IsRequired();
@@ -27,7 +26,6 @@ namespace InSite.Persistence
             Property(x => x.PermissionGranted).IsOptional();
             Property(x => x.PermissionGrantedBy).IsOptional();
             Property(x => x.PermissionIdentifier).IsRequired();
-            Property(x => x.PermissionMask).IsRequired();
 
             HasRequired(a => a.Group).WithMany(b => b.GroupPermissions).HasForeignKey(c => c.GroupIdentifier).WillCascadeOnDelete(false);
         }

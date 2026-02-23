@@ -185,7 +185,7 @@ namespace InSite.UI.Admin.Reports
                 var dataSource = reportDefinition != null ? ReportDataSourceReader.ReadDataSource(reportDefinition.DataSource) : null;
 
                 if (dataSource == null)
-                    throw new Exception("The data source for this report has been modified. Please re-create your report");
+                    throw new InvalidOperationException("The data source for this report has been modified. Please re-create your report");
 
                 DataSetSelector.SelectedValue = reportDefinition.DataSource;
 

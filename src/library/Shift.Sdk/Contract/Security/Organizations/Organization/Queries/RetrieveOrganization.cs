@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveOrganization : Query<OrganizationModel>
     {
-        public Guid OrganizationIdentifier { get; set; }
+        public Guid OrganizationId { get; set; }
     }
 }

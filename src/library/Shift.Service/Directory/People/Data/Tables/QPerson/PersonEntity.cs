@@ -5,8 +5,12 @@ namespace Shift.Service.Directory;
 
 public partial class PersonEntity: ISystemRoles
 {
+    public AddressEntity? BillingAddress { get; set; }
+    public AddressEntity? HomeAddress { get; set; }
     public OrganizationEntity? Organization { get; set; }
+    public AddressEntity? ShippingAddress { get; set; }
     public UserEntity? User { get; set; }
+    public AddressEntity? WorkAddress { get; set; }
 
     public Guid? BillingAddressIdentifier { get; set; }
     public Guid CreatedBy { get; set; }

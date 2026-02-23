@@ -7,10 +7,10 @@ public class GroupAdapter : IEntityAdapter
 {
     public void Copy(ModifyGroup modify, GroupEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.ParentGroupIdentifier = modify.ParentGroupIdentifier;
-        entity.SurveyFormIdentifier = modify.SurveyFormIdentifier;
-        entity.GroupStatusItemIdentifier = modify.GroupStatusItemIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.ParentGroupIdentifier = modify.ParentGroupId;
+        entity.SurveyFormIdentifier = modify.SurveyFormId;
+        entity.GroupStatusItemIdentifier = modify.GroupStatusItemId;
         entity.MessageToUserWhenMembershipStarted = modify.MessageToUserWhenMembershipStarted;
         entity.MessageToAdminWhenMembershipStarted = modify.MessageToAdminWhenMembershipStarted;
         entity.MessageToAdminWhenEventVenueChanged = modify.MessageToAdminWhenEventVenueChanged;
@@ -45,7 +45,7 @@ public class GroupAdapter : IEntityAdapter
         entity.LifetimeQuantity = modify.LifetimeQuantity;
         entity.MessageToAdminWhenMembershipEnded = modify.MessageToAdminWhenMembershipEnded;
         entity.MessageToUserWhenMembershipEnded = modify.MessageToUserWhenMembershipEnded;
-        entity.MembershipProductIdentifier = modify.MembershipProductIdentifier;
+        entity.MembershipProductIdentifier = modify.MembershipProductId;
         entity.AllowJoinGroupUsingLink = modify.AllowJoinGroupUsingLink;
 
     }
@@ -61,10 +61,10 @@ public class GroupAdapter : IEntityAdapter
     {
         var entity = new GroupEntity
         {
-            GroupIdentifier = create.GroupIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            ParentGroupIdentifier = create.ParentGroupIdentifier,
-            SurveyFormIdentifier = create.SurveyFormIdentifier,
+            GroupIdentifier = create.GroupId,
+            OrganizationIdentifier = create.OrganizationId,
+            ParentGroupIdentifier = create.ParentGroupId,
+            SurveyFormIdentifier = create.SurveyFormId,
             MessageToUserWhenMembershipStarted = create.MessageToUserWhenMembershipStarted,
             MessageToAdminWhenMembershipStarted = create.MessageToAdminWhenMembershipStarted,
             MessageToAdminWhenEventVenueChanged = create.MessageToAdminWhenEventVenueChanged,
@@ -86,7 +86,7 @@ public class GroupAdapter : IEntityAdapter
             GroupPhone = create.GroupPhone,
             GroupRegion = create.GroupRegion,
             GroupSize = create.GroupSize,
-            GroupStatusItemIdentifier = create.GroupStatusItemIdentifier,
+            GroupStatusItemIdentifier = create.GroupStatusItemId,
             GroupWebSiteUrl = create.GroupWebSiteUrl,
             ShippingPreference = create.ShippingPreference,
             SurveyNecessity = create.SurveyNecessity,
@@ -100,7 +100,7 @@ public class GroupAdapter : IEntityAdapter
             LifetimeQuantity = create.LifetimeQuantity,
             MessageToAdminWhenMembershipEnded = create.MessageToAdminWhenMembershipEnded,
             MessageToUserWhenMembershipEnded = create.MessageToUserWhenMembershipEnded,
-            MembershipProductIdentifier = create.MembershipProductIdentifier,
+            MembershipProductIdentifier = create.MembershipProductId,
             AllowJoinGroupUsingLink = create.AllowJoinGroupUsingLink
         };
         return entity;
@@ -115,10 +115,10 @@ public class GroupAdapter : IEntityAdapter
     {
         var model = new GroupModel
         {
-            GroupIdentifier = entity.GroupIdentifier,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            ParentGroupIdentifier = entity.ParentGroupIdentifier,
-            SurveyFormIdentifier = entity.SurveyFormIdentifier,
+            GroupId = entity.GroupIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            ParentGroupId = entity.ParentGroupIdentifier,
+            SurveyFormId = entity.SurveyFormIdentifier,
             MessageToUserWhenMembershipStarted = entity.MessageToUserWhenMembershipStarted,
             MessageToAdminWhenMembershipStarted = entity.MessageToAdminWhenMembershipStarted,
             MessageToAdminWhenEventVenueChanged = entity.MessageToAdminWhenEventVenueChanged,
@@ -140,7 +140,7 @@ public class GroupAdapter : IEntityAdapter
             GroupPhone = entity.GroupPhone,
             GroupRegion = entity.GroupRegion,
             GroupSize = entity.GroupSize,
-            GroupStatusItemIdentifier = entity.GroupStatusItemIdentifier,
+            GroupStatusItemId = entity.GroupStatusItemIdentifier,
             GroupWebSiteUrl = entity.GroupWebSiteUrl,
             ShippingPreference = entity.ShippingPreference,
             SurveyNecessity = entity.SurveyNecessity,
@@ -154,7 +154,7 @@ public class GroupAdapter : IEntityAdapter
             LifetimeQuantity = entity.LifetimeQuantity,
             MessageToAdminWhenMembershipEnded = entity.MessageToAdminWhenMembershipEnded,
             MessageToUserWhenMembershipEnded = entity.MessageToUserWhenMembershipEnded,
-            MembershipProductIdentifier = entity.MembershipProductIdentifier,
+            MembershipProductId = entity.MembershipProductIdentifier,
             AllowJoinGroupUsingLink = entity.AllowJoinGroupUsingLink
         };
 
@@ -170,7 +170,7 @@ public class GroupAdapter : IEntityAdapter
     {
         var match = new GroupMatch
         {
-            GroupIdentifier = entity.GroupIdentifier,
+            GroupId = entity.GroupIdentifier,
             GroupName = entity.GroupName
         };
 

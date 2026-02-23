@@ -2,15 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Web.UI;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Periods.Write;
 using InSite.Application.Records.Read;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.UI.Layout.Admin;
 
-using Shift.Constant;
+using Shift.Common;
+using Shift.Common.Timeline.Commands;
 
 namespace InSite.Admin.Records.Periods
 {
@@ -29,7 +28,7 @@ namespace InSite.Admin.Records.Periods
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/admin/records/periods/search");
 
             if (!IsPostBack)

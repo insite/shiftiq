@@ -187,7 +187,7 @@ namespace InSite.UI.Lobby
 
         private void Unsubscribed(string userEmail)
         {
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var relativeUrl = $"/ui/lobby/subscribe?user={UserIdentifier}&resubscribe=1";
             var absoluteUrl = UrlHelper.GetAbsoluteUrl(domain, ServiceLocator.AppSettings.Environment, relativeUrl, Organization.Code);
 

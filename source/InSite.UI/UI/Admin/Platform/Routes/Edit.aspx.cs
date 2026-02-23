@@ -31,15 +31,15 @@ namespace InSite.Admin.Utilities.Actions.Forms
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
-            {
-                Open();
+            if (IsPostBack)
+                return;
 
-                CancelButton.NavigateUrl = SearchUrl;
+            Open();
 
-                if (string.Equals(Request.QueryString["panel"], "permission", StringComparison.OrdinalIgnoreCase))
-                    PermissionPanel.IsSelected = true;
-            }
+            CancelButton.NavigateUrl = SearchUrl;
+
+            if (string.Equals(Request.QueryString["panel"], "permission", StringComparison.OrdinalIgnoreCase))
+                PermissionPanel.IsSelected = true;
         }
 
         public override void ApplyAccessControl()
@@ -84,8 +84,24 @@ namespace InSite.Admin.Utilities.Actions.Forms
             PageHelper.AutoBindHeader(this, null, title);
 
             Detail.SetInputValues(info);
-            PermissionRepeater.DataBind();
+
             LoadSubactions(info);
+
+            BindPermissions(info);
+        }
+
+        private void BindPermissions(TAction action)
+        {
+            var routeTypeIsPermission = action.ActionType == "Resource";
+
+            var routeHasParent = action.PermissionParentActionIdentifier.HasValue;
+
+            var allowPermissionAssignment = routeTypeIsPermission && !routeHasParent;
+
+            PermissionPanel.Visible = allowPermissionAssignment;
+
+            if (allowPermissionAssignment)
+                PermissionRepeater.DataBind();
         }
 
         private void GetInputValues(TAction info)
@@ -145,7 +161,7 @@ namespace InSite.Admin.Utilities.Actions.Forms
 
         private void LoadSubactions(TAction action)
         {
-            var isPermission = action.ActionType == "Permission";
+            var isPermission = action.ActionType == "Resource";
             var routes = TActionSearch.Search(x => x.PermissionParentActionIdentifier == action.ActionIdentifier
                                                 || x.NavigationParentActionIdentifier == action.ActionIdentifier);
 
@@ -155,9 +171,9 @@ namespace InSite.Admin.Utilities.Actions.Forms
                 Url = $"/ui/admin/platform/routes/edit?id={x.ActionIdentifier}",
                 x.ActionIcon,
                 x.ActionName,
-                Note = isPermission && x.PermissionParentActionIdentifier != action.ActionIdentifier 
-                    ? "Permission Downstream" 
-                    : !isPermission && x.NavigationParentActionIdentifier != action.ActionIdentifier 
+                Note = isPermission && x.PermissionParentActionIdentifier != action.ActionIdentifier
+                    ? "Permission Downstream"
+                    : !isPermission && x.NavigationParentActionIdentifier != action.ActionIdentifier
                         ? "Navigation Downstream"
                         : null
             });

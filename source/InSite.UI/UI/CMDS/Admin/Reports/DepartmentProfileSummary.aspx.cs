@@ -92,14 +92,14 @@ namespace InSite.Cmds.Admin.Reports.Forms
 
         private void InitSelectors()
         {
-            Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Department.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 Department.Filter.UserIdentifier = User.UserIdentifier;
 
             Department.Value = null;
 
-            CurrentProfile.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            CurrentProfile.Filter.OrganizationIdentifier = Organization.Identifier;
             CurrentProfile.Filter.DepartmentIdentifier = Department.Value;
         }
 
@@ -119,7 +119,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         {
             CurrentProfile.Value = null;
 
-            CurrentProfile.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            CurrentProfile.Filter.OrganizationIdentifier = Organization.Identifier;
             CurrentProfile.Filter.DepartmentIdentifier = Department.Value;
         }
 
@@ -354,7 +354,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         {
             CurrentParameters = new SearchParameters
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 DepartmentIdentifier = Department.Value,
                 ProfileStandardIdentifier = CurrentProfile.Value
             };

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
-
 namespace Shift.Api;
 
 [ApiController]
@@ -9,14 +7,16 @@ namespace Shift.Api;
 public class PermissionController : ControllerBase
 {
     private readonly PermissionService _permissionService;
+    private readonly PermissionCache _permissionCache;
 
-    public PermissionController(PermissionService permissionService)
+    public PermissionController(PermissionService permissionService, PermissionCache permissionCache)
     {
         _permissionService = permissionService;
+        _permissionCache = permissionCache;
     }
 
-    [HttpHead("security/permissions/{permission:guid}")]
-    [HybridAuthorize(Policies.Security.Permissions.Permission.Assert)]
+    [HttpHead("api/security/permissions/{permission:guid}")]
+    [HybridPermission("security/permissions", DataAccess.Read)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<ActionResult<bool>> AssertAsync([FromRoute] Guid permission, CancellationToken cancellation = default)
     {
@@ -25,8 +25,8 @@ public class PermissionController : ControllerBase
         return Ok(exists);
     }
 
-    [HttpGet("security/permissions/{permission:guid}")]
-    [HybridAuthorize(Policies.Security.Permissions.Permission.Retrieve)]
+    [HttpGet("api/security/permissions/{permission:guid}")]
+    [HybridPermission("security/permissions", DataAccess.Read)]
     [ProducesResponseType(typeof(PermissionModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<PermissionModel>> RetrieveAsync([FromRoute] Guid permission, CancellationToken cancellation = default)
     {
@@ -38,8 +38,8 @@ public class PermissionController : ControllerBase
         return Ok(model);
     }
 
-    [HttpGet("security/permissions/count")]
-    [HybridAuthorize(Policies.Security.Permissions.Permission.Count)]
+    [HttpGet("api/security/permissions/count")]
+    [HybridPermission("security/permissions", DataAccess.Read)]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<ActionResult<int>> CountAsync([FromQuery] CountPermissions query, CancellationToken cancellation = default)
     {
@@ -48,8 +48,8 @@ public class PermissionController : ControllerBase
         return Ok(count);
     }
 
-    [HttpGet("security/permissions")]
-    [HybridAuthorize(Policies.Security.Permissions.Permission.Collect)]
+    [HttpGet("api/security/permissions")]
+    [HybridPermission("security/permissions", DataAccess.Read)]
     [ProducesResponseType(typeof(IEnumerable<PermissionModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PermissionModel>>> CollectAsync([FromQuery] CollectPermissions query, CancellationToken cancellation = default)
     {
@@ -62,8 +62,8 @@ public class PermissionController : ControllerBase
         return Ok(models);
     }
 
-    [HttpGet("security/permissions/search")]
-    [HybridAuthorize(Policies.Security.Permissions.Permission.Search)]
+    [HttpGet("api/security/permissions/search")]
+    [HybridPermission("security/permissions", DataAccess.Read)]
     [ProducesResponseType(typeof(IEnumerable<PermissionMatch>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PermissionMatch>>> SearchAsync([FromQuery] SearchPermissions query, CancellationToken cancellation = default)
     {
@@ -76,8 +76,8 @@ public class PermissionController : ControllerBase
         return Ok(matches);
     }
 
-    [HttpPost("security/permissions")]
-    [HybridAuthorize(Policies.Security.Permissions.Permission.Create)]
+    [HttpPost("api/security/permissions")]
+    [HybridPermission("security/permissions", DataAccess.Create)]
     [ProducesResponseType(typeof(PermissionModel), StatusCodes.Status201Created, "application/json")]
     [ProducesResponseType(typeof(ValidationFailure), StatusCodes.Status400BadRequest, "application/json")]
     public async Task<ActionResult<PermissionModel>> CreateAsync([FromBody] CreatePermission create, CancellationToken cancellation = default)
@@ -85,24 +85,24 @@ public class PermissionController : ControllerBase
         var created = await _permissionService.CreateAsync(create, cancellation);
 
         if (!created)
-            return BadRequest($"Duplicate not permitted: PermissionIdentifier {create.PermissionIdentifier}. You cannot insert a duplicate object with the same primary key.");
+            return BadRequest($"Duplicate not permitted: PermissionIdentifier {create.PermissionId}. You cannot insert a duplicate object with the same primary key.");
 
-        var model = await _permissionService.RetrieveAsync(create.PermissionIdentifier, cancellation);
+        var model = await _permissionService.RetrieveAsync(create.PermissionId, cancellation);
 
         return CreatedAtAction(nameof(CreateAsync), model);
     }
 
-    [HttpPut("security/permissions/{permission:guid}")]
-    [HybridAuthorize(Policies.Security.Permissions.Permission.Modify)]
+    [HttpPut("api/security/permissions/{permission:guid}")]
+    [HybridPermission("security/permissions", DataAccess.Update)]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationFailure), StatusCodes.Status400BadRequest, "application/json")]
     public async Task<IActionResult> ModifyAsync([FromBody] ModifyPermission modify, CancellationToken cancellation = default)
     {
-        var model = await _permissionService.RetrieveAsync(modify.PermissionIdentifier, cancellation);
+        var model = await _permissionService.RetrieveAsync(modify.PermissionId, cancellation);
 
         if (model is null)
-            return NotFound($"Permission not found: PermissionIdentifier {modify.PermissionIdentifier}. You cannot modify an object that is not in the database.");
+            return NotFound($"Permission not found: PermissionIdentifier {modify.PermissionId}. You cannot modify an object that is not in the database.");
 
         var modified = await _permissionService.ModifyAsync(modify, cancellation);
 
@@ -112,16 +112,13 @@ public class PermissionController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("security/permissions/{permission:guid}")]
-    [HybridAuthorize(Policies.Security.Permissions.Permission.Delete)]
+    [HttpGet("api/security/permissions/refresh")]
+    [HybridPermission("security/permissions", AuthorityAccess.Operator)]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAsync([FromRoute] Guid permission, CancellationToken cancellation = default)
+    public IActionResult Refresh(CancellationToken cancellation = default)
     {
-        var deleted = await _permissionService.DeleteAsync(permission, cancellation);
-
-        if (!deleted)
-            return NotFound();
+        _permissionCache.Refresh(null);
 
         return Ok();
     }

@@ -17,9 +17,9 @@ public class UserConnectionService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid fromUser, Guid toUser, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid fromUser, Guid toUser, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(fromUser, toUser, cancellation);
+        return await _reader.AssertAsync(fromUser, toUser, organization, cancellation);
     }
 
     public async Task<IEnumerable<UserConnectionModel>> CollectAsync(IUserConnectionCriteria criteria, CancellationToken cancellation = default)
@@ -54,9 +54,9 @@ public class UserConnectionService : IEntityService
         }
     }
 
-    public async Task<bool> ModifyAsync(ModifyUserConnection modify, CancellationToken cancellation = default)
+    public async Task<bool> ModifyAsync(ModifyUserConnection modify, Guid organization, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.FromUserIdentifier, modify.ToUserIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.FromUserId, modify.ToUserId, organization, cancellation);
 
         if (entity == null)
             return false;
@@ -66,9 +66,9 @@ public class UserConnectionService : IEntityService
         return await _writer.ModifyAsync(entity, cancellation);
     }
 
-    public async Task<UserConnectionModel?> RetrieveAsync(Guid fromUser, Guid toUser, CancellationToken cancellation = default)
+    public async Task<UserConnectionModel?> RetrieveAsync(Guid fromUser, Guid toUser, Guid? organization = null, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(fromUser, toUser, cancellation);
+        var entity = await _reader.RetrieveAsync(fromUser, toUser, organization, cancellation);
 
         return entity != null ? _adapter.ToModel(entity) : null;
     }

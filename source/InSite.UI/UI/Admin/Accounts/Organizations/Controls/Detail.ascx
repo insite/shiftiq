@@ -60,41 +60,6 @@
         </section>
     </insite:NavItem>
 
-    <insite:NavItem runat="server" ID="SubOrganizationsSection" Title="Suborganizations" Icon="far fa-sitemap" IconPosition="BeforeText">
-        <section>
-            <h2 class="h4 mt-4 mb-3">Suborganizations</h2>
-
-            <div class="card border-0 shadow-lg">
-                <div class="card-body">
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="mb-3 text-end position-relative" style="width:300px;">
-                                <a runat="server" id="ClearButton" href="#" class="filter-cmd" style="display:none;" title="Clear"><i class="fas fa-times"></i></a>
-                                <insite:TextBox runat="server" ID="SubOrganizationFilterText" EmptyMessage="Filter" />
-                            </div>
-
-                            <asp:Repeater runat="server" ID="SubOrganizationRepeater">
-                                <HeaderTemplate><ul id="<%# SubOrganizationRepeater.ClientID %>" class="tree-view"></HeaderTemplate>
-                                <FooterTemplate></ul></FooterTemplate>
-                                <ItemTemplate>
-                                    <%# GetTreeViewPrefix(Container.DataItem) %>
-                                    <div>
-                                        <div>
-                                            <a href='<%# Eval("DataItem.OrganizationIdentifier", "/ui/admin/accounts/organizations/edit?organization={0}") %>'><%# Eval("DataItem.OrganizationName") %></a>
-                                        </div>
-                                    </div>
-                                    <%# GetTreeViewPostfix(Container.DataItem) %>
-                                </ItemTemplate>
-                            </asp:Repeater>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-    </insite:NavItem>
-
     <insite:NavItem runat="server" ID="DivisionsSection" Title="Divisions" Icon="far fa-industry" IconPosition="BeforeText">
         <section>
             <h2 class="h4 mt-4 mb-3">Divisions</h2>
@@ -180,64 +145,3 @@
 
     </style>
 </insite:PageHeadContent>
-
-<insite:PageFooterContent runat="server">
-    <script type="text/javascript">
-        (function () {
-            const treeId = '#<%= SubOrganizationRepeater.ClientID %>';
-            if ($(treeId).length == 0)
-                return;
-
-            const $filterInput = $('#<%= SubOrganizationFilterText.ClientID %>').on('keyup', function () {
-                if (filterTimeoutHandler)
-                    clearTimeout(filterTimeoutHandler);
-
-                filterTimeoutHandler = setTimeout(onFilterTimeout, 500);
-            });
-            const $filterClear = $('#<%= ClearButton.ClientID %>').on('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                $filterInput.val('');
-                filterTree();
-            });
-          
-            let filterTimeoutHandler = null;
-
-            $(function () {
-                filterTree();
-
-                const items = inSite.common.treeView.getAllTreeItems(treeId);
-                for (let item of items)
-                    item.dataset.text = item.querySelector(':scope > div > div > a').innerText.trim().toUpperCase();
-            });            
-
-            function onFilterTimeout() {
-                filterTimeoutHandler = null;
-                filterTree();
-            }
-
-            function filterTree() {
-                const searchText = $filterInput.val().trim().toUpperCase();
-
-                const prevText = $filterInput.data('prev');
-                if (prevText === searchText)
-                    return;
-
-                if (searchText.length > 0) {
-                    inSite.common.treeView.filter(treeId, (item) => {
-                        const itemText = item.dataset.text;
-                        return itemText && itemText.indexOf(searchText) >= 0;
-                    });
-                    $filterClear.show();
-                } else {
-                    inSite.common.treeView.filter(treeId);
-                    $filterClear.hide();
-                }
-
-                $filterInput.data('prev', searchText);
-            }
-        })();
-    
-    </script>
-</insite:PageFooterContent>

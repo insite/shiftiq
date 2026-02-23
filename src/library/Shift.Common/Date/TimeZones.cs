@@ -117,7 +117,9 @@ namespace Shift.Common
         public static string FormatUTC(DateTime time, TimeZoneInfo zone, bool isHtml = false)
         {
             var timeUTC = time.ToUniversalTime();
+
             var builder = new StringBuilder();
+
             Append(builder, DateTimeOffset.Parse(timeUTC.ToString()), zone, isHtml);
 
             return builder.ToString();

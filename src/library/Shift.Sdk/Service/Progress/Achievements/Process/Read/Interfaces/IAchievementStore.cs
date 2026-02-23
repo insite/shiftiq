@@ -22,6 +22,7 @@ namespace InSite.Application.Records.Read
         void UpdateAchievement(AchievementBadgeImageChanged e);
         void UpdateAchievement(AchievementBadgeImageDisabled e);
         void UpdateAchievement(AchievementBadgeImageEnabled e);
+        void UpdateAchievement(AchievementNotificationChanged e);
 
         void UpdateAchievement(AchievementReportingDisabled e);
         void UpdateAchievement(AchievementReportingEnabled e);
@@ -33,6 +34,7 @@ namespace InSite.Application.Records.Read
         void UpdateCredential(CredentialExpired2 e, CredentialStatus status);
         void UpdateCredential(CredentialGranted3 e, CredentialStatus status);
         void UpdateCredential(CredentialRevoked2 e, CredentialStatus status);
+        void UpdateCredential(CredentialNotificationSent e);
         void UpdateCredential(CredentialEmployerChanged e);
         void UpdateCredential(CredentialTagged e);
         void DeleteCredential(CredentialDeleted2 e);

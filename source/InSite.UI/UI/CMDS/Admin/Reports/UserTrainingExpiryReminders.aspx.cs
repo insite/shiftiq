@@ -113,7 +113,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
 
             PageHelper.AutoBindHeader(this);
 
-            OrganizationIdentifier.Value = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            OrganizationIdentifier.Value = Organization.Identifier;
 
             DepartmentField.Visible = OrganizationIdentifier.HasValue;
             DepartmentIdentifier.Filter.OrganizationIdentifier = OrganizationIdentifier.Value.Value;

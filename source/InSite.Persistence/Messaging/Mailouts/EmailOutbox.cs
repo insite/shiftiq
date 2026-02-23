@@ -20,11 +20,14 @@ namespace InSite.Persistence
 
         private readonly EnvironmentName _environment;
 
-        public EmailOutbox(MailgunServer mailgunSender, EnvironmentName environment)
+        private readonly IPartitionModel _partition;
+
+        public EmailOutbox(MailgunServer mailgunSender, EnvironmentName environment, IPartitionModel partition)
         {
             _mailgun = mailgunSender;
 
             _environment = environment;
+            _partition = partition;
         }
 
         private class RecipientList
@@ -198,16 +201,16 @@ namespace InSite.Persistence
 
             #region Methods (analyse data)
 
-            public void LoadRecipients(Guid organization)
+            public void LoadRecipients(Guid organization, IPartitionModel partition)
             {
-                _to = LoadRecipients(_to, new RecipientInfo[0], organization);
-                _cc = LoadRecipients(_cc, _to, organization);
-                _bcc = LoadRecipients(_bcc, _to.Concat(_cc), organization);
+                _to = LoadRecipients(_to, new RecipientInfo[0], organization, partition);
+                _cc = LoadRecipients(_cc, _to, organization, partition);
+                _bcc = LoadRecipients(_bcc, _to.Concat(_cc), organization, partition);
 
                 _isLocked = true;
             }
 
-            private static List<RecipientInfo> LoadRecipients(IEnumerable<RecipientInfo> input, IEnumerable<RecipientInfo> exclude, Guid organization)
+            private List<RecipientInfo> LoadRecipients(IEnumerable<RecipientInfo> input, IEnumerable<RecipientInfo> exclude, Guid organization, IPartitionModel partition)
             {
                 var excludeIds = new HashSet<Guid>();
                 var excludeAddresses = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -234,10 +237,10 @@ namespace InSite.Persistence
 
                 var result = new List<RecipientInfo>();
 
-                foreach (var item in GetRecipientsById(idItems, organization))
+                foreach (var item in GetRecipientsById(idItems, organization, partition))
                     AddItem(item);
 
-                foreach (var item in GetRecipientsByAddress(addressItems, organization))
+                foreach (var item in GetRecipientsByAddress(addressItems, organization, partition))
                     AddItem(item);
 
                 foreach (var item in addressItems)
@@ -284,14 +287,14 @@ namespace InSite.Persistence
                 }
             }
 
-            private static IEnumerable<RecipientInfo> GetRecipientsById(IEnumerable<RecipientInfo> recipients, Guid organization)
+            private IEnumerable<RecipientInfo> GetRecipientsById(IEnumerable<RecipientInfo> recipients, Guid organization, IPartitionModel partition)
             {
                 if (!recipients.Any())
                     yield break;
 
                 var data = GetRecipients(new PersonFilter
                 {
-                    OrganizationOrParentIdentifier = organization,
+                    OrganizationIdentifier = organization == partition.Identifier ? (Guid?)null : organization,
                     IncludeUserIdentifiers = recipients.Select(x => x.Identifier.Value).ToArray()
                 }).ToDictionary(x => x.Identifier);
 
@@ -310,14 +313,14 @@ namespace InSite.Persistence
                 }
             }
 
-            private static IEnumerable<RecipientInfo> GetRecipientsByAddress(IEnumerable<RecipientInfo> recipients, Guid organization)
+            private IEnumerable<RecipientInfo> GetRecipientsByAddress(IEnumerable<RecipientInfo> recipients, Guid organization, IPartitionModel partition)
             {
                 if (!recipients.Any())
                     yield break;
 
                 var data = GetRecipients(new PersonFilter
                 {
-                    OrganizationOrParentIdentifier = organization,
+                    OrganizationIdentifier = organization == partition.Identifier ? (Guid?)null : organization,
                     EmailsExact = recipients.Select(x => x.Address).ToArray()
                 })
                 .ToDictionary(x => x.Address);
@@ -412,7 +415,7 @@ namespace InSite.Persistence
                 if (email.RecipientListTo != null && email.RecipientListTo.Count == 1)
                 {
                     var item = email.RecipientListTo.Single();
-                    var envelope = CreateEmailVariables(item.Key, item.Value);
+                    var envelope = CreateEmailVariables(email, item.Key, item.Value);
 
                     SendUsingMailgun(email, envelope, tag, type);
                 }
@@ -421,45 +424,45 @@ namespace InSite.Persistence
                     foreach (var item in email.RecipientListTo)
                     {
                         var _email = CopyEmail(email, item.Key, item.Value);
-                        var envelope = CreateEmailVariables(item.Key, item.Value);
+                        var envelope = CreateEmailVariables(email, item.Key, item.Value);
 
                         SendUsingMailgun(_email, envelope, tag, type);
                     }
                 }
             }
+        }
 
-            EmailVariables CreateEmailVariables(Guid userId, string address)
+        public static EmailVariables CreateEmailVariables(EmailDraft email, Guid userId, string address)
+        {
+            var result = new EmailVariables(userId, address, email.OrganizationIdentifier, email.ContentVariables);
+
+            if (result.RecipientEmail.IsEmpty())
+                result.RecipientEmail = address;
+
+            var person = ServiceLocator.PersonSearch.GetPerson(userId, email.OrganizationIdentifier, x => x.User);
+
+            if (person != null)
             {
-                var result = new EmailVariables(userId, address, email.OrganizationIdentifier, email.ContentVariables);
+                if (!result.RecipientIdentifier.HasValue)
+                    result.RecipientIdentifier = person.UserIdentifier;
 
-                if (result.RecipientEmail.IsEmpty())
-                    result.RecipientEmail = address;
+                if (result.RecipientCode.IsEmpty())
+                    result.RecipientCode = person.PersonCode;
 
-                var person = ServiceLocator.PersonSearch.GetPerson(userId, email.OrganizationIdentifier, x => x.User);
+                if (result.RecipientName.IsEmpty())
+                    result.RecipientName = person.User.FullName;
 
-                if (person != null)
-                {
-                    if (!result.RecipientIdentifier.HasValue)
-                        result.RecipientIdentifier = person.UserIdentifier;
+                if (result.RecipientNameFirst.IsEmpty())
+                    result.RecipientNameFirst = person.User.FirstName;
 
-                    if (result.RecipientCode.IsEmpty())
-                        result.RecipientCode = person.PersonCode;
+                if (result.RecipientNameLast.IsEmpty())
+                    result.RecipientNameLast = person.User.LastName;
 
-                    if (result.RecipientName.IsEmpty())
-                        result.RecipientName = person.User.FullName;
-
-                    if (result.RecipientNameFirst.IsEmpty())
-                        result.RecipientNameFirst = person.User.FirstName;
-
-                    if (result.RecipientNameLast.IsEmpty())
-                        result.RecipientNameLast = person.User.LastName;
-
-                    if (!result.OrganizationIdentifier.HasValue)
-                        result.OrganizationIdentifier = person.OrganizationIdentifier;
-                }
-
-                return result;
+                if (!result.OrganizationIdentifier.HasValue)
+                    result.OrganizationIdentifier = person.OrganizationIdentifier;
             }
+
+            return result;
         }
 
         public void Send(EmailDraft email)
@@ -480,7 +483,7 @@ namespace InSite.Persistence
             foreach (var recipient in draft.Recipients)
             {
                 if (recipient.Identifier == null)
-                    throw new Exception($"The identifier for this recipient ({recipient.Address}) cannot be null.");
+                    throw new InvalidOperationException($"The identifier for this recipient ({recipient.Address}) cannot be null.");
 
                 var message = MessageHelper.BuildMessage(draft, recipient.Language);
 
@@ -514,7 +517,7 @@ namespace InSite.Persistence
                 email.MailoutScheduled = draft.MailoutScheduled;
 
                 if (recipient.Identifier == null)
-                    throw new Exception($"No email address found for user identifier {recipient.Identifier}.");
+                    throw new InvalidOperationException($"No email address found for user identifier {recipient.Identifier}.");
 
                 var envelope = new EmailVariables(recipient.Identifier.Value, recipient.Address, email.OrganizationIdentifier, recipient.Variables);
 
@@ -536,7 +539,7 @@ namespace InSite.Persistence
                 foreach (var recipient in draft.Recipients)
                 {
                     if (recipient.Identifier == null)
-                        throw new Exception($"The identifier for this recipient ({recipient.Address}) cannot be null.");
+                        throw new InvalidOperationException($"The identifier for this recipient ({recipient.Address}) cannot be null.");
 
                     to.Add(recipient.Identifier.Value, recipient.Address);
                 }
@@ -565,7 +568,7 @@ namespace InSite.Persistence
                 OnSendCompleted(email, envelope.RecipientIdentifier);
         }
 
-        private static Dictionary<Guid, string> GetEmailAddresses(Guid organization, List<Guid> users)
+        private Dictionary<Guid, string> GetEmailAddresses(Guid organization, List<Guid> users)
         {
             if (users.IsEmpty())
                 return new Dictionary<Guid, string>();
@@ -581,7 +584,7 @@ namespace InSite.Persistence
                 },
                 new PersonFilter
                 {
-                    OrganizationOrParentIdentifier = organization,
+                    OrganizationIdentifier = organization == _partition.Identifier ? (Guid?)null : organization,
                     IncludeUserIdentifiers = users.ToArray(),
                     EmailOrEmailAlternateEnabled = true
                 });
@@ -688,7 +691,7 @@ namespace InSite.Persistence
 
             var recipients = getRecipients(draft);
 
-            recipients.LoadRecipients(organizationId);
+            recipients.LoadRecipients(organizationId, _partition);
 
             var sender = TSenderSearch.Select(draft.SenderIdentifier);
             var result = new List<QMailout>();
@@ -810,11 +813,11 @@ namespace InSite.Persistence
                 email.AutoBccSubscribers
                 );
 
-            draft.ContentAttachments = email.ContentAttachments;
-            draft.ContentBody = email.ContentBody;
+            draft.ContentAttachments = email.ContentAttachments?.ToList();
+            draft.ContentBody = email.ContentBody?.Clone();
             draft.ContentPriority = email.ContentPriority;
-            draft.ContentSubject = email.ContentSubject;
-            draft.ContentVariables = email.ContentVariables;
+            draft.ContentSubject = email.ContentSubject?.Clone();
+            draft.ContentVariables = email.ContentVariables?.ToDictionary(x => x.Key, x => x.Value);
             draft.EventIdentifier = email.EventIdentifier;
             draft.MailoutIdentifier = UniqueIdentifier.Create();
             draft.MailoutScheduled = email.MailoutScheduled;
@@ -826,8 +829,8 @@ namespace InSite.Persistence
             {
                 { recipientId, recipientEmail }
             };
-            draft.RecipientListCc = email.RecipientListCc;
-            draft.RecipientListBcc = email.RecipientListBcc;
+            draft.RecipientListCc = email.RecipientListCc?.ToDictionary(x => x.Key, x => x.Value);
+            draft.RecipientListBcc = email.RecipientListBcc?.ToDictionary(x => x.Key, x => x.Value);
 
             draft.SenderEmail = email.SenderEmail;
             draft.SenderEnabled = email.SenderEnabled;
@@ -946,7 +949,7 @@ namespace InSite.Persistence
             return ReplaceSmarterMailVariables(recipientData, 0, subject, body);
         }
 
-        public static void OnSendCompleted(EmailDraft email, Guid? userId)
+        private void OnSendCompleted(EmailDraft email, Guid? userId)
         {
             var mailout = TEmailSearch.Get(email.MailoutIdentifier);
 

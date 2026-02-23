@@ -4,17 +4,16 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface ISubmissionCriteria
+    public interface ISubmissionCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
-        Guid? GroupIdentifier { get; set; }
-        Guid? LastAnsweredQuestionIdentifier { get; set; }
+
+        Guid? GroupId { get; set; }
+        Guid? LastAnsweredQuestionId { get; set; }
         Guid? LastChangeUser { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? PeriodIdentifier { get; set; }
-        Guid? RespondentUserIdentifier { get; set; }
-        Guid? SurveyFormIdentifier { get; set; }
+        Guid? PeriodId { get; set; }
+        Guid? RespondentUserId { get; set; }
+        Guid? SurveyFormId { get; set; }
 
         bool? ResponseIsLocked { get; set; }
 

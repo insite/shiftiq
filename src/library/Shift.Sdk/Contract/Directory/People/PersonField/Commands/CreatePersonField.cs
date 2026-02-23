@@ -4,9 +4,9 @@ namespace Shift.Contract
 {
     public class CreatePersonField
     {
-        public Guid FieldIdentifier { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid UserIdentifier { get; set; }
+        public Guid FieldId { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid UserId { get; set; }
 
         public string FieldName { get; set; }
         public string FieldValue { get; set; }

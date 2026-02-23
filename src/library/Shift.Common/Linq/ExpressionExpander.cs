@@ -43,7 +43,7 @@ namespace Shift.Common.Linq
 			var lambda = (LambdaExpression)target;
 
 		    if (lambda == null)
-		        throw new Exception("Lambda expression cannot be null");
+		        throw new InvalidOperationException("Lambda expression cannot be null");
 
 		    var replaceVars = _replaceVars == null 
 		        ? new Dictionary<ParameterExpression, Expression> () 
@@ -73,7 +73,7 @@ namespace Shift.Common.Linq
 				var lambda = (LambdaExpression)target;
 
 			    if (lambda == null)
-			        throw new Exception("Lambda expression cannot be null");
+			        throw new InvalidOperationException("Lambda expression cannot be null");
 
 			    var replaceVars = _replaceVars == null 
 			        ? new Dictionary<ParameterExpression, Expression> () 

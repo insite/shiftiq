@@ -4,6 +4,8 @@ using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+using InSite.Application.Records.Read;
+using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
@@ -11,7 +13,7 @@ using Shift.Common.Events;
 
 namespace InSite.UI.Admin.Contacts.Groups.Controls
 {
-    public partial class DepartmentChecklist : UserControl
+    public partial class DepartmentChecklist : BaseUserControl
     {
         #region Events
 
@@ -51,7 +53,7 @@ namespace InSite.UI.Admin.Contacts.Groups.Controls
         {
             AchievementIdentifier = achievementIdentifier;
 
-            var data = VCmdsAchievementSearch.SelectForDepartmentChecklist(CurrentIdentityFactory.ActiveOrganizationIdentifier, achievementIdentifier);
+            var data = VCmdsAchievementSearch.SelectForDepartmentChecklist(Organization.Identifier, achievementIdentifier);
 
             DepartmentsRepeater.DataSource = data;
             DepartmentsRepeater.DataBind();

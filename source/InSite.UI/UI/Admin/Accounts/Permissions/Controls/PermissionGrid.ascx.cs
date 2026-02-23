@@ -4,6 +4,7 @@ using System.ComponentModel;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
+using Shift.Common;
 using Shift.Constant;
 
 namespace InSite.Admin.Accounts.Permissions.Controls
@@ -22,9 +23,9 @@ namespace InSite.Admin.Accounts.Permissions.Controls
 
         protected override bool IsFinder => false;
 
-        protected bool CanWrite => CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Accounts, PermissionOperation.Write);
+        protected bool CanWrite => CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Accounts, DataAccess.Update);
 
-        protected bool CanDelete => CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Accounts, PermissionOperation.Write);
+        protected bool CanDelete => CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Accounts, DataAccess.Update);
 
         protected string JsManagerName => $"{ClientID}_manager";
 

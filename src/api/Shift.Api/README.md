@@ -1,55 +1,111 @@
 # Shift API
 
-Here is the list of components in the Shift API:
+Here is the list of subsystems in the Shift API:
 
-* **Application Feature Components**
-  * Assessment
+* **Domain Subsystems (Application Features)**
   * Billing (Sales)
   * Booking (Calendar/Event/Schedule)
   * Competency (Standard)
-  * Content
+  * Content (Assets/Files)
   * Directory (Contact)
-  * Feedback (Survey)
-  * Job
+  * Evaluation (Assessment)
   * Learning (Course)
   * Messaging (Message)
   * Progress (Record)
   * Reporting
-  * Workflow
-  * Workspace (Site)
+  * Workflow (Survey/Form)
+  * Workspace (Site/Page)
   
-* **Plugin Components**
+* **Plugin Subsystems**
   * Integration
   * Variant
 
-* **Utility Components**
+* **Utility Subsystems**
+  * Diagnostic
+  * Internal
+  * Lab 
   * Metadata
-  * Platform
   * Security
+  * Setup
   * Timeline
 
-* **Special-Purpose Components**
-  * Internal
-  * Orchestration
+* **Shell Subsystems**
+  * Lobby
+  * Me
+  * Portal
 
 
-## Special-Purpose Components
+## Domains
 
-### Internal
+**Domains** are the core business subsystems. They implement the primary features of the system. Each domain represents a distinct bounded context with its own data ownership, business rules, and API surface. Domains are designed to be cohesive and loosely coupled, exposing well-defined interfaces that other subsystems can depend on without requiring a lot of knowledge about internal implementation details. They form the functional backbone of the system and directly support the system features that customers use.
 
-**Internal** is a special-purpose subsystem that encapsulates non-public, platform-facing functionality used exclusively for system maintenance, diagnostics, testing, and administrative operations. It contains tools, endpoints, and workflows that support internal development, staging, and operational activities, but are not intended for tenant access or external API consumers. The Internal component provides isolated access to infrastructure-level behaviors without exposing them in the public API surface, and should be treated as privileged and access-restricted in all environments.
+- **Billing** manages financial transactions, invoices, payments, and subscription lifecycles. It handles pricing tiers, discount applications, and recurring charges.
 
-### Orchestration
+- **Booking** manages calendar events, scheduling, and registrations. It supports event creation, attendee management, instructor assignments, and accommodation tracking.
 
-**Orchestration** is a special-purpose subsystem responsible for aggregating and composing data from multiple components to deliver unified, session-aware views for client applications. It acts as a bridge between feature-specific subsystems and the user interface, assembling contextual models such as user session state, dashboard metadata, or cross-component summaries. Orchestration is not responsible for business logic or data ownership, but instead coordinates and shapes data from underlying services to support runtime experience delivery, particularly for dynamic front-end rendering and role-based navigation.
+- **Competency** defines and manages skills, capabilities, and proficiency standards. It supports alignment with roles, training plans, learning paths, and assessments.
+
+- **Content** manages files, media assets, and translations. It handles file storage, upload/download operations, and multilingual content support.
+
+- **Directory** manages people, groups, and organizational structures. It models relationships such as reporting lines and group memberships across the platform.
+
+- **Evaluation** manages assessments, quizzes, and question banks. It handles question authoring, test delivery, attempt tracking, and answer grading.
+
+- **Learning** manages courses, learning paths, and educational activities. It supports enrollments, unit sequencing, and integration with competencies and assessments.
+
+- **Messaging** manages email, SMS, and notification delivery. It handles message templates, mailouts, delivery tracking, and communication scheduling.
+
+- **Progress** tracks learner advancement, achievements, and completion states. It manages gradebooks, training and education credentials, and time-based progression metrics.
+
+- **Reporting** provides data extraction and analytics capabilities. It supports generating reports, dashboards, and data exports across domain subsystems.
+
+- **Workflow** manages forms, surveys, and case management processes. It handles form submissions, conditional logic, and workflow-driven approvals.
+
+- **Workspace** manages sites, pages, and navigation structures. It defines how features are grouped and accessed across roles and organizations.
+
+## Plugins
+
+**Plugins** are subsystems that extend or adapt system features without modifying core domain logic. They provide extensibility points for third-party integrations, tenant-specific variations, and optional features that may not apply to all deployments. Plugins depend on domains but domains do not depend on plugins, preserving a clean dependency direction and allowing the system to evolve without destabilizing its foundation.
+
+- **Integration** provides connectivity with third-party systems and external services. It encapsulates adapters, synchronization logic, and data exchange protocols to enable interoperability without coupling domain subsystems to external dependencies.
+
+- **Variant** supports custom features that are specific to individual partitions, tenants, or organizations. It isolates bespoke functionality from the shared system codebase, allowing tenant-specific behavior without fragmenting the core system.
+
+## Utilities
+
+**Utilities** are infrastructure subsystems that provide cross-cutting operational features to support overall system functionality and maintenance. They are not tied to specific business features but instead offer foundational services such as security, configuration, diagnostics, and metadata management. Utilities may be consumed by domains, plugins, and shells alike, and do not contain business logic or own domain-specific data.
+
+- **Diagnostic** exposes health check and version endpoints for monitoring and operational visibility. It provides lightweight endpoints that infrastructure tools use to verify system status.
+
+- **Internal** is a special-purpose utility subsystem that encapsulates non-public features used exclusively for system maintenance, diagnostics, and testing. It contains tools, endpoints, and workflows that support internal development, staging, and operations. It is not intended for tenant access or external API consumers. The Internal subsystem provides isolated access to infrastructure-level features without exposing them in the public API surface. It should be treated as privileged and access-restricted in all environments.
+
+- **Lab** provides a sandbox environment for experimental features and prototyping. It isolates work-in-progress features from production-ready subsystems.
+
+- **Metadata** offers utilities for inspection, parsing, and validation of entity specifications, database schemas, and data formats. It supports debugging and troubleshooting by providing a variety of introspection tools.
+
+- **Security** manages authentication, authorization, and identity across the system. It handles user accounts, organization accounts, roles, permissions, API tokens, secrets, and session management.
+
+- **Setup** exposes endpoints for API route discovery, permission mapping, and OpenAPI specification access. It supports developer tooling and operational configuration of the system.
+
+- **Timeline** provides a command and query interface for the event sourcing infrastructure. It enables audit trails, change tracking, and event-driven workflows by relaying commands to the event store and executing queries against projected state.
+
+## Shells
+
+**Shells** are responsible for composition of front-end and back-end features from multiple subsystems to deliver unified, session-aware views for client applications. They act as a bridge between domain-specific subsystems and the user interface, assembling contextual models such as user session state, dashboard metadata, and cross-subsystem summaries. Shells are not responsible for business logic or data ownership, but instead coordinate and shape data from underlying services to support runtime experience delivery, particularly for dynamic front-end rendering and role-based navigation.
+
+- **Lobby** provides the initial entry experience for users before they authenticate or select their organization. It handles pre-session rendering, organization discovery, and multi-tenant (i.e., multi-organization and/or multi-partition) landing experiences.
+
+- **Me** aggregates user identity, permissions, environment settings, and UI configuration from multiple subsystems into a unified session context. The resulting model supports front-end application initialization and role-based navigation for the currently authenticated user.
+
+- **Portal** assembles partition-specific, organization-specific, and role-specific dashboard views by coordinating data from multiple domain subsystems. It provides cross-subsystem summaries and navigation structures tailored to the user's organizational context.
 
 
-## API Component Aliases for UI Toolkits
+## API subsystem aliases for UI toolkits
 
 
 ### Rationale for Billing instead of Sales
 
-The Billing API component manages everything within the Sales UI toolkit. The name Billing better reflects its functional purpose, which improves clarity for developers and product stakeholders.
+The Billing API subsystem manages everything within the Sales UI toolkit. The name Billing better reflects its functional purpose, which improves clarity for developers and product stakeholders.
 
 **Sales** is too generic and business-focused, easily confused with:
 * Sales team activities and CRM features
@@ -84,7 +140,7 @@ The subsystem focuses on the technical implementation of financial transactions 
 
 ### Rationale for Booking instead of Events
 
-The Booking API component manages everything within the Events UI toolkit. The name Booking better reflects its true functional purpose and improves clarity for developers and product stakeholders.
+The Booking API subsystem manages everything within the Events UI toolkit. The name Booking better reflects its true functional purpose and improves clarity for developers and product stakeholders.
 
 **Events** is too generic and ambiguous, easily confused with:
 
@@ -114,7 +170,7 @@ GET /booking/registrations/{id}
 
 ### Rationale for Competency instead of Standards
 
-The Competency API component manages everything within the Standards UI toolkit. The name Competency better represents its functional purpose and enhance clarity for developers, domain experts, and product stakeholders.
+The Competency API subsystem manages everything within the Standards UI toolkit. The name Competency better represents its functional purpose and enhance clarity for developers, domain experts, and product stakeholders.
 
 **Standards** is too broad and ambiguous, easily confused with:
 
@@ -146,7 +202,7 @@ GET /competency/profiles
 
 ### Rationale for Directory instead of Contacts
 
-The Directory API component manages everything within the Contacts UI toolkit. The name Directory more accurately reflects its scope and improves semantic clarity for developers and product stakeholders.
+The Directory API subsystem manages everything within the Contacts UI toolkit. The name Directory more accurately reflects its scope and improves semantic clarity for developers and product stakeholders.
 
 **Contacts** is overly narrow and potentially misleading, because it can be easily misinterpreted (by a newcomer) as:
 
@@ -168,42 +224,9 @@ GET /directory/people/{id}
 ```
 
 
-### Rationale for Feedback instead of Surveys
-
-The Feedback API component manages everything within the Surveys UI toolkit. The name Feedback better captures its purpose and improves clarity for developers and product stakeholders.
-
-**Surveys** is too specific and limited in scope. It is easily misinterpreted to mean:
-
-* Traditional questionnaires only
-* Static data collection forms
-* Standalone surveys disconnected from system workflows
-
-Additionally, it leads to awkward and repetitive API routes like:
-
-```
-GET /surveys/surveys
-```
-
-> Technical Note: API routes like surveys/forms are intentionally avoided because they introduce the potential for duplication of entity names. Although C# namespaces and SQL Server schemas allow `assessment.Form` and `survey.Form` to co-exist (for example), this is discouraged to avoid overloading the names of aggregates, commands, and changes.
-
-**Feedback** better reflects the intent and evolving capabilities of this subsystem:
-
-* Collecting structured and unstructured responses from users
-* Supporting feedback workflows tied to assessments, courses, and other content
-* Enabling analytics and improvement loops based on user input
-
-This name aligns with clear and easily readable RESTful conventions and improves API discoverability. For example:
-
-```
-GET /feedback/surveys/{id}
-GET /feedback/surveys/{id}/responses
-GET /feedback/responses
-```
-
-
 ### Rationale for Learning instead of Courses
 
-The Learning API component manages everything within the Courses UI toolkit. The name Learning better reflects the broader scope of functionality and improves clarity and extensibility for developers and product stakeholders.
+The Learning API subsystem manages everything within the Courses UI toolkit. The name Learning better reflects the broader scope of functionality and improves clarity and extensibility for developers and product stakeholders.
 
 **Courses** was too narrow and prescriptive, easily misinterpreted as:
 
@@ -235,7 +258,7 @@ GET /learning/activities/{id}
 
 ### Rationale for Messaging instead of Messages
 
-The Messaging API component manages everything within the Messages UI toolkit. The name Messaging more accurately represents the subsystem's purpose and improves clarity for developers and administrators.
+The Messaging API subsystem manages everything within the Messages UI toolkit. The name Messaging more accurately represents the subsystem's purpose and improves clarity for developers and administrators.
 
 **Messages** is too object-oriented in nature, and it is easily misinterpreted as:
 
@@ -270,7 +293,7 @@ GET /messaging/deliveries
 
 ### Rationale for Progress instead of Record
 
-The Progress API component manages everything within the Records UI toolkit. The name Progress better reflects its purpose in tracking learner and user advancement.
+The Progress API subsystem manages everything within the Records UI toolkit. The name Progress better reflects its purpose in tracking learner and user advancement.
 
 **Records** is too generic and very ambiguous. Its meaning (especially without the additional context of subcomponents within Records) is unclear, especially when viewed alongside similarly vague terms like report, entry, or status. It is very easily misinterpreted as:
 
@@ -300,9 +323,42 @@ GET /progress/logbooks
 ```
 
 
+### Rationale for Workflow Forms instead of Surveys
+
+The Workflow API subsystem manages everything within the Surveys UI toolkit. Forms are housed within Workflow rather than in a standalone subsystem because surveys are fundamentally a type of structured data collection that supports broader workflow processes.
+
+**Surveys** as a standalone subsystem is too narrow and disconnected. It is easily misinterpreted to mean:
+
+* Traditional questionnaires only
+* Static data collection forms
+* Standalone surveys disconnected from system workflows
+
+Additionally, it leads to awkward and repetitive API routes like:
+
+```
+GET /surveys/surveys
+```
+
+**Workflow Forms** better reflects the intent and operational context of this functionality:
+
+* Forms are triggers, inputs, or checkpoints within larger workflow processes
+* Survey responses feed into approvals, notifications, and downstream actions
+* Data collection is rarely an end in itself; it initiates or advances work
+
+Placing forms within Workflow also avoids entity name collisions across subsystems (e.g., `evaluation.Form` vs `survey.Form`) and reinforces the principle that each aggregate name should be unique across the platform.
+
+This structure aligns with clear and discoverable RESTful conventions. For example:
+
+```
+GET /workflow/forms/{id}
+GET /workflow/forms/{id}/submissions
+GET /workflow/submissions
+```
+
+
 ### Rationale for Workspace instead of Site
 
-The Workspace API component manages everything within the Sites UI toolkit. The name Workspace better reflects its functional role and to improves clarity within a system that is oriented to training, education, and human resources.
+The Workspace API subsystem manages everything within the Sites UI toolkit. The name Workspace better reflects its functional role and to improves clarity within a system that is oriented to training, education, and human resources.
 
 **Site** is too generic and misleading; it is easily misinterpreted as:
 

@@ -24,7 +24,8 @@ namespace InSite.Api.Controllers
             {
                 EventIdentifier = Guid.NewGuid(),
                 EventData = payload,
-                EventWhen = DateTimeOffset.Now
+                EventWhen = DateTimeOffset.Now,
+                EventSource = "SCORM Cloud"
             };
 
             var store = new ScormStore();

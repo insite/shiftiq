@@ -14,7 +14,7 @@ using Shift.Common.Linq;
 
 namespace InSite.Persistence
 {
-    public class TGroupPermissionSearch
+    public static class TGroupPermissionSearch
     {
         private class ReadHelper : ReadHelper<TGroupPermission>
         {
@@ -39,10 +39,15 @@ namespace InSite.Persistence
             {
                 context.Configuration.ProxyCreationEnabled = false;
 
+                var startActionUrl = Urls.StartImpersonation.TrimStart('/');
+
                 var actionId = context.TActions
-                    .Where(x => x.ActionUrl == "ui/portal/identity/impersonate")
-                    .Select(x => x.ActionIdentifier)
+                    .Where(x => x.ActionUrl == startActionUrl)
+                    .Select(x => x.PermissionParentActionIdentifier)
                     .FirstOrDefault();
+
+                if (actionId == null || actionId == Guid.Empty)
+                    return false;
 
                 var authorizations = context
                     .TGroupPermissions
@@ -266,8 +271,6 @@ namespace InSite.Persistence
                         OrganizationCode = x.Group.Organization.OrganizationCode,
                         OrganizationIdentifier = x.Group.OrganizationIdentifier,
 
-                        AllowExecute = x.AllowExecute,
-
                         AllowRead = x.AllowRead,
                         AllowWrite = x.AllowWrite,
                         AllowCreate = x.AllowCreate,
@@ -276,7 +279,7 @@ namespace InSite.Persistence
                         AllowConfigure = x.AllowConfigure,
                         AllowTrialAccess = x.AllowTrialAccess,
 
-                        Allow = x.AllowExecute || x.AllowRead || x.AllowWrite || x.AllowDelete || x.AllowCreate || x.AllowAdministrate || x.AllowConfigure
+                        Allow = x.AllowRead || x.AllowWrite || x.AllowDelete || x.AllowCreate || x.AllowAdministrate || x.AllowConfigure
                     })
                     .ToList();
 
@@ -288,7 +291,7 @@ namespace InSite.Persistence
                         item.ObjectName = action.ActionName;
                         item.ObjectSubtype = action.ActionType;
                     }
-                    var page = (new PageSearch(null, null)).Select(item.ObjectIdentifier);
+                    var page = (new PageSearch(null, null, ServiceLocator.Partition)).Select(item.ObjectIdentifier);
                     if (page != null)
                     {
                         item.ObjectName = page.PageSlug;

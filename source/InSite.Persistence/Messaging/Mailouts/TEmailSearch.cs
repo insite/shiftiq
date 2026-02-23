@@ -94,12 +94,16 @@ namespace InSite.Persistence
 
         public static MyMessage[] GetMyMessages(Guid user, Guid organization)
         {
-            const string query = @"EXEC logs.MyMessages @UserIdentifier, @OrganizationIdentifier";
+            const string query = @"EXEC logs.MyMessages @UserIdentifier, @OrganizationIdentifiers";
+
+            var organizations = organization != ServiceLocator.Partition.Identifier
+                ? new[] { ServiceLocator.Partition.Identifier, organization }
+                : new[] { organization };
 
             object[] sqlParameters =
             {
                 new SqlParameter("@UserIdentifier", user),
-                new SqlParameter("@OrganizationIdentifier", organization),
+                SqlParameterHelper.IdentifierList("@OrganizationIdentifiers", organizations),
             };
 
             using (var db = new InternalDbContext())
@@ -113,14 +117,18 @@ namespace InSite.Persistence
 
         public static int CountMyMessages(Guid user, Guid organization)
         {
+            var organizations = organization != ServiceLocator.Partition.Identifier
+                ? new[] { ServiceLocator.Partition.Identifier, organization }
+                : new[] { organization };
+
             using (var db = new InternalDbContext())
                 return db.Database
                     .SqlQuery<int>(
-                        "EXEC logs.MyMessagesCount @UserIdentifier, @OrganizationIdentifier",
+                        "EXEC logs.MyMessagesCount @UserIdentifier, @OrganizationIdentifiers",
                         new[]
                         {
                             new SqlParameter("@UserIdentifier", user),
-                            new SqlParameter("@OrganizationIdentifier", organization),
+                            SqlParameterHelper.IdentifierList("@OrganizationIdentifiers", organizations),
                         })
                     .FirstOrDefault();
         }

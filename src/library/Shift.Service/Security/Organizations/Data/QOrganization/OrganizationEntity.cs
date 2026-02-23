@@ -12,10 +12,8 @@ public partial class OrganizationEntity
     public Guid? AdministratorUserIdentifier { get; set; }
     public Guid? GlossaryIdentifier { get; set; }
     public Guid OrganizationIdentifier { get; set; }
-    public Guid? ParentOrganizationIdentifier { get; set; }
 
     public string AccountStatus { get; set; } = null!;
-    public string? CompanyDomain { get; set; }
     public string? CompanyName { get; set; }
     public string? CompanySize { get; set; }
     public string? CompanySummary { get; set; }

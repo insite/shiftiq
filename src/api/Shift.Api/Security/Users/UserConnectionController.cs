@@ -7,10 +7,12 @@ namespace Shift.Api;
 public class UserConnectionController : ShiftControllerBase
 {
     private readonly UserConnectionService _userConnectionService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public UserConnectionController(UserConnectionService userConnectionService)
+    public UserConnectionController(UserConnectionService userConnectionService, IPrincipalProvider principalProvider)
     {
         _userConnectionService = userConnectionService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -18,13 +20,17 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific user connection
     /// </summary>
-    [HttpHead("security/users-connections/{from:guid}/{to:guid}")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Assert)]
+    [HttpHead("api/security/users-connections/{from:guid}/{to:guid}")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertUserConnection")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid fromUser, [FromRoute] Guid toUser, CancellationToken cancellation = default)
     {
-        var exists = await _userConnectionService.AssertAsync(fromUser, toUser, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _userConnectionService.AssertAsync(fromUser, toUser, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -32,8 +38,8 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Collects the list of user connections that match specific criteria
     /// </summary>
-    [HttpPost("security/users-connections/collect")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Collect)]
+    [HttpPost("api/security/users-connections/collect")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserConnectionModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectUserConnections")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectUserConnections query, CancellationToken cancellation = default)
@@ -41,8 +47,8 @@ public class UserConnectionController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("security/users-connections")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Collect)]
+    [HttpGet("api/security/users-connections")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserConnectionModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectUserConnections_get")]
     [AliasFor("collectUserConnections")]
@@ -54,6 +60,10 @@ public class UserConnectionController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectUserConnections query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _userConnectionService.CollectAsync(query, cancellation);
 
         var count = await _userConnectionService.CountAsync(query, cancellation);
@@ -66,8 +76,8 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Counts the user connections that match specific criteria
     /// </summary>
-    [HttpPost("security/users-connections/count")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Count)]
+    [HttpPost("api/security/users-connections/count")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countUserConnections")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountUserConnections query, CancellationToken cancellation = default)
@@ -75,8 +85,8 @@ public class UserConnectionController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("security/users-connections/count")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Count)]
+    [HttpGet("api/security/users-connections/count")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countUserConnections_get")]
     [AliasFor("countUserConnections")]
@@ -88,6 +98,10 @@ public class UserConnectionController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountUserConnections query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _userConnectionService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -96,8 +110,8 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of user connections that match specific criteria
     /// </summary>    
-    [HttpPost("security/users-connections/download")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Download)]
+    [HttpPost("api/security/users-connections/download")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadUserConnections")]
@@ -106,8 +120,8 @@ public class UserConnectionController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("security/users-connections/download")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Download)]
+    [HttpGet("api/security/users-connections/download")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadUserConnections_get")]
@@ -120,6 +134,10 @@ public class UserConnectionController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectUserConnections query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Security", "UserConnections", query.Filter.Format, User);
 
         var models = await _userConnectionService
@@ -140,13 +158,17 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific user connection
     /// </summary>
-    [HttpGet("security/users-connections/{from:guid}/{to:guid}")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Retrieve)]
+    [HttpGet("api/security/users-connections/{from:guid}/{to:guid}")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType<UserConnectionModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveUserConnection")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid fromUser, [FromRoute] Guid toUser, CancellationToken cancellation = default)
     {
-        var model = await _userConnectionService.RetrieveAsync(fromUser, toUser, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var model = await _userConnectionService.RetrieveAsync(fromUser, toUser, organizationId, cancellation);
 
         return model != null ? Ok(model) : NotFound();
     }
@@ -154,8 +176,8 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Searches for the list of user connections that match specific criteria
     /// </summary>
-    [HttpPost("security/users-connections/search")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Search)]
+    [HttpPost("api/security/users-connections/search")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserConnectionMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchUserConnections")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchUserConnections query, CancellationToken cancellation = default)
@@ -163,8 +185,8 @@ public class UserConnectionController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("security/users-connections/search")]
-    [HybridAuthorize(Policies.Security.Users.UserConnection.Search)]
+    [HttpGet("api/security/users-connections/search")]
+    [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserConnectionMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchUserConnections_get")]
     [AliasFor("searchUserConnections")]
@@ -176,6 +198,10 @@ public class UserConnectionController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchUserConnections query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _userConnectionService.SearchAsync(query, cancellation);
 
         var count = await _userConnectionService.CountAsync(query, cancellation);

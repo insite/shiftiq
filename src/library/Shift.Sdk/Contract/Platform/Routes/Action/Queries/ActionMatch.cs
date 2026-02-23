@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public partial class ActionMatch
     {
-        public Guid ActionIdentifier { get; set; }
+        public Guid ActionId { get; set; }
     }
 }

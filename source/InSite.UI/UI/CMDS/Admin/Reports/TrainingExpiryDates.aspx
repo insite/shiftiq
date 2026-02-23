@@ -53,7 +53,7 @@
 
 
                     .table-report-container table.table-report > thead > tr > td.group-header {
-                        background-color: #696969;
+                        background-color: #2c2d3f;
                         color: #fff;
                         font-weight: bold;
                     }
@@ -111,18 +111,15 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 
-    <insite:Alert runat="server" ID="ScreenStatus" />
-    <insite:ValidationSummary runat="server" ValidationGroup="Report" />
-
-    <insite:CustomValidator runat="server" ID="DepartmentIdentifierValidator" ErrorMessage="At least one department must be selected" Display="None" ValidationGroup="Report" />
-    <insite:CustomValidator runat="server" ID="AchievementSelectorValidator" ErrorMessage="At least one achievement must be selected." Display="None" ValidationGroup="Report" />
+    <insite:UpdatePanel runat="server" UpdateMode="Always">
+        <ContentTemplate>
+            <insite:Alert runat="server" ID="ScreenStatus" />
+            <insite:ValidationSummary runat="server" ValidationGroup="Report" />
+        </ContentTemplate>
+    </insite:UpdatePanel>
 
     <insite:Nav runat="server" ID="NavPanel">
         <insite:NavItem runat="server" ID="CriteriaTab" Title="Criteria" Icon="far fa-search" IconPosition="BeforeText">
-
-            <h2 class="h4 my-3">
-                Criteria
-            </h2>
 
             <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="ReportUpdatePanel" />
                 
@@ -139,9 +136,17 @@
 
                                     <div class="form-group mb-3">
                                         <label class="form-label">
-                                            Departments
+                                            Department
+                                            <insite:RequiredValidator runat="server" ControlToValidate="FindDepartment" FieldName="Department" ValidationGroup="Report" />
                                         </label>
-                                        <cmds:FindDepartment runat="server" ID="DepartmentIdentifier" MaxSelectionCount="0" />
+                                        <cmds:FindDepartment runat="server" ID="FindDepartment" MaxSelectionCount="0" CausesValidation="true" ValidationGroup="Other" />
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            Learner
+                                        </label>
+                                        <insite:FindPerson runat="server" ID="FindLearner" MaxSelectionCount="0" Enabled="false" />
                                     </div>
 
                                     <div class="form-group mb-3">
@@ -159,7 +164,20 @@
                                 </div>
                                 <div class="col-lg-6">
 
-                                    <uc:AchievementCriteriaSelector runat="server" ID="AchievementSelector" />
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            Program
+                                        </label>
+                                        <insite:FindProgram runat="server" ID="FindProgram" MaxSelectionCount="0" CausesValidation="true" ValidationGroup="Other" />
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            Achievement
+                                            <insite:RequiredValidator runat="server" ControlToValidate="FindAchievement" FieldName="Achievement" ValidationGroup="Report" />
+                                        </label>
+                                        <insite:FindAchievement runat="server" ID="FindAchievement" MaxSelectionCount="0" Enabled="false" />
+                                    </div>
 
                                 </div>
                             </div>
@@ -176,7 +194,7 @@
                             CausesValidation="true"
                             DisableAfterClick="true"
                         />
-                        <insite:CloseButton runat="server" NavigateUrl="/ui/cmds/reports" />
+                        <insite:CloseButton runat="server" ID="CloseButton1" />
                     </div>
 
                 </ContentTemplate>
@@ -254,7 +272,7 @@
             </div>
 
             <div class="mt-3">
-                <insite:CloseButton runat="server" NavigateUrl="/ui/cmds/reports" />
+                <insite:CloseButton runat="server" ID="CloseButton2" />
             </div>
 
         </insite:NavItem>

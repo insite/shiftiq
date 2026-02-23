@@ -41,7 +41,7 @@ namespace InSite.Domain.Organizations
                     return new PersonCodeAutoincrementSettings { Enabled = (bool)reader.Value };
 
                 if (reader.TokenType != JsonToken.StartObject)
-                    throw new Exception("Unexpected token type: " + reader.TokenType);
+                    throw new JsonSerializationException("Unexpected token type: " + reader.TokenType);
 
                 var jObj = JObject.Load(reader);
                 var result = new PersonCodeAutoincrementSettings();

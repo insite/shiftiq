@@ -4,12 +4,13 @@ namespace Shift.Contract
 {
     public partial class FileModel
     {
-        public Guid? ApprovedUserIdentifier { get; set; }
-        public Guid FileIdentifier { get; set; }
-        public Guid? LastActivityUserIdentifier { get; set; }
-        public Guid ObjectIdentifier { get; set; }
-        public Guid? ReviewedUserIdentifier { get; set; }
-        public Guid UserIdentifier { get; set; }
+        public Guid? ApprovedUserId { get; set; }
+        public Guid FileId { get; set; }
+        public Guid? LastActivityUserId { get; set; }
+        public Guid ObjectId { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid? ReviewedUserId { get; set; }
+        public Guid UserId { get; set; }
 
         public string DocumentName { get; set; }
         public string FileCategory { get; set; }

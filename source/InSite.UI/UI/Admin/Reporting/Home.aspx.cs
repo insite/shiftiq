@@ -12,13 +12,17 @@ namespace InSite.UI.Admin.Reporting
     public partial class Home : AdminBasePage
     {
         public int tempQueryCount;
+
         public bool tempQueryResult;
 
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
-            tempQueryResult = int.TryParse($"{InSite.Admin.Reports.Queries.Controls.QuerySearchCriteria.GetReports().Length}", out tempQueryCount);
+            var queryCount = InSite.Admin.Reports.Queries.Controls.QuerySearchCriteria.GetReports().Length;
+
+            tempQueryResult = int.TryParse($"{queryCount}", out tempQueryCount);
+
             tempQueryCount = (tempQueryResult == true) ? tempQueryCount : 0;
 
             ImpersonationsCounter.Visible = Identity.IsOperator;
@@ -38,11 +42,10 @@ namespace InSite.UI.Admin.Reporting
             try
             {
                 DatabaseQueryRow.Visible = Identity.IsOperator;
-
-                CurrentSessionGrid.LoadData();
             }
             catch (Exception)
             {
+
             }
 
             PageHelper.AutoBindHeader(this);
@@ -53,7 +56,7 @@ namespace InSite.UI.Admin.Reporting
 
             FrequentlyUsedReports.Visible = !isE03 || isE03Admin;
 
-            CurrentUserSessions.Visible = !isE03 || isE03Admin;
+            CurrentUserSessionsLink.Visible = !isE03 || isE03Admin;
 
             var isQueriesVisible = tempQueryCount > 0 || Identity.IsOperator;
             LoadCounter(QueryCounter, QueryCount, isQueriesVisible, tempQueryCount, QueryLink, "/ui/admin/reports/queries/search");

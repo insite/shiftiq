@@ -4,9 +4,9 @@ import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 import { DateTimeInvalid, DateTimeParts } from "@/helpers/date/dateTimeTypes";
 
 export interface FileCriteria extends BaseCriteria {
-    organizationIdentifier: string;
+    organizationId: string;
     objectType: string;
-    objectIdentifier: string;
+    objectId: string;
     fileName: string;
     documentName: string;
     fileUploadedSince: DateTimeParts | DateTimeInvalid | null;
@@ -17,15 +17,15 @@ export interface FileCriteria extends BaseCriteria {
 
 export function toApiSearchFiles(criteria: FileCriteria): ApiSearchFiles {
     return {
-        OrganizationIdentifier: criteria.organizationIdentifier,
+        OrganizationId: criteria.organizationId,
         ObjectTypeExact: criteria.objectType,
-        ObjectIdentifier: null,
-        ObjectIdentifierContains: criteria.objectIdentifier,
+        ObjectId: null,
+        ObjectIdContains: criteria.objectId,
         FileNameContains: criteria.fileName,
         DocumentNameContains: criteria.documentName,
         FileUploadedSince: dateTimeHelper.formatServerDateTime(criteria.fileUploadedSince),
         FileUploadedBefore: dateTimeHelper.formatServerDateTime(criteria.fileUploadedBefore),
-        UserIdentifier: criteria.fileUploadedBy,
+        UserId: criteria.fileUploadedBy,
         HasClaims: criteria.visibility === "public" ? false : (criteria.visibility === "private" ? true : null),
     }
 }

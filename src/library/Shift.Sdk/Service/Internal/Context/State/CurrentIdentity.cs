@@ -12,7 +12,7 @@ using UserModel = InSite.Domain.Foundations.User;
 
 namespace InSite.Domain.Foundations
 {
-    public interface ISecurityFramework : IIdentity, IPrincipal, ISimplePrincipal
+    public interface ISecurityFramework : IIdentity, System.Security.Principal.IPrincipal, ISimplePrincipal
     {
         ClaimList Claims { get; set; }
         GroupList Groups { get; set; }
@@ -32,14 +32,9 @@ namespace InSite.Domain.Foundations
         UserModel User { get; set; }
 
         string ChangeLanguage(string language);
-        bool IsActionAuthorized(string actionName);
-        bool IsGranted(Guid? action);
-        bool IsGranted(Guid? action, PermissionOperation operation);
-        bool IsGranted(string action);
-        bool IsGranted(string action, PermissionOperation operation);
-        bool IsInGroup(string group);
-        bool IsInGroup(string[] groups);
-        bool IsInGroup(Guid group);
+
+        bool IsGranted(Guid? action, DataAccess? operation = null);
+        bool IsGranted(string action, DataAccess? operation = null);
     }
 
     /// <summary>
@@ -47,8 +42,10 @@ namespace InSite.Domain.Foundations
     /// methods except the methods required to implement IPrincipal.
     /// </summary>
     [Serializable]
-    public class CurrentIdentity : IIdentity, IPrincipal, ISecurityFramework
+    public class CurrentIdentity : IIdentity, System.Security.Principal.IPrincipal, ISecurityFramework
     {
+        public static string Partition { get; set; }
+
         public static readonly Guid PortalActionIdentifier = Guid.Parse("20056572-CFE8-4049-9774-7876F33E0404");
 
         public string AuthenticationType
@@ -64,7 +61,7 @@ namespace InSite.Domain.Foundations
         /// </summary>
         public string Language { get; private set; }
 
-        IIdentity IPrincipal.Identity
+        IIdentity System.Security.Principal.IPrincipal.Identity
             => this;
 
         /// <summary>
@@ -114,7 +111,7 @@ namespace InSite.Domain.Foundations
         /// </summary>
         public OrganizationState Organization { get; set; }
 
-        public Guid? OrganizationId => Organization?.OrganizationIdentifier;
+        public Guid OrganizationId => Organization?.OrganizationIdentifier ?? Guid.Empty;
 
         /// <summary>
         /// The organization accounts to which the user has access.
@@ -126,7 +123,9 @@ namespace InSite.Domain.Foundations
         /// </summary>
         public UserModel User { get; set; }
 
-        public Guid? UserId => User?.UserIdentifier;
+        public Guid UserId => User?.UserIdentifier ?? Guid.Empty;
+
+        public TimeZoneInfo TimeZone => User?.TimeZone ?? TimeZoneInfo.Utc;
 
         /// <summary>
         /// The default constructor creates an empty list for each collection. Disallow construction 
@@ -161,42 +160,63 @@ namespace InSite.Domain.Foundations
                 User = user,
             };
 
+            AddAuthority(identity);
+
             identity.ChangeLanguage(language);
 
             return identity;
         }
 
-        public bool HasAccessToAllCompanies => IsOperator || IsInGroup(CmdsRole.SystemAdministrators) || IsInGroup(CmdsRole.Programmers);
-
-        public bool IsActionAuthorized(string actionName)
+        private static void AddAuthority(CurrentIdentity identity)
         {
-            if (IsOperator)
-                return true;
+            var access = AuthorityAccess.Unspecified;
 
-            if (actionName.Contains("?"))
-                actionName = actionName.Substring(0, actionName.IndexOf("?"));
+            var roles = identity.Groups;
 
-            if (actionName.StartsWith("/"))
-                actionName = actionName.Substring(1);
+            var person = identity.Person;
 
-            var permission = ApplicationContext.GetPermission(actionName);
-            if (permission == null)
-                return false;
+            if (person == null)
+                return;
 
-            if (IsGranted(actionName))
-                return true;
-
-            if (permission.Parent.HasValue)
+            if (person.IsAdministrator)
             {
-                var parent = ApplicationContext.GetAction(permission.Parent.Value);
-                if (parent == null)
-                    return false;
-
-                return parent.Identifier == PortalActionIdentifier || IsGranted(parent.Identifier);
+                access |= AuthorityAccess.Administrator;
+                AddSystemGroup(SystemRole.Administrator);
             }
 
-            return false;
+            if (person.IsDeveloper)
+            {
+                access |= AuthorityAccess.Developer;
+                AddSystemGroup(SystemRole.Developer);
+            }
+
+            if (person.IsLearner)
+            {
+                access |= AuthorityAccess.Learner;
+                AddSystemGroup(SystemRole.Learner);
+            }
+
+            if (person.IsOperator)
+            {
+                access |= AuthorityAccess.Operator;
+                AddSystemGroup(SystemRole.Operator);
+            }
+
+            void AddSystemGroup(string name)
+            {
+                var role = new Group
+                {
+                    Identifier = UuidFactory.CreateV5(name),
+                    Name = name,
+                    Type = GroupType.Role
+                };
+
+                if (!roles.Any(r => r.Name == name))
+                    roles.Add(role);
+            }
         }
+
+        public bool HasAccessToAllCompanies => IsOperator || IsInRole(CmdsRole.SystemAdministrators) || IsInRole(CmdsRole.Programmers);
 
         public bool IsAdministrator
             => Persons != null && Persons.Any(x => x.IsAdministrator);
@@ -207,94 +227,92 @@ namespace InSite.Domain.Foundations
         public bool IsAuthenticated
             => User != null;
 
-        public bool IsGranted(Guid? action)
+        public bool IsGranted(Guid? actionId, DataAccess? operation = null)
         {
-            // An operator (platform administrator) has access to all actions.
-            if (IsOperator)
-                return true;
+            var isGrantedWithOldLogic = IsGrantedWithOldLogic(actionId, operation);
 
-            if (action == null || action.Value == Guid.Empty)
+            var isGrantedWithNewLogic = IsGrantedWithNewLogic(actionId, operation);
+
+            if (isGrantedWithOldLogic != isGrantedWithNewLogic)
+                throw new InvalidOperationException($"The old authorization logic {(isGrantedWithOldLogic ? "grants" : "denies")} access"
+                    + $" to {Name} on action"
+                    + $" {actionId} and the new authorization logic {(isGrantedWithNewLogic ? "grants" : "denies")} access."
+                    + " This means there is an unexpected problem in the new permission matrix.");
+
+            return isGrantedWithOldLogic;
+        }
+
+        private bool IsGrantedWithOldLogic(Guid? actionId, DataAccess? operation = null)
+        {
+            if (IsOperator)
                 return true;
 
             if (IsInRole(CmdsRole.Programmers))
                 return true;
 
-            if (Claims.Contains(action.Value))
+            if (actionId == null || actionId.Value == Guid.Empty)
                 return true;
 
-            var a = ApplicationContext.GetAction(action.Value);
-            return HasPortalPermission(a);
-        }
-
-        public bool IsGranted(Guid? action, PermissionOperation operation)
-        {
-            // An operator (platform administrator) has access to all actions.
-            if (IsOperator)
-                return true;
+            var action = ApplicationContext.GetActionForPermission(actionId.Value);
 
             if (action == null)
-                return true;
-
-            var a = ApplicationContext.GetAction(action.Value);
-
-            if (a == null)
                 return false;
 
-            if (HasPortalPermission(a))
+            var isLearner = Person?.IsLearner ?? false;
+
+            var isPortal = isLearner && (action.Identifier == PortalActionIdentifier || action.Parent == PortalActionIdentifier);
+            if (isPortal)
                 return true;
 
-            return Claims.IsGranted(action.Value, operation);
-        }
+            var parentId = action.Parent ?? Guid.Empty;
 
-        public bool IsGranted(string action)
-        {
-            // An operator (platform administrator) has access to all actions.
-            if (IsOperator)
+            if (operation != null)
+                if (Claims.IsGranted(action.Identifier, operation.Value) || Claims.IsGranted(parentId, operation.Value))
+                    return true;
+
+            if (Claims.Contains(action.Identifier) || Claims.Contains(parentId))
                 return true;
-
-            if (Claims.Contains(action))
-                return true;
-
-            var a = ApplicationContext.GetAction(action);
-            return HasPortalPermission(a);
-        }
-
-        public bool IsGranted(string action, PermissionOperation operation)
-        {
-            // An operator (platform administrator) has access to all actions.
-            if (IsOperator)
-                return true;
-
-            var a = ApplicationContext.GetAction(action);
-
-            if (a == null)
-                return false;
-
-            if (HasPortalPermission(a))
-                return true;
-
-            return Claims.IsGranted(action, operation);
-        }
-
-        private bool HasPortalPermission(ActionNode a)
-        {
-            if (a?.Url != null)
-                return ApplicationContext.GetPermission(a.Url)?.Parent == PortalActionIdentifier;
 
             return false;
         }
 
-        public bool IsInGroup(string group)
-            => Groups.Contains(group);
+        private bool IsGrantedWithNewLogic(Guid? actionId, DataAccess? operation = null)
+        {
+            if (actionId == null || actionId.Value == Guid.Empty)
+                return true;
 
-        public bool IsInGroup(string[] groups)
-            => groups.Any(group => Groups.Contains(group));
+            var action = ApplicationContext.GetAction(actionId.Value);
 
-        public bool IsInGroup(Guid group)
-            => Groups.Any(g => g.Identifier == group);
+            var resource = action.Url;
+
+            var roles = Groups.Select(x => new Role(x.Name)).ToList();
+
+            var matrix = PermissionContext.GetMatrix();
+
+            if (matrix.IsAllowed(Organization.Code, resource, roles))
+                return true;
+
+            if (!string.IsNullOrEmpty(Partition))
+                return matrix.IsAllowed(Partition, resource, roles);
+
+            return false;
+        }
+
+        public bool IsGranted(string actionUrl, DataAccess? operation = null)
+        {
+            if (actionUrl.Contains("?"))
+                actionUrl = actionUrl.Substring(0, actionUrl.IndexOf("?"));
+
+            if (actionUrl.StartsWith("/"))
+                actionUrl = actionUrl.Substring(1);
+
+            var action = ApplicationContext.GetAction(actionUrl);
+
+            return IsGranted(action?.Identifier, operation);
+        }
 
         public bool IsInRole(string role)
-            => User != null && IsInGroup(role);
+            => !string.IsNullOrEmpty(role) && Groups.Contains(role);
 
         public string Name
             => IsAuthenticated ? User.Email : UserNames.Someone;

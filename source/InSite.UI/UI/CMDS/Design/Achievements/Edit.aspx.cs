@@ -35,7 +35,7 @@ namespace InSite.Cmds.Admin.Achievements.Forms
                 Access = Access.SetAll(false);
 
             var info = VCmdsAchievementSearch.Select(AchievementIdentifier);
-            if (info?.OrganizationIdentifier != CurrentIdentityFactory.ActiveOrganizationIdentifier)
+            if (info?.OrganizationIdentifier != Organization.Identifier)
                 Access = Access.SetAll(false);
 
             AchievementDetails.DisableEdit();

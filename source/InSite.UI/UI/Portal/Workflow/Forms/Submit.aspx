@@ -12,7 +12,7 @@
 </asp:Content>
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
-    <div class="lesson col-full-height" style="z-index:auto;">
+    <div class="col-full-height" style="z-index:auto;">
         <asp:PlaceHolder runat="server" ID="VerbPlaceholder" />
     </div>
 </asp:Content>

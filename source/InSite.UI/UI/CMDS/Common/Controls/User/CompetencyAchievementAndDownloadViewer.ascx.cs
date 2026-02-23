@@ -15,7 +15,7 @@ using Shift.Constant;
 
 namespace InSite.Cmds.User.Competencies.Controls
 {
-    public partial class CompetencyAchievementAndDownloadViewer : UserControl
+    public partial class CompetencyAchievementAndDownloadViewer : BaseUserControl
     {
         #region Delegates
 
@@ -428,7 +428,7 @@ namespace InSite.Cmds.User.Competencies.Controls
 
         private bool LoadGroups()
         {
-            var table = UploadRepository.SelectCompetencyUploads(CurrentIdentityFactory.ActiveOrganizationIdentifier, CompetencyStandardIdentifier);
+            var table = UploadRepository.SelectCompetencyUploads(Organization.Identifier, CompetencyStandardIdentifier);
 
             GroupWithDownloads.Visible = table.Rows.Count > 0;
 

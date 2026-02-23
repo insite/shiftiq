@@ -4,7 +4,7 @@ namespace Shift.Common
 {
     public class ValidationFailure
     {
-        public List<ValidationError> Errors { get; set; }
+        public List<Problem> Errors { get; set; }
 
         public bool IsFailed() => !IsPassed();
 
@@ -12,7 +12,7 @@ namespace Shift.Common
 
         public ValidationFailure()
         {
-            Errors = new List<ValidationError>();
+            Errors = new List<Problem>();
         }
 
         public ValidationFailure(string summary)
@@ -20,9 +20,9 @@ namespace Shift.Common
             AddError(summary);
         }
 
-        public void AddError(string summary, string description = null)
+        public void AddError(string detail)
         {
-            Errors.Add(new ValidationError { Summary = summary, Description = description });
+            Errors.Add(new Problem(422, detail));
         }
     }
 }

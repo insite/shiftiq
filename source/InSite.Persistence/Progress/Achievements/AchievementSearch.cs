@@ -20,6 +20,13 @@ namespace InSite.Persistence
     {
         internal InternalDbContext CreateContext() => new InternalDbContext(false);
 
+        private readonly IPartitionModel _partition;
+
+        public AchievementSearch(IPartitionModel partition)
+        {
+            _partition = partition;
+        }
+
         #region Achievements
 
         public List<ContactSummaryWithExpiryReportItem> GetContactSummaryWithExpiryReport(Guid userIdentifier, Guid organizationIdentifier)
@@ -276,13 +283,29 @@ namespace InSite.Persistence
                 .AsNoTracking()
                 .AsQueryable();
 
-            if (filter.OrganizationIdentifiers != null && filter.OrganizationIdentifiers.Any())
+            if (filter.OrganizationIdentifiers.IsNotEmpty())
                 query = query.Where(x => filter.OrganizationIdentifiers.Contains(x.OrganizationIdentifier));
+
+            if (filter.DepartmentIdentifiers.IsNotEmpty())
+            {
+                query = query.Where(x => db.TAchievementDepartments
+                                           .Where(d => filter.DepartmentIdentifiers.Contains(d.DepartmentIdentifier))
+                                           .Select(d => d.AchievementIdentifier)
+                                           .Contains(x.AchievementIdentifier));
+            }
+
+            if (filter.ProgramIdentifiers.IsNotEmpty())
+            {
+                query = query.Where(x => db.TTasks
+                                           .Where(t => t.ObjectType == "Achievement" && filter.ProgramIdentifiers.Contains(t.ProgramIdentifier))
+                                           .Select(d => d.ObjectIdentifier)
+                                           .Contains(x.AchievementIdentifier));
+            }
 
             if (filter.AchievementTitle.HasValue())
                 query = query.Where(x => x.AchievementTitle.Contains(filter.AchievementTitle));
 
-            if (filter.AchievementLabels != null && filter.AchievementLabels.Any())
+            if (filter.AchievementLabels.IsNotEmpty())
                 query = query.Where(x => filter.AchievementLabels.Contains(x.AchievementLabel));
 
             if (filter.AchievementDescription.HasValue())
@@ -305,6 +328,19 @@ namespace InSite.Persistence
 
             if (filter.ExpirationFixedDateBefore.HasValue)
                 query = query.Where(x => x.ExpirationFixedDate < filter.ExpirationFixedDateBefore.Value);
+
+            if (filter.HasMandatoryCredential == true)
+            {
+                query = query.Where(x => db.QCredentials
+                                           .Any(c => c.CredentialNecessity == "Mandatory"
+                                                  && c.AchievementIdentifier == x.AchievementIdentifier));
+            }
+            else if (filter.HasMandatoryCredential == false)
+            {
+                query = query.Where(x => db.QCredentials
+                                           .All(c => c.CredentialNecessity != "Mandatory"
+                                                  && c.AchievementIdentifier == x.AchievementIdentifier));
+            }
 
             return query;
         }
@@ -389,6 +425,61 @@ namespace InSite.Persistence
             }
         }
 
+        public List<VCredentialSearchResultsItem> GetCredentialSearchResults(VCredentialFilter filter)
+        {
+            using (var db = CreateContext())
+            {
+                var query = CreateQuery(filter, db);
+
+                if (filter.OrderBy.IsNotEmpty())
+                    query = query.OrderBy(filter.OrderBy);
+                else
+                    query = query
+                        .OrderBy(x => x.UserFullName)
+                        .ThenBy(x => x.AchievementTitle);
+
+                return query
+                    .Select(c => new
+                    {
+                        Entity = c,
+                        Departments = db.TAchievementDepartments
+                            .Where(ad => ad.AchievementIdentifier == c.AchievementIdentifier
+                                      && ad.Department.QMemberships
+                                           .Any(m => m.MembershipFunction == "Department"
+                                                  && m.UserIdentifier == c.UserIdentifier)
+                                  )
+                            .Select(y => y.Department.GroupName)
+                    })
+                    .ApplyPaging(filter)
+                    .AsEnumerable()
+                    .Select(x => new VCredentialSearchResultsItem
+                    {
+                        CredentialIdentifier = x.Entity.CredentialIdentifier,
+                        UserIdentifier = x.Entity.UserIdentifier,
+                        UserFullName = x.Entity.UserFullName,
+                        UserEmail = x.Entity.UserEmail,
+                        AchievementIdentifier = x.Entity.AchievementIdentifier,
+                        AchievementTitle = x.Entity.AchievementTitle,
+                        CredentialStatus = x.Entity.CredentialStatus,
+                        CredentialGranted = x.Entity.CredentialGranted,
+                        CredentialRevoked = x.Entity.CredentialRevoked,
+                        EmployerGroupIdentifier = x.Entity.OriginalEmployerGroupIdentifier ?? x.Entity.EmployerGroupIdentifier,
+                        EmployerGroupName = x.Entity.OriginalEmployerGroupName ?? x.Entity.EmployerGroupName,
+                        EmployerGroupStatus = x.Entity.OriginalEmployerGroupIdentifier.HasValue ? x.Entity.OriginalEmployerGroupStatus : x.Entity.EmployerGroupStatus,
+                        EmployerGroupRegion = x.Entity.OriginalEmployerGroupIdentifier.HasValue ? x.Entity.OriginalEmployerGroupRegion : x.Entity.EmployerGroupRegion,
+                        AchievementCertificateLayoutCode = x.Entity.AchievementCertificateLayoutCode,
+                        BadgeImageUrl = x.Entity.BadgeImageUrl,
+                        HasBadgeImage = x.Entity.HasBadgeImage,
+                        PersonCode = x.Entity.PersonCode,
+                        AchievementTag = x.Entity.AchievementLabel,
+                        CredentialExpirationExpected = x.Entity.CredentialExpirationExpected,
+                        CredentialExpired = x.Entity.CredentialExpired,
+                        Department = string.Join(", ", x.Departments).NullIfEmpty()
+                    })
+                    .ToList();
+            }
+        }
+
         public List<VCredential> GetRecentCredentials(VCredentialFilter filter, int count)
         {
             using (var db = CreateContext())
@@ -403,7 +494,7 @@ namespace InSite.Persistence
             }
         }
 
-        private static IQueryable<VCredential> CreateQuery(VCredentialFilter filter, InternalDbContext db)
+        private IQueryable<VCredential> CreateQuery(VCredentialFilter filter, InternalDbContext db)
         {
             var now = DateTimeOffset.UtcNow;
             var query = db.VCredentials.AsQueryable();
@@ -423,13 +514,11 @@ namespace InSite.Persistence
             {
                 var learners = db.Memberships
                     .Where(x => x.GroupIdentifier == filter.DepartmentIdentifier && x.MembershipType == "Department")
-                    .Select(x => x.UserIdentifier)
-                    .ToArray();
+                    .Select(x => x.UserIdentifier);
 
                 var achievements = db.TAchievementDepartments
                     .Where(x => x.DepartmentIdentifier == filter.DepartmentIdentifier.Value)
-                    .Select(x => x.AchievementIdentifier)
-                    .ToArray();
+                    .Select(x => x.AchievementIdentifier);
 
                 query = query.Where(credential =>
                     learners.Any(learner => learner == credential.UserIdentifier)
@@ -485,12 +574,8 @@ namespace InSite.Persistence
             {
                 var orgIds = new List<Guid> { filter.OrganizationIdentifier.Value };
 
-                var parentOrgId = db.QOrganizations
-                    .Where(x => x.OrganizationIdentifier == filter.OrganizationIdentifier.Value)
-                    .Select(x => x.ParentOrganizationIdentifier)
-                    .Single();
-                if (parentOrgId.HasValue)
-                    orgIds.Add(parentOrgId.Value);
+                if (filter.OrganizationIdentifier.Value != _partition.Identifier)
+                    orgIds.Add(_partition.Identifier);
 
                 query = query.Where(x => orgIds.Contains(x.OrganizationIdentifier));
             }
@@ -874,6 +959,18 @@ ORDER BY
             }
 
             return new QCredential[0];
+        }
+
+        public CredentialPendingNotificationInfo[] GetCredentialsPendingNotification(DateTime now)
+        {
+            const string query = "EXEC achievements.GetCredentialsPendingNotification @Now;";
+
+            using (var db = new InternalDbContext(false))
+            {
+                return db.Database
+                    .SqlQuery<CredentialPendingNotificationInfo>(query, new SqlParameter("@Now", now))
+                    .ToArray();
+            }
         }
 
         #endregion

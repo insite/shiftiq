@@ -4,11 +4,9 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IPeriodCriteria
+    public interface IPeriodCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-
-        Guid OrganizationId { get; set; }
 
         string Name { get; set; }
 

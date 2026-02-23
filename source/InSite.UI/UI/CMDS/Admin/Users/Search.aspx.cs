@@ -4,6 +4,7 @@ using InSite.Common.Web.UI;
 using InSite.Persistence.Plugin.CMDS;
 using InSite.UI.Layout.Admin;
 
+using Shift.Common;
 using Shift.Constant;
 using Shift.Contract;
 using Shift.Sdk.UI;
@@ -25,8 +26,8 @@ namespace InSite.Cmds.Admin.People.Forms
 
             var permissionName = PermissionNames.Custom_CMDS_Workers;
             var canAdd = Access.Create
-                || Identity.IsGranted(permissionName, PermissionOperation.Delete)
-                || Identity.IsGranted(permissionName, PermissionOperation.Configure);
+                || Identity.IsGranted(permissionName, DataAccess.Delete)
+                || Identity.IsGranted(permissionName, DataAccess.Configure);
 
             BreadcrumbItem addNewItem = null;
             if (canAdd)

@@ -74,7 +74,7 @@ namespace InSite.Custom.CMDS.Admin.Messages
 
                     var contacts = PersonCriteria.Bind(x => new { x.User.Email, x.UserIdentifier }, new PersonFilter
                     {
-                        OrganizationOrParentIdentifier = OrganizationIdentifiers.CMDS,
+                        OrganizationIdentifier = ServiceLocator.Partition.IsE03() ? (Guid?)null : Guid.Empty,
                         IsCmds = true,
                         EmailEnabled = true,
                         IsApproved = true

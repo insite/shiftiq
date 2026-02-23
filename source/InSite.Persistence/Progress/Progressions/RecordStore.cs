@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Contents.Read;
 using InSite.Application.Records.Read;
 using InSite.Domain.Records;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Persistence
 {
@@ -74,6 +73,7 @@ namespace InSite.Persistence
 DELETE FROM records.QGradebookCompetencyValidation WHERE GradebookIdentifier = @GradebookIdentifier;
 DELETE FROM records.QProgress WHERE GradebookIdentifier = @GradebookIdentifier;
 DELETE FROM records.QEnrollment WHERE GradebookIdentifier = @GradebookIdentifier;
+DELETE FROM records.QGroupEnrollment WHERE GradebookIdentifier = @GradebookIdentifier;
 
 DELETE FROM records.QGradebook WHERE GradebookIdentifier = @GradebookIdentifier;
 DELETE FROM records.QGradeItem WHERE GradebookIdentifier = @GradebookIdentifier;
@@ -196,6 +196,33 @@ DELETE FROM records.QGradeItemCompetency WHERE GradebookIdentifier = @GradebookI
                     db.QGradebookEvents.Remove(remove);
 
                 x.EventIdentifier = c.NewPrimaryEvent;
+            });
+        }
+
+        public void UpdateRecord(GradebookGroupEnrollmentAdded c)
+        {
+            Update(c, (x, db) =>
+            {
+                db.QGroupEnrollments.Add(new QGroupEnrollment
+                {
+                    GradebookIdentifier = x.GradebookIdentifier,
+                    GroupEnrollmentIdentifier = c.Enrollment,
+                    GroupIdentifier = c.Group,
+                    EnrollmentStarted = c.ChangeTime,
+                    OrganizationIdentifier = x.OrganizationIdentifier
+                });
+            });
+        }
+
+        public void UpdateRecord(GradebookGroupEnrollmentRemoved c)
+        {
+            Update(c, (x, db) =>
+            {
+                var entity = db.QGroupEnrollments.FirstOrDefault(y => y.GradebookIdentifier == x.GradebookIdentifier && y.GroupEnrollmentIdentifier == c.Enrollment);
+                if (entity == null)
+                    return;
+
+                db.QGroupEnrollments.Remove(entity);
             });
         }
 

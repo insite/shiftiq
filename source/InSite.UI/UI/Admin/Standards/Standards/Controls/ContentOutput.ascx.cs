@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
 
 using InSite.Common.Web.UI;
@@ -19,11 +20,13 @@ namespace InSite.Admin.Standards.Standards.Controls
 
             if (item != null)
             {
-                str = item.Html;
+                var languages = Organization.Languages.Select(x => x.TwoLetterISOLanguageName).ToArray();
+
+                str = item.Html?.Clone(languages);
                 isHtml = str != null && !str.IsEmpty;
 
                 if (!isHtml)
-                    str = item.Text;
+                    str = item.Text?.Clone(languages);
 
                 if (str == null)
                     str = new MultilingualString();

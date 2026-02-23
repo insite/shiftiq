@@ -38,7 +38,7 @@ namespace InSite.Web.Integration
         /// <summary>
         /// Generates an authenticated URL to Scoop for the given user
         /// </summary>
-        public string GenerateAuthenticatedUrl(ISecurityFramework user, string domain, string targetPath, string exitUrl)
+        public string GenerateAuthenticatedUrl(ISecurityFramework user, string domain, string targetPath, string progressUrl, string exitUrl)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -46,7 +46,7 @@ namespace InSite.Web.Integration
             if (string.IsNullOrEmpty(domain))
                 throw new ArgumentNullException(nameof(domain));
 
-            var token = CreateRelayToken(user, domain, targetPath, exitUrl);
+            var token = CreateRelayToken(user, domain, targetPath, progressUrl, exitUrl);
 
             var encodedToken = token.Encode(_relayTokenSecret);
 
@@ -73,38 +73,38 @@ namespace InSite.Web.Integration
         /// <summary>
         /// Generates a URL to launch a specific course
         /// </summary>
-        public string GenerateCourseUrl(ISecurityFramework user, string domain, string accountSlug, string courseSlug, string exitUrl)
+        public string GenerateCourseUrl(ISecurityFramework user, string domain, string accountSlug, string courseSlug, string progressUrl, string exitUrl)
         {
             var targetPath = $"/{accountSlug}/{courseSlug}";
 
-            return GenerateAuthenticatedUrl(user, domain, targetPath, exitUrl);
+            return GenerateAuthenticatedUrl(user, domain, targetPath, progressUrl, exitUrl);
         }
 
         /// <summary>
         /// Generates a URL to the course library
         /// </summary>
-        public string GenerateLibraryUrl(ISecurityFramework user, string domain, string accountSlug, string exitUrl)
+        public string GenerateLibraryUrl(ISecurityFramework user, string domain, string accountSlug, string progressUrl, string exitUrl)
         {
             var path = $"admin/library";
 
             return _relayTokenEnabled
-                ? GenerateAuthenticatedUrl(user, domain, path, exitUrl)
+                ? GenerateAuthenticatedUrl(user, domain, path, progressUrl, exitUrl)
                 : GenerateUnauthenticatedUrl(path);
         }
 
         /// <summary>
         /// Generates an authenticated URL to the admin dashboard
         /// </summary>
-        public string GenerateDashboardUrl(ISecurityFramework user, string domain, string accountSlug, string exitUrl)
+        public string GenerateDashboardUrl(ISecurityFramework user, string domain, string accountSlug, string progressUrl, string exitUrl)
         {
             var path = $"admin/dashboard";
 
             return _relayTokenEnabled
-                ? GenerateAuthenticatedUrl(user, domain, path, exitUrl)
+                ? GenerateAuthenticatedUrl(user, domain, path, progressUrl, exitUrl)
                 : GenerateUnauthenticatedUrl(path);
         }
 
-        private RelayToken CreateRelayToken(ISecurityFramework user, string domain, string targetPath, string exitUrl)
+        private RelayToken CreateRelayToken(ISecurityFramework user, string domain, string targetPath, string progressUrl, string exitUrl)
         {
             var now = DateTimeOffset.UtcNow;
 
@@ -121,6 +121,7 @@ namespace InSite.Web.Integration
                 OrganizationId = user.OrganizationId,
                 Roles = GetUserRoles(user),
                 TargetUrl = targetPath,
+                ProgressUrl = progressUrl,
                 ExitUrl = exitUrl
             };
         }

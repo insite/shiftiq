@@ -7,6 +7,7 @@ using InSite.Persistence.Plugin.CMDS;
 using InSite.UI.CMDS.Common.Controls.User;
 using InSite.UI.Layout.Admin;
 
+using Shift.Common;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -32,10 +33,10 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Group
             PageHelper.AutoBindHeader(this);
 
             var permissionName = PermissionNames.Custom_CMDS_Workers;
-            var hasPermissions = Identity.IsGranted(permissionName, PermissionOperation.Delete) ||
-                Identity.IsGranted(permissionName, PermissionOperation.Configure) ||
-                Identity.IsGranted(permissionName, PermissionOperation.Read) ||
-                Identity.IsGranted(permissionName, PermissionOperation.Write);
+            var hasPermissions = Identity.IsGranted(permissionName, DataAccess.Delete) ||
+                Identity.IsGranted(permissionName, DataAccess.Configure) ||
+                Identity.IsGranted(permissionName, DataAccess.Read) ||
+                Identity.IsGranted(permissionName, DataAccess.Update);
 
             ReportSection.Visible = hasPermissions;
 
@@ -51,7 +52,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Group
         private void ManagersRepeater_DataBinding(object sender, EventArgs e)
         {
             ManagersRepeater.DataSource =
-                ContactRepository3.SelectManagersForGroupCompetencySummaryViewer(CurrentIdentityFactory.ActiveOrganizationIdentifier);
+                ContactRepository3.SelectManagersForGroupCompetencySummaryViewer(Organization.Identifier);
         }
 
         private void ManagersRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
@@ -64,7 +65,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Group
             var relatedEmployees = (Repeater)e.Item.FindControl("RelatedEmployees");
             relatedEmployees.ItemDataBound += RelatedEmployees_ItemDataBound1;
             relatedEmployees.DataSource =
-                ContactRepository3.SelectManagerWorkersForGroupCompetencySummaryViewer((Guid)data["UserIdentifier"], CurrentIdentityFactory.ActiveOrganizationIdentifier);
+                ContactRepository3.SelectManagerWorkersForGroupCompetencySummaryViewer((Guid)data["UserIdentifier"], Organization.Identifier);
             relatedEmployees.DataBind();
 
             e.Item.Visible = relatedEmployees.Items.Count > 0;
@@ -85,7 +86,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Group
                 : string.Format("{0} Workers", workersCount);
 
             var groupCompetencySummary = (CompetencySummary)e.Item.FindControl("GroupCompetencySummary");
-            groupCompetencySummary.LoadData((Guid)row["UserIdentifier"], CurrentIdentityFactory.ActiveOrganizationIdentifier, CompetencySummaryType.ManagerGroup);
+            groupCompetencySummary.LoadData((Guid)row["UserIdentifier"], Organization.Identifier, CompetencySummaryType.ManagerGroup);
         }
     }
 }

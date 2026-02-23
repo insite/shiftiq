@@ -6,13 +6,13 @@ namespace Shift.Contract
 {
     public class CountSubmissions : Query<int>, ISubmissionCriteria
     {
-        public Guid? GroupIdentifier { get; set; }
-        public Guid? LastAnsweredQuestionIdentifier { get; set; }
+        public Guid? GroupId { get; set; }
+        public Guid? LastAnsweredQuestionId { get; set; }
         public Guid? LastChangeUser { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? PeriodIdentifier { get; set; }
-        public Guid? RespondentUserIdentifier { get; set; }
-        public Guid? SurveyFormIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? PeriodId { get; set; }
+        public Guid? RespondentUserId { get; set; }
+        public Guid? SurveyFormId { get; set; }
 
         public bool? ResponseIsLocked { get; set; }
 

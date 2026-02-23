@@ -81,7 +81,7 @@ namespace InSite.UI.Individual
 
             var tiles = routes
                 .Where(tile =>
-                    identity.IsActionAuthorized(tile.Url) &&
+                    identity.IsGranted(tile.Url) &&
                     (tile.Url != "cmds/user/modules/search" || isE03))
                 .ToList();
 

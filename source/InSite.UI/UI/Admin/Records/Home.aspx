@@ -65,7 +65,6 @@
                     <div class="col-lg-12">
                         <a class="me-3" href="#recent-changes"><i class="fas fa-history me-1"></i>Recent Changes</a>
                         <a class="me-3" href="/ui/admin/records/reports/learner-activity" runat="server" id="A4"><i class="fas fa-file-chart-line me-1"></i>Learner Activity Report</a>
-                        <a class="me-3" href="/ui/admin/records/reports/engagement-prompt" runat="server" id="A3"><i class="fas fa-paper-plane me-1"></i>Engagement Prompts</a>
                         <a class="me-3" href="/ui/admin/records/reports/learning-mastery" runat="server" id="LearningMastery"><i class="fas fa-ruler-triangle me-1"></i>Learning Mastery</a>
                         <a class="me-3" href="/ui/admin/records/reports/academic-year" runat="server" id="AcademicYear"><i class="fas fa-ruler-triangle me-1"></i>Academic Year</a>
                     </div>

@@ -454,14 +454,21 @@ namespace InSite.Persistence
             if (filter.JournalIdentifier.HasValue)
                 query = query.Where(x => x.JournalIdentifier == filter.JournalIdentifier);
 
+            if (filter.UserDepratmentIdentifier.HasValue)
+            {
+                query = query.Where(
+                    x => db.QMemberships.Any(
+                        m => m.GroupIdentifier == filter.UserDepratmentIdentifier.Value
+                          && m.UserIdentifier == x.Journal.UserIdentifier
+                          && m.MembershipFunction == "Department"
+                ));
+            }
+
             if (filter.UserIdentifier.HasValue)
                 query = query.Where(x => x.Journal.UserIdentifier == filter.UserIdentifier);
 
             if (filter.CompetencyStandardIdentifier.HasValue)
                 query = query.Where(x => x.Competencies.Any(y => y.CompetencyStandardIdentifier == filter.CompetencyStandardIdentifier));
-
-            if (filter.TrainingType.HasValue())
-                query = query.Where(x => x.TrainingType == filter.TrainingType);
 
             if (filter.ValidatorUserIdentifier.HasValue)
             {
@@ -480,6 +487,27 @@ namespace InSite.Persistence
                 query = filter.IsValidated.Value
                     ? query.Where(x => x.ExperienceValidated != null)
                     : query.Where(x => x.ExperienceValidated == null);
+            }
+
+            if (filter.TrainingTypeExact.IsNotEmpty())
+                query = query.Where(x => x.TrainingType == filter.TrainingTypeExact);
+
+            if (filter.EmployerContains.IsNotEmpty())
+                query = query.Where(x => x.Employer.Contains(filter.EmployerContains));
+
+            if (filter.SupervisorContains.IsNotEmpty())
+                query = query.Where(x => x.Supervisor.Contains(filter.SupervisorContains));
+
+            if (filter.StartDateExact.HasValue)
+                query = query.Where(x => x.ExperienceStarted == filter.StartDateExact.Value);
+
+            if (filter.EndDateExact.HasValue)
+                query = query.Where(x => x.ExperienceStopped == filter.EndDateExact.Value);
+
+            if (filter.HoursExact.HasValue)
+            {
+                var value = filter.HoursExact.Value;
+                query = query.Where(x => x.ExperienceHours >= value && x.ExperienceHours < value + 1);
             }
 
             return query;

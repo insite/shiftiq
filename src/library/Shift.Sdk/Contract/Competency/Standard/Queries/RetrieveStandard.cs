@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveStandard : Query<StandardModel>
     {
-        public Guid StandardIdentifier { get; set; }
+        public Guid StandardId { get; set; }
     }
 }

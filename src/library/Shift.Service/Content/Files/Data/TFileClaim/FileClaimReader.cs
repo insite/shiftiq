@@ -12,23 +12,20 @@ public class FileClaimReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "ClaimIdentifier";
 
-    public FileClaimReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public FileClaimReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid claim, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid claim, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.ClaimIdentifier == claim, cancellation);
+            return query.AnyAsync(x => x.ClaimIdentifier == claim && (organization == null || organization == x.File.OrganizationIdentifier), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,8 @@ public class FileClaimReader : IEntityReader
     /// </remarks>
     private IQueryable<FileClaimEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.TFileClaim
-            .AsNoTracking()
-            .Where(x => x.File.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -122,6 +116,9 @@ public class FileClaimReader : IEntityReader
         var query = BuildQueryable(db);
 
         // TODO: Apply criteria
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.File.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         return query;
     }
@@ -138,17 +135,11 @@ public class FileClaimReader : IEntityReader
         var matches = await queryable
             .Select(entity => new FileClaimMatch
             {
-                ClaimIdentifier = entity.ClaimIdentifier
+                ClaimId = entity.ClaimIdentifier
 
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

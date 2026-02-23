@@ -1,31 +1,27 @@
 ﻿namespace Shift.Api;
 
+/// <remarks>
+/// Eager loading ensures the app absorbs the initialization cost during startup. No user is penalized, and we'll find 
+/// out immediately if loading fails - rather than on the first request to the permission cache.
+/// </remarks>
 public class AuthorizationServiceInitializer : IHostedService
 {
-    private readonly PermissionMatrixLoader _permissiongMatrixLoader;
-    private readonly PermissionMatrixProvider _permissionMatrixProvider;
+    private readonly PermissionCache _cache;
 
-    public AuthorizationServiceInitializer(
-        PermissionMatrixLoader permissionMatrixLoader,
-        PermissionMatrixProvider permissionMatrixProvider,
-        ILogger<AuthorizationServiceInitializer> logger)
+    public AuthorizationServiceInitializer(PermissionCache cache)
     {
-        _permissiongMatrixLoader = permissionMatrixLoader;
-        _permissionMatrixProvider = permissionMatrixProvider;
+        _cache = cache;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        var matrix = new PermissionMatrix();
+        _cache.Refresh(null);
 
-        await _permissiongMatrixLoader.LoadAsync(matrix, cancellationToken);
-
-        // TODO: Add resources from the permission matrix. Resources = Authorization Requirement policies!
-        // foreach (var requirement in _authorizationRequirements)
-        //    matrix.AddResource(requirement.Policy);
-
-        _permissionMatrixProvider.SetMatrix(matrix);
+        return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }

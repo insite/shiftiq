@@ -13,7 +13,8 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         public string Language => CookieTokenModule.Current.Language;
 
         public Guid FormIdentifier { get; set; } = Guid.Empty;
-        public Guid UserIdentifier { get; set; } = Shift.Constant.UserIdentifiers.Someone;
+        public Guid RespondentUserIdentifier { get; set; } = Shift.Constant.UserIdentifiers.Someone;
+        public Guid AssessorUserIdentifier { get; set; } = Shift.Constant.UserIdentifiers.Someone;
         public Guid SessionIdentifier { get; set; } = Guid.Empty;
 
         public int PageNumber { get; set; }
@@ -33,6 +34,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         public ISurveyResponse[] Sessions { get; set; }
         public ISecurityFramework Identity => CurrentSessionState.Identity;
         public Persistence.User Respondent { get; set; }
+        public Persistence.User Assessor { get; set; }
 
         public int GetResponseNumber(Guid response)
         {

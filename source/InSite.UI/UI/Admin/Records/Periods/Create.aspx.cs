@@ -25,7 +25,7 @@ namespace InSite.Admin.Records.Periods
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/admin/records/periods/search");
 
             if (!IsPostBack)

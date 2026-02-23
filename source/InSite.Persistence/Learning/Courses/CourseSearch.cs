@@ -250,7 +250,7 @@ namespace InSite.Persistence
             string GetTriggerDescription(string type, Guid id)
             {
                 if (!Enum.TryParse<TriggerType>(type, true, out var triggerType))
-                    throw new ApplicationError($"Unknown trigger type: ${type}");
+                    throw new ArgumentException($"Unknown trigger type: ${type}");
 
                 if (triggerType == TriggerType.Activity)
                 {
@@ -655,6 +655,7 @@ namespace InSite.Persistence
             course.Catalog = item.CatalogIdentifier;
             course.IsHidden = item.CourseIsHidden;
             course.IsProgressReportEnabled = item.IsProgressReportEnabled;
+            course.IsDisplayOverviewOnly = item.IsDisplayOverviewOnly;
             course.OutlineWidth = item.OutlineWidth;
             course.CompletionActivityIdentifier = item.CompletionActivityIdentifier;
 
@@ -1068,6 +1069,7 @@ namespace InSite.Persistence
             public string AchievementLabel { get; set; }
             public string AchievementTitle { get; set; }
             public string CourseUrl { get; set; }
+            public string EnrollmentType { get; set; }
 
             public DateTimeOffset? EnrollmentStarted { get; set; }
             public DateTimeOffset? EnrollmentCompleted { get; set; }

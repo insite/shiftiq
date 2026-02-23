@@ -7,6 +7,8 @@ namespace Shift.Common
 {
     public class Application
     {
+        public string Partition { get; set; }
+
         public string AbsoluteUrl { get; set; }
         public string EmailDomain { get; set; }
         public string EmailOutbox { get; set; }
@@ -16,7 +18,6 @@ namespace Shift.Common
 
         public bool EmailOutboxDisabled => string.Compare(EmailOutbox, "Disabled", true) == 0;
         public bool EmailOutboxFiltered => string.Compare(EmailOutbox, "Filtered", true) == 0;
-        public bool LoadPartitionSpecificSettings { get; set; }
         public bool ResourceBundleEnabled => ResourceBundle != "Disabled";
         public bool ResourceLinkDebug => ResourceLink == "Debug";
         public bool UseStrictModeForEmailEnabled { get; set; }
@@ -27,7 +28,6 @@ namespace Shift.Common
         public string DataPath { get; set; }
         public string ToolPath { get; set; }
         public string StylePath { get; set; }
-        public string DefaultAvatarImageUrl { get; set; }
         public string SecurityConfigurationPath { get; set; }
 
         public string FFmpegFolderPath => Path.Combine(ToolPath, "ffmpeg");

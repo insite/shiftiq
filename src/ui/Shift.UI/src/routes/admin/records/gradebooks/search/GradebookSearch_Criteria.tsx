@@ -57,7 +57,7 @@ export default function GradebookSearch_Criteria() {
                     />
                     <PeriodFinder
                         control={control}
-                        name="periodIdentifier"
+                        name="periodId"
                         placeholder="Gradebook Period"
                         className="mb-2"
                         disabled={isLoading}
@@ -65,7 +65,7 @@ export default function GradebookSearch_Criteria() {
                 </div>
                 <div className="col-4">
                     <AchievementFinder
-                        name="achievementIdentifier"
+                        name="achievementId"
                         control={control}
                         disabled={isLoading}
                         placeholder={translate("Achievement")}
@@ -73,7 +73,7 @@ export default function GradebookSearch_Criteria() {
                     />
                     <FrameworkFinder
                         control={control}
-                        name="frameworkIdentifier"
+                        name="frameworkId"
                         placeholder="Framework"
                         className="mb-2"
                         disabled={isLoading}
@@ -114,7 +114,7 @@ export default function GradebookSearch_Criteria() {
                     />
                     <InstructorFinder
                         control={control}
-                        name="classInstructorIdentifier"
+                        name="classInstructorId"
                         disabled={isLoading}
                         placeholder={translate("Class Instructor")}
                         className="mb-2"

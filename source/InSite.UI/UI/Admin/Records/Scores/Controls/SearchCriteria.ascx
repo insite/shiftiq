@@ -124,6 +124,10 @@
                     <div class="mb-2">
                         <insite:ComboBox runat="server" ID="EventInstructorIdentifier" EmptyMessage="Class Instructor" Height="300" />
                     </div>
+
+                    <div class="mb-2">
+                        <insite:FindDepartment runat="server" ID="DepartmentIdentifier" EmptyMessage="Department"  />
+                    </div>
                 </div>
             </div> 
         </div>

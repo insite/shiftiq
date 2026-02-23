@@ -1,7 +1,7 @@
 using System;
 using System.Web;
-using System.Web.UI;
 
+using InSite.Common.Web.UI;
 using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
@@ -9,7 +9,7 @@ using Shift.Constant;
 
 namespace InSite.Cmds.Controls.User
 {
-    public partial class TrainingSummary : UserControl
+    public partial class TrainingSummary : BaseUserControl
     {
         public void LoadData(Guid user, Guid organization)
         {
@@ -25,7 +25,7 @@ namespace InSite.Cmds.Controls.User
 
         private void LoadModules(Guid user)
         {
-            VCmdsCredentialSearch.CountCompletedByScore(user, CurrentIdentityFactory.ActiveOrganizationIdentifier, AchievementTypes.Module, out var completedAchievements, out var totalAchievements);
+            VCmdsCredentialSearch.CountCompletedByScore(user, Organization.Identifier, AchievementTypes.Module, out var completedAchievements, out var totalAchievements);
             var score = CalculateScore(completedAchievements, totalAchievements);
             ModuleProgress.Text = string.Format("{0:n1}%", score);
             ModuleLink.Text = string.Format("{0} out of {1} completed", completedAchievements, totalAchievements);

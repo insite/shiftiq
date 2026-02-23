@@ -54,37 +54,50 @@ namespace InSite.Persistence
 
                 return query
                     .ApplyPaging(filter)
+                    .Select(x => new
+                    {
+                        Issue = x,
+                        TopicUserDepartments = db.QMemberships
+                            .Where(
+                                m => m.UserIdentifier == x.TopicUserIdentifier
+                                  && m.MembershipFunction == "Department"
+                                  && m.Group.GroupType == "Department"
+                                  && m.Group.OrganizationIdentifier == filter.OrganizationIdentifier)
+                            .Select(m => m.Group.GroupName)
+                    })
+                    .AsEnumerable()
                     .Select(x => new ExportCase
                     {
-                        IssueClosedBy = x.IssueClosedBy,
-                        IssueIdentifier = x.IssueIdentifier,
-                        IssueOpenedBy = x.IssueOpenedBy,
-                        TopicUserIdentifier = x.TopicUserIdentifier,
-                        AdministratorUserName = x.AdministratorUserName,
-                        IssueDescription = x.IssueDescription,
-                        IssueEmployerGroupName = x.IssueEmployerGroupName,
-                        IssueEmployerGroupParentGroupName = x.IssueEmployerGroupParentGroupName,
-                        IssueSource = x.IssueSource,
-                        IssueStatusCategory = x.IssueStatusCategory,
-                        IssueStatusName = x.IssueStatusName,
-                        IssueTitle = x.IssueTitle,
-                        IssueType = x.IssueType,
-                        LawyerUserName = x.LawyerUserName,
-                        OwnerUserEmail = x.OwnerUserEmail,
-                        OwnerUserName = x.OwnerUserName,
-                        TopicAccountStatus = x.TopicAccountStatus,
-                        TopicEmployerGroupName = x.TopicEmployerGroupName,
-                        TopicUserName = x.TopicUserName,
-                        TopicUserEmail = x.TopicUserEmail,
-                        IssueNumber = x.IssueNumber,
-                        IssueStatusSequence = x.IssueStatusSequence,
-                        IssueClosed = x.IssueClosed,
-                        IssueOpened = x.IssueOpened,
-                        IssueReported = x.IssueReported,
-                        LastChangeTime = x.LastChangeTime,
-                        LastChangeType = x.LastChangeType,
-                        LastChangeUser = x.LastChangeUser,
-                        LastChangeUserName = x.LastChangeUserName,
+                        IssueClosedBy = x.Issue.IssueClosedBy,
+                        IssueIdentifier = x.Issue.IssueIdentifier,
+                        IssueOpenedBy = x.Issue.IssueOpenedBy,
+                        TopicUserIdentifier = x.Issue.TopicUserIdentifier,
+                        TopicUserDepartment = string.Join(", ", x.TopicUserDepartments),
+                        AdministratorUserName = x.Issue.AdministratorUserName,
+                        IssueDescription = x.Issue.IssueDescription,
+                        IssueEmployerGroupName = x.Issue.IssueEmployerGroupName,
+                        IssueEmployerGroupParentGroupName = x.Issue.IssueEmployerGroupParentGroupName,
+                        IssueSource = x.Issue.IssueSource,
+                        IssueStatusCategory = x.Issue.IssueStatusCategory,
+                        IssueStatusName = x.Issue.IssueStatusName,
+                        IssueTitle = x.Issue.IssueTitle,
+                        IssueType = x.Issue.IssueType,
+                        LawyerUserName = x.Issue.LawyerUserName,
+                        OwnerUserEmail = x.Issue.OwnerUserEmail,
+                        OwnerUserName = x.Issue.OwnerUserName,
+                        TopicAccountStatus = x.Issue.TopicAccountStatus,
+                        TopicEmployerGroupName = x.Issue.TopicEmployerGroupName,
+                        TopicUserName = x.Issue.TopicUserName,
+                        TopicUserEmail = x.Issue.TopicUserEmail,
+                        IssueNumber = x.Issue.IssueNumber,
+                        IssueStatusSequence = x.Issue.IssueStatusSequence,
+                        IssueClosed = x.Issue.IssueClosed,
+                        IssueOpened = x.Issue.IssueOpened,
+                        IssueReported = x.Issue.IssueReported,
+                        LastChangeTime = x.Issue.LastChangeTime,
+                        LastChangeType = x.Issue.LastChangeType,
+                        LastChangeUser = x.Issue.LastChangeUser,
+                        LastChangeUserName = x.Issue.LastChangeUserName,
                     })
                     .ToList();
             }
@@ -202,12 +215,6 @@ namespace InSite.Persistence
             var commentQuery = db.VComments.AsQueryable();
             var hasCommentFilter = false;
 
-            if (filter.IssueCommentsDescription.IsNotEmpty())
-            {
-                commentQuery = commentQuery.Where(comment => comment.CommentText.Contains(filter.IssueCommentsDescription));
-                hasCommentFilter = true;
-            }
-
             if (filter.IssueCommentAssigneeIdentifier.HasValue)
             {
                 commentQuery = commentQuery.Where(comment => comment.CommentAssignedToUserIdentifier == filter.IssueCommentAssigneeIdentifier);
@@ -235,6 +242,12 @@ namespace InSite.Persistence
             if (filter.IssueCommentTag.IsNotEmpty())
             {
                 commentQuery = commentQuery.Where(comment => comment.CommentTag == filter.IssueCommentTag);
+                hasCommentFilter = true;
+            }
+
+            if (filter.IssueCommentText.IsNotEmpty())
+            {
+                commentQuery = commentQuery.Where(comment => comment.CommentText.Contains(filter.IssueCommentText));
                 hasCommentFilter = true;
             }
 
@@ -295,6 +308,15 @@ namespace InSite.Persistence
 
             if (filter.AssigneeOrganization.IsNotEmpty())
                 query = query.Where(x => x.TopicGroupNames.Contains(filter.AssigneeOrganization));
+
+            if (filter.TopicDepartmentIdentifier.HasValue)
+            {
+                query = query.Where(
+                    x => db.QMemberships.Any(
+                        m => m.UserIdentifier == x.TopicUserIdentifier
+                          && m.GroupIdentifier == filter.TopicDepartmentIdentifier.Value
+                          && m.MembershipFunction == "Department"));
+            }
 
             query = ApplyFileRequirementFilter(filter, db, query);
             query = ApplyAttachmentFilter(filter, db, query);
@@ -703,6 +725,18 @@ namespace InSite.Persistence
                     .Where(x => x.OrganizationIdentifier == organization && x.CaseType == caseType && x.StatusCategory == statusCategory)
                     .OrderBy(x => x.StatusSequence).ThenBy(x => x.StatusName)
                     .ToList();
+            }
+        }
+
+        public Guid? GetStatusId(Guid organization, string caseType, string statusName)
+        {
+            using (var db = CreateContext())
+            {
+                return db.TCaseStatuses
+                    .Where(x => x.OrganizationIdentifier == organization && x.CaseType == caseType && x.StatusName == statusName)
+                    .OrderBy(x => x.StatusSequence).ThenBy(x => x.StatusName)
+                    .Select(x => (Guid?)x.StatusIdentifier)
+                    .FirstOrDefault();
             }
         }
 

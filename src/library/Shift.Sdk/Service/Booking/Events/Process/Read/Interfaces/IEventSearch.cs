@@ -27,6 +27,7 @@ namespace InSite.Application.Events.Read
         List<QEvent> GetEvents(IEnumerable<Guid> eventId, params Expression<Func<QEvent, object>>[] includes);
         List<QEvent> GetEvents(QEventFilter filter, params Expression<Func<QEvent, object>>[] includes);
         List<QEvent> GetRecentEvents(QEventFilter filter, int? take = null);
+        List<QEvent> GetExamEventsToValidateAndPublish(DateTimeOffset now, int onlineEventWindowHours, int paperEventWindowMonths, params Expression<Func<QEvent, object>>[] includes);
 
         ScheduleProblem GetScheduleProblem(Guid @event, Guid candidate, Guid? form);
 

@@ -240,6 +240,15 @@ namespace InSite.Admin.Records.Scores.Controls
         protected global::InSite.Common.Web.UI.ComboBox EventInstructorIdentifier;
 
         /// <summary>
+        /// DepartmentIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindDepartment DepartmentIdentifier;
+
+        /// <summary>
         /// ShowColumns control.
         /// </summary>
         /// <remarks>

@@ -6,6 +6,7 @@
             "As a validator, I have personally tested the candidate with respect to the knowledge and the candidate demonstrated the skills components of this competency.",
             "As a validator, I have personally tested the candidate with respect to the knowledge and the candidate simulated the skills components of this competency.",
             "This candidate has adequate experience in this area and has been successfully completing this task.",
+            "This individual holds a leadership role and is being validated on this competency to enable the validation of their direct reports, with Subject Matter Expert support as required.",
             "The candidate has previously been validated and is continuously using the competency.",
             "I agree that this competency is not applicable for this person.",
             "As a validator I have tested this person on their knowledge of this competency and another person (validated in this competency) has seen them perform this competency -- _______ (name)",

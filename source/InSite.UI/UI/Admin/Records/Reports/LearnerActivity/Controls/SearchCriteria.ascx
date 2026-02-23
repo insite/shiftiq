@@ -37,13 +37,6 @@
                         <insite:ItemIdMultiComboBox runat="server" ID="MembershipStatusItemIdentifiers" EmptyMessage="Membership Status" DropDown-Size="10" Multiple-ActionsBox="true" />
                     </div>
 
-                    <div runat="server" id="CountStrategyContainer" class="mb-2">
-                        <asp:RadioButtonList runat="server" ID="CountStrategy" RepeatDirection="Vertical" RepeatLayout="Flow" CssClass="radio-count-strategy">
-                            <asp:ListItem Text="Summary by Learner" Value="Summary" Selected="True" />
-                            <asp:ListItem Text="Detail by Learner and Gradebook (Course)" Value="Detail" />
-                        </asp:RadioButtonList>
-                    </div>
-
                     <div class="mt-3">
                         <insite:FilterButton ID="SearchButton" runat="server" />
                         <insite:ClearButton ID="ClearButton" runat="server" />
@@ -58,22 +51,11 @@
                     </div>
 
                     <div class="mb-2">
-                        <insite:FindProgram runat="server" ID="ProgramIdentifiers" EmptyMessage="Program Names" MaxSelectionCount="0" />
+                        <insite:MultiComboBox runat="server" ID="ProgramIdentifiers" EmptyMessage="Programs" DropDown-Size="10" Multiple-ActionsBox="true" />
                     </div>
 
                     <div class="mb-2">
-                        <insite:MultiComboBox runat="server" ID="GradebookNames" EmptyMessage="Gradebook Names" DropDown-Size="10" Multiple-ActionsBox="true" />
-                    </div>
-
-                    <div class="mb-2">
-                        <insite:ComboBox runat="server" ID="EnrollmentStatus" EmptyMessage="Enrollment Status">
-                            <Items>
-                                <insite:ComboBoxOption />
-                                <insite:ComboBoxOption Value="1. Registered" Text="1. Registered" />
-                                <insite:ComboBoxOption Value="2. Started" Text="2. Started" />
-                                <insite:ComboBoxOption Value="3. Completed" Text="3. Completed" />
-                            </Items>
-                        </insite:ComboBox>
+                        <insite:MultiComboBox runat="server" ID="GradebookIdentifiers" EmptyMessage="Gradebooks" DropDown-Size="10" Multiple-ActionsBox="true" />
                     </div>
 
                     <div class="mb-2">
@@ -89,32 +71,11 @@
                 <div class="col-4">
 
                     <div class="mb-2">
-                        <insite:ComboBox runat="server" ID="AchievementStatus" EmptyMessage="Achievement Status">
-                            <Items>
-                                <insite:ComboBoxOption />
-                                <insite:ComboBoxOption Value="Not Granted" Text="Achievement Not Granted" />
-                                <insite:ComboBoxOption Value="Granted" Text="Achievement Granted" />
-                            </Items>
-                        </insite:ComboBox>
-                    </div>
-
-                    <div class="mb-2">
                         <insite:DateTimeOffsetSelector ID="AchievementGrantedSince" runat="server" EmptyMessage="Achievement Granted &ge;" />
                     </div>
 
                     <div class="mb-2">
                         <insite:DateTimeOffsetSelector ID="AchievementGrantedBefore" runat="server" EmptyMessage="Achievement Granted &lt;" />
-                    </div>
-
-                    <div class="mb-2">
-                        <insite:ComboBox runat="server" ID="EngagementStatus" EmptyMessage="Engagement Status">
-                            <Items>
-                                <insite:ComboBoxOption />
-                                <insite:ComboBoxOption Value="NoActivity" Text="Never Signed In" />
-                                <insite:ComboBoxOption Value="LastActivityOverOneWeekAgo" Text="Last Authenticated Over 1 Week Ago" />
-                                <insite:ComboBoxOption Value="LastActivityOverOneMonthAgo" Text="Last Authenticated Over 1 Month Ago" />
-                            </Items>
-                        </insite:ComboBox>
                     </div>
 
                     <div class="mb-2">

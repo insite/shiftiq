@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class StandardController : ShiftControllerBase
 {
     private readonly StandardService _standardService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public StandardController(StandardService standardService)
+    public StandardController(StandardService standardService, IPrincipalProvider principalProvider)
     {
         _standardService = standardService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class StandardController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific standard
     /// </summary>
-    [HttpHead("competency/standards/{standard:guid}")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Assert)]
+    [HttpHead("api/competency/standards/{standard:guid}")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertStandard")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid standard, CancellationToken cancellation = default)
     {
-        var exists = await _standardService.AssertAsync(standard, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _standardService.AssertAsync(standard, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class StandardController : ShiftControllerBase
     /// <summary>
     /// Collects the list of standards that match specific criteria
     /// </summary>
-    [HttpPost("competency/standards/collect")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Collect)]
+    [HttpPost("api/competency/standards/collect")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<StandardModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectStandards")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectStandards query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class StandardController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("competency/standards")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Collect)]
+    [HttpGet("api/competency/standards")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<StandardModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectStandards_get")]
     [AliasFor("collectStandards")]
@@ -56,6 +62,10 @@ public class StandardController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectStandards query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _standardService.CollectAsync(query, cancellation);
 
         var count = await _standardService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class StandardController : ShiftControllerBase
     /// <summary>
     /// Counts the standards that match specific criteria
     /// </summary>
-    [HttpPost("competency/standards/count")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Count)]
+    [HttpPost("api/competency/standards/count")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countStandards")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountStandards query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class StandardController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("competency/standards/count")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Count)]
+    [HttpGet("api/competency/standards/count")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countStandards_get")]
     [AliasFor("countStandards")]
@@ -90,6 +100,10 @@ public class StandardController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountStandards query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _standardService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class StandardController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of standards that match specific criteria
     /// </summary>    
-    [HttpPost("competency/standards/download")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Download)]
+    [HttpPost("api/competency/standards/download")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadStandards")]
@@ -108,8 +122,8 @@ public class StandardController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("competency/standards/download")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Download)]
+    [HttpGet("api/competency/standards/download")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadStandards_get")]
@@ -122,6 +136,10 @@ public class StandardController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectStandards query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Competency", "Standards", query.Filter.Format, User);
 
         var models = await _standardService
@@ -142,22 +160,30 @@ public class StandardController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific standard
     /// </summary>
-    [HttpGet("competency/standards/{standard:guid}")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Retrieve)]
+    [HttpGet("api/competency/standards/{standard:guid}")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType<StandardModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveStandard")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid standard, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _standardService.RetrieveAsync(standard, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of standards that match specific criteria
     /// </summary>
-    [HttpPost("competency/standards/search")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Search)]
+    [HttpPost("api/competency/standards/search")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<StandardMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchStandards")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchStandards query, CancellationToken cancellation = default)
@@ -165,8 +191,8 @@ public class StandardController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("competency/standards/search")]
-    [HybridAuthorize(Policies.Competency.Standards.Standard.Search)]
+    [HttpGet("api/competency/standards/search")]
+    [HybridPermission("competency/standards", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<StandardMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchStandards_get")]
     [AliasFor("searchStandards")]
@@ -178,6 +204,10 @@ public class StandardController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchStandards query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _standardService.SearchAsync(query, cancellation);
 
         var count = await _standardService.CountAsync(query, cancellation);

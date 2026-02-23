@@ -17,9 +17,9 @@ public class GroupService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid group, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid group, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(group, cancellation);
+        return await _reader.AssertAsync(group, organization, cancellation);
     }
 
     public async Task<IEnumerable<GroupModel>> CollectAsync(IGroupCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class GroupService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyGroup modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.GroupIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.GroupId, cancellation);
 
         if (entity == null)
             return false;
@@ -78,9 +78,9 @@ public class GroupService : IEntityService
         return await _reader.SearchAsync(criteria, cancellation);
     }
 
-    public async Task<string[]> SearchUserRolesAsync(Guid? parentOrganizationId, Guid organizationId, Guid userId)
+    public async Task<string[]> SearchUserRolesAsync(Guid partitionId, Guid organizationId, Guid userId)
     {
-        return await _reader.SearchUserRolesAsync(parentOrganizationId, organizationId, userId);
+        return await _reader.SearchUserRolesAsync(partitionId, organizationId, userId);
     }
 
     public string Serialize<T>(IEnumerable<T> models, string format, string includes)

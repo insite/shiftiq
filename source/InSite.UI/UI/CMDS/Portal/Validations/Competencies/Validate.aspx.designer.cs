@@ -147,7 +147,7 @@ namespace InSite.Cmds.User.Competencies.Forms
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList ValidatorSelection;
+        protected global::InSite.Common.Web.UI.RadioButtonList ValidatorSelection;
 
         /// <summary>
         /// YesButton control.

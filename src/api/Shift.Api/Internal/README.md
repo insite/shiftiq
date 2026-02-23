@@ -1,6 +1,6 @@
 # Internal
 
-The Internal component within this library contains contains classes that implement cross-cutting concerns within the library itself (e.g., validation helpers, logging, utility base classes, etc.).
+The Internal subsystem within this library contains classes that implement cross-cutting concerns within the library itself (e.g., validation helpers, logging, utility base classes, etc.).
 
 Code in this folder is used **only** within this library, and must never be referenced by code outside this library.
 

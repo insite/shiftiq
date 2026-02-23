@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using System.Linq;
 
@@ -14,7 +13,7 @@ using Shift.Sdk.UI;
 
 namespace InSite.UI.Admin.Reporting.Controls
 {
-    public partial class OnlineUsersGrid : SearchResultsGridViewController<NullFilter>
+    public partial class DashboardUsers : SearchResultsGridViewController<NullFilter>
     {
         #region Fields
 
@@ -50,9 +49,7 @@ namespace InSite.UI.Admin.Reporting.Controls
         {
             _currentSessions = CookieTokenModule.GetActiveTokens();
 
-            var parent = Organization.ParentOrganizationIdentifier;
-
-            if (parent.HasValue && parent != Guid.Empty)
+            if (Organization.OrganizationIdentifier != ServiceLocator.Partition.Identifier)
                 _currentSessions = _currentSessions
                     .Where(x => x.OrganizationCode == CookieTokenModule.Current.OrganizationCode)
                     .ToArray();

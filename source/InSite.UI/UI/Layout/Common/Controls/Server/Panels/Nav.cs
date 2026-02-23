@@ -284,7 +284,7 @@ function {2}() {{ $('#{0}_state').val(''); }}", ClientID, onShowHandler, onHideH
             if (!string.IsNullOrEmpty(ContentRendererID))
             {
                 if (!(NamingContainer.FindControl(ContentRendererID) is NavContent contentRenderer))
-                    throw new ApplicationError("Content renderer not found: " + ContentRendererID);
+                    throw new InvalidOperationException("Content renderer not found: " + ContentRendererID);
 
                 contentRenderer.Register(this);
 

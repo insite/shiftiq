@@ -53,6 +53,9 @@ namespace InSite.Application.Records.Read
         public Guid? EmployerGroupIdentifier { get; set; }
         public string EmployerGroupStatus { get; set; }
 
+        public bool BeforeExpiryNotificationSent { get; set; }
+        public bool AfterExpiryNotificationSent { get; set; }
+
         public virtual QAchievement Achievement { get; set; }
         public virtual QGroup EmployerGroup { get; set; }
     }

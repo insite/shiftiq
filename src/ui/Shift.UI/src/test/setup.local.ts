@@ -33,6 +33,6 @@ global.logout = async () => {
 }
 
 shiftConfig.isLocal = true;
-shiftConfig.shiftApiHostUrl = "https://localhost:5000";
+shiftConfig.shiftApiHostUrl = "http://localhost:5000";
 
 requestHelper.setThrowAuthError(true);

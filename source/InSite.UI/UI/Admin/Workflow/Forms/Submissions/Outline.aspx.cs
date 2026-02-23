@@ -68,24 +68,24 @@ namespace InSite.Admin.Workflow.Forms.Submissions
 
         private void AnswerGroupRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
-            {
-                var group = (AnswerGroup)e.Item.DataItem;
-                var itemRepeater = (Repeater)e.Item.FindControl("AnswerItemRepeater");
-                itemRepeater.ItemDataBound += AnswerItemRepeater_ItemDataBound;
-                itemRepeater.DataSource = group.AnswerPackets;
-                itemRepeater.DataBind();
-            }
+            if (!IsContentItem(e))
+                return;
+
+            var group = (AnswerGroup)e.Item.DataItem;
+            var itemRepeater = (Repeater)e.Item.FindControl("AnswerItemRepeater");
+            itemRepeater.ItemDataBound += AnswerItemRepeater_ItemDataBound;
+            itemRepeater.DataSource = group.AnswerPackets;
+            itemRepeater.DataBind();
         }
 
         private void AnswerItemRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
-            {
-                var item = (AnswerItem)e.Item.DataItem;
-                var ah = (ITextControl)e.Item.FindControl("AnswerHtml");
-                ah.Text = CreateAnswerHtml(item);
-            }
+            if (!IsContentItem(e))
+                return;
+
+            var item = (AnswerItem)e.Item.DataItem;
+            var ah = (ITextControl)e.Item.FindControl("AnswerHtml");
+            ah.Text = CreateAnswerHtml(item);
         }
 
         private string CreateAnswerHtml(AnswerItem item)
@@ -139,7 +139,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions
             if (answer.LikertScales.Length == 0)
                 return;
 
-            html.AppendLine("<div>");
+            html.AppendLine("<div class='row'>");
 
             foreach (var item in answer.LikertScales)
                 html.AppendLine(item);
@@ -168,7 +168,8 @@ namespace InSite.Admin.Workflow.Forms.Submissions
 
             Current.SessionIdentifier = query.ResponseSessionIdentifier;
             Current.FormIdentifier = query.SurveyFormIdentifier;
-            Current.UserIdentifier = query.RespondentUserIdentifier;
+            Current.RespondentUserIdentifier = query.RespondentUserIdentifier;
+            Current.AssessorUserIdentifier = query.AssessorUserIdentifier;
 
             SubmissionSessionControl.LoadCurrentStateObjects(Current, ResponseNavigator);
 
@@ -193,6 +194,37 @@ namespace InSite.Admin.Workflow.Forms.Submissions
 
             BindAnswers();
 
+            if (Current.Survey.DisplaySummaryChart)
+            {
+                var chartQuestions = Current.Survey.Questions
+                    .Where(q => q.HasInput && q.Type == SurveyQuestionType.Likert)
+                    .Select(q =>
+                    {
+                        var likertType = ReviewDetails.GetLikertType(q.LikertAnalysis);
+                        if (likertType != ReviewDetails.LikertAnalysisType.Strategy1 && likertType != ReviewDetails.LikertAnalysisType.Strategy2)
+                            return default;
+
+                        var options = Current.Session.QResponseOptions
+                            .Where(x => x.SurveyQuestionIdentifier == q.Identifier)
+                            .OrderBy(x => x.OptionSequence)
+                            .ToArray();
+
+                        var likertScale = ReviewDetails.GetLikertScale(q, options, Current.Session.QResponseOptions, likertType);
+
+                        return likertScale?.Items == null || likertScale.Items.Count == 0
+                            ? default
+                            : (q.Content.Title.GetHtml(Current.Language, true), likertScale);
+                    })
+                    .Where(q => q != default)
+                    .ToArray();
+
+                SummaryChartPanel.Visible = chartQuestions.Length > 0;
+
+                (ChartBody.Text, ChartLegend.DataSource) = ReviewDetails.BuildSummaryBarChart(chartQuestions, false);
+
+                ChartLegend.DataBind();
+            }
+
             PageHelper.AutoBindHeader(
                 this,
                 qualifier: $"{Current.Survey.Name} <span class='form-text'>Form #{Current.Survey.Asset}</span>");
@@ -200,17 +232,28 @@ namespace InSite.Admin.Workflow.Forms.Submissions
 
         private void BindRespondentSection()
         {
-            var respondent = Current.Survey.EnableUserConfidentiality
-                ? null
-                : Current.Respondent;
+            RespondentFields.Visible = false;
+            AssessorContainer.Visible = false;
 
-            if (respondent != null)
+            var showUserData = !Current.Survey.EnableUserConfidentiality;
+
+            if (showUserData && Current.Respondent != null)
             {
+                var respondent = Current.Respondent;
+
                 RespondentName.Text = $"<a href='/ui/admin/contacts/people/edit?contact={respondent.UserIdentifier}'>{respondent.FullName}</a>";
                 RespondentEmail.Text = $"<a href='mailto:{respondent.Email}'>{respondent.Email}</a>";
+                RespondentFields.Visible = true;
             }
 
-            RespondentFields.Visible = respondent != null;
+            if (showUserData && Current.Assessor != null && Current.AssessorUserIdentifier != Current.RespondentUserIdentifier)
+            {
+                var assessor = Current.Assessor;
+
+                AssessorName.Text = $"<a href='/ui/admin/contacts/people/edit?contact={assessor.UserIdentifier}'>{assessor.FullName}</a>";
+                AssessorEmail.Text = $"<a href='mailto:{assessor.Email}'>{assessor.Email}</a>";
+                AssessorContainer.Visible = true;
+            }
         }
 
         private void BindSurveySection()
@@ -501,7 +544,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions
             foreach (var item in likertScale.Items)
             {
                 var itemText = new StringBuilder();
-                itemText.AppendLine("<div>");
+                itemText.AppendLine("<div class='col-12 col-md-6 col-lg-4 col-xxl-2'>");
                 itemText.AppendLine("<h2>");
                 itemText.AppendLine(item.Category);
                 itemText.AppendLine("</h2>");

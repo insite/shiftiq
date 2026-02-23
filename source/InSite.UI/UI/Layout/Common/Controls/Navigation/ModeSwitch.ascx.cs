@@ -132,9 +132,9 @@ namespace InSite.UI.Layout.Admin
                 {
                     cookie.Value = HttpUtility.UrlEncode(mode);
                     cookie.Expires = DateTime.Now.AddDays(CookieLifetimeInDays);
-                    cookie.HttpOnly = true; // Security: prevent client-side script access
+                    cookie.HttpOnly = false;
                     cookie.SameSite = SameSiteMode.Lax; // CSRF protection
-                    cookie.Domain = ServiceLocator.AppSettings.Security.Domain;
+                    cookie.Domain = ServiceLocator.AppSettings.Partition.Domain;
                 }
                 else
                 {

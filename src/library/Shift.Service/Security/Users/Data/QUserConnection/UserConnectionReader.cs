@@ -12,23 +12,22 @@ public class UserConnectionReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "FromUserIdentifier, ToUserIdentifier";
 
-    public UserConnectionReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public UserConnectionReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid fromUser, Guid toUser, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid fromUser, Guid toUser, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db);
+            var query = BuildQueryable(db, organization);
 
-            return query.AnyAsync(x => x.FromUserIdentifier == fromUser && x.ToUserIdentifier == toUser, cancellation);
+            var exists = query.AnyAsync(x => x.FromUserIdentifier == fromUser && x.ToUserIdentifier == toUser, cancellation);
+
+            return exists;
 
         }, cancellation);
     }
@@ -70,11 +69,11 @@ public class UserConnectionReader : IEntityReader
         }
     }
 
-    public Task<UserConnectionEntity?> RetrieveAsync(Guid fromUser, Guid toUser, CancellationToken cancellation = default)
+    public Task<UserConnectionEntity?> RetrieveAsync(Guid fromUser, Guid toUser, Guid? organization = null, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db);
+            var query = BuildQueryable(db, organization);
 
             return query.FirstOrDefaultAsync(x => x.FromUserIdentifier == fromUser && x.ToUserIdentifier == toUser, cancellation);
 
@@ -104,20 +103,20 @@ public class UserConnectionReader : IEntityReader
     /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
     /// ordering fully unique, otherwise the result set is non-deterministic.
     /// </remarks>
-    private IQueryable<UserConnectionEntity> BuildQueryable(TableDbContext db)
+    private IQueryable<UserConnectionEntity> BuildQueryable(TableDbContext db, Guid? organization)
     {
-        ValidateOrganizationContext();
+        var query = db.QUserConnection.AsNoTracking();
 
-        var principal = _auth.GetPrincipal();
+        if (organization != null)
+        {
+            var organizationUsers = db.QPerson
+                .Where(x => x.OrganizationIdentifier == organization.Value)
+                .Select(x => x.UserIdentifier);
 
-        var organizationUsers = db.QPerson
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId)
-            .Select(x => x.UserIdentifier);
-
-        var query = db.QUserConnection
-            .AsNoTracking()
-            .Join(organizationUsers, connection => connection.FromUserIdentifier, user => user, (connection, user) => connection)
-            .Join(organizationUsers, connection => connection.ToUserIdentifier, user => user, (connection, user) => connection);
+            query = query
+                .Join(organizationUsers, connection => connection.FromUserIdentifier, user => user, (connection, user) => connection)
+                .Join(organizationUsers, connection => connection.ToUserIdentifier, user => user, (connection, user) => connection);
+        }
 
         return query;
     }
@@ -126,7 +125,7 @@ public class UserConnectionReader : IEntityReader
     {
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
-        var query = BuildQueryable(db);
+        var query = BuildQueryable(db, criteria.OrganizationId);
 
         // TODO: Apply criteria
 
@@ -145,8 +144,8 @@ public class UserConnectionReader : IEntityReader
         var matches = await queryable
             .Select(entity => new UserConnectionMatch
             {
-                FromUserIdentifier = entity.FromUserIdentifier,
-                ToUserIdentifier = entity.ToUserIdentifier
+                FromUserId = entity.FromUserIdentifier,
+                ToUserId = entity.ToUserIdentifier
 
             })
             .ToListAsync(cancellation);
@@ -154,9 +153,4 @@ public class UserConnectionReader : IEntityReader
         return matches;
     }
 
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
-    }
 }

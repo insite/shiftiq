@@ -88,7 +88,7 @@ namespace InSite.UI.Portal.Home
         private void BindResponseButtons(uxButton restartButton)
         {
             var allowDelete = CurrentSessionState.Identity
-                .IsGranted(PermissionIdentifiers.Admin_Surveys_Responses, PermissionOperation.Delete);
+                .IsGranted(PermissionIdentifiers.Admin_Surveys_Responses, DataAccess.Delete);
 
             {
                 var button = restartButton;
@@ -124,7 +124,7 @@ namespace InSite.UI.Portal.Home
             }
 
             var allowDelete = CurrentSessionState.Identity
-                .IsGranted(PermissionIdentifiers.Admin_Surveys_Responses, PermissionOperation.Delete);
+                .IsGranted(PermissionIdentifiers.Admin_Surveys_Responses, DataAccess.Delete);
 
             {
                 var button = restartButton;
@@ -142,6 +142,8 @@ namespace InSite.UI.Portal.Home
 
         private void RestartButton_Click(object sender, EventArgs e)
         {
+            var user = CurrentSessionState.Identity.User;
+
             // Delete the existing submission session
             var id = Guid.Parse(((uxButton)sender).CommandArgument);
             var response = ServiceLocator.SurveySearch.GetResponseSession(id);
@@ -150,7 +152,7 @@ namespace InSite.UI.Portal.Home
             // Create a new submission session.
             var survey = ServiceLocator.SurveySearch.GetSurveyState(response.SurveyFormIdentifier).Form;
             var session = UniqueIdentifier.Create();
-            var commands = Launch.BuildCommandScript("Restarted", session, survey, CurrentSessionState.Identity.User.UserIdentifier);
+            var commands = Launch.BuildCommandScript("Restarted", session, survey, user.UserIdentifier, user.UserIdentifier);
             foreach (var command in commands)
                 ServiceLocator.SendCommand(command);
 

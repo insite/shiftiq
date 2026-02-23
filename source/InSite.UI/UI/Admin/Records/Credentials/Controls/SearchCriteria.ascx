@@ -48,7 +48,7 @@
                 <div class="col-4">
 
                     <div class="mb-2">
-                        <insite:FindEmployer ID="EmployerGroupIdentifier" runat="server" EmptyMessage="Employer" isBootStrap5="true" />
+                        <insite:FindEmployer ID="EmployerGroupIdentifier" runat="server" EmptyMessage="Employer" />
                     </div>
 
                     <div class="mb-2">
@@ -56,7 +56,11 @@
                     </div>
 
                     <div class="mb-2">
-                        <insite:ItemNameComboBox ID="EmployerRegion" runat="server" EmptyMessage="Employer Region" isBootStrap5="true" />
+                        <insite:ItemNameComboBox ID="EmployerRegion" runat="server" EmptyMessage="Employer Region" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:FindDepartment ID="DepartmentIdentifier" runat="server" EmptyMessage="Department" />
                     </div>
                     
                 </div>

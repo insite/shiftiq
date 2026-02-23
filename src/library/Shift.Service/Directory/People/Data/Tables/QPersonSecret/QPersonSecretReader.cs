@@ -125,7 +125,7 @@ public class QPersonSecretReader : IEntityReader
         var matches = await queryable
             .Select(entity => new PersonSecretMatch
             {
-                SecretIdentifier = entity.SecretIdentifier
+                SecretId = entity.SecretIdentifier
 
             })
             .ToListAsync(cancellation);

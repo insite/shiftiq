@@ -105,14 +105,14 @@ namespace InSite.UI.Portal.Integrations.Lti
 
             var partition = ServiceLocator.Partition;
 
-            var product = StringHelper.Sanitize(settings.Release.Brand, '-');
+            var product = StringHelper.Sanitize(settings.Partition.Brand, '-');
 
             AddToolParameters(postParameters,
                 product,
                 settings.Release.Version,
                 partition.Email,
-                settings.Security.Domain,
-                settings.Release.Brand,
+                settings.Partition.Domain,
+                settings.Partition.Brand,
                 rootUrl);
 
             AddCustomParameters(postParameters, asset.ResourceParameters);

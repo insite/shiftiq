@@ -42,15 +42,6 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl BarChartPanel;
 
         /// <summary>
-        /// BarChartCardBody control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl BarChartCardBody;
-
-        /// <summary>
         /// ChartLegend control.
         /// </summary>
         /// <remarks>
@@ -60,13 +51,13 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         protected global::System.Web.UI.WebControls.Repeater ChartLegend;
 
         /// <summary>
-        /// Chart control.
+        /// ChartBody control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal Chart;
+        protected global::System.Web.UI.WebControls.Literal ChartBody;
 
         /// <summary>
         /// CardRepeater control.

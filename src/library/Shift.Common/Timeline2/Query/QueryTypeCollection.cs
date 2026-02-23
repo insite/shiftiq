@@ -35,7 +35,7 @@ namespace Shift.Common
                     .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>));
 
                 if (iQueryInterface == null)
-                    throw new Exception($"{key} does not implement the IQuery interface.");
+                    throw new InvalidOperationException($"{key} does not implement the IQuery interface.");
 
                 var resultType = iQueryInterface.GetGenericArguments()[0];
 
@@ -55,7 +55,7 @@ namespace Shift.Common
 
                 var resource = new Resource(name);
 
-                resource.Aliases.Add(queries[key].FullName);
+                resource.Routes.Add(queries[key].FullName);
 
                 list.Add(resource);
             }

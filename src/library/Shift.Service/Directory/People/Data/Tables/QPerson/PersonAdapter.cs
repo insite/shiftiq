@@ -10,8 +10,8 @@ public class PersonAdapter : IEntityAdapter
         entity.EmployeeUnion = modify.EmployeeUnion;
         entity.IsAdministrator = modify.IsAdministrator;
         entity.SocialInsuranceNumber = modify.SocialInsuranceNumber;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.UserIdentifier = modify.UserIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.UserIdentifier = modify.UserId;
         entity.PersonCode = modify.PersonCode;
         entity.IsLearner = modify.IsLearner;
         entity.Birthdate = modify.Birthdate;
@@ -49,7 +49,7 @@ public class PersonAdapter : IEntityAdapter
         entity.EmergencyContactPhone = modify.EmergencyContactPhone;
         entity.EmergencyContactRelationship = modify.EmergencyContactRelationship;
         entity.FirstLanguage = modify.FirstLanguage;
-        entity.EmployerGroupIdentifier = modify.EmployerGroupIdentifier;
+        entity.EmployerGroupIdentifier = modify.EmployerGroupId;
         entity.JobsApproved = modify.JobsApproved;
         entity.JobsApprovedBy = modify.JobsApprovedBy;
         entity.ImmigrationDisability = modify.ImmigrationDisability;
@@ -65,21 +65,21 @@ public class PersonAdapter : IEntityAdapter
         entity.CandidateIsWillingToRelocate = modify.CandidateIsWillingToRelocate;
         entity.CandidateLinkedInUrl = modify.CandidateLinkedInUrl;
         entity.CandidateOccupationList = modify.CandidateOccupationList;
-        entity.IndustryItemIdentifier = modify.IndustryItemIdentifier;
-        entity.OccupationStandardIdentifier = modify.OccupationStandardIdentifier;
+        entity.IndustryItemIdentifier = modify.IndustryItemId;
+        entity.OccupationStandardIdentifier = modify.OccupationStandardId;
         entity.AccountReviewQueued = modify.AccountReviewQueued;
         entity.AccountReviewCompleted = modify.AccountReviewCompleted;
         entity.ConsentToShare = modify.ConsentToShare;
         entity.EmailEnabled = modify.EmailEnabled;
         entity.EmailAlternateEnabled = modify.EmailAlternateEnabled;
-        entity.MembershipStatusItemIdentifier = modify.MembershipStatusItemIdentifier;
+        entity.MembershipStatusItemIdentifier = modify.MembershipStatusItemId;
         entity.FullName = modify.FullName;
         entity.LastAuthenticated = modify.LastAuthenticated;
         entity.IsOperator = modify.IsOperator;
-        entity.BillingAddressIdentifier = modify.BillingAddressIdentifier;
-        entity.HomeAddressIdentifier = modify.HomeAddressIdentifier;
-        entity.ShippingAddressIdentifier = modify.ShippingAddressIdentifier;
-        entity.WorkAddressIdentifier = modify.WorkAddressIdentifier;
+        entity.BillingAddressIdentifier = modify.BillingAddressId;
+        entity.HomeAddressIdentifier = modify.HomeAddressId;
+        entity.ShippingAddressIdentifier = modify.ShippingAddressId;
+        entity.WorkAddressIdentifier = modify.WorkAddressId;
         entity.MarketingEmailEnabled = modify.MarketingEmailEnabled;
         entity.IsArchived = modify.IsArchived;
         entity.WhenArchived = modify.WhenArchived;
@@ -107,8 +107,8 @@ public class PersonAdapter : IEntityAdapter
             EmployeeUnion = create.EmployeeUnion,
             IsAdministrator = create.IsAdministrator,
             SocialInsuranceNumber = create.SocialInsuranceNumber,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            UserIdentifier = create.UserIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            UserIdentifier = create.UserId,
             PersonCode = create.PersonCode,
             IsLearner = create.IsLearner,
             Birthdate = create.Birthdate,
@@ -146,11 +146,11 @@ public class PersonAdapter : IEntityAdapter
             EmergencyContactPhone = create.EmergencyContactPhone,
             EmergencyContactRelationship = create.EmergencyContactRelationship,
             FirstLanguage = create.FirstLanguage,
-            EmployerGroupIdentifier = create.EmployerGroupIdentifier,
+            EmployerGroupIdentifier = create.EmployerGroupId,
             JobsApproved = create.JobsApproved,
             JobsApprovedBy = create.JobsApprovedBy,
             ImmigrationDisability = create.ImmigrationDisability,
-            PersonIdentifier = create.PersonIdentifier,
+            PersonIdentifier = create.PersonId,
             AccessRevoked = create.AccessRevoked,
             AccessRevokedBy = create.AccessRevokedBy,
             UserAccessGranted = create.UserAccessGranted,
@@ -163,21 +163,21 @@ public class PersonAdapter : IEntityAdapter
             CandidateIsWillingToRelocate = create.CandidateIsWillingToRelocate,
             CandidateLinkedInUrl = create.CandidateLinkedInUrl,
             CandidateOccupationList = create.CandidateOccupationList,
-            IndustryItemIdentifier = create.IndustryItemIdentifier,
-            OccupationStandardIdentifier = create.OccupationStandardIdentifier,
+            IndustryItemIdentifier = create.IndustryItemId,
+            OccupationStandardIdentifier = create.OccupationStandardId,
             AccountReviewQueued = create.AccountReviewQueued,
             AccountReviewCompleted = create.AccountReviewCompleted,
             ConsentToShare = create.ConsentToShare,
             EmailEnabled = create.EmailEnabled,
             EmailAlternateEnabled = create.EmailAlternateEnabled,
-            MembershipStatusItemIdentifier = create.MembershipStatusItemIdentifier,
+            MembershipStatusItemIdentifier = create.MembershipStatusItemId,
             FullName = create.FullName,
             LastAuthenticated = create.LastAuthenticated,
             IsOperator = create.IsOperator,
-            BillingAddressIdentifier = create.BillingAddressIdentifier,
-            HomeAddressIdentifier = create.HomeAddressIdentifier,
-            ShippingAddressIdentifier = create.ShippingAddressIdentifier,
-            WorkAddressIdentifier = create.WorkAddressIdentifier,
+            BillingAddressIdentifier = create.BillingAddressId,
+            HomeAddressIdentifier = create.HomeAddressId,
+            ShippingAddressIdentifier = create.ShippingAddressId,
+            WorkAddressIdentifier = create.WorkAddressId,
             MarketingEmailEnabled = create.MarketingEmailEnabled,
             IsArchived = create.IsArchived,
             WhenArchived = create.WhenArchived,
@@ -204,14 +204,14 @@ public class PersonAdapter : IEntityAdapter
             EmployeeUnion = entity.EmployeeUnion,
             IsAdministrator = entity.IsAdministrator,
             SocialInsuranceNumber = entity.SocialInsuranceNumber,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            UserIdentifier = entity.UserIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            UserId = entity.UserIdentifier,
             PersonCode = entity.PersonCode,
             IsLearner = entity.IsLearner,
             Birthdate = entity.Birthdate,
             Citizenship = entity.Citizenship,
             Created = entity.Created,
-            CreatedBy = entity.CreatedBy,
+            CreatedBy = entity.CreatedBy == Guid.Empty ? null : entity.CreatedBy,
             CustomKey = entity.CustomKey,
             EducationLevel = entity.EducationLevel,
             Gender = entity.Gender,
@@ -243,11 +243,11 @@ public class PersonAdapter : IEntityAdapter
             EmergencyContactPhone = entity.EmergencyContactPhone,
             EmergencyContactRelationship = entity.EmergencyContactRelationship,
             FirstLanguage = entity.FirstLanguage,
-            EmployerGroupIdentifier = entity.EmployerGroupIdentifier,
+            EmployerGroupId = entity.EmployerGroupIdentifier,
             JobsApproved = entity.JobsApproved,
             JobsApprovedBy = entity.JobsApprovedBy,
             ImmigrationDisability = entity.ImmigrationDisability,
-            PersonIdentifier = entity.PersonIdentifier,
+            PersonId = entity.PersonIdentifier,
             AccessRevoked = entity.AccessRevoked,
             AccessRevokedBy = entity.AccessRevokedBy,
             UserAccessGranted = entity.UserAccessGranted,
@@ -260,21 +260,21 @@ public class PersonAdapter : IEntityAdapter
             CandidateIsWillingToRelocate = entity.CandidateIsWillingToRelocate,
             CandidateLinkedInUrl = entity.CandidateLinkedInUrl,
             CandidateOccupationList = entity.CandidateOccupationList,
-            IndustryItemIdentifier = entity.IndustryItemIdentifier,
-            OccupationStandardIdentifier = entity.OccupationStandardIdentifier,
+            IndustryItemId = entity.IndustryItemIdentifier,
+            OccupationStandardId = entity.OccupationStandardIdentifier,
             AccountReviewQueued = entity.AccountReviewQueued,
             AccountReviewCompleted = entity.AccountReviewCompleted,
             ConsentToShare = entity.ConsentToShare,
             EmailEnabled = entity.EmailEnabled,
             EmailAlternateEnabled = entity.EmailAlternateEnabled,
-            MembershipStatusItemIdentifier = entity.MembershipStatusItemIdentifier,
+            MembershipStatusItemId = entity.MembershipStatusItemIdentifier,
             FullName = entity.FullName,
             LastAuthenticated = entity.LastAuthenticated,
             IsOperator = entity.IsOperator,
-            BillingAddressIdentifier = entity.BillingAddressIdentifier,
-            HomeAddressIdentifier = entity.HomeAddressIdentifier,
-            ShippingAddressIdentifier = entity.ShippingAddressIdentifier,
-            WorkAddressIdentifier = entity.WorkAddressIdentifier,
+            BillingAddress = ToAddressModel(entity.BillingAddress),
+            HomeAddress = ToAddressModel(entity.HomeAddress),
+            ShippingAddress = ToAddressModel(entity.ShippingAddress),
+            WorkAddress = ToAddressModel(entity.WorkAddress),
             MarketingEmailEnabled = entity.MarketingEmailEnabled,
             IsArchived = entity.IsArchived,
             WhenArchived = entity.WhenArchived,
@@ -286,6 +286,24 @@ public class PersonAdapter : IEntityAdapter
             SinModified = entity.SinModified,
             AgeGroup = entity.AgeGroup
         };
+
+        var user = entity.User;
+
+        if (user != null)
+        {
+            model.PersonFirstName = user.FirstName;
+            model.PersonLastName = user.LastName;
+
+            model.UserEmail = user.Email;
+            model.UserName = user.FullName;
+
+            model.IsAdministrator = entity.IsAdministrator;
+            model.IsDeveloper = entity.IsDeveloper;
+            model.IsLearner = entity.IsLearner;
+            model.IsOperator = entity.IsOperator;
+
+            model.TimeZone = user.TimeZone;
+        }
 
         return model;
     }
@@ -300,12 +318,44 @@ public class PersonAdapter : IEntityAdapter
         var match = new PersonMatch
         {
             PersonId = entity.PersonIdentifier,
-            UserId = entity.UserIdentifier,
-
-            UserEmail = entity.User != null ? entity.User.Email : "-",
-            UserName = entity.User != null ? entity.User.FullName : "-",
+            UserId = entity.UserIdentifier
         };
 
+        var user = entity.User;
+
+        if (user != null)
+        {
+            match.PersonFirstName = user.FirstName;
+            match.PersonLastName = user.LastName;
+
+            match.UserEmail = user.Email;
+            match.UserName = user.FullName;
+
+            match.IsAdministrator = entity.IsAdministrator;
+            match.IsDeveloper = entity.IsDeveloper;
+            match.IsLearner = entity.IsLearner;
+            match.IsOperator = entity.IsOperator;
+
+            match.TimeZone = user.TimeZone;
+        }
+
         return match;
+    }
+
+    private static PersonAddressModel? ToAddressModel(AddressEntity? entity)
+    {
+        if (entity == null) return null;
+
+        return new PersonAddressModel
+        {
+            AddressId = entity.AddressIdentifier,
+            City = entity.City,
+            Country = entity.Country,
+            Description = entity.Description,
+            PostalCode = entity.PostalCode,
+            Province = entity.Province,
+            Street1 = entity.Street1,
+            Street2 = entity.Street2
+        };
     }
 }

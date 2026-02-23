@@ -14,17 +14,20 @@ namespace InSite.Application.Organizations.Write
         public string InlineInstructionsUrl { get; set; }
         public string InlineLabelsUrl { get; set; }
         public string SafeExamBrowserUserAgentSuffix { get; set; }
+        public bool RequireEmailVerification { get; set; }
 
         public ModifyOrganizationPlatformSettings(
             Guid organizationId,
             string inlineInstructionsUrl,
             string inlineLabelsUrl,
-            string safeExamBrowserUserAgentSuffix)
+            string safeExamBrowserUserAgentSuffix,
+            bool requireEmailVerification)
         {
             AggregateIdentifier = organizationId;
             InlineInstructionsUrl = inlineInstructionsUrl;
             InlineLabelsUrl = inlineLabelsUrl;
             SafeExamBrowserUserAgentSuffix = safeExamBrowserUserAgentSuffix;
+            RequireEmailVerification = requireEmailVerification;
         }
 
         bool IHasRun.Run(OrganizationAggregate aggregate)
@@ -33,19 +36,21 @@ namespace InSite.Application.Organizations.Write
             if (state.AccountStatus != AccountStatus.Opened)
                 return false;
 
-            var inlineInstructionsUrl = state.PlatformCustomization.InlineInstructionsUrl;
-            var inlineLabelsUrl = state.PlatformCustomization.InlineLabelsUrl;
-            var safeExamBrowserUserAgentSuffix = state.PlatformCustomization.SafeExamBrowserUserAgentSuffix;
+            var customization = state.PlatformCustomization;
 
-            var isSame = safeExamBrowserUserAgentSuffix.NullIfEmpty() == SafeExamBrowserUserAgentSuffix.NullIfEmpty() &&
-                inlineInstructionsUrl.NullIfEmpty() == InlineInstructionsUrl.NullIfEmpty() &&
-                inlineLabelsUrl.NullIfEmpty() == InlineLabelsUrl.NullIfEmpty()
-                ;
+            
+            
+            var requireEmailVerification = state.PlatformCustomization.RequireEmailVerification;
+
+            var isSame = customization.InlineInstructionsUrl.NullIfEmpty() == InlineInstructionsUrl.NullIfEmpty()
+                      && customization.InlineLabelsUrl.NullIfEmpty() == InlineLabelsUrl.NullIfEmpty()
+                      && customization.SafeExamBrowserUserAgentSuffix.NullIfEmpty() == SafeExamBrowserUserAgentSuffix.NullIfEmpty()
+                      && customization.RequireEmailVerification == RequireEmailVerification;
 
             if (isSame)
                 return true;
 
-            aggregate.Apply(new OrganizationPlatformSettingsModified(InlineInstructionsUrl, InlineLabelsUrl, SafeExamBrowserUserAgentSuffix));
+            aggregate.Apply(new OrganizationPlatformSettingsModified(InlineInstructionsUrl, InlineLabelsUrl, SafeExamBrowserUserAgentSuffix, RequireEmailVerification));
 
             return true;
         }

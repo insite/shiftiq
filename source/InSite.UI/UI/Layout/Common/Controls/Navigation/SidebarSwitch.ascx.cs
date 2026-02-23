@@ -58,7 +58,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
                     cookie.Expires = DateTime.Now.AddDays(CookieLifetimeInDays);
                     cookie.HttpOnly = true; // Security: prevent client-side script access
                     cookie.SameSite = SameSiteMode.Lax; // CSRF protection
-                    cookie.Domain = ServiceLocator.AppSettings.Security.Domain;
+                    cookie.Domain = ServiceLocator.AppSettings.Partition.Domain;
                 }
                 else
                 {

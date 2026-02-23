@@ -48,7 +48,7 @@ public class CredentialService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyCredential modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.CredentialIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.CredentialId, cancellation);
 
         if (entity == null)
             return false;

@@ -43,7 +43,7 @@ public class ActionService : IActionService
 
                 _actions.Add(model);
                 _actionsByUrl.Add(model.ActionUrl, model);
-                _actionsById.Add(model.ActionIdentifier, model);
+                _actionsById.Add(model.ActionId, model);
             }
         }
     }
@@ -104,7 +104,7 @@ public class ActionService : IActionService
 
     public async Task<bool> ModifyAsync(ModifyAction modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.ActionIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.ActionId, cancellation);
 
         if (entity == null)
             return false;

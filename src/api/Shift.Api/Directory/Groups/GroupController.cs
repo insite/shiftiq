@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class GroupController : ShiftControllerBase
 {
     private readonly GroupService _groupService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public GroupController(GroupService groupService)
+    public GroupController(GroupService groupService, IPrincipalProvider principalProvider)
     {
         _groupService = groupService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class GroupController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific group
     /// </summary>
-    [HttpHead("directory/groups/{group:guid}")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Assert)]
+    [HttpHead("api/directory/groups/{group:guid}")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertGroup")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid group, CancellationToken cancellation = default)
     {
-        var exists = await _groupService.AssertAsync(group, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _groupService.AssertAsync(group, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class GroupController : ShiftControllerBase
     /// <summary>
     /// Collects the list of groups that match specific criteria
     /// </summary>
-    [HttpPost("directory/groups/collect")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Collect)]
+    [HttpPost("api/directory/groups/collect")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<GroupModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectGroups")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectGroups query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class GroupController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("directory/groups")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Collect)]
+    [HttpGet("api/directory/groups")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<GroupModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectGroups_get")]
     [AliasFor("collectGroups")]
@@ -56,6 +62,10 @@ public class GroupController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectGroups query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _groupService.CollectAsync(query, cancellation);
 
         var count = await _groupService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class GroupController : ShiftControllerBase
     /// <summary>
     /// Counts the groups that match specific criteria
     /// </summary>
-    [HttpPost("directory/groups/count")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Count)]
+    [HttpPost("api/directory/groups/count")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countGroups")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountGroups query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class GroupController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("directory/groups/count")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Count)]
+    [HttpGet("api/directory/groups/count")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countGroups_get")]
     [AliasFor("countGroups")]
@@ -90,6 +100,10 @@ public class GroupController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountGroups query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _groupService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class GroupController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of groups that match specific criteria
     /// </summary>    
-    [HttpPost("directory/groups/download")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Download)]
+    [HttpPost("api/directory/groups/download")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadGroups")]
@@ -108,8 +122,8 @@ public class GroupController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("directory/groups/download")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Download)]
+    [HttpGet("api/directory/groups/download")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadGroups_get")]
@@ -122,6 +136,10 @@ public class GroupController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectGroups query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Directory", "Groups", query.Filter.Format, User);
 
         var models = await _groupService
@@ -142,22 +160,30 @@ public class GroupController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific group
     /// </summary>
-    [HttpGet("directory/groups/{group:guid}")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Retrieve)]
+    [HttpGet("api/directory/groups/{group:guid}")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType<GroupModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveGroup")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid group, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _groupService.RetrieveAsync(group, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of groups that match specific criteria
     /// </summary>
-    [HttpPost("directory/groups/search")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Search)]
+    [HttpPost("api/directory/groups/search")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<GroupMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchGroups")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchGroups query, CancellationToken cancellation = default)
@@ -165,8 +191,8 @@ public class GroupController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("directory/groups/search")]
-    [HybridAuthorize(Policies.Directory.Groups.Group.Search)]
+    [HttpGet("api/directory/groups/search")]
+    [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<GroupMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchGroups_get")]
     [AliasFor("searchGroups")]
@@ -178,6 +204,10 @@ public class GroupController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchGroups query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _groupService.SearchAsync(query, cancellation);
 
         var count = await _groupService.CountAsync(query, cancellation);

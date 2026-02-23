@@ -7,8 +7,8 @@ namespace Shift.Contract
 {
     public class SearchSubmissionOptions : Query<IEnumerable<SubmissionOptionMatch>>, ISubmissionOptionCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? SurveyQuestionIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? SurveyQuestionId { get; set; }
 
         public bool? ResponseOptionIsSelected { get; set; }
 

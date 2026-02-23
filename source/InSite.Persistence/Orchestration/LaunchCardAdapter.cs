@@ -5,6 +5,7 @@ using System.Web;
 
 using InSite.Application.Contacts.Read;
 using InSite.Application.Sites.Read;
+using InSite.Domain;
 using InSite.Domain.Foundations;
 
 using Shift.Common;
@@ -14,6 +15,13 @@ namespace InSite.Persistence.Content
 {
     public class LaunchCardAdapter
     {
+        private readonly IPartitionModel _partition;
+
+        public LaunchCardAdapter(IPartitionModel partition)
+        {
+            _partition = partition;
+        }
+
         private static string BuildUrl(string path, string parameters)
         {
             return parameters.IsNotEmpty()
@@ -58,7 +66,7 @@ namespace InSite.Persistence.Content
 
             return pageUrl.IsNotEmpty()
                 ? pageUrl
-                : new PageSearch(null, null).GetPagePath(pageId, false);
+                : new PageSearch(null, null, _partition).GetPagePath(pageId, false);
         }
 
         private string CreateUrl(string appUrl, QPage page, string portalName, ISecurityFramework identity, string caller, Func<string, string> translate)
@@ -98,7 +106,7 @@ namespace InSite.Persistence.Content
                 return HttpUtility.HtmlEncode($"javascript:alert('{translate("The program is not found")}.')");
             }
 
-            var pageSearch = new PageSearch(null, null);
+            var pageSearch = new PageSearch(null, null, _partition);
 
             return !string.IsNullOrWhiteSpace(page.NavigateUrl)
                 ? page.NavigateUrl
@@ -136,7 +144,7 @@ namespace InSite.Persistence.Content
             if (siteId == null)
                 return portals;
 
-            var search = new PageSearch(null, null);
+            var search = new PageSearch(null, null, _partition);
 
             var pages = search
                 .Bind(
@@ -155,7 +163,7 @@ namespace InSite.Persistence.Content
             foreach (var page in pages)
             {
                 if (!page.IsAccessDenied && !page.IsHidden)
-                    portals.Add(new LaunchCardAdapter().ToCard(page, identity.Language));
+                    portals.Add(ToCard(page, identity.Language));
             }
 
             return portals;
@@ -163,7 +171,7 @@ namespace InSite.Persistence.Content
 
         public List<LaunchCard> GetAssessmentCards(ISecurityFramework identity, Func<Guid, string> assessmentStartUrl)
         {
-            var pageSearch = new PageSearch(null, null);
+            var pageSearch = new PageSearch(null, null, _partition);
 
             var pages = pageSearch.Bind(
                     x => x,
@@ -177,7 +185,7 @@ namespace InSite.Persistence.Content
             var identifiers = pages.Select(x => x.PageIdentifier).ToList();
             var permissions = TGroupPermissionSearch.Bind(x => x, x => identifiers.Any(i => i == x.ObjectIdentifier)).ToList();
 
-            var isSiteAdministrator = identity.IsOperator || identity.IsGranted(PermissionIdentifiers.Admin_Sites, PermissionOperation.Administrate);
+            var isSiteAdministrator = identity.IsOperator || identity.IsGranted(PermissionIdentifiers.Admin_Sites, DataAccess.Administrate);
 
             pages = pages
                 .Where(x => isSiteAdministrator || IsAccessible(x.PageIdentifier, x.OrganizationIdentifier, permissions, accessibleObjects, identity.Organization.Identifier))
@@ -224,7 +232,7 @@ namespace InSite.Persistence.Content
         {
             var pages = new List<LaunchCard>();
 
-            var pageSearch = new PageSearch(null, null);
+            var pageSearch = new PageSearch(null, null, _partition);
 
             var programs = pageSearch
                 .Bind(x => x, x => x.ParentPageIdentifier == root && !x.IsHidden)

@@ -2,13 +2,20 @@ import AdminHomeLayout_UserMenu from "./AdminHomeLayout_UserMenu";
 import AdminHomeLayout_DesktopMenu from "./AdminHomeLayout_DesktopMenu";
 import AdminHomeLayout_MobileMenu from "./AdminHomeLayout_MobileMenu";
 import { useState } from "react";
-import AdminHomeLayout_EnvItem from "./AdminHomeLayout_EnvItem";
 import ActionLink from "@/components/ActionLink";
-import AdminHomeLayout_PermissionItem from "./AdminHomeLayout_PermissionItem";
 import { useSiteProvider } from "@/contexts/SiteProvider";
 import { shiftConfig } from "@/helpers/shiftConfig";
+import { SidebarState } from "../models/SidebarState";
+import Icon from "@/components/icon/Icon";
+import AdminHomeLayout_Navigation_AdminMenu from "./AdminHomeLayout_Navigation_AdminMenu";
+import AdminHomeLayout_Navigation_HelpMenu from "./AdminHomeLayout_Navigation_HelpMenu";
+import AdminHomeLayout_Navigation_Lang from "./AdminHomeLayout_Navigation_Lang";
 
-export default function AdminHomeLayout_Navigation() {
+interface Props {
+    onStateChange: (state: SidebarState) => void;
+}
+
+export default function AdminHomeLayout_Navigation({ onStateChange }: Props) {
     const [show, setShow] = useState(false);
     const { siteSetting } = useSiteProvider();
 
@@ -31,73 +38,51 @@ export default function AdminHomeLayout_Navigation() {
 
                             {shiftConfig.isLocal && (
                                 <>
-                                    <li className="nav-item">
+                                    <li className="nav-item fs-sm">
                                         <ActionLink className="nav-link text-info" href="/client/react/home">
-                                            <i className="fab fa-width-auto fa-react me-2"></i>React {siteSetting.OrganizationCode ? `(${siteSetting.OrganizationCode})` : ""}
+                                            <Icon style="Brands" name="react" className="fa-width-auto me-2" />
+                                            React {siteSetting.OrganizationCode ? `(${siteSetting.OrganizationCode})` : ""}
                                         </ActionLink>
                                     </li>
-                                    <li className="nav-item">
+                                    <li className="nav-item fs-sm">
                                         <div className="nav-link disabled text-border px-1">|</div>
                                     </li>
                                 </>
                             )}
 
-                            {siteSetting.IsCmds && (
-                                <li className="nav-item">
-                                    <ActionLink className="nav-link" href={siteSetting.CmdsHomeLink}><i className="fas fa-width-auto fa-boxes me-2"></i>CMDS</ActionLink>
-                                </li>
-                            )}
-                            <li className="nav-item">
-                                <ActionLink className="nav-link" href="/ui/portal/home"><i className="fas fa-width-auto fa-layer-group me-2"></i>Portal</ActionLink>
+                            <li className="nav-item fs-sm">
+                                <ActionLink className="nav-link" href="/ui/portal/home">
+                                    <Icon style="Regular" name="chalkboard-user" className="fa-width-auto me-2" />
+                                    Portal
+                                </ActionLink>
                             </li>
-                            <li className="nav-item d-none">
-                                <ActionLink className="d-none nav-link" href="/client/admin/home"><i className="fas fa-width-auto fa-cog me-2"></i>Admin</ActionLink>
-                            </li>
-                            <li className="nav-item">
-                                <div className="nav-link disabled text-border px-1">|</div>
-                            </li>
+
+                            <AdminHomeLayout_Navigation_AdminMenu />
 
                             <AdminHomeLayout_UserMenu />
 
-                            <li className="nav-item">
-                                <div className="nav-link disabled text-border px-1">|</div>
-                            </li>
-
                             {siteSetting.ImpersonatorName && (
                                 <>
-                                    <li className="nav-item">
-                                        <ActionLink className="nav-link text-danger" href="/ui/portal/accounts/users/impersonate">
-                                            <i className="fas fa-width-auto fa-user-secret me-2"></i>
+                                    <li className="nav-item fs-sm">
+                                        <ActionLink className="nav-link text-danger" href="/ui/portal/identity/impersonate">
+                                            <Icon style="Regular" name="user-secret" className="fa-width-auto me-2" />
                                             {siteSetting.ImpersonatorName}
                                         </ActionLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <div className="nav-link disabled text-border px-1">|</div>
                                     </li>
                                 </>
                             )}
 
                             {siteSetting.UserName && (
-                                <>
-                                    <li className="nav-item">
-                                        <ActionLink className="nav-link" href="/ui/portal/support" target="_blank"><i className="fas fa-width-auto fa-envelope me-2"></i>Support</ActionLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <div className="nav-link disabled text-border px-1">|</div>
-                                    </li>
-                                </>
+                                <AdminHomeLayout_Navigation_HelpMenu />
                             )}
-                    
 
-                            <AdminHomeLayout_PermissionItem />
-
-                            <AdminHomeLayout_EnvItem />
+                            <AdminHomeLayout_Navigation_Lang />
                         </ul>
                     </nav>
                 </div>
             </header>
 
-            <AdminHomeLayout_DesktopMenu />
+            <AdminHomeLayout_DesktopMenu onStateChange={onStateChange} />
 
             <AdminHomeLayout_MobileMenu show={show} onHide={handleHideMobile} />
         </>

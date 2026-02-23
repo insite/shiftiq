@@ -14,21 +14,18 @@ public class SubmissionReader : IEntityReader
 
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
-    public SubmissionReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public SubmissionReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid responseSession, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid responseSession, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
-            
-            return query.AnyAsync(x => x.ResponseSessionIdentifier == responseSession, cancellation);
+
+            return query.AnyAsync(x => x.ResponseSessionIdentifier == responseSession && (organization == null || x.OrganizationIdentifier == organization), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,7 @@ public class SubmissionReader : IEntityReader
     /// </remarks>
     private IQueryable<SubmissionEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
-        var query = db.Submission
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+        var query = db.Submission.AsNoTracking();
 
         return query;
     }
@@ -120,6 +113,9 @@ public class SubmissionReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
 
         // TODO: Apply criteria
 
@@ -138,17 +134,11 @@ public class SubmissionReader : IEntityReader
         var matches = await queryable
             .Select(entity => new SubmissionMatch
             {
-                ResponseSessionIdentifier = entity.ResponseSessionIdentifier
+                ResponseSessionId = entity.ResponseSessionIdentifier
 
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

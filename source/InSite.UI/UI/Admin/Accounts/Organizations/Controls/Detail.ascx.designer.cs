@@ -78,42 +78,6 @@ namespace InSite.Admin.Accounts.Organizations.Controls
         protected global::InSite.UI.Admin.Accounts.Organizations.Controls.CollectionManager CollectionManager;
 
         /// <summary>
-        /// SubOrganizationsSection control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.NavItem SubOrganizationsSection;
-
-        /// <summary>
-        /// ClearButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor ClearButton;
-
-        /// <summary>
-        /// SubOrganizationFilterText control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox SubOrganizationFilterText;
-
-        /// <summary>
-        /// SubOrganizationRepeater control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater SubOrganizationRepeater;
-
-        /// <summary>
         /// DivisionsSection control.
         /// </summary>
         /// <remarks>

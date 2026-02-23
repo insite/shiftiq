@@ -5,8 +5,6 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Credentials.Write;
 using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
@@ -16,6 +14,7 @@ using InSite.Persistence.Plugin.CMDS;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Constant.CMDS;
 
@@ -55,11 +54,11 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             var permissionName = PermissionNames.Custom_CMDS_Workers;
 
             var identity = CurrentSessionState.Identity;
-            if (identity.IsGranted(permissionName, PermissionOperation.Configure))
+            if (identity.IsGranted(permissionName, DataAccess.Configure))
                 return;
 
             CanSeeAllCompanies = false;
-            CanSeeAllCompanyPeople = identity.IsGranted(permissionName, PermissionOperation.Delete);
+            CanSeeAllCompanyPeople = identity.IsGranted(permissionName, DataAccess.Delete);
             CanSeeAllDepartments = false;
         }
     }
@@ -285,7 +284,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
                 SetCategoryVisibility();
 
-                Category.ListFilter.OrganizationIdentifier = OrganizationSearch.Select(CurrentIdentityFactory.ActiveOrganizationIdentifier).OrganizationIdentifier;
+                Category.ListFilter.OrganizationIdentifier = OrganizationSearch.Select(Organization.Identifier).OrganizationIdentifier;
                 Category.ListFilter.AchievementLabel = AchievementType.Value;
                 Category.RefreshData();
 
@@ -428,7 +427,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         {
             if (!IsPostBack)
             {
-                Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                Department.Filter.OrganizationIdentifier = Organization.Identifier;
 
                 if (!FinderSecurityInfo.CanSeeAllDepartments && !Identity.HasAccessToAllCompanies)
                     Department.Filter.UserIdentifier = User.UserIdentifier;
@@ -549,7 +548,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
                     var expiration = expirationFactory();
 
                     var label = achievements[achievementId].AchievementLabel;
-                    var authorityType = InSite.Common.Web.Cmds.EmployeeAchievementHelper.TypeAllowsSignOff(label)
+                    var authorityType = InSite.Common.Web.Cmds.EmployeeAchievementHelper.AllowSignOff(label)
                         ? "Self" : null;
 
                     commands.Add(new CreateCredential(credentialId, Organization.OrganizationIdentifier, achievementId, userId, DateTimeOffset.Now));
@@ -667,7 +666,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
             if (AchievementVisibility.Value == "Organization-Specific Achievements")
             {
-                filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                filter.OrganizationIdentifier = Organization.Identifier;
                 filter.CategoryIdentifier = Category.ValueAsGuid;
                 filter.AchievementVisibility = AccountScopes.Organization;
             }
@@ -680,7 +679,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             }
             else
             {
-                filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                filter.OrganizationIdentifier = Organization.Identifier;
                 filter.GlobalOrCompanySpecific = true;
             }
 

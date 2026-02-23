@@ -64,7 +64,7 @@ namespace InSite.Custom.CMDS.Admin.People.Controls
 
             RelationshipTypeSelected();
 
-            PersonIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            PersonIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!finderSecurityInfo.CanSeeAllCompanyPeople && !Identity.HasAccessToAllCompanies)
             {

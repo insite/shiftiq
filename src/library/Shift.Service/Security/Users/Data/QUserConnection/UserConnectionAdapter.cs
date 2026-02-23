@@ -30,8 +30,8 @@ public class UserConnectionAdapter : IEntityAdapter
             IsManager = create.IsManager,
             IsSupervisor = create.IsSupervisor,
             IsValidator = create.IsValidator,
-            FromUserIdentifier = create.FromUserIdentifier,
-            ToUserIdentifier = create.ToUserIdentifier,
+            FromUserIdentifier = create.FromUserId,
+            ToUserIdentifier = create.ToUserId,
             IsLeader = create.IsLeader
         };
         return entity;
@@ -50,8 +50,8 @@ public class UserConnectionAdapter : IEntityAdapter
             IsManager = entity.IsManager,
             IsSupervisor = entity.IsSupervisor,
             IsValidator = entity.IsValidator,
-            FromUserIdentifier = entity.FromUserIdentifier,
-            ToUserIdentifier = entity.ToUserIdentifier,
+            FromUserId = entity.FromUserIdentifier,
+            ToUserId = entity.ToUserIdentifier,
             IsLeader = entity.IsLeader
         };
 
@@ -67,8 +67,8 @@ public class UserConnectionAdapter : IEntityAdapter
     {
         var match = new UserConnectionMatch
         {
-            FromUserIdentifier = entity.FromUserIdentifier,
-            ToUserIdentifier = entity.ToUserIdentifier
+            FromUserId = entity.FromUserIdentifier,
+            ToUserId = entity.ToUserIdentifier
 
         };
 

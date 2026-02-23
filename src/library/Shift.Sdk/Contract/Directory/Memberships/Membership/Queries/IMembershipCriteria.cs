@@ -4,14 +4,13 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IMembershipCriteria
+    public interface IMembershipCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
 
-        Guid? GroupIdentifier { get; set; }
+        Guid? GroupId { get; set; }
         Guid? ModifiedBy { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? UserIdentifier { get; set; }
+        Guid? UserId { get; set; }
 
         string MembershipFunction { get; set; }
 

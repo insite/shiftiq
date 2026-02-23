@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Contract;
-
-using Shift.Common;
 
 namespace Shift.Service.Cases;
 
@@ -12,21 +11,20 @@ public class TCaseStatusReader : IEntityReader
     private const string DefaultSort = "StatusSequence";
 
     private readonly IDbContextFactory<TableDbContext> _context;
-    private readonly IShiftIdentityService _identity;
 
-    public TCaseStatusReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService identity)
+    public TCaseStatusReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _identity = identity;
     }
 
     public async Task<bool> AssertAsync(
         Guid statusId,
+        Guid? organization,
         CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
         return await db.TCaseStatus
-            .AnyAsync(x => x.StatusIdentifier == statusId, cancellation);
+            .AnyAsync(x => x.StatusIdentifier == statusId && (organization == null || x.OrganizationIdentifier == organization), cancellation);
     }
 
     public async Task<TCaseStatusEntity?> RetrieveAsync(
@@ -84,11 +82,10 @@ public class TCaseStatusReader : IEntityReader
         TableDbContext db,
         ICaseStatusCriteria criteria)
     {
-        criteria.OrganizationIdentifier = criteria.OrganizationIdentifier ?? _identity.OrganizationId;
-
         var q = db.TCaseStatus.AsNoTracking().AsQueryable();
 
-        q = q.Where(x => x.OrganizationIdentifier == criteria.OrganizationIdentifier);
+        if (criteria.OrganizationId != null)
+            q = q.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
 
         if (!string.IsNullOrEmpty(criteria.CaseTypeExact))
             q = q.Where(x => x.CaseType == criteria.CaseTypeExact);
@@ -130,7 +127,7 @@ public class TCaseStatusReader : IEntityReader
         var matches = await queryable
             .Select(entity => new CaseStatusMatch
             {
-                StatusIdentifier = entity.StatusIdentifier,
+                StatusId = entity.StatusIdentifier,
                 StatusName = entity.StatusName,
                 CaseType = entity.CaseType,
                 StatusCategory = entity.StatusCategory,

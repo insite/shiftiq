@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
+using InSite.Common.Web.UI;
 using InSite.Persistence.Plugin.CMDS;
 
 namespace InSite.Cmds.Controls.Contacts.Companies.Files
 {
-    public partial class UploadCompetencyChooser : UserControl
+    public partial class UploadCompetencyChooser : BaseUserControl
     {
         #region CompetencyItem class
 
@@ -31,7 +31,7 @@ namespace InSite.Cmds.Controls.Contacts.Companies.Files
             }
         }
 
-        private List<CompetencyItem> Competencies => (List<CompetencyItem>)(ViewState[nameof(Competencies)] 
+        private List<CompetencyItem> Competencies => (List<CompetencyItem>)(ViewState[nameof(Competencies)]
             ?? (ViewState[nameof(Competencies)] = new List<CompetencyItem>()));
 
         #endregion
@@ -51,7 +51,7 @@ namespace InSite.Cmds.Controls.Contacts.Companies.Files
             base.OnLoad(e);
 
             if (!IsPostBack)
-                CompetencyStandardIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                CompetencyStandardIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
         }
 
         protected override void OnPreRender(EventArgs e)

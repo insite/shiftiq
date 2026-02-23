@@ -9,7 +9,7 @@ namespace Shift.Common
 {
     public class JwtClient
     {
-        private static readonly SemaphoreSlim Lock = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
 
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -48,7 +48,7 @@ namespace Shift.Common
             _token = string.Empty;
             try
             {
-                await Lock.WaitAsync();
+                await _lock.WaitAsync();
 
                 if (jwtRequest.Lifetime == null || jwtRequest.Lifetime <= 0)
                     jwtRequest.Lifetime = JwtRequest.DefaultLifetime;
@@ -75,7 +75,7 @@ namespace Shift.Common
             }
             finally
             {
-                Lock.Release();
+                _lock.Release();
             }
             return _token;
         }

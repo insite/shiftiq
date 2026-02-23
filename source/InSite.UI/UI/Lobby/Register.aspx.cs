@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Groups.Write;
 using InSite.Application.People.Write;
+using InSite.Application.Users.Write;
 using InSite.Common;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
@@ -258,7 +259,15 @@ namespace InSite.UI.Lobby
             QPersonSecret secret = null;
 
             if (ReturnVerifiedUrl.HasValue())
-                secret = TokenHelper.GetClientSecret(factory.Person.PersonIdentifier, false);
+            {
+                var tokenSettings = ServiceLocator.AppSettings.Security.Token;
+
+                var tokenLifetimeInMinutes = tokenSettings.Lifetime;
+
+                var secretExpiryInDays = tokenSettings.GetClientSecretLifetimeInDays();
+
+                secret = TokenHelper.GetClientSecret(factory.Person.PersonIdentifier, false, secretExpiryInDays, tokenLifetimeInMinutes);
+            }
 
             bool isRegistrationSubmitted;
             var autoApprove = Organization.PlatformCustomization.UserRegistration.AutomaticApproval;
@@ -266,9 +275,15 @@ namespace InSite.UI.Lobby
             try
             {
                 if (autoApprove)
-                    SendEmailVerificationRequested(factory);
+                {
+                    var token = new VerifyEmail.Token(factory.User.UserIdentifier, factory.User.Email);
+                    ServiceLocator.SendCommand(new ModifyUserFieldDateOffset(token.UserId, UserField.EmailVerificationTokenIssued, token.Issued));
+                    SendEmailVerificationRequested(token);
+                }
                 else
+                {
                     SendOrganizationAccessRequested(factory);
+                }
 
                 SendUserRegistrationSubmitted(factory);
 
@@ -297,14 +312,15 @@ namespace InSite.UI.Lobby
                 ShowRegisterError(Translate("An unexpected error occurred."));
         }
 
-        private void SendEmailVerificationRequested(UserFactory factory)
+        private void SendEmailVerificationRequested(VerifyEmail.Token token)
         {
-            ServiceLocator.AlertMailer.Send(Organization.OrganizationIdentifier, factory.User.UserIdentifier, new AlertUserEmailVerificationRequested
+            ServiceLocator.AlertMailer.Send(Organization.OrganizationIdentifier, token.UserId, new AlertUserEmailVerificationRequested
             {
                 AppUrl = HttpRequestHelper.CurrentRootUrl,
                 Organization = Organization.LegalName,
-                UserEmail = factory.User.Email,
-                UserIdentifier = factory.User.UserIdentifier
+                UserEmail = token.Email,
+                UserIdentifier = token.UserId,
+                TokenValue = token.Serialize()
             });
         }
 
@@ -445,7 +461,7 @@ namespace InSite.UI.Lobby
             if (group.HasValue)
                 MembershipHelper.Save(group.Value, user, null);
 
-            if (CurrentSessionState.EnableUserRegistration && (Organization.ParentOrganizationIdentifier == OrganizationIdentifiers.CMDS))
+            if (CurrentSessionState.EnableUserRegistration && ServiceLocator.Partition.IsE03())
                 MembershipHelper.Save(OrganizationIdentifiers.CMDS, GroupTypes.Role, "Skills Passport Users", user, "Membership");
 
             foreach (RepeaterItem outer in GroupList.Items)

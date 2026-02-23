@@ -1,16 +1,22 @@
 import { filePickerHelper } from "@/helpers/filePickerHelper";
 
 interface Props {
+    disabled: boolean;
     supportedFileTypes: string[];
     onUploadFile: (file: File) => void;
 }
 
 export default function RichTextEditor_FileTypes({
+    disabled,
     supportedFileTypes,
     onUploadFile
 }: Props) {
     async function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
         e.preventDefault();
+
+        if (disabled) {
+            return;
+        }
 
         const files = await filePickerHelper.pick(false, supportedFileTypes);
         if (files && files.length === 1) {

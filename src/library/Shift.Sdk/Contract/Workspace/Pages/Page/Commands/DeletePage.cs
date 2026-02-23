@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeletePage
     {
-        public Guid PageIdentifier { get; set; }
+        public Guid PageId { get; set; }
     }
 }

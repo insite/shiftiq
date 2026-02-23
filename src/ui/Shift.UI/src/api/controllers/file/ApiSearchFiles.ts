@@ -1,8 +1,8 @@
 export interface ApiSearchFiles {
-    OrganizationIdentifier?: string | null;
-    UserIdentifier?: string | null;
-    ObjectIdentifier?: string | null;
-    ObjectIdentifierContains?: string | null;
+    OrganizationId?: string | null;
+    UserId?: string | null;
+    ObjectId?: string | null;
+    ObjectIdContains?: string | null;
 
     ObjectTypeExact?: string | null;
     FileNameContains?: string | null;

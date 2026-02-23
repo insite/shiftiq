@@ -144,7 +144,7 @@ namespace InSite.UI.Portal.Home
 
             var achievement = VCmdsCredentialSearch.SelectFirst(x => x.UserIdentifier == item.UserIdentifier && x.AchievementIdentifier == item.AchievementIdentifier);
 
-            var isSignOffApplicable = EmployeeAchievementHelper.TypeAllowsSignOff(item.AchievementLabel)
+            var isSignOffApplicable = EmployeeAchievementHelper.AllowSignOff(item.AchievementLabel)
                     && achievement.AuthorityType == "Self"
                     && item.UserIdentifier == User.UserIdentifier;
 

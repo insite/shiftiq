@@ -1,4 +1,4 @@
 export interface ApiAchievementModel {
-    AchievementIdentifier: string;
+    AchievementId: string;
     AchievementTitle: string;
 }

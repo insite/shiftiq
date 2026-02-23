@@ -44,7 +44,7 @@ namespace InSite.UI.Layout.Lobby
             var token = CookieTokenModule.Current;
             var organization = OrganizationSearch.Select(token.OrganizationCode)?.OrganizationIdentifier ?? Guid.Empty;
 
-            Translator = new InputTranslator(organization, language);
+            Translator = new InputTranslator(language, organization);
         }
 
         private bool AutoTranslate => ServiceLocator.AppSettings.Application.AutoTranslateEnabled && Translator?.Language != "en";

@@ -316,7 +316,7 @@ namespace InSite.Admin.Sites.Pages
                 ;
 
             var caller = FormCaller.CreatePortal(string.Empty).Serialize();
-            var helper = new LaunchCardAdapter();
+            var helper = new LaunchCardAdapter(ServiceLocator.Partition);
             var url = helper.CreateUrl(appUrl, page.PageIdentifier, page.NavigateUrl, page.ObjectType, page.ObjectIdentifier, page.PageSlug, Identity.User.Identifier, caller, LabelHelper.GetTranslation);
 
             if (!site.SiteIsPortal)

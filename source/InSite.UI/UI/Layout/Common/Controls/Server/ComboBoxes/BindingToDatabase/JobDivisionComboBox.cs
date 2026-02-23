@@ -17,7 +17,7 @@ namespace InSite.Common.Web.UI
 
             if (organizationId != null)
             {
-                var jobDivisions = ServiceLocator.PersonSearch.GetJobDivisions(organizationId.Value);
+                var jobDivisions = ServiceLocator.PersonSearch.GetJobDivisions(organizationId);
 
                 foreach (var jobDivision in jobDivisions)
                 {

@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class AssertUserSession : Query<bool>
     {
-        public Guid SessionIdentifier { get; set; }
+        public Guid SessionId { get; set; }
     }
 }

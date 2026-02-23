@@ -321,7 +321,7 @@ namespace InSite.Common.Web.UI
                 if (Mode == UploadMode.Basic)
                 {
                     if (FolderPath.IsEmpty())
-                        throw new ApplicationError("FolderPath is null");
+                        throw new InvalidOperationException("FolderPath is null");
 
                     var upload = Api.Controllers.FilesLegacyController
                         .SaveUploadedFile("Uploads", Guid.NewGuid(), _fileUpload.PostedFile, CurrentSessionState.Identity.User.Email);
@@ -334,7 +334,7 @@ namespace InSite.Common.Web.UI
                 else if (Mode == UploadMode.Advanced)
                 {
                     if (FolderPath.IsEmpty())
-                        throw new ApplicationError("FolderPath is null");
+                        throw new InvalidOperationException("FolderPath is null");
 
                     var file = _fileUpload.PostedFile;
                     var fileName = StringHelper.Sanitize(Path.GetFileNameWithoutExtension(file.FileName), '-');
@@ -355,7 +355,7 @@ namespace InSite.Common.Web.UI
                 }
                 else
                 {
-                    throw new ApplicationError("Unexpected upload mode: " + Mode.GetName());
+                    throw new InvalidOperationException("Unexpected upload mode: " + Mode.GetName());
                 }
 
                 if (callback.Function.IsNotEmpty())

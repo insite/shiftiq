@@ -21,8 +21,8 @@ namespace InSite.UI.Admin.Records
 
             BindModelToControls();
 
-            LearningMastery.Visible = Identity.IsGranted(PermissionIdentifiers.Admin_Integrations_Canvas);
-            AcademicYear.Visible = Identity.IsGranted(PermissionIdentifiers.Admin_Integrations_Canvas);
+            LearningMastery.Visible = false;
+            AcademicYear.Visible = false;
 
             LoadRecentChanges();
         }

@@ -11,12 +11,12 @@ namespace Shift.Sdk.UI
         public override object ReadJson(JsonReader reader, Type type, object value, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
-                throw new Exception("Unexpected token type: " + reader.TokenType);
+                throw new JsonSerializationException("Unexpected token type: " + reader.TokenType);
 
             var str = (string)reader.Value;
             var result = Enum.Parse(type, str);
             if (!Enum.IsDefined(type, result))
-                throw new Exception("Unexpected enum value: " + str ?? "(null)");
+                throw new JsonSerializationException("Unexpected enum value: " + str ?? "(null)");
 
             return result;
         }

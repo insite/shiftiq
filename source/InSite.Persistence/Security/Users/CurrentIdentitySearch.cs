@@ -13,9 +13,9 @@ using UserModel = InSite.Domain.Foundations.User;
 
 namespace InSite.Persistence
 {
-    public class CurrentIdentitySearch
+    public static class CurrentIdentitySearch
     {
-        public CurrentIdentity Get(
+        public static CurrentIdentity Get(
             string userName,
             string organizationCode,
             string language,
@@ -26,6 +26,7 @@ namespace InSite.Persistence
             IPersonSearch personSearch
             )
         {
+
             var model = new IdentityModel(organizationCode);
 
             var organizationId = model.Organization.Identifier;
@@ -40,7 +41,7 @@ namespace InSite.Persistence
 
                 LoadOrganizations(model, userId, userName);
 
-                LoadGroupsAndPermissions(model, userId, organizationId, model.Organization.ParentOrganizationIdentifier, groupSearch);
+                LoadGroupsAndPermissions(model, userId, organizationId, groupSearch);
 
                 LoadPerson(model, userId, people, personSearch);
             }
@@ -57,14 +58,14 @@ namespace InSite.Persistence
                 );
         }
 
-        private void LoadPerson(IdentityModel model, Guid userId, List<QPerson> people, IPersonSearch personSearch)
+        private static void LoadPerson(IdentityModel model, Guid userId, List<QPerson> people, IPersonSearch personSearch)
         {
             var organizationId = model.Organization.Identifier;
 
             if (people == null)
                 people = personSearch.GetPersons(new QPersonFilter { UserIdentifier = userId });
 
-            var person = people.First(x => x.OrganizationIdentifier == organizationId);
+            var person = people.Single(x => x.OrganizationIdentifier == organizationId);
 
             model.Person = PersonAdapter.CreatePersonPacket(person);
 
@@ -72,24 +73,19 @@ namespace InSite.Persistence
                 model.Persons.Add(PersonAdapter.CreatePersonPacket(p));
         }
 
-        private void LoadGroupsAndPermissions(IdentityModel model, Guid userId, Guid organizationId, Guid? parentOrganizationId, IGroupSearch groupSearch)
+        private static void LoadGroupsAndPermissions(IdentityModel model, Guid userId, Guid organizationId, IGroupSearch groupSearch)
         {
             var roles = MembershipSearch.Select(
                     x => x.UserIdentifier == userId,
                     x => x.User);
 
-            var upstreamOrganizations = new List<Guid>
-                {
-                    model.Organization.Identifier
-                };
-
-            if (parentOrganizationId.HasValue && parentOrganizationId != Guid.Empty)
+            var upstreamOrganizations = new HashSet<Guid>
             {
-                upstreamOrganizations.Add(parentOrganizationId.Value);
-                var parent = OrganizationSearch.Select(parentOrganizationId.Value);
-                if (parent.ParentOrganizationIdentifier.HasValue && parent.ParentOrganizationIdentifier != Guid.Empty)
-                    upstreamOrganizations.Add(parent.ParentOrganizationIdentifier.Value);
-            }
+                model.Organization.Identifier
+            };
+
+            if (organizationId != ServiceLocator.Partition.Identifier)
+                upstreamOrganizations.Add(ServiceLocator.Partition.Identifier);
 
             foreach (var role in roles)
             {
@@ -97,21 +93,18 @@ namespace InSite.Persistence
                 if (group == null)
                     continue;
 
-                var permissions = TGroupPermissionSearch.Select(x => x.GroupIdentifier == group.GroupIdentifier);
-
-                bool enabled = upstreamOrganizations.Any(o => o == group.OrganizationIdentifier);
-
+                var enabled = upstreamOrganizations.Any(o => o == group.OrganizationIdentifier);
                 if (!enabled)
                     continue;
 
                 model.Groups.Add(GroupAdapter.CreateGroupPacket(group));
 
+                var permissions = TGroupPermissionSearch.Select(x => x.GroupIdentifier == group.GroupIdentifier);
                 foreach (var permission in permissions)
                 {
                     var action = TActionSearch.Get(permission.ObjectIdentifier);
                     model.Claims.Add(permission.ObjectIdentifier,
-                        action?.ActionType, action?.ActionUrl,
-                        permission.AllowExecute,
+                        action?.ActionUrl,
                         permission.AllowRead, permission.AllowWrite, permission.AllowCreate, permission.AllowDelete,
                         permission.AllowAdministrate, permission.AllowConfigure,
                         permission.AllowTrialAccess);
@@ -119,7 +112,7 @@ namespace InSite.Persistence
             }
         }
 
-        private void LoadOrganizations(IdentityModel model, Guid user, string userName)
+        private static void LoadOrganizations(IdentityModel model, Guid user, string userName)
         {
             model.Organizations = OrganizationHelper.SelectOrganizationsAccessibleToUser(user);
 
@@ -130,7 +123,7 @@ namespace InSite.Persistence
                 model.Organization = model.Organizations.First();
         }
 
-        private void LoadImpersonator(IdentityModel model, string impersonatorLoginName, string impersonatorOrganizationCode, Guid organization)
+        private static void LoadImpersonator(IdentityModel model, string impersonatorLoginName, string impersonatorOrganizationCode, Guid organization)
         {
             if (impersonatorLoginName == null || impersonatorOrganizationCode == null)
                 return;
@@ -147,7 +140,7 @@ namespace InSite.Persistence
             model.Impersonator = impersonator;
         }
 
-        private UserModel GetUser(string userName, Guid organization)
+        private static UserModel GetUser(string userName, Guid organization)
         {
             return userName.HasValue()
                 ? UserSearch.SelectWebContact(userName, organization, false)

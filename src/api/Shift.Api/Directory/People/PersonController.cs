@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class PersonController : ShiftControllerBase
 {
     private readonly PersonService _personService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public PersonController(PersonService personService)
+    public PersonController(PersonService personService, IPrincipalProvider principalProvider)
     {
         _personService = personService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class PersonController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific person
     /// </summary>
-    [HttpHead("directory/people/{person:guid}")]
-    [HybridAuthorize(Policies.Directory.People.Person.Assert)]
+    [HttpHead("api/directory/people/{person:guid}")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertPerson")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid person, CancellationToken cancellation = default)
     {
-        var exists = await _personService.AssertAsync(person, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _personService.AssertAsync(person, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class PersonController : ShiftControllerBase
     /// <summary>
     /// Collects the list of people that match specific criteria
     /// </summary>
-    [HttpPost("directory/people/collect")]
-    [HybridAuthorize(Policies.Directory.People.Person.Collect)]
+    [HttpPost("api/directory/people/collect")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PersonModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectPeople")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectPeople query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class PersonController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("directory/people")]
-    [HybridAuthorize(Policies.Directory.People.Person.Collect)]
+    [HttpGet("api/directory/people")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PersonModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectPeople_get")]
     [AliasFor("collectPeople")]
@@ -56,6 +62,10 @@ public class PersonController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectPeople query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _personService.CollectAsync(query, cancellation);
 
         var count = await _personService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class PersonController : ShiftControllerBase
     /// <summary>
     /// Counts the people that match specific criteria
     /// </summary>
-    [HttpPost("directory/people/count")]
-    [HybridAuthorize(Policies.Directory.People.Person.Count)]
+    [HttpPost("api/directory/people/count")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countPeople")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountPeople query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class PersonController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("directory/people/count")]
-    [HybridAuthorize(Policies.Directory.People.Person.Count)]
+    [HttpGet("api/directory/people/count")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countPeople_get")]
     [AliasFor("countPeople")]
@@ -90,6 +100,10 @@ public class PersonController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountPeople query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _personService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class PersonController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of people that match specific criteria
     /// </summary>    
-    [HttpPost("directory/people/download")]
-    [HybridAuthorize(Policies.Directory.People.Person.Download)]
+    [HttpPost("api/directory/people/download")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadPeople")]
@@ -108,8 +122,8 @@ public class PersonController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("directory/people/download")]
-    [HybridAuthorize(Policies.Directory.People.Person.Download)]
+    [HttpGet("api/directory/people/download")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadPeople_get")]
@@ -122,6 +136,10 @@ public class PersonController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectPeople query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Directory", "People", query.Filter.Format, User);
 
         var models = await _personService
@@ -142,22 +160,30 @@ public class PersonController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific person
     /// </summary>
-    [HttpGet("directory/people/{person:guid}")]
-    [HybridAuthorize(Policies.Directory.People.Person.Retrieve)]
+    [HttpGet("api/directory/people/{person:guid}")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType<PersonModel>(StatusCodes.Status200OK)]
     [EndpointName("retrievePerson")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid person, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _personService.RetrieveAsync(person, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of people that match specific criteria
     /// </summary>
-    [HttpPost("directory/people/search")]
-    [HybridAuthorize(Policies.Directory.People.Person.Search)]
+    [HttpPost("api/directory/people/search")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PersonMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchPeople")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchPeople query, CancellationToken cancellation = default)
@@ -165,8 +191,8 @@ public class PersonController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("directory/people/search")]
-    [HybridAuthorize(Policies.Directory.People.Person.Search)]
+    [HttpGet("api/directory/people/search")]
+    [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PersonMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchPeople_get")]
     [AliasFor("searchPeople")]
@@ -178,6 +204,10 @@ public class PersonController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchPeople query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _personService.SearchAsync(query, cancellation);
 
         var count = await _personService.CountAsync(query, cancellation);

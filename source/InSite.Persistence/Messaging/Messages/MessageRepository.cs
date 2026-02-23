@@ -123,7 +123,7 @@ namespace InSite.Persistence
             var filter = new MessageFilter
             {
                 OrganizationIdentifier = organization,
-                Name = messageName
+                NameContains = messageName
             };
 
             var message = MessageSearch.Instance.GetMessage(filter);
@@ -138,7 +138,7 @@ namespace InSite.Persistence
             var filter = new MessageFilter
             {
                 OrganizationIdentifier = organization,
-                Name = messageName
+                NameContains = messageName
             };
 
             return MessageSearch.Instance.GetMessage(filter);

@@ -96,13 +96,11 @@ namespace InSite.Admin.Sites.Pages
         {
             var filterGroupName = FilterGroupName.Text;
 
-            var organizations = new List<Guid> { Organization.Identifier };
-            if (Organization.ParentOrganizationIdentifier.HasValue)
-                organizations.Add(Organization.ParentOrganizationIdentifier.Value);
-
             var filter = new QGroupFilter
             {
-                OrganizationIdentifiers = organizations.ToArray(),
+                OrganizationIdentifiers = Organization.Identifier != ServiceLocator.Partition.Identifier
+                    ? new[] { ServiceLocator.Partition.Identifier, Organization.Identifier }
+                    : new[] { Organization.Identifier },
                 GroupType = FilterGroupType.Value,
                 GroupNameLike = filterGroupName
             };

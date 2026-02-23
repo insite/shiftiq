@@ -37,7 +37,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             if (Current.IsValid)
             {
                 ServiceLocator.SendCommand(new DeleteResponseSession(Current.SessionIdentifier));
-                redirectUrl = SubmissionSessionNavigator.GetLaunchPageUrl(Current.Survey.Asset, Current.UserIdentifier).ToString();
+                redirectUrl = SubmissionSessionNavigator.GetLaunchPageUrl(Current.Survey.Asset, User.Identifier).ToString();
             }
 
             HttpResponseHelper.Redirect(GetReturnUrl() ?? redirectUrl, true);

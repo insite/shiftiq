@@ -60,6 +60,15 @@ namespace InSite.Admin.Workflow.Forms.Submissions.Controls
         protected global::InSite.Common.Web.UI.TextBox RespondentName;
 
         /// <summary>
+        /// AssessorName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox AssessorName;
+
+        /// <summary>
         /// SearchButton control.
         /// </summary>
         /// <remarks>

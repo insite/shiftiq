@@ -1,16 +1,14 @@
 ﻿using Shift.Common.Timeline.Commands;
 
-using Shift.Common;
-
 namespace Shift.Service.Timeline
 {
     public class CommandQueue : ICommandQueue
     {
-        private readonly IShiftIdentityService _identityService;
+        private readonly Toolbox.TimelineClient _timelineClient;
 
-        public CommandQueue(IShiftIdentityService identityService, Toolbox.TimelineClient timelineClient)
+        public CommandQueue(Toolbox.TimelineClient timelineClient)
         {
-            _identityService = identityService;
+            _timelineClient = timelineClient;
         }
 
         public void Bookmark(ICommand command, DateTimeOffset expired)
@@ -45,21 +43,10 @@ namespace Shift.Service.Timeline
 
         public void Send(ICommand command)
         {
-            var principal = _identityService.GetPrincipal();
+            var result = _timelineClient.QueueCommand(command);
 
-            command.OriginOrganization = principal.Organization.Identifier;
-
-            command.OriginUser = principal.User.Identifier;
-
-            var commandName = command.GetType().Name;
-
-            var endpoint = $"react/commands?c={commandName}";
-
-            // var result = TaskRunner.RunSync(_timelineClient.HttpPost, endpoint, command);
-            // if (result.Status != System.Net.HttpStatusCode.OK)
-            //    throw new Exception("An unexpected error occurred.");
-
-            throw new NotImplementedException();
+            if (result.Status != System.Net.HttpStatusCode.OK)
+                throw new HttpRequestException("An unexpected error occurred.");
         }
 
         public bool Start(Guid command)

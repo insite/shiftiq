@@ -18,7 +18,7 @@ export default function InstructorFinder<Criteria extends object>(props: Props<C
 }
 
 async function loadText(id: string) {
-    const result = await shiftClient.people.search({ UserIdentifier: id }, 0, 1, ["UserName"]);
+    const result = await shiftClient.people.search({ UserId: id }, 0, 1, ["UserName"]);
     return result?.rows?.length ? result.rows[0].UserName : "";
 }
 

@@ -1,0 +1,1 @@
+export type IconStyle = "Brands" | "Regular" | "Solid" | "Light";

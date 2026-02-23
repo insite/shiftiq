@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Commands;
-
 using Humanizer;
 
 using InSite.Application.Banks.Read;
@@ -15,6 +13,7 @@ using InSite.Application.Surveys.Read;
 using InSite.Persistence;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -64,16 +63,16 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
             return taskInfoContainer;
         }
 
-        public static List<TaskObjectData> GetTaskObjectData(Guid Organization, Guid? ParentOrganization = null)
+        public static List<TaskObjectData> GetTaskObjectData(Guid organization)
         {
             var results = new List<TaskObjectData>();
 
-            GetAchievementsObjectData(Organization, results, ParentOrganization);
-            GetLogbooksObjectData(Organization, results);
-            GetSurveysObjectData(Organization, results);
-            GetCoursesObjectData(Organization, results);
-            GetAssessmentBankObjectData(Organization, results);
-            GetAssessmentFormsObjectData(Organization, results);
+            GetAchievementsObjectData(organization, results);
+            GetLogbooksObjectData(organization, results);
+            GetSurveysObjectData(organization, results);
+            GetCoursesObjectData(organization, results);
+            GetAssessmentBankObjectData(organization, results);
+            GetAssessmentFormsObjectData(organization, results);
 
             return results;
         }
@@ -168,12 +167,12 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
             }
         }
 
-        public static IEnumerable<Shift.Common.ListItem> GetTaskObjects(string objectType, Guid organizationId, Guid? parentOrganizationId = null)
-            => GetTaskListItemBasedOnObjectType(objectType, organizationId, parentOrganizationId);
+        public static IEnumerable<Shift.Common.ListItem> GetTaskObjects(string objectType, Guid organizationId, bool includePartitionItems = false)
+            => GetTaskListItemBasedOnObjectType(objectType, organizationId, includePartitionItems);
 
-        public static (List<TTask>, List<ProgramTaskItem>) GetTasksAndItems(Guid? programId, string objectType, Guid organizationId, Guid? parentOrganizationId)
+        public static (List<TTask>, List<ProgramTaskItem>) GetTasksAndItems(Guid? programId, string objectType, Guid organizationId, bool includePartitionItems = false)
         {
-            var objects = GetTaskListItemBasedOnObjectType(objectType, organizationId, parentOrganizationId);
+            var objects = GetTaskListItemBasedOnObjectType(objectType, organizationId, includePartitionItems);
 
             var filter = new TTaskFilter
             {
@@ -182,8 +181,8 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
 
             filter.OrganizationIdentifiers.Add(organizationId);
 
-            if (parentOrganizationId.HasValue)
-                filter.OrganizationIdentifiers.Add(parentOrganizationId.Value);
+            if (includePartitionItems && organizationId != ServiceLocator.Partition.Identifier)
+                filter.OrganizationIdentifiers.Add(ServiceLocator.Partition.Identifier);
 
             var programTasks = ProgramSearch1.GetProgramTasks(filter);
 
@@ -233,7 +232,7 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
 
         #region Helper Methods
 
-        private static List<Shift.Common.ListItem> GetTaskListItemBasedOnObjectType(string objectType, Guid organizationId, Guid? parentOrganizationId)
+        private static List<Shift.Common.ListItem> GetTaskListItemBasedOnObjectType(string objectType, Guid organizationId, bool includePartitionItems)
         {
             var list = new List<Shift.Common.ListItem>();
 
@@ -243,7 +242,7 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
                     GetAssesmentTaskListItems(organizationId, list);
                     return list;
                 case "Achievement":
-                    GetAchievementTaskListItems(organizationId, list, parentOrganizationId);
+                    GetAchievementTaskListItems(organizationId, list, includePartitionItems);
                     return list;
                 case "Logbook":
                     GetLogbookTaskListItems(organizationId, list);
@@ -276,12 +275,12 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
                 list.Add(new Shift.Common.ListItem { Text = item.Name, Value = item.Id.ToString() });
         }
 
-        private static void GetAchievementTaskListItems(Guid organizationId, List<Shift.Common.ListItem> list, Guid? parentOrganizationId)
+        private static void GetAchievementTaskListItems(Guid organizationId, List<Shift.Common.ListItem> list, bool includePartitionItems)
         {
             var filter = new QAchievementFilter(organizationId);
 
-            if (parentOrganizationId.HasValue)
-                filter.OrganizationIdentifiers.Add(parentOrganizationId.Value);
+            if (includePartitionItems && organizationId != ServiceLocator.Partition.Identifier)
+                filter.OrganizationIdentifiers.Add(ServiceLocator.Partition.Identifier);
 
             var items = ServiceLocator.AchievementSearch.GetAchievements(filter);
 
@@ -315,12 +314,12 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
                 list.Add(new Shift.Common.ListItem { Text = item.CourseName, Value = item.CourseIdentifier.ToString() });
         }
 
-        private static void GetAchievementsObjectData(Guid organization, List<TaskObjectData> results, Guid? parentOrganization)
+        private static void GetAchievementsObjectData(Guid organization, List<TaskObjectData> results)
         {
             var filter = new QAchievementFilter(organization);
 
-            if (parentOrganization.HasValue)
-                filter.OrganizationIdentifiers.Add(parentOrganization.Value);
+            if (organization != ServiceLocator.Partition.Identifier)
+                filter.OrganizationIdentifiers.Add(ServiceLocator.Partition.Identifier);
 
             var achievementsItems = ServiceLocator.AchievementSearch
                 .GetAchievements(filter)

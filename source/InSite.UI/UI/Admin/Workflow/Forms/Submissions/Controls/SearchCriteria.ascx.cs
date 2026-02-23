@@ -19,10 +19,11 @@ namespace InSite.Admin.Workflow.Forms.Submissions.Controls
                     CompletedSince = CompletedSince.Value,
                     AgencyGroupIdentifier = AgencyGroupIdentifier.Value,
                     IsLocked = IsLocked.ValueAsBoolean,
-                    IsPlatformAdministrator = Identity.IsOperator,
+                    IsOperator = Identity.IsOperator,
                     OrganizationIdentifier = Organization.Identifier,
                     PeriodIdentifiers = PeriodIdentifiers.Values,
                     RespondentName = RespondentName.Text,
+                    AssessorName = AssessorName.Text,
                     ResponseAnswerText = AnswerText.Value,
                     StartedBefore = StartedBefore.Value,
                     StartedSince = StartedSince.Value,
@@ -54,6 +55,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions.Controls
                 AgencyGroupIdentifier.Value = value.AgencyGroupIdentifier;
                 PeriodIdentifiers.Values = value.PeriodIdentifiers;
                 RespondentName.Text = value.RespondentName;
+                AssessorName.Text = value.AssessorName;
                 StartedSince.Value = value.StartedSince;
                 StartedBefore.Value = value.StartedBefore;
                 CompletedSince.Value = value.CompletedSince;
@@ -125,6 +127,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions.Controls
             PeriodIdentifiers.Value = null;
             AgencyGroupIdentifier.Value = null;
             RespondentName.Text = null;
+            AssessorName.Text = null;
             StartedSince.Value = null;
             StartedBefore.Value = null;
             CompletedSince.Value = null;
@@ -144,6 +147,9 @@ namespace InSite.Admin.Workflow.Forms.Submissions.Controls
 
             RespondentName.Enabled = false;
             RespondentName.Text = null;
+
+            AssessorName.Enabled = false;
+            AssessorName.Text = null;
         }
     }
 }

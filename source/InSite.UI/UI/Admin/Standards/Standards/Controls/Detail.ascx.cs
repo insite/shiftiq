@@ -11,8 +11,8 @@ using InSite.Persistence;
 using Newtonsoft.Json;
 
 using Shift.Common;
-using Shift.Constant;
 using Shift.Common.Events;
+using Shift.Constant;
 
 namespace InSite.Admin.Standards.Standards.Controls
 {
@@ -241,6 +241,8 @@ namespace InSite.Admin.Standards.Standards.Controls
             SetGlossaryTerms(standard, content, canEdit);
 
             SetScenarioQuestions(standard, panel, canEdit, canDelete);
+
+            SetAttachments(standard, panel);
         }
 
         private void SetDetails(Standard standard)
@@ -294,8 +296,7 @@ namespace InSite.Admin.Standards.Standards.Controls
             MinorVersion.Text = standard.MinorVersion;
             Thumbprint.Text = standard.StandardIdentifier.ToString();
 
-            var hasCanvasAccess = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Integrations_Canvas);
-            CanvasIdentifierField.Visible = hasCanvasAccess;
+            CanvasIdentifierField.Visible = false;
             CanvasIdentifier.Text = string.IsNullOrEmpty(standard.CanvasIdentifier) ? "N/A" : standard.CanvasIdentifier;
 
             DescriptionEn.Text = standard.ContentDescription;
@@ -336,7 +337,7 @@ namespace InSite.Admin.Standards.Standards.Controls
                 tab = null;
 
             var content = ServiceLocator.ContentSearch.GetBlock(asset.StandardIdentifier, labels: fields);
-            var canWrite = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards, PermissionOperation.Write);
+            var canWrite = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards, DataAccess.Update);
 
             foreach (var name in fields)
             {
@@ -440,6 +441,14 @@ namespace InSite.Admin.Standards.Standards.Controls
 
             ScenarioQuestions.SetInputValues(standard, canEdit && canDelete, "id&panel=questions", selectedQuestionId);
             ScenarioQuesionsTab.SetTitle("Questions", ScenarioQuestions.QuestionsCount);
+        }
+
+        private void SetAttachments(Standard standard, string panel)
+        {
+            AttachmentSection.BindModelToControls(standard.StandardIdentifier);
+
+            if (panel == "attachments")
+                AttachmentTab.IsSelected = true;
         }
 
         #endregion

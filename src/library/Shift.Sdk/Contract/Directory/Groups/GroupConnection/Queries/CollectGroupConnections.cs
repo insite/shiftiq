@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public class CollectGroupConnections : Query<IEnumerable<GroupConnectionModel>>, IGroupConnectionCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
     }
 }

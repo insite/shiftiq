@@ -37,7 +37,7 @@ namespace InSite.Common.Web
 
         #region Classes
 
-        public class MaxFileSizeExceededException : ApplicationError
+        public class MaxFileSizeExceededException : Exception
         {
             public string FileName { get; private set; }
             public string FileSize { get; private set; }

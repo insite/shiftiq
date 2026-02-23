@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveAchievement : Query<AchievementModel>
     {
-        public Guid AchievementIdentifier { get; set; }
+        public Guid AchievementId { get; set; }
     }
 }

@@ -9,9 +9,9 @@ namespace Shift.Common
         public static void EncryptStream(string password, string salt, Stream inputStream, Stream outputStream, SymmetricEncryptionAlgorithm algorithm = SymmetricEncryptionAlgorithm.AES_256_CBC)
         {
             if (!inputStream.CanRead)
-                throw new Exception("The input stream has to support read");
+                throw new ArgumentException("The input stream must support read", nameof(inputStream));
             if (!outputStream.CanWrite)
-                throw new Exception("The output stream has to support write");
+                throw new ArgumentException("The output stream must support write", nameof(outputStream));
 
             EncryptionBuffer encBuffer = new EncryptionBuffer(password, salt, algorithm);
             byte[] readBuffer = new byte[500000];
@@ -30,9 +30,9 @@ namespace Shift.Common
         public static void DecryptStream(string password, string salt, Stream inputStream, Stream outputStream, SymmetricEncryptionAlgorithm algorithm = SymmetricEncryptionAlgorithm.AES_256_CBC)
         {
             if (!inputStream.CanRead)
-                throw new Exception("The input stream has to support read");
+                throw new ArgumentException("The input stream must support read", nameof(inputStream));
             if (!outputStream.CanWrite)
-                throw new Exception("The output stream has to support write");
+                throw new ArgumentException("The output stream must support write", nameof(outputStream));
 
             DecryptionBuffer decBuffer = new DecryptionBuffer(password, salt, algorithm);
 
@@ -42,9 +42,9 @@ namespace Shift.Common
         public static void DecryptStreamWithoutSalt(byte[] ivBytes, byte[] keyBytes, Stream inputStream, Stream outputStream, SymmetricEncryptionAlgorithm algorithm = SymmetricEncryptionAlgorithm.AES_256_CBC)
         {
             if (!inputStream.CanRead)
-                throw new Exception("The input stream has to support read");
+                throw new ArgumentException("The input stream must support read", nameof(inputStream));
             if (!outputStream.CanWrite)
-                throw new Exception("The output stream has to support write");
+                throw new ArgumentException("The output stream must support write", nameof(outputStream));
 
             DecryptionBuffer decBuffer = DecryptionBuffer.CreateWithoutSalt(ivBytes, keyBytes, algorithm);
 
@@ -69,9 +69,9 @@ namespace Shift.Common
         public static void EncryptStream(string password, AutoSaltSizes saltSize, Stream inputStream, Stream outputStream, SymmetricEncryptionAlgorithm algorithm = SymmetricEncryptionAlgorithm.AES_256_CBC)
         {
             if (!inputStream.CanRead)
-                throw new Exception("The input stream has to support read");
+                throw new ArgumentException("The input stream must support read", nameof(inputStream));
             if (!outputStream.CanWrite)
-                throw new Exception("The output stream has to support write");
+                throw new ArgumentException("The output stream must support write", nameof(outputStream));
 
             EncryptionBuffer encBuffer = new EncryptionBuffer(password, saltSize, algorithm);
             byte[] readBuffer = new byte[500000];
@@ -90,9 +90,9 @@ namespace Shift.Common
         public static void DecryptStream(string password, AutoSaltSizes saltSize, Stream inputStream, Stream outputStream, SymmetricEncryptionAlgorithm algorithm = SymmetricEncryptionAlgorithm.AES_256_CBC)
         {
             if (!inputStream.CanRead)
-                throw new Exception("The input stream has to support read");
+                throw new ArgumentException("The input stream must support read", nameof(inputStream));
             if (!outputStream.CanWrite)
-                throw new Exception("The output stream has to support write");
+                throw new ArgumentException("The output stream must support write", nameof(outputStream));
 
             DecryptionBuffer decBuffer = new DecryptionBuffer(password, saltSize, algorithm);
             byte[] readBuffer = new byte[500000];

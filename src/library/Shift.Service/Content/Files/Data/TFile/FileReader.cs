@@ -12,23 +12,20 @@ public class FileReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "FileUploaded DESC, FileIdentifier";
 
-    public FileReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public FileReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid file, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid file, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.FileIdentifier == file, cancellation);
+            return query.AnyAsync(x => x.FileIdentifier == file && (organization == null || organization == x.OrganizationIdentifier), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,8 @@ public class FileReader : IEntityReader
     /// </remarks>
     private IQueryable<FileEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.TFile
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -121,17 +115,20 @@ public class FileReader : IEntityReader
 
         var query = BuildQueryable(db);
 
-        if (criteria.UserIdentifier.HasValue)
-            query = query.Where(x => x.UserIdentifier == criteria.UserIdentifier.Value);
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
 
-        if (criteria.OrganizationIdentifier.HasValue)
-            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationIdentifier.Value);
+        if (criteria.UserId.HasValue)
+            query = query.Where(x => x.UserIdentifier == criteria.UserId.Value);
+
+        if (criteria.FileIds != null && criteria.FileIds.Length > 0)
+            query = query.Where(x => criteria.FileIds.Contains(x.FileIdentifier));
 
         if (criteria.ObjectTypeExact.IsNotEmpty())
             query = query.Where(x => x.ObjectType == criteria.ObjectTypeExact!);
 
-        if (criteria.ObjectIdentifier.HasValue)
-            query = query.Where(x => x.ObjectIdentifier == criteria.ObjectIdentifier.Value);
+        if (criteria.ObjectId.HasValue)
+            query = query.Where(x => x.ObjectIdentifier == criteria.ObjectId.Value);
 
         if (criteria.ObjectIdentifierContains.IsNotEmpty())
             query = query.Where(x => x.ObjectIdentifier.ToString().Contains(criteria.ObjectIdentifierContains!));
@@ -171,28 +168,22 @@ public class FileReader : IEntityReader
         var matches = await queryable
             .Select(entity => new FileMatch
             {
-                OrganizationIdentifier = entity.OrganizationIdentifier,
+                OrganizationId = entity.OrganizationIdentifier,
                 OrganizationCode = entity.Organization.OrganizationCode,
                 ObjectType = entity.ObjectType,
-                ObjectIdentifier = entity.ObjectIdentifier,
-                FileIdentifier = entity.FileIdentifier,
+                ObjectId = entity.ObjectIdentifier,
+                FileId = entity.FileIdentifier,
                 FileLocation = entity.FileLocation,
                 FileName = entity.FileName,
                 DocumentName = entity.DocumentName,
                 FileSize = entity.FileSize,
                 FileUploaded = entity.FileUploaded,
-                UserIdentifier = entity.UserIdentifier,
+                UserId = entity.UserIdentifier,
                 UserFullName = entity.User.FullName,
                 HasClaims = entity.Claims.Any()
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

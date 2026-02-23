@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class EventController : ShiftControllerBase
 {
     private readonly EventService _eventService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public EventController(EventService eventService)
+    public EventController(EventService eventService, IPrincipalProvider principalProvider)
     {
         _eventService = eventService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class EventController : ShiftControllerBase
     /// <summary>
     /// Check for the existence of one specific event
     /// </summary>
-    [HttpHead("booking/events/{event:guid}")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Assert)]
+    [HttpHead("api/booking/events/{event:guid}")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertEvent")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid @event, CancellationToken cancellation = default)
     {
-        var exists = await _eventService.AssertAsync(@event, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _eventService.AssertAsync(@event, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class EventController : ShiftControllerBase
     /// <summary>
     /// Collect the list of events that match specific criteria
     /// </summary>
-    [HttpPost("booking/events/collect")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Collect)]
+    [HttpPost("api/booking/events/collect")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<EventModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectEvents")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectEvents query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class EventController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("booking/events")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Collect)]
+    [HttpGet("api/booking/events")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<EventModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectEvents_get")]
     [AliasFor("collectEvents")]
@@ -56,6 +62,10 @@ public class EventController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectEvents query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _eventService.CollectAsync(query, cancellation);
 
         var count = await _eventService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class EventController : ShiftControllerBase
     /// <summary>
     /// Count the events that match specific criteria
     /// </summary>
-    [HttpPost("booking/events/count")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Count)]
+    [HttpPost("api/booking/events/count")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countEvents")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountEvents query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class EventController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("booking/events/count")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Count)]
+    [HttpGet("api/booking/events/count")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countEvents_get")]
     [AliasFor("countEvents")]
@@ -90,6 +100,10 @@ public class EventController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountEvents query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _eventService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class EventController : ShiftControllerBase
     /// <summary>
     /// Download the list of events that match specific criteria
     /// </summary>    
-    [HttpPost("booking/events/download")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Download)]
+    [HttpPost("api/booking/events/download")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadEvents")]
@@ -108,8 +122,8 @@ public class EventController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("booking/events/download")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Download)]
+    [HttpGet("api/booking/events/download")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadEvents_get")]
@@ -122,6 +136,10 @@ public class EventController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectEvents query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Booking", "Events", query.Filter.Format, User);
 
         var models = await _eventService
@@ -142,22 +160,30 @@ public class EventController : ShiftControllerBase
     /// <summary>
     /// Retrieve one specific event
     /// </summary>
-    [HttpGet("booking/events/{event:guid}")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Retrieve)]
+    [HttpGet("api/booking/events/{event:guid}")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType<EventModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveEvent")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid @event, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _eventService.RetrieveAsync(@event, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Search for the list of events that match specific criteria
     /// </summary>
-    [HttpPost("booking/events/search")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Search)]
+    [HttpPost("api/booking/events/search")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<EventMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchEvents")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchEvents query, CancellationToken cancellation = default)
@@ -165,8 +191,8 @@ public class EventController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("booking/events/search")]
-    [HybridAuthorize(Policies.Booking.Events.Event.Search)]
+    [HttpGet("api/booking/events/search")]
+    [HybridPermission("booking/events", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<EventMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchEvents_get")]
     [AliasFor("searchEvents")]
@@ -178,6 +204,10 @@ public class EventController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchEvents query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _eventService.SearchAsync(query, cancellation);
 
         var count = await _eventService.CountAsync(query, cancellation);

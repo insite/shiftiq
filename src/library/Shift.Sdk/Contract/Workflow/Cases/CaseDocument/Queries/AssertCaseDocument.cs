@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class AssertCaseDocument : Query<bool>
     {
-        public Guid AttachmentIdentifier { get; set; }
+        public Guid AttachmentId { get; set; }
     }
 }

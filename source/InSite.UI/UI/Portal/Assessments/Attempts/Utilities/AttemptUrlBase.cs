@@ -98,7 +98,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                 attemptId = AttemptID;
 
             if (isRequired && !attemptId.HasValue)
-                throw new ApplicationError("AttemptID is null");
+                throw new InvalidOperationException("AttemptID is null");
 
             var key = GetKey();
             var keyHash = CalculateHashCode(key);

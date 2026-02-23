@@ -60,7 +60,7 @@ namespace InSite.Cmds.User.Competencies.Forms
                 : ButtonStyle.Default;
 
             NoButton.ButtonStyle = ValidatorSelection.SelectedIndex == 1
-                ? ButtonStyle.Success
+                ? ButtonStyle.Danger
                 : ButtonStyle.Default;
 
             if (Identity.IsImpersonating)
@@ -95,7 +95,7 @@ namespace InSite.Cmds.User.Competencies.Forms
             var contact = UserSearch.Select(UserId);
             var competency = CompetencyRepository.Select(info.StandardIdentifier);
 
-            PageHelper.AutoBindHeader(this, null, $"#{competency.Number} ({contact.FullName})");
+            PageHelper.AutoBindHeader(this, null, $"#{competency.Number} for {contact.FullName}", null, " ");
 
             Number.Text = competency.Number;
             Summary.Text = competency.Summary;
@@ -111,7 +111,7 @@ namespace InSite.Cmds.User.Competencies.Forms
             else
                 Skills.Text = "-";
 
-            SelfAssessmentStatus.LoadData(Identity.Organization.Identifier, Identity.Organization.ParentOrganizationIdentifier);
+            SelfAssessmentStatus.LoadData(Identity.Organization.Identifier);
             SelfAssessmentStatus.SelectedValue = info.SelfAssessmentStatus;
 
             ValidatorComment.Text = null;

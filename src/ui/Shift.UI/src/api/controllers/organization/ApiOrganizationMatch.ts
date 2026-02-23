@@ -1,4 +1,4 @@
 export interface ApiOrganizationMatch {
-    OrganizationIdentifier: string;
+    OrganizationId: string;
     CompanyName: string | undefined | null;
 }

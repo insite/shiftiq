@@ -89,7 +89,7 @@ namespace InSite.UI.Admin.Standards.Standards.Controls
         public string GetSelectorValue(string fieldName)
         {
             if (!Items.TryGetValue(fieldName, out var fieldIndex))
-                throw new ApplicationError("Field not found: " + fieldName);
+                throw new KeyNotFoundException("Field not found: " + fieldName);
 
             var selector = (ComboBox)FieldRepeater.Items[fieldIndex].FindControl("Selector");
 

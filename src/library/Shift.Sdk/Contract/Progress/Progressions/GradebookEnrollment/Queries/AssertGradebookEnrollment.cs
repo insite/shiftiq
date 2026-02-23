@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public class AssertGradebookEnrollment : Query<bool>
     {
-        public Guid EnrollmentIdentifier { get; set; }
+        public Guid EnrollmentId { get; set; }
     }
 }

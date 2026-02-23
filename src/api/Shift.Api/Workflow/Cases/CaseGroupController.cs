@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common;
 using Shift.Service.Workflow;
 
 namespace Shift.Api;
@@ -9,10 +10,12 @@ namespace Shift.Api;
 public class CaseGroupController : ShiftControllerBase
 {
     private readonly CaseGroupService _caseGroupService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public CaseGroupController(CaseGroupService caseGroupService)
+    public CaseGroupController(CaseGroupService caseGroupService, IPrincipalProvider principalProvider)
     {
         _caseGroupService = caseGroupService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,22 +23,23 @@ public class CaseGroupController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific case group
     /// </summary>
-    [HttpHead("workflow/cases-groups/{relationship:guid}")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Assert)]
+    [HttpHead("api/workflow/cases-groups/{relationship:guid}")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertCaseGroup")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid join, CancellationToken cancellation = default)
     {
-        var exists = await _caseGroupService.AssertAsync(join, cancellation);
-
+        var principal = _principalProvider.GetPrincipal();
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+        var exists = await _caseGroupService.AssertAsync(join, organizationId, cancellation);
         return exists ? Ok() : NotFound();
     }
 
     /// <summary>
     /// Collects the list of case groups that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-groups/collect")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Collect)]
+    [HttpPost("api/workflow/cases-groups/collect")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseGroupModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectCaseGroups")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectCaseGroups query, CancellationToken cancellation = default)
@@ -43,8 +47,8 @@ public class CaseGroupController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-groups")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Collect)]
+    [HttpGet("api/workflow/cases-groups")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseGroupModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectCaseGroups_get")]
     [AliasFor("collectCaseGroups")]
@@ -56,6 +60,9 @@ public class CaseGroupController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectCaseGroups query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _caseGroupService.CollectAsync(query, cancellation);
 
         var count = await _caseGroupService.CountAsync(query, cancellation);
@@ -68,8 +75,8 @@ public class CaseGroupController : ShiftControllerBase
     /// <summary>
     /// Counts the case groups that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-groups/count")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Count)]
+    [HttpPost("api/workflow/cases-groups/count")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countCaseGroups")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountCaseGroups query, CancellationToken cancellation = default)
@@ -77,8 +84,8 @@ public class CaseGroupController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-groups/count")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Count)]
+    [HttpGet("api/workflow/cases-groups/count")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countCaseGroups_get")]
     [AliasFor("countCaseGroups")]
@@ -90,6 +97,9 @@ public class CaseGroupController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountCaseGroups query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _caseGroupService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +108,8 @@ public class CaseGroupController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of case groups that match specific criteria
     /// </summary>    
-    [HttpPost("workflow/cases-groups/download")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Download)]
+    [HttpPost("api/workflow/cases-groups/download")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadCaseGroups")]
@@ -108,8 +118,8 @@ public class CaseGroupController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-groups/download")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Download)]
+    [HttpGet("api/workflow/cases-groups/download")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadCaseGroups_get")]
@@ -122,6 +132,9 @@ public class CaseGroupController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectCaseGroups query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Workflow", "CaseGroups", query.Filter.Format, User);
 
         var models = await _caseGroupService
@@ -142,22 +155,26 @@ public class CaseGroupController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific case group
     /// </summary>
-    [HttpGet("workflow/cases-groups/{relationship:guid}")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Retrieve)]
+    [HttpGet("api/workflow/cases-groups/{relationship:guid}")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType<CaseGroupModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveCaseGroup")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid join, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
         var model = await _caseGroupService.RetrieveAsync(join, cancellation);
-
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of case groups that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-groups/search")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Search)]
+    [HttpPost("api/workflow/cases-groups/search")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseGroupMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchCaseGroups")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchCaseGroups query, CancellationToken cancellation = default)
@@ -165,8 +182,8 @@ public class CaseGroupController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-groups/search")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseGroup.Search)]
+    [HttpGet("api/workflow/cases-groups/search")]
+    [HybridPermission("workflow/cases-groups", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseGroupMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchCaseGroups_get")]
     [AliasFor("searchCaseGroups")]
@@ -178,6 +195,9 @@ public class CaseGroupController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchCaseGroups query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _caseGroupService.SearchAsync(query, cancellation);
 
         var count = await _caseGroupService.CountAsync(query, cancellation);

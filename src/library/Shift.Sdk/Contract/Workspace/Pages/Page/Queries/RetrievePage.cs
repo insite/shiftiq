@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrievePage : Query<PageModel>
     {
-        public Guid PageIdentifier { get; set; }
+        public Guid PageId { get; set; }
     }
 }

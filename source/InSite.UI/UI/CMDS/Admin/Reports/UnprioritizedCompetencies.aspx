@@ -14,9 +14,6 @@
 
         <insite:NavItem runat="server" ID="CriteriaSection" Title="Criteria" Icon="far fa-search" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    Criteria
-                </h2>
 
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
@@ -71,10 +68,6 @@
         </insite:NavItem>
         <insite:NavItem runat="server" ID="PreviewSection" Title="Report" Icon="far fa-chart-bar" IconPosition="BeforeText" Visible="false">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    Report
-                </h2>
-
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <insite:Button runat="server" ID="DownloadXlsx" ButtonStyle="Primary" Text="Download XLSX" Icon="far fa-download" CssClass="mb-3" />

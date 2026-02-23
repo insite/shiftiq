@@ -80,6 +80,5 @@ namespace InSite.Admin.Records.Logbooks.Controls
             var when = (DateTimeOffset?)item;
             return when.HasValue ? "<i class='text-danger fas fa-lock ps-2'></i>" : String.Empty;
         }
-        
     }
 }

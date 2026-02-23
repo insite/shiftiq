@@ -86,14 +86,15 @@ namespace InSite.UI.Admin.Contacts.People.Controls
             var identity = CurrentSessionState.Identity;
             var user = person.User;
 
-            ImpersonateAnchor.Visible =
-                TGroupPermissionSearch.AllowImpersonation(identity.Groups)
-                && person.UserAccessGranted.HasValue
-                && !identity.IsImpersonating;
+            var isImpersonationPermitted = TGroupPermissionSearch.AllowImpersonation(identity.Groups);
+            var isUserAccessGranted = person.UserAccessGranted.HasValue;
+            var isUserAnImpersonator = identity.IsImpersonating;
+
+            ImpersonateAnchor.Visible = isImpersonationPermitted && isUserAccessGranted && !isUserAnImpersonator;
 
             if (person.UserAccessGranted.HasValue)
             {
-                ImpersonateAnchor.NavigateUrl = "/ui/portal/identity/impersonate?user=" + person.UserIdentifier;
+                ImpersonateAnchor.NavigateUrl = Urls.StartImpersonation + $"?user={person.UserIdentifier}";
                 ImpersonateAnchor.Attributes["class"] = "btn btn-primary";
             }
 
@@ -277,8 +278,8 @@ namespace InSite.UI.Admin.Contacts.People.Controls
             var roles = ServiceLocator.GroupSearch.GetUserRoles(Organization.Identifier, UserIdentifier.Value);
 
             var isE03 = ServiceLocator.Partition.IsE03();
-            if (isE03 && Organization.ParentOrganizationIdentifier.HasValue)
-                AppendRoles(Organization.ParentOrganizationIdentifier.Value, roles);
+            if (isE03 && Organization.OrganizationIdentifier != OrganizationIdentifiers.CMDS)
+                AppendRoles(OrganizationIdentifiers.CMDS, roles);
 
             RoleCheckList.DataSource = roles;
             RoleCheckList.DataValueField = "GroupIdentifier";

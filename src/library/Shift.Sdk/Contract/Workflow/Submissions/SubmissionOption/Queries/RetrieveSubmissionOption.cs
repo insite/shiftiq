@@ -6,7 +6,7 @@ namespace Shift.Contract
 {
     public class RetrieveSubmissionOption : Query<SubmissionOptionModel>
     {
-        public Guid ResponseSessionIdentifier { get; set; }
-        public Guid SurveyOptionIdentifier { get; set; }
+        public Guid ResponseSessionId { get; set; }
+        public Guid SurveyOptionId { get; set; }
     }
 }

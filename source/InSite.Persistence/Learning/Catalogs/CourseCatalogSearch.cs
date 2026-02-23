@@ -23,8 +23,12 @@ namespace InSite.Persistence
         public const int PageSize = 24;
         public int PageCount { get; set; }
 
-        public CourseCatalogSearch(Guid organization, Guid? catalog, Guid[] groups, bool viewEntireCatalog)
+        private readonly IPartitionModel _partition;
+
+        public CourseCatalogSearch(Guid organization, Guid? catalog, Guid[] groups, bool viewEntireCatalog, IPartitionModel partition)
         {
+            _partition = partition;
+
             GetOrganizations(organization);
 
             var identifiers = _organizations.Select(x => x.OrganizationIdentifier).ToList();
@@ -144,9 +148,9 @@ namespace InSite.Persistence
             var organization = OrganizationSearch.Select(id);
             _organizations.Add(organization);
 
-            if (organization.ParentOrganizationIdentifier.HasValue)
+            if (id != _partition.Identifier)
             {
-                var parent = OrganizationSearch.Select(organization.ParentOrganizationIdentifier.Value);
+                var parent = OrganizationSearch.Select(_partition.Identifier);
                 if (parent != null)
                     _organizations.Add(parent);
             }
@@ -198,7 +202,7 @@ namespace InSite.Persistence
                     ThumbnailImageUrl = x.CourseImage,
                     CourseFlagColor = x.CourseFlagColor?.ToLower(),
                     CourseFlagText = x.CourseFlagText,
-
+                    IsOverview = x.CourseIsDisplayOverviewOnly
                 };
                 list.Add(item);
             }

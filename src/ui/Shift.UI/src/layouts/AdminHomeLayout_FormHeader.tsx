@@ -1,17 +1,17 @@
 import { Fragment, useEffect, useMemo } from "react";
 import { useLocation, useParams } from "react-router";
 import ActionLink from "@/components/ActionLink";
-import { useSiteProvider } from "@/contexts/SiteProvider";
 import { formRouteHelper } from "@/routes/formRouteHelper";
 import { MenuItem } from "@/routes/formRoutes";
-import { environmentHelper } from "@/helpers/environmentHelper";
+import AdminHomeLayout_FormHeader_Env from "./AdminHomeLayout_FormHeader_Env";
+import Icon from "@/components/icon/Icon";
+import { useSiteProvider } from "@/contexts/SiteProvider";
 
 export default function AdminHomeLayout_FormHeader() {
     const location = useLocation();
     const params = useParams();
-    const { siteSetting } = useSiteProvider();
 
-    const { indicator } = environmentHelper.getIndicator(siteSetting.Environment.Name);
+    const { actionSubtitle } = useSiteProvider();
 
     const { breadcrumbs, menu, actionTitle } = useMemo(() => {
         const breadcrumbs = formRouteHelper.getBreadcrumbs(location.pathname);
@@ -36,11 +36,8 @@ export default function AdminHomeLayout_FormHeader() {
 
     return (
         <div className="form-header border-bottom">
-            {siteSetting.Environment.Name.toLowerCase() !== "production" && (
-                <div className={`float-end text-${indicator}`}>
-                    <i className="fa-solid fa-thumbtack me-2"></i>Please remember you are <strong>not</strong> working in a live version.
-                </div>
-            )}
+            <AdminHomeLayout_FormHeader_Env />
+
             <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
                     {breadcrumbs?.map(({ title, path, category }, index) => (
@@ -68,7 +65,7 @@ export default function AdminHomeLayout_FormHeader() {
                     {menu && menu.map(({ href, icon, title }) => (
                         <li key={href} className="ms-5">
                             <ActionLink href={href}>
-                                <i className={`${icon} ms-2 me-1`}></i>{title}
+                                <Icon style="Solid" name={icon} className="ms-2 me-1" />{title}
                             </ActionLink>
                         </li>
                     ))}
@@ -78,6 +75,12 @@ export default function AdminHomeLayout_FormHeader() {
                 <div className="col-lg-12">
                     <h1 className="mb-1">
                         {actionTitle}
+                        {actionSubtitle && (
+                            <>
+                                &nbsp;-&nbsp;
+                                <span className="text-info">{actionSubtitle}</span>
+                            </>
+                        )}
                     </h1>
                 </div>
             </div>

@@ -2,11 +2,10 @@
 using System.Data.SqlClient;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Records.Read;
 using InSite.Domain.Records;
 
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Persistence
@@ -112,6 +111,20 @@ DELETE FROM achievements.QAchievement WHERE AchievementIdentifier = @Achievement
             Update(e, achievement =>
             {
                 achievement.AchievementIsEnabled = false;
+            });
+        }
+
+        public void UpdateAchievement(AchievementNotificationChanged e)
+        {
+            Update(e, achievement =>
+            {
+                achievement.BeforeExpiryLearnerMessageIdentifier = e.Settings.BeforeExpiryLearnerMessageIdentifier;
+                achievement.BeforeExpiryAdministratorMessageIdentifier = e.Settings.BeforeExpiryAdministratorMessageIdentifier;
+                achievement.BeforeExpiryNotificationTiming = e.Settings.BeforeExpiryNotificationTiming;
+
+                achievement.AfterExpiryLearnerMessageIdentifier = e.Settings.AfterExpiryLearnerMessageIdentifier;
+                achievement.AfterExpiryAdministratorMessageIdentifier = e.Settings.AfterExpiryAdministratorMessageIdentifier;
+                achievement.AfterExpiryNotificationTiming = e.Settings.AfterExpiryNotificationTiming;
             });
         }
 
@@ -315,7 +328,21 @@ DELETE FROM achievements.QAchievement WHERE AchievementIdentifier = @Achievement
                 credential.CredentialExpirationExpected = CredentialState.CalculateExpectedExpiry(expiration, e.Granted);
                 credential.CredentialStatus = status.ToString();
 
+                credential.AfterExpiryNotificationSent = false;
+                credential.BeforeExpiryNotificationSent = false;
+
                 ResetReminders(credential);
+            });
+        }
+
+        public void UpdateCredential(CredentialNotificationSent e)
+        {
+            Update(e, null, null, null, credential =>
+            {
+                if (e.NotificationType == CredentialNotificationType.AfterExpiry)
+                    credential.AfterExpiryNotificationSent = true;
+                else if (e.NotificationType == CredentialNotificationType.BeforeExpiry)
+                    credential.BeforeExpiryNotificationSent = true;
             });
         }
 

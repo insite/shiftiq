@@ -52,7 +52,7 @@ namespace InSite.UI.Admin.Messages.Subscribers.Forms
             var people = ServiceLocator.PersonSearch.GetPersons(new QPersonFilter
             {
                 UserIdentifier = RecipientID,
-                OrganizationOrParentOrganizationIdentifier = Organization.Key
+                OrganizationIdentifier = Organization.Key == ServiceLocator.Partition.Identifier ? (Guid?)null : Organization.Key,
             }, x => x.User);
 
             var person = people.FirstOrDefault(x => x.OrganizationIdentifier == Organization.Key)

@@ -87,6 +87,24 @@ namespace InSite.Admin.Events.Classes.Forms
         protected global::InSite.Common.Web.UI.ColorComboBox ClassCalendarColor;
 
         /// <summary>
+        /// DisplayOnCalendarField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DisplayOnCalendarField;
+
+        /// <summary>
+        /// DisplayOnCalendar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox DisplayOnCalendar;
+
+        /// <summary>
         /// LocationInfo control.
         /// </summary>
         /// <remarks>

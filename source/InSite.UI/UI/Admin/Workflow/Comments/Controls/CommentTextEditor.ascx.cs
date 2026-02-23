@@ -45,7 +45,7 @@ namespace InSite.Admin.Issues.Comments.Controls
             set
             {
                 if (CurrentData == null)
-                    throw new ApplicationError("The contol is not initialized.");
+                    throw new InvalidOperationException("The contol is not initialized.");
 
                 CommentText.Text = value;
             }

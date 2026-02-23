@@ -420,6 +420,15 @@ namespace InSite.Cmds.Admin.People.Controls
         protected global::InSite.Custom.CMDS.Common.Controls.Server.PersonStatusSelector Status;
 
         /// <summary>
+        /// StatusTimestamp control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal StatusTimestamp;
+
+        /// <summary>
         /// PasswordExpiryField control.
         /// </summary>
         /// <remarks>
@@ -438,31 +447,13 @@ namespace InSite.Cmds.Admin.People.Controls
         protected global::InSite.Common.Web.UI.DateTimeOffsetSelector PasswordExpires;
 
         /// <summary>
-        /// StatusTimestamp control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal StatusTimestamp;
-
-        /// <summary>
-        /// GroupsTab control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.NavItem GroupsTab;
-
-        /// <summary>
         /// UserRoleList control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList UserRoleList;
+        protected global::InSite.Common.Web.UI.CheckBoxList UserRoleList;
 
         /// <summary>
         /// DuplicatesTab control.

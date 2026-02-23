@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteForm
     {
-        public Guid SurveyFormIdentifier { get; set; }
+        public Guid SurveyFormId { get; set; }
     }
 }

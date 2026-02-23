@@ -1,7 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="CompanyDetail.ascx.cs" Inherits="InSite.Cmds.Controls.Contacts.Companies.CompanyDetails" %>
 
-<asp:CustomValidator runat="server" ID="CompanyDomainValidator" ErrorMessage="Web Site is invalid" ValidationGroup="CompanyInfo" />
-
 <div class="row">
     <div class="col-lg-6">
 

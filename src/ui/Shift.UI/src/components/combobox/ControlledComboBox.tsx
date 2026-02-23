@@ -1,13 +1,13 @@
 import { Control, Path, useController } from "react-hook-form";
 import ComboBox, { ComboBoxProps } from "./ComboBox";
-import { fieldRequiredMessage } from "@/helpers/errorHelper";
+import { errorHelper } from "@/helpers/errorHelper";
 
 export interface ControlledComboBoxProps<Criteria extends object>
     extends Omit<ComboBoxProps, "buttonRef" | "name" | "value" | "defaultValue" | "error" | "onSelect" | "onBlur" | "onChange">
 {
     name: Path<Criteria>;
     control: Control<Criteria>;
-    required?: boolean;
+    required?: boolean | string;
     validate?: (value: string | null) => string | undefined;
 }
 
@@ -25,7 +25,7 @@ export default function ControlledComboBox<Criteria extends object>({
             ? {
                 validate: (value: string | null | undefined) => {
                     if (required && !value) {
-                        return fieldRequiredMessage;
+                        return errorHelper.createFieldRequiredMessage(required);
                     }
                     return validate?.(value ?? null);
                 }

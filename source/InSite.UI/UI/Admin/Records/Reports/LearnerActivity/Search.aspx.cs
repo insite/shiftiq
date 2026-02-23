@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
-using InSite.Admin.Records.Reports.LearnerActivity.Models;
 using InSite.Common.Web.UI;
+using InSite.Domain.Reports;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
-using Shift.Common.Events;
+using InSite.Admin.Records.Reports.LearnerActivity.Controls;
 
 namespace InSite.UI.Admin.Records.Reports.LearnerActivity
 {
@@ -13,33 +15,19 @@ namespace InSite.UI.Admin.Records.Reports.LearnerActivity
     {
         public override string EntityName => "Learner Activity";
 
-        protected override void OnInit(EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
-            base.OnInit(e);
+            base.OnLoad(e);
 
-            SearchResults.Updated += SearchResults_Updated;
-            SearchResults.DataStateChanged += SearchResults_DataStateChanged;
-
-            SummaryTables.NeedDataSource += SummaryTables_NeedDataSource;
-
-            PageHelper.AutoBindHeader(this);
+            if (!IsPostBack)
+                PageHelper.AutoBindHeader(this);
         }
 
-        private void SearchResults_DataStateChanged(object sender, BooleanValueArgs args)
+        protected override IEnumerable<DownloadColumn> GetExportColumns()
         {
-            SummaryTab.Visible = args.Value;
-        }
-
-        private void SearchResults_Updated(object sender, EventArgs e)
-        {
-            SummaryTables.BindSummaryCounterData();
-        }
-
-        private void SummaryTables_NeedDataSource(object sender, SummaryTablesNeedDataSourceArgs args)
-        {
-            args.DataSource = new SummaryTablesDataSource(
-                SearchResults.DataSource, 
-                SearchResults.Filter.IsSummaryCountStrategy);
+            return BaseSearchDownload
+                .GetColumns(typeof(SearchResults.ExportDataItem))
+                .OrderBy(x => x.Name);
         }
     }
 }

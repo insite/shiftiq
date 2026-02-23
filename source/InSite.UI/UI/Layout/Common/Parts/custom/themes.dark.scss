@@ -1,0 +1,11 @@
+﻿body.dark-theme header.admin-navbar,
+body.dark-theme aside.admin-sidebar,
+body.dark-theme .offcanvas.admin-offcanvas {
+    --in-nav-header-height: 2.875rem;
+    background-color: #2c2d3f !important;
+}
+
+body.dark-theme header.admin-navbar nav.navbar-collapse > ul.navbar-nav > li.nav-item > a.nav-link {
+    --ar-text-opacity: 1;
+    color: rgba(var(--ar-light-rgb), var(--ar-text-opacity)) !important;
+}

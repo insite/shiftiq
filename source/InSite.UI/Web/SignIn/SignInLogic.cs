@@ -106,7 +106,7 @@ namespace InSite.Web.SignIn
                     ? returnUrl
                     : isCmdsMultiOrganization
                         ? "/ui/portal/security/organizations?login=1"
-                        : Urls.CmdsHomeUrl;
+                        : Urls.HomeUrl;
             }
             else if (!ServiceLocator.Partition.IsE03() && UserPasswordCheck.IsPasswordExpired(user))
             {

@@ -96,6 +96,9 @@ namespace InSite.Persistence
             if (filter.ProgramDescription.HasValue())
                 query = query.Where(x => x.ProgramDescription.Contains(filter.ProgramDescription));
 
+            if (filter.ProgramTag.IsNotEmpty())
+                query = query.Where(x => x.ProgramTag.Contains(filter.ProgramTag));
+
             return query;
         }
     }

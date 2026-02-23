@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class PeriodController : ShiftControllerBase
 {
     private readonly PeriodService _periodService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public PeriodController(PeriodService periodService)
+    public PeriodController(PeriodService periodService, IPrincipalProvider principalProvider)
     {
         _periodService = periodService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class PeriodController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific period
     /// </summary>
-    [HttpHead("progress/periods/{period:guid}")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Assert)]
+    [HttpHead("api/progress/periods/{period:guid}")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertPeriod")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid period, CancellationToken cancellation = default)
     {
-        var exists = await _periodService.AssertAsync(period, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _periodService.AssertAsync(period, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class PeriodController : ShiftControllerBase
     /// <summary>
     /// Collects the list of periods that match specific criteria
     /// </summary>
-    [HttpPost("progress/periods/collect")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Collect)]
+    [HttpPost("api/progress/periods/collect")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PeriodModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectPeriods")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectPeriods query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class PeriodController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("progress/periods")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Collect)]
+    [HttpGet("api/progress/periods")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PeriodModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectPeriods_get")]
     [AliasFor("collectPeriods")]
@@ -56,6 +62,10 @@ public class PeriodController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectPeriods query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _periodService.CollectAsync(query, cancellation);
 
         var count = await _periodService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class PeriodController : ShiftControllerBase
     /// <summary>
     /// Counts the periods that match specific criteria
     /// </summary>
-    [HttpPost("progress/periods/count")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Count)]
+    [HttpPost("api/progress/periods/count")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countPeriods")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountPeriods query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class PeriodController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("progress/periods/count")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Count)]
+    [HttpGet("api/progress/periods/count")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countPeriods_get")]
     [AliasFor("countPeriods")]
@@ -90,6 +100,10 @@ public class PeriodController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountPeriods query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _periodService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class PeriodController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of periods that match specific criteria
     /// </summary>    
-    [HttpPost("progress/periods/download")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Download)]
+    [HttpPost("api/progress/periods/download")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadPeriods")]
@@ -108,8 +122,8 @@ public class PeriodController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("progress/periods/download")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Download)]
+    [HttpGet("api/progress/periods/download")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadPeriods_get")]
@@ -122,6 +136,10 @@ public class PeriodController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectPeriods query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Progress", "Periods", query.Filter.Format, User);
 
         var models = await _periodService
@@ -142,22 +160,30 @@ public class PeriodController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific period
     /// </summary>
-    [HttpGet("progress/periods/{period:guid}")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Retrieve)]
+    [HttpGet("api/progress/periods/{period:guid}")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType<PeriodModel>(StatusCodes.Status200OK)]
     [EndpointName("retrievePeriod")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid period, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _periodService.RetrieveAsync(period, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of periods that match specific criteria
     /// </summary>
-    [HttpPost("progress/periods/search")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Search)]
+    [HttpPost("api/progress/periods/search")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PeriodMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchPeriods")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchPeriods query, CancellationToken cancellation = default)
@@ -165,8 +191,8 @@ public class PeriodController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("progress/periods/search")]
-    [HybridAuthorize(Policies.Progress.Periods.Period.Search)]
+    [HttpGet("api/progress/periods/search")]
+    [HybridPermission("progress/periods", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PeriodMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchPeriods_get")]
     [AliasFor("searchPeriods")]
@@ -178,6 +204,10 @@ public class PeriodController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchPeriods query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _periodService.SearchAsync(query, cancellation);
 
         var count = await _periodService.CountAsync(query, cancellation);

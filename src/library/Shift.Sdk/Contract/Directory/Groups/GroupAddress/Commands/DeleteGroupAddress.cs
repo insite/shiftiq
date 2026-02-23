@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteGroupAddress
     {
-        public Guid AddressIdentifier { get; set; }
+        public Guid AddressId { get; set; }
     }
 }

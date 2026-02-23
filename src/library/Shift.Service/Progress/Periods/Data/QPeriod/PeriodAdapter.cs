@@ -7,7 +7,7 @@ public class PeriodAdapter : IEntityAdapter
 {
     public void Copy(ModifyPeriod modify, PeriodEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.PeriodName = modify.PeriodName;
         entity.PeriodStart = modify.PeriodStart;
         entity.PeriodEnd = modify.PeriodEnd;
@@ -25,8 +25,8 @@ public class PeriodAdapter : IEntityAdapter
     {
         var entity = new PeriodEntity
         {
-            PeriodIdentifier = create.PeriodIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
+            PeriodIdentifier = create.PeriodId,
+            OrganizationIdentifier = create.OrganizationId,
             PeriodName = create.PeriodName,
             PeriodStart = create.PeriodStart,
             PeriodEnd = create.PeriodEnd
@@ -43,6 +43,7 @@ public class PeriodAdapter : IEntityAdapter
     {
         var model = new PeriodModel
         {
+            OrganizationId = entity.OrganizationIdentifier,
             PeriodId = entity.PeriodIdentifier,
             PeriodName = entity.PeriodName,
             PeriodStart = entity.PeriodStart,

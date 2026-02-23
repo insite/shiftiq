@@ -20,15 +20,15 @@ export interface GradebookRow {
 
 export function toGradebookRow(row: ApiGradebookMatch, timeZoneId: TimeZoneId) {
     return {
-        gradebookId: row.GradebookIdentifier,
+        gradebookId: row.GradebookId,
         gradebookTitle: row.GradebookTitle,
         gradebookCreated: dateTimeHelper.parseServerDateTime(row.GradebookCreated, timeZoneId)!,
         gradebookEnrollmentCount: row.GradebookEnrollmentCount,
-        classId: row.ClassIdentifier ?? null,
+        classId: row.ClassId ?? null,
         classTitle: row.ClassTitle ?? null,
         classStarted: dateTimeHelper.parseServerDateTime(row.ClassStarted, timeZoneId),
         classEnded: dateTimeHelper.parseServerDateTime(row.ClassEnded, timeZoneId),
-        achievementId: row.AchievementIdentifier ?? null,
+        achievementId: row.AchievementId ?? null,
         achievementTitle: row.AchievementTitle ?? null,
         achievementCountGranted: row.AchievementCountGranted,
         isLocked: row.IsLocked,

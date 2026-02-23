@@ -10,21 +10,21 @@
                     <div class="mb-2">
                         <insite:FindJournalSetup runat="server" ID="JournalSetupIdentifier" EmptyMessage="Logbook" />
                     </div>
-    
-                    <div class="mb-2">
-                        <insite:FindPerson runat="server" ID="UserIdentifier" EmptyMessage="Learner" />
-                    </div>     
-                    
-                    <div class="mb-2">
-                        <insite:TrainingTypeComboBox runat="server" ID="TrainingTypeComboBox" EmptyMessage="Training Type" />
-                    </div>    
 
-                    <div class="mb-2">
-                        <insite:FilterButton runat="server" ID="SearchButton" />
-                        <insite:ClearButton runat="server" ID="ClearButton" />
-                    </div>
-                </div>
-                <div class="col-6">
+                    <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="DepartmentUserUpdatePanel" />
+
+                    <insite:UpdatePanel runat="server" ID="DepartmentUserUpdatePanel">
+                        <ContentTemplate>
+                            <div class="mb-2">
+                                <insite:FindDepartment runat="server" ID="DepartmentIdentifier" EmptyMessage="Department" />
+                            </div>
+    
+                            <div class="mb-2">
+                                <insite:FindPerson runat="server" ID="UserIdentifier" EmptyMessage="Learner" />
+                            </div>
+                        </ContentTemplate>
+                    </insite:UpdatePanel>
+
                     <div class="mb-2">
                         <insite:DateTimeOffsetSelector ID="CreatedSince" runat="server" EmptyMessage="Created &ge;" />
                     </div>
@@ -42,6 +42,38 @@
                             </Items>
                         </insite:ComboBox>
                     </div>
+
+                    <div class="mb-2">
+                        <insite:FilterButton runat="server" ID="SearchButton" />
+                        <insite:ClearButton runat="server" ID="ClearButton" />
+                    </div>
+                </div>
+                <div class="col-6">
+
+                    <div class="mb-2">
+                        <insite:TrainingTypeComboBox runat="server" ID="TrainingType" EmptyMessage="Training Type" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:TextBox runat="server" ID="Employer" EmptyMessage="Employer" MaxLength="100" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:TextBox runat="server" ID="Supervisor" EmptyMessage="Supervisor" MaxLength="100" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:DateSelector ID="StartDate" runat="server" EmptyMessage="Start Date" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:DateSelector ID="EndDate" runat="server" EmptyMessage="End Date" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:NumericBox runat="server" ID="Hours" EmptyMessage="Hours" NumericMode="Integer" />
+                    </div>
+
                 </div>               
             </div> 
         </div>

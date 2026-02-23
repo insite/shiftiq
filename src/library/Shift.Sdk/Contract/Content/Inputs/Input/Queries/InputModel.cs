@@ -7,9 +7,9 @@ namespace Shift.Contract
 {
     public partial class InputModel
     {
-        public Guid ContainerIdentifier { get; set; }
-        public Guid ContentIdentifier { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
+        public Guid ContainerId { get; set; }
+        public Guid ContentId { get; set; }
+        public Guid OrganizationId { get; set; }
 
         public string ContainerType { get; set; }
         public string ContentHtml { get; set; }

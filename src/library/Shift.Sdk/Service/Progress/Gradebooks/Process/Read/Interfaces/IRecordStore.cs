@@ -18,6 +18,8 @@ namespace InSite.Application.Records.Read
         void UpdateRecord(GradebookEventChanged e);
         void UpdateRecord(GradebookEventAdded e);
         void UpdateRecord(GradebookEventRemoved e);
+        void UpdateRecord(GradebookGroupEnrollmentAdded e);
+        void UpdateRecord(GradebookGroupEnrollmentRemoved e);
         void UpdateRecord(GradebookTypeChanged e);
         void UpdateRecord(GradebookPeriodChanged e);
         void UpdateRecord(GradebookWarningAdded e);

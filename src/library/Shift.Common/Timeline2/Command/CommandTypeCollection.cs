@@ -49,7 +49,7 @@ namespace Shift.Common
 
                 var resource = new Resource(name);
 
-                resource.Aliases.Add(queries[key].FullName);
+                resource.Routes.Add(queries[key].FullName);
 
                 list.Add(resource);
             }

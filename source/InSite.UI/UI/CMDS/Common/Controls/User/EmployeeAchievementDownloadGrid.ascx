@@ -5,16 +5,19 @@
     <ItemTemplate>
 
         <div class="mb-2">
-            <div runat="server" id="Commands" class="float-start me-3" visible="<%# AllowEdit %>">
+
+            <span runat="server" id="Commands" class="float-end ms-1" visible="<%# AllowEdit %>">
                 <cmds:IconButton runat="server" IsFontIcon="true" CssClass="trash-alt" ToolTip="Delete File" ConfirmText="Are you sure you want to delete this file?" CommandArgument='<%# Eval("UploadIdentifier") %>' CommandName="DeleteFile" />
-            </div>
+            </span>
 
             <a target="_blank" runat="server" href='<%# CmdsUploadProvider.GetFileRelativeUrl((Guid)Eval("ContainerIdentifier"), (string)Eval("Name")) %>'><%# Eval("Title") %></a>
+            
             <span class="form-text"><%# ((int)Eval("ContentSize") / 1024).ToString("n0") + " KB" %></span>
 
             <div runat="server" visible='<%# ValueConverter.IsNotNull(Eval("Description")) %>'>
                 <%# Eval("Description") %>
             </div>
+
         </div>
 
     </ItemTemplate>

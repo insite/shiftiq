@@ -485,20 +485,20 @@ namespace InSite.Admin.Accounts.Organizations.Controls
             {
                 var foldersData = inputValue.Split(';');
                 if (foldersData.Length != folders.Count)
-                    throw new ApplicationError("Invalid collections count: " + inputValue);
+                    throw new FormatException("Invalid collections count: " + inputValue);
 
                 foreach (var folderData in foldersData)
                 {
                     var folderDataParts = folderData.Split(':');
                     if (folderDataParts.Length != 2)
-                        throw new ApplicationError("Invalid collection group: " + inputValue);
+                        throw new FormatException("Invalid collection group: " + inputValue);
 
                     var folderIndex = int.Parse(folderDataParts[0]);
                     var itemNums = string.IsNullOrEmpty(folderDataParts[1]) ? new int[0] : folderDataParts[1].Split(',').Select(x => int.Parse(x)).ToArray();
 
                     var folderInfo = folders[folderIndex];
                     if (folderInfo.Items.Count != itemNums.Length)
-                        throw new ApplicationError("Invalid collection tags count: " + inputValue);
+                        throw new FormatException("Invalid collection tags count: " + inputValue);
 
                     var itemMapping = folderInfo.Items.Select((x, i) => new Tuple<int, ItemInfo>(i, x)).ToDictionary(x => x.Item2.Number);
 

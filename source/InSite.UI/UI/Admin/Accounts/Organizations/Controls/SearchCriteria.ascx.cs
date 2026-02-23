@@ -1,5 +1,4 @@
 using InSite.Common.Web.UI;
-
 using InSite.Persistence;
 
 namespace InSite.Admin.Accounts.Organizations.Controls
@@ -12,7 +11,6 @@ namespace InSite.Admin.Accounts.Organizations.Controls
             {
                 var filter = new OrganizationFilter
                 {
-                    CompanyDomain = DomainName.Text,
                     OrganizationCode = Code.Text,
                     CompanyName = CompanyName.Text,
                     IsClosed = IsClosed.ValueAsBoolean
@@ -24,7 +22,6 @@ namespace InSite.Admin.Accounts.Organizations.Controls
             }
             set
             {
-                DomainName.Text = value.CompanyDomain;
                 Code.Text = value.OrganizationCode;
                 CompanyName.Text = value.CompanyName;
                 IsClosed.ValueAsBoolean = value.IsClosed;
@@ -33,7 +30,6 @@ namespace InSite.Admin.Accounts.Organizations.Controls
 
         public override void Clear()
         {
-            DomainName.Text = null;
             Code.Text = null;
             CompanyName.Text = null;
             IsClosed.ClearSelection();

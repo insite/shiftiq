@@ -2,52 +2,35 @@
 {
     public static class AppSettingsHelper
     {
-        public static T GetAllSettings<T>() where T : new()
+        public static T GetAllSettings<T>(string filename) where T : new()
         {
-            var configuration = BuildConfiguration();
+            var configuration = BuildConfiguration(filename);
 
             var settings = configuration.Get<T>();
 
             return settings ?? new T();
         }
 
-        private static IConfigurationRoot BuildConfiguration()
+        private static IConfigurationRoot BuildConfiguration(string filename)
         {
-            var path = AppContext.BaseDirectory;
+            var basePath = AppContext.BaseDirectory;
 
-            var builder = new ConfigurationBuilder().SetBasePath(path);
-
-            AddSettings(builder, path, "appsettings.json");
-
-            AddSettings(builder, path, "appsettings.local.json");
+            var builder = new ConfigurationBuilder()
+                // .AddEnvironmentVariables()
+                .SetBasePath(basePath)
+                .AddJsonFile(filename + ".json", optional: false, reloadOnChange: true)
+                .AddJsonFile(filename + ".local.json", optional: true, reloadOnChange: true);
 
             return builder.Build();
         }
 
-        private static void AddSettings(IConfigurationBuilder builder, string path, string file)
+        private static T LoadSettings<T>(string filename) where T : new()
         {
-            if (TryAddFile(builder, path, file))
-                return;
+            var configuration = BuildConfiguration(filename);
 
-            if (TryAddFile(builder, Path.Combine(path, ".."), file))
-                return;
+            var settings = configuration.Get<T>();
 
-            if (TryAddFile(builder, Path.Combine(path, "..", ".."), file))
-                return;
-
-            TryAddFile(builder, Path.Combine(path, "..", "..", ".."), file);
-        }
-
-        private static bool TryAddFile(IConfigurationBuilder builder, string folder, string file)
-        {
-            var path = Path.Combine(folder, file);
-
-            if (!File.Exists(path))
-                return false;
-
-            builder = builder.AddJsonFile(path);
-
-            return true;
+            return settings ?? new T();
         }
     }
 }

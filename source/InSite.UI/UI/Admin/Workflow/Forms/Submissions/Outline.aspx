@@ -115,6 +115,24 @@
                                 </div>
                             </div>
                         </insite:Container>
+
+                        <insite:Container runat="server" ID="AssessorContainer" Visible="false">
+                            <h3>
+                                Assessor
+                            </h3>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Name</label>
+                                <div><asp:Literal runat="server" ID="AssessorName" /></div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email</label>
+                                <div>
+                                    <asp:Literal runat="server" ID="AssessorEmail" />
+                                </div>
+                            </div>
+                        </insite:Container>
                     </div>
                 </div>
 
@@ -153,13 +171,41 @@
             <div class="col-lg-12">
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
+
                         <div class="float-end">
                             <insite:Button runat="server" ID="EditLink" NavigateTarget="_blank" Text="Edit" Icon="fas fa-pencil" ButtonStyle="Default" />
                             <insite:Button runat="server" ID="LockLink" Text="Lock" Icon="fas fa-lock" ButtonStyle="Default" />
                             <insite:Button runat="server" ID="UnlockLink" Text="Unlock" Icon="fas fa-lock-open" ButtonStyle="Default" />
                             <insite:DownloadButton runat="server" ID="DownloadButton" />
                         </div>
-                        <div class="clearfix"></div>           
+
+                        <div class="clearfix"></div>
+
+                        <div runat="server" id="SummaryChartPanel" class="mt-5" visible="false">
+                            <div class="card card-hover shadow bg-secondary">
+
+                                <div class="card-header border-bottom-0">
+                                    <h2 class="mb-0"><insite:Literal runat="server" Text="Summary Chart" /></h2>
+                                </div>
+
+                                <div class="card-body bg-white">
+                                    <div class="d-flex flex-wrap justify-content-center fs-sm">
+                                        <asp:Repeater runat="server" ID="ChartLegend">
+                                            <ItemTemplate>
+                                                <div class="border rounded-1 py-1 px-2 me-2 mb-2">
+                                                    <div class="d-inline-block align-middle me-1" style="width:.75rem; height:.75rem; background-color:<%# Eval("Color") %>;"></div>
+                                                    <span class="d-inline-block align-middle"><%# Eval("Category") %></span>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </div>
+
+                                    <asp:Literal runat="server" ID="ChartBody" />
+                                </div>
+
+                            </div>
+                        </div>
+
                         <div class="row settings">
                             <div class="col-lg-12">
                                 <asp:Repeater runat="server" ID="AnswerGroupRepeater">
@@ -187,9 +233,15 @@
                                 </asp:Repeater>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <insite:PageFooterContent runat="server">
+        <link rel="stylesheet" href="/ui/portal/workflow/forms/controls/charts.css" />
+        <script src="/ui/portal/workflow/forms/controls/charts.js"></script>
+    </insite:PageFooterContent>
 </asp:Content>

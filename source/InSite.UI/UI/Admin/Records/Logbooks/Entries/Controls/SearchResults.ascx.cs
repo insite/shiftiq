@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Web.UI.WebControls;
 
+using InSite.Application.Contacts.Read;
 using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
 
@@ -24,9 +25,20 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
         protected override IListSource SelectData(QExperienceFilter filter)
         {
             var returnUrl = new ReturnUrl();
+            var data = ServiceLocator.JournalSearch
+                .GetExperiences(filter, x => x.Journal.User, x => x.Journal.JournalSetup, x => x.Validator);
 
-            return ServiceLocator.JournalSearch
-                .GetExperiences(filter, x => x.Journal.User, x => x.Journal.JournalSetup, x => x.Validator)
+            var departments = ServiceLocator.MembershipSearch
+                .Select(new QMembershipFilter
+                {
+                    GroupOrganizationIdentifier = Organization.Identifier,
+                    UserIdentifiers = data.Select(x => x.Journal.UserIdentifier).Distinct().ToArray(),
+                    MembershipFunction = "Department"
+                }, x => x.Group)
+                .GroupBy(x => x.UserIdentifier)
+                .ToDictionary(x => x.Key, x => string.Join(", ", x.Select(y => y.Group.GroupName).OrderBy(y => y)));
+
+            return data
                 .Select(x => new
                 {
                     ExperienceIdentifier = x.ExperienceIdentifier,
@@ -34,14 +46,14 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
                     Created = x.ExperienceCreated,
                     ExperienceValidated = x.ExperienceValidated,
                     Status = x.ExperienceValidated.HasValue
-                            ? $"Validated by {x.Validator?.UserFullName ?? UserNames.Someone}"
-                            : "Not Validated",
+                        ? $"Validated by {x.Validator?.UserFullName ?? UserNames.Someone}"
+                        : "Not Validated",
                     ValidateButtonIcon = x.ExperienceValidated.HasValue
-                            ? "graduation-cap"
-                            : "question-circle",
+                        ? "graduation-cap"
+                        : "question-circle",
                     ValidateButtonHint = x.ExperienceValidated.HasValue
-                            ? "Validated"
-                            : "Validate",
+                        ? "Validated"
+                        : "Validate",
                     JournalSetupIdentifier = x.Journal.JournalSetupIdentifier,
                     JournalIdentifier = x.Journal.JournalIdentifier,
                     JournalSetupName = x.Journal.JournalSetup.JournalSetupName,
@@ -49,7 +61,13 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
                     UserIdentifier = x.Journal.UserIdentifier,
                     UserFullName = x.Journal.User.UserFullName,
                     UserEmail = x.Journal.User.UserEmail,
+                    UserDepartment = departments.GetOrDefault(x.Journal.UserIdentifier),
                     TrainingType = x.TrainingType,
+                    Employer = x.Employer,
+                    Supervisor = x.Supervisor,
+                    ExperienceStarted = x.ExperienceStarted,
+                    ExperienceStopped = x.ExperienceStopped,
+                    ExperienceHours = x.ExperienceHours,
                     DeleteUrl = IsValidator
                         ? returnUrl.GetRedirectUrl($"/admin/records/logbooks/validators/entries/delete?experience={x.ExperienceIdentifier}")
                         : returnUrl.GetRedirectUrl($"/ui/admin/records/logbooks/entries/delete?experience={x.ExperienceIdentifier}")

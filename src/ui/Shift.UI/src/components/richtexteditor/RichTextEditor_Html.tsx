@@ -24,7 +24,7 @@ type ProgressFn = (percent: number) => void;
 
 interface Props {
     ref?: ForwardedRef<RichTextEditor_HtmlRef>;
-    isTranslating: boolean;
+    disabled: boolean;
     html: string;
     disableUploadFile: boolean;
     supportedImageFileTypes: string[];
@@ -35,7 +35,7 @@ interface Props {
 
 export default function RichTextEditor_Html({
     ref,
-    isTranslating,
+    disabled,
     html,
     disableUploadFile,
     supportedImageFileTypes,
@@ -88,7 +88,7 @@ export default function RichTextEditor_Html({
                     return;
                 }
 
-                const { FileIdentifier: fileId, FileName: fileName, DocumentName: documentName } = apiFile;
+                const { FileId: fileId, FileName: fileName, DocumentName: documentName } = apiFile;
                 const html = `<a href="${urlHelper.getFileUrl(fileId, fileName)}">${documentName}</a>`;
 
                 editorRef.current?.insertContent(html);
@@ -106,7 +106,7 @@ export default function RichTextEditor_Html({
             return "";
         }
 
-        return urlHelper.getFileUrl(apiFile.FileIdentifier, apiFile.FileName);
+        return urlHelper.getFileUrl(apiFile.FileId, apiFile.FileName);
     }
 
     return (
@@ -114,7 +114,7 @@ export default function RichTextEditor_Html({
             tinymceScriptSrc={shiftConfig.tinymceScript}
             licenseKey="gpl"
             initialValue={initialValue}
-            disabled={isTranslating}
+            disabled={disabled}
             init={{
                 menubar: false,
                 statusbar: false,

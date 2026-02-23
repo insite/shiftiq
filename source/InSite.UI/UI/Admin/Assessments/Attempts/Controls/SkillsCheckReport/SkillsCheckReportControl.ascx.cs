@@ -69,7 +69,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
                 : $"<span class='badge bg-danger'>{attempt.Score:p0}</span>";
 
             var organization = CurrentSessionState.Identity.Organization;
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var environment = ServiceLocator.AppSettings.Environment;
             var code = organization.OrganizationCode;
 

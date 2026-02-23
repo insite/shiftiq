@@ -522,6 +522,58 @@ namespace InSite.Persistence
                 return db.QEnrollments.FirstOrDefault(x => x.GradebookIdentifier == gradebook && x.LearnerIdentifier == user);
         }
 
+        public int CountGroupEnrollments(QGroupEnrollmentFilter filter)
+        {
+            using (var db = CreateContext())
+                return CreateQuery(filter, db).Count();
+        }
+
+        public List<QGroupEnrollment> GetGroupEnrollments(QGroupEnrollmentFilter filter, params Expression<Func<QGroupEnrollment, object>>[] includes)
+        {
+            using (var db = CreateContext())
+            {
+                var query = CreateQuery(filter, db).ApplyIncludes(includes);
+
+                if (filter.OrderBy.IsEmpty())
+                    query = query.OrderBy(x => x.Group.GroupName);
+                else
+                    query = query.OrderBy(filter.OrderBy);
+
+                return query.ApplyPaging(filter).ToList();
+            }
+        }
+
+        public bool GroupEnrollmentExists(QGroupEnrollmentFilter filter)
+        {
+            using (var db = CreateContext())
+                return CreateQuery(filter, db).Any();
+        }
+
+        public QGroupEnrollment GetGroupEnrollment(Guid enrollmentId)
+        {
+            using (var db = CreateContext())
+                return db.QGroupEnrollments.FirstOrDefault(x => x.GroupEnrollmentIdentifier == enrollmentId);
+        }
+
+        public QGroupEnrollment GetGroupEnrollment(Guid gradebookId, Guid groupId)
+        {
+            using (var db = CreateContext())
+                return db.QGroupEnrollments.FirstOrDefault(x => x.GradebookIdentifier == gradebookId && x.GroupIdentifier == groupId);
+        }
+
+        private static IQueryable<QGroupEnrollment> CreateQuery(QGroupEnrollmentFilter filter, InternalDbContext db)
+        {
+            var query = db.QGroupEnrollments.AsQueryable();
+
+            if (filter.GradebookIdentifier.HasValue)
+                query = query.Where(x => x.GradebookIdentifier == filter.GradebookIdentifier.Value);
+
+            if (filter.GroupIdentifier.HasValue)
+                query = query.Where(x => x.GroupIdentifier == filter.GroupIdentifier.Value);
+
+            return query;
+        }
+
         public GradebookState GetGradebookState(Guid gradebook)
         {
             return _aggregateSearch.GetState<GradebookAggregate>(gradebook) as GradebookState;
@@ -938,6 +990,13 @@ namespace InSite.Persistence
 
             if (filter.GradedBefore.HasValue)
                 query = query.Where(x => x.ProgressGraded < filter.GradedBefore.Value);
+
+            if (filter.DepartmentIdentifier.HasValue)
+            {
+                query = query.Where(x => 
+                    x.Gradebook.Achievement.Departments.Any(y => y.DepartmentIdentifier == filter.DepartmentIdentifier.Value)
+                    && x.Learner.Memberships.Any(y => y.GroupIdentifier == filter.DepartmentIdentifier.Value && y.MembershipType == "Department"));
+            }
 
             return query;
         }

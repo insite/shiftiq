@@ -4,7 +4,7 @@ using Shift.Common;
 
 namespace InSite.Common.Web.UI
 {
-    public class RouteTypeComboBox : ComboBox
+    public class ActionTypeComboBox : ComboBox
     {
         protected override ListItemArray CreateDataSource()
         {
@@ -55,7 +55,7 @@ namespace InSite.Common.Web.UI
         }
     }
 
-    public class RouteAuthorityComboBox : ComboBox
+    public class ActionAuthorityComboBox : ComboBox
     {
         protected override ListItemArray CreateDataSource()
         {

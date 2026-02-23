@@ -22,6 +22,7 @@ namespace InSite.Persistence
 
         public bool CatalogIsHidden { get; set; }
         public bool CourseIsHidden { get; set; }
+        public bool CourseIsDisplayOverviewOnly { get; set; }
 
         public DateTimeOffset CourseCreated { get; set; }
         public DateTimeOffset CourseModified { get; set; }

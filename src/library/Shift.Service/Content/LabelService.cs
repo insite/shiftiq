@@ -18,11 +18,11 @@ public class LabelService : ILabelService
         _writer = writer;
     }
 
-    public async Task Refresh()
+    public async Task RefreshAsync()
     {
         var labels = await _reader.CollectAsync(new CollectInputs
         {
-            ContainerIdentifier = ContainerIdentifier,
+            ContainerId = ContainerIdentifier,
             ContainerType = ContentContainerType.Application
         });
 
@@ -71,7 +71,7 @@ public class LabelService : ILabelService
         return content?.ContentText;
     }
 
-    public async Task SaveTranslation(string language, string label, string source, string target)
+    public async Task SaveTranslationAsync(string language, string label, string source, string target)
     {
         label = StringHelper.Snip(label, 100);
 

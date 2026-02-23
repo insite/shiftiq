@@ -114,6 +114,15 @@ namespace InSite.Admin.Achievements.Credentials.Controls
         protected global::InSite.Common.Web.UI.ItemNameComboBox EmployerRegion;
 
         /// <summary>
+        /// DepartmentIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindDepartment DepartmentIdentifier;
+
+        /// <summary>
         /// CredentialGrantedSince control.
         /// </summary>
         /// <remarks>

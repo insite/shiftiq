@@ -93,8 +93,8 @@ namespace InSite.UI.Admin.Assets.Files
         {
             var parent = GetParent();
 
-            if (!Identity.IsActionAuthorized(parent.Name)
-                || !Identity.IsGranted(parent.ToolkitNumber, PermissionOperation.Write))
+            if (!Identity.IsGranted(parent.Name)
+                || !Identity.IsGranted(parent.ToolkitNumber, DataAccess.Update))
             {
                 CreateAccessDeniedException();
             }
@@ -120,7 +120,7 @@ namespace InSite.UI.Admin.Assets.Files
 
             if (!parent.Name.EndsWith("/edit"))
                 return null;
-            
+
             switch (ObjectType)
             {
                 case FileObjectType.User:

@@ -1,17 +1,21 @@
 import ActionLink from "@/components/ActionLink";
+import Icon from "@/components/icon/Icon";
 import { useSiteProvider } from "@/contexts/SiteProvider";
 
 export default function AdminHomeLayout_UserMenu() {
     const { siteSetting } = useSiteProvider();
+    
+    if (!siteSetting.UserName) {
+        return null;
+    }
+
     return (
-        <li className="nav-item dropdown">
+        <li className="nav-item dropdown fs-sm">
                     
-            {siteSetting.UserName && (
-                <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                    <i className='fas fa-width-auto fa-user me-2'></i>
-                    {siteSetting.UserName}
-                </a>
-            )}
+            <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                <Icon style="Regular" name="user" className="fa-width-auto me-2" />
+                {siteSetting.UserName}
+            </a>
 
             <ul className="dropdown-menu">
                 {siteSetting.MyDashboard && (
@@ -22,7 +26,7 @@ export default function AdminHomeLayout_UserMenu() {
                     </li>
                 )}
                 <li>
-                    <ActionLink className="dropdown-item" href="/ui/portal/identity/profile">My Profile</ActionLink>
+                    <ActionLink className="dropdown-item" href="/ui/portal/profile">My Profile</ActionLink>
                 </li>
                 {siteSetting.IsAdministrator && (
                     <li>
@@ -31,7 +35,7 @@ export default function AdminHomeLayout_UserMenu() {
                 )}
                 {siteSetting.IsMultiOrganization && (
                     <li>
-                        <ActionLink className="dropdown-item" href="/ui/portal/identity/organizations?auto-redirect=0">Select Organization</ActionLink>
+                        <ActionLink className="dropdown-item" href="/ui/portal/security/organizations?auto-redirect=0">Select Organization</ActionLink>
                     </li>
                 )}
                 <li>

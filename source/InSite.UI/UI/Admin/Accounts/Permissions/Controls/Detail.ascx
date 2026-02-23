@@ -30,8 +30,6 @@
         Access
     </label>
     
-    <div><asp:CheckBox runat="server" ID="AllowExecute" Text="Execute" /></div>
-
     <div><asp:CheckBox runat="server" ID="AllowRead" Text="Read" /></div>
 	<div><asp:CheckBox runat="server" ID="AllowWrite" Text="Write" /></div>
 

@@ -277,7 +277,7 @@ namespace InSite.Common.Web.UI
         public void SetExternalContext(IProgressExternalContext context)
         {
             if (_overridenContext != null || !(context is ProgressExternalContext extContext))
-                throw new ApplicationError("Can't override the progress context: " + ClientID);
+                throw new InvalidOperationException("Can't override the progress context: " + ClientID);
 
             _overridenContext = extContext;
             ContextID = _overridenContext.ID;

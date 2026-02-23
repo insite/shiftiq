@@ -36,7 +36,7 @@ namespace InSite.Admin.Standards.Standards.Forms
         {
             base.ApplyAccessControl();
 
-            SaveButton.Visible = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write);
+            SaveButton.Visible = CurrentSessionState.Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update);
         }
 
         #endregion
@@ -59,7 +59,7 @@ namespace InSite.Admin.Standards.Standards.Forms
 
             if (!IsPostBack)
             {
-                if (!Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write))
+                if (!Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update))
                     RedirectToSearch();
 
                 Open();

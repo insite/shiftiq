@@ -1,16 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 
+using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Contract;
-
-using Shift.Common;
 
 namespace Shift.Service.Content;
 
 public class TInputReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
+
     private readonly TInputAdapter _adapter;
+
+    private string DefaultSort = "ContentIdentifier";
 
     public TInputReader(IDbContextFactory<TableDbContext> context, TInputAdapter adapter)
     {
@@ -48,7 +50,7 @@ public class TInputReader : IEntityReader
         using var db = _context.CreateDbContext();
 
         return await BuildQueryable(db, criteria)
-            .OrderBy(criteria.Filter.Sort)
+            .OrderBy(criteria.Filter.Sort ?? DefaultSort)
             .ApplyPaging(criteria.Filter)
             .ToListAsync(cancellation);
     }
@@ -58,7 +60,7 @@ public class TInputReader : IEntityReader
         using var db = _context.CreateDbContext();
 
         var queryable = BuildQueryable(db, criteria)
-            .OrderBy(criteria.Filter.Sort)
+            .OrderBy(criteria.Filter.Sort ?? DefaultSort)
             .ApplyPaging(criteria.Filter);
 
         return await ToMatchesAsync(queryable, cancellation);
@@ -70,8 +72,11 @@ public class TInputReader : IEntityReader
     {
         var q = db.TInput.AsNoTracking().AsQueryable();
 
-        if (criteria.ContainerIdentifier != null)
-            q = q.Where(x => x.ContainerIdentifier == criteria.ContainerIdentifier);
+        if (criteria.ContainerId != null)
+            q = q.Where(x => x.ContainerIdentifier == criteria.ContainerId);
+
+        if (criteria.ContainerIds != null && criteria.ContainerIds.Length > 0)
+            q = q.Where(x => criteria.ContainerIds.Contains(x.ContainerIdentifier));
 
         if (!string.IsNullOrEmpty(criteria.ContainerType))
             q = q.Where(x => x.ContainerType == criteria.ContainerType);
@@ -92,7 +97,7 @@ public class TInputReader : IEntityReader
         var matches = await queryable
             .Select(entity => new InputMatch
             {
-                ContentIdentifier = entity.ContentIdentifier
+                ContentId = entity.ContentIdentifier
             })
             .ToListAsync(cancellation);
 

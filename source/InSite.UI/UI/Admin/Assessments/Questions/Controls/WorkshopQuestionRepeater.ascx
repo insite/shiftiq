@@ -237,10 +237,10 @@
                         <div class="my-3">
                             <insite:DropDownButton runat="server" ID="ReplaceButton" IconName="tools" Text="Replace" CssClass="d-inline-block">
                                 <Items>
-                                    <insite:DropDownButtonItem Name="NewVersion" IconType="Regular" IconName="arrow-alt-up" Text="New Version" ToolTip="New Version" />
-                                    <insite:DropDownButtonItem Name="NewQuestionAndSurplus" IconType="Regular" IconName="plus-circle" Text="New Question and Surplus" ToolTip="New Question and Surplus" />
-                                    <insite:DropDownButtonItem Name="NewQuestionAndPurge" IconType="Regular" IconName="plus-hexagon" Text="New Question and Purge" ToolTip="New Question and Purge" />
-                                    <insite:DropDownButtonItem Name="RollbackQuestion" IconType="Regular" IconName="undo-alt" Text="Revert/Rollback" ToolTip="Revert/Rollback" />
+                                    <sdk:DropDownButtonItem Name="NewVersion" IconType="Regular" IconName="arrow-alt-up" Text="New Version" ToolTip="New Version" />
+                                    <sdk:DropDownButtonItem Name="NewQuestionAndSurplus" IconType="Regular" IconName="plus-circle" Text="New Question and Surplus" ToolTip="New Question and Surplus" />
+                                    <sdk:DropDownButtonItem Name="NewQuestionAndPurge" IconType="Regular" IconName="plus-hexagon" Text="New Question and Purge" ToolTip="New Question and Purge" />
+                                    <sdk:DropDownButtonItem Name="RollbackQuestion" IconType="Regular" IconName="undo-alt" Text="Revert/Rollback" ToolTip="Revert/Rollback" />
                                 </Items>
                             </insite:DropDownButton>
 

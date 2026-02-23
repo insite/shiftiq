@@ -59,7 +59,7 @@ namespace InSite.UI.Lobby
             if (IsPostBack)
                 return;
 
-            var hostUrl = ServiceLocator.AppSettings.Shift.Api.Hosting.V2.BaseUrl.TrimEnd('/');
+            var hostUrl = ServiceLocator.AppSettings.v2ApiBaseUrl.TrimEnd('/');
 
             TestUrl.Text = $"{hostUrl}/security/cookies/validate";
 
@@ -81,7 +81,7 @@ namespace InSite.UI.Lobby
 
                 SerializedCookieValue.Text = cookie.Value;
                 var encoder = new CookieTokenEncoder();
-                var token = encoder.Deserialize(cookie.Value, encrypt, secret);
+                var token = encoder.Deserialize(cookie.Value, encrypt, secret, true);
                 DeserializedCookieValue.Text = JsonConvert.SerializeObject(token, Formatting.Indented);
                 DeserializedSuccess.Visible = true;
                 DeserializedDetail.InnerHtml = $"Cookie {(cookie.Expires != DateTime.MinValue && cookie.Expires < DateTime.UtcNow ? " expires " + cookie.Expires.ToString() : " is expired")} | Domain {cookie.Domain} | Path {cookie.Path}";

@@ -1,7 +1,7 @@
 export interface ApiCaseStatusModel {
-    OrganizationIdentifier: string;
+    OrganizationId: string;
     CaseType: string;
-    StatusIdentifier: string;
+    StatusId: string;
     StatusName: string;
     StatusSequence: number;
     StatusCategory: string;

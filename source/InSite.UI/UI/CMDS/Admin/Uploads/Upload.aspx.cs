@@ -31,7 +31,7 @@ namespace InSite.Cmds.Actions.Contact.Company.Achievement
 
         #region Properties
 
-        private Guid OrganizationIdentifier => CurrentIdentityFactory.ActiveOrganizationIdentifier;
+        private Guid OrganizationIdentifier => Organization.Identifier;
 
         private Guid? CompanyThumbprint
         {

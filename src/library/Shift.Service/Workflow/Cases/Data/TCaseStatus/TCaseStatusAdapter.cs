@@ -9,9 +9,9 @@ public class TCaseStatusAdapter : IEntityAdapter
     {
         return new CaseStatusModel
         {
-            OrganizationIdentifier = entity.OrganizationIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
             CaseType = entity.CaseType,
-            StatusIdentifier = entity.StatusIdentifier,
+            StatusId = entity.StatusIdentifier,
             StatusName = entity.StatusName,
             StatusSequence = entity.StatusSequence,
             StatusCategory = entity.StatusCategory,

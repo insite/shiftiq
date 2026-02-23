@@ -12,9 +12,9 @@ namespace InSite.Persistence
         public string CollectionSlug { get; set; }
         public string CollectionKey { get; set; }
 
-        public string ComponentType { get; set; }
-        public string ComponentName { get; set; }
-        public string ComponentPart { get; set; }
+        public string SubsystemType { get; set; }
+        public string SubsystemName { get; set; }
+        public string SubsystemComponent { get; set; }
 
         public string EntityName { get; set; }
 

@@ -58,6 +58,7 @@ namespace InSite.Persistence
             Property(x => x.ExamType).IsOptional().IsUnicode(false).HasMaxLength(40);
             Property(x => x.IntegrationWithholdDistribution).IsRequired();
             Property(x => x.IntegrationWithholdGrades).IsRequired();
+            Property(x => x.DisplayOnCalendar).IsRequired();
             Property(x => x.InvigilatorMinimum).IsOptional();
             Property(x => x.LastChangeTime).IsOptional();
             Property(x => x.LastChangeType).IsOptional().IsUnicode(false).HasMaxLength(100);

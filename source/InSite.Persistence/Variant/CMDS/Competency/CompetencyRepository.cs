@@ -104,7 +104,7 @@ namespace InSite.Persistence.Plugin.CMDS
             catch (Exception ex)
             {
                 var message = $"Unable to select expired competencies as at {asAt:g}.";
-                throw new Exception(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
 

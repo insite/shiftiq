@@ -6,17 +6,17 @@ namespace Shift.Contract
 {
     public class CountCases : Query<int>, ICaseCriteria
     {
-        public Guid? AdministratorUserIdentifier { get; set; }
-        public Guid? EmployerGroupIdentifier { get; set; }
+        public Guid? AdministratorUserId { get; set; }
+        public Guid? EmployerGroupId { get; set; }
         public Guid? CaseClosedBy { get; set; }
         public Guid? CaseOpenedBy { get; set; }
-        public Guid? CaseStatusIdentifier { get; set; }
+        public Guid? CaseStatusId { get; set; }
         public Guid? LastChangeUser { get; set; }
-        public Guid? LawyerUserIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? OwnerUserIdentifier { get; set; }
-        public Guid? ResponseSessionIdentifier { get; set; }
-        public Guid? TopicUserIdentifier { get; set; }
+        public Guid? LawyerUserId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? OwnerUserId { get; set; }
+        public Guid? ResponseSessionId { get; set; }
+        public Guid? TopicUserId { get; set; }
 
         public string CaseDescription { get; set; }
         public string CaseSource { get; set; }

@@ -27,7 +27,7 @@ async function loadItems(pageIndex: number, keyword: string) {
     }, pageIndex, shiftConfig.finderPageSize, null);
 
     return toFinderSearchWindowData(result, row => ({
-        value: row.UserIdentifier,
+        value: row.UserId,
         text: row.FullName
     }));
 }

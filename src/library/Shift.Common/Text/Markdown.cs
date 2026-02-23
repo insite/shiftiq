@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using Markdig;
@@ -18,7 +19,25 @@ namespace Shift.Common
 
             var pipeline = GetDefaultPipeline();
 
-            var html = Markdig.Markdown.ToHtml(markdown, pipeline);
+            string html;
+
+            try
+            {
+                html = Markdig.Markdown.ToHtml(markdown, pipeline);
+            }
+            catch (ArgumentException ex) when (ex.Message.StartsWith("Markdown elements in the input are too deeply nested - depth limit exceeded."))
+            {
+                return @"
+<div class=""alert alert-danger d-flex align-items-start"" role=""alert"">
+    <i class=""fas fa-stop-circle me-2 mt-1""></i>
+    <div>
+        <strong>Rendering error</strong><br>
+        The content is too complex to render.
+        This usually happens with large tables containing many inline formatting elements. 
+        Please simplify the content and try again.
+    </div>
+</div>";
+            }
 
             html = html.Replace("<table>", "<table class=\"table-markdown\">");
 

@@ -17,9 +17,9 @@ public class PeriodService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid period, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid period, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(period, cancellation);
+        return await _reader.AssertAsync(period, organization, cancellation);
     }
 
     public async Task<IEnumerable<PeriodModel>> CollectAsync(IPeriodCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class PeriodService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyPeriod modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.PeriodIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.PeriodId, cancellation);
 
         if (entity == null)
             return false;

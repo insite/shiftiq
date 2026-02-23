@@ -47,7 +47,7 @@ namespace InSite.UI.Layout.Portal.Controls
             RootItem.InnerText = Translate(RootText);
         }
 
-        public void BindTitle(string qualifier = null)
+        public void BindTitle(string qualifier = null, string spacer = " - ")
         {
             string helpUrl = null;
 
@@ -58,7 +58,7 @@ namespace InSite.UI.Layout.Portal.Controls
                 if (portalPage is IHasTitle p)
                     title = p.GetTitle();
 
-                PageTitle = (qualifier ?? title) + " - " + ServiceLocator.Partition.GetPlatformName();
+                PageTitle = (qualifier ?? title) + spacer + ServiceLocator.Partition.Name;
 
                 ActionTitle.Text = qualifier ?? title;
 
@@ -76,13 +76,13 @@ namespace InSite.UI.Layout.Portal.Controls
             ActionSubtitle.Visible = !string.IsNullOrEmpty(ActionSubtitle.InnerText);
         }
 
-        public void BindTitleAndSubtitleNoTranslate(string title, string subtitle) =>
-            BindTitleAndSubtitleNoTranslate(title, title, subtitle);
+        public void BindTitleAndSubtitleNoTranslate(string title, string subtitle, string spacer = " - ")
+            => BindTitleAndSubtitleNoTranslate(title, title, subtitle, spacer);
 
-        public void BindTitleAndSubtitleNoTranslate(string pageTitle, string screenTitle, string screenSubtitle)
+        public void BindTitleAndSubtitleNoTranslate(string pageTitle, string screenTitle, string screenSubtitle, string spacer = " - ")
         {
             if (Page is PortalBasePage)
-                PageTitle = pageTitle + " - " + ServiceLocator.Partition.GetPlatformName();
+                PageTitle = pageTitle + spacer + ServiceLocator.Partition.Name;
 
             ActionTitle.Text = screenTitle;
             ActionSubtitle.InnerHtml = screenSubtitle;
@@ -92,10 +92,10 @@ namespace InSite.UI.Layout.Portal.Controls
         public void BindTitleAndSubtitle(string title, string subtitle) =>
             BindTitleAndSubtitle(title, title, subtitle);
 
-        public void BindTitleAndSubtitle(string pageTitle, string screenTitle, string screenSubtitle)
+        public void BindTitleAndSubtitle(string pageTitle, string screenTitle, string screenSubtitle, string spacer = " - ")
         {
             if (Page is PortalBasePage)
-                PageTitle = pageTitle + " - " + ServiceLocator.Partition.GetPlatformName();
+                PageTitle = pageTitle + spacer + ServiceLocator.Partition.Name;
 
             ActionTitle.Text = GetDisplayText(screenTitle);
             ActionSubtitle.InnerHtml = GetDisplayText(screenSubtitle);
@@ -140,7 +140,7 @@ namespace InSite.UI.Layout.Portal.Controls
                     continue;
 
                 var actionUrl = create.Href.Substring(1);
-                if (Identity.IsActionAuthorized(actionUrl))
+                if (Identity.IsGranted(actionUrl))
                     anchors.Add(create);
             }
 

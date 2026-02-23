@@ -84,11 +84,11 @@ namespace InSite.Domain.Messages
         {
             foreach (NotificationType item in Enum.GetValues(typeof(NotificationType)))
                 if (Select(item) == null)
-                    throw new Exception($"The definition for notification type {item} is missing from NotificationTypes.json");
+                    throw new InvalidOperationException($"The definition for notification type {item} is missing from NotificationTypes.json");
 
             foreach (var item in All)
                 if (!Enum.IsDefined(typeof(NotificationType), item.Slug))
-                    throw new Exception($"The notification {item.Slug} is missing from the enumeration type.");
+                    throw new InvalidOperationException($"The notification {item.Slug} is missing from the enumeration type.");
         }
     }
 }

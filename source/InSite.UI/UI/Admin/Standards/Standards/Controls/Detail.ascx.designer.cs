@@ -708,6 +708,24 @@ namespace InSite.Admin.Standards.Standards.Controls
         protected global::InSite.UI.Admin.Standards.Standards.Controls.ScenarioQuestions ScenarioQuestions;
 
         /// <summary>
+        /// AttachmentTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NavItem AttachmentTab;
+
+        /// <summary>
+        /// AttachmentSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Admin.Standards.Standards.Controls.AttachmentsSection AttachmentSection;
+
+        /// <summary>
         /// BulkRegistrationWindow control.
         /// </summary>
         /// <remarks>

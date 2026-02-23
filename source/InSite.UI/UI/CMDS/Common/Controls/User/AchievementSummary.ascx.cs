@@ -114,7 +114,7 @@ namespace InSite.Cmds.Controls.Training.EmployeeAchievements
 
             if (employeeAchievement != null && canBeSigned)
             {
-                var allowSelfDeclaredAchievementType = EmployeeAchievementHelper.TypeAllowsSignOff(employeeAchievement.AchievementLabel);
+                var allowSelfDeclaredAchievementType = EmployeeAchievementHelper.AllowSignOff(employeeAchievement.AchievementLabel);
 
                 var allowSelfDeclaredAchievement = employeeAchievement.AchievementAllowSelfDeclared &&
                     employeeAchievement.UserIdentifier == identity.User.UserIdentifier;

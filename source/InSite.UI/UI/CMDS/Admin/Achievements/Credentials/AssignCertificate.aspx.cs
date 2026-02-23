@@ -10,8 +10,6 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using Humanizer;
 
 using InSite.Application.Credentials.Write;
@@ -26,6 +24,7 @@ using InSite.Persistence.Plugin.CMDS;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 using AlertType = Shift.Constant.AlertType;
@@ -281,7 +280,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
                 SubType.LoadItems(new[] { AchievementTypes.TimeSensitiveSafetyCertificate, AchievementTypes.TrainingGuide });
 
-                Category.ListFilter.OrganizationIdentifier = OrganizationSearch.Select(CurrentIdentityFactory.ActiveOrganizationIdentifier).OrganizationIdentifier;
+                Category.ListFilter.OrganizationIdentifier = OrganizationSearch.Select(Organization.Identifier).OrganizationIdentifier;
                 Category.RefreshData();
 
                 LoadAchievements();
@@ -537,7 +536,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             IsRequired.Checked = true;
             IsTimeSensitive.Checked = false;
 
-            Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Department.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!FinderSecurityInfo.CanSeeAllDepartments && !Identity.HasAccessToAllCompanies)
                 Department.Filter.UserIdentifier = User.UserIdentifier;
@@ -618,7 +617,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             {
                 var necessity = IsRequired.Checked ? "Mandatory" : "Optional";
                 var priority = "Planned";
-                var authorityType = EmployeeAchievementHelper.TypeAllowsSignOff(SubType.Value) ? "Self" : null;
+                var authorityType = EmployeeAchievementHelper.AllowSignOff(SubType.Value) ? "Self" : null;
 
                 var achievement = AchievementIdentifier.Value.Value;
                 credentialIdentifier = ServiceLocator.AchievementSearch.GetCredentialIdentifier(null, achievement, userIdentifier);
@@ -702,7 +701,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         {
             var filter = new CmdsPersonFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 DepartmentIdentifier = Department.Value,
                 KeyeraRoles = new[] { CmdsRole.Workers }
             };
@@ -887,14 +886,14 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         private void LoadAchievements()
         {
             AchievementIdentifier.Filter.AchievementType = SubType.Value;
-            AchievementIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            AchievementIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementIdentifier.Filter.CategoryIdentifier = Category.ValueAsGuid;
             AchievementIdentifier.Value = null;
         }
 
         private void SetEnableSignOffAvailability()
         {
-            EnableSignOff.Visible = EmployeeAchievementHelper.TypeAllowsSignOff(SubType.Value);
+            EnableSignOff.Visible = EmployeeAchievementHelper.AllowSignOff(SubType.Value);
             EnableSignOff.Checked = false;
         }
 

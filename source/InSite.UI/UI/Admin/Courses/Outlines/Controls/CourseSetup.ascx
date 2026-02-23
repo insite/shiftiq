@@ -3,6 +3,8 @@
 <%@ Register Src="./PrivacySettingsGroups.ascx" TagName="PrivacySettingsGroups" TagPrefix="uc" %>
 <%@ Register Src="./CourseFileList.ascx" TagName="CourseFileList" TagPrefix="uc" %>
 <%@ Register Src="./CourseCategoryList.ascx" TagName="CourseCategoryList" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Admin/Courses/Outlines/Controls/EnrollmentUserGrid.ascx" TagName="EnrollmentUserGrid" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Admin/Courses/Outlines/Controls/EnrollmentGroupGrid.ascx" TagName="EnrollmentGroupGrid" TagPrefix="uc" %>
 
 <insite:Alert runat="server" ID="CourseSetupAlert" />
 
@@ -401,6 +403,7 @@
                                 Settings
                             </label>
                             <insite:CheckBox runat="server" ID="CourseIsHidden" Text="Hidden" />
+                            <insite:CheckBox runat="server" ID="IsDisplayOverviewOnly" Text="Display only the course overview" />
                         </div>
 
                         <uc:CourseCategoryList runat="server" ID="CategoryList" />
@@ -556,7 +559,7 @@
 
     <insite:NavItem runat="server" ID="EnrollmentsTab" Title="Enrollments">
 
-        <div class="card">
+        <div class="card" data-track-skip="1">
             <div class="card-body">
 
                 <div runat="server" ID="EnrollmentsMissingGradebookPanel" class="alert alert-warning">
@@ -603,20 +606,17 @@
                         </div>
                     </div>
 
-                    <div runat="server" id="ExistedEnrollmentsPanel" class="row">
-                        <div class="col-lg-12">
-                            <div id="CommandButtons" runat="server" style="padding-bottom: 10px;">
-                                <insite:Button runat="server" ID="SelectAllButton" ButtonStyle="Default" ToolTip="Select All" style="padding:5px 8px;" Icon="far fa-square" />
-                                <insite:Button runat="server" ID="UnselectAllButton" ButtonStyle="Default" ToolTip="Deselect All" style="display:none; padding:5px 8px;" Icon="far fa-check-square" />
-                                <insite:Button runat="server" ID="PreDeleteButton" ButtonStyle="Default" ToolTip="Delete Selected Enrollments" style="padding:5px 8px;" Icon="fas fa-trash-alt" />
-                            </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <asp:Panel runat="server" ID="GroupEnrollmentContainer" CssClass="mb-4">
+                                <h3>Groups</h3>
+                                <uc:EnrollmentGroupGrid runat="server" ID="GroupEnrollments" />
+                            </asp:Panel>
 
-                            <asp:DataList runat="server" ID="EnrollmentList" RepeatColumns="6" RepeatDirection="Vertical" CssClass="table table-striped table-bordered">
-                                <ItemTemplate>
-                                    <asp:Literal runat="server" ID="LearnerIdentifier" Text='<%# Eval("LearnerIdentifier") %>' Visible="false" />
-                                    <asp:CheckBox runat="server" ID="IsSelected" Text='<%# Eval("LearnerName") %>' />
-                                </ItemTemplate>
-                            </asp:DataList>
+                            <asp:Panel runat="server" ID="UserEnrollmentContainer">
+                                <h3>People</h3>
+                                <uc:EnrollmentUserGrid runat="server" ID="UserEnrollments" />
+                            </asp:Panel>
                         </div>
                     </div>
 
@@ -669,53 +669,3 @@
     <insite:SaveButton runat="server" ID="CourseSaveButton" ValidationGroup="CourseSetup" />
     <insite:CancelButton runat="server" ID="CourseCancelButton" />
 </div>
-
-<asp:Button runat="server" ID="DeleteEnrollmentsButton" style="display:none;" />
-
-<insite:PageFooterContent runat="server">
-<script type="text/javascript">
-
-    (function () {
-        Sys.Application.add_load(onLoad);
-
-        function onLoad() {
-            $("#<%= PreDeleteButton.ClientID %>")
-                .off('click', onDeleteCompetencies)
-                .on('click', onDeleteCompetencies);
-
-            $("#<%= SelectAllButton.ClientID %>")
-                .off('click', onSelectAll)
-                .on('click', onSelectAll);
-
-            $("#<%= UnselectAllButton.ClientID %>")
-                .off('click', onUnselectAll)
-                .on('click', onUnselectAll);
-        }
-
-        function onDeleteCompetencies() {
-            if ($("#<%= ExistedEnrollmentsPanel.ClientID %> input[id$='IsSelected']:checked").length > 0) {
-                if (confirm('Are you sure you want to delete selected enrollments?'))
-                    __doPostBack('<%= DeleteEnrollmentsButton.UniqueID %>', '');
-            }
-            else {
-                alert("Please select the enrollments you want to delete.");
-            }
-
-            return false;
-        }
-
-        function onSelectAll() {
-            $('#<%= UnselectAllButton.ClientID %>').css('display', '');
-            $('#<%= SelectAllButton.ClientID %>').css('display', 'none');
-            return setCheckboxes('<%= ExistedEnrollmentsPanel.ClientID %>', true);
-        }
-
-        function onUnselectAll() {
-            $('#<%= UnselectAllButton.ClientID %>').css('display', 'none');
-            $('#<%= SelectAllButton.ClientID %>').css('display', '');
-            return setCheckboxes('<%= ExistedEnrollmentsPanel.ClientID %>', false);
-        }
-    })();
-
-</script>
-</insite:PageFooterContent>

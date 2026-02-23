@@ -63,7 +63,13 @@ namespace InSite.UI.Portal
 
                 var personId = person.PersonIdentifier;
 
-                TokenHelper.GetClientSecret(personId, true);
+                var tokenSettings = ServiceLocator.AppSettings.Security.Token;
+
+                var tokenLifetimeInMinutes = tokenSettings.Lifetime;
+
+                var secretExpiryInDays = tokenSettings.GetClientSecretLifetimeInDays();
+
+                TokenHelper.GetClientSecret(personId, true, secretExpiryInDays, tokenLifetimeInMinutes);
 
                 HttpResponseHelper.Redirect("/ui/portal/profile");
             };
@@ -101,21 +107,19 @@ namespace InSite.UI.Portal
         {
             var data = new { Secret = secret, Debug = true };
 
-            {
-                var oneDay = 24 * 60 * 60; // 86,400 seconds
+            var oneDay = 24 * 60 * 60; // 86,400 seconds
 
-                var request = new JwtRequest { Secret = secret, Lifetime = oneDay };
+            var request = new JwtRequest { Secret = secret, Lifetime = oneDay };
 
-                var serializer = new JsonSerializer2();
+            var serializer = new JsonSerializer2();
 
-                var baseAddress = new Uri(ServiceLocator.AppSettings.Shift.Api.Hosting.V2.BaseUrl);
+            var baseAddress = new Uri(ServiceLocator.AppSettings.v2ApiBaseUrl);
 
-                var client = new ApiClientSynchronous(new HttpClientFactory(baseAddress, secret), serializer);
+            var client = new ApiClientSynchronous(new HttpClientFactory(baseAddress, secret), serializer);
 
-                var response = client.HttpPost<JwtResponse>("security/tokens/generate", request);
+            var response = client.HttpPost<JwtResponse>("api/security/tokens/generate", request);
 
-                return response.Data;
-            }
+            return response.Data;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -187,7 +191,7 @@ namespace InSite.UI.Portal
                 .ToList();
 
             foreach (var membership in memberships)
-                membership.IsActive = identity.IsInGroup(membership.GroupName);
+                membership.IsActive = identity.IsInRole(membership.GroupName);
 
             repeater.DataSource = memberships;
             repeater.DataBind();
@@ -206,7 +210,7 @@ namespace InSite.UI.Portal
         {
             FeatureFlagCard.Visible = Identity.IsAdministrator && ServiceLocator.AppSettings.Environment.IsPreProduction();
 
-            FeatureFlagHeading.InnerText = ServiceLocator.Partition.GetPlatformName() + " Feature Flags";
+            FeatureFlagHeading.InnerText = ServiceLocator.Partition.Name + " Feature Flags";
 
             var (user, person) = GetUserAndPerson();
 
@@ -283,10 +287,19 @@ namespace InSite.UI.Portal
                 .GetByPerson(person.PersonIdentifier, SecretName.ShiftClientSecret);
 
             if (secret != null)
-                PersonSecretValue.Text = secret.SecretValue;
+            {
+                var expiry = secret.SecretExpiry;
+                var expiryDisplay = TimeZones.Format(expiry, User.TimeZone);
 
-            ApiBaseUrl2.Text = ServiceLocator.AppSettings.Shift.Api.Hosting.V2.BaseUrl;
-            ApiBaseUrl1.Text = ServiceLocator.AppSettings.Shift.Api.Hosting.V1.BaseUrl;
+                PersonSecretValue.Text = secret.SecretValue;
+                PersonSecretExpiry.Text = expiryDisplay;
+
+                if (expiry < DateTimeOffset.Now)
+                    PersonSecretExpiry.Text = $"<span class='text-danger'>{expiryDisplay}</span>";
+            }
+
+            ApiBaseUrl1.Text = ServiceLocator.AppSettings.v1ApiBaseUrl;
+            ApiBaseUrl2.Text = ServiceLocator.AppSettings.v2ApiBaseUrl;
         }
 
         private void SetupFieldsConfiguration(QPerson person)

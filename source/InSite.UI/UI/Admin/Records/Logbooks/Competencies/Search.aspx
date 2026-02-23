@@ -1,8 +1,8 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" AutoEventWireup="true" CodeBehind="Search.aspx.cs" Inherits="InSite.UI.Admin.Records.Logbooks.Competencies.Search1" %>
+
 <%@ Register Src="./Controls/SearchCriteria.ascx" TagName="SearchCriteria" TagPrefix="uc" %>
 <%@ Register Src="./Controls/SearchResults.ascx" TagName="SearchResults" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Layout/Common/Controls/SearchDownload.ascx" TagName="SearchDownload" TagPrefix="uc" %>
-
 
 <asp:Content ContentPlaceHolderID="BodyContent" runat="server">
     <insite:Alert runat="server" ID="SearchAlert" />

@@ -1,14 +1,18 @@
 ﻿using System.Text;
 
-using ImageMagick;
-
 using Microsoft.AspNetCore.Mvc;
+
+using NetVips;
+using NetVips.Extensions;
 
 using Shift.Common;
 using Shift.Common.Integration.ImageMagick;
 using Shift.Constant;
 
 namespace Engine.ImageMagick;
+
+using SysDrawBitmap = System.Drawing.Bitmap;
+using SysDrawImageFormat = System.Drawing.Imaging.ImageFormat;
 
 [ApiController]
 public class ImageController(IMonitor monitor) : ControllerBase
@@ -33,20 +37,32 @@ public class ImageController(IMonitor monitor) : ControllerBase
             if (data.IsEmpty())
                 return BadRequest("Image is undefined.");
 
-            var imgInfo = new MagickImageInfo(data);
-
-            return Ok(new ImageInfo
+            using (var image = TryLoadImage(data))
             {
-                Height = imgInfo.Height,
-                Width = imgInfo.Width,
-                Format = imgInfo.Format == MagickFormat.Unknown ? ImageFormat.Unknown : ImageFormat.Known,
-                ImageType = GetImageType(imgInfo),
-                ColorSpace = GetColorSpace(imgInfo),
-                PixelsPerInch = GetImageDensity(imgInfo),
-            });
+                return Ok(new ImageInfo
+                {
+                    Height = (uint)image.Height,
+                    Width = (uint)image.Width,
+                    Format = ImageFormat.Known,
+                    ImageType = GetImageType(image),
+                    ColorSpace = GetColorSpace(image),
+                    PixelsPerInch = image.Xres * 25.4
+                });
+            }
         }
         catch (ApplicationError apperr)
         {
+            if (apperr.Message == "Unknown format")
+                return Ok(new ImageInfo
+                {
+                    Height = 0,
+                    Width = 0,
+                    Format = ImageFormat.Unknown,
+                    ImageType = ImageType.Null,
+                    ColorSpace = ColorSpace.Undefined,
+                    PixelsPerInch = 0,
+                });
+
             return BadRequest(apperr);
         }
         catch (Exception ex)
@@ -118,181 +134,297 @@ public class ImageController(IMonitor monitor) : ControllerBase
 
     #region Methods
 
-    public static void AdjustImage(Stream inputStream, Stream outputStream, AdjustImageSettings settings, List<string> messages)
+    private static Image TryLoadImage(byte[] data, VOption? options = null)
     {
-        var imgInfo = new MagickImageInfo(inputStream);
-
-        inputStream.Seek(0, SeekOrigin.Begin);
-
-        var currentType = GetImageType(imgInfo);
-        var isNeedResize = imgInfo.Width > settings.MaxWidth || imgInfo.Height > settings.MaxHeight;
-        var isChangeType = currentType != settings.OutputType;
-
-        if (isChangeType)
-            messages.Add($"Warning: image type changed ({currentType.GetName()} -> {settings.OutputType.GetName()})");
-
-        if (!isNeedResize && !isChangeType)
+        if (!IsBmp(data))
         {
-            inputStream.CopyTo(outputStream);
-        }
-        else if (settings.OutputType == ImageType.Gif)
-        {
-            using (var collection = new MagickImageCollection(inputStream))
+            try
             {
-                collection.Coalesce();
-
-                foreach (MagickImage image in collection)
-                {
-                    Resize(imgInfo, image, settings.MaxWidth, settings.MaxHeight, isNeedResize, settings.Crop, messages);
-
-                    image.Strip();
-                    image.Settings.Interlace = Interlace.NoInterlace;
-                }
-
-                collection.Write(outputStream);
+                return Image.NewFromBuffer(data, kwargs: options);
             }
+            catch (VipsException vipex)
+            {
+                if (!vipex.Message.StartsWith("unable to load from buffer\r\nVipsForeignLoad: buffer is not in a known format"))
+                    throw;
+            }
+        }
+
+        if (OperatingSystem.IsWindows())
+            return TryLoadWithSystemDrawing(data);
+
+        throw ApplicationError.Create("Unknown format");
+    }
+
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    private static Image TryLoadWithSystemDrawing(byte[] data)
+    {
+        try
+        {
+            using (var ms = new MemoryStream(data))
+            {
+                using (var bitmap = new SysDrawBitmap(ms))
+                {
+                    var image = bitmap.ToVips();
+
+                    return image.Mutate(mutable =>
+                    {
+                        var formatGuid = bitmap.RawFormat.Guid;
+                        var formatName = "Unknown";
+
+                        if (formatGuid == SysDrawImageFormat.Jpeg.Guid)
+                            formatName = "JPEG";
+                        else if (formatGuid == SysDrawImageFormat.Png.Guid)
+                            formatName = "PNG";
+                        else if (formatGuid == SysDrawImageFormat.Gif.Guid)
+                            formatName = "GIF";
+                        else if (formatGuid == SysDrawImageFormat.Bmp.Guid)
+                            formatName = "BMP";
+                        else if (formatGuid == SysDrawImageFormat.Tiff.Guid)
+                            formatName = "TIFF";
+                        else if (formatGuid == SysDrawImageFormat.Icon.Guid)
+                            formatName = "ICO";
+                        else if (formatGuid == SysDrawImageFormat.Wmf.Guid)
+                            formatName = "WMF";
+                        else if (formatGuid == SysDrawImageFormat.Emf.Guid)
+                            formatName = "EMF";
+
+                        mutable.Set(GValue.GStrType, "sysdraw-format", formatName);
+                    });
+                }
+            }
+        }
+        catch (ArgumentException argex)
+        {
+            if (argex.Message == "Parameter is not valid.")
+                throw ApplicationError.Create("Unknown format");
+
+            throw;
+        }
+    }
+
+    private static void AdjustImage(Stream inputStream, Stream outputStream, AdjustImageSettings settings, List<string> messages)
+    {
+        byte[] inputData;
+        using (var ms = new MemoryStream())
+        {
+            inputStream.CopyTo(ms);
+            inputData = ms.ToArray();
+        }
+
+        var imgOptions = IsGif(inputData)
+            ? new VOption { { "n", -1 } }
+            : null;
+
+        using (var image = TryLoadImage(inputData, imgOptions))
+        {
+            var currentType = GetImageType(image);
+            var originalWidth = image.Width;
+            var originalHeight = image.PageHeight;
+            var isNeedResize = originalWidth > settings.MaxWidth || originalHeight > settings.MaxHeight;
+            var isChangeType = currentType != settings.OutputType;
+
+            if (isChangeType)
+                messages.Add($"Warning: image type changed ({currentType.GetName()} -> {settings.OutputType.GetName()})");
+
+            if (!isNeedResize && !isChangeType)
+            {
+                outputStream.Write(inputData, 0, inputData.Length);
+                return;
+            }
+
+            var processedImage = RemoveMetadata(image);
+
+            if (isNeedResize)
+            {
+                processedImage = ResizeImage(processedImage, settings);
+
+                messages.Add($"Warning: image resized ({originalWidth}x{originalHeight} -> {settings.MaxWidth}x{settings.MaxHeight})");
+            }
+
+            WriteImage(processedImage, outputStream, settings);
+        }
+    }
+
+    private static void WriteImage(Image processedImage, Stream outputStream, AdjustImageSettings settings)
+    {
+        byte[] outputData;
+
+        if (settings.OutputType == ImageType.Gif)
+        {
+            outputData = processedImage.GifsaveBuffer();
         }
         else if (settings.OutputType == ImageType.Jpeg)
         {
-            using (var image = new MagickImage(inputStream))
-            {
-                Resize(imgInfo, image, settings.MaxWidth, settings.MaxHeight, isNeedResize, settings.Crop, messages);
-                WriteJpeg(image, outputStream);
-            }
+            outputData = processedImage.JpegsaveBuffer(
+                q: 85,
+                interlace: true,
+                optimizeCoding: true,
+                subsampleMode: Enums.ForeignSubsample.Off,
+                keep: Enums.ForeignKeep.None
+            );
         }
         else if (settings.OutputType == ImageType.Png)
         {
-            using (var image = new MagickImage(inputStream))
-            {
-                Resize(imgInfo, image, settings.MaxWidth, settings.MaxHeight, isNeedResize, settings.Crop, messages);
-                WritePng(image, outputStream);
-            }
+            outputData = processedImage.PngsaveBuffer(
+                compression: 9,
+                interlace: false,
+                filter: Enums.ForeignPngFilter.All
+            );
         }
         else
-            throw ApplicationError.Create("Unexpexted image output type: {0}", settings.OutputType);
-    }
-
-    private static void Resize(IMagickImageInfo info, MagickImage image, int width, int height, bool isResizeNeeded, bool isCropNeeded, List<string> messages)
-    {
-        if (!isResizeNeeded)
-            return;
-
-        image.FilterType = FilterType.Triangle;
-        image.Settings.SetDefine("filter:support", "2");
-
-        if (isCropNeeded)
         {
-            var resizeRatio = (decimal)height / width;
-            var imageRatio = (decimal)image.Height / image.Width;
-
-            if (imageRatio > resizeRatio)
-                image.Crop(image.Width, (uint)Math.Round(resizeRatio * image.Width), Gravity.Center);
-            else
-                image.Crop((uint)Math.Round(image.Height / resizeRatio), image.Height, Gravity.Center);
+            throw new ApplicationException($"Unexpected image output type: {settings.OutputType}");
         }
 
-        image.AdaptiveResize((uint)width, (uint)height);
-
-        messages.Add($"Warning: image resized ({info.Width}x{info.Height} -> {width}x{height})");
+        outputStream.Write(outputData, 0, outputData.Length);
     }
 
-    private static void WriteJpeg(MagickImage image, Stream outputStream)
+    private static Image ResizeImage(Image image, AdjustImageSettings settings)
     {
-        const int MaxQuality = 85;
+        if (settings.Crop)
+        {
+            var nPages = image.Contains("n-pages") ? (int)image.Get("n-pages") : 1;
+            if (nPages > 1)
+                return ResizeAnimatedWithCrop(image, settings.MaxWidth, settings.MaxHeight, nPages);
+        }
 
-        image.Strip();
-        image.Settings.Interlace = Interlace.Plane;
-        image.Format = MagickFormat.Pjpeg;
-
-        if (image.Quality == 0 || image.Quality > (MaxQuality + 1))
-            image.Quality = MaxQuality;
-
-        image.Settings.SetDefine(MagickFormat.Jpeg, "fancy-upsampling", "off");
-        image.Settings.SetDefine(MagickFormat.Jpeg, "dct-method", "float");
-        image.Settings.SetDefine(MagickFormat.Jpeg, "optimize-coding", "true");
-
-        image.Write(outputStream);
+        return image.ThumbnailImage(
+            width: settings.MaxWidth,
+            height: settings.MaxHeight,
+            size: Enums.Size.Down,
+            crop: settings.Crop ? Enums.Interesting.Centre : null
+        );
     }
 
-    private static void WritePng(MagickImage image, Stream outputStream)
+    private static Image ResizeAnimatedWithCrop(Image image, int maxWidth, int maxHeight, int nPages)
     {
-        image.Strip();
-        image.Settings.Interlace = Interlace.NoInterlace;
+        Image result;
 
-        if (GetImageType(image.Format) != ImageType.Png)
-            image.Format = MagickFormat.Png;
+        var originalWidth = image.Width;
+        var pageHeight = image.PageHeight;
+        var frames = new List<Image>();
 
-        image.Settings.SetDefine(MagickFormat.Png, "exclude-chunks", "all");
-        image.Settings.SetDefine(MagickFormat.Png, "include-chunks", "tRNS,gAMA");
-        image.Settings.SetDefine(MagickFormat.Png, "compression-filter", "5");
-        image.Settings.SetDefine(MagickFormat.Png, "compression-level", "9");
-        image.Settings.SetDefine(MagickFormat.Png, "compression-strategy", "1");
+        try
+        {
+            for (var i = 0; i < nPages; i++)
+            {
+                var frame = image.Crop(0, i * pageHeight, originalWidth, pageHeight);
+                var resizedFrame = frame.ThumbnailImage(
+                    width: maxWidth,
+                    height: maxHeight,
+                    size: Enums.Size.Down,
+                    crop: Enums.Interesting.Centre
+                );
 
-        if (image.HasAlpha && image.IsOpaque)
-            image.HasAlpha = false;
+                frames.Add(resizedFrame);
+            }
 
-        image.Write(outputStream);
+            result = Image.Arrayjoin(frames.ToArray(), across: 1);
+
+            result = result.Mutate(mutable =>
+            {
+                mutable.Set(GValue.GIntType, "page-height", maxHeight);
+
+                if (image.Contains("delay"))
+                    mutable.Set(GValue.ArrayIntType, "delay", image.Get("delay"));
+
+                if (image.Contains("loop"))
+                    mutable.Set(GValue.GIntType, "loop", image.Get("loop"));
+            });
+        }
+        finally
+        {
+            foreach (var frame in frames)
+                frame.Dispose();
+        }
+
+        return result;
     }
-    private static Shift.Common.Integration.ImageMagick.ColorSpace GetColorSpace(IMagickImageInfo imgInfo)
+
+    private static bool IsGif(byte[] data)
     {
-        if (imgInfo.ColorSpace == global::ImageMagick.ColorSpace.Gray)
+        return data[0] == 'G'
+            && data[1] == 'I'
+            && data[2] == 'F'
+            && data[3] == '8'
+            && (data[4] == '7' || data[4] == '9')
+            && data[5] == 'a';
+    }
+
+    private static bool IsBmp(byte[] data)
+    {
+        return data[0] == 'B'
+            && data[1] == 'M';
+    }
+
+    private static readonly string[] MetadataFields =
+    {
+            "exif-data", "exif-ifd0-Orientation", "exif-ifd2-ExifVersion",
+            "icc-profile-data", "xmp-data", "iptc-data",
+            "gif-comment", "png-comment", "jpeg-comment"
+        };
+
+    private static Image RemoveMetadata(Image image)
+    {
+        var result = image.Copy();
+
+        foreach (var field in MetadataFields)
+        {
+            if (result.Contains(field))
+                result = result.Mutate(mutable => mutable.Remove(field));
+        }
+
+        return result;
+    }
+
+    private static Shift.Common.Integration.ImageMagick.ColorSpace GetColorSpace(Image img)
+    {
+        var interpretation = img.Interpretation;
+
+        if (interpretation == Enums.Interpretation.Bw ||
+            interpretation == Enums.Interpretation.Grey16)
             return Shift.Common.Integration.ImageMagick.ColorSpace.Gray;
 
-        if (imgInfo.ColorSpace == global::ImageMagick.ColorSpace.Undefined)
+        if (interpretation == Enums.Interpretation.Error)
             return Shift.Common.Integration.ImageMagick.ColorSpace.Undefined;
 
         return Shift.Common.Integration.ImageMagick.ColorSpace.Other;
     }
 
-    private static ImageType GetImageType(IMagickImageInfo imgInfo) => GetImageType(imgInfo.Format);
-
-    private static ImageType GetImageType(MagickFormat format)
+    private static ImageType GetImageType(Image image)
     {
-        if (format == MagickFormat.Bmp
-            || format == MagickFormat.Bmp2
-            || format == MagickFormat.Bmp3)
-            return ImageType.Bmp;
-
-        if (format == MagickFormat.Gif
-            || format == MagickFormat.Gif87)
-            return ImageType.Gif;
-
-        if (format == MagickFormat.Jpe
-            || format == MagickFormat.Jpeg
-            || format == MagickFormat.Jpg
-            || format == MagickFormat.Jps
-            || format == MagickFormat.Pjpeg)
-            return ImageType.Jpeg;
-
-        if (format == MagickFormat.Png
-            || format == MagickFormat.Png00
-            || format == MagickFormat.Png8
-            || format == MagickFormat.Png24
-            || format == MagickFormat.Png32
-            || format == MagickFormat.Png48
-            || format == MagickFormat.Png64)
-            return ImageType.Png;
-
-        if (format == MagickFormat.Tif
-            || format == MagickFormat.Tiff
-            || format == MagickFormat.Tiff64)
-            return ImageType.Tiff;
-
-        return ImageType.Null;
-    }
-
-    private static double GetImageDensity(IMagickImageInfo imgInfo)
-    {
-        var density = imgInfo.Density;
-        if (density != null)
+        try
         {
-            if (density.Units == DensityUnit.PixelsPerCentimeter)
-                density = density.ChangeUnits(DensityUnit.PixelsPerInch);
+            var loader = (image.Contains("sysdraw-format")
+                ? image.Get("sysdraw-format")
+                : image.Get("vips-loader")) as string;
 
-            return density.X;
+            if (loader.IsEmpty())
+                return ImageType.Null;
+
+            loader = loader!.ToLowerInvariant();
+
+            if (loader.Contains("gif"))
+                return ImageType.Gif;
+
+            if (loader.Contains("jpeg") || loader.Contains("jpg"))
+                return ImageType.Jpeg;
+
+            if (loader.Contains("png"))
+                return ImageType.Png;
+
+            if (loader.Contains("tiff") || loader.Contains("tif"))
+                return ImageType.Tiff;
+
+            if (loader.Contains("bmp"))
+                return ImageType.Bmp;
+
+            return ImageType.Null;
         }
-
-        return -1;
+        catch
+        {
+            return ImageType.Null;
+        }
     }
 
     #endregion

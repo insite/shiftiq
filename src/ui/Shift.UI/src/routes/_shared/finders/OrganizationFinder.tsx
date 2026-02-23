@@ -27,7 +27,7 @@ async function loadItems(pageIndex: number, keyword: string) {
     }, pageIndex, shiftConfig.finderPageSize, null);
 
     return toFinderSearchWindowData(result, row => ({
-        value: row.OrganizationIdentifier,
+        value: row.OrganizationId,
         text: row.CompanyName || "Untitled Organization"
     }));
 }

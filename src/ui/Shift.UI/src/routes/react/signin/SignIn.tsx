@@ -3,11 +3,15 @@ import { cache } from "@/cache/cache";
 import Button from "@/components/Button";
 import FormField from "@/components/form/FormField";
 import FormSection from "@/components/form/FormSection";
+import Icon from "@/components/icon/Icon";
 import TextBox from "@/components/TextBox";
 import { useSiteProvider } from "@/contexts/SiteProvider";
 import { useStatusProvider } from "@/contexts/StatusProvider";
+import { cookieHelper } from "@/helpers/cookieHelper";
+import { cssHelper } from "@/helpers/cssHelper";
 import { shiftConfig } from "@/helpers/shiftConfig";
 import { useState } from "react";
+import { Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router";
 
@@ -18,6 +22,8 @@ interface FormFields {
 
 export default function SignIn() {
     const [isLogginIn, setIsLogginIn] = useState(false);
+    const [isChangingTheme, setIsChangingTheme] = useState(false);
+    const [theme, setTheme] = useState(cookieHelper.getTheme);
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormFields>({
         defaultValues: {
@@ -63,46 +69,100 @@ export default function SignIn() {
         }
     }
 
+    async function handleThemeClick() {
+        if (isChangingTheme) {
+            return;
+        }
+
+        const newTheme = theme === "dark" ? "light" : "dark";
+
+        setTheme(newTheme);
+        setIsChangingTheme(true);
+
+        try {
+            await shiftClient.cookie.changeTheme(newTheme);
+        } catch (error) {
+            addError(error, "Failed to change theme");
+        } finally {
+            setIsChangingTheme(false);
+        }
+
+        const latestTheme = cookieHelper.getTheme();
+
+        cssHelper.refreshTheme();
+
+        setTheme(latestTheme);
+    }
+
     return (
-        <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
-            <FormSection className="w-50">
-                <FormField label="Organization" required>
-                    <TextBox
-                        autoFocus
-                        {...register("organizationCode", {
-                            required: true
-                        })}
-                        error={errors.organizationCode}
-                        disabled={isLogginIn}
-                    />
-                </FormField>
-                <FormField label="Email" required>
-                    <TextBox
-                        {...register("email", {
-                            required: true
-                        })}
-                        error={errors.email}
-                        disabled={isLogginIn}
-                    />
-                </FormField>
-                <FormField hasBottomMargin={false}>
-                    <Button
-                        variant="save"
-                        text="Login"
-                        loadingMessage="Logging In..."
-                        isLoading={isLogginIn}
-                    />
-                    {UserName && (
-                        <Button
-                            type="button"
-                            variant="delete"
-                            text="Logout"
-                            className="ms-2"
-                            onClick={handleLogout}
+        <>
+            <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
+                <FormSection className="w-50">
+                    <FormField label="Organization" required>
+                        <TextBox
+                            autoFocus
+                            {...register("organizationCode", {
+                                required: true
+                            })}
+                            error={errors.organizationCode}
+                            disabled={isLogginIn}
                         />
-                    )}
+                    </FormField>
+                    <FormField label="Email" required>
+                        <TextBox
+                            {...register("email", {
+                                required: true
+                            })}
+                            error={errors.email}
+                            disabled={isLogginIn}
+                        />
+                    </FormField>
+                    <FormField hasBottomMargin={false}>
+                        <Button
+                            variant="save"
+                            text="Login"
+                            loadingMessage="Logging In..."
+                            isLoading={isLogginIn}
+                        />
+                        {UserName && (
+                            <Button
+                                type="button"
+                                variant="delete"
+                                text="Logout"
+                                className="ms-2"
+                                onClick={handleLogout}
+                            />
+                        )}
+                    </FormField>
+                </FormSection>
+            </form>
+
+            <FormSection className="w-50">
+                <FormField label="Light/dark mode switch">
+                    <div className="d-flex align-items-center mt-2">
+                        <div className="form-check form-switch mode-switch" data-bs-toggle="mode" onClick={handleThemeClick}>
+                            <input
+                                type="checkbox"
+                                className="form-check-input"
+                                defaultChecked={theme === "dark"}
+                            />
+                            <label className="form-check-label">
+                                <Icon style="Light" name="sun-bright" className="fs-lg" />
+                            </label>
+                            <label className="form-check-label">
+                                <Icon style="Light" name="moon" className="fs-lg" />
+                            </label>
+                        </div>
+
+                        {isChangingTheme && (
+                            <>
+                                <Spinner animation="border" role="status" size="sm" className="ms-2 me-2" />
+                                Saving ...
+                            </>
+                        )}
+                    </div>
                 </FormField>
             </FormSection>
-        </form>
+        </>
     );
 }

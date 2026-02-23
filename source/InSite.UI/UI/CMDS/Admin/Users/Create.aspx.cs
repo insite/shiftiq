@@ -89,7 +89,7 @@ namespace InSite.Cmds.Admin.People.Forms
             }
             else
             {
-                OrganizationIdentifier.Value = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                OrganizationIdentifier.Value = Organization.Identifier;
                 OrganizationIdentifier.Enabled = false;
             }
         }

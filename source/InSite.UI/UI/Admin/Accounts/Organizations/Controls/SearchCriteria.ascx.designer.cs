@@ -33,15 +33,6 @@ namespace InSite.Admin.Accounts.Organizations.Controls
         protected global::InSite.Common.Web.UI.TextBox Code;
 
         /// <summary>
-        /// DomainName control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox DomainName;
-
-        /// <summary>
         /// IsClosed control.
         /// </summary>
         /// <remarks>

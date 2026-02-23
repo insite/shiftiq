@@ -163,9 +163,9 @@ namespace InSite.Common.Web
 
             var info = new FileInfo(path);
             if (!info.Exists)
-                throw new ApplicationError("File not found: " + path);
+                throw new FileNotFoundException("File not found: " + path);
             else if (info.Length == 0)
-                throw new ApplicationError("File is empty: " + path);
+                throw new InvalidOperationException("File is empty: " + path);
 
             if (string.IsNullOrEmpty(filename))
                 filename = info.Name;

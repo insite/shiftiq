@@ -8,6 +8,8 @@
         public DatabaseConnectionSettings Connection { get; set; }
         public string ConnectionString { get; set; }
         public string FileStorage { get; set; }
+        public int MonitorCommandSize { get; set; }
+        public bool MonitorStackTrace { get; set; }
     }
 
     public class DatabaseConnectionStrings

@@ -139,15 +139,8 @@ namespace Shift.Sdk.UI
         {
             if (_hostedData == null)
             {
-                try
-                {
-                    using (var webClient = new WebClient())
-                        _hostedData = webClient.DownloadString(Id).EmptyIfNull();
-                }
-                catch (Exception ex)
-                {
-                    throw ApplicationError.Create(ex, "Unable to read the hosted data: " + ex.Message);
-                }
+                using (var webClient = new WebClient())
+                    _hostedData = webClient.DownloadString(Id).EmptyIfNull();
             }
 
             return _hostedData;

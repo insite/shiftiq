@@ -4,17 +4,16 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IRegistrationCriteria
+    public interface IRegistrationCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
+
         Guid? AttemptIdentifier { get; set; }
         Guid? CandidateIdentifier { get; set; }
         Guid? CustomerIdentifier { get; set; }
         Guid? EmployerIdentifier { get; set; }
         Guid? EventIdentifier { get; set; }
         Guid? ExamFormIdentifier { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
         Guid? PaymentIdentifier { get; set; }
         Guid? RegistrationRequestedBy { get; set; }
         Guid? SchoolIdentifier { get; set; }

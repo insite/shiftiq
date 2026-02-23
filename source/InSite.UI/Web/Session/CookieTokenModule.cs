@@ -28,6 +28,9 @@ namespace InSite
         public static CookieSettings CookieSettings
             => ServiceLocator.AppSettings.Security.Cookie;
 
+        public static IdCookieSettings IdCookieSettings
+            => ServiceLocator.AppSettings.Security.IdCookie;
+
         #region Constants
 
         public const string DefaultOrganization = "insite";
@@ -266,7 +269,7 @@ namespace InSite
             var session = context.Session;
             var token = GetToken(session, request);
 
-            token.Created = DateTimeOffset.UtcNow.ToString("O");
+            token.ResetCreated();
 
             SetToken(response, session, token);
             AddActiveToken(token, session.Timeout);
@@ -291,7 +294,10 @@ namespace InSite
         {
             var token = (CookieToken)session?[CookieSettings.Name];
 
-            if (token == null)
+            if (token == null
+                || Guid.TryParse(request.Cookies.Get(IdCookieSettings.Name)?.Value, out var newId)
+                    && token.ID != newId
+                )
             {
                 var data = request.Headers[CookieSettings.Name];
                 if (string.IsNullOrEmpty(data))
@@ -305,7 +311,7 @@ namespace InSite
 
                 try
                 {
-                    token = encoder.Deserialize(data, encrypt, secret);
+                    token = encoder.Deserialize(data, encrypt, secret, true);
                 }
                 catch (CookieSerializationException)
                 {
@@ -325,14 +331,23 @@ namespace InSite
         private static void OverrideFromQueryString(HttpRequest request, CookieToken token)
         {
             var language = request.QueryString["language"];
-            if (language.HasValue() && Language.CodeExists(language))
+            if (language.HasValue() && token.Language != language && Language.CodeExists(language))
+            {
+                token.ResetID();
                 token.Language = language;
+            }
 
             var organization = UrlHelper.GetOrganizationCode(request.Url);
             if (organization != null)
             {
-                token.OrganizationCode = organization;
-                token.OrganizationIdentifier = OrganizationSearch.Select(organization)?.OrganizationIdentifier;
+                var organizationId = OrganizationSearch.Select(organization)?.OrganizationIdentifier;
+
+                if (token.OrganizationCode != organization || token.OrganizationIdentifier != organizationId)
+                {
+                    token.ResetID();
+                    token.OrganizationCode = organization;
+                    token.OrganizationIdentifier = organizationId;
+                }
             }
         }
 
@@ -344,7 +359,7 @@ namespace InSite
             if (HttpContext.Current.Request != null && DisableTokenRefresh(HttpContext.Current.Request.RawUrl))
                 return;
 
-            token.ValidationKey = CreateValidationKey(token);
+            token.ValidationKey = CookieToken.CreateValidationKey(token, GetSecret());
             token.Modified = DateTimeOffset.UtcNow.ToString("O");
 
             if (session != null)
@@ -361,10 +376,10 @@ namespace InSite
 
             var cookie = new HttpCookie(CookieSettings.Name)
             {
-                Domain = SecuritySettings.Domain,
+                Domain = ServiceLocator.AppSettings.Partition.Domain,
                 Expires = DateTime.UtcNow.AddMinutes(CookieSettings.Lifetime),
                 Path = CookieSettings.Path,
-                Value = encoder.Serialize(token, encrypt, secret),
+                Value = encoder.Serialize(token, encrypt, secret, true),
                 SameSite = SameSiteMode.Lax,
                 Secure = true,
                 HttpOnly = true
@@ -386,11 +401,23 @@ namespace InSite
                 }
             }
 
-            // This is needed for React app to share cookie with localhost:3000
-            if (ServiceLocator.AppSettings.Environment.Name == EnvironmentName.Local)
-                cookie.SameSite = SameSiteMode.None;
-
             response.Cookies.Set(cookie);
+
+            SetIdCookie(HttpContext.Current.Request, response, token);
+        }
+
+        private static void SetIdCookie(HttpRequest request, HttpResponse response, CookieToken token)
+        {
+            response.Cookies.Add(new HttpCookie(IdCookieSettings.Name)
+            {
+                Domain = ServiceLocator.AppSettings.Partition.Domain,
+                Expires = DateTime.UtcNow.AddMinutes(CookieSettings.Lifetime),
+                Path = CookieSettings.Path,
+                Value = token.ID.ToString().ToLower(),
+                SameSite = SameSiteMode.Lax,
+                Secure = true,
+                HttpOnly = true
+            });
         }
 
         private static bool DisableTokenRefresh(string rawUrl)
@@ -471,39 +498,12 @@ namespace InSite
 
         #region Methods (token serialization and validation)
 
-        private static string CreateValidationKey(CookieToken token)
-        {
-            var secret = GetSecret();
-
-            var parts = new List<string>
-            {
-                token.Environment,
-                token.UserEmail,
-                token.ImpersonatorUser,
-                secret,
-                token.ID.ToString()
-            };
-
-            var text = string.Join("/", parts.Where(part => !string.IsNullOrWhiteSpace(part)));
-
-            var hash = HashText(text);
-
-            return hash;
-        }
-
         private static string GetSecret()
             => ServiceLocator.AppSettings.Security.Cookie.Secret;
 
-        private static string HashText(string text)
-        {
-            var hash = EncryptionHelper.ComputeHashSha256(text);
-
-            return StringHelper.ByteArrayToHex(hash);
-        }
-
         private static bool IsValid(CookieToken token)
         {
-            return token != null && token.ValidationKey == CreateValidationKey(token);
+            return token != null && token.ValidationKey == CookieToken.CreateValidationKey(token, GetSecret());
         }
 
         #endregion

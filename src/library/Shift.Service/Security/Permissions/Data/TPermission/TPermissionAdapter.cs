@@ -11,20 +11,18 @@ public class TPermissionAdapter : IEntityAdapter
 {
     public void Copy(ModifyPermission modify, TPermissionEntity entity)
     {
-        entity.AllowExecute = modify.AllowExecute;
         entity.AllowRead = modify.AllowRead;
         entity.AllowWrite = modify.AllowWrite;
         entity.AllowCreate = modify.AllowCreate;
         entity.AllowDelete = modify.AllowDelete;
         entity.AllowAdministrate = modify.AllowAdministrate;
         entity.AllowConfigure = modify.AllowConfigure;
-        entity.PermissionMask = modify.PermissionMask;
         entity.PermissionGranted = modify.PermissionGranted;
         entity.PermissionGrantedBy = modify.PermissionGrantedBy;
-        entity.ObjectIdentifier = modify.ObjectIdentifier;
+        entity.ObjectIdentifier = modify.ObjectId;
         entity.ObjectType = modify.ObjectType;
-        entity.GroupIdentifier = modify.GroupIdentifier;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.GroupIdentifier = modify.GroupId;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.AllowTrialAccess = modify.AllowTrialAccess;
 
     }
@@ -58,21 +56,19 @@ public class TPermissionAdapter : IEntityAdapter
     {
         var entity = new TPermissionEntity
         {
-            AllowExecute = create.AllowExecute,
             AllowRead = create.AllowRead,
             AllowWrite = create.AllowWrite,
             AllowCreate = create.AllowCreate,
             AllowDelete = create.AllowDelete,
             AllowAdministrate = create.AllowAdministrate,
             AllowConfigure = create.AllowConfigure,
-            PermissionMask = create.PermissionMask,
             PermissionGranted = create.PermissionGranted,
             PermissionGrantedBy = create.PermissionGrantedBy,
-            ObjectIdentifier = create.ObjectIdentifier,
+            ObjectIdentifier = create.ObjectId,
             ObjectType = create.ObjectType,
-            GroupIdentifier = create.GroupIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            PermissionIdentifier = create.PermissionIdentifier,
+            GroupIdentifier = create.GroupId,
+            OrganizationIdentifier = create.OrganizationId,
+            PermissionIdentifier = create.PermissionId,
             AllowTrialAccess = create.AllowTrialAccess
         };
         return entity;
@@ -87,21 +83,19 @@ public class TPermissionAdapter : IEntityAdapter
     {
         var model = new PermissionModel
         {
-            AllowExecute = entity.AllowExecute,
             AllowRead = entity.AllowRead,
             AllowWrite = entity.AllowWrite,
             AllowCreate = entity.AllowCreate,
             AllowDelete = entity.AllowDelete,
             AllowAdministrate = entity.AllowAdministrate,
             AllowConfigure = entity.AllowConfigure,
-            PermissionMask = entity.PermissionMask,
             PermissionGranted = entity.PermissionGranted,
             PermissionGrantedBy = entity.PermissionGrantedBy,
-            ObjectIdentifier = entity.ObjectIdentifier,
+            ObjectId = entity.ObjectIdentifier,
             ObjectType = entity.ObjectType,
-            GroupIdentifier = entity.GroupIdentifier,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            PermissionIdentifier = entity.PermissionIdentifier,
+            GroupId = entity.GroupIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            PermissionId = entity.PermissionIdentifier,
             AllowTrialAccess = entity.AllowTrialAccess,
 
             GroupName = entity.Group?.GroupName,
@@ -120,7 +114,7 @@ public class TPermissionAdapter : IEntityAdapter
     {
         var match = new PermissionMatch
         {
-            PermissionIdentifier = entity.PermissionIdentifier
+            PermissionId = entity.PermissionIdentifier
 
         };
 

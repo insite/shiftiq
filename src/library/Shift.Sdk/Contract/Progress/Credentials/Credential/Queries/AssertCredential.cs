@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public class AssertCredential : Query<bool>
     {
-        public Guid CredentialIdentifier { get; set; }
+        public Guid CredentialId { get; set; }
     }
 }

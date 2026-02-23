@@ -8,6 +8,7 @@ using InSite.Application.QuizAttempts.Read;
 using InSite.Application.Quizzes.Read;
 using InSite.UI.Layout.Admin;
 
+using Shift.Common;
 using Shift.Constant;
 
 namespace InSite.UI.Admin.Assessments
@@ -82,14 +83,14 @@ namespace InSite.UI.Admin.Assessments
             RecentChanges.BindModelToControls(10);
             HistorySection.Visible = RecentChanges.ItemCount > 0;
 
-            UploadAttemptsRow.Visible = Identity.IsGranted(PermissionIdentifiers.Admin_Assessments_Attempts, PermissionOperation.Write);
+            UploadAttemptsRow.Visible = Identity.IsGranted(PermissionIdentifiers.Admin_Assessments_Attempts, DataAccess.Update);
 
             PerformanceReportLink.Visible = Organization.Toolkits.Assessments?.PerformanceReport?.Enabled ?? false;
         }
 
         public void LoadCounter(HtmlGenericControl card, Literal counter, int count, HtmlAnchor link, string action)
         {
-            card.Visible = Identity.IsActionAuthorized(action);
+            card.Visible = Identity.IsGranted(action);
             link.HRef = action;
             counter.Text = $@"{count:n0}";
         }

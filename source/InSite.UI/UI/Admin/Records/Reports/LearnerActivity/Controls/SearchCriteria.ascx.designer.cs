@@ -69,24 +69,6 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
         protected global::InSite.Common.Web.UI.ItemIdMultiComboBox MembershipStatusItemIdentifiers;
 
         /// <summary>
-        /// CountStrategyContainer control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CountStrategyContainer;
-
-        /// <summary>
-        /// CountStrategy control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList CountStrategy;
-
-        /// <summary>
         /// SearchButton control.
         /// </summary>
         /// <remarks>
@@ -120,25 +102,16 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.FindProgram ProgramIdentifiers;
+        protected global::InSite.Common.Web.UI.MultiComboBox ProgramIdentifiers;
 
         /// <summary>
-        /// GradebookNames control.
+        /// GradebookIdentifiers control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.MultiComboBox GradebookNames;
-
-        /// <summary>
-        /// EnrollmentStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.ComboBox EnrollmentStatus;
+        protected global::InSite.Common.Web.UI.MultiComboBox GradebookIdentifiers;
 
         /// <summary>
         /// EnrollmentStartedSince control.
@@ -159,15 +132,6 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
         protected global::InSite.Common.Web.UI.DateTimeOffsetSelector EnrollmentStartedBefore;
 
         /// <summary>
-        /// AchievementStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.ComboBox AchievementStatus;
-
-        /// <summary>
         /// AchievementGrantedSince control.
         /// </summary>
         /// <remarks>
@@ -184,15 +148,6 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.DateTimeOffsetSelector AchievementGrantedBefore;
-
-        /// <summary>
-        /// EngagementStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.ComboBox EngagementStatus;
 
         /// <summary>
         /// LearnerRole control.

@@ -11,6 +11,7 @@ namespace InSite.Persistence.Integration.Moodle
 
             Property(x => x.EventIdentifier).IsRequired();
             Property(x => x.EventData).IsRequired().IsUnicode(false).HasMaxLength(2147483647);
+            Property(x => x.EventSource).IsOptional().IsUnicode(false);
             Property(x => x.EventWhen).IsRequired();
         }
     }

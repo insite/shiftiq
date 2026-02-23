@@ -217,7 +217,7 @@ namespace InSite.Api.Controllers
             if (Request.Headers.Contains("Origin"))
             {
                 var requestOrigin = Request.Headers.GetValues("Origin").First();
-                if (!string.IsNullOrEmpty(requestOrigin) && requestOrigin.EndsWith($".{ServiceLocator.AppSettings.Security.Domain}"))
+                if (!string.IsNullOrEmpty(requestOrigin) && requestOrigin.EndsWith($".{ServiceLocator.AppSettings.Partition.Domain}"))
                 {
                     origin = requestOrigin;
                     user = PagesUserInfo.Get(CurrentOrganization.Identifier);
@@ -322,7 +322,7 @@ namespace InSite.Api.Controllers
         {
             var organization = ApiHelper.GetOrganization();
             var subdomain = organization.OrganizationCode;
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var json = JsonSuccess(new PagesSettingsModel { LoginPageUrl = $"https://{subdomain}.{domain}{InSite.Web.SignIn.SignInLogic.GetUrl()}" });
             return json;
         }
@@ -353,11 +353,11 @@ namespace InSite.Api.Controllers
             {
                 Type = MessageTypeName.Newsletter,
                 OrganizationIdentifier = OrganizationIdentifiers.CMDS,
-                Name = "CMDS News Update",
+                NameContains = "CMDS News Update",
             };
             var message = ServiceLocator.MessageSearch.GetMessage(messageFilter);
             if (message == null)
-                return JsonBadRequest($"Message not found: {messageFilter.Name}");
+                return JsonBadRequest($"Message not found: {messageFilter.NameContains}");
 
             ServiceLocator.SendCommand(new AddSubscriber(message.MessageIdentifier, userId.Value, "Message Recipient", false, false));
 

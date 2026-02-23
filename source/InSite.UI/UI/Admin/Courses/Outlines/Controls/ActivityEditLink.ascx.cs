@@ -158,7 +158,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
             {
                 var linkGenerator = new ScoopLinkGenerator();
 
-                var scoopUrl = linkGenerator.GenerateLibraryUrl(Identity, Request.Url.Host, Organization.Code, Request.RawUrl);
+                var scoopUrl = linkGenerator.GenerateLibraryUrl(Identity, Request.Url.Host, Organization.Code, null, Request.RawUrl);
 
                 ScoopLibraryUrl.Text = $"{Organization.Name} SCO Library";
 

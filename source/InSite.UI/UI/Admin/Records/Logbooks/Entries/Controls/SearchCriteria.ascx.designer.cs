@@ -24,6 +24,24 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
         protected global::InSite.Common.Web.UI.FindJournalSetup JournalSetupIdentifier;
 
         /// <summary>
+        /// DepartmentUserUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel DepartmentUserUpdatePanel;
+
+        /// <summary>
+        /// DepartmentIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindDepartment DepartmentIdentifier;
+
+        /// <summary>
         /// UserIdentifier control.
         /// </summary>
         /// <remarks>
@@ -31,33 +49,6 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.FindPerson UserIdentifier;
-
-        /// <summary>
-        /// TrainingTypeComboBox control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.TrainingTypeComboBox TrainingTypeComboBox;
-
-        /// <summary>
-        /// SearchButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.FilterButton SearchButton;
-
-        /// <summary>
-        /// ClearButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.ClearButton ClearButton;
 
         /// <summary>
         /// CreatedSince control.
@@ -85,6 +76,78 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.ComboBox ValidationStatus;
+
+        /// <summary>
+        /// SearchButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FilterButton SearchButton;
+
+        /// <summary>
+        /// ClearButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ClearButton ClearButton;
+
+        /// <summary>
+        /// TrainingType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TrainingTypeComboBox TrainingType;
+
+        /// <summary>
+        /// Employer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox Employer;
+
+        /// <summary>
+        /// Supervisor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox Supervisor;
+
+        /// <summary>
+        /// StartDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DateSelector StartDate;
+
+        /// <summary>
+        /// EndDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DateSelector EndDate;
+
+        /// <summary>
+        /// Hours control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NumericBox Hours;
 
         /// <summary>
         /// ShowColumns control.

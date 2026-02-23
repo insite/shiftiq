@@ -4,12 +4,11 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IGroupAddressCriteria
+    public interface IGroupAddressCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
-        Guid? GroupIdentifier { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
+
+        Guid? GroupId { get; set; }
 
         string AddressType { get; set; }
         string City { get; set; }

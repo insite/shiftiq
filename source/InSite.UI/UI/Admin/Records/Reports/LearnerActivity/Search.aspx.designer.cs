@@ -15,15 +15,6 @@ namespace InSite.UI.Admin.Records.Reports.LearnerActivity
     {
 
         /// <summary>
-        /// ScreenStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.Alert ScreenStatus;
-
-        /// <summary>
         /// SearchResultsTab control.
         /// </summary>
         /// <remarks>
@@ -76,23 +67,5 @@ namespace InSite.UI.Admin.Records.Reports.LearnerActivity
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Layout.Common.Controls.SearchDownload SearchDownload;
-
-        /// <summary>
-        /// SummaryTab control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.NavItem SummaryTab;
-
-        /// <summary>
-        /// SummaryTables control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Admin.Records.Reports.LearnerActivity.Controls.SummaryTables SummaryTables;
     }
 }

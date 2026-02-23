@@ -9,7 +9,10 @@ namespace Shift.Service.Metadata;
 public class TActionReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
+
     private readonly TActionAdapter _adapter;
+
+    private string DefaultSort = "ActionUrl";
 
     public TActionReader(IDbContextFactory<TableDbContext> context, TActionAdapter adapter)
     {
@@ -73,7 +76,7 @@ public class TActionReader : IEntityReader
         using var db = _context.CreateDbContext();
 
         return await BuildQueryable(db, criteria)
-            .OrderBy(criteria.Filter.Sort)
+            .OrderBy(criteria.Filter.Sort ?? DefaultSort)
             .ApplyPaging(criteria.Filter)
             .ToListAsync(cancellation);
     }
@@ -83,7 +86,7 @@ public class TActionReader : IEntityReader
         using var db = _context.CreateDbContext();
 
         var queryable = BuildQueryable(db, criteria)
-            .OrderBy(criteria.Filter.Sort)
+            .OrderBy(criteria.Filter.Sort ?? DefaultSort)
             .ApplyPaging(criteria.Filter);
 
         return await ToMatchesAsync(queryable, cancellation);
@@ -91,13 +94,17 @@ public class TActionReader : IEntityReader
 
     private IQueryable<TActionEntity> BuildQueryable(TableDbContext db, IActionCriteria criteria)
     {
-        var q = db.TAction.AsNoTracking().AsQueryable();
+        var q = db.TAction
+            .Include(x => x.PermissionParent)
+            .Include(x => x.PermissionChildren)
+            .AsNoTracking()
+            .AsQueryable();
 
-        if (criteria.NavigationParentActionIdentifier != null)
-            q = q.Where(x => x.NavigationParentActionIdentifier == criteria.NavigationParentActionIdentifier);
+        if (criteria.NavigationParentActionId != null)
+            q = q.Where(x => x.NavigationParentActionIdentifier == criteria.NavigationParentActionId);
 
-        if (criteria.PermissionParentActionIdentifier != null)
-            q = q.Where(x => x.PermissionParentActionIdentifier == criteria.PermissionParentActionIdentifier);
+        if (criteria.PermissionParentActionId != null)
+            q = q.Where(x => x.PermissionParentActionIdentifier == criteria.PermissionParentActionId);
 
         if (criteria.ActionIcon != null)
             q = q.Where(x => x.ActionIcon == criteria.ActionIcon);
@@ -142,7 +149,7 @@ public class TActionReader : IEntityReader
         var matches = await queryable
             .Select(entity => new ActionMatch
             {
-                ActionIdentifier = entity.ActionIdentifier
+                ActionId = entity.ActionIdentifier
             })
             .ToListAsync(cancellation);
 

@@ -1,4 +1,4 @@
 export interface ApiUserModel {
-    UserIdentifier: string;
+    UserId: string;
     FullName: string;
 }

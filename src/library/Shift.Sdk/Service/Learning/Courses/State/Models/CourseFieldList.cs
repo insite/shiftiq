@@ -42,6 +42,7 @@ namespace InSite.Domain.Courses
             { CourseField.CourseIsHidden, new StateFieldMeta { FieldType = StateFieldType.Bool, Required = true } },
             { CourseField.IsMultipleUnitsEnabled, new StateFieldMeta { FieldType = StateFieldType.Bool, Required = true } },
             { CourseField.IsProgressReportEnabled, new StateFieldMeta { FieldType = StateFieldType.Bool, Required = true } },
+            { CourseField.IsDisplayOverviewOnly, new StateFieldMeta { FieldType = StateFieldType.Bool, Required = true } },
 
             // int
             { CourseField.CourseAsset, new StateFieldMeta { FieldType = StateFieldType.Int, DirectlyModifiable = false, Required = true } },

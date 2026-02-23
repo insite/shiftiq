@@ -141,7 +141,8 @@ namespace InSite.Domain.Messages
         public string Organization { get; set; }
         public string UserEmail { get; set; }
         public Guid UserIdentifier { get; set; }
-        public string VerifyEmailUrl => $"{AppUrl}/ui/lobby/verify-email?thumbprint={StringHelper.EncodeBase64Url(UserIdentifier.ToString())}";
+        public string TokenValue { get; set; }
+        public string VerifyEmailUrl => $"{AppUrl}/ui/lobby/verify-email?token={TokenValue}";
     }
 
     public class AlertPasswordResetRequested : Notification
@@ -811,4 +812,53 @@ namespace InSite.Domain.Messages
         public string LoginUrl => AppUrl + "/ui/lobby/signin";
         public string DashboardUrl => AppUrl + "/ui/portal/learning/dashboard/home";
     }
+
+    public class AchievementExpiringNotification : Notification
+    {
+        public AchievementExpiringNotification()
+        {
+            Type = NotificationType.AchievementExpiring;
+        }
+
+        public string AchievementTitle { get; set; }
+        public string AchievementExpirationDate { get; set; }
+    }
+
+    public class AchievementExpiredNotification : Notification
+    {
+        public AchievementExpiredNotification()
+        {
+            Type = NotificationType.AchievementExpired;
+        }
+
+        public string AchievementTitle { get; set; }
+        public string AchievementExpirationDate { get; set; }
+    }
+
+    public class LearnerAchievementExpiringNotification : Notification
+    {
+        public LearnerAchievementExpiringNotification()
+        {
+            Type = NotificationType.LearnerAchievementExpiring;
+        }
+
+        public string AchievementTitle { get; set; }
+        public string AchievementExpirationDate { get; set; }
+        public Guid LearnerIdentifier { get; set; }
+        public string LearnerName { get; set; }
+    }
+
+    public class LearnerAchievementExpiredNotification : Notification
+    {
+        public LearnerAchievementExpiredNotification()
+        {
+            Type = NotificationType.LearnerAchievementExpired;
+        }
+
+        public string AchievementTitle { get; set; }
+        public string AchievementExpirationDate { get; set; }
+        public Guid LearnerIdentifier { get; set; }
+        public string LearnerName { get; set; }
+    }
+
 }

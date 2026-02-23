@@ -27,7 +27,7 @@ namespace Shift.Common
                     symmetricAlg = new RC2CryptoServiceProvider();
                     break;
                 default:
-                    throw new Exception($"The symmetric encryption algorithm {parts[0]} is not permitted. Please use AES, Rijndael, or RC2.");
+                    throw new NotSupportedException($"The symmetric encryption algorithm {parts[0]} is not permitted. Please use AES, Rijndael, or RC2.");
             }
 
             symmetricAlg.KeySize = int.Parse(parts[1]);
@@ -44,7 +44,7 @@ namespace Shift.Common
                     symmetricAlg.Mode = CipherMode.CFB;
                     break;
                 default:
-                    throw new Exception("Invalid CipherMode");
+                    throw new NotSupportedException("Invalid CipherMode");
             }
 
             return symmetricAlg;
@@ -70,7 +70,7 @@ namespace Shift.Common
                     return System.Security.Cryptography.PaddingMode.ANSIX923;
 
                 default:
-                    throw new Exception("Invalid PaddingMode");
+                    throw new NotSupportedException("Invalid PaddingMode");
             }
         }
 

@@ -3,11 +3,13 @@
 using Shift.Common;
 using Shift.Contract;
 using Shift.Contract.Presentation;
+using Shift.Service;
 using Shift.Service.Content;
+using Shift.Service.Directory;
 using Shift.Service.Presentation;
 using Shift.Service.Security;
 
-namespace Shift.Test.Orchestration
+namespace Shift.Test.Me
 {
     [Collection(PlatformFixtures.PlatformTest)]
     public class ReactServiceTests : IClassFixture<PlatformFixture>
@@ -24,11 +26,13 @@ namespace Shift.Test.Orchestration
         private readonly Platform _platform;
         private readonly OrganizationAdapter _organizationAdapter;
         private readonly UserService _userService;
+        private readonly PersonService _personService;
         private readonly INavigationService _navigationService;
         private readonly ILabelService _labelService;
         private readonly IPageService _pageService;
         private readonly TInputReader _inputReader;
-        private readonly PartitionFieldService _partitionService;
+
+        private readonly PermissionCache _permissions;
 
         public ReactServiceTests(PlatformFixture fixture)
         {
@@ -44,47 +48,32 @@ namespace Shift.Test.Orchestration
             _platform = fixture.ServiceProvider.GetRequiredService<Platform>();
             _organizationAdapter = fixture.ServiceProvider.GetRequiredService<OrganizationAdapter>();
             _userService = fixture.ServiceProvider.GetRequiredService<UserService>();
+            _personService = fixture.ServiceProvider.GetRequiredService<PersonService>();
             _navigationService = fixture.ServiceProvider.GetRequiredService<INavigationService>();
             _labelService = fixture.ServiceProvider.GetRequiredService<ILabelService>();
             _pageService = fixture.ServiceProvider.GetRequiredService<IPageService>();
             _inputReader = fixture.ServiceProvider.GetRequiredService<TInputReader>();
-            _partitionService = fixture.ServiceProvider.GetRequiredService<PartitionFieldService>();
+
+            _permissions = fixture.ServiceProvider.GetRequiredService<PermissionCache>();
         }
 
         [Fact]
         public async Task Constructor_TestOperatorPermission_Success()
         {
-            var matrix = new PermissionMatrix();
-
-            var loader = new PermissionMatrixLoader(
-                _releaseSettings,
-                _securitySettings,
-                _organizationService,
-                _actionService,
-                _permissionService,
-                _queryTypeCollection
-                );
-
-            await loader.LoadAsync(matrix);
-
-            var permissionMatrixProvider = new PermissionMatrixProvider();
-
-            permissionMatrixProvider.SetMatrix(matrix);
-
             var react = new ReactService(
                 _appSettings,
                 _startupOptions,
                 _platform,
-                permissionMatrixProvider,
+                _permissions,
                 _actionService,
                 _organizationService,
                 _organizationAdapter,
                 _userService,
+                _personService,
                 _navigationService,
                 _labelService,
                 _pageService,
-                _inputReader,
-                _partitionService
+                _inputReader
                 );
 
             var testPrincipal = new TestPrincipal();

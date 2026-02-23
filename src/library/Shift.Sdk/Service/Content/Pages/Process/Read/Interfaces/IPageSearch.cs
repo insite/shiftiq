@@ -64,9 +64,9 @@ namespace InSite.Application.Sites.Read
 
         byte[] SerializeSite(Guid id);
 
-        void LoadSite(Guid? parentOrganization, Guid organization, Guid user, QSiteExport exportSite, QSite site);
+        void LoadSite(Guid organization, Guid user, QSiteExport exportSite, QSite site);
 
-        void LoadPage(Guid? parentOrganization, Guid organization, Guid user, QPageExport exportPage, QPage page, Guid? webSiteIdentifier, Dictionary<string, Guid?> groups = null);
+        void LoadPage(Guid organization, Guid user, QPageExport exportPage, QPage page, Guid? webSiteIdentifier, Dictionary<string, Guid?> groups = null);
 
         void SavePageContent(QPageExport exportPage, QPage page);
 

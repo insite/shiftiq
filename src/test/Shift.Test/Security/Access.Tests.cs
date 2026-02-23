@@ -2,185 +2,187 @@
 
 namespace Shift.Test.Security;
 
-public class SwitchAccessHelperTests
+public class FeatureAccessHelperTests
 {
     [Fact]
     public void Constructor_SetsValue()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
-        Assert.Equal(SwitchAccess.On, helper.Value);
+        var helper = new FeatureAccessHelper(FeatureAccess.Trial);
+        Assert.Equal(FeatureAccess.Trial, helper.Value);
     }
 
     [Fact]
-    public void IsEmpty_WhenOff_ReturnsTrue()
+    public void IsEmpty_WhenUnspecified_ReturnsTrue()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
         Assert.True(helper.IsEmpty);
     }
 
     [Fact]
-    public void IsEmpty_WhenOn_ReturnsFalse()
+    public void IsEmpty_WhenTrial_ReturnsFalse()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
+        var helper = new FeatureAccessHelper(FeatureAccess.Trial);
         Assert.False(helper.IsEmpty);
     }
 
     [Fact]
-    public void On_WhenSwitchIsOn_ReturnsTrue()
+    public void Use_WhenFeatureIsUse_ReturnsTrue()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
-        Assert.True(helper.On);
+        var helper = new FeatureAccessHelper(FeatureAccess.Use);
+        Assert.True(helper.Use);
     }
 
     [Fact]
-    public void On_WhenSwitchIsOff_ReturnsFalse()
+    public void Use_WhenFeatureIsUnspecified_ReturnsFalse()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
-        Assert.False(helper.On);
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
+        Assert.False(helper.Use);
     }
 
     [Fact]
-    public void Abbreviate_WhenOn_ReturnsPlus()
+    public void Abbreviate_WhenUse_ReturnsU()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
-        Assert.Equal("+", helper.Abbreviate());
+        var helper = new FeatureAccessHelper(FeatureAccess.Use);
+        Assert.Equal("u", helper.Abbreviate());
     }
 
     [Fact]
-    public void Abbreviate_WhenOff_ReturnsDash()
+    public void Abbreviate_WhenUnspecified_ReturnsDash()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
         Assert.Equal("-", helper.Abbreviate());
     }
 
     [Fact]
     public void Abbreviate_SingleValue_ReturnsCorrectAbbreviation()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
-        Assert.Equal("+", helper.Abbreviate(SwitchAccess.On));
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
+        Assert.Equal("u", helper.Abbreviate(FeatureAccess.Use));
     }
 
     [Fact]
-    public void Describe_WhenOn_ReturnsOn()
+    public void Describe_WhenUse_ReturnsUse()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
-        Assert.Equal("On", helper.Describe());
+        var helper = new FeatureAccessHelper(FeatureAccess.Use);
+        Assert.Equal("Use", helper.Describe());
     }
 
     [Fact]
-    public void Describe_WhenOff_ReturnsOff()
+    public void Describe_WhenUnspecified_ReturnsUnspecified()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
-        Assert.Equal("Off", helper.Describe());
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
+        Assert.Equal("Unspecified", helper.Describe());
     }
 
     [Fact]
-    public void HasAny_WhenOn_ReturnsTrue()
+    public void HasAny_WhenUse_ReturnsTrue()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
+        var helper = new FeatureAccessHelper(FeatureAccess.Use);
         Assert.True(helper.HasAny());
     }
 
     [Fact]
-    public void HasAny_WhenOff_ReturnsFalse()
+    public void HasAny_WhenUnspecified_ReturnsFalse()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
         Assert.False(helper.HasAny());
     }
 
     [Fact]
     public void HasFlag_WhenFlagSet_ReturnsTrue()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
-        Assert.True(helper.HasFlag(SwitchAccess.On));
+        var helper = new FeatureAccessHelper(FeatureAccess.Use);
+        Assert.True(helper.HasFlag(FeatureAccess.Use));
     }
 
     [Fact]
-    public void Add_SwitchValue_AddsFlag()
+    public void Add_FeatureValue_AddsFlag()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
-        helper.Add(SwitchAccess.On);
-        Assert.True(helper.On);
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
+        helper.Add(FeatureAccess.Use);
+        Assert.True(helper.Use);
     }
 
     [Theory]
-    [InlineData("on")]
-    [InlineData("On")]
-    [InlineData("ON")]
+    [InlineData("use")]
+    [InlineData("Use")]
+    [InlineData("USE")]
     public void Add_StringValue_ParsesCaseInsensitively(string value)
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
         helper.Add(new[] { value });
-        Assert.True(helper.On);
+        Assert.True(helper.Use);
     }
 
     [Fact]
-    public void Add_Wildcard_SetsAllFlags()
+    public void Add_Wildcard_SetsUseFlag()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
         helper.Add(new[] { "*" });
-        Assert.True(helper.On);
+        Assert.True(helper.Use);
     }
 
     [Fact]
-    public void Add_AllKeyword_SetsAllFlags()
+    public void Add_AllKeyword_SetsUseFlag()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.Off);
+        var helper = new FeatureAccessHelper(FeatureAccess.Unspecified);
         helper.Add(new[] { "all" });
-        Assert.True(helper.On);
+        Assert.True(helper.Use);
     }
 
     [Fact]
     public void HasAll_WhenAllFlagsSet_ReturnsTrue()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
+        var helper = new FeatureAccessHelper(FeatureAccess.Trial);
+        helper.Add(FeatureAccess.Use);
         Assert.True(helper.HasAll());
     }
 
     [Fact]
     public void HasAll_WithStringValue_ChecksFlag()
     {
-        var helper = new SwitchAccessHelper(SwitchAccess.On);
-        Assert.True(helper.HasAll("on"));
+        var helper = new FeatureAccessHelper(FeatureAccess.Trial);
+        helper.Add(FeatureAccess.Use);
+        Assert.True(helper.HasAll("trial"));
     }
 }
 
-public class OperationAccessHelperTests
+public class DataAccessHelperTests
 {
     [Fact]
     public void Constructor_SetsValue()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read);
-        Assert.Equal(OperationAccess.Read, helper.Value);
+        var helper = new DataAccessHelper(DataAccess.Read);
+        Assert.Equal(DataAccess.Read, helper.Value);
     }
 
     [Fact]
-    public void IsEmpty_WhenNone_ReturnsTrue()
+    public void IsEmpty_WhenUnspecified_ReturnsTrue()
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
         Assert.True(helper.IsEmpty);
     }
 
     [Fact]
     public void IsEmpty_WhenHasFlags_ReturnsFalse()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read);
+        var helper = new DataAccessHelper(DataAccess.Read);
         Assert.False(helper.IsEmpty);
     }
 
     [Theory]
-    [InlineData(OperationAccess.Read, true, false, false, false, false, false)]
-    [InlineData(OperationAccess.Write, false, true, false, false, false, false)]
-    [InlineData(OperationAccess.Create, false, false, true, false, false, false)]
-    [InlineData(OperationAccess.Delete, false, false, false, true, false, false)]
-    [InlineData(OperationAccess.Administrate, false, false, false, false, true, false)]
-    [InlineData(OperationAccess.Configure, false, false, false, false, false, true)]
+    [InlineData(DataAccess.Read, true, false, false, false, false, false)]
+    [InlineData(DataAccess.Update, false, true, false, false, false, false)]
+    [InlineData(DataAccess.Create, false, false, true, false, false, false)]
+    [InlineData(DataAccess.Delete, false, false, false, true, false, false)]
+    [InlineData(DataAccess.Administrate, false, false, false, false, true, false)]
+    [InlineData(DataAccess.Configure, false, false, false, false, false, true)]
     public void IndividualFlags_ReturnCorrectValues(
-        OperationAccess access, bool read, bool write, bool create, bool delete, bool admin, bool config)
+        DataAccess access, bool read, bool update, bool create, bool delete, bool admin, bool config)
     {
-        var helper = new OperationAccessHelper(access);
+        var helper = new DataAccessHelper(access);
         Assert.Equal(read, helper.Read);
-        Assert.Equal(write, helper.Write);
+        Assert.Equal(update, helper.Update);
         Assert.Equal(create, helper.Create);
         Assert.Equal(delete, helper.Delete);
         Assert.Equal(admin, helper.Administrate);
@@ -190,11 +192,11 @@ public class OperationAccessHelperTests
     [Fact]
     public void CombinedFlags_AllReturnTrue()
     {
-        var access = OperationAccess.Read | OperationAccess.Write | OperationAccess.Delete;
-        var helper = new OperationAccessHelper(access);
+        var access = DataAccess.Read | DataAccess.Update | DataAccess.Delete;
+        var helper = new DataAccessHelper(access);
 
         Assert.True(helper.Read);
-        Assert.True(helper.Write);
+        Assert.True(helper.Update);
         Assert.True(helper.Delete);
         Assert.False(helper.Create);
         Assert.False(helper.Administrate);
@@ -204,127 +206,127 @@ public class OperationAccessHelperTests
     [Fact]
     public void Abbreviate_SingleFlag_ReturnsCorrectAbbreviation()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read);
+        var helper = new DataAccessHelper(DataAccess.Read);
         Assert.Equal("r", helper.Abbreviate());
     }
 
     [Fact]
     public void Abbreviate_MultipleFlags_ReturnsCombinedAbbreviations()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read | OperationAccess.Write);
+        var helper = new DataAccessHelper(DataAccess.Read | DataAccess.Update);
         var abbrev = helper.Abbreviate();
         Assert.Contains("r", abbrev);
-        Assert.Contains("w", abbrev);
+        Assert.Contains("u", abbrev);
     }
 
     [Fact]
-    public void Abbreviate_None_ReturnsDash()
+    public void Abbreviate_Unspecified_ReturnsDash()
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
         Assert.Equal("-", helper.Abbreviate());
     }
 
     [Theory]
-    [InlineData(OperationAccess.Read, "r")]
-    [InlineData(OperationAccess.Write, "w")]
-    [InlineData(OperationAccess.Create, "c")]
-    [InlineData(OperationAccess.Delete, "d")]
-    [InlineData(OperationAccess.Administrate, "a")]
-    [InlineData(OperationAccess.Configure, "f")]
-    public void Abbreviate_SpecificValue_ReturnsCorrectAbbreviation(OperationAccess access, string expected)
+    [InlineData(DataAccess.Read, "r")]
+    [InlineData(DataAccess.Update, "u")]
+    [InlineData(DataAccess.Create, "c")]
+    [InlineData(DataAccess.Delete, "d")]
+    [InlineData(DataAccess.Administrate, "a")]
+    [InlineData(DataAccess.Configure, "f")]
+    public void Abbreviate_SpecificValue_ReturnsCorrectAbbreviation(DataAccess access, string expected)
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
         Assert.Equal(expected, helper.Abbreviate(access));
     }
 
     [Fact]
     public void Describe_SingleFlag_ReturnsName()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read);
+        var helper = new DataAccessHelper(DataAccess.Read);
         Assert.Equal("Read", helper.Describe());
     }
 
     [Fact]
     public void Describe_MultipleFlags_ReturnsCommaSeparatedNames()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read | OperationAccess.Write);
+        var helper = new DataAccessHelper(DataAccess.Read | DataAccess.Update);
         var desc = helper.Describe();
         Assert.Contains("Read", desc);
-        Assert.Contains("Write", desc);
+        Assert.Contains("Update", desc);
         Assert.Contains(",", desc);
     }
 
     [Fact]
     public void HasAny_WithFlags_ReturnsTrue()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read);
+        var helper = new DataAccessHelper(DataAccess.Read);
         Assert.True(helper.HasAny());
     }
 
     [Fact]
-    public void HasAny_WithNone_ReturnsFalse()
+    public void HasAny_WithUnspecified_ReturnsFalse()
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
         Assert.False(helper.HasAny());
     }
 
     [Fact]
     public void HasAny_WithOverlappingFlags_ReturnsTrue()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read | OperationAccess.Write);
-        Assert.True(helper.HasAny(OperationAccess.Read));
+        var helper = new DataAccessHelper(DataAccess.Read | DataAccess.Update);
+        Assert.True(helper.HasAny(DataAccess.Read));
     }
 
     [Fact]
     public void HasAny_WithNonOverlappingFlags_ReturnsFalse()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read);
-        Assert.False(helper.HasAny(OperationAccess.Write));
+        var helper = new DataAccessHelper(DataAccess.Read);
+        Assert.False(helper.HasAny(DataAccess.Update));
     }
 
     [Fact]
     public void HasFlag_WhenFlagPresent_ReturnsTrue()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read | OperationAccess.Write);
-        Assert.True(helper.HasFlag(OperationAccess.Read));
+        var helper = new DataAccessHelper(DataAccess.Read | DataAccess.Update);
+        Assert.True(helper.HasFlag(DataAccess.Read));
     }
 
     [Fact]
     public void HasFlag_WhenFlagMissing_ReturnsFalse()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read);
-        Assert.False(helper.HasFlag(OperationAccess.Write));
+        var helper = new DataAccessHelper(DataAccess.Read);
+        Assert.False(helper.HasFlag(DataAccess.Update));
     }
 
     [Fact]
     public void Add_SingleFlag_AddsToValue()
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
-        helper.Add(OperationAccess.Read);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
+        helper.Add(DataAccess.Read);
         Assert.True(helper.Read);
     }
 
     [Fact]
     public void Add_MultipleFlags_AccumulatesFlags()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read);
-        helper.Add(OperationAccess.Write);
+        var helper = new DataAccessHelper(DataAccess.Read);
+        helper.Add(DataAccess.Update);
         Assert.True(helper.Read);
-        Assert.True(helper.Write);
+        Assert.True(helper.Update);
     }
 
     [Theory]
-    [InlineData("read", OperationAccess.Read)]
-    [InlineData("Read", OperationAccess.Read)]
-    [InlineData("READ", OperationAccess.Read)]
-    [InlineData("write", OperationAccess.Write)]
-    [InlineData("create", OperationAccess.Create)]
-    [InlineData("delete", OperationAccess.Delete)]
-    [InlineData("administrate", OperationAccess.Administrate)]
-    [InlineData("configure", OperationAccess.Configure)]
-    public void Add_StringArray_ParsesCorrectly(string input, OperationAccess expected)
+    [InlineData("read", DataAccess.Read)]
+    [InlineData("Read", DataAccess.Read)]
+    [InlineData("READ", DataAccess.Read)]
+    [InlineData("update", DataAccess.Update)]
+    [InlineData("create", DataAccess.Create)]
+    [InlineData("delete", DataAccess.Delete)]
+    [InlineData("administrate", DataAccess.Administrate)]
+    [InlineData("configure", DataAccess.Configure)]
+    public void Add_StringArray_ParsesCorrectly(string input, DataAccess expected)
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
         helper.Add(new[] { input });
         Assert.True(helper.HasFlag(expected));
     }
@@ -332,11 +334,11 @@ public class OperationAccessHelperTests
     [Fact]
     public void Add_MultipleStrings_AddsAllFlags()
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
-        helper.Add(new[] { "read", "write", "delete" });
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
+        helper.Add(new[] { "read", "update", "delete" });
 
         Assert.True(helper.Read);
-        Assert.True(helper.Write);
+        Assert.True(helper.Update);
         Assert.True(helper.Delete);
         Assert.False(helper.Create);
     }
@@ -344,11 +346,11 @@ public class OperationAccessHelperTests
     [Fact]
     public void Add_Wildcard_SetsAllFlags()
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
         helper.Add(new[] { "*" });
 
         Assert.True(helper.Read);
-        Assert.True(helper.Write);
+        Assert.True(helper.Update);
         Assert.True(helper.Create);
         Assert.True(helper.Delete);
         Assert.True(helper.Administrate);
@@ -358,7 +360,7 @@ public class OperationAccessHelperTests
     [Fact]
     public void Add_AllKeyword_SetsAllFlags()
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
         helper.Add(new[] { "ALL" });
         Assert.True(helper.HasAll());
     }
@@ -366,137 +368,33 @@ public class OperationAccessHelperTests
     [Fact]
     public void Add_InvalidString_DoesNotThrow()
     {
-        var helper = new OperationAccessHelper(OperationAccess.None);
+        var helper = new DataAccessHelper(DataAccess.Unspecified);
         helper.Add(new[] { "invalid" });
-        Assert.Equal(OperationAccess.None, helper.Value);
+        Assert.Equal(DataAccess.Unspecified, helper.Value);
     }
 
     [Fact]
     public void HasAll_WhenAllFlagsSet_ReturnsTrue()
     {
-        var all = OperationAccess.Read | OperationAccess.Write | OperationAccess.Create |
-                  OperationAccess.Delete | OperationAccess.Administrate | OperationAccess.Configure;
-        var helper = new OperationAccessHelper(all);
+        var all = DataAccess.Read | DataAccess.Update | DataAccess.Create |
+                  DataAccess.Delete | DataAccess.Administrate | DataAccess.Configure;
+        var helper = new DataAccessHelper(all);
         Assert.True(helper.HasAll());
     }
 
     [Fact]
     public void HasAll_WhenSomeFlagsMissing_ReturnsFalse()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read | OperationAccess.Write);
+        var helper = new DataAccessHelper(DataAccess.Read | DataAccess.Update);
         Assert.False(helper.HasAll());
     }
 
     [Fact]
     public void HasAll_StringVersion_ChecksSpecificFlag()
     {
-        var helper = new OperationAccessHelper(OperationAccess.Read | OperationAccess.Write);
+        var helper = new DataAccessHelper(DataAccess.Read | DataAccess.Update);
         Assert.True(helper.HasAll("read"));
         Assert.False(helper.HasAll("delete"));
-    }
-}
-
-public class HttpAccessHelperTests
-{
-    [Fact]
-    public void Constructor_SetsValue()
-    {
-        var helper = new HttpAccessHelper(HttpAccess.Get);
-        Assert.Equal(HttpAccess.Get, helper.Value);
-    }
-
-    [Fact]
-    public void IsEmpty_WhenNone_ReturnsTrue()
-    {
-        var helper = new HttpAccessHelper(HttpAccess.None);
-        Assert.True(helper.IsEmpty);
-    }
-
-    [Theory]
-    [InlineData(HttpAccess.Head, true, false, false, false, false)]
-    [InlineData(HttpAccess.Get, false, true, false, false, false)]
-    [InlineData(HttpAccess.Put, false, false, true, false, false)]
-    [InlineData(HttpAccess.Post, false, false, false, true, false)]
-    [InlineData(HttpAccess.Delete, false, false, false, false, true)]
-    public void IndividualFlags_ReturnCorrectValues(
-        HttpAccess access, bool head, bool get, bool put, bool post, bool delete)
-    {
-        var helper = new HttpAccessHelper(access);
-        Assert.Equal(head, helper.Head);
-        Assert.Equal(get, helper.Get);
-        Assert.Equal(put, helper.Put);
-        Assert.Equal(post, helper.Post);
-        Assert.Equal(delete, helper.Delete);
-    }
-
-    [Fact]
-    public void CombinedFlags_WorkCorrectly()
-    {
-        var access = HttpAccess.Get | HttpAccess.Post | HttpAccess.Delete;
-        var helper = new HttpAccessHelper(access);
-
-        Assert.False(helper.Head);
-        Assert.True(helper.Get);
-        Assert.False(helper.Put);
-        Assert.True(helper.Post);
-        Assert.True(helper.Delete);
-    }
-
-    [Theory]
-    [InlineData(HttpAccess.Head, "h")]
-    [InlineData(HttpAccess.Get, "g")]
-    [InlineData(HttpAccess.Put, "u")]
-    [InlineData(HttpAccess.Post, "p")]
-    [InlineData(HttpAccess.Delete, "d")]
-    public void Abbreviate_SpecificValue_ReturnsCorrectAbbreviation(HttpAccess access, string expected)
-    {
-        var helper = new HttpAccessHelper(HttpAccess.None);
-        Assert.Equal(expected, helper.Abbreviate(access));
-    }
-
-    [Fact]
-    public void Abbreviate_MultipleFlags_ReturnsCombinedAbbreviations()
-    {
-        var helper = new HttpAccessHelper(HttpAccess.Get | HttpAccess.Post);
-        var abbrev = helper.Abbreviate();
-        Assert.Contains("g", abbrev);
-        Assert.Contains("p", abbrev);
-    }
-
-    [Fact]
-    public void Add_Wildcard_SetsAllFlags()
-    {
-        var helper = new HttpAccessHelper(HttpAccess.None);
-        helper.Add(new[] { "*" });
-
-        Assert.True(helper.Head);
-        Assert.True(helper.Get);
-        Assert.True(helper.Put);
-        Assert.True(helper.Post);
-        Assert.True(helper.Delete);
-    }
-
-    [Theory]
-    [InlineData("get", HttpAccess.Get)]
-    [InlineData("Get", HttpAccess.Get)]
-    [InlineData("GET", HttpAccess.Get)]
-    [InlineData("post", HttpAccess.Post)]
-    [InlineData("put", HttpAccess.Put)]
-    [InlineData("delete", HttpAccess.Delete)]
-    [InlineData("head", HttpAccess.Head)]
-    public void Add_StringArray_ParsesCorrectly(string input, HttpAccess expected)
-    {
-        var helper = new HttpAccessHelper(HttpAccess.None);
-        helper.Add(new[] { input });
-        Assert.True(helper.HasFlag(expected));
-    }
-
-    [Fact]
-    public void HasAll_WhenAllFlagsSet_ReturnsTrue()
-    {
-        var all = HttpAccess.Head | HttpAccess.Get | HttpAccess.Put | HttpAccess.Post | HttpAccess.Delete;
-        var helper = new HttpAccessHelper(all);
-        Assert.True(helper.HasAll());
     }
 }
 
@@ -510,16 +408,16 @@ public class AuthorityAccessHelperTests
     }
 
     [Fact]
-    public void IsEmpty_WhenNone_ReturnsTrue()
+    public void IsEmpty_WhenUnspecified_ReturnsTrue()
     {
-        var helper = new AuthorityAccessHelper(AuthorityAccess.None);
+        var helper = new AuthorityAccessHelper(AuthorityAccess.Unspecified);
         Assert.True(helper.IsEmpty);
     }
 
     [Fact]
     public void AllIndividualFlags_WorkCorrectly()
     {
-        Assert.True(new AuthorityAccessHelper(AuthorityAccess.Visitor).Visitor);
+        Assert.True(new AuthorityAccessHelper(AuthorityAccess.Guest).Guest);
         Assert.True(new AuthorityAccessHelper(AuthorityAccess.Member).Member);
         Assert.True(new AuthorityAccessHelper(AuthorityAccess.Trainee).Trainee);
         Assert.True(new AuthorityAccessHelper(AuthorityAccess.Learner).Learner);
@@ -538,7 +436,7 @@ public class AuthorityAccessHelperTests
         var access = AuthorityAccess.Administrator | AuthorityAccess.Developer | AuthorityAccess.Operator;
         var helper = new AuthorityAccessHelper(access);
 
-        Assert.False(helper.Visitor);
+        Assert.False(helper.Guest);
         Assert.False(helper.Member);
         Assert.True(helper.Administrator);
         Assert.True(helper.Developer);
@@ -546,8 +444,8 @@ public class AuthorityAccessHelperTests
     }
 
     [Theory]
-    [InlineData(AuthorityAccess.Visitor, "x")]
-    [InlineData(AuthorityAccess.Member, "e")]
+    [InlineData(AuthorityAccess.Guest, "g")]
+    [InlineData(AuthorityAccess.Member, "b")]
     [InlineData(AuthorityAccess.Trainee, "t")]
     [InlineData(AuthorityAccess.Learner, "l")]
     [InlineData(AuthorityAccess.Instructor, "i")]
@@ -559,17 +457,17 @@ public class AuthorityAccessHelperTests
     [InlineData(AuthorityAccess.Operator, "o")]
     public void Abbreviate_SpecificValue_ReturnsCorrectAbbreviation(AuthorityAccess access, string expected)
     {
-        var helper = new AuthorityAccessHelper(AuthorityAccess.None);
+        var helper = new AuthorityAccessHelper(AuthorityAccess.Unspecified);
         Assert.Equal(expected, helper.Abbreviate(access));
     }
 
     [Theory]
-    [InlineData("visitor", AuthorityAccess.Visitor)]
+    [InlineData("guest", AuthorityAccess.Guest)]
     [InlineData("Administrator", AuthorityAccess.Administrator)]
     [InlineData("DEVELOPER", AuthorityAccess.Developer)]
     public void Add_StringArray_ParsesCorrectly(string input, AuthorityAccess expected)
     {
-        var helper = new AuthorityAccessHelper(AuthorityAccess.None);
+        var helper = new AuthorityAccessHelper(AuthorityAccess.Unspecified);
         helper.Add(new[] { input });
         Assert.True(helper.HasFlag(expected));
     }
@@ -577,10 +475,10 @@ public class AuthorityAccessHelperTests
     [Fact]
     public void Add_Wildcard_SetsAllFlags()
     {
-        var helper = new AuthorityAccessHelper(AuthorityAccess.None);
+        var helper = new AuthorityAccessHelper(AuthorityAccess.Unspecified);
         helper.Add(new[] { "*" });
 
-        Assert.True(helper.Visitor);
+        Assert.True(helper.Guest);
         Assert.True(helper.Member);
         Assert.True(helper.Trainee);
         Assert.True(helper.Learner);
@@ -596,7 +494,7 @@ public class AuthorityAccessHelperTests
     [Fact]
     public void HasAll_WhenAllFlagsSet_ReturnsTrue()
     {
-        var all = AuthorityAccess.Visitor | AuthorityAccess.Member | AuthorityAccess.Trainee |
+        var all = AuthorityAccess.Guest | AuthorityAccess.Member | AuthorityAccess.Trainee |
                   AuthorityAccess.Learner | AuthorityAccess.Instructor | AuthorityAccess.Validator |
                   AuthorityAccess.Supervisor | AuthorityAccess.Manager | AuthorityAccess.Administrator |
                   AuthorityAccess.Developer | AuthorityAccess.Operator;
@@ -608,184 +506,144 @@ public class AuthorityAccessHelperTests
 public class AccessTests
 {
     [Fact]
-    public void Add_FormalSwitchPattern_ParsesCorrectly()
+    public void Add_FormalFeaturePattern_ParsesCorrectly()
     {
-        var access = new Access();
-        access.Add("switch:on");
-        Assert.Equal(SwitchAccess.On, access.Switch);
+        var access = new AccessSet();
+        access.Add("feature:trial,use");
+        Assert.True(access.Feature.HasFlag(FeatureAccess.Trial));
+        Assert.True(access.Feature.HasFlag(FeatureAccess.Use));
     }
 
     [Fact]
-    public void Add_FormalOperationPattern_ParsesCorrectly()
+    public void Add_FormalDataPattern_ParsesCorrectly()
     {
-        var access = new Access();
-        access.Add("operation:read,write");
-        Assert.True(access.Operation.HasFlag(OperationAccess.Read));
-        Assert.True(access.Operation.HasFlag(OperationAccess.Write));
-    }
-
-    [Fact]
-    public void Add_FormalHttpPattern_ParsesCorrectly()
-    {
-        var access = new Access();
-        access.Add("http:get,post");
-        Assert.True(access.Http.HasFlag(HttpAccess.Get));
-        Assert.True(access.Http.HasFlag(HttpAccess.Post));
+        var access = new AccessSet();
+        access.Add("data:read,update");
+        Assert.True(access.Data.HasFlag(DataAccess.Read));
+        Assert.True(access.Data.HasFlag(DataAccess.Update));
     }
 
     [Fact]
     public void Add_FormalAuthorityPattern_ParsesCorrectly()
     {
-        var access = new Access();
+        var access = new AccessSet();
         access.Add("authority:administrator,developer");
         Assert.True(access.Authority.HasFlag(AuthorityAccess.Administrator));
         Assert.True(access.Authority.HasFlag(AuthorityAccess.Developer));
     }
 
     [Fact]
-    public void Add_WildcardOperation_SetsAllFlags()
+    public void Add_WildcardData_SetsAllFlags()
     {
-        var access = new Access();
-        access.Add("operation:*");
-        Assert.True(access.Operation.HasFlag(OperationAccess.Read));
-        Assert.True(access.Operation.HasFlag(OperationAccess.Write));
-        Assert.True(access.Operation.HasFlag(OperationAccess.Create));
-        Assert.True(access.Operation.HasFlag(OperationAccess.Delete));
-        Assert.True(access.Operation.HasFlag(OperationAccess.Administrate));
-        Assert.True(access.Operation.HasFlag(OperationAccess.Configure));
-    }
-
-    [Fact]
-    public void Add_AllKeyword_SetsAllFlags()
-    {
-        var access = new Access();
-        access.Add("http:all");
-        Assert.True(access.Http.HasFlag(HttpAccess.Head));
-        Assert.True(access.Http.HasFlag(HttpAccess.Get));
-        Assert.True(access.Http.HasFlag(HttpAccess.Put));
-        Assert.True(access.Http.HasFlag(HttpAccess.Post));
-        Assert.True(access.Http.HasFlag(HttpAccess.Delete));
+        var access = new AccessSet();
+        access.Add("data:*");
+        Assert.True(access.Data.HasFlag(DataAccess.Read));
+        Assert.True(access.Data.HasFlag(DataAccess.Update));
+        Assert.True(access.Data.HasFlag(DataAccess.Create));
+        Assert.True(access.Data.HasFlag(DataAccess.Delete));
+        Assert.True(access.Data.HasFlag(DataAccess.Administrate));
+        Assert.True(access.Data.HasFlag(DataAccess.Configure));
     }
 
     [Theory]
-    [InlineData("on")]
-    [InlineData("On")]
-    [InlineData("ON")]
-    public void Add_SimplePattern_SetsSwitchOn(string input)
+    [InlineData("use")]
+    [InlineData("Use")]
+    [InlineData("USE")]
+    public void Add_SimplePattern_SetsFeatureUse(string input)
     {
-        var access = new Access();
+        var access = new AccessSet();
         access.Add(input);
-        Assert.Equal(SwitchAccess.On, access.Switch);
+        Assert.Equal(FeatureAccess.Use, access.Feature);
     }
 
     [Fact]
     public void Add_CaseInsensitive_ParsesCorrectly()
     {
-        var access = new Access();
-        access.Add("OPERATION:READ,WRITE");
-        Assert.True(access.Operation.HasFlag(OperationAccess.Read));
-        Assert.True(access.Operation.HasFlag(OperationAccess.Write));
+        var access = new AccessSet();
+        access.Add("DATA:READ,UPDATE");
+        Assert.True(access.Data.HasFlag(DataAccess.Read));
+        Assert.True(access.Data.HasFlag(DataAccess.Update));
     }
 
     [Fact]
     public void Add_InvalidPattern_DoesNotThrow()
     {
-        var access = new Access();
+        var access = new AccessSet();
         access.Add("invalid:pattern:here");
-        Assert.Equal(SwitchAccess.Off, access.Switch);
-        Assert.Equal(OperationAccess.None, access.Operation);
+        Assert.Equal(FeatureAccess.Unspecified, access.Feature);
+        Assert.Equal(DataAccess.Unspecified, access.Data);
     }
 
     [Fact]
     public void Add_AnotherAccessObject_CombinesFlags()
     {
-        var access1 = new Access();
-        access1.Add("operation:read");
+        var access1 = new AccessSet();
+        access1.Add("data:read");
 
-        var access2 = new Access();
-        access2.Add("operation:write");
-        access2.Add("http:get");
+        var access2 = new AccessSet();
+        access2.Add("data:update");
 
         access1.Add(access2);
 
-        Assert.True(access1.Operation.HasFlag(OperationAccess.Read));
-        Assert.True(access1.Operation.HasFlag(OperationAccess.Write));
-        Assert.True(access1.Http.HasFlag(HttpAccess.Get));
+        Assert.True(access1.Data.HasFlag(DataAccess.Read));
+        Assert.True(access1.Data.HasFlag(DataAccess.Update));
     }
 
     [Fact]
     public void HasAny_WhenEmpty_ReturnsFalse()
     {
-        var access = new Access();
+        var access = new AccessSet();
         Assert.False(access.HasAny());
     }
 
     [Fact]
-    public void HasAny_WhenSwitchSet_ReturnsTrue()
+    public void HasAny_WhenFeatureTrial_ReturnsTrue()
     {
-        var access = new Access();
-        access.Add("switch:on");
+        var access = new AccessSet();
+        access.Add("feature:trial");
         Assert.True(access.HasAny());
     }
 
     [Fact]
-    public void HasAny_WhenOperationSet_ReturnsTrue()
+    public void HasAny_WhenDataSet_ReturnsTrue()
     {
-        var access = new Access();
-        access.Add("operation:read");
-        Assert.True(access.HasAny());
-    }
-
-    [Fact]
-    public void HasAny_WhenHttpSet_ReturnsTrue()
-    {
-        var access = new Access();
-        access.Add("http:get");
+        var access = new AccessSet();
+        access.Add("data:read");
         Assert.True(access.HasAny());
     }
 
     [Fact]
     public void HasAny_WhenAuthoritySet_ReturnsTrue()
     {
-        var access = new Access();
+        var access = new AccessSet();
         access.Add("authority:administrator");
         Assert.True(access.HasAny());
     }
 
     [Theory]
-    [InlineData(SwitchAccess.On, true)]
-    [InlineData(SwitchAccess.Off, false)]
-    public void Has_SwitchAccess_ReturnsCorrectValue(SwitchAccess check, bool expected)
+    [InlineData(FeatureAccess.Use, true)]
+    [InlineData(FeatureAccess.Trial, true)]
+    public void Has_FeatureAccess_ReturnsCorrectValue(FeatureAccess check, bool expected)
     {
-        var access = new Access();
-        access.Add("switch:on");
+        var access = new AccessSet();
+        access.Add("feature:trial,use");
         Assert.Equal(expected, access.Has(check));
     }
 
     [Fact]
-    public void Has_OperationAccess_ReturnsCorrectValue()
+    public void Has_DataAccess_ReturnsCorrectValue()
     {
-        var access = new Access();
-        access.Add("operation:read,write");
-        Assert.True(access.Has(OperationAccess.Read));
-        Assert.True(access.Has(OperationAccess.Write));
-        Assert.False(access.Has(OperationAccess.Delete));
-    }
-
-    [Fact]
-    public void Has_HttpAccess_ReturnsCorrectValue()
-    {
-        var access = new Access();
-        access.Add("http:get,post");
-        Assert.True(access.Has(HttpAccess.Get));
-        Assert.True(access.Has(HttpAccess.Post));
-        Assert.False(access.Has(HttpAccess.Delete));
+        var access = new AccessSet();
+        access.Add("data:read,update");
+        Assert.True(access.Has(DataAccess.Read));
+        Assert.True(access.Has(DataAccess.Update));
+        Assert.False(access.Has(DataAccess.Delete));
     }
 
     [Fact]
     public void Has_AuthorityAccess_ReturnsCorrectValue()
     {
-        var access = new Access();
+        var access = new AccessSet();
         access.Add("authority:administrator");
         Assert.True(access.Has(AuthorityAccess.Administrator));
         Assert.False(access.Has(AuthorityAccess.Developer));
@@ -807,39 +665,40 @@ public class AccessControlTests
     {
         var control = new AccessControl();
         control.Add("allow");
-        Assert.Equal(SwitchAccess.On, control.Granted.Switch);
+        Assert.True(control.Granted.Feature.HasFlag(FeatureAccess.Trial));
+        Assert.True(control.Granted.Feature.HasFlag(FeatureAccess.Use));
     }
 
     [Fact]
     public void Add_AllowWithAccess_AddsToGranted()
     {
         var control = new AccessControl();
-        control.Add("allow:operation:read");
-        Assert.True(control.Granted.Operation.HasFlag(OperationAccess.Read));
+        control.Add("allow:data:read");
+        Assert.True(control.Granted.Data.HasFlag(DataAccess.Read));
     }
 
     [Fact]
     public void Add_DenyString_AddsToDenied()
     {
         var control = new AccessControl();
-        control.Add("deny:switch:on");
-        Assert.Equal(SwitchAccess.On, control.Denied.Switch);
+        control.Add("deny:feature:use");
+        Assert.Equal(FeatureAccess.Use, control.Denied.Feature);
     }
 
     [Fact]
     public void Add_DenyWithAccess_AddsToDenied()
     {
         var control = new AccessControl();
-        control.Add("deny:operation:delete");
-        Assert.True(control.Denied.Operation.HasFlag(OperationAccess.Delete));
+        control.Add("deny:data:delete");
+        Assert.True(control.Denied.Data.HasFlag(DataAccess.Delete));
     }
 
     [Fact]
     public void Add_CaseInsensitive_ParsesCorrectly()
     {
         var control = new AccessControl();
-        control.Add("ALLOW:OPERATION:READ");
-        Assert.True(control.Granted.Operation.HasFlag(OperationAccess.Read));
+        control.Add("ALLOW:DATA:READ");
+        Assert.True(control.Granted.Data.HasFlag(DataAccess.Read));
     }
 
     [Fact]
@@ -855,49 +714,49 @@ public class AccessControlTests
     public void Add_AnotherAccessControl_CombinesBoth()
     {
         var control1 = new AccessControl();
-        control1.Add("allow:operation:read");
+        control1.Add("allow:data:read");
 
         var control2 = new AccessControl();
-        control2.Add("allow:operation:write");
-        control2.Add("deny:operation:delete");
+        control2.Add("allow:data:update");
+        control2.Add("deny:data:delete");
 
         control1.Add(control2);
 
-        Assert.True(control1.Granted.Operation.HasFlag(OperationAccess.Read));
-        Assert.True(control1.Granted.Operation.HasFlag(OperationAccess.Write));
-        Assert.True(control1.Denied.Operation.HasFlag(OperationAccess.Delete));
+        Assert.True(control1.Granted.Data.HasFlag(DataAccess.Read));
+        Assert.True(control1.Granted.Data.HasFlag(DataAccess.Update));
+        Assert.True(control1.Denied.Data.HasFlag(DataAccess.Delete));
     }
 
     [Fact]
-    public void Grant_SwitchAccess_AddsToGranted()
+    public void Grant_FeatureAccess_AddsToGranted()
     {
         var control = new AccessControl();
-        control.Grant(SwitchAccess.On);
-        Assert.True(control.IsGranted(SwitchAccess.On));
+        control.Grant(FeatureAccess.Use);
+        Assert.True(control.IsGranted(FeatureAccess.Use));
     }
 
     [Fact]
-    public void Deny_SwitchAccess_AddsToDenied()
+    public void Deny_FeatureAccess_AddsToDenied()
     {
         var control = new AccessControl();
-        control.Deny(SwitchAccess.On);
-        Assert.True(control.IsDenied(SwitchAccess.On));
+        control.Deny(FeatureAccess.Use);
+        Assert.True(control.IsDenied(FeatureAccess.Use));
     }
 
     [Fact]
-    public void Grant_OperationAccess_AddsToGranted()
+    public void Grant_DataAccess_AddsToGranted()
     {
         var control = new AccessControl();
-        control.Grant(OperationAccess.Read);
-        Assert.True(control.IsGranted(OperationAccess.Read));
+        control.Grant(DataAccess.Read);
+        Assert.True(control.IsGranted(DataAccess.Read));
     }
 
     [Fact]
-    public void Deny_OperationAccess_AddsToDenied()
+    public void Deny_DataAccess_AddsToDenied()
     {
         var control = new AccessControl();
-        control.Deny(OperationAccess.Delete);
-        Assert.True(control.IsDenied(OperationAccess.Delete));
+        control.Deny(DataAccess.Delete);
+        Assert.True(control.IsDenied(DataAccess.Delete));
     }
 
     [Fact]
@@ -911,66 +770,49 @@ public class AccessControlTests
     public void IsAllowed_WithGrants_ReturnsTrue()
     {
         var control = new AccessControl();
-        control.Grant(SwitchAccess.On);
+        control.Grant(FeatureAccess.Use);
         Assert.True(control.IsAllowed());
     }
 
     [Fact]
-    public void IsAllowed_SwitchAccess_WhenGrantedNotDenied_ReturnsTrue()
+    public void IsAllowed_FeatureAccess_WhenGrantedNotDenied_ReturnsTrue()
     {
         var control = new AccessControl();
-        control.Grant(SwitchAccess.On);
-        Assert.True(control.IsAllowed(SwitchAccess.On));
+        control.Grant(FeatureAccess.Use);
+        Assert.True(control.IsAllowed(FeatureAccess.Use));
     }
 
     [Fact]
-    public void IsAllowed_SwitchAccess_WhenDenied_ReturnsFalse()
+    public void IsAllowed_FeatureAccess_WhenDenied_ReturnsFalse()
     {
         var control = new AccessControl();
-        control.Grant(SwitchAccess.On);
-        control.Deny(SwitchAccess.On);
-        Assert.False(control.IsAllowed(SwitchAccess.On));
+        control.Grant(FeatureAccess.Use);
+        control.Deny(FeatureAccess.Use);
+        Assert.False(control.IsAllowed(FeatureAccess.Use));
     }
 
     [Fact]
-    public void IsAllowed_SwitchAccess_WhenNotGranted_ReturnsFalse()
+    public void IsAllowed_FeatureAccess_WhenNotGranted_ReturnsFalse()
     {
         var control = new AccessControl();
-        Assert.False(control.IsAllowed(SwitchAccess.On));
+        Assert.False(control.IsAllowed(FeatureAccess.Use));
     }
 
     [Fact]
-    public void IsAllowed_OperationAccess_WhenGrantedNotDenied_ReturnsTrue()
+    public void IsAllowed_DataAccess_WhenGrantedNotDenied_ReturnsTrue()
     {
         var control = new AccessControl();
-        control.Grant(OperationAccess.Read);
-        Assert.True(control.IsAllowed(OperationAccess.Read));
+        control.Grant(DataAccess.Read);
+        Assert.True(control.IsAllowed(DataAccess.Read));
     }
 
     [Fact]
-    public void IsAllowed_OperationAccess_WhenDenied_ReturnsFalse()
+    public void IsAllowed_DataAccess_WhenDenied_ReturnsFalse()
     {
         var control = new AccessControl();
-        control.Grant(OperationAccess.Read);
-        control.Deny(OperationAccess.Read);
-        Assert.False(control.IsAllowed(OperationAccess.Read));
-    }
-
-    [Fact]
-    public void IsAllowed_HttpAccess_WhenGrantedNotDenied_ReturnsTrue()
-    {
-        var control = new AccessControl();
-        control.Granted.Add("http:get");
-        Assert.True(control.IsAllowed(HttpAccess.Get));
-    }
-
-    [Fact]
-    public void IsAllowed_HttpAccess_WhenDenied_ReturnsFalse()
-    {
-        var control = new AccessControl();
-        control.Granted.Add("http:get");
-        control.Denied.Add("http:get");
-        Assert.False(control.IsAllowed(HttpAccess.Get));
+        control.Grant(DataAccess.Read);
+        control.Deny(DataAccess.Read);
+        Assert.False(control.IsAllowed(DataAccess.Read));
     }
 
     [Fact]
@@ -991,65 +833,49 @@ public class AccessControlTests
     }
 
     [Fact]
-    public void IsGranted_SwitchAccess_WhenGranted_ReturnsTrue()
+    public void IsGranted_FeatureAccess_WhenGranted_ReturnsTrue()
     {
         var control = new AccessControl();
-        control.Grant(SwitchAccess.On);
-        Assert.True(control.IsGranted(SwitchAccess.On));
+        control.Grant(FeatureAccess.Use);
+        Assert.True(control.IsGranted(FeatureAccess.Use));
     }
 
     [Fact]
-    public void IsGranted_SwitchAccess_WhenNotGranted_ReturnsFalse()
+    public void IsGranted_FeatureAccess_WhenNotGranted_ReturnsFalse()
     {
         var control = new AccessControl();
-        Assert.False(control.IsGranted(SwitchAccess.On));
+        Assert.False(control.IsGranted(FeatureAccess.Use));
     }
 
     [Fact]
-    public void IsDenied_SwitchAccess_WhenDenied_ReturnsTrue()
+    public void IsDenied_FeatureAccess_WhenDenied_ReturnsTrue()
     {
         var control = new AccessControl();
-        control.Deny(SwitchAccess.On);
-        Assert.True(control.IsDenied(SwitchAccess.On));
+        control.Deny(FeatureAccess.Use);
+        Assert.True(control.IsDenied(FeatureAccess.Use));
     }
 
     [Fact]
-    public void IsDenied_SwitchAccess_WhenNotDenied_ReturnsFalse()
+    public void IsDenied_FeatureAccess_WhenNotDenied_ReturnsFalse()
     {
         var control = new AccessControl();
-        Assert.False(control.IsDenied(SwitchAccess.On));
+        Assert.False(control.IsDenied(FeatureAccess.Use));
     }
 
     [Fact]
-    public void IsGranted_OperationAccess_WhenGranted_ReturnsTrue()
+    public void IsGranted_DataAccess_WhenGranted_ReturnsTrue()
     {
         var control = new AccessControl();
-        control.Grant(OperationAccess.Read);
-        Assert.True(control.IsGranted(OperationAccess.Read));
+        control.Grant(DataAccess.Read);
+        Assert.True(control.IsGranted(DataAccess.Read));
     }
 
     [Fact]
-    public void IsDenied_OperationAccess_WhenDenied_ReturnsTrue()
+    public void IsDenied_DataAccess_WhenDenied_ReturnsTrue()
     {
         var control = new AccessControl();
-        control.Deny(OperationAccess.Delete);
-        Assert.True(control.IsDenied(OperationAccess.Delete));
-    }
-
-    [Fact]
-    public void IsGranted_HttpAccess_WhenGranted_ReturnsTrue()
-    {
-        var control = new AccessControl();
-        control.Granted.Add("http:get");
-        Assert.True(control.IsGranted(HttpAccess.Get));
-    }
-
-    [Fact]
-    public void IsDenied_HttpAccess_WhenDenied_ReturnsTrue()
-    {
-        var control = new AccessControl();
-        control.Denied.Add("http:delete");
-        Assert.True(control.IsDenied(HttpAccess.Delete));
+        control.Deny(DataAccess.Delete);
+        Assert.True(control.IsDenied(DataAccess.Delete));
     }
 
     [Fact]
@@ -1064,22 +890,22 @@ public class AccessControlTests
     public void IsDenied_AuthorityAccess_WhenDenied_ReturnsTrue()
     {
         var control = new AccessControl();
-        control.Denied.Add("authority:visitor");
-        Assert.True(control.IsDenied(AuthorityAccess.Visitor));
+        control.Denied.Add("authority:guest");
+        Assert.True(control.IsDenied(AuthorityAccess.Guest));
     }
 
     [Fact]
     public void DenyTakesPrecedence_OverGrant()
     {
         var control = new AccessControl();
-        control.Grant(OperationAccess.Read);
-        control.Grant(OperationAccess.Write);
-        control.Grant(OperationAccess.Delete);
-        control.Deny(OperationAccess.Delete);
+        control.Grant(DataAccess.Read);
+        control.Grant(DataAccess.Update);
+        control.Grant(DataAccess.Delete);
+        control.Deny(DataAccess.Delete);
 
-        Assert.True(control.IsAllowed(OperationAccess.Read));
-        Assert.True(control.IsAllowed(OperationAccess.Write));
-        Assert.False(control.IsAllowed(OperationAccess.Delete));
+        Assert.True(control.IsAllowed(DataAccess.Read));
+        Assert.True(control.IsAllowed(DataAccess.Update));
+        Assert.False(control.IsAllowed(DataAccess.Delete));
     }
 
     [Fact]
@@ -1087,20 +913,16 @@ public class AccessControlTests
     {
         var control = new AccessControl();
 
-        control.Add("allow:switch:on");
-        control.Add("allow:operation:read,write,create");
-        control.Add("deny:operation:delete");
-        control.Add("allow:http:get,post");
+        control.Add("allow:feature:trial");
+        control.Add("allow:data:read,update,create");
+        control.Add("deny:data:delete");
         control.Add("allow:authority:administrator,developer");
 
-        Assert.True(control.IsAllowed(SwitchAccess.On));
-        Assert.True(control.IsAllowed(OperationAccess.Read));
-        Assert.True(control.IsAllowed(OperationAccess.Write));
-        Assert.True(control.IsAllowed(OperationAccess.Create));
-        Assert.False(control.IsAllowed(OperationAccess.Delete));
-        Assert.True(control.IsAllowed(HttpAccess.Get));
-        Assert.True(control.IsAllowed(HttpAccess.Post));
-        Assert.False(control.IsAllowed(HttpAccess.Delete));
+        Assert.True(control.IsAllowed(FeatureAccess.Trial));
+        Assert.True(control.IsAllowed(DataAccess.Read));
+        Assert.True(control.IsAllowed(DataAccess.Update));
+        Assert.True(control.IsAllowed(DataAccess.Create));
+        Assert.False(control.IsAllowed(DataAccess.Delete));
         Assert.True(control.IsAllowed(AuthorityAccess.Administrator));
         Assert.True(control.IsAllowed(AuthorityAccess.Developer));
         Assert.False(control.IsAllowed(AuthorityAccess.Operator));
@@ -1110,33 +932,22 @@ public class AccessControlTests
 public class EnumFlagsTests
 {
     [Fact]
-    public void OperationAccess_FlagsArePowersOfTwo()
+    public void DataAccess_FlagsArePowersOfTwo()
     {
-        Assert.Equal(0, (int)OperationAccess.None);
-        Assert.Equal(1, (int)OperationAccess.Read);
-        Assert.Equal(2, (int)OperationAccess.Write);
-        Assert.Equal(4, (int)OperationAccess.Create);
-        Assert.Equal(8, (int)OperationAccess.Delete);
-        Assert.Equal(16, (int)OperationAccess.Administrate);
-        Assert.Equal(32, (int)OperationAccess.Configure);
-    }
-
-    [Fact]
-    public void HttpAccess_FlagsArePowersOfTwo()
-    {
-        Assert.Equal(0, (int)HttpAccess.None);
-        Assert.Equal(1, (int)HttpAccess.Head);
-        Assert.Equal(2, (int)HttpAccess.Get);
-        Assert.Equal(4, (int)HttpAccess.Put);
-        Assert.Equal(8, (int)HttpAccess.Post);
-        Assert.Equal(16, (int)HttpAccess.Delete);
+        Assert.Equal(0, (int)DataAccess.Unspecified);
+        Assert.Equal(1, (int)DataAccess.Read);
+        Assert.Equal(2, (int)DataAccess.Update);
+        Assert.Equal(4, (int)DataAccess.Create);
+        Assert.Equal(8, (int)DataAccess.Delete);
+        Assert.Equal(16, (int)DataAccess.Administrate);
+        Assert.Equal(32, (int)DataAccess.Configure);
     }
 
     [Fact]
     public void AuthorityAccess_FlagsArePowersOfTwo()
     {
-        Assert.Equal(0, (int)AuthorityAccess.None);
-        Assert.Equal(1, (int)AuthorityAccess.Visitor);
+        Assert.Equal(0, (int)AuthorityAccess.Unspecified);
+        Assert.Equal(1, (int)AuthorityAccess.Guest);
         Assert.Equal(2, (int)AuthorityAccess.Member);
         Assert.Equal(4, (int)AuthorityAccess.Trainee);
         Assert.Equal(8, (int)AuthorityAccess.Learner);
@@ -1150,37 +961,37 @@ public class EnumFlagsTests
     }
 
     [Fact]
-    public void SwitchAccess_FlagsAreCorrect()
+    public void FeatureAccess_FlagsAreCorrect()
     {
-        Assert.Equal(0, (int)SwitchAccess.Off);
-        Assert.Equal(1, (int)SwitchAccess.On);
+        Assert.Equal(0, (int)FeatureAccess.Unspecified);
+        Assert.Equal(1, (int)FeatureAccess.Trial);
+        Assert.Equal(2, (int)FeatureAccess.Use);
     }
 
     [Fact]
     public void CombinedFlags_WorkWithBitwiseOr()
     {
-        var combined = OperationAccess.Read | OperationAccess.Write;
+        var combined = DataAccess.Read | DataAccess.Update;
         Assert.Equal(3, (int)combined);
     }
 
     [Fact]
     public void FlagsCanBeCheckedWithHasFlag()
     {
-        var combined = OperationAccess.Read | OperationAccess.Write | OperationAccess.Delete;
-        Assert.True(combined.HasFlag(OperationAccess.Read));
-        Assert.True(combined.HasFlag(OperationAccess.Write));
-        Assert.True(combined.HasFlag(OperationAccess.Delete));
-        Assert.False(combined.HasFlag(OperationAccess.Create));
+        var combined = DataAccess.Read | DataAccess.Update | DataAccess.Delete;
+        Assert.True(combined.HasFlag(DataAccess.Read));
+        Assert.True(combined.HasFlag(DataAccess.Update));
+        Assert.True(combined.HasFlag(DataAccess.Delete));
+        Assert.False(combined.HasFlag(DataAccess.Create));
     }
 }
 
 public class AccessTypeEnumTests
 {
     [Theory]
-    [InlineData("Switch", AccessType.Switch)]
-    [InlineData("Operation", AccessType.Operation)]
-    [InlineData("Http", AccessType.Http)]
     [InlineData("Authority", AccessType.Authority)]
+    [InlineData("Data", AccessType.Data)]
+    [InlineData("Feature", AccessType.Feature)]
     public void AccessType_ParsesCorrectly(string input, AccessType expected)
     {
         var result = Enum.Parse<AccessType>(input, ignoreCase: true);
@@ -1191,10 +1002,9 @@ public class AccessTypeEnumTests
     public void AccessType_HasExpectedValues()
     {
         var values = Enum.GetValues<AccessType>();
-        Assert.Equal(4, values.Length);
-        Assert.Contains(AccessType.Switch, values);
-        Assert.Contains(AccessType.Operation, values);
-        Assert.Contains(AccessType.Http, values);
+        Assert.Equal(3, values.Length);
         Assert.Contains(AccessType.Authority, values);
+        Assert.Contains(AccessType.Data, values);
+        Assert.Contains(AccessType.Feature, values);
     }
 }

@@ -56,7 +56,7 @@ public class OrganizationService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyOrganization modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.OrganizationIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.OrganizationId, cancellation);
 
         if (entity == null)
             return false;

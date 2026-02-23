@@ -14,21 +14,18 @@ public class StandardReader : IEntityReader
 
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
-    public StandardReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public StandardReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid standard, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid standard, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.StandardIdentifier == standard, cancellation);
+            return query.AnyAsync(x => x.StandardIdentifier == standard && (organization == null || organization == x.OrganizationIdentifier), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,8 @@ public class StandardReader : IEntityReader
     /// </remarks>
     private IQueryable<StandardEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.QStandard
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -120,6 +114,9 @@ public class StandardReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         if (!string.IsNullOrEmpty(criteria.ContentTitle))
             query = query.Where(x => x.ContentTitle!.Contains(criteria.ContentTitle));
@@ -151,11 +148,5 @@ public class StandardReader : IEntityReader
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

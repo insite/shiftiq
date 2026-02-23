@@ -121,7 +121,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             PageHelper.AutoBindHeader(this);
 
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 DepartmentIdentifier.Filter.UserIdentifier = User.UserIdentifier;
@@ -328,7 +328,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             CurrentParameters = new SearchParameters
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 Departments = DepartmentIdentifier.Values,
                 Status = StatusSelector.SelectedValue
             };

@@ -38,7 +38,7 @@ namespace Shift.Common
         public override string ToString()
         {
             if (string.IsNullOrEmpty(Header) || string.IsNullOrEmpty(Payload) || string.IsNullOrEmpty(Signature))
-                return null;
+                return string.Empty;
 
             return $"{Header}.{Payload}.{Signature}";
         }

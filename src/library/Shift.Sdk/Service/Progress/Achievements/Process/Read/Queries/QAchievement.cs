@@ -14,6 +14,10 @@ namespace InSite.Application.Records.Read
     {
         public Guid AchievementIdentifier { get; set; }
         public Guid OrganizationIdentifier { get; set; }
+        public Guid? BeforeExpiryLearnerMessageIdentifier { get; set; }
+        public Guid? BeforeExpiryAdministratorMessageIdentifier { get; set; }
+        public Guid? AfterExpiryLearnerMessageIdentifier { get; set; }
+        public Guid? AfterExpiryAdministratorMessageIdentifier { get; set; }
 
         public string AchievementDescription { get; set; }
         public string AchievementLabel { get; set; }
@@ -29,6 +33,8 @@ namespace InSite.Application.Records.Read
         public string AchievementType { get; set; }
         public bool? HasBadgeImage { get; set; }
         public string BadgeImageUrl { get; set; }
+        public int? BeforeExpiryNotificationTiming { get; set; }
+        public int? AfterExpiryNotificationTiming { get; set; }
 
         public virtual ICollection<QEvent> Events { get; set; } = new HashSet<QEvent>();
         public virtual ICollection<QCredential> Credentials { get; set; } = new HashSet<QCredential>();
@@ -37,6 +43,7 @@ namespace InSite.Application.Records.Read
         public virtual ICollection<QJournalSetup> JournalSetups { get; set; } = new HashSet<QJournalSetup>();
         public virtual ICollection<QAchievementPrerequisite> Prerequisites { get; set; } = new HashSet<QAchievementPrerequisite>();
         public virtual ICollection<TProgram> Programs { get; set; } = new HashSet<TProgram>();
+        public virtual ICollection<TAchievementDepartment> Departments { get; set; } = new HashSet<TAchievementDepartment>();
 
         public string ExpirationToString()
             => ExpirationToString(TimeZones.Pacific);
@@ -76,6 +83,7 @@ namespace InSite.Application.Records.Read
         public string ExpirationLifetimeUnit { get; set; }
         public string ExpirationType { get; set; }
 
+        public bool AchievementAllowSelfDeclared { get; set; }
         public bool AchievementIsEnabled { get; set; }
 
         public int? ExpirationLifetimeQuantity { get; set; }

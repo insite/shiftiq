@@ -1,10 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
+using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Contract;
-
-
-using Shift.Common;
 
 namespace Shift.Service.Security;
 
@@ -161,7 +159,7 @@ public class TPermissionReader : IEntityReader
         var matches = await queryable
             .Select(entity => new PermissionMatch
             {
-                PermissionIdentifier = entity.PermissionIdentifier
+                PermissionId = entity.PermissionIdentifier
 
             })
             .ToListAsync(cancellation);

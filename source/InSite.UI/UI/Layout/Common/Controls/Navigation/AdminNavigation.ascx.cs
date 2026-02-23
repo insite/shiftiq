@@ -10,11 +10,11 @@ using System.Web.UI.WebControls;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
-using InSite.UI.Layout.Common.Controls.Navigation.Models;
 using InSite.UI.Layout.Lobby;
 
 using Shift.Common;
 using Shift.Constant;
+using Shift.Sdk.UI.Navigation;
 
 using PortalNavigation = InSite.UI.Layout.Portal.Controls.PortalHeader;
 
@@ -24,7 +24,10 @@ namespace InSite.UI.Layout.Admin
     {
         protected int SessionTimeountInMinutes => Session.Timeout;
 
-        private static readonly NavigationRoot _navigationRoot = NavigationRoot.GetSidebarInstance();
+        private static readonly NavigationRoot _navigationRoot = NavigationRootFactory.Create(
+            ServiceLocator.Partition.Slug,
+            url => TActionSearch.Get(url)?.PermissionParent?.ActionUrl
+        );
 
         private static readonly ConcurrentDictionary<string, bool> _validUrlCache = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
@@ -67,6 +70,8 @@ namespace InSite.UI.Layout.Admin
             if (IsPostBack)
                 return;
 
+            ImpersonatorAnchor.HRef = Urls.StopImpersonation;
+
             LoadPermissionMatrix();
 
             var sidebar = _navigationRoot;
@@ -83,29 +88,14 @@ namespace InSite.UI.Layout.Admin
                 HomeContainer3.InnerHtml = homeLink;
             }
 
-            var isE03 = ServiceLocator.Partition.IsE03();
-
-            AdminMenu.Visible = Identity.IsGranted(PermissionNames.Admin_Courses);
-
-            if (AdminMenu.Visible)
-                PortalNavigation.BindNavbar(AdminMenu);
+            AdminMenu.LoadData();
 
             BindUser();
             BindImpersonator();
             BindHelpLink();
             PortalNavigation.BindLanguages(Identity.Organization.Languages, LanguageItem, CurrentLanguageOutput, LanguageMenuItems, Request.RawUrl, Request.Url.Query);
-            BindSetupLink();
 
-            BindSidebar(sidebar?.Menu);
-
-            BindThemeMode();
-        }
-
-        private void BindThemeMode()
-        {
-            var mode = ModeSwitch.GetCurrentThemeMode();
-            if (mode == "Dark" && Page.Master is AdminHome home)
-                home.BindThemeMode(mode);
+            BindSidebar(sidebar);
         }
 
         private void BindUser()
@@ -154,30 +144,9 @@ namespace InSite.UI.Layout.Admin
             CmdsContainer.Visible = Request.IsAuthenticated && ServiceLocator.Partition.IsE03();
         }
 
-        private void BindSetupLink()
+        private void BindSidebar(NavigationRoot sidebar)
         {
-            var allIntegrations = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Integrations);
-            var allAccounts = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Accounts);
-            var allSettings = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Settings);
-
-            AdminMenuUtilities.Visible = allIntegrations || allAccounts || allSettings;
-            AdminIntegrationLink.Visible = allIntegrations;
-            AdminSecurityLink.Visible = allAccounts;
-            AdminSetupLink.Visible = allSettings;
-            AdminTimelineLink.Visible = allAccounts;
-        }
-
-        private void BindSidebar(IEnumerable<NavigationCategory> categories)
-        {
-            var dataSource = categories?
-                .Where(c => c.IsAccessPermitted(Identity))
-                .Select(c => new
-                {
-                    Category = c.Category,
-                    Items = c.Links.Where(l => l.IsAccessPermitted(Identity)).ToArray()
-                })
-                .Where(x => x.Items.Length > 0)
-                .ToArray();
+            var dataSource = sidebar?.GetAccessibleCategories(new NavigationIdentity(Identity, ServiceLocator.Partition.Slug));
 
             SidebarCategoryRepeater.Visible = dataSource != null && dataSource.Any();
             SidebarCategoryRepeater.DataSource = dataSource;
@@ -193,14 +162,14 @@ namespace InSite.UI.Layout.Admin
             if (!IsContentItem(e))
                 return;
 
-            var items = (NavigationLink[])DataBinder.Eval(e.Item.DataItem, "Items");
+            var links = (List<NavigationLink>)DataBinder.Eval(e.Item.DataItem, "Links");
 
             var itemRepeater = (Repeater)e.Item.FindControl("ItemRepeater");
             itemRepeater.ItemDataBound += ItemRepeater_ItemDataBound;
-            itemRepeater.DataSource = items;
+            itemRepeater.DataSource = links;
             itemRepeater.DataBind();
 
-            e.Item.Visible = items.Length > 0;
+            e.Item.Visible = links.Count > 0;
         }
 
         private void ItemRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
@@ -208,12 +177,12 @@ namespace InSite.UI.Layout.Admin
             if (!IsContentItem(e))
                 return;
 
-            var link = (NavigationLink)e.Item.DataItem;
-            var items = link.Links?.Where(l => l.IsAccessPermitted(Identity)).ToArray();
+            var categoryLink = (NavigationLink)e.Item.DataItem;
+            var links = categoryLink.Links;
 
             var itemRepeater = (Repeater)e.Item.FindControl("SubItemRepeater");
-            itemRepeater.Visible = items != null && items.Length > 0;
-            itemRepeater.DataSource = items;
+            itemRepeater.Visible = links != null && links.Count > 0;
+            itemRepeater.DataSource = links;
             itemRepeater.DataBind();
         }
 

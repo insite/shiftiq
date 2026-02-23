@@ -18,7 +18,7 @@
 
 <insite:Grid runat="server" ID="Grid" DataKeyNames="RegistrationIdentifier">
     <Columns>
-                        
+
         <asp:TemplateField HeaderText="Exam Form">
             <ItemTemplate>
                 <a href="/ui/admin/assessments/banks/outline?bank=<%# Eval("Form.BankIdentifier") %>&form=<%# Eval("Form.FormIdentifier") %>">
@@ -34,7 +34,7 @@
                 </div>
             </ItemTemplate>
         </asp:TemplateField>
-            
+
         <asp:TemplateField HeaderText="Exam Candidate" ItemStyle-Wrap="False">
             <ItemTemplate>
                 <a href='/ui/admin/contacts/people/edit?contact=<%# Eval("CandidateIdentifier") %>'><%# Eval("Candidate.UserFullName") %></a>
@@ -53,7 +53,7 @@
                 <%# Logic.FormatTime(Container.DataItem) %>
             </ItemTemplate>
         </asp:TemplateField>
-            
+
         <asp:TemplateField HeaderText="Score" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end" ItemStyle-Wrap="False">
             <ItemTemplate>
                 <%# Logic.FormatScore(Container.DataItem) %>

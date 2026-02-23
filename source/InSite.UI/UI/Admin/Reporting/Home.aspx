@@ -1,7 +1,5 @@
 ﻿<%@ Page Language="C#" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" CodeBehind="Home.aspx.cs" Inherits="InSite.UI.Admin.Reporting.Home" %>
 
-<%@ Register Src="~/UI/Admin/Reporting/Controls/DashboardUsers.ascx" TagName="OnlineUsersGrid" TagPrefix="uc" %>
-
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent">
     
 </asp:Content>
@@ -62,20 +60,12 @@
 
                <div class="row mt-4">
                     <div class="col-lg-12">
-                        <a runat="server" id="DatabaseQueryRow" href="/ui/admin/reports/queries/sql"><i class="far fa-database me-1 ms-2"></i>Run a dynamic SQL query</a>
-                        <a href="/ui/admin/reports/build"><i class="far fa-file-alt me-1"></i>Build a custom report</a>
+                        <a runat="server" id="DatabaseQueryRow" href="/ui/admin/reports/queries/sql" class="me-3"><i class="far fa-database me-1"></i>Run a dynamic SQL query</a>
+                        <a href="/ui/admin/reports/build" class="me-3"><i class="far fa-file-alt me-1"></i>Build a custom report</a>
+                        <a runat="server" id="CurrentUserSessionsLink" href="/ui/admin/reporting/current-user-sessions"><i class="far fa-users me-1 me-1"></i>Current user sessions</a>
                     </div>
                 </div>
 
-            </div>
-        </div>
-    </section>
-
-    <section runat="server" id="CurrentUserSessions" class="pb-5 mb-md-2">
-        <h2 class="h4 mb-3">Current user sessions</h2>
-        <div class="card border-0 shadow-lg">
-            <div class="card-body">
-                <uc:OnlineUsersGrid runat="server" ID="CurrentSessionGrid" />
             </div>
         </div>
     </section>
@@ -102,7 +92,7 @@
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/competencies-per-department">Competency Listing per Department</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/department-profile-details">Department Profile Details</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/department-profile-summary">Department Profile Summary</a></li>
-                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/group-competency-summary">Group Competency Summaries</a></li>
+                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/group-competency-summary">Group Competency Summary</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/user-competency-summary">Worker Competency Summary</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/individual-profile-assignment">Individual Profile Assignment</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/notification-subscribers">Notification Subscribers</a></li>
@@ -121,10 +111,10 @@
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/user-training-details">Worker Training Details</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/training-expiry-dates">Training Expiry Dates</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/training-completions">Training Completions</a></li>
-                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/training-history-per-user">Training History by Worker</a></li>
+                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/training-history-by-worker">Training History by Worker</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/training-requirements-per-competency">Training Requirements per Competency</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/training-requirements-per-user">Training Requirements per Worker</a></li>
-                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/user-training-summary">Training Summary</a></li>
+                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/worker-training-summary">Worker Training Summary</a></li>
                             </ul>
                         </div>
                     </div>
@@ -136,13 +126,13 @@
                                 <h3 class='h5 nav-heading mb-2 text-break'>Administration Reporting</h3>
                             </div>
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/active-users">All Active Users</a></li>
-                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/competency-count-per-category">Competencies per Category</a></li>
-                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/expired-credentials">Expired/Expiring Achievements</a></li>
-                                <li class="list-group-item"><a href="/ui/admin/contact/persons/anomalies">Missing and Invalid Emails</a></li>
-                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/multiorganization-users">Multi-Organization Users</a></li>
+                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/active-users">Active Users</a></li>
+                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/competencies-per-category">Competencies per Category</a></li>
+                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/achievement-expirations">Achievement Expirations</a></li>
+                                <li class="list-group-item"><a href="/ui/admin/reporting/contact-data-anomalies">Contact Data Anomalies</a></li>
+                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/multi-organization-users">Multi-Organization Users</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/organization-summary">Organization Summary</a></li>
-                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/snapshots">Snapshots</a></li>
+                                <li class="list-group-item"><a href="/ui/admin/reporting/compliance-snapshots">Compliance Snapshots</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/unprioritized-competencies">Unprioritized Competencies</a></li>
                             </ul>
                         </div>

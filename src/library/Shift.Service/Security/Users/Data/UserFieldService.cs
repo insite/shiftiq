@@ -1,8 +1,7 @@
 namespace Shift.Service.Security;
 
-using Shift.Contract;
-
 using Shift.Common;
+using Shift.Contract;
 
 public class UserFieldService : IEntityService
 {
@@ -49,7 +48,7 @@ public class UserFieldService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyUserField modify, CancellationToken cancellation)
     {
-        var entity = await _reader.RetrieveAsync(modify.SettingIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.SettingId, cancellation);
 
         if (entity == null)
             return false;

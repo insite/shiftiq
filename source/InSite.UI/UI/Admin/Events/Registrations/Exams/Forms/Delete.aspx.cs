@@ -56,7 +56,7 @@ namespace InSite.Admin.Events.Registrations.Exams.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 RedirectToSearch();
 
             var registration = RegistrationIdentifier.HasValue

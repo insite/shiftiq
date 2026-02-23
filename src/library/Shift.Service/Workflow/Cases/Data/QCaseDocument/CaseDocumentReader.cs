@@ -10,25 +10,27 @@ namespace Shift.Service.Workflow;
 
 public class CaseDocumentReader : IEntityReader
 {
-    private string DefaultSort = "AttachmentIdentifier";
-
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
+    private string DefaultSort = "AttachmentIdentifier";
 
-    public CaseDocumentReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public CaseDocumentReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid attachment, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid attachment, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
-            
-            return query.AnyAsync(x => x.AttachmentIdentifier == attachment, cancellation);
+
+            if (organization != null)
+                query = query.Where(x => x.OrganizationIdentifier == organization.Value);
+
+            var exists = query.AnyAsync(x => x.AttachmentIdentifier == attachment, cancellation);
+
+            return exists;
 
         }, cancellation);
     }
@@ -106,11 +108,8 @@ public class CaseDocumentReader : IEntityReader
     /// </remarks>
     private IQueryable<CaseDocumentEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.QCaseDocument
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -120,6 +119,9 @@ public class CaseDocumentReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         // TODO: Apply criteria
 
@@ -138,7 +140,7 @@ public class CaseDocumentReader : IEntityReader
         var matches = await queryable
             .Select(entity => new CaseDocumentMatch
             {
-                AttachmentIdentifier = entity.AttachmentIdentifier
+                AttachmentId = entity.AttachmentIdentifier
 
             })
             .ToListAsync(cancellation);
@@ -146,9 +148,4 @@ public class CaseDocumentReader : IEntityReader
         return matches;
     }
 
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
-    }
 }

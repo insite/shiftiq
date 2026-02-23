@@ -307,6 +307,7 @@
   <ItemGroup>
     <Compile Include="Api\Attributes\CookieAuthorizeAttribute.cs" />
     <Compile Include="Api\Attributes\JwtAuthorizeAttribute.cs" />
+    <Compile Include="Api\Controllers\IntegrationScoopController.cs" />
     <Compile Include="Api\Controllers\ProgressCredentialController1.cs" />
     <Compile Include="Api\Controllers\SecurityCookieController.cs" />
     <Compile Include="Api\Controllers\TimelineCommandController2.cs" />
@@ -950,6 +951,20 @@
     <Compile Include="UI\Admin\Courses\Outlines\Controls\CourseCategoryList.ascx.designer.cs">
       <DependentUpon>CourseCategoryList.ascx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Courses\Outlines\Controls\EnrollmentGroupGrid.ascx.cs">
+      <DependentUpon>EnrollmentGroupGrid.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Courses\Outlines\Controls\EnrollmentGroupGrid.ascx.designer.cs">
+      <DependentUpon>EnrollmentGroupGrid.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Courses\Outlines\Controls\EnrollmentUserGrid.ascx.cs">
+      <DependentUpon>EnrollmentUserGrid.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Courses\Outlines\Controls\EnrollmentUserGrid.ascx.designer.cs">
+      <DependentUpon>EnrollmentUserGrid.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Courses\Resources\Controls\EditDetailContent.ascx.cs">
       <DependentUpon>EditDetailContent.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1380,6 +1395,13 @@
     <Compile Include="UI\Admin\Prototype\MultidimensionalDataInput.aspx.designer.cs">
       <DependentUpon>MultidimensionalDataInput.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Records\Achievements\Controls\OutlineNotifications.ascx.cs">
+      <DependentUpon>OutlineNotifications.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Records\Achievements\Controls\OutlineNotifications.ascx.designer.cs">
+      <DependentUpon>OutlineNotifications.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Records\Credentials\Utilities\BadgeHelper.cs" />
     <Compile Include="UI\Admin\Records\Gradebooks\Controls\ScormEventGrid.ascx.cs">
       <DependentUpon>ScormEventGrid.ascx</DependentUpon>
@@ -1416,12 +1438,6 @@
     <Compile Include="UI\Admin\Records\Reports\Controls\RecentCredentialList.ascx.designer.cs">
       <DependentUpon>RecentCredentialList.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Models\SearchResultDataItem.cs" />
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Models\SearchResultProgramInfo.cs" />
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Models\SummaryExportDataGroup.cs" />
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Models\SummaryTablesDataSource.cs" />
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Models\SummaryTablesNeedDataSourceArgs.cs" />
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Models\SummaryTablesNeedDataSourceEventHandler.cs" />
     <Compile Include="UI\Admin\Records\Rurbics\Controls\TranslateField.ascx.cs">
       <DependentUpon>TranslateField.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1449,6 +1465,13 @@
     </Compile>
     <Compile Include="UI\Admin\Reporting\Home.aspx.designer.cs">
       <DependentUpon>Home.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Reporting\CurrentUserSessions.aspx.cs">
+      <DependentUpon>CurrentUserSessions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Reporting\CurrentUserSessions.aspx.designer.cs">
+      <DependentUpon>CurrentUserSessions.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Reports\Changes\Models\HistoryReader.cs" />
     <Compile Include="UI\Admin\Reports\Changes\Models\MembershipChangeReader.cs" />
@@ -1570,6 +1593,13 @@
     </Compile>
     <Compile Include="UI\Admin\Sales\Packages\Forms\Search.aspx.designer.cs">
       <DependentUpon>Search.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Standards\Standards\Controls\AttachmentsSection.ascx.cs">
+      <DependentUpon>AttachmentsSection.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Standards\Standards\Controls\AttachmentsSection.ascx.designer.cs">
+      <DependentUpon>AttachmentsSection.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Standards\Standards\Controls\ScenarioQuestions.ascx.cs">
       <DependentUpon>ScenarioQuestions.ascx</DependentUpon>
@@ -1693,14 +1723,6 @@
     <Compile Include="UI\Admin\Learning\Programs\Tasks\Assign.aspx.designer.cs">
       <DependentUpon>Assign.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Controls\SummaryTables.ascx.cs">
-      <DependentUpon>SummaryTables.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Controls\SummaryTables.ascx.designer.cs">
-      <DependentUpon>SummaryTables.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Models\SummaryCounterData.cs" />
     <Compile Include="UI\Admin\Records\Rurbics\Delete.aspx.cs">
       <DependentUpon>Delete.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1731,12 +1753,12 @@
       <DependentUpon>Delete.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Admin\Reports\ActiveUsersExcel.cs" />
-    <Compile Include="UI\CMDS\Admin\Reports\ExpiredCredentials.aspx.cs">
-      <DependentUpon>ExpiredCredentials.aspx</DependentUpon>
+    <Compile Include="UI\CMDS\Admin\Reports\AchievementExpirations.aspx.cs">
+      <DependentUpon>AchievementExpirations.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\CMDS\Admin\Reports\ExpiredCredentials.aspx.designer.cs">
-      <DependentUpon>ExpiredCredentials.aspx</DependentUpon>
+    <Compile Include="UI\CMDS\Admin\Reports\AchievementExpirations.aspx.designer.cs">
+      <DependentUpon>AchievementExpirations.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Contacts\People\Utilities\ArchiveHelper.cs" />
     <Compile Include="UI\CMDS\Admin\Users\Controls\NotificationsTab.ascx.cs">
@@ -1824,13 +1846,13 @@
     <Compile Include="UI\Layout\Common\Controls\BundleJsHeader.ascx.designer.cs">
       <DependentUpon>BundleJsHeader.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Layout\Common\Controls\Navigation\Models\NavigationCategory.cs" />
-    <Compile Include="UI\Layout\Common\Controls\Navigation\Models\NavigationHome.cs" />
-    <Compile Include="UI\Layout\Common\Controls\Navigation\Models\NavigationLink.cs" />
-    <Compile Include="UI\Layout\Common\Controls\Navigation\Models\NavigationRoot.cs" />
-    <Compile Include="UI\Layout\Common\Controls\Navigation\Models\NavigationSecurity.cs" />
-    <Compile Include="UI\Layout\Common\Controls\Navigation\Models\NavigationSecurityClaim.cs" />
-    <Compile Include="UI\Layout\Common\Controls\Navigation\Models\NavigationSecurityOperator.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Navigation\AdminMenu.ascx.cs">
+      <DependentUpon>AdminMenu.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Layout\Common\Controls\Navigation\AdminMenu.ascx.designer.cs">
+      <DependentUpon>AdminMenu.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Layout\Common\Controls\Navigation\ModeSwitch.ascx.cs">
       <DependentUpon>ModeSwitch.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1838,6 +1860,7 @@
     <Compile Include="UI\Layout\Common\Controls\Navigation\ModeSwitch.ascx.designer.cs">
       <DependentUpon>ModeSwitch.ascx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Layout\Common\Controls\Navigation\NavigationIdentity.cs" />
     <Compile Include="UI\Layout\Common\Controls\Navigation\Navigator.cs" />
     <Compile Include="UI\Layout\Common\Controls\Navigation\SidebarSwitch.ascx.cs">
       <DependentUpon>SidebarSwitch.ascx</DependentUpon>
@@ -1870,6 +1893,7 @@
     <Compile Include="UI\Layout\Common\Controls\Server\Containers\ICanHide.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Controls\BindingToDatabase\ContentTextLiteral.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Controls\ControlVisibilityHelper.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\Controls\UserEmailVerificationCheck.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Controls\VisibilityException.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Icons\Icon.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Media\InputMedia.cs" />
@@ -1927,6 +1951,7 @@
     <Compile Include="UI\Lobby\Logs\500.aspx.designer.cs">
       <DependentUpon>500.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\MenuHelperFactory.cs" />
     <Compile Include="UI\Portal\Billing\Cart.aspx.cs">
       <DependentUpon>Cart.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2375,6 +2400,20 @@
       <DependentUpon>Media.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Portal\Billing\Utilities\ProductHelper.cs" />
+    <Compile Include="UI\Portal\Security\Impersonation\Start.aspx.cs">
+      <DependentUpon>Start.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Portal\Security\Impersonation\Start.aspx.designer.cs">
+      <DependentUpon>Start.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Portal\Security\Impersonation\Stop.aspx.cs">
+      <DependentUpon>Stop.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Portal\Security\Impersonation\Stop.aspx.designer.cs">
+      <DependentUpon>Stop.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Portal\Workflow\Cases\Controls\CaseDocumentList.ascx.cs">
       <DependentUpon>CaseDocumentList.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -4140,27 +4179,6 @@
     </Compile>
     <Compile Include="UI\Admin\Records\Reports\Controls\RecentGradebookList.ascx.designer.cs">
       <DependentUpon>RecentGradebookList.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Reports\EngagementPrompt\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Reports\EngagementPrompt\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Reports\EngagementPrompt\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Reports\EngagementPrompt\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Reports\EngagementPrompt\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Reports\EngagementPrompt\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Records\Reports\LearnerActivity\Search.aspx.cs">
       <DependentUpon>Search.aspx</DependentUpon>
@@ -6353,6 +6371,8 @@
     <Content Include="UI\Admin\Assets\Labels\Delete.aspx" />
     <Content Include="UI\Admin\Assets\Labels\Search.aspx" />
     <Content Include="UI\Admin\Contacts\People\Archive.aspx" />
+    <Content Include="UI\Admin\Courses\Outlines\Controls\EnrollmentGroupGrid.ascx" />
+    <Content Include="UI\Admin\Courses\Outlines\Controls\EnrollmentUserGrid.ascx" />
     <Content Include="UI\Admin\Courses\Scorm\Upload.aspx" />
     <Content Include="UI\Admin\Assets\Uploads\Forms\Browse.aspx" />
     <Content Include="UI\Admin\Assets\Uploads\Forms\Info.aspx" />
@@ -6473,6 +6493,7 @@
     <Content Include="UI\Admin\Prototype\DashboardTrainingProvider.aspx" />
     <Content Include="UI\Admin\Prototype\DashboardAdministrator.aspx" />
     <Content Include="UI\Admin\Prototype\MultidimensionalDataInput.aspx" />
+    <Content Include="UI\Admin\Records\Achievements\Controls\OutlineNotifications.ascx" />
     <Content Include="UI\Admin\Records\Gradebooks\Controls\ScormEventGrid.ascx" />
     <Content Include="UI\Admin\Records\Logbooks\ChangeArea.aspx" />
     <Content Include="UI\Admin\Records\Logbooks\Controls\GroupGrid.ascx" />
@@ -6482,6 +6503,7 @@
     <Content Include="UI\Admin\Records\Rurbics\Translate.aspx" />
     <Content Include="UI\Admin\Reporting\Controls\DashboardUsers.ascx" />
     <Content Include="UI\Admin\Reporting\Home.aspx" />
+    <Content Include="UI\Admin\Reporting\CurrentUserSessions.aspx" />
     <Content Include="UI\Admin\Sales\Orders\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Sales\Orders\Controls\SearchResults.ascx" />
     <Content Include="UI\Admin\Sales\Orders\Search.aspx" />
@@ -6498,6 +6520,7 @@
     <Content Include="UI\Admin\Sales\Packages\Forms\Create.aspx" />
     <Content Include="UI\Admin\Sales\Packages\Forms\Edit.aspx" />
     <Content Include="UI\Admin\Sales\Packages\Forms\Search.aspx" />
+    <Content Include="UI\Admin\Standards\Standards\Controls\AttachmentsSection.ascx" />
     <Content Include="UI\Admin\Standards\Standards\Controls\ScenarioQuestions.ascx" />
     <Content Include="UI\Admin\Standards\Standards\Forms\Status.aspx" />
     <Content Include="UI\Admin\Standards\Standards\Forms\Troubleshoot.aspx" />
@@ -6609,7 +6632,6 @@
     <Content Include="UI\Admin\Learning\Programs\Tasks\Assign.aspx" />
     <Content Include="UI\Admin\Learning\Programs\Tasks\Controls\TaskPresentationSetup.ascx" />
     <Content Include="UI\Admin\Learning\Programs\Tasks\Edit.aspx" />
-    <Content Include="UI\Admin\Records\Reports\LearnerActivity\Controls\SummaryTables.ascx" />
     <Content Include="UI\Admin\Records\Rurbics\Controls\RubricCriteriaList.ascx" />
     <Content Include="UI\Admin\Records\Rurbics\Controls\RubricDetail.ascx" />
     <Content Include="UI\Admin\Records\Rurbics\Controls\SearchCriteria.ascx" />
@@ -6715,9 +6737,6 @@
     <Content Include="UI\Admin\Learning\Programs\Enrollments\Remove.aspx" />
     <Content Include="UI\Admin\Records\Reports\Controls\RecentGradebookList.ascx" />
     <Content Include="UI\Admin\Records\Reports\Forms\AcademicYear.aspx" />
-    <Content Include="UI\Admin\Records\Reports\EngagementPrompt\Search.aspx" />
-    <Content Include="UI\Admin\Records\Reports\EngagementPrompt\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Records\Reports\EngagementPrompt\SearchResults.ascx" />
     <Content Include="UI\Admin\Records\Reports\LearnerActivity\Search.aspx" />
     <Content Include="UI\Admin\Records\Reports\LearnerActivity\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Records\Reports\LearnerActivity\Controls\SearchResults.ascx" />
@@ -7131,7 +7150,7 @@
     <Content Include="UI\Admin\Workflow\Forms\Search.aspx" />
     <Content Include="UI\Admin\Prototype\TestEquation.aspx" />
     <Content Include="UI\CMDS\Admin\Departments\ProfileCompetencies\Select.ascx" />
-    <Content Include="UI\CMDS\Admin\Reports\ExpiredCredentials.aspx" />
+    <Content Include="UI\CMDS\Admin\Reports\AchievementExpirations.aspx" />
     <Content Include="UI\CMDS\Admin\Uploads\SearchCriteria.ascx" />
     <Content Include="UI\CMDS\Admin\Uploads\SearchResults.ascx" />
     <Content Include="UI\CMDS\Admin\Users\Controls\NotificationsTab.ascx" />
@@ -7152,6 +7171,7 @@
     <Content Include="UI\Layout\Common\Controls\BundleCss.ascx" />
     <Content Include="UI\Layout\Common\Controls\BundleJsFooter.ascx" />
     <Content Include="UI\Layout\Common\Controls\BundleJsHeader.ascx" />
+    <Content Include="UI\Layout\Common\Controls\Navigation\AdminMenu.ascx" />
     <Content Include="UI\Layout\Common\Controls\Navigation\ModeSwitch.ascx" />
     <Content Include="UI\Layout\Common\Controls\Navigation\SidebarSwitch.ascx" />
     <Content Include="UI\Layout\Common\Controls\ProfilePictureUpload.ascx" />
@@ -7235,7 +7255,7 @@
     <Content Include="UI\Layout\Common\Parts\around\js\vendor\prismjs\components\prism-jsonp.min.js" />
     <Content Include="UI\Layout\Common\Parts\around\js\vendor\prismjs\prism.js" />
     <Content Include="UI\Layout\Common\Parts\around\js\vendor\prismjs\prism.min.js" />
-    <Content Include="UI\Layout\Common\Parts\css\common.adminSidebar.css" />
+    <None Include="UI\Layout\Common\Parts\custom\common.adminSidebar.scss" />
     <Content Include="UI\Layout\Common\Parts\css\common.inputVideo.css" />
     <Content Include="UI\Layout\Common\Parts\css\common.outputVideo.css" />
     <Content Include="UI\Layout\Common\Parts\css\common.portalSidebar.css" />
@@ -7287,34 +7307,34 @@
     <Content Include="UI\Layout\Common\Parts\bootstrap\scss\tests\jasmine.js" />
     <Content Include="UI\Layout\Common\Parts\bootstrap\scss\tests\sass-true\register.js" />
     <Content Include="UI\Layout\Common\Parts\bootstrap\scss\tests\sass-true\runner.js" />
-    <Content Include="UI\Layout\Common\Styles\Cmds.css">
-      <DependentUpon>Cmds.scss</DependentUpon>
+    <Content Include="UI\Layout\Common\Styles\cmds.css">
+      <DependentUpon>cmds.scss</DependentUpon>
     </Content>
-    <Content Include="UI\Layout\Common\Styles\Cmds.min.css">
-      <DependentUpon>Cmds.css</DependentUpon>
+    <Content Include="UI\Layout\Common\Styles\cmds.min.css">
+      <DependentUpon>cmds.css</DependentUpon>
     </Content>
     <Content Include="UI\Layout\Common\Styles\Components\_badge.scss" />
     <Content Include="UI\Layout\Common\Styles\Components\_card.scss" />
-    <Content Include="Config\Security\access-denied.E03.json" />
     <None Include="packages.config" />
     <Content Include="UI\Layout\Common\Styles\Components\_circular-progress.scss" />
-    <Content Include="UI\Layout\Admin\Sidebar.json" />
-    <Content Include="UI\Layout\Admin\Sidebar-E03.json" />
+    <Content Include="UI\Layout\Common\Parts\custom\rtl-styles.scss" />
     <None Include="UI\Layout\Common\Styles\Components\_header.scss" />
-    <Content Include="UI\Layout\Common\Styles\Shift.css">
-      <DependentUpon>Shift.scss</DependentUpon>
-    </Content>
-    <Content Include="UI\Layout\Common\Styles\Shift.min.css">
-      <DependentUpon>Shift.css</DependentUpon>
-    </Content>
     <EmbeddedResource Include="UI\Layout\Common\Styles\Swagger.css" />
-    <Content Include="UI\Layout\Common\Styles\Skills.css">
-      <DependentUpon>Skills.scss</DependentUpon>
+    <Content Include="UI\Layout\Common\Styles\shift.css">
+      <DependentUpon>shift.scss</DependentUpon>
     </Content>
-    <Content Include="UI\Layout\Common\Styles\Skills.min.css">
-      <DependentUpon>Skills.css</DependentUpon>
+    <Content Include="UI\Layout\Common\Styles\shift.min.css">
+      <DependentUpon>shift.css</DependentUpon>
     </Content>
-    <Content Include="UI\Layout\Portal\Images\DefaultSkillsCheck.png" />
+    <Content Include="UI\Layout\Common\Styles\skills.css">
+      <DependentUpon>skills.scss</DependentUpon>
+    </Content>
+    <Content Include="UI\Layout\Common\Styles\skills.min.css">
+      <DependentUpon>skills.css</DependentUpon>
+    </Content>
+    <Content Include="UI\Layout\Portal\Images\Default-cmds.png" />
+    <Content Include="UI\Layout\Portal\Images\Default-shift.png" />
+    <Content Include="UI\Layout\Portal\Images\Default-skills.png" />
     <Content Include="UI\Lobby\AuthToken.aspx" />
     <Content Include="UI\Lobby\Controls\ErrorPageBody.ascx" />
     <Content Include="UI\Lobby\Controls\ErrorPageHeader.ascx" />
@@ -7886,6 +7906,8 @@
     <Content Include="UI\Portal\Records\Logbooks\Controls\ExperienceFields\DropDown.ascx" />
     <Content Include="UI\Portal\Records\Logbooks\Controls\ExperienceFields\Media.ascx" />
     <Content Include="UI\Portal\Home\Chats.aspx" />
+    <Content Include="UI\Portal\Security\Impersonation\Start.aspx" />
+    <Content Include="UI\Portal\Security\Impersonation\Stop.aspx" />
     <Content Include="UI\Portal\Workflow\Forms\Controls\charts.css" />
     <Content Include="UI\Portal\Workflow\Forms\Controls\charts.js" />
     <Content Include="UI\Portal\Plugin\NCSHA\Statistics.js" />
@@ -7946,6 +7968,10 @@
       <Link>AppSettings.Local.json</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>AppSettings.json</DependentUpon>
+    </None>
+    <None Include="..\..\config\RouteSettings.json">
+      <Link>RouteSettings.json</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="app.config" />
     <Content Include="UI\Portal\Contacts\Referral\Controls\SearchCriteria.ascx" />
@@ -8439,8 +8465,6 @@
     <Content Include="UI\Admin\Reports\Search.aspx" />
     <Content Include="UI\Layout\Common\Controls\LinkToAchievement.ascx" />
     <Content Include="UI\Layout\Common\Controls\LinkToAssessment.ascx" />
-    <Content Include="UI\Portal\Identity\Impersonate.aspx" />
-    <Content Include="UI\Admin\Reports\DashboardUsers.ascx" />
     <Content Include="UI\Admin\Events\Attendees\Controls\AttendeePanel.ascx" />
     <Content Include="UI\Admin\Events\Attendees\Controls\PersonAttendeePanel.ascx" />
     <Content Include="UI\Admin\Events\Attendees\Forms\Add.aspx" />
@@ -8871,7 +8895,7 @@
     <Content Include="UI\CMDS\Admin\Reports\CompanySummary_PdfHeader.html" />
     <Content Include="UI\CMDS\Admin\Reports\CompetenciesPerDepartment.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\CompetenciesPerProfile.aspx" />
-    <Content Include="UI\CMDS\Admin\Reports\CompetencyCountPerCategory.aspx" />
+    <Content Include="UI\CMDS\Admin\Reports\CompetenciesPerCategory.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\CompetencyStatusHistory.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\CompetencyStatusHistoryChart_PdfBody.html" />
     <Content Include="UI\CMDS\Admin\Reports\CompetencyStatusHistoryChart_PdfHeader.html" />
@@ -8895,15 +8919,15 @@
     <Content Include="UI\CMDS\Admin\Reports\ExecutiveSummaryOnAchievementStatus.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\GroupCompetencySummary.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\IndividualProfileAssignment.aspx" />
-    <Content Include="UI\Admin\Contact\Persons\Anomalies.aspx" />
+    <Content Include="UI\Admin\Reporting\ContactDataAnomalies.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\MultiorganizationUsers.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\NotificationSubscribers.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\NotificationSubscribersGrid.ascx" />
     <Content Include="UI\Admin\Reporting\PhoneList.aspx" />
-    <Content Include="UI\CMDS\Admin\Reports\Snapshots.aspx" />
+    <Content Include="UI\Admin\Reporting\ComplianceSnapshots.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\TrainingCompletions.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\TrainingExpiryDates.aspx" />
-    <Content Include="UI\CMDS\Admin\Reports\TrainingHistoryPerUser.aspx" />
+    <Content Include="UI\CMDS\Admin\Reports\TrainingHistoryByWorker.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\TrainingRequirementsPerCompetency.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\TrainingRequirementsPerUser.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\UnprioritizedCompetencies.aspx" />
@@ -8913,7 +8937,7 @@
     <Content Include="UI\CMDS\Admin\Reports\UserTrainingExpiryReminders.aspx" />
     <Content Include="UI\CMDS\Admin\Reports\UserTrainingExpiryReminders_PdfBody.html" />
     <Content Include="UI\CMDS\Admin\Reports\UserTrainingExpiryReminders_PdfHeader.html" />
-    <Content Include="UI\CMDS\Admin\Reports\UserTrainingSummary.aspx" />
+    <Content Include="UI\CMDS\Admin\Reports\WorkerTrainingSummary.aspx" />
     <Content Include="UI\CMDS\Admin\Standards\Competencies\Create.aspx" />
     <Content Include="UI\CMDS\Admin\Standards\Competencies\Edit.aspx" />
     <Content Include="UI\CMDS\Admin\Standards\Competencies\Search.aspx" />
@@ -12035,20 +12059,6 @@
     <Compile Include="UI\Layout\Common\Controls\LinkToAssessment.ascx.designer.cs">
       <DependentUpon>LinkToAssessment.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Portal\Identity\Impersonate.aspx.cs">
-      <DependentUpon>Impersonate.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Identity\Impersonate.aspx.designer.cs">
-      <DependentUpon>Impersonate.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Reports\DashboardUsers.ascx.cs">
-      <DependentUpon>DashboardUsers.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Reports\DashboardUsers.ascx.designer.cs">
-      <DependentUpon>DashboardUsers.ascx</DependentUpon>
-    </Compile>
     <Compile Include="UI\Admin\Events\Attendees\Controls\AttendeePanel.ascx.cs">
       <DependentUpon>AttendeePanel.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -14847,12 +14857,12 @@
     <Compile Include="UI\CMDS\Admin\Reports\CompetenciesPerProfile.aspx.designer.cs">
       <DependentUpon>CompetenciesPerProfile.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\CMDS\Admin\Reports\CompetencyCountPerCategory.aspx.cs">
-      <DependentUpon>CompetencyCountPerCategory.aspx</DependentUpon>
+    <Compile Include="UI\CMDS\Admin\Reports\CompetenciesPerCategory.aspx.cs">
+      <DependentUpon>CompetenciesPerCategory.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\CMDS\Admin\Reports\CompetencyCountPerCategory.aspx.designer.cs">
-      <DependentUpon>CompetencyCountPerCategory.aspx</DependentUpon>
+    <Compile Include="UI\CMDS\Admin\Reports\CompetenciesPerCategory.aspx.designer.cs">
+      <DependentUpon>CompetenciesPerCategory.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Admin\Reports\CompetencyStatusHistory.aspx.cs">
       <DependentUpon>CompetencyStatusHistory.aspx</DependentUpon>
@@ -14974,12 +14984,12 @@
     <Compile Include="UI\CMDS\Admin\Reports\IndividualProfileAssignment.aspx.designer.cs">
       <DependentUpon>IndividualProfileAssignment.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Contact\Persons\Anomalies.aspx.cs">
-      <DependentUpon>Anomalies.aspx</DependentUpon>
+    <Compile Include="UI\Admin\Reporting\ContactDataAnomalies.aspx.cs">
+      <DependentUpon>ContactDataAnomalies.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Contact\Persons\Anomalies.aspx.designer.cs">
-      <DependentUpon>Anomalies.aspx</DependentUpon>
+    <Compile Include="UI\Admin\Reporting\ContactDataAnomalies.aspx.designer.cs">
+      <DependentUpon>ContactDataAnomalies.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Admin\Reports\MultiorganizationUsers.aspx.cs">
       <DependentUpon>MultiorganizationUsers.aspx</DependentUpon>
@@ -15010,12 +15020,12 @@
       <DependentUpon>PhoneList.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Admin\Reports\ReportXlsxHelper.cs" />
-    <Compile Include="UI\CMDS\Admin\Reports\Snapshots.aspx.cs">
-      <DependentUpon>Snapshots.aspx</DependentUpon>
+    <Compile Include="UI\Admin\Reporting\ComplianceSnapshots.aspx.cs">
+      <DependentUpon>ComplianceSnapshots.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\CMDS\Admin\Reports\Snapshots.aspx.designer.cs">
-      <DependentUpon>Snapshots.aspx</DependentUpon>
+    <Compile Include="UI\Admin\Reporting\ComplianceSnapshots.aspx.designer.cs">
+      <DependentUpon>ComplianceSnapshots.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Admin\Reports\TrainingCompletions.aspx.cs">
       <DependentUpon>TrainingCompletions.aspx</DependentUpon>
@@ -15031,12 +15041,12 @@
     <Compile Include="UI\CMDS\Admin\Reports\TrainingExpiryDates.aspx.designer.cs">
       <DependentUpon>TrainingExpiryDates.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\CMDS\Admin\Reports\TrainingHistoryPerUser.aspx.cs">
-      <DependentUpon>TrainingHistoryPerUser.aspx</DependentUpon>
+    <Compile Include="UI\CMDS\Admin\Reports\TrainingHistoryByWorker.aspx.cs">
+      <DependentUpon>TrainingHistoryByWorker.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\CMDS\Admin\Reports\TrainingHistoryPerUser.aspx.designer.cs">
-      <DependentUpon>TrainingHistoryPerUser.aspx</DependentUpon>
+    <Compile Include="UI\CMDS\Admin\Reports\TrainingHistoryByWorker.aspx.designer.cs">
+      <DependentUpon>TrainingHistoryByWorker.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Admin\Reports\TrainingRequirementsPerCompetency.aspx.cs">
       <DependentUpon>TrainingRequirementsPerCompetency.aspx</DependentUpon>
@@ -15087,12 +15097,12 @@
     <Compile Include="UI\CMDS\Admin\Reports\UserTrainingExpiryReminders.aspx.designer.cs">
       <DependentUpon>UserTrainingExpiryReminders.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\CMDS\Admin\Reports\UserTrainingSummary.aspx.cs">
-      <DependentUpon>UserTrainingSummary.aspx</DependentUpon>
+    <Compile Include="UI\CMDS\Admin\Reports\WorkerTrainingSummary.aspx.cs">
+      <DependentUpon>WorkerTrainingSummary.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\CMDS\Admin\Reports\UserTrainingSummary.aspx.designer.cs">
-      <DependentUpon>UserTrainingSummary.aspx</DependentUpon>
+    <Compile Include="UI\CMDS\Admin\Reports\WorkerTrainingSummary.aspx.designer.cs">
+      <DependentUpon>WorkerTrainingSummary.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Admin\Standards\Competencies\Create.aspx.cs">
       <DependentUpon>Create.aspx</DependentUpon>
@@ -16559,7 +16569,7 @@
     <Content Include="UI\Layout\Common\Parts\plugins\html2pdf\html2pdf.bundle.min.js.map" />
     <Content Include="UI\Layout\Common\Parts\plugins\fullcalendar\LICENSE.md" />
     <Content Include="UI\Layout\Common\Parts\plugins\fullcalendar\README.md" />
-    <Content Include="UI\Layout\Common\Styles\Shift.scss" />
+    <Content Include="UI\Layout\Common\Styles\shift.scss" />
     <Content Include="UI\Portal\Records\Certificates\Certificate.rdlc" />
     <Content Include="UI\Layout\Common\Parts\around\scss\components\_accordion.scss" />
     <Content Include="UI\Layout\Common\Parts\around\scss\components\_alert.scss" />
@@ -16721,8 +16731,8 @@
     <Content Include="UI\Lobby\Models\Agreement-Short-fr.md" />
     <Content Include="Web\Persistence\AppStatus.ashx" />
     <Content Include="UI\Portal\Records\Certificates\Badge.ashx" />
-    <Content Include="UI\Layout\Common\Styles\Skills.scss" />
-    <Content Include="UI\Layout\Common\Styles\Cmds.scss" />
+    <Content Include="UI\Layout\Common\Styles\skills.scss" />
+    <Content Include="UI\Layout\Common\Styles\cmds.scss" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Controllers\AssessmentFormController.cs" />
@@ -17382,6 +17392,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="UI\Admin\Contacts\Locations\Holidays\Controls\" />
+    <Folder Include="UI\Admin\Contact\Persons\" />
     <Folder Include="UI\Admin\Identity\UsersSessions\Controls\" />
     <Folder Include="UI\Layout\Common\Parts\around\js\vendor\%40fullcalendar\bootstrap5\" />
     <Folder Include="UI\Layout\Common\Parts\around\js\vendor\%40fullcalendar\core\" />

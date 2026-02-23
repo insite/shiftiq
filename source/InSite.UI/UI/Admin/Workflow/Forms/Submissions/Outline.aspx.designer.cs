@@ -141,6 +141,33 @@ namespace InSite.Admin.Workflow.Forms.Submissions
         protected global::System.Web.UI.WebControls.Literal RespondentEmail;
 
         /// <summary>
+        /// AssessorContainer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Container AssessorContainer;
+
+        /// <summary>
+        /// AssessorName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal AssessorName;
+
+        /// <summary>
+        /// AssessorEmail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal AssessorEmail;
+
+        /// <summary>
         /// SurveyName control.
         /// </summary>
         /// <remarks>
@@ -202,6 +229,33 @@ namespace InSite.Admin.Workflow.Forms.Submissions
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.DownloadButton DownloadButton;
+
+        /// <summary>
+        /// SummaryChartPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SummaryChartPanel;
+
+        /// <summary>
+        /// ChartLegend control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater ChartLegend;
+
+        /// <summary>
+        /// ChartBody control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ChartBody;
 
         /// <summary>
         /// AnswerGroupRepeater control.

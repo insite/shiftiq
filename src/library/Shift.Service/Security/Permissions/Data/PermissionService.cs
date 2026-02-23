@@ -1,6 +1,5 @@
-using Shift.Contract;
-
 using Shift.Common;
+using Shift.Contract;
 
 namespace Shift.Service.Security;
 
@@ -58,7 +57,7 @@ public class PermissionService : IEntityService
         ModifyPermission modify,
         CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.PermissionIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.PermissionId, cancellation);
 
         if (entity == null)
             return false;

@@ -924,8 +924,11 @@ where MailoutIdentifier = @Mailout
             if (filter.IsDisabled.HasValue)
                 query = query.Where(x => x.IsDisabled == filter.IsDisabled.Value);
 
-            if (filter.Name.IsNotEmpty())
-                query = query.Where(x => x.MessageName.Contains(filter.Name));
+            if (filter.NameExact.IsNotEmpty())
+                query = query.Where(x => x.MessageName == filter.NameExact);
+
+            if (filter.NameContains.IsNotEmpty())
+                query = query.Where(x => x.MessageName.Contains(filter.NameContains));
 
             if (filter.Title.IsNotEmpty())
                 query = query.Where(x => x.MessageTitle.Contains(filter.Title));

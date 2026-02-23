@@ -5,16 +5,16 @@
     <div class="col-3">
         <div id="toolbox" class="toolbox-section">
 
-            <h4>Component</h4>
+            <h4>Architecture</h4>
 
             <div class="mb-2">
-                <insite:TextBox runat="server" ID="ComponentType" EmptyMessage="Component Type" MaxLength="40" />
+                <insite:TextBox runat="server" ID="SubsystemType" EmptyMessage="Subsystem Type" MaxLength="40" />
             </div>
             <div class="mb-2">
-                <insite:TextBox runat="server" ID="ComponentName" EmptyMessage="Component Name" MaxLength="40" />
+                <insite:TextBox runat="server" ID="SubsystemName" EmptyMessage="Subsystem Name" MaxLength="40" />
             </div>
             <div class="mb-2">
-                <insite:TextBox runat="server" ID="ComponentPart" EmptyMessage="Component Part" MaxLength="40" />
+                <insite:TextBox runat="server" ID="SubsystemComponent" EmptyMessage="Subsystem Component" MaxLength="40" />
             </div>
             <div class="mb-2">
                 <insite:TextBox runat="server" ID="EntityName" EmptyMessage="Entity Name" MaxLength="40" />
@@ -22,11 +22,14 @@
 
             <insite:FilterButton runat="server" ID="SearchButton" />
             <insite:ClearButton runat="server" ID="ClearButton" />
+
         </div>
     </div>
     <div class="col-3">
         <div>
+
             <h4>Storage</h4>
+
             <div class="mb-2">
                 <insite:TextBox runat="server" ID="StorageStructure" EmptyMessage="Storage Structure" MaxLength="40" />
             </div>
@@ -39,6 +42,7 @@
             <div class="mb-2">
                 <insite:TextBox runat="server" ID="StorageKey" EmptyMessage="Storage Key" MaxLength="40" />
             </div>
+
         </div>       
     </div>
     <div class="col-3">

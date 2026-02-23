@@ -117,7 +117,7 @@ namespace InSite.Common.Web.UI
         {
             return HasFile
                 ? IoFile.ReadAllText(Metadata.FilePath, encoding)
-                : throw new ApplicationError("File is not uploaded");
+                : throw new InvalidOperationException("File is not uploaded");
         }
 
         public Unit Width

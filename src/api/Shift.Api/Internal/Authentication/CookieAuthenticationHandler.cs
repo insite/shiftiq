@@ -20,10 +20,13 @@ public class CookieAuthenticationHandler : AuthenticationHandler<CookieAuthentic
     private readonly IClaimConverter _converter;
     private readonly SecuritySettings _security;
 
-    public CookieAuthenticationHandler(IOptionsMonitor<CookieAuthenticationOptions> options,
-        ILoggerFactory logger, UrlEncoder encoder, IClaimConverter converter,
-        SecuritySettings security)
-
+    public CookieAuthenticationHandler(
+        IOptionsMonitor<CookieAuthenticationOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        IClaimConverter converter,
+        SecuritySettings security
+        )
         : base(options, logger, encoder)
     {
         _converter = converter;
@@ -54,7 +57,7 @@ public class CookieAuthenticationHandler : AuthenticationHandler<CookieAuthentic
 
         try
         {
-            token = encoder.Deserialize(cookie, encrypt, secret);
+            token = encoder.Deserialize(cookie, encrypt, secret, false);
         }
         catch (CookieSerializationException ex)
         {
@@ -85,6 +88,7 @@ public class CookieAuthenticationHandler : AuthenticationHandler<CookieAuthentic
 
         var list = new List<Claim>
             {
+                _converter.ToClaim(ClaimName.CookieId, claims.ID.ToString()),
                 _converter.ToClaim(ClaimName.OrganizationCode, claims.OrganizationCode),
                 _converter.ToClaim(ClaimName.UserEmail, claims.UserEmail),
                 _converter.ToClaim(ClaimName.UserLanguage, claims.Language ?? ClaimConverter.DefaultLanguage),

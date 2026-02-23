@@ -14,21 +14,18 @@ public class CaseGroupReader : IEntityReader
 
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
-    public CaseGroupReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public CaseGroupReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid join, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid join, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
-            
-            return query.AnyAsync(x => x.JoinIdentifier == join, cancellation);
+
+            return query.AnyAsync(x => x.JoinIdentifier == join && (organization == null || x.OrganizationIdentifier == organization), cancellation);
 
         }, cancellation);
     }
@@ -106,13 +103,7 @@ public class CaseGroupReader : IEntityReader
     /// </remarks>
     private IQueryable<CaseGroupEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
-        var query = db.QCaseGroup
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
-
-        return query;
+        return db.QCaseGroup.AsNoTracking();
     }
 
     private IQueryable<CaseGroupEntity> BuildQueryable(TableDbContext db, ICaseGroupCriteria criteria)
@@ -120,6 +111,9 @@ public class CaseGroupReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
 
         // TODO: Apply criteria
 
@@ -138,7 +132,7 @@ public class CaseGroupReader : IEntityReader
         var matches = await queryable
             .Select(entity => new CaseGroupMatch
             {
-                JoinIdentifier = entity.JoinIdentifier
+                JoinId = entity.JoinIdentifier
 
             })
             .ToListAsync(cancellation);
@@ -146,9 +140,4 @@ public class CaseGroupReader : IEntityReader
         return matches;
     }
 
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
-    }
 }

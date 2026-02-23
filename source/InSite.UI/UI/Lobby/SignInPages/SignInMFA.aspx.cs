@@ -165,7 +165,7 @@ namespace InSite.UI.Lobby.SignInPages
 
             var cookie = new HttpCookie(ShortLivedCookieName)
             {
-                Domain = CookieTokenModule.SecuritySettings.Domain,
+                Domain = ServiceLocator.AppSettings.Partition.Domain,
                 Expires = DateTime.Now.AddHours(ShortCookieLifeTime),
                 Path = CookieTokenModule.CookieSettings.Path,
                 Value = MFA.ShortLivedCookieToken.Value.ToString(),

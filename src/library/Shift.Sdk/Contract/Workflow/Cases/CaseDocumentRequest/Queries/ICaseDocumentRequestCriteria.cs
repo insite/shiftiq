@@ -4,12 +4,11 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface ICaseDocumentRequestCriteria
+    public interface ICaseDocumentRequestCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? RequestedUserIdentifier { get; set; }
+
+        Guid? RequestedUserId { get; set; }
 
         string RequestedFileDescription { get; set; }
         string RequestedFileSubcategory { get; set; }

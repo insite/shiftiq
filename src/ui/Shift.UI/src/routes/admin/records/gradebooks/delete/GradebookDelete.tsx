@@ -78,8 +78,8 @@ async function load(gradebookId: string, timeZoneId: TimeZoneId): Promise<Gradeb
         achievement,
         event
     ] = await Promise.all([
-        apiModel.AchievementIdentifier ? shiftClient.achievement.retrieve(apiModel.AchievementIdentifier) : null,
-        apiModel.EventIdentifier ? shiftClient.event.retrieve(apiModel.EventIdentifier) : null,
+        apiModel.AchievementId ? shiftClient.achievement.retrieve(apiModel.AchievementId) : null,
+        apiModel.EventId ? shiftClient.event.retrieve(apiModel.EventId) : null,
     ]);
 
     return {
@@ -87,9 +87,9 @@ async function load(gradebookId: string, timeZoneId: TimeZoneId): Promise<Gradeb
         gradebookTitle: apiModel.GradebookTitle,
         gradebookType: apiModel.GradebookType,
         created: dateTimeHelper.parseServerDateTime(apiModel.GradebookCreated, timeZoneId)!,
-        achievementId: apiModel.AchievementIdentifier ?? null,
+        achievementId: apiModel.AchievementId ?? null,
         achievementTitle: achievement?.AchievementTitle ?? null,
-        eventId: apiModel.EventIdentifier ?? null,
+        eventId: apiModel.EventId ?? null,
         eventTitle: event?.EventTitle ?? null,
         eventScheduledStart: dateTimeHelper.parseServerDateTime(event?.EventScheduledStart, timeZoneId),
         eventScheduledEnd: dateTimeHelper.parseServerDateTime(event?.EventScheduledEnd, timeZoneId),

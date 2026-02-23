@@ -393,7 +393,7 @@ namespace InSite.Admin.Contacts.People.Forms
                 LogbookSubTab.SetTitle("Logbooks", logbookCount);
             }
 
-            var canWriteEvents = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Events, PermissionOperation.Write);
+            var canWriteEvents = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Events, DataAccess.Update);
             RegistrationGrid.LoadData(person.UserIdentifier, canWriteEvents);
             SetupRegistrationsTab();
 
@@ -413,11 +413,7 @@ namespace InSite.Admin.Contacts.People.Forms
             SurveyResponseGrid.Visible = SurveyResponseGrid.HasData;
             NoSurveyResponses.Visible = !SurveyResponseGrid.HasData;
 
-            var hasCanvasAccess = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Integrations_Canvas);
-            OutcomeSubTab.Visible = hasCanvasAccess;
-
-            if (hasCanvasAccess)
-                OutcomeTree.LoadData(person.UserIdentifier);
+            OutcomeSubTab.Visible = false;
 
             // SystemAccessTab
 

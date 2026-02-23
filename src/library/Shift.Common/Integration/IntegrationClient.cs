@@ -241,7 +241,7 @@ namespace Shift.Common
             var endpoint = GetBaseEndpoint(_organizationIdentifier) ?? GetBaseEndpoint(OrganizationIdentifiers.Global);
 
             if (endpoint == null)
-                throw new Exception($"API Endpoint Not Found: Environment = {Environment}; Organization = {_organizationIdentifier}; Integration = {_integrationType} ");
+                throw new InvalidOperationException($"API Endpoint Not Found: Environment = {Environment}; Organization = {_organizationIdentifier}; Integration = {_integrationType}");
 
             return endpoint;
 

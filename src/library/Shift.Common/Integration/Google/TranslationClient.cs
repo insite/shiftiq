@@ -65,7 +65,7 @@ namespace Shift.Common.Integration.Google
             var postResult = await StaticHttpClient.Client.PostAsync(url, content);
 
             if (HttpStatusCode.OK != postResult.StatusCode)
-                throw new Exception($"Translation Failed: The Engine API returned HTTP {postResult.StatusCode}. {postResult.ReasonPhrase}");
+                throw new InvalidOperationException($"Translation Failed: The Engine API returned HTTP {postResult.StatusCode}. {postResult.ReasonPhrase}");
 
             var apiResponseContent = await postResult.Content.ReadAsStringAsync();
 
@@ -78,7 +78,7 @@ namespace Shift.Common.Integration.Google
             }
 
             if (inputs.Length != outputs.Length)
-                throw new Exception($"Translation Failed: The input array contains {inputs.Length} items, but the output array contains {outputs.Length} items.");
+                throw new InvalidOperationException($"Translation Failed: The input array contains {inputs.Length} items, but the output array contains {outputs.Length} items.");
 
             return outputs;
         }

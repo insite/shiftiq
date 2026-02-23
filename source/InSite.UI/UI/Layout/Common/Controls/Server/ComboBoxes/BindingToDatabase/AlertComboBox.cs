@@ -15,6 +15,12 @@ namespace InSite.Common.Web.UI
             set => ViewState[nameof(ExcludeValues)] = value;
         }
 
+        public NotificationMessageType MessageType
+        {
+            get => (NotificationMessageType)(ViewState[nameof(MessageType)] ?? NotificationMessageType.Undefined);
+            set => ViewState[nameof(MessageType)] = value;
+        }
+
         protected override ListItemArray CreateDataSource()
         {
             var all = Notifications.All
@@ -26,6 +32,9 @@ namespace InSite.Common.Web.UI
                          || x.Organizations.Any(o => o == CurrentSessionState.Identity.Organization.Code)
                     )
                 );
+
+            if (MessageType != NotificationMessageType.Undefined)
+                all = all.Where(x => x.MessageType == MessageType);
 
             if (ExcludeValues.IsNotEmpty())
                 all = all.Where(x => !ExcludeValues.Contains(x.Slug, StringComparer.OrdinalIgnoreCase));

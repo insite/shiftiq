@@ -32,7 +32,7 @@ namespace InSite.Admin.Messages.Messages.Controls
                 {
                     OrganizationIdentifier = Organization.Identifier,
                     Type = !IsPostBack && !string.IsNullOrEmpty(DefaultType) ? DefaultType : MessageType.Value,
-                    Name = MessageName.Text,
+                    NameContains = MessageName.Text,
                     Title = Subject.Text,
                     Modified = new DateTimeRange(ModifiedSince.Value?.UtcDateTime, ModifiedBefore.Value?.UtcDateTime),
                     SenderNickname = SenderNickname.Text,
@@ -60,7 +60,7 @@ namespace InSite.Admin.Messages.Messages.Controls
                     OrganizationIdentifier.Value = value.OrganizationIdentifier;
 
                 MessageType.Value = !IsPostBack && !string.IsNullOrEmpty(DefaultType) ? DefaultType : value.Type;
-                MessageName.Text = value.Name;
+                MessageName.Text = value.NameContains;
                 Subject.Text = value.Title;
                 MessageDisabled.ValueAsBoolean = value.IsDisabled;
 

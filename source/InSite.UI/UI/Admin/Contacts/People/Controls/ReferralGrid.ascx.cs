@@ -136,7 +136,7 @@ namespace InSite.UI.Admin.Contacts.People.Controls
 
             var isCurrentOrg = data.GroupOrganizationIdentifier == Organization.Identifier;
             var hasParent = data.GroupParentIdentifier.HasValue;
-            var allowEditGroup = isCurrentOrg && Identity.IsActionAuthorized("ui/admin/contacts/groups/edit");
+            var allowEditGroup = isCurrentOrg && Identity.IsGranted("ui/admin/contacts/groups/edit");
 
             var groupName = data.GroupName;
             if (groupName.IsNotEmpty())

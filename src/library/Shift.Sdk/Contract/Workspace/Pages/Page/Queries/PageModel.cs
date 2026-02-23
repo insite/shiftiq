@@ -1,14 +1,15 @@
 using System;
+using System.Linq;
 
 namespace Shift.Contract
 {
     public partial class PageModel
     {
-        public Guid? ObjectIdentifier { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid PageIdentifier { get; set; }
-        public Guid? ParentPageIdentifier { get; set; }
-        public Guid? SiteIdentifier { get; set; }
+        public Guid? ObjectId { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid PageId { get; set; }
+        public Guid? ParentPageId { get; set; }
+        public Guid? SiteId { get; set; }
 
         public bool IsAccessDenied { get; set; }
         public bool IsHidden { get; set; }
@@ -31,5 +32,17 @@ namespace Shift.Contract
 
         public DateTimeOffset? AuthorDate { get; set; }
         public DateTimeOffset? LastChangeTime { get; set; }
+
+        public string[] ContentLabelsToArray()
+        {
+            if (ContentLabels == null)
+                return new string[0];
+
+            return ContentLabels
+                .Split(new []{','}, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrEmpty(x) && (PageType != "Folder" || !x.Equals("PageBlocks", StringComparison.OrdinalIgnoreCase)))
+                .ToArray();
+        }
     }
 }

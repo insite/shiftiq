@@ -35,5 +35,6 @@
         UserPasswordExpired,
         UtcArchived,
         UtcUnarchived,
+        EmailVerificationTokenIssued,
     }
 }

@@ -17,14 +17,11 @@ public partial class TPermissionEntity
     public bool AllowConfigure { get; set; }
     public bool AllowCreate { get; set; }
     public bool AllowDelete { get; set; }
-    public bool AllowExecute { get; set; }
     public bool AllowRead { get; set; }
     public bool AllowTrialAccess { get; set; }
     public bool AllowWrite { get; set; }
 
     public string ObjectType { get; set; } = null!;
-
-    public int PermissionMask { get; set; }
 
     public DateTimeOffset? PermissionGranted { get; set; }
 }

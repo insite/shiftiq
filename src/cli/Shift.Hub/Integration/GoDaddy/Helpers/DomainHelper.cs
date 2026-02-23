@@ -20,13 +20,11 @@ internal static class DomainHelper
         }
     }
 
-    public static List<MissingSubdomainInfo> GetMissingSubdomains(DbHelper db, string? env, string apiKey, string apiSecret)
+    public static List<MissingSubdomainInfo> GetMissingSubdomains(DbHelper db, string hostName, string? env, string apiKey, string apiSecret)
     {
-        var partition = GetPartition(db);
-
-        var hostParts = partition.HostName.Split('.');
+        var hostParts = hostName.Split('.');
         if (hostParts.Length < 2)
-            throw new InternalException($"Invalid Partition.HostName parameter value: " + partition.HostName);
+            throw new InternalException($"Invalid HostName parameter value: " + hostName);
 
         var organizations = db.GetOpenOrganizations();
         if (organizations.Count == 0)
@@ -58,18 +56,5 @@ internal static class DomainHelper
         }
 
         return result.OrderBy(x => x.Subdomain).ToList();
-    }
-
-    private static DbHelper.PartitionInfo GetPartition(DbHelper db)
-    {
-        var partition = db.GetPartition();
-
-        if (partition.PartitionSlug.Length == 0)
-            throw new InternalException("The value of the \"Partition:Slug\" parameter is null.");
-
-        if (partition.HostName.Length == 0)
-            throw new InternalException("The value of the \"Host:Name\" parameter is null.");
-
-        return partition;
     }
 }

@@ -248,7 +248,7 @@ namespace InSite.Admin.Events.Classes.Controls
 
             if (registration != null)
             {
-                var domain = ServiceLocator.AppSettings.Security.Domain;
+                var domain = ServiceLocator.AppSettings.Partition.Domain;
                 var registrationRelativeUrl = $"/ui/portal/events/classes/register?event={registration.EventIdentifier}&candidate={registration.CandidateIdentifier}";
                 var registrationAbsoluteUrl = UrlHelper.GetAbsoluteUrl(domain, ServiceLocator.AppSettings.Environment, registrationRelativeUrl, Organization.Code);
                 var recipientId = registration.RegistrationRequestedBy ?? registration.CandidateIdentifier;

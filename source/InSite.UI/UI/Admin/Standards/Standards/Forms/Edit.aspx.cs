@@ -222,7 +222,7 @@ namespace InSite.Admin.Standards.Standards.Forms
 
             var showOutlineLink = !GraphHasDependencyCycle
                 && !GraphContainsMutiplePaths
-                && Identity.IsActionAuthorized("ui/admin/standards/manage");
+                && Identity.IsGranted("ui/admin/standards/manage");
             var rootId = StandardSearch.BindFirst(
                 x => (Guid?)x.StandardIdentifier,
                 x => rootKeys.Contains(x.StandardIdentifier)

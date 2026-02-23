@@ -1,26 +1,23 @@
 import { ReactNode } from "react";
+import { IconName } from "./icon/IconName";
+import Icon from "./icon/Icon";
 
 export type AlertType = "none" | "error" | "information" | "success" | "warning";
 
 interface Props {
     alertType?: AlertType;
-    icon?: string | null;
     children?: ReactNode;
     className?: string;
     messages?: ReactNode[];
 }
 
-export default function Alert({ alertType, icon, children, className, messages }: Props) {
+export default function Alert({ alertType, children, className, messages }: Props) {
     const alertInfo = getAlertInfo(alertType ?? "none");
     
-    const alertIcon = icon !== undefined
-        ? (icon ? icon : "")
-        : `far fa-${alertInfo.icon}`;
-
     return (
         <div role="alert" className={`alert alert-${alertInfo.variant} d-flex alert-custom-padding ${className ?? ""}`}>
             {alertInfo.icon && (
-                <i className={`${alertIcon} fs-xl me-2`}></i>
+                <Icon style="Regular" name={alertInfo.icon} className="fs-xl me-2" />
             )}
             {messages ? (
                 <>
@@ -39,7 +36,7 @@ export default function Alert({ alertType, icon, children, className, messages }
     );
 }
 
-function getAlertInfo(alertType: AlertType): { variant: string; icon: string | null } {
+function getAlertInfo(alertType: AlertType): { variant: string; icon: IconName | null } {
     switch (alertType) {
         case "none":
             return { variant: "light", icon: null };

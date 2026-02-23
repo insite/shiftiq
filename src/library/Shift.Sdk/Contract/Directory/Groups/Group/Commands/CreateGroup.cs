@@ -4,17 +4,17 @@ namespace Shift.Contract
 {
     public class CreateGroup
     {
-        public Guid GroupIdentifier { get; set; }
-        public Guid? MembershipProductIdentifier { get; set; }
+        public Guid GroupId { get; set; }
+        public Guid? MembershipProductId { get; set; }
         public Guid? MessageToAdminWhenEventVenueChanged { get; set; }
         public Guid? MessageToAdminWhenMembershipEnded { get; set; }
         public Guid? MessageToAdminWhenMembershipStarted { get; set; }
         public Guid? MessageToUserWhenMembershipEnded { get; set; }
         public Guid? MessageToUserWhenMembershipStarted { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid? ParentGroupIdentifier { get; set; }
-        public Guid? SurveyFormIdentifier { get; set; }
-        public Guid? GroupStatusItemIdentifier { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid? ParentGroupId { get; set; }
+        public Guid? SurveyFormId { get; set; }
+        public Guid? GroupStatusItemId { get; set; }
 
         public bool AddNewUsersAutomatically { get; set; }
         public bool AllowJoinGroupUsingLink { get; set; }

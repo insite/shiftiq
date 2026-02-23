@@ -1,9 +1,10 @@
 import { translate } from "@/helpers/translate";
+import Icon from "../icon/Icon";
 
 export default function Search_DownloadTitle() {
     return (
         <>
-            <i className="fas fa-download me-2"></i>
+            <Icon style="Solid" name="download" className="me-2" />
             {translate("Downloads")}
         </>
     );

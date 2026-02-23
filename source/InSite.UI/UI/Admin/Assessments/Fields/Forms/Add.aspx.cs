@@ -302,7 +302,7 @@ namespace InSite.Admin.Assessments.Fields.Forms
 
             var strValues = QuestionsSequence.Value.Split(',');
             if (strValues.Length != QuestionRepeaterDataSource.Length)
-                throw new ApplicationError("Invalid questions sequence length: " + QuestionsSequence.Value);
+                throw new FormatException("Invalid questions sequence length: " + QuestionsSequence.Value);
 
             var items = new HashSet<int>();
             var result = new int[strValues.Length];
@@ -311,10 +311,10 @@ namespace InSite.Admin.Assessments.Fields.Forms
             {
                 var value = int.Parse(strValues[i]);
                 if (value < 0 || value >= result.Length)
-                    throw new ApplicationError($"Question index out of range: Value={value}, Length={result.Length}, Input={QuestionsSequence.Value}");
+                    throw new FormatException($"Question index out of range: Value={value}, Length={result.Length}, Input={QuestionsSequence.Value}");
 
                 if (items.Contains(value))
-                    throw new ApplicationError($"Question index duplicate found: Value={value}, Input={QuestionsSequence.Value}");
+                    throw new FormatException($"Question index duplicate found: Value={value}, Input={QuestionsSequence.Value}");
 
                 items.Add(result[i] = value);
             }

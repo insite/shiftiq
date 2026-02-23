@@ -5,17 +5,17 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using DocumentFormat.OpenXml.Spreadsheet;
 
 using InSite.Application.Cases.Write;
+using InSite.Application.Contacts.Read;
 using InSite.Application.Contents.Read;
 using InSite.Application.Issues.Read;
 using InSite.Common.Web.UI;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 using CheckBox = InSite.Common.Web.UI.CheckBox;
@@ -60,6 +60,8 @@ namespace InSite.Admin.Issues.Controls
         private List<VComment> _comments = new List<VComment>();
 
         private Dictionary<Guid, int> _responseAttachmentCounts = new Dictionary<Guid, int>();
+
+        private Dictionary<Guid, string> _departments = new Dictionary<Guid, string>();
 
         #endregion
 
@@ -129,6 +131,7 @@ namespace InSite.Admin.Issues.Controls
 
             GetIssueComments(issues);
             CalcResponseAttachmentCount(issues);
+            GetDepartments(issues);
 
             return issues.ToSearchResult();
         }
@@ -334,11 +337,36 @@ namespace InSite.Admin.Issues.Controls
                 .ToList();
         }
 
+        private void GetDepartments(List<VIssue> issues)
+        {
+            var userIds = issues
+                .Where(x => x.TopicUserIdentifier.HasValue)
+                .Select(x => x.TopicUserIdentifier.Value)
+                .ToArray();
+
+            if (userIds.Length == 0)
+            {
+                _departments.Clear();
+                return;
+            }
+
+            var filter = new QMembershipFilter
+            {
+                GroupOrganizationIdentifier = Organization.Identifier,
+                UserIdentifiers = userIds,
+                MembershipFunction = "Department"
+            };
+
+            _departments = ServiceLocator.MembershipSearch.Select(filter, x => x.Group)
+                .GroupBy(x => x.UserIdentifier)
+                .ToDictionary(x => x.Key, x => string.Join(", ", x.Select(y => y.Group.GroupName).OrderBy(y => y)));
+        }
+
         private void SaveScrollPosition()
         {
             var script = @"
-        var scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-        document.getElementById('" + hfScrollPosition.ClientID + @"').value = scrollPosition;";
+var scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+document.getElementById('" + hfScrollPosition.ClientID + @"').value = scrollPosition;";
             ScriptManager.RegisterStartupScript(this, GetType(), "SaveScrollPosition", script, true);
         }
 
@@ -349,9 +377,9 @@ namespace InSite.Admin.Issues.Controls
             if (!string.IsNullOrEmpty(scrollPosition))
             {
                 var script = $@"
-            window.onload = function() {{
-                window.scrollTo(0, {scrollPosition});
-            }};";
+window.onload = function() {{
+    window.scrollTo(0, {scrollPosition});
+}};";
                 ScriptManager.RegisterStartupScript(this, GetType(), "RestoreScrollPosition", script, true);
             }
         }
@@ -418,6 +446,14 @@ namespace InSite.Admin.Issues.Controls
                 : 0;
 
             return issue.AttachmentCount + responseAttachmentCount;
+        }
+
+        protected string GetTopicDepartments()
+        {
+            var entity = (VIssue)Page.GetDataItem();
+            return entity.TopicUserIdentifier.HasValue
+                ? _departments.GetOrDefault(entity.TopicUserIdentifier.Value)
+                : null;
         }
 
         #endregion

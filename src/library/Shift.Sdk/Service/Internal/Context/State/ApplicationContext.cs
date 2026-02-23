@@ -14,6 +14,8 @@ namespace InSite.Domain.Foundations
         public static ActionTree NavigationTree { get; set; }
         public static ActionTree PermissionTree { get; set; }
 
+        public static Dictionary<Guid, ActionNode> PermissionNodesByIdentifier { get; set; }
+
         public static void Initialize(ActionNode[] actions, ActionTree navigation, ActionTree permission)
         {
             ActionsByIdentifier = actions.ToDictionary(x => x.Identifier, x => x);
@@ -21,6 +23,14 @@ namespace InSite.Domain.Foundations
 
             NavigationTree = navigation;
             PermissionTree = permission;
+
+            PermissionNodesByIdentifier = PermissionTree.Flatten()
+                .Select(x => x.Node)
+                .ToList()
+                .ToDictionary(x => x.Identifier);
+
+            if (!PermissionNodesByIdentifier.ContainsKey(Guid.Parse("c22bd56b-2cc7-4688-93a7-20842961cec2")))
+                throw new InvalidOperationException("The permission hierarchy is expected to include an entry for Admin/Events/Classes. (This is a node in the tree that has no parent and no children.)");
         }
 
         public static ActionNode GetAction(string url)
@@ -29,10 +39,7 @@ namespace InSite.Domain.Foundations
         public static ActionNode GetAction(Guid id)
             => id != Guid.Empty && ActionsByIdentifier.ContainsKey(id) ? ActionsByIdentifier[id] : null;
 
-        public static ActionNode GetPermission(string url)
-            => PermissionTree.Flatten().FirstOrDefault(p => StringHelper.Equals(p.Node.Url, url))?.Node;
-
-        public static ActionNode GetPermission(Guid id)
-            => PermissionTree.Flatten().FirstOrDefault(p => p.Node.Identifier == id)?.Node;
+        public static ActionNode GetActionForPermission(Guid id)
+            => PermissionNodesByIdentifier.TryGetValue(id, out var action) ? action : null;
     }
 }

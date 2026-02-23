@@ -113,6 +113,12 @@
             </ItemTemplate>
         </asp:TemplateField>
             
+        <asp:TemplateField HeaderText="Department">
+            <ItemTemplate>
+                <%# GetTopicDepartments() %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
         <asp:TemplateField HeaderText="Employer">
             <ItemTemplate>
                 <%# Eval("IssueEmployerGroupName") %>

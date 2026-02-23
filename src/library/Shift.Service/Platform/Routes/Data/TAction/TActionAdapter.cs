@@ -7,8 +7,8 @@ public class TActionAdapter : IEntityAdapter
 {
     public void Copy(ModifyAction modify, TActionEntity entity)
     {
-        entity.NavigationParentActionIdentifier = modify.NavigationParentActionIdentifier;
-        entity.PermissionParentActionIdentifier = modify.PermissionParentActionIdentifier;
+        entity.NavigationParentActionIdentifier = modify.NavigationParentActionId;
+        entity.PermissionParentActionIdentifier = modify.PermissionParentActionId;
         entity.ActionIcon = modify.ActionIcon;
         entity.ActionList = modify.ActionList;
         entity.ActionName = modify.ActionName;
@@ -26,9 +26,9 @@ public class TActionAdapter : IEntityAdapter
     {
         var entity = new TActionEntity
         {
-            ActionIdentifier = create.ActionIdentifier,
-            NavigationParentActionIdentifier = create.NavigationParentActionIdentifier,
-            PermissionParentActionIdentifier = create.PermissionParentActionIdentifier,
+            ActionIdentifier = create.ActionId,
+            NavigationParentActionIdentifier = create.NavigationParentActionId,
+            PermissionParentActionIdentifier = create.PermissionParentActionId,
             ActionIcon = create.ActionIcon,
             ActionList = create.ActionList,
             ActionName = create.ActionName,
@@ -53,9 +53,9 @@ public class TActionAdapter : IEntityAdapter
     {
         var model = new ActionModel
         {
-            ActionIdentifier = entity.ActionIdentifier,
-            NavigationParentActionIdentifier = entity.NavigationParentActionIdentifier,
-            PermissionParentActionIdentifier = entity.PermissionParentActionIdentifier,
+            ActionId = entity.ActionIdentifier,
+            NavigationParentActionId = entity.NavigationParentActionIdentifier,
+            PermissionParentActionUrl = entity.PermissionParent?.ActionUrl,
             ActionIcon = entity.ActionIcon,
             ActionList = entity.ActionList,
             ActionName = entity.ActionName,
@@ -81,7 +81,7 @@ public class TActionAdapter : IEntityAdapter
     {
         var match = new ActionMatch
         {
-            ActionIdentifier = entity.ActionIdentifier
+            ActionId = entity.ActionIdentifier
         };
 
         return match;

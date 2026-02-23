@@ -71,6 +71,9 @@ namespace Shift.Common
         [EnumMember(Value = "authority")]
         Authority,
 
+        [EnumMember(Value = "cookie_id")]
+        CookieId,
+
         [EnumMember(Value = "org_code")]
         OrganizationCode,
 

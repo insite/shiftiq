@@ -7,22 +7,18 @@ namespace Shift.Service.Variant.CMDS;
 
 public class ComplianceSummaryReader
 {
-    private readonly IShiftIdentityService _identityService;
     private readonly CmdsDbContext _cmds;
     private readonly IDbContextFactory<TableDbContext> _core;
 
-    public ComplianceSummaryReader(IShiftIdentityService identityService, CmdsDbContext cmds, IDbContextFactory<TableDbContext> core)
+    public ComplianceSummaryReader(CmdsDbContext cmds, IDbContextFactory<TableDbContext> core)
     {
-        _identityService = identityService;
         _cmds = cmds;
         _core = core;
     }
 
-    public async Task<IEnumerable<ComplianceSummaryEntity>> ExportAsync(ComplianceSummaryCriteria criteria, CancellationToken token)
+    public async Task<IEnumerable<ComplianceSummaryEntity>> ExportAsync(ComplianceSummaryCriteria criteria, Guid organizationId, CancellationToken token)
     {
         using var db = _core.CreateDbContext();
-
-        var organizationId = _identityService.OrganizationId;
 
         var allDepartmentUsers = db.QMembership
             .Where(x => x.Group != null && x.Group.OrganizationIdentifier == organizationId && x.Group.GroupType == "Department")

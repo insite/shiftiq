@@ -596,7 +596,7 @@ namespace InSite.Common.Web.UI
                     AutoPostBack = AutoPostBack
                 };
 
-                if (CausesValidation && Page.GetValidators(ValidationGroup).Count > 0)
+                if (CausesValidation)
                 {
                     postBackOptions.PerformValidation = true;
                     postBackOptions.ValidationGroup = ValidationGroup;

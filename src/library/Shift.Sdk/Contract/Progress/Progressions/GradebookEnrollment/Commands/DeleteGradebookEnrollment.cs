@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteGradebookEnrollment
     {
-        public Guid EnrollmentIdentifier { get; set; }
+        public Guid EnrollmentId { get; set; }
     }
 }

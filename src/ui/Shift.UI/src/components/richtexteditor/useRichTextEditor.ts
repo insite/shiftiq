@@ -145,7 +145,7 @@ export function useRichTextEditor(
             return;
         }
 
-        const { FileIdentifier: fileId, FileName: fileName, DocumentName: documentName } = apiFile;
+        const { FileId: fileId, FileName: fileName, DocumentName: documentName } = apiFile;
         const isImage = file.type.toLowerCase().startsWith("image/");
         const fileUrl = urlHelper.getFileUrl(fileId, fileName);
 

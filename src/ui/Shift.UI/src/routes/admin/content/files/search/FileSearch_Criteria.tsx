@@ -31,7 +31,7 @@ export default function FileSearch_Criteria() {
                 <div className="col-4">
                     <OrganizationFinder
                         control={control}
-                        name="organizationIdentifier"
+                        name="organizationId"
                         placeholder={translate("Organization")}
                         className="mb-2"
                         disabled={isLoading}
@@ -44,8 +44,8 @@ export default function FileSearch_Criteria() {
                         disabled={isLoading}
                     />
                     <TextBox
-                        {...register("objectIdentifier")}
-                        placeholder={translate("Object Identifier")}
+                        {...register("objectId")}
+                        placeholder={translate("Object Id")}
                         className="mb-2"
                         readOnly={isLoading}
                         maxLength={36}

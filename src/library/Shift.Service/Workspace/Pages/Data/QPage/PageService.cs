@@ -16,9 +16,9 @@ public class PageService : IPageService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid page, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid page, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(page, cancellation);
+        return await _reader.AssertAsync(page, organization, cancellation);
     }
 
     public async Task<IEnumerable<PageModel>> CollectAsync(IPageCriteria criteria, CancellationToken cancellation = default)
@@ -55,7 +55,7 @@ public class PageService : IPageService
 
     public async Task<bool> ModifyAsync(ModifyPage modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.PageIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.PageId, cancellation);
 
         if (entity == null)
             return false;

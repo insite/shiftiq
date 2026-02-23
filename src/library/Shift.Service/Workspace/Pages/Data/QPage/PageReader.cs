@@ -1,10 +1,12 @@
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks.Dataflow;
 
 using Microsoft.EntityFrameworkCore;
 
 using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Contract;
+using System.Collections.Generic;
 
 namespace Shift.Service.Workspace;
 
@@ -12,23 +14,20 @@ public class PageReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "PageIdentifier";
 
-    public PageReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public PageReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid page, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid page, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.PageIdentifier == page, cancellation);
+            return query.AnyAsync(x => x.PageIdentifier == page && (organization == null || x.OrganizationIdentifier == organization), cancellation);
 
         }, cancellation);
     }
@@ -45,6 +44,32 @@ public class PageReader : IEntityReader
                 .ToListAsync(cancellation);
 
         }, cancellation);
+    }
+
+    public Task<List<PageEntity>> CollectChildrenAsync(Guid parentPageId, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(async db =>
+        {
+            var children = await db.QPage.Where(x => x.ParentPageIdentifier == parentPageId).ToListAsync();
+            var ids = children.Select(x => x.PageIdentifier).ToHashSet();
+            var index = 0;
+
+            while (index < children.Count)
+            {
+                var subChildren = await db.QPage.Where(x => x.ParentPageIdentifier == children[index].PageIdentifier).ToListAsync();
+                foreach (var subChild in subChildren)
+                {
+                    if (!ids.Contains(subChild.PageIdentifier))
+                    {
+                        children.Add(subChild);
+                        ids.Add(subChild.PageIdentifier);
+                    }
+                }
+                index++;
+            }
+
+            return children;
+        }, cancellation);        
     }
 
     public Task<int> CountAsync(IPageCriteria criteria, CancellationToken cancellation = default)
@@ -106,11 +131,7 @@ public class PageReader : IEntityReader
     /// </remarks>
     private IQueryable<PageEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
-        var query = db.QPage
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+        var query = db.QPage.AsNoTracking();
 
         return query;
     }
@@ -120,6 +141,9 @@ public class PageReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
 
         if (criteria.PageType != null)
             query = query.Where(x => x.PageType == criteria.PageType);
@@ -160,11 +184,11 @@ public class PageReader : IEntityReader
         if (criteria.PageSlug != null)
             query = query.Where(x => x.PageSlug == criteria.PageSlug);
 
-        if (criteria.SiteIdentifier != null)
-            query = query.Where(x => x.SiteIdentifier == criteria.SiteIdentifier);
+        if (criteria.SiteId != null)
+            query = query.Where(x => x.SiteIdentifier == criteria.SiteId);
 
-        if (criteria.ParentPageIdentifier != null)
-            query = query.Where(x => x.ParentPageIdentifier == criteria.ParentPageIdentifier);
+        if (criteria.ParentPageId != null)
+            query = query.Where(x => x.ParentPageIdentifier == criteria.ParentPageId);
 
         if (criteria.LastChangeTime != null)
             query = query.Where(x => x.LastChangeTime == criteria.LastChangeTime);
@@ -181,8 +205,8 @@ public class PageReader : IEntityReader
         if (criteria.ObjectType != null)
             query = query.Where(x => x.ObjectType == criteria.ObjectType);
 
-        if (criteria.ObjectIdentifier != null)
-            query = query.Where(x => x.ObjectIdentifier == criteria.ObjectIdentifier);
+        if (criteria.ObjectId != null)
+            query = query.Where(x => x.ObjectIdentifier == criteria.ObjectId);
 
         if (criteria.IsNullNavigateUrl != null)
             query = criteria.IsNullNavigateUrl ?? false
@@ -213,17 +237,14 @@ public class PageReader : IEntityReader
         var matches = await queryable
             .Select(entity => new PageMatch
             {
-                PageIdentifier = entity.PageIdentifier
+                PageId = entity.PageIdentifier,
+                PageIcon = entity.PageIcon,
+                PageTitle = entity.Title,
+                PageUrl = entity.NavigateUrl
 
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

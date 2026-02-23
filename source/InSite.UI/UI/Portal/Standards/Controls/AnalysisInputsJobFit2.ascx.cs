@@ -5,6 +5,7 @@ using InSite.Admin.Standards.Documents.Utilities;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
+using Shift.Common;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -42,7 +43,7 @@ namespace InSite.UI.Portal.Standards.Controls
                 return;
 
             ProfileSelector.Filter.StandardTypes = new[] { StandardType.Profile };
-            ProfileSelector.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure);
+            ProfileSelector.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure);
             ProfileSelector.Filter.CreatedBy = User.UserIdentifier;
             ProfileSelector.Value = null;
         }

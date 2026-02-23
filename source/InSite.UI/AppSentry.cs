@@ -75,8 +75,8 @@ namespace InSite
             if (!Settings.Enabled)
                 return;
 
-            var size = ServiceLocator.Partition.DatabaseMonitorLargeCommandSize;
-            var trace = ServiceLocator.Partition.DatabaseMonitorIncludeStackTrace;
+            var size = ServiceLocator.AppSettings.Database.MonitorCommandSize;
+            var trace = ServiceLocator.AppSettings.Database.MonitorStackTrace;
 
             var enabled = size > 0;
 

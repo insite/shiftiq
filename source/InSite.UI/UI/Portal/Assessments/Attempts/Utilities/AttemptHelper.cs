@@ -130,7 +130,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
         {
             var questions = CreateAttemptQuestions(bankForm, true, language);
             if (questions.Length == 0)
-                throw new ApplicationError(
+                throw new InvalidOperationException(
                     $"The exam form assigned to this assessment " +
                     $"(Form Asset {bankForm.Asset}: \"{(bankForm.Content.Title?.Default).IfNullOrEmpty(bankForm.Name)}\") " +
                     $"does not contain any questions that match the criteria specified for it.");
@@ -311,7 +311,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                     return new ActionRedirect(url.GetResultUrl(summary.AttemptLastPassedIdentifier.Value));
                 }
                 else
-                    throw new ApplicationError($"Unexpected URL type: {url.GetType()}");
+                    throw new InvalidOperationException($"Unexpected URL type: {url.GetType()}");
             }
 
             var isLastAttempt = !url.AttemptID.HasValue || summary.AttemptLastStartedIdentifier == url.AttemptID;

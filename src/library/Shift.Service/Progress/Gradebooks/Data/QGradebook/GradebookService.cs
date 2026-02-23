@@ -15,18 +15,16 @@ public class GradebookService : IEntityService
         _reader = reader;
     }
 
-    public async Task<bool> AssertAsync(Guid gradebook, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid gradebook, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(gradebook, cancellation);
+        return await _reader.AssertAsync(gradebook, organization, cancellation);
     }
 
-    public async Task<IEnumerable<GradebookModel>> CollectAsync(IGradebookCriteria criteria, CancellationToken cancellation = default)
+    public async Task<IEnumerable<GradebookModel>> CollectAsync(IGradebookCriteria criteria, TimeZoneInfo? timeZone, CancellationToken cancellation = default)
     {
-        var timezone = _reader.GetTimeZone();
-
         var entities = await _reader.CollectAsync(criteria, cancellation);
 
-        return _adapter.ToModel(entities, timezone);
+        return _adapter.ToModel(entities, timeZone);
     }
 
     public async Task<int> CountAsync(IGradebookCriteria criteria, CancellationToken cancellation = default)
@@ -34,23 +32,19 @@ public class GradebookService : IEntityService
         return await _reader.CountAsync(criteria, cancellation);
     }
 
-    public async IAsyncEnumerable<GradebookModel> DownloadAsync(IGradebookCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation)
+    public async IAsyncEnumerable<GradebookModel> DownloadAsync(IGradebookCriteria criteria, TimeZoneInfo? timeZone, [EnumeratorCancellation] CancellationToken cancellation)
     {
-        var timezone = _reader.GetTimeZone();
-
         await foreach (var entity in _reader.DownloadAsync(criteria, cancellation))
         {
-            yield return _adapter.ToModel(entity, timezone);
+            yield return _adapter.ToModel(entity, timeZone);
         }
     }
 
-    public async Task<GradebookModel?> RetrieveAsync(Guid gradebook, CancellationToken cancellation = default)
+    public async Task<GradebookModel?> RetrieveAsync(Guid gradebook, TimeZoneInfo? timeZone, CancellationToken cancellation = default)
     {
-        var timezone = _reader.GetTimeZone();
-
         var entity = await _reader.RetrieveAsync(gradebook, cancellation);
 
-        return entity != null ? _adapter.ToModel(entity, timezone) : null;
+        return entity != null ? _adapter.ToModel(entity, timeZone) : null;
     }
 
     public async Task<IEnumerable<GradebookMatch>> SearchAsync(IGradebookCriteria criteria, CancellationToken cancellation = default)
@@ -61,5 +55,23 @@ public class GradebookService : IEntityService
     public string Serialize<T>(IEnumerable<T> models, string format, string includes)
     {
         return _adapter.Serialize(models, format, includes);
+    }
+
+    /// <summary>
+    /// Exports the gradebooks with matching criteria to a file.
+    /// </summary>
+    public async Task ExportAsync(StartExport start, IGradebookCriteria criteria, TimeZoneInfo? timeZone, CancellationToken cancellation)
+    {
+        var gradebooks = await DownloadAsync(criteria, timeZone, cancellation).ToListAsync(cancellation);
+
+        var content = Serialize(gradebooks, start.ExportFormat, criteria.Filter.Includes);
+
+        System.IO.Directory.CreateDirectory(Path.GetDirectoryName(start.PhysicalFile)!);
+
+        await using var writer = new StreamWriter(start.PhysicalFile);
+
+        await writer.WriteAsync(content);
+
+        await writer.FlushAsync();
     }
 }

@@ -101,7 +101,7 @@ namespace InSite.Application.Events.Write
             }, x => x.Candidate);
 
             var classUrl = UrlHelper.GetAbsoluteUrl(
-                _appSettings.Security.Domain,
+                _appSettings.Partition.Domain,
                 _appSettings.Environment,
                 $"/ui/portal/events/classes/outline?event={@event.EventIdentifier}",
                 organization.OrganizationCode
@@ -153,7 +153,7 @@ namespace InSite.Application.Events.Write
             }).FirstOrDefault();
 
             var gradebookUrl = UrlHelper.GetAbsoluteUrl(
-                _appSettings.Security.Domain,
+                _appSettings.Partition.Domain,
                 _appSettings.Environment,
                 $"/ui/admin/records/gradebooks/instructors/gradebook-outline?id={gradebook?.GradebookIdentifier}",
                 organization.OrganizationCode

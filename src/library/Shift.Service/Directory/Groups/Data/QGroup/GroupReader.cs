@@ -12,23 +12,20 @@ public class GroupReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "GroupIdentifier";
 
-    public GroupReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public GroupReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid group, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid group, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.GroupIdentifier == group, cancellation);
+            return query.AnyAsync(x => x.GroupIdentifier == group && (organization == null || organization == x.OrganizationIdentifier), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,8 @@ public class GroupReader : IEntityReader
     /// </remarks>
     private IQueryable<GroupEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.QGroup
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -122,6 +116,9 @@ public class GroupReader : IEntityReader
         var query = BuildQueryable(db);
 
         // TODO: Apply criteria
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         return query;
     }
@@ -138,7 +135,7 @@ public class GroupReader : IEntityReader
         var matches = await queryable
             .Select(entity => new GroupMatch
             {
-                GroupIdentifier = entity.GroupIdentifier,
+                GroupId = entity.GroupIdentifier,
                 GroupName = entity.GroupName
             })
             .ToListAsync(cancellation);
@@ -146,13 +143,7 @@ public class GroupReader : IEntityReader
         return matches;
     }
 
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
-    }
-
-    public async Task<string[]> SearchUserRolesAsync(Guid? parentOrganizationId, Guid organizationId, Guid userId)
+    public async Task<string[]> SearchUserRolesAsync(Guid partitionId, Guid organizationId, Guid userId)
     {
         using var db = _context.CreateDbContext();
 
@@ -160,7 +151,7 @@ public class GroupReader : IEntityReader
             .Join(
                 db.QGroup
                     .Where(g =>
-                        (g.OrganizationIdentifier == organizationId || (parentOrganizationId != null && g.OrganizationIdentifier == parentOrganizationId))
+                        (g.OrganizationIdentifier == organizationId || g.OrganizationIdentifier == partitionId)
                         && g.GroupType == "Role"
                     ),
                 m => m.GroupIdentifier,

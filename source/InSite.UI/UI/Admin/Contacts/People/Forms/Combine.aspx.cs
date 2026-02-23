@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Contacts.Read;
 using InSite.Application.Credentials.Write;
 using InSite.Application.Gradebooks.Write;
@@ -24,6 +22,7 @@ using InSite.Web.Data;
 using InSite.Web.Security;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 
@@ -316,20 +315,16 @@ namespace InSite.Admin.Contacts.People.Forms
             var u2 = p2.User;
 
             var mergeItems = GetMergeItems();
-            var commands = new List<Command>();
 
-            MergeRegistrations(u1, u2, commands);
-            MergeGrades(u1, u2, commands);
-            MergeCredentials(u1, u2, commands);
-            MergeSurveyResponses(u1, u2, commands);
+            MergeRegistrations(u1, u2);
+            MergeGrades(u1, u2);
+            MergeCredentials(u1, u2);
+            MergeSurveyResponses(u1, u2);
 
             MergeFields(p1, p2, mergeItems);
             MergeGroups(u1, u2);
             MergeConnections(u1, u2);
             MergeComments(u1, u2);
-
-            foreach (var command in commands)
-                ServiceLocator.SendCommand(command);
 
             PersonStore.Delete(u2.UserIdentifier, Organization.OrganizationIdentifier);
 
@@ -446,8 +441,9 @@ namespace InSite.Admin.Contacts.People.Forms
             }
         }
 
-        private void MergeRegistrations(QUser u1, QUser u2, List<Command> commands)
+        private void MergeRegistrations(QUser u1, QUser u2)
         {
+            var commands = new List<Command>();
             var registrations1 = ServiceLocator.RegistrationSearch.GetRegistrationsByCandidate(u1.UserIdentifier);
             var registrations2 = ServiceLocator.RegistrationSearch.GetRegistrationsByCandidate(u2.UserIdentifier);
 
@@ -456,10 +452,14 @@ namespace InSite.Admin.Contacts.People.Forms
                 if (registration.Event.OrganizationIdentifier == Organization.Identifier && registrations1.Find(x => x.EventIdentifier == registration.EventIdentifier) == null)
                     commands.Add(new ChangeCandidate(registration.RegistrationIdentifier, u1.UserIdentifier));
             }
+
+            foreach (var command in commands)
+                ServiceLocator.SendCommand(command);
         }
 
-        private void MergeGrades(QUser u1, QUser u2, List<Command> commands)
+        private void MergeGrades(QUser u1, QUser u2)
         {
+            var commands = new List<Command>();
             var gradebooks1 = ServiceLocator.RecordSearch.GetGradebooks(new QGradebookFilter { OrganizationIdentifier = Organization.OrganizationIdentifier, StudentIdentifier = u1.UserIdentifier });
             var gradebooks2 = ServiceLocator.RecordSearch.GetGradebooks(new QGradebookFilter { OrganizationIdentifier = Organization.OrganizationIdentifier, StudentIdentifier = u2.UserIdentifier });
 
@@ -506,10 +506,14 @@ namespace InSite.Admin.Contacts.People.Forms
                 if (data.IsLocked)
                     commands.Add(new LockGradebook(gradebook.GradebookIdentifier));
             }
+
+            foreach (var command in commands)
+                ServiceLocator.SendCommand(command);
         }
 
-        private void MergeCredentials(QUser u1, QUser u2, List<Command> commands)
+        private void MergeCredentials(QUser u1, QUser u2)
         {
+            var commands = new List<Command>();
             var credentials1 = ServiceLocator.AchievementSearch.GetCredentials(new VCredentialFilter { OrganizationIdentifier = Organization.OrganizationIdentifier, UserIdentifier = u1.UserIdentifier });
             var credentials2 = ServiceLocator.AchievementSearch.GetCredentials(new VCredentialFilter { OrganizationIdentifier = Organization.OrganizationIdentifier, UserIdentifier = u2.UserIdentifier });
 
@@ -532,6 +536,9 @@ namespace InSite.Admin.Contacts.People.Forms
                     CreateCredential(u1, credential2, commands);
                 }
             }
+
+            foreach (var command in commands)
+                ServiceLocator.SendCommand(command);
         }
 
         private void CreateCredential(QUser u1, VCredential credential, List<Command> commands)
@@ -567,11 +574,16 @@ namespace InSite.Admin.Contacts.People.Forms
                 commands.Add(new ExpireCredential(id, credential.CredentialExpired.Value));
         }
 
-        private void MergeSurveyResponses(QUser u1, QUser u2, List<Command> commands)
+        private void MergeSurveyResponses(QUser u1, QUser u2)
         {
+            var commands = new List<Command>();
+
             var responses = ServiceLocator.SurveySearch.GetResponseSessions(u2.UserIdentifier);
             foreach (var response in responses)
                 commands.Add(new ChangeResponseUser(response.ResponseSessionIdentifier, u1.UserIdentifier));
+
+            foreach (var command in commands)
+                ServiceLocator.SendCommand(command);
         }
 
         private List<MergeItem> GetMergeItems()

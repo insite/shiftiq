@@ -37,6 +37,7 @@
         CourseIsHidden,
         IsMultipleUnitsEnabled,
         IsProgressReportEnabled,
+        IsDisplayOverviewOnly,
 
         // int
         CourseAsset,

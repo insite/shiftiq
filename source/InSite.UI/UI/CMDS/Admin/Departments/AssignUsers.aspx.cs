@@ -35,7 +35,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
             PageHelper.AutoBindHeader(this);
 
-            Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Department.Filter.OrganizationIdentifier = Organization.Identifier;
 
             LoadEmployees();
         }
@@ -48,7 +48,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
                 return;
 
             var filter = new PersonFilter();
-            filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            filter.OrganizationIdentifier = Organization.Identifier;
 
             var table = ContactRepository3.SelectSearchResultsWithDepartment(filter, Department.Value.Value, Organization.Identifier);
 

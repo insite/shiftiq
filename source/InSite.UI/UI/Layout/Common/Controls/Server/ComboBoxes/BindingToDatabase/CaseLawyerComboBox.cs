@@ -13,7 +13,10 @@ namespace InSite.Common.Web.UI
                 x => new { x.UserIdentifier, x.FullName },
                 new UserFilter
                 {
-                    MembershipGroupName = "Issue Lawyers",
+                    Memberships = new[]
+                    {
+                        new UserFilterMembership { MembershipGroupName = "Issue Lawyers" }
+                    },
                     PersonOrganizationIdentifier = CurrentSessionState.Identity.Organization.Identifier
                 },
                 "FullName");

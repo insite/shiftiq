@@ -43,7 +43,7 @@ namespace InSite.Persistence
         public void Add(CreateAssetNode group)
         {
             if (_tree.Root.Contains(group))
-                throw new Exception("Duplicate Not Allowed: " + group);
+                throw new InvalidOperationException("Duplicate Not Allowed: " + group);
 
             _tree.AddChild(group);
         }
@@ -78,7 +78,7 @@ namespace InSite.Persistence
             if (_tree.DataComparer.Equals(child, parent))
             {
                 error = string.Format("Self-Reference Not Allowed: {0} cannot be its own parent", child);
-                throw new Exception(error);
+                throw new InvalidOperationException(error);
             }
 
             // If the child is already in the tree, then the parent must also be in the tree,
@@ -91,7 +91,7 @@ namespace InSite.Persistence
                 if (!Contains(parent))
                 {
                     error = string.Format("Duplicate Not Allowed: {0} is already in the tree", child);
-                    throw new Exception(error);
+                    throw new InvalidOperationException(error);
                 }
 
                 var parentNode = _tree[parent];
@@ -107,7 +107,7 @@ namespace InSite.Persistence
                     "Multiple Parents Not Allowed: {0} is already assigned to {1}",
                     child,
                     parent);
-                throw new Exception(error);
+                throw new InvalidOperationException(error);
             }
 
             // Otherwise, add the parent if it is not already in the tree, and then add the child.

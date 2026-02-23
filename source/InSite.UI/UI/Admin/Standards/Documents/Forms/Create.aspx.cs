@@ -445,7 +445,6 @@ namespace InSite.Admin.Standards.Documents.Forms
             document.Language = "en";
             document.DocumentType = DocumentType.Value;
 
-            var isEhrcOrganization = Organization.OrganizationIdentifier == Shift.Constant.OrganizationIdentifiers.EHRC;
             var isCopDoc = document.DocumentType == Shift.Sdk.UI.DocumentType.CustomizedOccupationProfile;
 
             var content = new ContentContainer();
@@ -467,43 +466,14 @@ namespace InSite.Admin.Standards.Documents.Forms
                     content[key2] = baseContent[key2];
                     content[key3] = baseContent[key3];
 
-                    if (isEhrcOrganization)
-                    {
-                        if (content[key1].IsEmpty)
-                            content[key1].Html.Default = "<p>All rights reserved, Tourism HR Canada, 2021.</p>" +
-                                "<p>None of the contents of this document may be reproduced except when explicitly allowed in writing by the rights holder. Fair use of contents is allowed for non-commercial applications.</p>";
+                    if (content[key1].IsEmpty)
+                        content[key1].Html.Default = GetEmbededHelpContent("#" + key1);
 
-                        if (content[key2].IsEmpty)
-                            content[key2].Html.Default = "<h2>Developed for Industry by Industry</h2>" +
-                                "<p>Industry expertise and experience are the key ingredients to emerit&reg; National Occupational Standards. Extensive participation by a representative group of tourism sector professionals plays a critical role in the development and validation process. The CTHRC collaborates with those who work in and are affected by an occupation to produce realistic and comprehensive occupational standards. Job incumbents, supervisors, educators and other industry representatives from participating provinces and territories participate in a variety of activities to develop and ratify the final standards. These activities include surveys, interviews, focus group sessions and standards review and validation activities. Job incumbents are extremely valuable sources of information for defining the scope, tasks, knowledge, skills and attitudes required. By obtaining information directly from the most knowledgeable individuals, the CTHRC ensures that the standards contain accurate, relevant and practical information.</p>" +
-                                "<h2>Steps in the Development Process</h2>" +
-                                "<p>There are three steps to the standards development process:</p>" +
-                                "<ol>" +
-                                "<li>Exploring the Occupational Profile: The scope of the occupation and the types of activities and tasks performed in an occupation are determined through a variety of research methods. A qualified person, often referred to as a \"job analyst,\" develops draft standards by analyzing existing written information on the occupation and by conducting surveys, interviews and focus groups. A common activity is to bring a representative group of stakeholders together for a face-to-face meeting or series of virtual meetings to define the occupation.</li>" +
-                                "<li>Reviewing/Validating the Draft Standards: A larger group of subject matter experts is then asked to provide feedback on the draft standards. This allows the job analyst to obtain impartial feedback from beyond the original stakeholder group, thus helping to ensure that sufficient scope of the occupational domain is captured and that content is relevant.</li>" +
-                                "<li>Finding Consensus and Ratifying the Standards: When a stakeholder ratifies the document, he or she accepts the standards as valid. If, during the ratification stage, a stakeholder identifies an issue and suggests a specific change, then a formal process is undertaken to resolve the issue and finalize the content of the standards. Once pan-Canadian consensus on the scope, tasks and competencies is achieved, standards are published and made readily available to the industry.</li>" +
-                                "</ol>" +
-                                "<p>emerit&reg; National Occupational Standards are recognized in the Canadian tourism sector and internationally because they are valid, relevant, practical and-most of all-developed by industry for industry.</p>" +
-                                "<p>Do you have any feedback regarding these National Occupational Standards? If so, please email <a href='mailto:standards@cthrc.ca'>standards@cthrc.ca</a> and we will review your input for future updates.</p>";
+                    if (content[key2].IsEmpty)
+                        content[key2].Html.Default = GetEmbededHelpContent("#" + key2);
 
-                        if (content[key3].IsEmpty)
-                            content[key3].Html.Default = "<h2>Recognizing Competence</h2>" +
-                                "<p>Industry-defined credentials play an important role in increasing and recognizing professionalism and competence in tourism. emerit&reg; Professional Certification is competency-based, which means:</p>" +
-                                "<ul>" +
-                                "<li>it is based on industry-defined National Occupational Standards</li>" +
-                                "<li>it defines a level of performance that industry expects</li>" +
-                                "</ul>" +
-                                "<p>Professional certification assesses both the knowledge and performance required to be considered competent in an occupation. emerit&reg; Professional Certification benefits workers, operators and the tourism sector as a whole. Workers receive recognition for good performance, increase their opportunities for advancement and may be able to receive credit for entry into formal training programs. Operators benefit from having qualified staff whose work results in increased productivity and guest satisfaction. In addition, the industry's and the general public's image of the tourism sector is enhanced.</p>" +
-                                "<h2>Steps in the Development Process</h2>" +
-                                "<p>The certification development process has three steps:</p>" +
-                                "<ol>" +
-                                "<li>Developing the Assessment Tools: A qualified team of people, often referred to as \"assessment specialists,\" creates assessment instruments that measure the knowledge and skills at the level defined in the National Occupational Standards. Usually there are two types of assessments: one that measures application of knowledge and one that measures performance of skills and demonstration of attitudes.</li>" +
-                                "<li>Pilot Testing of Instruments: Assessment specialists collaborate with industry professionals to develop valid and reliable assessments. To ensure the assessments meet international standards of testing science, the assessments are administered to a representative group of industry professionals. The pilot participants complete each assessment as if they were certification candidates and provide feedback. The assessment specialists then analyze the results and consider the feedback to refine the assessments.</li>" +
-                                "<li>Reviewing and Finalizing the Assessment Tools: A final round of revisions is performed before assessments are final. A group of industry professionals come together, virtually or face-to-face, to discuss final revisions to the assessments. An assessment specialist guides the group in the review process. This ensures the assessments are at the right level of difficulty and measure what they are supposed to measure. The group reviews every exam question and sets the percentage required to pass the performance assessment. At this time, the industry professionals also define the amount and type of work experience required for a candidate to become certified. Once group consensus has been reached on all details, the assessment instruments are published and candidates can register to complete the assessments and become certified.</li>" +
-                                "</ol>" +
-                                "<p>As workers complete assessments to become certified, a third-party testing provider collects statistics to monitor the quality of the assessments. Revisions are made if necessary.</p>" +
-                                "<p>emerit&reg; Professional Certification is available for front-line, supervisory and management occupations. emerit&reg; certification recognizes workers as leading professionals in the industry who earn the right to display their professional designation on business cards and resumes.</p>";
-                    }
+                    if (content[key3].IsEmpty)
+                        content[key3].Html.Default = GetEmbededHelpContent("#" + key3);
                 }
                 else
                 {
@@ -517,7 +487,7 @@ namespace InSite.Admin.Standards.Documents.Forms
 
             content.Title.Text.Default = TitleInput.Text;
 
-            if (isEhrcOrganization && isCopDoc)
+            if (isCopDoc)
             {
                 var contentSettings = new ContentSettings();
                 contentSettings.Locked.Add("Copyright");

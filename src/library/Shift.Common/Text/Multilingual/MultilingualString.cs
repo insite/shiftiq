@@ -160,18 +160,21 @@ namespace Shift.Common
             this[DefaultLanguage] = text;
         }
 
-        private MultilingualString(MultilingualString source)
+        private MultilingualString(MultilingualString source, string[] languages)
             : this()
         {
             if (source == null)
                 return;
 
             foreach (var kv in source._items)
-                _items.Add(kv.Key, string.IsNullOrWhiteSpace(kv.Value) ? string.Empty : kv.Value);
+            {
+                if (languages == null || languages.Any(x => string.Equals(kv.Key, x, StringComparison.OrdinalIgnoreCase)))
+                    _items.Add(kv.Key, string.IsNullOrWhiteSpace(kv.Value) ? string.Empty : kv.Value);
+            }
         }
 
-        public MultilingualString Clone()
-            => new MultilingualString(this);
+        public MultilingualString Clone(string[] languages = null)
+            => new MultilingualString(this, languages);
 
         #endregion
 

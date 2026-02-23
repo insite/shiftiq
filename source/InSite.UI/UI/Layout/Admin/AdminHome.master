@@ -10,20 +10,6 @@
     <!-- Properly implement the light/dark mode switcher when this is prioritized.
     <!-- <script src="/ui/layout/common/parts/around/js/theme-switcher.js"></script> -->
 
-    <style runat="server" id="DarkStyle" visible="false">
-        header.admin-navbar,
-        aside.admin-sidebar,
-        .offcanvas.admin-offcanvas {
-            --in-nav-header-height: 2.875rem;
-            background-color: #2c2d3f !important;
-        }
-
-            header.admin-navbar nav.navbar-collapse > ul.navbar-nav > li.nav-item > a.nav-link {
-                --ar-text-opacity: 1;
-                color: rgba(var(--ar-light-rgb), var(--ar-text-opacity)) !important;
-            }
-    </style>
-
     <style>
         .navbar-expand-lg .mega-dropdown-column { width: 12rem; }
     </style>

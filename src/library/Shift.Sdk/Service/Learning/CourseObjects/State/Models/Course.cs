@@ -31,6 +31,7 @@ namespace InSite.Domain.CourseObjects
         [DefaultValue(true)]
         public bool AllowMultipleUnits { get; set; } = true;
         public bool IsProgressReportEnabled { get; set; }
+        public bool IsDisplayOverviewOnly { get; set; }
         public int? OutlineWidth { get; set; }
 
         public Guid? CourseMessageStalledToLearner { get; set; }

@@ -43,7 +43,7 @@ namespace InSite.Admin.Accounts.Users.Forms
         {
             base.ApplyAccessControl();
 
-            CanEdit = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Contacts, PermissionOperation.Write);
+            CanEdit = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Contacts, DataAccess.Update);
 
             SaveButton.Visible = CanEdit;
             DeleteButton.Visible = CanEdit && CanDelete;
@@ -76,7 +76,7 @@ namespace InSite.Admin.Accounts.Users.Forms
 
             ViewHistoryLink.OnClientClick = "personEditor.onViewHistoryClick(); return false;";
             DeleteButton.NavigateUrl = $"/ui/admin/accounts/users/delete?user={UserID}";
-            ImpersonateButton.NavigateUrl = $"/ui/portal/identity/impersonate?user={UserID}";
+            ImpersonateButton.NavigateUrl = Urls.StartImpersonation + $"?user={UserID}";
             CancelButton.NavigateUrl = SearchUrl;
         }
 

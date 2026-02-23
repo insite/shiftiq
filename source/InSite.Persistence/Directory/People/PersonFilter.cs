@@ -16,7 +16,6 @@ namespace InSite.Persistence
         }
 
         public Guid? OrganizationIdentifier { get; set; }
-        public Guid? OrganizationOrParentIdentifier { get; set; }
 
         public string[] OrganizationPersonTypes { get; set; }
 
@@ -68,6 +67,7 @@ namespace InSite.Persistence
             get => IncludeUserIdentifiers != null && IncludeUserIdentifiers.Length == 1 ? IncludeUserIdentifiers[0] : (Guid?)null;
             set => IncludeUserIdentifiers = value.HasValue ? new[] { value.Value } : null;
         }
+        public Guid[] AlwaysIncludeUserIdentifiers { get; set; }
 
         public Guid[] AccountStatuses { get; set; }
 

@@ -153,7 +153,7 @@ namespace Shift.Sdk.UI
                     }
 
                     if (tryCount-- <= 0)
-                        throw new ApplicationError("Unable to lock files: " + string.Join(", ", uploadKeys));
+                        throw new InvalidOperationException("Unable to lock files: " + string.Join(", ", uploadKeys));
 
                     Thread.Sleep(5);
                 }

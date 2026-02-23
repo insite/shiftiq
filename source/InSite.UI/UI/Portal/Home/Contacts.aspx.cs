@@ -74,7 +74,7 @@ namespace InSite.UI.Portal.Home
 
             var filter = new PersonFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 ParentUserIdentifier = personID,
                 ExcludeUserIdentifier = personID,
                 RelationWithParent = new[] { RelationCategory.Manager, RelationCategory.Supervisor }
@@ -100,7 +100,7 @@ namespace InSite.UI.Portal.Home
 
             var userIdentifier = (Guid)DataBinder.Eval(e.Item.DataItem, "UserIdentifier");
 
-            var href = $"{Shift.Common.Urls.CmdsHomeUrl}?id={userIdentifier}";
+            var href = $"{Shift.Common.Urls.HomeUrl}?id={userIdentifier}";
 
             anchor.HRef = href;
         }

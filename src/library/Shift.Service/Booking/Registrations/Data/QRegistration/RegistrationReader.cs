@@ -14,21 +14,18 @@ public class RegistrationReader : IEntityReader
 
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
-    public RegistrationReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public RegistrationReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid registration, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid registration, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
-            
-            return query.AnyAsync(x => x.RegistrationIdentifier == registration, cancellation);
+
+            return query.AnyAsync(x => x.RegistrationIdentifier == registration && (organization == null || organization == x.OrganizationIdentifier), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,8 @@ public class RegistrationReader : IEntityReader
     /// </remarks>
     private IQueryable<RegistrationEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.QRegistration
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -122,6 +116,9 @@ public class RegistrationReader : IEntityReader
         var query = BuildQueryable(db);
 
         // TODO: Apply criteria
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         return query;
     }
@@ -144,11 +141,5 @@ public class RegistrationReader : IEntityReader
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

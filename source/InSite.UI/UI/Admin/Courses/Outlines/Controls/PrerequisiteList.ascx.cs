@@ -229,7 +229,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
         private string GetTriggerUrl(CourseSearch.TPrerequisiteSearchResult item)
         {
             if (!Enum.TryParse<TriggerType>(item.TriggerType, true, out var triggerType))
-                throw new ApplicationError($"Unknown trigger type: ${item.TriggerType}");
+                throw new ArgumentException($"Unknown trigger type: ${item.TriggerType}");
 
             switch (triggerType)
             {

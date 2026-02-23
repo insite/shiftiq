@@ -13,7 +13,7 @@ namespace Shift.Common
                 if (reader.TokenType == JsonToken.StartObject)
                     return serializer.Deserialize<TimeZoneInfo>(reader);
 
-                throw new ApplicationError("Unexpected token type: " + reader.TokenType);
+                throw new FormatException("Unexpected token type: " + reader.TokenType);
             }
 
             var id = (string)reader.Value;
@@ -24,7 +24,7 @@ namespace Shift.Common
             var result = TimeZones.GetInfo(id);
 
             if (result == null)
-                throw new ApplicationError("Unsupported time zone: " + id ?? "(null)");
+                throw new ArgumentException("Unsupported time zone: " + id ?? "(null)");
 
             return result;
         }

@@ -12,23 +12,20 @@ public class SiteReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "SiteIdentifier";
 
-    public SiteReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public SiteReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid site, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid site, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.SiteIdentifier == site, cancellation);
+            return query.AnyAsync(x => x.SiteIdentifier == site && (organization == null || x.OrganizationIdentifier == organization), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,7 @@ public class SiteReader : IEntityReader
     /// </remarks>
     private IQueryable<SiteEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
-        var query = db.QSite
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+        var query = db.QSite.AsNoTracking();
 
         return query;
     }
@@ -120,6 +113,9 @@ public class SiteReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
 
         // TODO: Apply criteria
 
@@ -138,17 +134,11 @@ public class SiteReader : IEntityReader
         var matches = await queryable
             .Select(entity => new SiteMatch
             {
-                SiteIdentifier = entity.SiteIdentifier
+                SiteId = entity.SiteIdentifier
 
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

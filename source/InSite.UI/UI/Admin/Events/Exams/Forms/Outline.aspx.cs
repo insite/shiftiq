@@ -114,7 +114,7 @@ namespace InSite.Admin.Events.Exams.Forms
 
         private void CandidatePanel_Refreshed(object sender, EventArgs e)
         {
-            var canWrite = Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write);
+            var canWrite = Identity.IsGranted(Route.ToolkitName, DataAccess.Update);
 
             AttendeePanel.LoadData(EventIdentifier, canWrite);
             SetupExamCandidates(null, false);
@@ -168,8 +168,8 @@ namespace InSite.Admin.Events.Exams.Forms
 
         private void SetInputValues(EventState state, QEvent @event)
         {
-            var canWrite = Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write);
-            var canDelete = Identity.IsGranted(Route.ToolkitName, PermissionOperation.Delete);
+            var canWrite = Identity.IsGranted(Route.ToolkitName, DataAccess.Update);
+            var canDelete = Identity.IsGranted(Route.ToolkitName, DataAccess.Delete);
 
             var seatsReturnUrl = new ReturnUrl($"event={@event.EventIdentifier}&panel=seats");
 
@@ -199,7 +199,7 @@ namespace InSite.Admin.Events.Exams.Forms
                 return;
 
             var registrationIdentifier = !IsPostBack && Guid.TryParse(Request["registration"], out var registrationIdentifierTemp) ? registrationIdentifierTemp : (Guid?)null;
-            var canWrite = Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write);
+            var canWrite = Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update);
 
             CandidatePanel.LoadData(@event, registrationIdentifier, canWrite);
         }

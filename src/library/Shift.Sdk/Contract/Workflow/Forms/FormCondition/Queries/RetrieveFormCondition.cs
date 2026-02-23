@@ -6,7 +6,7 @@ namespace Shift.Contract
 {
     public class RetrieveFormCondition : Query<FormConditionModel>
     {
-        public Guid MaskedSurveyQuestionIdentifier { get; set; }
-        public Guid MaskingSurveyOptionItemIdentifier { get; set; }
+        public Guid MaskedSurveyQuestionId { get; set; }
+        public Guid MaskingSurveyOptionItemId { get; set; }
     }
 }

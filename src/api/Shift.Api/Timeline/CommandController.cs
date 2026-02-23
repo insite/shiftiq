@@ -3,8 +3,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
-using Shift.Common;
-
 namespace Shift.Api;
 
 [ApiController]
@@ -13,30 +11,28 @@ public class CommandController : ControllerBase
 {
     private static MemoryCache<string, string> TokenCache = new MemoryCache<string, string>();
 
-    private readonly ReleaseSettings _releaseSettings;
-    private readonly SecuritySettings _securitySettings;
-    private readonly ApiSettings _timelineServer;
+    private readonly AppSettings _appSettings;
     private readonly IPrincipalSearch _principalSearch;
+    private readonly IPrincipalProvider _principalProvider;
 
     public CommandController(
-        ReleaseSettings releaseSettings,
-        SecuritySettings securitySettings,
-        ShiftSettings apiSettings,
-        IPrincipalSearch principalSearch)
+        AppSettings appSettings,
+        IPrincipalSearch principalSearch,
+        IPrincipalProvider principalProvider)
     {
-        _releaseSettings = releaseSettings;
-        _securitySettings = securitySettings;
-        _timelineServer = apiSettings.Api.Hosting.V1;
+        _appSettings = appSettings;
         _principalSearch = principalSearch;
+        _principalProvider = principalProvider;
     }
 
-    [HttpPost("timeline/commands")]
-    [HybridAuthorize(Policies.Timeline.Commands.Send)]
+    [HttpPost("api/timeline/commands")]
+    [HybridPermission("timeline/commands")]
     public async Task<IActionResult> ProxyCommandAsync([FromQuery] string command)
     {
         // Relay the command to the v1 API (hosted by the main UI app).
 
-        var environment = _releaseSettings.GetEnvironment();
+        var principal = _principalProvider.GetPrincipal();
+        var environment = _appSettings.Release.GetEnvironment();
 
         if (environment.Name != Common.EnvironmentName.Local
             && environment.Name != Common.EnvironmentName.Development)
@@ -49,7 +45,7 @@ public class CommandController : ControllerBase
 
         try
         {
-            var client = new Toolbox.TimelineClient(_timelineServer, _securitySettings);
+            var client = new Toolbox.TimelineClient(_appSettings.v1ApiBaseUrl, _appSettings.Security);
 
             var commandData = await new StreamReader(Request.Body).ReadToEndAsync();
 
@@ -73,7 +69,7 @@ public class CommandController : ControllerBase
 
                 else
                 {
-                    var tokenResult = await client.GetTokenAsync(secret);
+                    var tokenResult = await client.GetTokenAsync(secret, _principalProvider.GetPrincipal().OrganizationId, null);
 
                     if (tokenResult.Data == null)
                         return Problem();

@@ -34,6 +34,8 @@ namespace InSite.Application.Records.Read
             publisher.Subscribe<GradebookEventChanged>(Handle);
             publisher.Subscribe<GradebookEventAdded>(Handle);
             publisher.Subscribe<GradebookEventRemoved>(Handle);
+            publisher.Subscribe<GradebookGroupEnrollmentAdded>(Handle);
+            publisher.Subscribe<GradebookGroupEnrollmentRemoved>(Handle);
             publisher.Subscribe<GradebookPeriodChanged>(Handle);
             publisher.Subscribe<GradebookTypeChanged>(Handle);
             publisher.Subscribe<GradebookWarningAdded>(Handle);
@@ -111,6 +113,12 @@ namespace InSite.Application.Records.Read
             => _store.UpdateRecord(c);
 
         public void Handle(GradebookEventRemoved c)
+            => _store.UpdateRecord(c);
+
+        public void Handle(GradebookGroupEnrollmentAdded c)
+            => _store.UpdateRecord(c);
+
+        public void Handle(GradebookGroupEnrollmentRemoved c)
             => _store.UpdateRecord(c);
 
         public void Handle(GradebookPeriodChanged c)

@@ -3,11 +3,12 @@
 namespace InSite.Domain.Foundations
 {
     [Serializable]
-    public class ActionNode 
+    public class ActionNode
     {
         public Guid Identifier { get; set; }
         public Guid? Parent { get; set; }
-        public Guid? Permission { get; set; }
+
+        public string Permission { get; set; }
 
         public string Desktop { get; set; }
         public string Icon { get; set; }

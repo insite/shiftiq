@@ -127,7 +127,7 @@ namespace InSite.Admin.Workflow.Forms.Controls
             internal void SetCollection(OptionInfoCollection collection)
             {
                 if (_collection != null)
-                    throw new ApplicationError("Options collection is already assigned.");
+                    throw new InvalidOperationException("Options collection is already assigned.");
 
                 _collection = collection;
             }
@@ -419,7 +419,7 @@ namespace InSite.Admin.Workflow.Forms.Controls
                 filter.StartedBefore = responseFilter.StartedBefore;
                 filter.CompletedSince = responseFilter.CompletedSince;
                 filter.CompletedBefore = responseFilter.CompletedBefore;
-                filter.IsPlatformAdministrator = responseFilter.IsPlatformAdministrator;
+                filter.IsOperator = responseFilter.IsOperator;
                 filter.IsLocked = responseFilter.IsLocked;
                 filter.GroupIdentifier = responseFilter.GroupIdentifier;
             }

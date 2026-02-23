@@ -66,6 +66,46 @@
         </div>
     </insite:NavItem>
 
+    <insite:NavItem runat="server" ID="SecurityTab" Title="Security">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <h3 class="mb-0">Access Granted to Actions</h3>
+                <div class="mb-2 form-text">
+                    This is a JSON representation of the group permissions assigned to UI actions.
+                </div>
+                <div class="form-group mb-3">
+                    <insite:TextBox runat="server" ID="AccessGrantedToActions" TextMode="MultiLine" Width="100%" CssClass="json-editor" />
+                </div>
+
+                <h3 class="mb-0 text-success">Access Granted</h3>
+                <div class="mb-2 form-text">
+                    Additional permissions granted to users in this organization.
+                </div>
+                <div class="form-group mb-3">
+                    <insite:TextBox runat="server" ID="AccessGranted" TextMode="MultiLine" Width="100%" CssClass="json-editor" />
+                </div>
+
+                <h3 class="mb-0 text-danger">Access Denied</h3>
+                <div class="mb-2 form-text">
+                    Permissions explicitly denied to users in this organization.
+                </div>
+                <div class="form-group mb-3">
+                    <insite:TextBox runat="server" ID="AccessDenied" TextMode="MultiLine" Width="100%" CssClass="json-editor" />
+                </div>
+
+                <h3 class="mb-0 text-primary">Download</h3>
+                <div class="mb-2 form-text">
+                    Download the permission matrix for this organization.
+                </div>
+                <div class="form-group mb-3">
+                    <insite:DownloadButton runat="server" ID="DownloadPermissionMatrix" />
+                </div>
+
+            </div>
+        </div>
+    </insite:NavItem>
+
 </insite:Nav>
 
 <insite:PageHeadContent runat="server">

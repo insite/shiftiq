@@ -19,13 +19,16 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
             if (IsPostBack)
                 return;
 
-            LearnerGenders.LoadItems(VLearnerActivitySearch.GetComboBoxItems(Organization.Identifier, "LearnerGender"));
-            LearnerCitizenships.LoadItems(VLearnerActivitySearch.GetComboBoxItems(Organization.Identifier, "LearnerCitizenship"));
-            GradebookNames.LoadItems(VLearnerActivitySearch.GetComboBoxItems(Organization.Identifier, "GradebookName"));
+            LearnerGenders.LoadItems(VLearnerActivitySearch.GetUserGenders(Organization.Identifier));
+            LearnerCitizenships.LoadItems(VLearnerActivitySearch.GetUserCitizenships(Organization.Identifier));
+            GradebookIdentifiers.LoadItems(VLearnerActivitySearch.GetGradebooks(Organization.Identifier));
+            ProgramIdentifiers.LoadItems(VLearnerActivitySearch.GetPrograms(Organization.Identifier));
 
             MembershipStatusItemIdentifiers.Settings.CollectionName = CollectionName.Contacts_People_Membership_Status;
             MembershipStatusItemIdentifiers.Settings.OrganizationIdentifier = Organization.Key;
             MembershipStatusItemIdentifiers.RefreshData();
+
+            PersonCode.EmptyMessage = GetEmptyMessage("Person Code");
         }
 
         public override VLearnerActivityFilter Filter
@@ -36,29 +39,25 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
                 {
                     OrganizationIdentifier = Organization.OrganizationIdentifier,
 
-                    CertificateStatus = AchievementStatus.Value,
-                    AchievementGrantedSince = AchievementGrantedSince.Value,
-                    AchievementGrantedBefore = AchievementGrantedBefore.Value,
+                    CredentialGrantedSince = AchievementGrantedSince.Value,
+                    CredentialGrantedBefore = AchievementGrantedBefore.Value,
 
-                    EnrollmentStatus = EnrollmentStatus.Value,
-                    EnrollmentStartedSince = EnrollmentStartedSince.Value,
-                    EnrollmentStartedBefore = EnrollmentStartedBefore.Value,
-                    LearnerEmail = LearnerEmail.Text,
-                    LearnerNameFirst = LearnerNameFirst.Text,
-                    LearnerNameLast = LearnerNameLast.Text,
-                    LearnerRole = LearnerRole.Value,
+                    EnrollmentCreatedSince = EnrollmentStartedSince.Value,
+                    EnrollmentCreatedBefore = EnrollmentStartedBefore.Value,
+                    UserEmail = LearnerEmail.Text,
+                    UserFirstName = LearnerNameFirst.Text,
+                    UserLastName = LearnerNameLast.Text,
+                    IsAdministrator = LearnerRole.Value == "Administrator" ? true : (bool?)null,
+                    IsLearner = LearnerRole.Value == "Learner" ? true : (bool?)null,
                     PersonCode = PersonCode.Text,
-                    CountStrategy = CountStrategy.SelectedValue,
 
-                    LearnerGenders = LearnerGenders.Values.NullIfEmpty()?.ToArray(),
-                    LearnerCitizenships = LearnerCitizenships.Values.NullIfEmpty()?.ToArray(),
-                    GradebookNames = GradebookNames.Values.NullIfEmpty()?.ToArray(),
+                    UserGenders = LearnerGenders.Values.NullIfEmpty()?.ToArray(),
+                    UserCitizenships = LearnerCitizenships.Values.NullIfEmpty()?.ToArray(),
+                    GradebookIdentifiers = GradebookIdentifiers.ValuesAsGuidArray,
 
                     MembershipStatusItemIdentifiers = MembershipStatusItemIdentifiers.ValuesAsGuidArray,
                     EmployerGroupIdentifiers = EmployerGroupIdentifiers.Values,
-                    ProgramIdentifiers = ProgramIdentifiers.Values,
-
-                    EngagementStatus = EngagementStatus.Value.ToEnum(EngagementStatusType.None),
+                    ProgramIdentifiers = ProgramIdentifiers.ValuesAsGuidArray,
                 };
 
                 GetCheckedShowColumns(filter);
@@ -67,47 +66,33 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
             }
             set
             {
-                AchievementStatus.Value = value.CertificateStatus;
-                AchievementGrantedSince.Value = value.AchievementGrantedSince;
-                AchievementGrantedBefore.Value = value.AchievementGrantedBefore;
+                AchievementGrantedSince.Value = value.CredentialGrantedSince;
+                AchievementGrantedBefore.Value = value.CredentialGrantedBefore;
 
-                EnrollmentStatus.Value = value.EnrollmentStatus;
-                EnrollmentStartedSince.Value = value.EnrollmentStartedSince;
-                EnrollmentStartedBefore.Value = value.EnrollmentStartedBefore;
-                LearnerEmail.Text = value.LearnerEmail;
-                LearnerNameFirst.Text = value.LearnerNameFirst;
-                LearnerNameLast.Text = value.LearnerNameLast;
-                LearnerRole.Value = value.LearnerRole;
+                EnrollmentStartedSince.Value = value.EnrollmentCreatedSince;
+                EnrollmentStartedBefore.Value = value.EnrollmentCreatedBefore;
+                LearnerEmail.Text = value.UserEmail;
+                LearnerNameFirst.Text = value.UserFirstName;
+                LearnerNameLast.Text = value.UserLastName;
+                LearnerRole.Value = value.IsAdministrator == true ? "Administrator" : value.IsLearner == true ? "Learner" : null;
                 PersonCode.Text = value.PersonCode;
-                CountStrategy.SelectedValue = value.CountStrategy;
 
-                LearnerGenders.Values = value.LearnerGenders;
-                LearnerCitizenships.Values = value.LearnerCitizenships;
+                LearnerGenders.Values = value.UserGenders;
+                LearnerCitizenships.Values = value.UserCitizenships;
                 MembershipStatusItemIdentifiers.ValuesAsGuid = value.MembershipStatusItemIdentifiers;
                 EmployerGroupIdentifiers.Values = value.EmployerGroupIdentifiers;
-                ProgramIdentifiers.Values = value.ProgramIdentifiers;
-                GradebookNames.Values = value.GradebookNames;
-
-                EngagementStatus.Value = value.EngagementStatus.GetName(EngagementStatusType.None);
+                ProgramIdentifiers.ValuesAsGuid = value.ProgramIdentifiers;
+                GradebookIdentifiers.ValuesAsGuid = value.GradebookIdentifiers;
             }
-        }
-
-        protected override void OnInit(EventArgs e)
-        {
-            base.OnInit(e);
-
-            PersonCode.EmptyMessage = GetEmptyMessage("Person Code");
         }
 
         public override void Clear()
         {
-            AchievementStatus.Value = null;
             AchievementGrantedSince.Value = null;
             AchievementGrantedBefore.Value = null;
 
             EnrollmentStartedSince.Value = null;
             EnrollmentStartedBefore.Value = null;
-            EnrollmentStatus.Value = null;
             LearnerEmail.Text = null;
             LearnerNameFirst.Text = null;
             LearnerNameLast.Text = null;
@@ -120,11 +105,7 @@ namespace InSite.Admin.Records.Reports.LearnerActivity.Controls
             MembershipStatusItemIdentifiers.ClearSelection();
             EmployerGroupIdentifiers.Values = null;
             ProgramIdentifiers.Values = null;
-            GradebookNames.ClearSelection();
-
-            CountStrategy.SelectedValue = "Summary";
-
-            EngagementStatus.Value = null;
+            GradebookIdentifiers.Values = null;
         }
 
         protected static string GetEmptyMessage(string text) => LabelHelper.GetLabelContentText(text);

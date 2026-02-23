@@ -17,9 +17,9 @@ public class UserService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid user, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid user, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(user, cancellation);
+        return await _reader.AssertAsync(user, organization, cancellation);
     }
 
     public async Task<IEnumerable<UserModel>> CollectAsync(IUserCriteria criteria, CancellationToken cancellation = default)
@@ -54,9 +54,9 @@ public class UserService : IEntityService
         }
     }
 
-    public async Task<bool> ModifyAsync(ModifyUser modify, CancellationToken cancellation = default)
+    public async Task<bool> ModifyAsync(ModifyUser modify, Guid organization, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.UserIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.UserId, organization, cancellation);
 
         if (entity == null)
             return false;
@@ -66,9 +66,9 @@ public class UserService : IEntityService
         return await _writer.ModifyAsync(entity, cancellation);
     }
 
-    public async Task<UserModel?> RetrieveAsync(Guid user, CancellationToken cancellation = default)
+    public async Task<UserModel?> RetrieveAsync(Guid user, Guid? organization = null, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(user, cancellation);
+        var entity = await _reader.RetrieveAsync(user, organization, cancellation);
 
         return entity != null ? _adapter.ToModel(entity) : null;
     }

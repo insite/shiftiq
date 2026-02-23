@@ -5,6 +5,7 @@ using InSite.Admin.Standards.Documents.Utilities;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
+using Shift.Common;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -48,12 +49,12 @@ namespace InSite.UI.Portal.Standards.Controls
                 return;
 
             Benchmark.Filter.StandardTypes = new[] { StandardType.Document };
-            Benchmark.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure);
+            Benchmark.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure);
             Benchmark.Filter.CreatedBy = User.UserIdentifier;
             OnTypeSelected(null, Benchmark, Comparison);
 
             Comparison.Filter.StandardTypes = new[] { StandardType.Document };
-            Comparison.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure);
+            Comparison.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure);
             Comparison.Filter.CreatedBy = User.UserIdentifier;
             OnTypeSelected(null, Comparison, Benchmark);
 

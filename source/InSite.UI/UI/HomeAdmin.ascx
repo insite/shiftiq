@@ -7,6 +7,7 @@
 
 <insite:UserLicenseCheck runat="server" />
 <insite:UserPasswordCheck runat="server" />
+<insite:UserEmailVerificationCheck runat="server" />
 <uc:AnnouncementToast runat="server" ID="AnnouncementToast" />
 <uc:MaintenanceToast runat="server" ID="MaintenanceToast" />
 <insite:Toast runat="server" ID="WarningToast" Icon="fas fa-brake-warning" Indicator="Warning" />

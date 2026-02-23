@@ -100,6 +100,7 @@ namespace InSite.Admin.Events.Timers.Controls
                 BindNotificationCombo(EventNotificationCombo, "Event");
                 EventNotificationCombo.Items.Add(new ComboBoxOption(Properties.ValidateAndPublishOption, Properties.ValidateAndPublishOption));
                 EventNotificationCombo.Items.Add(new ComboBoxOption("ITA001: Training Provider Notice - Class Event", NotificationType.ITA001.ToString()));
+                EventNotificationCombo.Items.Add(new ComboBoxOption("ITA003: Invigilator Notice - Online Only - Class Event", NotificationType.ITA003.ToString()));
                 EventNotificationCombo.Items.Add(new ComboBoxOption("ITA013: Administrator Notice - Exam Results Failed Validation", NotificationType.ITA013.ToString()));
                 EventNotificationCombo.Items.Add(new ComboBoxOption("ITA016: Exam Event Results", NotificationType.ITA016.ToString()));
                 EventNotificationCombo.Items.Add(new ComboBoxOption("ITA026: No Return Shipment Received", NotificationType.ITA026.ToString()));

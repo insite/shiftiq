@@ -4,9 +4,9 @@ namespace Shift.Contract
 {
     public class CreateUserSession
     {
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid SessionIdentifier { get; set; }
-        public Guid UserIdentifier { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid SessionId { get; set; }
+        public Guid UserId { get; set; }
 
         public bool SessionIsAuthenticated { get; set; }
 

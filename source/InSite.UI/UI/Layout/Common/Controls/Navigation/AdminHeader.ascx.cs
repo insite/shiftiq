@@ -36,8 +36,6 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
 
             var theme = environment.Color;
 
-            var icon = environment.Icon;
-
             var badge = "<a href='/ui/portal/platform/environments'>" +
                 $"<span class=\"badge bg-{theme} fs-sm\">{name}</span>" +
                 "</a>";
@@ -58,7 +56,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
             }
         }
 
-        public void BindTitle(string qualifier = null)
+        public void BindTitle(string qualifier = null, string spacer = " - ")
         {
             if (Page is Admin.AdminBasePage p)
             {
@@ -68,20 +66,20 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
 
                 if (qualifier != null)
                 {
-                    PageTitle = $"{p.ActionModel.ActionName} - {RemoveHtmlElements(qualifier)}";
+                    PageTitle = $"{p.ActionModel.ActionName}{spacer}{RemoveHtmlElements(qualifier)}";
 
                     var indicator = p.ActionModel.ActionUrl.EndsWith("/delete") || p.ActionModel.ActionUrl.Contains("/delete-")
                         ? "danger"
                         : "info";
 
-                    ActionTitle.InnerHtml += $" - <span class='text-{indicator}'>{qualifier}</span>";
+                    ActionTitle.InnerHtml += $"{spacer}<span class='text-{indicator}'>{qualifier}</span>";
                 }
 
                 ActionSubtitle.InnerText = string.Empty;
             }
             else if (Page is Portal.PortalBasePage q)
             {
-                PageTitle = (qualifier ?? q.ActionModel.ActionName) + " - " + ServiceLocator.Partition.GetPlatformName();
+                PageTitle = (qualifier ?? q.ActionModel.ActionName) + spacer + ServiceLocator.Partition.Name;
 
                 ActionTitle.InnerHtml = qualifier ?? q.ActionModel.ActionName;
 
@@ -127,7 +125,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
             {
                 if (breadcrumbs != null && breadcrumbs.Length > 1)
                 {
-                    HomeLink.HRef = Urls.CmdsHomeUrl;
+                    HomeLink.HRef = Urls.HomeUrl;
                     HomeLink.InnerText = "Home";
                     HomeItem.Visible = true;
                 }
@@ -163,7 +161,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
                     continue;
 
                 var actionUrl = create.Href.Substring(1);
-                if (Identity.IsActionAuthorized(actionUrl))
+                if (Identity.IsGranted(actionUrl))
                     anchors.Add(create);
             }
 
@@ -178,6 +176,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
         public void BindSubtitle(string subtitle)
         {
             ActionSubtitle.InnerHtml = subtitle;
+
             ActionSubtitle.Visible = !string.IsNullOrEmpty(ActionSubtitle.InnerText);
         }
 
@@ -189,11 +188,31 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
         public void OverrideTitle(string title)
         {
             ActionTitle.InnerHtml = title;
+
+            OverrideLastBreadcrumb(title);
+        }
+
+        private void OverrideLastBreadcrumb(string title)
+        {
+            var breadcrumbs = (BreadcrumbItem[])BreadcrumbRepeater.DataSource;
+
+            var breadcrumbCount = breadcrumbs.Length;
+
+            if (breadcrumbCount > 0)
+            {
+                var lastBreadcrumb = breadcrumbs[breadcrumbCount - 1];
+
+                if (lastBreadcrumb != null)
+                {
+                    lastBreadcrumb.Text = title;
+                }
+            }
         }
 
         public void HideTitle()
         {
             ActionTitlePanel.Visible = false;
+
             HiddenTitleLiteral.Visible = true;
         }
     }

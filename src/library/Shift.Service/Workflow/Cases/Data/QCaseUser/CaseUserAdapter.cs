@@ -7,10 +7,10 @@ public class CaseUserAdapter : IEntityAdapter
 {
     public void Copy(ModifyCaseUser modify, CaseUserEntity entity)
     {
-        entity.CaseIdentifier = modify.CaseIdentifier;
-        entity.UserIdentifier = modify.UserIdentifier;
+        entity.CaseIdentifier = modify.CaseId;
+        entity.UserIdentifier = modify.UserId;
         entity.CaseRole = modify.CaseRole;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
 
     }
 
@@ -25,11 +25,11 @@ public class CaseUserAdapter : IEntityAdapter
     {
         var entity = new CaseUserEntity
         {
-            CaseIdentifier = create.CaseIdentifier,
-            UserIdentifier = create.UserIdentifier,
+            CaseIdentifier = create.CaseId,
+            UserIdentifier = create.UserId,
             CaseRole = create.CaseRole,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            JoinIdentifier = create.JoinIdentifier
+            OrganizationIdentifier = create.OrganizationId,
+            JoinIdentifier = create.JoinId
         };
         return entity;
     }
@@ -43,11 +43,11 @@ public class CaseUserAdapter : IEntityAdapter
     {
         var model = new CaseUserModel
         {
-            CaseIdentifier = entity.CaseIdentifier,
-            UserIdentifier = entity.UserIdentifier,
+            CaseId = entity.CaseIdentifier,
+            UserId = entity.UserIdentifier,
             CaseRole = entity.CaseRole,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            JoinIdentifier = entity.JoinIdentifier
+            OrganizationId = entity.OrganizationIdentifier,
+            JoinId = entity.JoinIdentifier
         };
 
         return model;
@@ -62,7 +62,7 @@ public class CaseUserAdapter : IEntityAdapter
     {
         var match = new CaseUserMatch
         {
-            JoinIdentifier = entity.JoinIdentifier
+            JoinId = entity.JoinIdentifier
 
         };
 

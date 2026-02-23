@@ -74,12 +74,12 @@ namespace InSite.Admin.Assessments.Sets.Utilities
 
 
                 if (string.IsNullOrEmpty(q.Sequence))
-                    throw new ApplicationError($"Missing question sequence on row {i}");
+                    throw new FormatException($"Missing question sequence on row {i}");
 
                 q.Code += " " + q.Sequence.PadLeft(3, '0');
 
                 if (string.IsNullOrEmpty(q.Text))
-                    throw new ApplicationError($"Missing question stem on row {i}: {q.Code} {q.Sequence}");
+                    throw new FormatException($"Missing question stem on row {i}: {q.Code} {q.Sequence}");
 
                 var answer = row.GetString("ANSWER");
 

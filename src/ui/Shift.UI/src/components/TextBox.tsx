@@ -12,9 +12,12 @@ interface Props {
     placeholder?: string;
     disabled?: boolean;
     readOnly?: boolean;
+    value?: string;
+    defaultValue?: string;
     error?: FieldError;
     onBlur?: (e: FocusEvent<HTMLInputElement>) => void;
     onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+    onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 }
 
 export default function TextBox({
@@ -27,9 +30,12 @@ export default function TextBox({
     placeholder,
     disabled,
     readOnly,
+    value,
+    defaultValue,
     error,
     onBlur,
-    onChange
+    onChange,
+    onKeyDown
 }: Props) {
     const errorTooltip = errorHelper.getErrorTooltip(error);
 
@@ -41,12 +47,15 @@ export default function TextBox({
             className={`form-control insite-text ${error ? "is-invalid" : ""} ${className ?? ""}`}
             maxLength={maxLength}
             placeholder={placeholder}
+            value={value}
+            defaultValue={defaultValue}
             disabled={disabled}
             readOnly={readOnly}
             type={type}
             title={errorTooltip ?? undefined}
             onBlur={onBlur}
             onChange={onChange}
+            onKeyDown={onKeyDown}
         />
     );
 };

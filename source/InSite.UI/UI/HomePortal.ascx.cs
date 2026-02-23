@@ -26,7 +26,7 @@ namespace InSite.UI
             {
                 var organization = CurrentSessionState.Identity.Organization;
 
-                var portalName = $"{organization.Code}.{ServiceLocator.AppSettings.Security.Domain}";
+                var portalName = $"{organization.Code}.{ServiceLocator.AppSettings.Partition.Domain}";
 
                 return ServiceLocator.SiteSearch.BindFirst(x => x, x => x.SiteDomain == portalName);
             }
@@ -50,7 +50,7 @@ namespace InSite.UI
             var site = CurrentSite;
             Page.Title = site?.SiteTitle ?? "Shift iQ";
 
-            var helper = new LaunchCardAdapter();
+            var helper = new LaunchCardAdapter(ServiceLocator.Partition);
 
             var portals = helper.GetPortals(site?.SiteIdentifier, Identity);
 
@@ -132,7 +132,7 @@ namespace InSite.UI
                 return;
             }
 
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var organization = CurrentSessionState.Identity.Organization;
             var host = $"{organization.Code}.{domain}";
             var site = ServiceLocator.SiteSearch.BindFirst(x => x.SiteIdentifier,

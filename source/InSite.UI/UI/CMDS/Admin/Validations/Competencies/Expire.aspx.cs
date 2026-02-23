@@ -56,7 +56,7 @@ namespace InSite.Cmds.Actions.BulkTool.Expiry
             {
                 PageHelper.AutoBindHeader(this);
 
-                Person.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                Person.Filter.OrganizationIdentifier = Organization.Identifier;
 
                 Person.Filter.ParentUserIdentifier = FinderSecurityInfo.CanSeeAllCompanyPeople || Identity.HasAccessToAllCompanies
                     ? (Guid?)null
@@ -69,7 +69,7 @@ namespace InSite.Cmds.Actions.BulkTool.Expiry
 
                 Person.Filter.RoleType = new[] { MembershipType.Organization, MembershipType.Department };
 
-                Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                Department.Filter.OrganizationIdentifier = Organization.Identifier;
                 Department.Filter.UserIdentifier = FinderSecurityInfo.CanSeeAllDepartments || Identity.HasAccessToAllCompanies
                     ? (Guid?)null
                     : User.UserIdentifier;

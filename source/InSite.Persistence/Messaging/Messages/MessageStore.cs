@@ -4,14 +4,13 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Messages.Read;
 using InSite.Domain.Messages;
 
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Persistence
 {
@@ -478,16 +477,15 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
         {
             using (var db = new InternalDbContext())
             {
-                var persons = db.Persons
-                    .Where(x => x.OrganizationIdentifier == email.OrganizationIdentifier || x.Organization.ParentOrganizationIdentifier == email.OrganizationIdentifier)
+                var personQuery = db.Persons.AsQueryable();
+
+                if (email.OrganizationIdentifier != ServiceLocator.Partition.Identifier)
+                    personQuery = personQuery.Where(x => x.OrganizationIdentifier == email.OrganizationIdentifier);
+
+                var users = personQuery
                     .Select(x => new { x.UserIdentifier, x.User.Email })
-                    .ToList();
-
-                var users = new Dictionary<Guid, string>();
-
-                foreach (var person in persons)
-                    if (!users.ContainsKey(person.UserIdentifier))
-                        users.Add(person.UserIdentifier, person.Email);
+                    .Distinct()
+                    .ToDictionary(x => x.UserIdentifier, x => x.Email);
 
                 SnipStrings(email);
 

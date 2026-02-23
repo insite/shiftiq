@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common;
 using Shift.Service.Workspace;
 
 namespace Shift.Api;
@@ -9,10 +10,12 @@ namespace Shift.Api;
 public class PageController : ShiftControllerBase
 {
     private readonly PageService _pageService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public PageController(PageService pageService)
+    public PageController(PageService pageService, IPrincipalProvider principalProvider)
     {
         _pageService = pageService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +23,17 @@ public class PageController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific page
     /// </summary>
-    [HttpHead("workspace/pages/{page:guid}")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Assert)]
+    [HttpHead("api/workspace/pages/{page:guid}")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertPage")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid page, CancellationToken cancellation = default)
     {
-        var exists = await _pageService.AssertAsync(page, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _pageService.AssertAsync(page, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +41,8 @@ public class PageController : ShiftControllerBase
     /// <summary>
     /// Collects the list of pages that match specific criteria
     /// </summary>
-    [HttpPost("workspace/pages/collect")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Collect)]
+    [HttpPost("api/workspace/pages/collect")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PageModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectPages")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectPages query, CancellationToken cancellation = default)
@@ -43,8 +50,8 @@ public class PageController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("workspace/pages")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Collect)]
+    [HttpGet("api/workspace/pages")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PageModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectPages_get")]
     [AliasFor("collectPages")]
@@ -56,6 +63,10 @@ public class PageController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectPages query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _pageService.CollectAsync(query, cancellation);
 
         var count = await _pageService.CountAsync(query, cancellation);
@@ -68,8 +79,8 @@ public class PageController : ShiftControllerBase
     /// <summary>
     /// Counts the pages that match specific criteria
     /// </summary>
-    [HttpPost("workspace/pages/count")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Count)]
+    [HttpPost("api/workspace/pages/count")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countPages")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountPages query, CancellationToken cancellation = default)
@@ -77,8 +88,8 @@ public class PageController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("workspace/pages/count")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Count)]
+    [HttpGet("api/workspace/pages/count")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countPages_get")]
     [AliasFor("countPages")]
@@ -90,6 +101,10 @@ public class PageController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountPages query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _pageService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +113,8 @@ public class PageController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of pages that match specific criteria
     /// </summary>    
-    [HttpPost("workspace/pages/download")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Download)]
+    [HttpPost("api/workspace/pages/download")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadPages")]
@@ -108,8 +123,8 @@ public class PageController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("workspace/pages/download")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Download)]
+    [HttpGet("api/workspace/pages/download")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadPages_get")]
@@ -122,6 +137,10 @@ public class PageController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectPages query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Workspace", "Pages", query.Filter.Format, User);
 
         var models = await _pageService
@@ -142,22 +161,30 @@ public class PageController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific page
     /// </summary>
-    [HttpGet("workspace/pages/{page:guid}")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Retrieve)]
+    [HttpGet("api/workspace/pages/{page:guid}")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType<PageModel>(StatusCodes.Status200OK)]
     [EndpointName("retrievePage")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid page, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _pageService.RetrieveAsync(page, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of pages that match specific criteria
     /// </summary>
-    [HttpPost("workspace/pages/search")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Search)]
+    [HttpPost("api/workspace/pages/search")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PageMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchPages")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchPages query, CancellationToken cancellation = default)
@@ -165,8 +192,8 @@ public class PageController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("workspace/pages/search")]
-    [HybridAuthorize(Policies.Workspace.Pages.Page.Search)]
+    [HttpGet("api/workspace/pages/search")]
+    [HybridPermission("workspace/pages", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<PageMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchPages_get")]
     [AliasFor("searchPages")]
@@ -178,6 +205,10 @@ public class PageController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchPages query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _pageService.SearchAsync(query, cancellation);
 
         var count = await _pageService.CountAsync(query, cancellation);

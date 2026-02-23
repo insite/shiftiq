@@ -4,8 +4,8 @@ namespace Shift.Contract
 {
     public class CreateGroupConnection
     {
-        public Guid ChildGroupIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid ParentGroupIdentifier { get; set; }
+        public Guid ChildGroupId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid ParentGroupId { get; set; }
     }
 }

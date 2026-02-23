@@ -29,8 +29,8 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
                 }
                 else
                 {
-                    filter.UserIdentifier = Identity.IsGranted(PermissionName, PermissionOperation.Delete)
-                        || Identity.IsGranted(PermissionName, PermissionOperation.Configure)
+                    filter.UserIdentifier = Identity.IsGranted(PermissionName, DataAccess.Delete)
+                        || Identity.IsGranted(PermissionName, DataAccess.Configure)
                             ? Employee.Value
                             : User.UserIdentifier;
 
@@ -58,7 +58,7 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
             {
                 var filter = value;
 
-                OrganizationIdentifier.Value = filter.OrganizationIdentifier != Guid.Empty ? filter.OrganizationIdentifier : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                OrganizationIdentifier.Value = filter.OrganizationIdentifier != Guid.Empty ? filter.OrganizationIdentifier : Organization.Identifier;
 
                 InitSelectors();
 
@@ -70,10 +70,10 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
                 if (SearchMode.Value == "Group")
                     GroupManagerID.Value = filter.ManagerUserIdentifier ?? User.UserIdentifier;
 
-                if (Identity.IsGranted(PermissionName, PermissionOperation.Delete)
-                    || Identity.IsGranted(PermissionName, PermissionOperation.Configure)
-                    || Identity.IsGranted(PermissionName, PermissionOperation.Delete)
-                    || Identity.IsGranted(PermissionName, PermissionOperation.Configure)
+                if (Identity.IsGranted(PermissionName, DataAccess.Delete)
+                    || Identity.IsGranted(PermissionName, DataAccess.Configure)
+                    || Identity.IsGranted(PermissionName, DataAccess.Delete)
+                    || Identity.IsGranted(PermissionName, DataAccess.Configure)
                 )
                     Employee.Value = filter.UserIdentifier;
                 else
@@ -106,8 +106,8 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
             {
                 if (ViewState[nameof(CanSeeGroupCompetencies)] == null)
                 {
-                    if (Identity.IsGranted(PermissionName, PermissionOperation.Delete)
-                        || Identity.IsGranted(PermissionName, PermissionOperation.Configure)
+                    if (Identity.IsGranted(PermissionName, DataAccess.Delete)
+                        || Identity.IsGranted(PermissionName, DataAccess.Configure)
                     )
                     {
                         ViewState[nameof(CanSeeGroupCompetencies)] = true;
@@ -187,7 +187,7 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
             var canSee = webUser.IsInRole(CmdsRole.Programmers)
                          || webUser.IsInRole(CmdsRole.SystemAdministrators);
 
-            var organizationId = canSee && OrganizationIdentifier.Value.HasValue ? OrganizationIdentifier.Value.Value : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            var organizationId = canSee && OrganizationIdentifier.Value.HasValue ? OrganizationIdentifier.Value.Value : Organization.Identifier;
 
             OrganizationIdentifier.Value = organizationId;
 
@@ -200,8 +200,8 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
             Employee.Filter.OrganizationIdentifier = OrganizationIdentifier.Value.Value;
 
             Employee.Filter.ParentUserIdentifier =
-                Identity.IsGranted(PermissionName, PermissionOperation.Delete)
-                || Identity.IsGranted(PermissionName, PermissionOperation.Configure)
+                Identity.IsGranted(PermissionName, DataAccess.Delete)
+                || Identity.IsGranted(PermissionName, DataAccess.Configure)
                 || Identity.HasAccessToAllCompanies
                     ? (Guid?)null
                     : User.UserIdentifier
@@ -218,8 +218,8 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
             GroupManagerID.Filter.OrganizationIdentifier = OrganizationIdentifier.Value.Value;
 
             GroupManagerID.Filter.ParentUserIdentifier =
-                Identity.IsGranted(PermissionName, PermissionOperation.Delete)
-                || Identity.IsGranted(PermissionName, PermissionOperation.Configure)
+                Identity.IsGranted(PermissionName, DataAccess.Delete)
+                || Identity.IsGranted(PermissionName, DataAccess.Configure)
                 || Identity.HasAccessToAllCompanies
                     ? (Guid?)null
                     : User.UserIdentifier
@@ -253,7 +253,7 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
 
         public override void Clear()
         {
-            OrganizationIdentifier.Value = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            OrganizationIdentifier.Value = Organization.Identifier;
             Employee.Value = User.UserIdentifier;
             CurrentProfile.Value = null;
 

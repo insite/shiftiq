@@ -7,14 +7,14 @@ public class QGradebookEnrollmentAdapter : IEntityAdapter
 {
     public void Copy(ModifyGradebookEnrollment modify, QGradebookEnrollmentEntity entity)
     {
-        entity.GradebookIdentifier = modify.GradebookIdentifier;
-        entity.LearnerIdentifier = modify.LearnerIdentifier;
-        entity.PeriodIdentifier = modify.PeriodIdentifier;
+        entity.GradebookIdentifier = modify.GradebookId;
+        entity.LearnerIdentifier = modify.LearnerId;
+        entity.PeriodIdentifier = modify.PeriodId;
         entity.EnrollmentStarted = modify.EnrollmentStarted;
         entity.EnrollmentComment = modify.EnrollmentComment;
         entity.EnrollmentRestart = modify.EnrollmentRestart;
         entity.EnrollmentCompleted = modify.EnrollmentCompleted;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
 
     }
 
@@ -22,15 +22,15 @@ public class QGradebookEnrollmentAdapter : IEntityAdapter
     {
         var entity = new QGradebookEnrollmentEntity
         {
-            GradebookIdentifier = create.GradebookIdentifier,
-            LearnerIdentifier = create.LearnerIdentifier,
-            PeriodIdentifier = create.PeriodIdentifier,
-            EnrollmentIdentifier = create.EnrollmentIdentifier,
+            GradebookIdentifier = create.GradebookId,
+            LearnerIdentifier = create.LearnerId,
+            PeriodIdentifier = create.PeriodId,
+            EnrollmentIdentifier = create.EnrollmentId,
             EnrollmentStarted = create.EnrollmentStarted,
             EnrollmentComment = create.EnrollmentComment,
             EnrollmentRestart = create.EnrollmentRestart,
             EnrollmentCompleted = create.EnrollmentCompleted,
-            OrganizationIdentifier = create.OrganizationIdentifier
+            OrganizationIdentifier = create.OrganizationId
         };
         return entity;
     }
@@ -44,15 +44,15 @@ public class QGradebookEnrollmentAdapter : IEntityAdapter
     {
         var model = new GradebookEnrollmentModel
         {
-            GradebookIdentifier = entity.GradebookIdentifier,
-            LearnerIdentifier = entity.LearnerIdentifier,
-            PeriodIdentifier = entity.PeriodIdentifier,
-            EnrollmentIdentifier = entity.EnrollmentIdentifier,
+            GradebookId = entity.GradebookIdentifier,
+            LearnerId = entity.LearnerIdentifier,
+            PeriodId = entity.PeriodIdentifier,
+            EnrollmentId = entity.EnrollmentIdentifier,
             EnrollmentStarted = entity.EnrollmentStarted,
             EnrollmentComment = entity.EnrollmentComment,
             EnrollmentRestart = entity.EnrollmentRestart,
             EnrollmentCompleted = entity.EnrollmentCompleted,
-            OrganizationIdentifier = entity.OrganizationIdentifier
+            OrganizationId = entity.OrganizationIdentifier
         };
 
         return model;
@@ -67,7 +67,7 @@ public class QGradebookEnrollmentAdapter : IEntityAdapter
     {
         var match = new GradebookEnrollmentMatch
         {
-            EnrollmentIdentifier = entity.EnrollmentIdentifier
+            EnrollmentId = entity.EnrollmentIdentifier
 
         };
 

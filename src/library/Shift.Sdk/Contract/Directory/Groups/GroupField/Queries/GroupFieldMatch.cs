@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public partial class GroupFieldMatch
     {
-        public Guid SettingIdentifier { get; set; }
+        public Guid SettingId { get; set; }
     }
 }

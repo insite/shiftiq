@@ -27,6 +27,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                     CredentialStatus = CredentialStatus.Value,
                     AchievementLabel = AchievementLabel.Value,
                     EmployerGroupStatus = EmployerGroupStatus.Value,
+                    DepartmentIdentifier = DepartmentIdentifier.Value,
 
                     CredentialGrantedSince = CredentialGrantedSince.Value,
                     CredentialGrantedBefore = CredentialGrantedBefore.Value,
@@ -55,6 +56,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                 CredentialStatus.Value = value.CredentialStatus;
                 AchievementLabel.Value = value.AchievementLabel;
                 EmployerGroupStatus.Value = value.EmployerGroupStatus;
+                DepartmentIdentifier.Value = value.DepartmentIdentifier;
 
                 CredentialGrantedSince.Value = value.CredentialGrantedSince;
                 CredentialGrantedBefore.Value = value.CredentialGrantedBefore;
@@ -76,6 +78,8 @@ namespace InSite.Admin.Achievements.Credentials.Controls
 
             EmployerGroupStatus.Settings.CollectionName = CollectionName.Contacts_Groups_Status_Name;
             EmployerGroupStatus.Settings.OrganizationIdentifier = Organization.Key;
+
+            DepartmentIdentifier.OrganizationIdentifier = Organization.OrganizationIdentifier;
 
             PersonCode.EmptyMessage = GetEmptyMessage("Person Code");
         }
@@ -100,6 +104,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
             CredentialStatus.ClearSelection();
             AchievementLabel.ClearSelection();
             EmployerGroupStatus.ClearSelection();
+            DepartmentIdentifier.Value = null;
 
             CredentialGrantedSince.Value = null;
             CredentialGrantedBefore.Value = null;

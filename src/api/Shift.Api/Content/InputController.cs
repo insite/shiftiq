@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
 using Shift.Service.Content;
 
 namespace Shift.Api;
@@ -16,8 +15,8 @@ public class InputController : ControllerBase
         _inputService = inputService;
     }
 
-    [HttpHead("content/inputs/{content:guid}")]
-    [HybridAuthorize(Policies.Content.Inputs.Input.Assert)]
+    [HttpHead("api/content/inputs/{content:guid}")]
+    [HybridPermission("content/inputs", DataAccess.Read)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<ActionResult<bool>> AssertAsync([FromRoute] Guid content, CancellationToken cancellation = default)
     {
@@ -26,8 +25,8 @@ public class InputController : ControllerBase
         return Ok(exists);
     }
 
-    [HttpGet("content/inputs/{content:guid}")]
-    [HybridAuthorize(Policies.Content.Inputs.Input.Retrieve)]
+    [HttpGet("api/content/inputs/{content:guid}")]
+    [HybridPermission("content/inputs", DataAccess.Read)]
     [ProducesResponseType(typeof(InputModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<InputModel>> RetrieveAsync([FromRoute] Guid content, CancellationToken cancellation = default)
     {
@@ -39,8 +38,8 @@ public class InputController : ControllerBase
         return Ok(model);
     }
 
-    [HttpGet("content/inputs/count")]
-    [HybridAuthorize(Policies.Content.Inputs.Input.Count)]
+    [HttpGet("api/content/inputs/count")]
+    [HybridPermission("content/inputs", DataAccess.Read)]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<ActionResult<int>> CountAsync([FromQuery] CountInputs query, CancellationToken cancellation = default)
     {
@@ -49,8 +48,8 @@ public class InputController : ControllerBase
         return Ok(count);
     }
 
-    [HttpGet("content/inputs")]
-    [HybridAuthorize(Policies.Content.Inputs.Input.Collect)]
+    [HttpGet("api/content/inputs")]
+    [HybridPermission("content/inputs", DataAccess.Read)]
     [ProducesResponseType(typeof(IEnumerable<InputModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<InputModel>>> CollectAsync([FromQuery] CollectInputs query, CancellationToken cancellation = default)
     {
@@ -63,8 +62,8 @@ public class InputController : ControllerBase
         return Ok(models);
     }
 
-    [HttpGet("content/inputs/search")]
-    [HybridAuthorize(Policies.Content.Inputs.Input.Search)]
+    [HttpGet("api/content/inputs/search")]
+    [HybridPermission("content/inputs", DataAccess.Read)]
     [ProducesResponseType(typeof(IEnumerable<InputMatch>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<InputMatch>>> SearchAsync([FromQuery] SearchInputs query, CancellationToken cancellation = default)
     {
@@ -77,8 +76,8 @@ public class InputController : ControllerBase
         return Ok(matches);
     }
 
-    [HttpPost("content/inputs")]
-    [HybridAuthorize(Policies.Content.Inputs.Input.Create)]
+    [HttpPost("api/content/inputs")]
+    [HybridPermission("content/inputs", DataAccess.Update)]
     [ProducesResponseType(typeof(InputModel), StatusCodes.Status201Created, "application/json")]
     [ProducesResponseType(typeof(ValidationFailure), StatusCodes.Status400BadRequest, "application/json")]
     public async Task<ActionResult<InputModel>> CreateAsync([FromBody] CreateInput create, CancellationToken cancellation = default)
@@ -86,24 +85,24 @@ public class InputController : ControllerBase
         var created = await _inputService.CreateAsync(create, cancellation);
 
         if (!created)
-            return BadRequest($"Duplicate not permitted: ContentIdentifier {create.ContentIdentifier}. You cannot insert a duplicate object with the same primary key.");
+            return BadRequest($"Duplicate not permitted: ContentIdentifier {create.ContentId}. You cannot insert a duplicate object with the same primary key.");
 
-        var model = await _inputService.RetrieveAsync(create.ContentIdentifier, cancellation);
+        var model = await _inputService.RetrieveAsync(create.ContentId, cancellation);
 
         return CreatedAtAction(nameof(CreateAsync), model);
     }
 
-    [HttpPut("content/inputs/{content:guid}")]
-    [HybridAuthorize(Policies.Content.Inputs.Input.Modify)]
+    [HttpPut("api/content/inputs/{content:guid}")]
+    [HybridPermission("content/inputs", DataAccess.Update)]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationFailure), StatusCodes.Status400BadRequest, "application/json")]
     public async Task<IActionResult> ModifyAsync([FromBody] ModifyInput modify, CancellationToken cancellation = default)
     {
-        var model = await _inputService.RetrieveAsync(modify.ContentIdentifier, cancellation);
+        var model = await _inputService.RetrieveAsync(modify.ContentId, cancellation);
 
         if (model is null)
-            return NotFound($"Input not found: ContentIdentifier {modify.ContentIdentifier}. You cannot modify an object that is not in the database.");
+            return NotFound($"Input not found: ContentIdentifier {modify.ContentId}. You cannot modify an object that is not in the database.");
 
         var modified = await _inputService.ModifyAsync(modify, cancellation);
 
@@ -113,8 +112,8 @@ public class InputController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("content/inputs/{content:guid}")]
-    [HybridAuthorize(Policies.Content.Inputs.Input.Delete)]
+    [HttpDelete("api/content/inputs/{content:guid}")]
+    [HybridPermission("content/inputs", DataAccess.Delete)]
     [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAsync([FromRoute] Guid content, CancellationToken cancellation = default)

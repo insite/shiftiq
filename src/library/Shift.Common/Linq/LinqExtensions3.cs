@@ -39,10 +39,10 @@ namespace Shift.Common.Linq
         public static Expression<Func<T1, TResult>> MergeMemberInit<T1, TResult>(this Expression<Func<T1, TResult>> expr1, Expression<Func<T1, TResult>> expr2)
         {
             if (expr1.Body.NodeType != ExpressionType.MemberInit)
-                throw new ApplicationError($"Unexpected expression type (expr1): {expr1.Body.NodeType.GetName()}");
+                throw new ArgumentException($"Unexpected expression type (expr1): {expr1.Body.NodeType.GetName()}");
 
             if (expr2.Body.NodeType != ExpressionType.MemberInit)
-                throw new ApplicationError($"Unexpected expression type (expr2): {expr2.Body.NodeType.GetName()}");
+                throw new ArgumentException($"Unexpected expression type (expr2): {expr2.Body.NodeType.GetName()}");
 
             var visitor = new ReplaceExpressionVisitor(expr2.Parameters[0], expr1.Parameters[0]);
             var body2 = (MemberInitExpression)visitor.Visit(expr2.Body);

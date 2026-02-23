@@ -7,10 +7,11 @@ namespace Shift.Contract
 {
     public class CollectCaseDocuments : Query<IEnumerable<CaseDocumentModel>>, ICaseDocumentCriteria
     {
-        public Guid? FileIdentifier { get; set; }
-        public Guid? CaseIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? PosterIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+
+        public Guid? FileId { get; set; }
+        public Guid? CaseId { get; set; }
+        public Guid? PosterId { get; set; }
 
         public string FileName { get; set; }
         public string FileType { get; set; }

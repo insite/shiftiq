@@ -4,7 +4,7 @@ namespace Shift.Contract
 {
     public class DeleteSubmissionAnswer
     {
-        public Guid ResponseSessionIdentifier { get; set; }
-        public Guid SurveyQuestionIdentifier { get; set; }
+        public Guid ResponseSessionId { get; set; }
+        public Guid SurveyQuestionId { get; set; }
     }
 }

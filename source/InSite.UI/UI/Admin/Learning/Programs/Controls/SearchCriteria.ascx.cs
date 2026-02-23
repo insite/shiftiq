@@ -2,7 +2,6 @@
 
 using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
-using InSite.Persistence;
 
 namespace InSite.Admin.Records.Programs.Controls
 {
@@ -12,11 +11,11 @@ namespace InSite.Admin.Records.Programs.Controls
         {
             base.OnInit(e);
 
-            if (!IsPostBack)
-            {
-                DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
-                DepartmentIdentifier.Value = null;
-            }
+            if (IsPostBack)
+                return;
+
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
+            DepartmentIdentifier.Value = null;
         }
 
         public override TProgramFilter Filter
@@ -29,7 +28,10 @@ namespace InSite.Admin.Records.Programs.Controls
                     ProgramCode = ProgramCode.Text,
                     ProgramName = ProgramName.Text,
                     ProgramDescription = ProgramDescription.Text,
-                    GroupIdentifier = DepartmentIdentifier.Value
+                    ProgramTag = ProgramTag.Text,
+                    GroupIdentifier = DepartmentIdentifier.Value,
+                    AchievementIdentifiers = ProgramAchievementIdentifier.Values,
+                    TaskObjectIdentifiers = TaskAchievementIdentifier.Values
                 };
 
                 GetCheckedShowColumns(filter);
@@ -41,7 +43,10 @@ namespace InSite.Admin.Records.Programs.Controls
                 ProgramCode.Text = value.ProgramCode;
                 ProgramName.Text = value.ProgramName;
                 ProgramDescription.Text = value.ProgramDescription;
+                ProgramTag.Text = value.ProgramTag;
                 DepartmentIdentifier.Value = value.GroupIdentifier;
+                ProgramAchievementIdentifier.Values = value.AchievementIdentifiers;
+                TaskAchievementIdentifier.Values = value.TaskObjectIdentifiers;
             }
         }
 
@@ -50,7 +55,10 @@ namespace InSite.Admin.Records.Programs.Controls
             ProgramCode.Text = null;
             ProgramName.Text = null;
             ProgramDescription.Text = null;
+            ProgramTag.Text = null;
             DepartmentIdentifier.Value = null;
+            ProgramAchievementIdentifier.Values = null;
+            TaskAchievementIdentifier.Values = null;
         }
     }
 }

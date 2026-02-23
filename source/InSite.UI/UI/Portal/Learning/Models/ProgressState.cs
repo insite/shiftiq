@@ -9,6 +9,7 @@ using InSite.Domain.CourseObjects;
 using InSite.Persistence.Content;
 using InSite.Web.Routing;
 
+using Shift.Common;
 using Shift.Constant;
 
 using static InSite.Domain.CourseObjects.ProgressModel;
@@ -58,7 +59,7 @@ namespace InSite.UI.Portal.Learning.Models
         {
             var identity = CurrentSessionState.Identity;
 
-            var hasWriteAccess = identity.IsGranted(PermissionIdentifiers.Admin_Sites, PermissionOperation.Write);
+            var hasWriteAccess = identity.IsGranted(PermissionIdentifiers.Admin_Sites, DataAccess.Update);
 
             var appUrl = ServiceLocator.Urls.GetApplicationUrl(identity.Organization.Code);
 
@@ -70,11 +71,11 @@ namespace InSite.UI.Portal.Learning.Models
             if (!_courseIdentifier.HasValue)
                 return false;
 
-            var page = ServiceLocator.PageSearch.BindFirst(p=>p, x => x.ObjectIdentifier == _courseIdentifier.Value && x.ObjectType == "Course");
+            var page = ServiceLocator.PageSearch.BindFirst(p => p, x => x.ObjectIdentifier == _courseIdentifier.Value && x.ObjectType == "Course");
 
             PortalPage.Page.ObjectType = "Course";
             PortalPage.Page.ObjectIdentifier = _courseIdentifier.Value;
-            if(page != null )
+            if (page != null)
                 PortalPage.Page.IsHidden = page.IsHidden;
             PortalPage.Path = GetPreviewUrl(_courseIdentifier.Value);
 

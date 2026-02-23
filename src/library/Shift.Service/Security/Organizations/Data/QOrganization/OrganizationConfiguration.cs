@@ -13,7 +13,6 @@ public class QOrganizationConfiguration : IEntityTypeConfiguration<OrganizationE
         builder.Property(x => x.AccountClosed).HasColumnName("AccountClosed");
         builder.Property(x => x.AccountOpened).HasColumnName("AccountOpened");
         builder.Property(x => x.AccountStatus).HasColumnName("AccountStatus").IsRequired().IsUnicode(false).HasMaxLength(6);
-        builder.Property(x => x.CompanyDomain).HasColumnName("CompanyDomain").IsUnicode(false).HasMaxLength(50);
         builder.Property(x => x.CompanyName).HasColumnName("CompanyName").IsUnicode(false).HasMaxLength(50);
         builder.Property(x => x.CompanySize).HasColumnName("CompanySize").IsUnicode(false).HasMaxLength(10);
         builder.Property(x => x.CompanySummary).HasColumnName("CompanySummary").IsUnicode(false).HasMaxLength(900);
@@ -28,7 +27,6 @@ public class QOrganizationConfiguration : IEntityTypeConfiguration<OrganizationE
         builder.Property(x => x.TimeZone).HasColumnName("TimeZone").IsUnicode(false).HasMaxLength(32);
         builder.Property(x => x.AdministratorUserIdentifier).HasColumnName("AdministratorUserIdentifier");
         builder.Property(x => x.GlossaryIdentifier).HasColumnName("GlossaryIdentifier");
-        builder.Property(x => x.ParentOrganizationIdentifier).HasColumnName("ParentOrganizationIdentifier");
         builder.Property(x => x.OrganizationIdentifier).HasColumnName("OrganizationIdentifier").IsRequired();
         builder.Property(x => x.OrganizationData).HasColumnName("OrganizationData").IsRequired().IsUnicode(false).HasMaxLength(7700);
         builder.Property(x => x.PersonFullNamePolicy).HasColumnName("PersonFullNamePolicy").IsUnicode(false).HasMaxLength(50);

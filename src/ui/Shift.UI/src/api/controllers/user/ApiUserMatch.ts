@@ -1,4 +1,4 @@
 export interface ApiUserMatch {
-    UserIdentifier: string;
+    UserId: string;
     FullName: string;
 }

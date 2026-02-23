@@ -15,31 +15,31 @@ namespace InSite.UI.Admin.Database.Entities
     {
 
         /// <summary>
-        /// ComponentType control.
+        /// SubsystemType control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox ComponentType;
+        protected global::InSite.Common.Web.UI.TextBox SubsystemType;
 
         /// <summary>
-        /// ComponentName control.
+        /// SubsystemName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox ComponentName;
+        protected global::InSite.Common.Web.UI.TextBox SubsystemName;
 
         /// <summary>
-        /// ComponentPart control.
+        /// SubsystemComponent control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox ComponentPart;
+        protected global::InSite.Common.Web.UI.TextBox SubsystemComponent;
 
         /// <summary>
         /// EntityName control.

@@ -217,7 +217,7 @@ namespace InSite.Persistence
 
         public List<QPerson> GetPersons(QPersonFilter filter, params Expression<Func<QPerson, object>>[] includes)
         {
-            using (var db = CreateContext())
+            using (var db = CreateContext(false))
             {
                 return CreateQuery(filter, db)
                     .ApplyIncludes(includes)
@@ -238,7 +238,6 @@ namespace InSite.Persistence
                         OrganizationIdentifier = x.Organization.OrganizationIdentifier,
                         OrganizationName = x.Organization.CompanyName,
                         OrganizationCode = x.Organization.OrganizationCode,
-                        OrganizationDomain = x.Organization.CompanyDomain,
                         OrganizationStatus = x.Organization.AccountStatus,
                         OrganizationUrl = x.Organization.CompanyWebSiteUrl,
 
@@ -261,9 +260,6 @@ namespace InSite.Persistence
 
             if (filter.OrganizationIdentifier.HasValue)
                 query = query.Where(x => x.OrganizationIdentifier == filter.OrganizationIdentifier.Value);
-
-            if (filter.OrganizationOrParentOrganizationIdentifier.HasValue)
-                query = query.Where(x => x.OrganizationIdentifier == filter.OrganizationOrParentOrganizationIdentifier.Value || x.Organization.ParentOrganizationIdentifier == filter.OrganizationOrParentOrganizationIdentifier.Value);
 
             if (filter.UserIdentifiers.IsNotEmpty())
             {
@@ -373,10 +369,14 @@ namespace InSite.Persistence
             return query;
         }
 
-        private static InternalDbContext CreateContext()
+        private static InternalDbContext CreateContext(bool proxy = true)
         {
             var db = new InternalDbContext();
+
             db.Configuration.LazyLoadingEnabled = false;
+
+            db.Configuration.ProxyCreationEnabled = proxy;
+
             return db;
         }
     }

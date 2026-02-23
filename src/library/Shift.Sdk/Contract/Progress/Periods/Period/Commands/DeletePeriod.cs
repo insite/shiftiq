@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeletePeriod
     {
-        public Guid PeriodIdentifier { get; set; }
+        public Guid PeriodId { get; set; }
     }
 }

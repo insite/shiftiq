@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 using Shift.Common;
 
@@ -99,6 +101,35 @@ namespace Shift.Contract
 
         public DateTimeOffset ParseCreated()
             => _created;
+
+        public void ResetCreated()
+        {
+            Created = DateTimeOffset.UtcNow.ToString("O");
+        }
+
+        public void ResetID()
+        {
+            ID = UniqueIdentifier.Create();
+        }
+
+        public static string CreateValidationKey(CookieToken token, string secret)
+        {
+            var parts = new List<string>
+            {
+                token.Environment,
+                token.UserEmail,
+                token.ImpersonatorUser,
+                secret,
+                token.ID.ToString()
+            };
+
+            var text = string.Join("/", parts.Where(part => !string.IsNullOrWhiteSpace(part)));
+
+            var hashBytes = EncryptionHelper.ComputeHashSha256(text);
+            var hash = StringHelper.ByteArrayToHex(hashBytes);
+
+            return hash;
+        }
 
         private string ConvertDateToString(DateTimeOffset iso)
             => iso.ToString("O");

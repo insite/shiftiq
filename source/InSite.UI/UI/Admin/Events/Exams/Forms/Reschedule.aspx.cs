@@ -46,7 +46,7 @@ namespace InSite.Admin.Events.Exams.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 NavigateToSearch();
 
             if (Properties.Event == null || Properties.Event.OrganizationIdentifier != Organization.OrganizationIdentifier)

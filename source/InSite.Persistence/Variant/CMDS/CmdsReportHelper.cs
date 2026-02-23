@@ -284,6 +284,7 @@ namespace InSite.Persistence.Plugin.CMDS
             public string PrimaryProfileName { get; set; }
             public string SecondaryRequiredProfiles { get; set; }
             public string SecondaryProfiles { get; set; }
+            public string Leaders { get; set; }
             public string Managers { get; set; }
             public string Supervisors { get; set; }
             public string Validators { get; set; }
@@ -492,19 +493,25 @@ namespace InSite.Persistence.Plugin.CMDS
         public static IEnumerable<TrainingHistoryPerUser> SelectTrainingHistoryPerUser(
                 Guid[] departments,
                 Guid[] achievements,
+                Guid[] learners,
                 bool? isRequired
             )
         {
-            using (var db = new InternalDbContext())
+            using (var db = new InternalDbContext(false, false))
             {
+                var allDepartments = departments.Length == 0;
+
                 var credentials = db.VCmdsCredentials.Where(
                     x => x.UserUtcArchived == null
                       && db.Memberships.Any(
                           y => y.UserIdentifier == x.UserIdentifier
-                            && departments.Contains(y.GroupIdentifier)
+                            && (allDepartments || departments.Contains(y.GroupIdentifier))
                             && y.MembershipType == "Department")
                       && achievements.Contains(x.AchievementIdentifier)
                 );
+
+                if (learners.IsNotEmpty())
+                    credentials = credentials.Where(x => learners.Contains(x.UserIdentifier));
 
                 if (isRequired.HasValue)
                     credentials = credentials.Where(x => x.CredentialIsMandatory == isRequired);
@@ -525,12 +532,13 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
-        public static IEnumerable<TrainingExpiryDate> SelectTrainingExpiryDates(Guid[] departments, Guid[] resources, bool? isRequired, decimal minimumPassingGrade)
+        public static IEnumerable<TrainingExpiryDate> SelectTrainingExpiryDates(Guid[] departments, Guid[] resources, Guid[] learners, bool? isRequired, decimal minimumPassingGrade)
         {
             var sqlParameters = new SqlParameter[]
             {
-                new SqlParameter("@Departments", departments != null ? string.Join(",", departments) : (object)DBNull.Value),
-                new SqlParameter("@Achievements", resources != null ? string.Join(",", resources) : (object)DBNull.Value),
+                new SqlParameter("@Departments", departments.IsNotEmpty() ? string.Join(",", departments) : (object)DBNull.Value),
+                new SqlParameter("@Achievements", resources.IsNotEmpty() ? string.Join(",", resources) : (object)DBNull.Value),
+                new SqlParameter("@Learners", learners.IsNotEmpty() ? string.Join(",", learners) : (object)DBNull.Value),
                 new SqlParameter("@IsRequired", isRequired ?? (object)DBNull.Value),
                 new SqlParameter("@MinimumPassingGrade", minimumPassingGrade)
             };
@@ -538,7 +546,7 @@ namespace InSite.Persistence.Plugin.CMDS
             using (var db = new InternalDbContext())
             {
                 return db.Database
-                    .SqlQuery<TrainingExpiryDate>("EXEC custom_cmds.SelectTrainingExpiryDates @Departments, @Achievements, @IsRequired, @MinimumPassingGrade", sqlParameters)
+                    .SqlQuery<TrainingExpiryDate>("EXEC custom_cmds.SelectTrainingExpiryDates @Departments, @Achievements, @Learners, @IsRequired, @MinimumPassingGrade", sqlParameters)
                     .ToList();
             }
         }
@@ -546,22 +554,24 @@ namespace InSite.Persistence.Plugin.CMDS
         public static IEnumerable<TrainingCompletionDate> SelectTrainingCompletionDates(
             Guid[] departments,
             Guid[] achievements,
+            Guid[] learners,
             bool? isRequired,
             DateTimeRange credentialGranted,
             string credentialStatus,
             string membershipFunction,
-            bool? includeSelfDeclaredCredentials)
+            bool? allowSelfDeclaredAchievements)
         {
             var sqlParameters = new SqlParameter[]
             {
                 new SqlParameter("@Departments", string.Join(",", departments)),
                 new SqlParameter("@Achievements", string.Join(",", achievements)),
+                new SqlParameter("@Learners", learners.IsNotEmpty() ? string.Join(",", learners) : (object)DBNull.Value),
                 new SqlParameter("@IsRequired", isRequired ?? (object)DBNull.Value),
                 new SqlParameter("@CredentialGrantedStartDate", credentialGranted?.Since ?? (object)DBNull.Value),
                 new SqlParameter("@CredentialGrantedEndDate", credentialGranted?.Before ?? (object)DBNull.Value),
                 new SqlParameter("@CredentialStatus", string.IsNullOrEmpty(credentialStatus) ? (object)DBNull.Value : credentialStatus),
                 new SqlParameter("@MembershipType", string.IsNullOrEmpty(membershipFunction) ? (object)DBNull.Value : membershipFunction),
-                new SqlParameter("@IncludeSelfDeclaredCredentials", includeSelfDeclaredCredentials ?? (object)DBNull.Value)
+                new SqlParameter("@AllowSelfDeclared", allowSelfDeclaredAchievements ?? (object)DBNull.Value)
             };
 
             using (var db = new InternalDbContext())
@@ -573,12 +583,13 @@ namespace InSite.Persistence.Plugin.CMDS
                         "EXEC custom_cmds.SelectTrainingCompletionDates" +
                         "  @Departments" +
                         ", @Achievements" +
+                        ", @Learners" +
                         ", @IsRequired" +
                         ", @CredentialGrantedStartDate" +
                         ", @CredentialGrantedEndDate" +
                         ", @CredentialStatus" +
                         ", @MembershipType" +
-                        ", @IncludeSelfDeclaredCredentials"
+                        ", @AllowSelfDeclared"
                         , sqlParameters)
                     .ToList();
             }
@@ -734,6 +745,7 @@ SELECT
    ,PrimaryProfiles.ProfileTitle AS PrimaryProfileName
    ,RequiredProfiles.Profiles AS SecondaryRequiredProfiles
    ,Profiles.Profiles AS SecondaryProfiles
+   ,Relationships.Leaders   
    ,Relationships.Managers
    ,Relationships.Supervisors
    ,Relationships.Validators
@@ -790,6 +802,13 @@ FROM
     OUTER APPLY  (
         SELECT
             STRING_AGG(
+                CASE
+                    WHEN UserConnection.IsLeader = 1 THEN '• ' + Persons.FullName
+                    ELSE NULL
+                END
+               ,CHAR(13) + CHAR(10)
+            ) WITHIN GROUP (ORDER BY Persons.FullName) AS Leaders
+           ,STRING_AGG(
                 CASE
                     WHEN UserConnection.IsManager = 1 THEN '• ' + Persons.FullName
                     ELSE NULL
@@ -2058,6 +2077,37 @@ ORDER BY
                 sqlParameters.Add(new SqlParameter("@AchievementType", filter.AchievementType));
 
             return sqlParameters.ToArray();
+        }
+
+        public static string SnapshotStatusHtml(TimeZoneInfo zone)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var html = new StringBuilder();
+
+                var asAt = db.Database
+                    .SqlQuery<DateTime>("select distinct asat from custom_cmds.QUserStatus")
+                    .FirstOrDefault();
+
+                if (asAt != DateTimeOffset.MinValue)
+                {
+                    var asAtOffset = TimeZones.GetDateTimeOffset(asAt, asAt, TimeZones.Utc);
+
+                    var local = TimeZones.Format(asAtOffset, zone);
+
+                    var line1 = $"The data in this report was last updated {local}.";
+
+                    html.AppendLine(line1);
+
+                    var tomorrow = TimeZones.Format(DateTime.Today.AddDays(1).AddMinutes(15), zone.Id);
+
+                    var line2 = $"The next update will take place tomorrow, {tomorrow}.";
+
+                    html.AppendLine(line2);
+                }
+
+                return html.ToString();
+            }
         }
     }
 }

@@ -60,7 +60,7 @@ namespace Engine.Common
         {
             try
             {
-                throw new Exception("Error! This is a test exception.");
+                throw new InvalidOperationException("Error! This is a test exception.");
             }
             catch (Exception ex)
             {

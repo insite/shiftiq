@@ -37,7 +37,7 @@ namespace InSite.UI.Portal.Records.Certificates
         public override void Render(CertificateBuilder builder)
         {
             if (string.IsNullOrEmpty(Value))
-                throw new Exception("Certificate text element value is null");
+                throw new InvalidOperationException("Certificate text element value is null");
 
             StringFormat format = null;
             Font font = null;

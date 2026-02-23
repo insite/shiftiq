@@ -26,7 +26,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Assessment
         {
             var filter = new EmployeeCompetencyFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 UserIdentifier = User.UserIdentifier,
                 Statuses = new[]
                 {
@@ -38,7 +38,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Assessment
             };
 
             var workersPermission = PermissionNames.Custom_CMDS_Workers;
-            var parentUserID = Identity.IsGranted(workersPermission, PermissionOperation.Delete) || Identity.IsGranted(workersPermission, PermissionOperation.Configure)
+            var parentUserID = Identity.IsGranted(workersPermission, DataAccess.Delete) || Identity.IsGranted(workersPermission, DataAccess.Configure)
                 ? (Guid?)null
                 : User.UserIdentifier;
 
@@ -46,7 +46,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Assessment
 
             if (table.Rows.Count == 0)
             {
-                CompetencySummary.LoadData(User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier, CompetencySummaryType.Employee);
+                CompetencySummary.LoadData(User.UserIdentifier, Organization.Identifier, CompetencySummaryType.Employee);
                 return;
             }
 

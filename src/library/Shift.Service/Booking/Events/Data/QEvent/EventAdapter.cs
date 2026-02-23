@@ -24,11 +24,11 @@ public class EventAdapter : IEntityAdapter
         entity.DistributionStatus = modify.DistributionStatus;
         entity.DistributionTracked = modify.DistributionTracked;
         entity.ExamStarted = modify.ExamStarted;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.VenueLocationIdentifier = modify.VenueLocationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.VenueLocationIdentifier = modify.VenueLocationId;
         entity.VenueRoom = modify.VenueRoom;
         entity.PublicationErrors = modify.PublicationErrors;
-        entity.VenueCoordinatorIdentifier = modify.VenueCoordinatorIdentifier;
+        entity.VenueCoordinatorIdentifier = modify.VenueCoordinatorId;
         entity.EventDescription = modify.EventDescription;
         entity.LastChangeTime = modify.LastChangeTime;
         entity.LastChangeType = modify.LastChangeType;
@@ -42,7 +42,7 @@ public class EventAdapter : IEntityAdapter
         entity.CapacityMinimum = modify.CapacityMinimum;
         entity.CapacityMaximum = modify.CapacityMaximum;
         entity.ExamType = modify.ExamType;
-        entity.AchievementIdentifier = modify.AchievementIdentifier;
+        entity.AchievementIdentifier = modify.AchievementId;
         entity.RegistrationDeadline = modify.RegistrationDeadline;
         entity.EventSummary = modify.EventSummary;
         entity.EventPublicationStatus = modify.EventPublicationStatus;
@@ -56,16 +56,16 @@ public class EventAdapter : IEntityAdapter
         entity.ExamMaterialReturnShipmentCondition = modify.ExamMaterialReturnShipmentCondition;
         entity.IntegrationWithholdGrades = modify.IntegrationWithholdGrades;
         entity.IntegrationWithholdDistribution = modify.IntegrationWithholdDistribution;
-        entity.VenueOfficeIdentifier = modify.VenueOfficeIdentifier;
+        entity.VenueOfficeIdentifier = modify.VenueOfficeId;
         entity.AppointmentType = modify.AppointmentType;
         entity.RegistrationLocked = modify.RegistrationLocked;
         entity.AllowRegistrationWithLink = modify.AllowRegistrationWithLink;
-        entity.LearnerRegistrationGroupIdentifier = modify.LearnerRegistrationGroupIdentifier;
+        entity.LearnerRegistrationGroupIdentifier = modify.LearnerRegistrationGroupId;
         entity.PersonCodeIsRequired = modify.PersonCodeIsRequired;
         entity.AllowMultipleRegistrations = modify.AllowMultipleRegistrations;
         entity.EventCalendarColor = modify.EventCalendarColor;
         entity.RegistrationFields = modify.RegistrationFields;
-        entity.MandatorySurveyFormIdentifier = modify.MandatorySurveyFormIdentifier;
+        entity.MandatorySurveyFormIdentifier = modify.MandatorySurveyFormId;
         entity.BillingCodeEnabled = modify.BillingCodeEnabled;
 
     }
@@ -85,7 +85,7 @@ public class EventAdapter : IEntityAdapter
             EventClassCode = create.EventClassCode,
             ExamDurationInMinutes = create.ExamDurationInMinutes,
             EventFormat = create.EventFormat,
-            EventIdentifier = create.EventIdentifier,
+            EventIdentifier = create.EventId,
             EventNumber = create.EventNumber,
             EventSchedulingStatus = create.EventSchedulingStatus,
             EventTitle = create.EventTitle,
@@ -99,11 +99,11 @@ public class EventAdapter : IEntityAdapter
             DistributionStatus = create.DistributionStatus,
             DistributionTracked = create.DistributionTracked,
             ExamStarted = create.ExamStarted,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            VenueLocationIdentifier = create.VenueLocationIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            VenueLocationIdentifier = create.VenueLocationId,
             VenueRoom = create.VenueRoom,
             PublicationErrors = create.PublicationErrors,
-            VenueCoordinatorIdentifier = create.VenueCoordinatorIdentifier,
+            VenueCoordinatorIdentifier = create.VenueCoordinatorId,
             EventDescription = create.EventDescription,
             LastChangeTime = create.LastChangeTime,
             LastChangeType = create.LastChangeType,
@@ -117,7 +117,7 @@ public class EventAdapter : IEntityAdapter
             CapacityMinimum = create.CapacityMinimum,
             CapacityMaximum = create.CapacityMaximum,
             ExamType = create.ExamType,
-            AchievementIdentifier = create.AchievementIdentifier,
+            AchievementIdentifier = create.AchievementId,
             RegistrationDeadline = create.RegistrationDeadline,
             EventSummary = create.EventSummary,
             EventPublicationStatus = create.EventPublicationStatus,
@@ -131,16 +131,16 @@ public class EventAdapter : IEntityAdapter
             ExamMaterialReturnShipmentCondition = create.ExamMaterialReturnShipmentCondition,
             IntegrationWithholdGrades = create.IntegrationWithholdGrades,
             IntegrationWithholdDistribution = create.IntegrationWithholdDistribution,
-            VenueOfficeIdentifier = create.VenueOfficeIdentifier,
+            VenueOfficeIdentifier = create.VenueOfficeId,
             AppointmentType = create.AppointmentType,
             RegistrationLocked = create.RegistrationLocked,
             AllowRegistrationWithLink = create.AllowRegistrationWithLink,
-            LearnerRegistrationGroupIdentifier = create.LearnerRegistrationGroupIdentifier,
+            LearnerRegistrationGroupIdentifier = create.LearnerRegistrationGroupId,
             PersonCodeIsRequired = create.PersonCodeIsRequired,
             AllowMultipleRegistrations = create.AllowMultipleRegistrations,
             EventCalendarColor = create.EventCalendarColor,
             RegistrationFields = create.RegistrationFields,
-            MandatorySurveyFormIdentifier = create.MandatorySurveyFormIdentifier,
+            MandatorySurveyFormIdentifier = create.MandatorySurveyFormId,
             BillingCodeEnabled = create.BillingCodeEnabled
         };
         return entity;
@@ -159,7 +159,7 @@ public class EventAdapter : IEntityAdapter
             EventClassCode = entity.EventClassCode,
             ExamDurationInMinutes = entity.ExamDurationInMinutes,
             EventFormat = entity.EventFormat,
-            EventIdentifier = entity.EventIdentifier,
+            EventId = entity.EventIdentifier,
             EventNumber = entity.EventNumber,
             EventSchedulingStatus = entity.EventSchedulingStatus,
             EventTitle = entity.EventTitle,
@@ -173,11 +173,11 @@ public class EventAdapter : IEntityAdapter
             DistributionStatus = entity.DistributionStatus,
             DistributionTracked = entity.DistributionTracked,
             ExamStarted = entity.ExamStarted,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            VenueLocationIdentifier = entity.VenueLocationIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            VenueLocationId = entity.VenueLocationIdentifier,
             VenueRoom = entity.VenueRoom,
             PublicationErrors = entity.PublicationErrors,
-            VenueCoordinatorIdentifier = entity.VenueCoordinatorIdentifier,
+            VenueCoordinatorId = entity.VenueCoordinatorIdentifier,
             EventDescription = entity.EventDescription,
             LastChangeTime = entity.LastChangeTime,
             LastChangeType = entity.LastChangeType,
@@ -191,7 +191,7 @@ public class EventAdapter : IEntityAdapter
             CapacityMinimum = entity.CapacityMinimum,
             CapacityMaximum = entity.CapacityMaximum,
             ExamType = entity.ExamType,
-            AchievementIdentifier = entity.AchievementIdentifier,
+            AchievementId = entity.AchievementIdentifier,
             RegistrationDeadline = entity.RegistrationDeadline,
             EventSummary = entity.EventSummary,
             EventPublicationStatus = entity.EventPublicationStatus,
@@ -205,16 +205,16 @@ public class EventAdapter : IEntityAdapter
             ExamMaterialReturnShipmentCondition = entity.ExamMaterialReturnShipmentCondition,
             IntegrationWithholdGrades = entity.IntegrationWithholdGrades,
             IntegrationWithholdDistribution = entity.IntegrationWithholdDistribution,
-            VenueOfficeIdentifier = entity.VenueOfficeIdentifier,
+            VenueOfficeId = entity.VenueOfficeIdentifier,
             AppointmentType = entity.AppointmentType,
             RegistrationLocked = entity.RegistrationLocked,
             AllowRegistrationWithLink = entity.AllowRegistrationWithLink,
-            LearnerRegistrationGroupIdentifier = entity.LearnerRegistrationGroupIdentifier,
+            LearnerRegistrationGroupId = entity.LearnerRegistrationGroupIdentifier,
             PersonCodeIsRequired = entity.PersonCodeIsRequired,
             AllowMultipleRegistrations = entity.AllowMultipleRegistrations,
             EventCalendarColor = entity.EventCalendarColor,
             RegistrationFields = entity.RegistrationFields,
-            MandatorySurveyFormIdentifier = entity.MandatorySurveyFormIdentifier,
+            MandatorySurveyFormId = entity.MandatorySurveyFormIdentifier,
             BillingCodeEnabled = entity.BillingCodeEnabled
         };
 
@@ -230,7 +230,7 @@ public class EventAdapter : IEntityAdapter
     {
         var match = new EventMatch
         {
-            EventIdentifier = entity.EventIdentifier
+            EventId = entity.EventIdentifier
 
         };
 

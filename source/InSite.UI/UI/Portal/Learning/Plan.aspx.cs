@@ -34,7 +34,15 @@ namespace InSite.UI.Portal.Learning
         public override void ApplyAccessControlForCmds()
         {
             base.ApplyAccessControlForCmds();
+
             SignOff.CanBeSigned = Access.Write;
+
+            var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
+
+            var roles = Identity.Groups.Select(x => x.Name).ToList();
+
+            if (permissions.IsDenied("ui/home#training-plan", roles))
+                HttpResponseHelper.SendHttp403();
         }
 
         private Guid EmployeeID => Guid.TryParse(Request["userID"], out var employeeID)
@@ -172,6 +180,17 @@ namespace InSite.UI.Portal.Learning
             HttpResponseHelper.Redirect(path);
         }
 
+        public static bool ShowSafetyAchievementsOnly()
+        {
+            var roles = Identity.Groups.Select(x => x.Name).ToList();
+
+            var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
+
+            var safetyAchievementsOnly = permissions.IsDenied("ui/home#safety-achievements-only", roles);
+
+            return safetyAchievementsOnly;
+        }
+
         private void SignOff_SignedOff(object sender, EventArgs e)
         {
             var url = $"/ui/portal/learning/plan";
@@ -206,8 +225,13 @@ namespace InSite.UI.Portal.Learning
 
             var credentials = VCmdsCredentialSearch.SelectForTrainingPlan(
                 EmployeeID,
-                CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                Organization.Identifier,
                 AchievementType);
+
+            if (ShowSafetyAchievementsOnly())
+                credentials = credentials
+                    .Where(x => x.AchievementLabel == "Time-Sensitive Safety Certificate")
+                    .ToList();
 
             var validCredentials = credentials.Where(x => x.CredentialStatus == "Valid").ToList();
 
@@ -243,7 +267,7 @@ namespace InSite.UI.Portal.Learning
                 }
             }
 
-            var employeeProfiles = UserProfileRepository.SelectSecondaryProfilesInTraining(EmployeeID, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+            var employeeProfiles = UserProfileRepository.SelectSecondaryProfilesInTraining(EmployeeID, Organization.Identifier);
 
             ProfilesInTrainingSection.Visible = employeeProfiles.Rows.Count > 0;
 

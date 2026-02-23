@@ -40,6 +40,7 @@ namespace InSite.Application.Events.Read
         public bool? IsRegistrationLocked { get; set; }
         public bool? IsResourceAssigned { get; set; }
         public bool? WithholdDistribution { get; set; }
+        public bool? DisplayOnCalendar { get; set; }
 
         public int? EventNumber { get; set; }
         public int[] EventNumbers { get; set; }

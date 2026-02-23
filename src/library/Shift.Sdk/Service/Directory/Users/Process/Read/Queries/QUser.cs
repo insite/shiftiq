@@ -49,6 +49,7 @@ namespace InSite.Application.Contacts.Read
         public DateTimeOffset UserPasswordExpired { get; set; }
         public DateTimeOffset? UtcArchived { get; set; }
         public DateTimeOffset? UtcUnarchived { get; set; }
+        public DateTimeOffset? EmailVerificationTokenIssued { get; set; }
 
         public virtual ICollection<ApiRequest> ApiRequests { get; set; } = new HashSet<ApiRequest>();
         public virtual ICollection<QCourseEnrollment> CourseEnrollments { get; set; } = new HashSet<QCourseEnrollment>();

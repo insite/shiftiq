@@ -70,6 +70,12 @@
             border-top-left-radius: 6px;
             border-bottom-left-radius: 6px;
         }
+        [dir='rtl'] .bar-container > div {
+            border-top-left-radius: unset;
+            border-bottom-left-radius: unset;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
         .bar-container > span {
             z-index: 10;
         }
@@ -77,34 +83,38 @@
             color: #fff;
             margin-right: 0.25rem;
         }
+        [dir='rtl'] .bar-container > div > span {
+            margin-right: unset;
+            margin-left: 0.25rem;
+        }
     </style>
 </insite:PageHeadContent>
 
 <uc:WelcomeUser runat="server" ID="WelcomeUser" />
 
-<h3 class="mt-4">What's happening this week</h3>
+<h3 class="mt-4">
+    <%= Translate("What's happening this week") %>
+</h3>
 
-<div class="alert alert-info d-flex">
+<div class="alert alert-info d-flex justify-content-between">
     <div>
-        You started the Pain Management and Opioids course on September 13, 2025.
-        Please continue your course before it expires to avoid losing access.
+        <%= Translate("You started the Pain Management and Opioids course on September 13, 2025. Please continue your course before it expires to avoid losing access.") %>
     </div>
     <div class="d-flex align-items-start justify-content-end ms-5">
         <button type="button" class="btn btn-sm btn-primary">
-            Resume
+            <%= Translate("Resume") %>
             <i class="far fa-play ms-2"></i>
         </button>
     </div>
 </div>
 
-<div class="alert alert-info d-flex mt-3">
+<div class="alert alert-info d-flex justify-content-between mt-3">
     <div>
-        You were enrolled in the Sickle Cell Disease course.
-        Please click the Start button to begin your course.
+        <%= Translate("You were enrolled in the Sickle Cell Disease course. Please click the Start button to begin your course.") %>
     </div>
     <div class="d-flex align-items-start justify-content-end ms-5">
         <button type="button" class="btn btn-sm btn-primary">
-            Start
+            <%= Translate("Start") %>
             <i class="far fa-arrow-right ms-2"></i>
         </button>
     </div>
@@ -114,11 +124,11 @@
     <div class="card">
         <div class="card-body">
             <h3 class="text-center">
-                My Completed Tasks
+                <%= Translate("My Completed Tasks") %>
             </h3>
 
             <div class="my-4 text-center">
-                Year-at-a-Glance
+                <%= Translate("Year-at-a-Glance") %>
             </div>
 
             <div class="d-flex gap-4">
@@ -128,10 +138,10 @@
                             <span>10/15</span>
                         </div>
                     </div>
-                    Assessments
+                    <%= Translate("Assessments") %>
                     <button type="button" class="btn btn-sm btn-primary mt-2">
                         <i class="far fa-magnifying-glass me-2"></i>
-                        View
+                        <%= Translate("View") %>
                     </button>
                 </div>
                 <div class="d-flex flex-column align-items-center">
@@ -140,10 +150,10 @@
                             <span>3/10</span>
                         </div>
                     </div>
-                    Courses
+                    <%= Translate("Courses") %>
                     <button type="button" class="btn btn-sm btn-primary mt-2">
                         <i class="far fa-magnifying-glass me-2"></i>
-                        View
+                        <%= Translate("View") %>
                     </button>
                 </div>
             </div>
@@ -152,7 +162,7 @@
     <div class="card" style="flex-grow: 1;">
         <div class="card-body">
             <h3 class="text-center">
-                My CE Credits
+                <%= Translate("My CE Credits") %>
             </h3>
 
             <div class="bar-grid">
@@ -162,32 +172,32 @@
                 <div>2025</div>
                 <div class="bar-container">
                     <div class="bg-warning" style="width: 40%;"></div>
-                    <span>12 completed</span>
+                    <span><%= Translate("12 completed") %></span>
                 </div>
 
                 <div>2024</div>
                 <div class="bar-container">
                     <div class="bg-danger" style="width: 30%;"></div>
-                    <span>9 completed</span>
+                    <span><span><%= Translate("9 completed") %></span></span>
                 </div>
 
                 <div>2023</div>
                 <div class="bar-container">
                     <div class="bg-success" style="width: 70%;"></div>
-                    <span>21 completed</span>
+                    <span><%= Translate("21 completed") %></span>
                 </div>
 
                 <div>2022</div>
                 <div class="bar-container">
                     <div class="bg-success" style="width: 99%;">
-                        <span>30 completed</span>
+                        <span><%= Translate("30 completed") %></span>
                     </div>
                 </div>
 
                 <div>2021</div>
                 <div class="bar-container">
                     <div class="bg-success" style="width: 99%;">
-                        <span>30 completed</span>
+                        <span><%= Translate("30 completed") %></span>
                     </div>
                 </div>
 

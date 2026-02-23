@@ -60,15 +60,6 @@ namespace InSite.Cmds.Admin.Records.Programs
         protected global::InSite.Custom.CMDS.Common.Controls.Server.FindDepartment DepartmentIdentifier;
 
         /// <summary>
-        /// TemplateField control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TemplateField;
-
-        /// <summary>
         /// ProgramIdentifier control.
         /// </summary>
         /// <remarks>
@@ -76,6 +67,33 @@ namespace InSite.Cmds.Admin.Records.Programs
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.FindAchievementList ProgramIdentifier;
+
+        /// <summary>
+        /// GroupIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindGroup GroupIdentifier;
+
+        /// <summary>
+        /// LearnerName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox LearnerName;
+
+        /// <summary>
+        /// SearchButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FilterButton SearchButton;
 
         /// <summary>
         /// LearnersPanel control.

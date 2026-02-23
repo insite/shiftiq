@@ -6,8 +6,6 @@ namespace InSite.Domain.Foundations
     [Serializable]
     public struct AccessControl
     {
-        public bool Execute { get; set; }
-
         public bool Read { get; set; }
         public bool Write { get; set; }
 

@@ -1,5 +1,7 @@
 using InSite.Application.Files.Read;
 
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
@@ -13,17 +15,21 @@ using Serilog;
 using Shift.Common.Integration.Google;
 using Shift.Constant;
 using Shift.Contract.Presentation;
+using Shift.Sdk.Service;
 using Shift.Service.Content;
+using Shift.Service.Content.PageContents;
 using Shift.Service.Directory;
 using Shift.Service.Feedback;
+using Shift.Service.Orchestration;
 using Shift.Service.Presentation;
 using Shift.Service.Workspace;
 
 // Step 1. Load configuration settings (from appsettings.json) before doing anything else.
 
-var configuration = BuildConfiguration();
+var configuration = BuildConfiguration("AppSettings");
 
-var settings = LoadSettings<AppSettings>();
+var settings = LoadSettings<AppSettings>("AppSettings");
+var partition = settings.Application;
 var databases = settings.Database;
 var database = databases.ConnectionStrings.Shift;
 var engine = settings.Engine;
@@ -32,6 +38,8 @@ var shift = settings.Shift;
 var telemetry = shift.Api.Telemetry;
 var release = settings.Release;
 var platform = settings.Platform;
+
+settings.RouteSettings = LoadSettings<RouteSettings>("RouteSettings");
 
 var environment = release.GetEnvironment();
 if (environment.IsLocal())
@@ -42,11 +50,13 @@ if (environment.IsLocal())
 // diagnosing startup issues, monitoring initialization steps, and providing consistent, centralized
 // logging throughout the application lifecycle.
 
-Serilog.Log.Logger = ConfigureLogging(shift.Api.Telemetry.Logging.File, shift.Api.Telemetry.Logging.Console);
+Serilog.Log.Logger = ConfigureLogging(shift.Api.Telemetry.Logging.File, shift.Api.Telemetry.Logging.Console, shift.Api.Telemetry.Logging.Framework);
 
 // Step 3. Build the application host with all services registered in the DI container.
 
 var host = BuildHost(settings, release, telemetry);
+
+Shift.Common.Timeline.Services.ServiceLocator.Instance.Register<Shift.Common.Timeline.Services.IGuidGenerator>(new UuidFactory());
 
 // Step 4. Start up the application.
 
@@ -60,23 +70,25 @@ await Shutdown(host);
 // -------------------------------------------------------------------------------------------------
 
 
-IConfigurationRoot BuildConfiguration()
+IConfigurationRoot BuildConfiguration(string filename)
 {
     var basePath = AppContext.BaseDirectory;
 
     var builder = new ConfigurationBuilder()
-        .AddEnvironmentVariables()
+        // .AddEnvironmentVariables()
         .SetBasePath(basePath)
-        .AddJsonFile("AppSettings.json", optional: false, reloadOnChange: true)
-        .AddJsonFile("AppSettings.Local.json", optional: true, reloadOnChange: true);
+        .AddJsonFile(filename + ".json", optional: false, reloadOnChange: true)
+        .AddJsonFile(filename + ".local.json", optional: true, reloadOnChange: true);
 
     return builder.Build();
 }
 
-T LoadSettings<T>() where T : new()
+T LoadSettings<T>(string filename) where T : new()
 {
-    var configuration = BuildConfiguration();
+    var configuration = BuildConfiguration(filename);
+
     var settings = configuration.Get<T>();
+
     return settings ?? new T();
 }
 
@@ -96,10 +108,15 @@ void DebugConfigurationProviders()
     }
 }
 
-Serilog.ILogger ConfigureLogging(string path, bool writeToConsole)
+Serilog.ILogger ConfigureLogging(string path, bool writeToConsole, bool enableFramework)
 {
     var config = new LoggerConfiguration()
         .MinimumLevel.Debug();
+
+    if (!enableFramework)
+        config = config
+            .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+            .MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning);
 
     var file = ProcessHelper.InitializeLogging(path);
     if (!string.IsNullOrEmpty(file))
@@ -123,7 +140,7 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
 
     services.AddSingleton<ReactStartupOptions>();
 
-    services.AddSingleton<IShiftIdentityService, IdentityService>();
+    services.AddSingleton<IPrincipalProvider, PrincipalProvider>();
 
     services.AddSingleton<IActionService, ActionService>();
 
@@ -137,8 +154,11 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
 
     services.AddSingleton<ResponseService>();
 
-    services.AddScoped<ITranslator, Translator>();
+    services.AddScoped<ICommanderAsync, CommanderAsync>();
+    services.AddScoped<ITranslatorService, TranslatorService>();
     services.AddScoped<IGroupLookupService, GroupLookupService>();
+    services.AddScoped<IContentRetrieveService, ContentRetrieveService>();
+    services.AddScoped<IContentModifyService, ContentModifyService>();
 
     services.AddSingleton<IFileChangeFactory>(x => new FileChangeFactory(x => string.Empty));
     services.AddSingleton<IFileSearchAsync, FileSearch>();
@@ -168,18 +188,26 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
     })
     .AddNewtonsoftJson(options =>
     {
-        options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-        options.SerializerSettings.ContractResolver = new DefaultContractResolver
+        var settings = options.SerializerSettings;
+
+        settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+        settings.Converters.Add(new FlagsEnumConverter<AuthorityAccess>());
+        settings.Converters.Add(new FlagsEnumConverter<DataAccess>());
+        settings.Converters.Add(new FlagsEnumConverter<FeatureAccess>());
+
+        settings.ContractResolver = new DefaultContractResolver
         {
-            NamingStrategy = new DefaultNamingStrategy() // Preserve original casing
+            NamingStrategy = new DefaultNamingStrategy() // preserve original casing
         };
-        options.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
-        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+
+        settings.Formatting = Newtonsoft.Json.Formatting.Indented;
+
+        settings.NullValueHandling = NullValueHandling.Ignore;
     });
 
     var developerDocsUrl = settings.Application.HelpUrl.TrimEnd('/') + "/developers";
 
-    services.AddDocumentation(release.Brand, developerDocsUrl);
+    services.AddDocumentation(settings.Partition.Brand, developerDocsUrl);
 
     services.AddQueries(typeof(TestOrganizationQuery).Assembly);
 
@@ -234,10 +262,10 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
         }
     });
 
-    return BuildApplication(builder, release, settings.Shift.Api, telemetry);
+    return BuildApplication(builder, settings, settings.Shift.Api, telemetry);
 }
 
-WebApplication BuildApplication(WebApplicationBuilder builder, ReleaseSettings release, ShiftSettingsApi api, TelemetrySettings telemetry)
+WebApplication BuildApplication(WebApplicationBuilder builder, AppSettings settings, ShiftSettingsApi api, TelemetrySettings telemetry)
 {
     var environment = release.GetEnvironment();
 
@@ -250,7 +278,7 @@ WebApplication BuildApplication(WebApplicationBuilder builder, ReleaseSettings r
     else
         host.UseDeveloperExceptionPage();
 
-    host.UseDocumentation(release);
+    host.UseDocumentation(settings);
 
     host.UseHttpsRedirection();
 
@@ -278,6 +306,7 @@ WebApplication BuildApplication(WebApplicationBuilder builder, ReleaseSettings r
 void AddSettings(IServiceCollection services)
 {
     services.AddSingleton(settings);
+    services.AddSingleton(partition);
     services.AddSingleton(database);
     services.AddSingleton(databases);
     services.AddSingleton(engine);
@@ -288,8 +317,9 @@ void AddSettings(IServiceCollection services)
     services.AddSingleton(settings.Shift.Api.Telemetry.Logging);
     services.AddSingleton(settings.Shift.Api.Telemetry.Monitoring);
     services.AddSingleton(platform);
+    services.AddSingleton(settings.RouteSettings);
 
-    UuidFactory.NamespaceId = UuidFactory.CreateV5ForDns(security.Domain);
+    UuidFactory.NamespaceId = UuidFactory.CreateV5ForDns(settings.Partition.Domain);
 
     OrganizationIdentifiers.Initialize(settings.Application.Organizations);
 }
@@ -336,20 +366,36 @@ void AddEntities(IServiceCollection services)
     }
 
     services.AddSingleton<IPersonValidator, PersonValidator>();
-
-    services.AddSingleton<PartitionFieldService>();
 }
 
 async Task Startup(WebApplication host)
 {
-    var log = host.Services.GetRequiredService<ILog>();
-    log.Information("Shift.Api starting up.");
-
     var labelService = host.Services.GetRequiredService<ILabelService>();
-    await labelService.Refresh();
+
+    await labelService.RefreshAsync();
 
     var actionService = host.Services.GetRequiredService<IActionService>();
+
     await actionService.RefreshAsync();
+
+    var log = host.Services.GetRequiredService<ILog>();
+
+    var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+
+    var server = host.Services.GetRequiredService<IServer>();
+
+    lifetime.ApplicationStarted.Register(() =>
+    {
+        var addresses = server.Features.Get<IServerAddressesFeature>()?.Addresses;
+
+        if (addresses != null)
+        {
+            foreach (var address in addresses)
+            {
+                log.Information($"Shift API is listening on {address}");
+            }
+        }
+    });
 
     await host.RunAsync();
 }

@@ -2,14 +2,13 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+    <insite:Alert runat="server" ID="ScreenStatus" />
     <insite:ValidationSummary runat="server" ValidationGroup="CompanyInfo" />
 
     <section runat="server" ID="OrganizationSection" class="mb-3">
 
         <div class="card border-0 shadow-lg">
             <div class="card-body">
-
-                <asp:CustomValidator runat="server" ID="CompanyDomainValidator" ErrorMessage="Web Site is invalid" ValidationGroup="CompanyInfo" />
 
                 <div class="row">
                     <div class="col-md-6">

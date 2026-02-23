@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Contract.Presentation;
 using Shift.Service.Directory;
 
 namespace Shift.Api;
@@ -11,68 +12,83 @@ namespace Shift.Api;
 /// </summary>
 [ApiController]
 [ApiExplorerSettings(GroupName = "Security API")]
-public partial class CookieController : ControllerBase
+[Route("api/security/cookies")]
+public partial class CookieController : ShiftControllerBase
 {
-    private readonly ReleaseSettings _releaseSettings;
-
-    private readonly SecuritySettings _securitySettings;
+    private readonly AppSettings _appSettings;
 
     private readonly PersonService _personService;
 
     private readonly OrganizationService _organizationService;
 
+    private readonly OrganizationAdapter _organizationAdapter;
+
     private readonly GroupService _groupService;
 
+    private readonly IPrincipalProvider _identityService;
+
+    private readonly IReactService _reactService;
+
     public CookieController(
-        ReleaseSettings releaseSettings,
-        SecuritySettings securitySettings,
+        AppSettings appSettings,
         PersonService personService,
         OrganizationService organizationService,
-        GroupService groupService
+        OrganizationAdapter organizationAdapter,
+        GroupService groupService,
+        IPrincipalProvider identityService,
+        IReactService reactService
         )
     {
-        _releaseSettings = releaseSettings;
-
-        _securitySettings = securitySettings;
+        _appSettings = appSettings;
 
         _personService = personService;
 
         _organizationService = organizationService;
 
+        _organizationAdapter = organizationAdapter;
+
         _groupService = groupService;
+
+        _identityService = identityService;
+
+        _reactService = reactService;
     }
 
-    [HttpPost("security/cookies/login")]
+    [HttpPost("login")]
     public async Task<IActionResult> LoginAsync(string organizationCode, string email)
     {
-        var environment = _releaseSettings.GetEnvironment();
-
-        var settings = _securitySettings.Cookie;
-
-        var domain = environment.IsLocal() ? "localhost" : _securitySettings.Domain;
+        var domain = GetSecurityDomain();
+        var settings = _appSettings.Security.Cookie;
 
         if (domain != "localhost" && !settings.Debug)
             return BadRequest("An untrusted cookie can be injected by the client only for debugging purposes.");
 
-        var token = await new LoginHelper(settings, _personService, _organizationService, _groupService).LoginAsync(organizationCode, email);
-        if (string.IsNullOrEmpty(token))
+        var token = await new LoginHelper(_personService, _organizationService, _groupService, _identityService).LoginAsync(organizationCode, email);
+        if (token == null)
             return BadRequest("Failed to create the token");
 
-        var now = DateTimeOffset.UtcNow;
+        AppendSecurityCookie(token);
 
-        var expiry = now.AddHours(settings.Lifetime);
+        return Ok(new { token });
+    }
 
-        // Mimic the same-site functionality from the security/cookies/generate endpoint.
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        var environment = _appSettings.Release.GetEnvironment();
+
+        var settings = _appSettings.Security.Cookie;
+        var idSettings = _appSettings.Security.IdCookie;
+
+        var domain = environment.IsLocal() ? "localhost" : _appSettings.Partition.Domain;
 
         var sameSite = settings.Encrypt ? SameSiteMode.Lax : SameSiteMode.None;
 
-        Response.Cookies.Append(
+        Response.Cookies.Delete(
             settings.Name,
-            token,
             new CookieOptions
             {
                 Domain = domain,
-                Expires = expiry,
                 Path = settings.Path,
                 SameSite = sameSite,
                 Secure = true,
@@ -80,22 +96,8 @@ public partial class CookieController : ControllerBase
             }
         );
 
-        return Ok(new { token });
-    }
-
-    [HttpPost("security/cookies/logout")]
-    public IActionResult Logout()
-    {
-        var environment = _releaseSettings.GetEnvironment();
-
-        var settings = _securitySettings.Cookie;
-
-        var domain = environment.IsLocal() ? "localhost" : _securitySettings.Domain;
-
-        var sameSite = settings.Encrypt ? SameSiteMode.Lax : SameSiteMode.None;
-
         Response.Cookies.Delete(
-            settings.Name,
+            idSettings.Name,
             new CookieOptions
             {
                 Domain = domain,
@@ -125,14 +127,14 @@ public partial class CookieController : ControllerBase
     /// tries to create a new cookie for you. This is useful for testing the behaviour of the API when it receives
     /// unexpected (or corrupted) cookie tokens. Please note this endpoint is available in localhost environments only!
     /// </remarks>
-    [HttpPost("security/cookies/create")]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateAsync(string? name, int? lifetime)
     {
-        var environment = _releaseSettings.GetEnvironment();
+        var environment = _appSettings.Release.GetEnvironment();
 
-        var settings = _securitySettings.Cookie;
+        var settings = _appSettings.Security.Cookie;
 
-        var domain = environment.IsLocal() ? "localhost" : _securitySettings.Domain;
+        var domain = environment.IsLocal() ? "localhost" : _appSettings.Partition.Domain;
 
         if (domain != "localhost" && !settings.Debug)
             return BadRequest("An untrusted cookie can be injected by the client only for debugging purposes.");
@@ -177,7 +179,7 @@ public partial class CookieController : ControllerBase
     /// </summary>
     /// <returns>An <see cref="IActionResult"/> containing the decoded cookie data, or a BadRequest 
     /// if decoding fails.</returns>
-    [HttpPost("security/cookies/decode")]
+    [HttpPost("decode")]
     public async Task<IActionResult> DecodeAsync()
     {
         var encoded = string.Empty;
@@ -189,10 +191,10 @@ public partial class CookieController : ControllerBase
 
         var encoder = new CookieTokenEncoder();
 
-        var cookie = encoder.Deserialize(encoded, _securitySettings.Cookie.Encrypt, _securitySettings.Cookie.Secret);
+        var cookie = encoder.Deserialize(encoded, _appSettings.Security.Cookie.Encrypt, _appSettings.Security.Cookie.Secret, false);
 
         if (cookie == null)
-            return BadRequest($"Failed to{(_securitySettings.Cookie.Encrypt ? " decrypt and " : " ")}decode HTTP request body.");
+            return BadRequest($"Failed to{(_appSettings.Security.Cookie.Encrypt ? " decrypt and " : " ")}decode HTTP request body.");
 
         return Ok(cookie);
     }
@@ -202,14 +204,14 @@ public partial class CookieController : ControllerBase
     /// </summary>
     /// <returns>An <see cref="IActionResult"/> containing the token that was used to create the 
     /// cookie, or a BadRequest if not in local environment.</returns>
-    [HttpPost("security/cookies/generate")]
+    [HttpPost("generate")]
     public async Task<IActionResult> GenerateAsync()
     {
-        var environment = _releaseSettings.GetEnvironment();
+        var environment = _appSettings.Release.GetEnvironment();
 
-        var settings = _securitySettings.Cookie;
+        var settings = _appSettings.Security.Cookie;
 
-        var domain = environment.IsLocal() ? "localhost" : _securitySettings.Domain;
+        var domain = environment.IsLocal() ? "localhost" : _appSettings.Partition.Domain;
 
         if (domain != "localhost" && !settings.Debug)
             return BadRequest("An untrusted cookie can be injected by the client only for debugging purposes.");
@@ -257,16 +259,16 @@ public partial class CookieController : ControllerBase
     /// </summary>
     /// <returns>An <see cref="ActionResult"/> containing an introspection report with 
     /// authentication details, cookie information, and authorization status.</returns>
-    [HttpGet("security/cookies/introspect")]
-    [CookieAuthorize("Security.Cookies.Introspect")]
-    public ActionResult IntrospectAsync()
+    [HttpGet("introspect")]
+    [CookieAuthorize]
+    public IActionResult IntrospectAsync()
     {
-        var cookieSettings = _securitySettings.Cookie;
+        var cookieSettings = _appSettings.Security.Cookie;
 
         var cookie = Request.Cookies[cookieSettings.Name];
 
         if (cookie == null)
-            return BadRequest(new Error($"Cookie is missing: {cookieSettings.Name}"));
+            return BadRequest($"Cookie is missing: {cookieSettings.Name}");
 
         var encrypt = cookieSettings.Encrypt;
 
@@ -279,7 +281,7 @@ public partial class CookieController : ControllerBase
 
         var encoder = new CookieTokenEncoder();
         report.Authentication.Cookie.Decoded = HttpUtility.UrlDecode(cookie);
-        report.Authentication.Cookie.Deserialized = encoder.Deserialize(cookie, encrypt, secret);
+        report.Authentication.Cookie.Deserialized = encoder.Deserialize(cookie, encrypt, secret, false);
 
         report.Authorization.Policy = "Security.Cookies.Introspect";
         report.Authorization.Status = "Security claims principal authorization succeeded";
@@ -295,7 +297,7 @@ public partial class CookieController : ControllerBase
     /// </summary>
     /// <returns>An <see cref="IActionResult"/> containing the validated cookie data, or a 
     /// BadRequest if validation fails.</returns>
-    [HttpPost("security/cookies/validate")]
+    [HttpPost("validate")]
     public async Task<IActionResult> ValidateAsync()
     {
         var token = string.Empty;
@@ -307,13 +309,13 @@ public partial class CookieController : ControllerBase
 
         var encoder = new CookieTokenEncoder();
 
-        var encrypt = _securitySettings.Cookie.Encrypt;
+        var encrypt = _appSettings.Security.Cookie.Encrypt;
 
-        var secret = _securitySettings.Cookie.Secret;
+        var secret = _appSettings.Security.Cookie.Secret;
 
         try
         {
-            var cookie = encoder.Deserialize(token, encrypt, secret);
+            var cookie = encoder.Deserialize(token, encrypt, secret, false);
 
             if (cookie == null)
                 return BadRequest("Cookie validation failed.");
@@ -324,5 +326,126 @@ public partial class CookieController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+    }
+
+    [HttpPost("change-language/{language}")]
+    public async Task<IActionResult> ChangeLanguageAsync([FromRoute] string language)
+    {
+        var cookieSettings = _appSettings.Security.Cookie;
+        var cookie = Request.Cookies[cookieSettings.Name];
+        if (cookie == null)
+            return BadRequest($"Cookie is missing: {cookieSettings.Name}");
+
+        var principal = _identityService.GetPrincipal();
+        if (principal.UserId == Guid.Empty)
+            return BadRequest($"Invalid principal user");
+
+        var organization = await _organizationService.RetrieveAsync(principal.Organization.Identifier);
+        var organizationData = organization != null ? _organizationAdapter.ToData(organization) : null;
+
+        if (organizationData == null || !organizationData.Languages.Any(x => x.TwoLetterISOLanguageName == language))
+            return BadRequest($"Unsupported language: {language}");
+
+        CookieToken token;
+
+        try
+        {
+            token = new CookieTokenEncoder().Deserialize(cookie, cookieSettings.Encrypt, cookieSettings.Secret, false);
+        }
+        catch (CookieSerializationException)
+        {
+            return BadRequest($"Cookie is broken: {cookieSettings.Name}");
+        }
+
+        token.ResetCreated();
+        token.ResetID();
+        token.Language = language;
+
+        AppendSecurityCookie(token);
+
+        return Ok();
+    }
+
+    [HttpPost("change-theme/{theme}")]
+    public IActionResult ChangeTheme([FromRoute] string theme)
+    {
+        var domain = GetSecurityDomain();
+        var settings = _appSettings.Security.Cookie;
+
+        if (domain != "localhost" && !settings.Debug)
+            return BadRequest("This endpoint is available only for debugging purposes");
+
+        string normalizedTheme;
+
+        if (string.Equals(theme, "light", StringComparison.OrdinalIgnoreCase))
+            normalizedTheme = "Light";
+        else if (string.Equals(theme, "dark", StringComparison.OrdinalIgnoreCase))
+            normalizedTheme = "Dark";
+        else
+            return BadRequest("Invalid theme");
+
+        Response.Cookies.Append(
+            "Shift.UI.ThemeMode",
+            normalizedTheme,
+            new CookieOptions
+            {
+                Domain = domain,
+                Expires = DateTime.Now.AddDays(90),
+                Path = settings.Path,
+                SameSite = SameSiteMode.Lax,
+                HttpOnly = false
+            }
+        );
+
+        return Ok();
+    }
+
+    private void AppendSecurityCookie(CookieToken token)
+    {
+        var domain = GetSecurityDomain();
+        var settings = _appSettings.Security.Cookie;
+        var idSettings = _appSettings.Security.IdCookie;
+        var now = DateTimeOffset.UtcNow;
+        var expiry = now.AddMinutes(settings.Lifetime);
+        var sameSite = settings.Encrypt ? SameSiteMode.Lax : SameSiteMode.None;
+
+        token.ValidationKey = CookieToken.CreateValidationKey(token, settings.Secret);
+
+        var serializedToken = new CookieTokenEncoder().Serialize(token, settings.Encrypt, settings.Secret, false);
+
+        Response.Cookies.Append(
+            settings.Name,
+            serializedToken,
+            new CookieOptions
+            {
+                Domain = domain,
+                Expires = expiry,
+                Path = settings.Path,
+                SameSite = sameSite,
+                Secure = true,
+                HttpOnly = true
+            }
+        );
+
+        Response.Cookies.Append(
+            idSettings.Name,
+            token.ID.ToString().ToLower(),
+            new CookieOptions
+            {
+                Domain = domain,
+                Expires = expiry,
+                Path = settings.Path,
+                SameSite = sameSite,
+                Secure = true,
+                HttpOnly = true
+            }
+        );
+    }
+
+    private string GetSecurityDomain()
+    {
+        return string.Equals(Request.Host.Host, "localhost", StringComparison.OrdinalIgnoreCase)
+            ? Request.Host.Host
+            : _appSettings.Partition.Domain;
     }
 }

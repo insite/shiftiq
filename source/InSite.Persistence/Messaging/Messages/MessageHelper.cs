@@ -300,7 +300,7 @@ namespace InSite.Persistence
                 ReplaceBodyPlaceholder("$" + variable.Key, value);
             }
 
-            var organization = OrganizationSearch.Select(organizationId) ?? throw new ApplicationError($"Organization not found: {organizationId}");
+            var organization = OrganizationSearch.Select(organizationId) ?? throw new KeyNotFoundException($"Organization not found: {organizationId}");
 
             ReplaceBodyPlaceholder("$RecipientName", envelope.RecipientName);
             ReplaceBodyPlaceholder("$RecipientEmail", envelope.RecipientEmail);
@@ -373,7 +373,7 @@ namespace InSite.Persistence
 
         public static string ReplacePlaceholdersForSmarterMail(Guid organizationId, Guid senderId, int? surveyFormAsset, string body)
         {
-            var organization = OrganizationSearch.Select(organizationId) ?? throw new ApplicationError($"Organization not found: {organizationId}");
+            var organization = OrganizationSearch.Select(organizationId) ?? throw new KeyNotFoundException($"Organization not found: {organizationId}");
 
             var organizationLogoUrl = organization.PlatformCustomization.PlatformUrl.Logo;
             if (!string.IsNullOrEmpty(organizationLogoUrl) && organizationLogoUrl.StartsWith("/"))
@@ -544,19 +544,19 @@ namespace InSite.Persistence
         public static IEnumerable<Command> CreateMessage(VMessage message, ContentContainer content, bool isNewsleter = false, SurveyMessageType surveyType = SurveyMessageType.Undefined) // add type
         {
             if (message.MessageType.IsEmpty())
-                throw new ApplicationError("Message type is undefined");
+                throw new InvalidOperationException("Message type is undefined");
 
             if (message.MessageName.IsEmpty())
-                throw new ApplicationError("Message name is undefined");
+                throw new InvalidOperationException("Message name is undefined");
 
             if (content.Title.Text.IsEmpty)
-                throw new ApplicationError("Message title is undefined");
+                throw new InvalidOperationException("Message title is undefined");
 
             if (content.Title.Text.Default.IsEmpty())
-                throw new ApplicationError("Message title has no value for the default language");
+                throw new InvalidOperationException("Message title has no value for the default language");
 
             if (!content.Body.Text.IsEmpty && content.Body.Text.Default.IsEmpty())
-                throw new ApplicationError("Message content has no value for the default language");
+                throw new InvalidOperationException("Message content has no value for the default language");
 
             message.MessageIdentifier = UniqueIdentifier.Create();
 

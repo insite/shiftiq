@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public partial class InputMatch
     {
-        public Guid ContentIdentifier { get; set; }
+        public Guid ContentId { get; set; }
     }
 }

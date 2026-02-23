@@ -4,21 +4,19 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IGradebookCriteria
+    public interface IGradebookCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
 
-        Guid? AchievementIdentifier { get; set; }
+        Guid? AchievementId { get; set; }
 
-        Guid? ClassIdentifier { get; set; }
+        Guid? ClassId { get; set; }
 
-        Guid? ClassInstructorIdentifier { get; set; }
+        Guid? ClassInstructorId { get; set; }
 
-        Guid? FrameworkIdentifier { get; set; }
+        Guid? FrameworkId { get; set; }
 
-        Guid OrganizationIdentifier { get; set; }
-
-        Guid? PeriodIdentifier { get; set; }
+        Guid? PeriodId { get; set; }
 
         bool? IsLocked { get; set; }
 

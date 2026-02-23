@@ -7,14 +7,14 @@ export interface GradebookCriteria extends BaseCriteria {
     gradebookTitle: string;
     gradebookCreatedSince: DateTime;
     gradebookCreatedBefore: DateTime;
-    periodIdentifier: string;
-    achievementIdentifier: string;
-    frameworkIdentifier: string;
+    periodId: string;
+    achievementId: string;
+    frameworkId: string;
     gradebookStatus: "locked" | "unlocked" | "";
     classTitle: string;
     classStartedSince: DateTime;
     classStartedBefore: DateTime;
-    classInstructorIdentifier: string;
+    classInstructorId: string;
 }
 
 export function defaultGradebookCriteria(): GradebookCriteria {
@@ -22,14 +22,14 @@ export function defaultGradebookCriteria(): GradebookCriteria {
         gradebookTitle: "",
         gradebookCreatedSince: null,
         gradebookCreatedBefore: null,
-        periodIdentifier: "",
-        achievementIdentifier: "",
-        frameworkIdentifier: "",
+        periodId: "",
+        achievementId: "",
+        frameworkId: "",
         gradebookStatus: "",
         classTitle: "",
         classStartedSince: null,
         classStartedBefore: null,
-        classInstructorIdentifier: "",
+        classInstructorId: "",
         visibleColumns: [],
         sortByColumn: ""
     }
@@ -40,13 +40,13 @@ export function toApiSearchGradebooks(criteria: GradebookCriteria): ApiSearchGra
         GradebookTitle: criteria.gradebookTitle,
         GradebookCreatedSince: dateTimeHelper.formatServerDateTime(criteria.gradebookCreatedSince),
         GradebookCreatedBefore: dateTimeHelper.formatServerDateTime(criteria.gradebookCreatedBefore),
-        PeriodIdentifier: criteria.periodIdentifier,
-        AchievementIdentifier: criteria.achievementIdentifier,
-        FrameworkIdentifier: criteria.frameworkIdentifier,
+        PeriodId: criteria.periodId,
+        AchievementId: criteria.achievementId,
+        FrameworkId: criteria.frameworkId,
         IsLocked: criteria.gradebookStatus === "locked" ? true : (criteria.gradebookStatus === "unlocked" ? false : null),
         ClassTitle: criteria.classTitle,
         ClassStartedSince: dateTimeHelper.formatServerDateTime(criteria.classStartedSince),
         ClassStartedBefore: dateTimeHelper.formatServerDateTime(criteria.classStartedBefore),
-        ClassInstructorIdentifier: criteria.classInstructorIdentifier,
+        ClassInstructorId: criteria.classInstructorId,
     }
 }

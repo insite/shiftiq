@@ -13,8 +13,8 @@
         <div runat="server" id="QuestionCommandsTop" class="mb-3 hstack">
             <insite:DropDownButton runat="server" ID="AddQuestionTopButton" IconName="plus-circle" Text="Add" CssClass="me-2">
                 <Items>
-                    <insite:DropDownButtonItem Name="AddMultipleChoice" ToolTip="Add a new multiple-choice question to this assessment" IconName="check-circle" Text="Multiple Choice" />
-                    <insite:DropDownButtonItem Name="AddTrueOrFalse" ToolTip="Add a new true-or-false question to this assessment" IconName="toggle-on" Text="True or False"  />
+                    <sdk:DropDownButtonItem Name="AddMultipleChoice" ToolTip="Add a new multiple-choice question to this assessment" IconName="check-circle" Text="Multiple Choice" />
+                    <sdk:DropDownButtonItem Name="AddTrueOrFalse" ToolTip="Add a new true-or-false question to this assessment" IconName="toggle-on" Text="True or False"  />
                 </Items>
             </insite:DropDownButton>
             <insite:Button runat="server" ID="CollapseTopButton" ButtonStyle="Default" Width="95px" Text="Collapse" Icon="fas fa-chevron-up" />
@@ -67,8 +67,8 @@
         <div runat="server" id="QuestionCommandsBottom" style="margin-bottom:15px; margin-top:15px;">
             <insite:DropDownButton runat="server" ID="AddQuestionBottomButton" IconName="plus-circle" Text="Add" CssClass="d-inline-block">
                 <Items>
-                    <insite:DropDownButtonItem Name="AddMultipleChoice" ToolTip="Add a new multiple-choice question to this assessment" IconName="check-circle" Text="Multiple Choice" />
-                    <insite:DropDownButtonItem Name="AddTrueOrFalse" ToolTip="Add a new true-or-false question to this assessment" IconName="toggle-on" Text="True or False"  />
+                    <sdk:DropDownButtonItem Name="AddMultipleChoice" ToolTip="Add a new multiple-choice question to this assessment" IconName="check-circle" Text="Multiple Choice" />
+                    <sdk:DropDownButtonItem Name="AddTrueOrFalse" ToolTip="Add a new true-or-false question to this assessment" IconName="toggle-on" Text="True or False"  />
                 </Items>
             </insite:DropDownButton>
             <insite:Button runat="server" ID="CollapseBottomButton" ButtonStyle="Default" Width="95px" Text="Collapse" Icon="fas fa-chevron-up" />

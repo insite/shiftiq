@@ -177,7 +177,7 @@ namespace InSite.Persistence
             while (!unique && count <= MaximumDuplicates);
 
             if (!unique && count > MaximumDuplicates)
-                throw new Exception($"Unable to create a unique email address for {duplicateEmail}. More than {Shift.Common.Humanizer.ToQuantity(MaximumDuplicates, "user")} cannot have the same email address.");
+                throw new InvalidOperationException($"Unable to create a unique email address for {duplicateEmail}. More than {Shift.Common.Humanizer.ToQuantity(MaximumDuplicates, "user")} cannot have the same email address.");
 
             return email;
         }
@@ -441,39 +441,43 @@ namespace InSite.Persistence
                     query = query.Where(x => x.DefaultPasswordExpired < filter.DefaultPasswordExpired.Before.Value);
             }
 
+            if (filter.Memberships.IsNotEmpty())
             {
-                var hasMembershipFilter = false;
-                var predicate = PredicateBuilder.True<Membership>();
-
-                if (filter.MembershipGroupIdentifier.HasValue)
+                foreach (var membershipFilter in filter.Memberships)
                 {
-                    predicate = predicate.And(x => x.GroupIdentifier == filter.MembershipGroupIdentifier.Value);
-                    hasMembershipFilter = true;
-                }
+                    var hasMembershipFilter = false;
+                    var predicate = PredicateBuilder.True<Membership>();
 
-                if (filter.MembershipGroupName.IsNotEmpty())
-                {
-                    predicate = predicate.And(x => x.Group.GroupName == filter.MembershipGroupName);
-                    hasMembershipFilter = true;
-                }
-
-                if (filter.MembershipType.IsNotEmpty())
-                {
-                    if (filter.MembershipTypeAnd)
+                    if (membershipFilter.MembershipGroupIdentifier.HasValue)
                     {
-                        predicate = predicate.And(x => x.MembershipType == filter.MembershipType);
+                        predicate = predicate.And(x => x.GroupIdentifier == membershipFilter.MembershipGroupIdentifier.Value);
+                        hasMembershipFilter = true;
                     }
-                    else
-                    {
-                        // REVIEW: Is this a bug? It produces unexpected results in the E03 partition
-                        // on this form - ui/admin/learning/programs/enrollments/assign.
-                        predicate = predicate.Or(x => x.MembershipType == filter.MembershipType);
-                    }
-                    hasMembershipFilter = true;
-                }
 
-                if (hasMembershipFilter)
-                    query = query.Where(LinqExtensions1.Expr((User x) => x.Memberships.Any(y => predicate.Invoke(y))).Expand());
+                    if (membershipFilter.MembershipGroupName.IsNotEmpty())
+                    {
+                        predicate = predicate.And(x => x.Group.GroupName == membershipFilter.MembershipGroupName);
+                        hasMembershipFilter = true;
+                    }
+
+                    if (membershipFilter.MembershipType.IsNotEmpty())
+                    {
+                        if (membershipFilter.MembershipTypeAnd)
+                        {
+                            predicate = predicate.And(x => x.MembershipType == membershipFilter.MembershipType);
+                        }
+                        else
+                        {
+                            // REVIEW: Is this a bug? It produces unexpected results in the E03 partition
+                            // on this form - ui/admin/learning/programs/enrollments/assign.
+                            predicate = predicate.Or(x => x.MembershipType == membershipFilter.MembershipType);
+                        }
+                        hasMembershipFilter = true;
+                    }
+
+                    if (hasMembershipFilter)
+                        query = query.Where(LinqExtensions1.Expr((User x) => x.Memberships.Any(y => predicate.Invoke(y))).Expand());
+                }
             }
 
             if (filter.IsCmds.HasValue)
@@ -823,7 +827,8 @@ ORDER BY PersonName
                 if (model == null)
                     return;
 
-                model.TimeZone = TimeZoneInfo.FindSystemTimeZoneById(model.TimeZoneId);
+                model.TimeZone = TimeZones.GetInfo(model.TimeZoneId)
+                    ?? TimeZoneInfo.FindSystemTimeZoneById(model.TimeZoneId);
 
                 var mfa = db.TUserAuthenticationFactors.FirstOrDefault(x => x.UserIdentifier == model.UserIdentifier);
                 model.ActiveOtpMode = mfa?.OtpMode ?? OtpModes.None;

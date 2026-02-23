@@ -100,7 +100,7 @@ namespace InSite.Admin.Sites.Pages
             {
                 if (item.Parent != null)
                 {
-                    throw new ApplicationError("Parent != null");
+                    throw new InvalidOperationException("Parent != null");
                 }
 
                 item.Parent = this;
@@ -224,7 +224,7 @@ namespace InSite.Admin.Sites.Pages
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 RedirectToSearch();
 
             if (IsPostBack)

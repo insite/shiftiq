@@ -151,7 +151,7 @@ namespace InSite.Cmds.Portal.Validations.CollegeCertificates
 
         private void LoadData()
         {
-            var table = UserCompetencyRepository.SelectCertifications(User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier, null);
+            var table = UserCompetencyRepository.SelectCertifications(User.UserIdentifier, Organization.Identifier, null);
 
             table.Columns.Add("CorePercentage", typeof(decimal));
             table.Columns.Add("NonCorePercentage", typeof(decimal));
@@ -195,7 +195,7 @@ namespace InSite.Cmds.Portal.Validations.CollegeCertificates
 
         private void LoadResults()
         {
-            var table = UserCompetencyRepository.SelectCertificationMissingCompetencies(ProfileStandardIdentifier.Value, User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+            var table = UserCompetencyRepository.SelectCertificationMissingCompetencies(ProfileStandardIdentifier.Value, User.UserIdentifier, Organization.Identifier);
 
             Grid.Visible = table.Rows.Count > 0;
             Grid.EnablePaging = false;
@@ -232,7 +232,7 @@ namespace InSite.Cmds.Portal.Validations.CollegeCertificates
                 Institution = institutionName
             };
 
-            AddHours(requested, User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier, profile.StandardIdentifier);
+            AddHours(requested, User.UserIdentifier, Organization.Identifier, profile.StandardIdentifier);
 
             ServiceLocator.ChangeQueue.Publish(requested);
 
@@ -291,7 +291,7 @@ namespace InSite.Cmds.Portal.Validations.CollegeCertificates
 
                 csv.AppendFormat("Number{0}Summary{0}Core Hours{0}Non-Core Hours{0}Total Hours{0}Status", ',');
 
-                var table = UserCompetencyRepository.SelectCertificationMissingCompetencies(ProfileStandardIdentifier.Value, User.Identifier, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+                var table = UserCompetencyRepository.SelectCertificationMissingCompetencies(ProfileStandardIdentifier.Value, User.Identifier, Organization.Identifier);
 
                 foreach (DataRow row in table.Rows)
                 {

@@ -4,8 +4,8 @@ namespace Shift.Contract
 {
     public partial class PersonSecretModel
     {
-        public Guid PersonIdentifier { get; set; }
-        public Guid SecretIdentifier { get; set; }
+        public Guid PersonId { get; set; }
+        public Guid SecretId { get; set; }
 
         public string SecretName { get; set; }
         public string SecretType { get; set; }

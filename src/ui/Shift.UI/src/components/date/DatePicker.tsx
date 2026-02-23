@@ -9,6 +9,7 @@ import DatePicker_TimeZone from "./DatePicker_TimeZone";
 import { useDatePicker } from "./useDatePicker";
 
 import "./DatePicker.css";
+import Icon from "../icon/Icon";
 
 export interface DatePickerProps {
     ref?: ForwardedRef<HTMLInputElement>,
@@ -106,7 +107,7 @@ export default function DatePicker({
                     title={translate("Select Time Zone")}
                     onClick={handleTimeZoneButtonClicked}
                 >
-                    <i className="far fa-globe-americas"></i>
+                    <Icon style="Regular" name="globe-americas" />
                     <span>{timeZone.timeZoneAbbrev}</span>
                 </button>
             )}
@@ -119,7 +120,7 @@ export default function DatePicker({
                 title={showTime ? translate("Select Date/Time") : translate("Select Date")}
                 onClick={handleCalendarButtonClicked}
             >
-                <i className="far fa-calendar-alt"></i>
+                <Icon style="Regular" name="calendar-alt" />
             </button>
             {calendarState.opened && inputRef.current && (
                 <DatePicker_Calendar

@@ -119,7 +119,7 @@
 
                     <div class="mt-3">
                         <insite:SearchButton runat="server" ID="ReportButton" Text="Report" Icon="fas fa-chart-bar" ValidationGroup="Report" CausesValidation="true" />
-                        <insite:CloseButton runat="server" NavigateUrl="/ui/cmds/reports" />
+                        <insite:CloseButton runat="server" NavigateUrl="/ui/admin/reporting" />
                     </div>
 
                 </ContentTemplate>
@@ -161,7 +161,7 @@
             </div>
 
             <div class="mt-3">
-                <insite:CloseButton runat="server" NavigateUrl="/ui/cmds/reports" />
+                <insite:CloseButton runat="server" NavigateUrl="/ui/admin/reporting" />
             </div>
 
         </insite:NavItem>

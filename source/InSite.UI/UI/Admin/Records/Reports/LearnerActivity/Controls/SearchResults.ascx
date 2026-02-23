@@ -13,80 +13,56 @@
 <div class="d-inline-block">
     <asp:Literal ID="Instructions" runat="server" />
 
-    <insite:Grid runat="server" ID="Grid" DataKeyNames="LearnerIdentifier" CssClass="table table-bordered table-striped table-responsive">
+    <insite:Grid runat="server" ID="Grid" CssClass="table table-bordered table-striped table-responsive">
         <Columns>
-
-            <asp:TemplateField HeaderText="Account Created" ItemStyle-Wrap="false">
-                <ItemTemplate>
-                    <%# LocalizeDate(Eval("LearnerCreated")) %>
-                </ItemTemplate>
-            </asp:TemplateField>
 
             <asp:TemplateField HeaderText="Full Name">
                 <ItemTemplate>
-                    <a href="/ui/admin/contacts/people/edit?contact=<%# Eval("LearnerIdentifier") %>"><%# Eval("LearnerName") %></a>
+                    <a href="/ui/admin/contacts/people/edit?contact=<%# Eval("UserIdentifier") %>"><%# Eval("UserFullName") %></a>
                 </ItemTemplate>
             </asp:TemplateField>
-            <asp:BoundField HeaderText="Last Name" DataField="LearnerNameLast" />
-            <asp:BoundField HeaderText="First Name" DataField="LearnerNameFirst" />
-            <asp:BoundField HeaderText="Email" DataField="LearnerEmail" />
-            <asp:BoundField HeaderText="Gender" DataField="LearnerGender" />
-
-            <asp:BoundField HeaderText="Phone" DataField="LearnerPhone" ItemStyle-Wrap="false" />
+            
+            <asp:BoundField HeaderText="Email" DataField="UserEmail" />
+            <asp:BoundField HeaderText="Gender" DataField="UserGender" />
+            <asp:BoundField HeaderText="Phone" DataField="UserPhone" ItemStyle-Wrap="false" />
+            
             <asp:TemplateField HeaderText="Birthdate" ItemStyle-Wrap="false">
                 <ItemTemplate>
-                    <%# FormatDate(Eval("LearnerBirthdate")) %>
+                    <%# FormatDate(Eval("UserBirthdate")) %>
                 </ItemTemplate>
             </asp:TemplateField>
+            
             <asp:BoundField HeaderText="Person Code" DataField="PersonCode" />
-            <asp:BoundField HeaderText="Occupation" DataField="LearnerOccupation" />
 
             <asp:TemplateField HeaderText="Program">
                 <ItemTemplate>
-                    <%# GetProgramsHtml() %>
+                    <a href="/ui/admin/learning/programs/outline?id=<%# Eval("ProgramIdentifier") %>"><%# Eval("ProgramName") %></a>
                 </ItemTemplate>
             </asp:TemplateField>
-            <asp:BoundField HeaderText="Gradebook" DataField="GradebookName" />
-            <asp:BoundField HeaderText="Enrollment Status" DataField="EnrollmentStatus" />
 
-            <asp:TemplateField HeaderText="Enrollment Started" ItemStyle-Wrap="false">
+            <asp:TemplateField HeaderText="Gradebook">
                 <ItemTemplate>
-                    <%# LocalizeDate(Eval("EnrollmentStarted")) %>
+                    <asp:Repeater runat="server" ID="GradebookRepeater">
+                        <HeaderTemplate><ul></HeaderTemplate>
+                        <FooterTemplate></ul></FooterTemplate>
+                        <ItemTemplate>
+                            <li>
+                                <a href="/ui/admin/records/gradebooks/outline?id=<%# Eval("GradebookIdentifier") %>"><%# Eval("GradebookTitle") %></a>
+                            </li>
+                        </ItemTemplate>
+                    </asp:Repeater>
                 </ItemTemplate>
             </asp:TemplateField>
-
-            <asp:TemplateField HeaderText="First Session" ItemStyle-Wrap="false">
-                <ItemTemplate>
-                    <%# LocalizeDate(Eval("SessionStartedFirst")) %>
-                </ItemTemplate>
-            </asp:TemplateField>
-
-            <asp:TemplateField HeaderText="Last Session" ItemStyle-Wrap="false">
-                <ItemTemplate>
-                    <%# LocalizeDate(Eval("SessionStartedLast")) %>
-                </ItemTemplate>
-            </asp:TemplateField>
-
-            <asp:TemplateField HeaderText="Session Count" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" ItemStyle-Wrap="false">
-                <ItemTemplate>
-                    <%# Eval("SessionCount","{0:n0}") %>
-                </ItemTemplate>
-            </asp:TemplateField>
-
-            <asp:TemplateField HeaderText="Session Time" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" ItemStyle-Wrap="false">
-                <ItemTemplate>
-                    <%# Eval("SessionMinutes","{0:n0} min") %>
-                </ItemTemplate>
-            </asp:TemplateField>
-
-            <asp:BoundField HeaderText="Employed By / Belongs To" DataField="EmployerName" />
-
-            <asp:BoundField HeaderText="Citizenship" DataField="LearnerCitizenship" />
-            <asp:BoundField HeaderText="Membership Status" DataField="MembershipStatus" />
 
             <asp:TemplateField HeaderText="Achievement Granted" ItemStyle-Wrap="false">
                 <ItemTemplate>
-                    <%# Eval("AchievementGranted", "{0:MMM d, yyyy}") %>
+                    <asp:Repeater runat="server" ID="AchievementRepeater">
+                        <ItemTemplate>
+                            <div>
+                                <%# LocalizeDate(Eval("CredentialGranted")) %>
+                            </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
                 </ItemTemplate>
             </asp:TemplateField>
 

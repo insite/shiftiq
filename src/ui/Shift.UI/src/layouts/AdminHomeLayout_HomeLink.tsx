@@ -1,9 +1,17 @@
 import ActionLink from "@/components/ActionLink";
+import { useSiteProvider } from "@/contexts/SiteProvider";
 
 export default function AdminHomeLayout_HomeLink() {
+    const { siteSetting: { Home: home } } = useSiteProvider();
+
     return (
-        <ActionLink href="/client/admin/home" className='text-light'>
-            <i className='fas fa-home me-1'></i>Home
+        <ActionLink href={home.Url} className='text-light' title={home.Text}>
+            {home.Image ? (
+                <img className="home-image me-2" src={home.Image} alt={home.Text} />
+            ) : (
+                <i className={`${home.Icon} me-1`}></i>
+            )}
+            <span className="hide-compact">{home.Text}</span>
         </ActionLink>
     );
 }

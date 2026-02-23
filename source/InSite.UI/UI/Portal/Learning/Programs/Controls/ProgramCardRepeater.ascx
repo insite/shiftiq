@@ -13,9 +13,10 @@
         }
         .program-card > .form-check {
             position: absolute;
-            right: 1rem;
-            top: 0.5rem;
+            right: 10px;
+            top: 0;
             z-index: 4;
+            padding: 8px 6px 8px 39px;
         }
         .program-card > div.card {
             cursor: pointer;
@@ -41,7 +42,7 @@
                 data-title='<%# Eval("Title") %>'
                 data-description='<%# GetProgramDescription() %>'
             >
-                <insite:CheckBox runat="server" />
+                <insite:RadioButton runat="server" GroupName='<%# UniqueID + "$RadioGroup" %>' />
 
                 <div class="card card-hover card-tile border-0 shadow h-100">
                     <img runat="server"
@@ -88,6 +89,22 @@
 
             document.querySelectorAll(".program-card > .form-check input:checked").forEach(chk => chk.checked = false);
 
+            document.querySelectorAll(".program-card > .form-check").forEach(c => {
+                c.addEventListener("click", e => {
+                    if (!e.target || !e.target.classList.contains('form-check'))
+                        return;
+
+                    const input = e.target.querySelector('input');
+                    if (!input)
+                        return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    input.click();
+                });
+            });
+
             enableSubmit();
 
             modal.querySelector("[data-action]").addEventListener("click", e => {
@@ -133,7 +150,6 @@
                 } else {
                     submitButton.classList.add("disabled");
                 }
-
             }
         })();
     </script>

@@ -68,9 +68,9 @@ public static class MonitorRegistration
 
     public class SentryMonitor : BaseMonitor
     {
-        private IShiftIdentityService _identityService;
+        private IPrincipalProvider _identityService;
 
-        public SentryMonitor(ILog log, MonitoringSettings settings, IShiftIdentityService identityService)
+        public SentryMonitor(ILog log, MonitoringSettings settings, IPrincipalProvider identityService)
             : base(log, settings)
         {
             _identityService = identityService;

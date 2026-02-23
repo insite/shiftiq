@@ -116,10 +116,6 @@ namespace InSite.Persistence
 
         public void SetPassword(string password)
         {
-            // Enforce this business rule in the UI layer.
-            // if (!string.IsNullOrEmpty(DefaultPassword) && password == DefaultPassword)
-            //    throw new ApplicationError("New password can't be the same as default password");
-
             UserPasswordHash = PasswordHash.CreateHash(password);
             UserPasswordChanged = DateTimeOffset.UtcNow;
             UserPasswordExpired = DateTimeOffset.UtcNow.AddMonths(6);

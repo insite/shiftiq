@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Cases.Write;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Records.Read;
 using InSite.UI.Admin.Records.Programs.Utilities;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Learning.Programs.Models
@@ -28,7 +27,6 @@ namespace InSite.UI.Portal.Learning.Programs.Models
 
         private static Guid UserId => CurrentSessionState.Identity.User.Identifier;
         private static Guid OrganizationId => CurrentSessionState.Identity.Organization.Identifier;
-        private static Guid? ParentOrganizationId => CurrentSessionState.Identity.Organization.ParentOrganizationIdentifier;
 
         public static SubmitResult Submit(List<Guid> programIds, string language)
         {
@@ -68,10 +66,11 @@ namespace InSite.UI.Portal.Learning.Programs.Models
             var number = ServiceLocator.IssueSearch.GetNextIssueNumber(OrganizationId);
             var employerGroupId = GetEmployerGroupId();
             var comment = CreateComment(programs);
+            var issueTitle = CaseType + " - " + string.Join(", ", programs.Select(x => x.ProgramName));
 
             var commands = new List<ICommand>
             {
-                new OpenIssue(caseId, OrganizationId, number, CaseType, null, DateTimeOffset.UtcNow, null, CaseType, DateTimeOffset.UtcNow),
+                new OpenIssue(caseId, OrganizationId, number, issueTitle, null, DateTimeOffset.UtcNow, null, CaseType, DateTimeOffset.UtcNow),
                 new AssignUser(caseId, supervisorUserId, "Administrator"),
                 new AssignUser(caseId, UserId, "Topic"),
                 new AssignUser(caseId, supervisorUserId, "Owner"),
@@ -82,21 +81,21 @@ namespace InSite.UI.Portal.Learning.Programs.Models
                 commands.Add(new AssignGroup(caseId, employerGroupId.Value, "Employer"));
 
             commands.Add(new AuthorComment(
-                caseId,
-                UniqueIdentifier.Create(),
-                comment,
-                "Programs",
-                null,
-                UserIdentifiers.Someone,
-                null,
-                null,
-                null,
-                null,
-                null,
-                DateTimeOffset.UtcNow,
-                null,
-                null,
-                null
+                aggregate: caseId,
+                comment: UniqueIdentifier.Create(),
+                text: comment,
+                category: "Programs",
+                flag: null,
+                author: UserIdentifiers.Someone,
+                authorRole: null,
+                assignedTo: null,
+                resolvedBy: null,
+                subCategory: programs.Count == 1 ? programs[0].ProgramName : null,
+                tag: null,
+                posted: DateTimeOffset.UtcNow,
+                flagged: null,
+                submitted: null,
+                resolved: null
             ));
 
             return commands;
@@ -137,7 +136,7 @@ namespace InSite.UI.Portal.Learning.Programs.Models
 
         private static List<string> GetAchievements(Guid programId)
         {
-            var (_, items) = ProgramHelper.GetTasksAndItems(programId, "Achievement", OrganizationId, ParentOrganizationId);
+            var (_, items) = ProgramHelper.GetTasksAndItems(programId, "Achievement", OrganizationId, true);
             return items.Select(x => x.TaskName).ToList();
         }
 
@@ -157,8 +156,7 @@ namespace InSite.UI.Portal.Learning.Programs.Models
 
         private static Guid? GetCaseStatusId()
         {
-            var statuses = ServiceLocator.IssueSearch.GetStatuses(OrganizationId, CaseType);
-            return statuses.Find(x => string.Equals(x.StatusName, CaseStatus, StringComparison.OrdinalIgnoreCase))?.StatusIdentifier;
+            return ServiceLocator.IssueSearch.GetStatusId(OrganizationId, CaseType, CaseStatus);
         }
 
         private static Guid? GetEmployerGroupId()

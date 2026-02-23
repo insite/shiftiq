@@ -23,6 +23,10 @@
 			<Link>AppSettings.Local.json</Link>
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
+		<Content Include="..\..\..\config\RouteSettings.json">
+			<Link>RouteSettings.json</Link>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 	
 	<ItemGroup>

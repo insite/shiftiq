@@ -12,7 +12,7 @@ namespace Shift.Contract
         public Guid? EmployerIdentifier { get; set; }
         public Guid? EventIdentifier { get; set; }
         public Guid? ExamFormIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
         public Guid? PaymentIdentifier { get; set; }
         public Guid? RegistrationRequestedBy { get; set; }
         public Guid? SchoolIdentifier { get; set; }

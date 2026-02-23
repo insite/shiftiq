@@ -5,7 +5,7 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
-using Shift.Constant;
+using Shift.Common;
 using Shift.Contract;
 
 namespace InSite.UI.Admin.Standards.Collections.Forms
@@ -27,7 +27,7 @@ namespace InSite.UI.Admin.Standards.Collections.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 HttpResponseHelper.Redirect(SearchUrl);
 
             if (IsPostBack)

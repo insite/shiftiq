@@ -9,6 +9,7 @@
         public string File { get; set; }
         public string Project { get; set; }
         public double? Rate { get; set; }
+        public bool Trace { get; set; }
 
         public bool Disabled => !Enabled;
     }

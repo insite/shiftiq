@@ -13,8 +13,8 @@ public class OrganizationController : ControllerBase
         _organizationService = organizationService;
     }
 
-    [HttpHead("security/organizations/{organization:guid}")]
-    [HybridAuthorize(Policies.Security.Organizations.Organization.Assert)]
+    [HttpHead("api/security/organizations/{organization:guid}")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<ActionResult<bool>> AssertAsync([FromRoute] Guid organization, CancellationToken cancellation = default)
     {
@@ -23,8 +23,8 @@ public class OrganizationController : ControllerBase
         return Ok(exists);
     }
 
-    [HttpGet("security/organizations/{organization:guid}")]
-    [HybridAuthorize(Policies.Security.Organizations.Organization.Retrieve)]
+    [HttpGet("api/security/organizations/{organization:guid}")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
     [ProducesResponseType(typeof(OrganizationModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<OrganizationModel>> RetrieveAsync([FromRoute] Guid organization, CancellationToken cancellation = default)
     {
@@ -36,8 +36,8 @@ public class OrganizationController : ControllerBase
         return Ok(model);
     }
 
-    [HttpGet("security/organizations/count")]
-    [HybridAuthorize(Policies.Security.Organizations.Organization.Count)]
+    [HttpGet("api/security/organizations/count")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<ActionResult<int>> CountAsync([FromQuery] CountOrganizations query, CancellationToken cancellation = default)
     {
@@ -46,8 +46,8 @@ public class OrganizationController : ControllerBase
         return Ok(count);
     }
 
-    [HttpGet("security/organizations")]
-    [HybridAuthorize(Policies.Security.Organizations.Organization.Collect)]
+    [HttpGet("api/security/organizations")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
     [ProducesResponseType(typeof(IEnumerable<OrganizationModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<OrganizationModel>>> CollectAsync([FromQuery] CollectOrganizations query, CancellationToken cancellation = default)
     {
@@ -60,8 +60,8 @@ public class OrganizationController : ControllerBase
         return Ok(models);
     }
 
-    [HttpGet("security/organizations/search")]
-    [HybridAuthorize(Policies.Security.Organizations.Organization.Search)]
+    [HttpGet("api/security/organizations/search")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
     [ProducesResponseType(typeof(IEnumerable<OrganizationMatch>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<OrganizationMatch>>> GetSearchAsync([FromQuery] SearchOrganizations query, CancellationToken cancellation = default)
     {
@@ -74,8 +74,8 @@ public class OrganizationController : ControllerBase
         return Ok(matches);
     }
 
-    [HttpPost("security/organizations/search")]
-    [HybridAuthorize(Policies.Security.Organizations.Organization.Search)]
+    [HttpPost("api/security/organizations/search")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
     [ProducesResponseType(typeof(IEnumerable<OrganizationMatch>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<OrganizationMatch>>> SearchAsync([FromBody] SearchOrganizations query, CancellationToken cancellation = default)
     {

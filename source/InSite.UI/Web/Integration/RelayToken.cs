@@ -46,6 +46,9 @@ namespace InSite.Web.Integration
         [JsonProperty("target")]
         public string TargetUrl { get; set; }
 
+        [JsonProperty("progress")]
+        public string ProgressUrl { get; set; }
+
         [JsonProperty("exit")]
         public string ExitUrl { get; set; }
 

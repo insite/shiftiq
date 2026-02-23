@@ -159,7 +159,7 @@ namespace InSite.UI.Layout.Portal
 
         public virtual void ApplyAccessControl()
         {
-            if (Route != null && !Identity.IsActionAuthorized(Route.Name))
+            if (Route != null && !Identity.IsGranted(Route.Name))
                 CreateAccessDeniedException();
 
             if (this is ICmdsUserControl)
@@ -176,11 +176,11 @@ namespace InSite.UI.Layout.Portal
             {
                 var permissionId = Route.ToolkitNumber;
 
-                Access = Access.SetAdministrate(Identity.IsGranted(permissionId, PermissionOperation.Delete), false);
-                Access = Access.SetConfigure(Access.Administrate || Identity.IsGranted(permissionId, PermissionOperation.Configure), false);
+                Access = Access.SetAdministrate(Identity.IsGranted(permissionId, DataAccess.Delete), false);
+                Access = Access.SetConfigure(Access.Administrate || Identity.IsGranted(permissionId, DataAccess.Configure), false);
                 Access = Access.SetDelete(false, false);
-                Access = Access.SetWrite(Access.Administrate || Identity.IsGranted(permissionId, PermissionOperation.Write), false);
-                Access = Access.SetRead(Access.Write || Identity.IsGranted(permissionId, PermissionOperation.Read));
+                Access = Access.SetWrite(Access.Administrate || Identity.IsGranted(permissionId, DataAccess.Update), false);
+                Access = Access.SetRead(Access.Write || Identity.IsGranted(permissionId, DataAccess.Read));
 
                 var requestedUserId = User.UserIdentifier;
 
@@ -200,7 +200,7 @@ namespace InSite.UI.Layout.Portal
             var access = Access;
 
             var currentUser = User.UserIdentifier;
-            var organizationId = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            var organizationId = Organization.Identifier;
 
             var hasLevel5 = Access.Configure;
 

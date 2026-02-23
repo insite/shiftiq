@@ -17,9 +17,9 @@ public class CaseUserService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid join, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid join, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(join, cancellation);
+        return await _reader.AssertAsync(join, organization, cancellation);
     }
 
     public async Task<IEnumerable<CaseUserModel>> CollectAsync(ICaseUserCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class CaseUserService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyCaseUser modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.JoinIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.JoinId, cancellation);
 
         if (entity == null)
             return false;

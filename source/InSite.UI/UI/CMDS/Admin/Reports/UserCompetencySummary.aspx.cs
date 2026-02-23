@@ -79,13 +79,13 @@ namespace InSite.Cmds.Actions.Reporting.Report
             {
                 PageHelper.AutoBindHeader(this);
 
-                Employee.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                Employee.Filter.OrganizationIdentifier = Organization.Identifier;
                 Employee.Filter.RoleType = new[] { MembershipType.Department, MembershipType.Organization };
 
                 if (!Identity.HasAccessToAllCompanies)
                     Employee.Filter.DepartmentsForParentId = User.UserIdentifier;
 
-                CurrentProfile.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                CurrentProfile.Filter.OrganizationIdentifier = Organization.Identifier;
                 CurrentProfile.Filter.ProfileUserIdentifier = Guid.Empty;
             }
         }

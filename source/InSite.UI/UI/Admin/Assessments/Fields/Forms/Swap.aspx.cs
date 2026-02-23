@@ -58,7 +58,7 @@ namespace InSite.Admin.Assessments.Fields.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/admin/assessments/banks/search");
 
             if (!IsPostBack)

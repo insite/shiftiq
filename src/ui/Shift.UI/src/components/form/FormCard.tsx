@@ -4,6 +4,7 @@ interface Props {
     title?: ReactNode;
     children?: ReactNode;
     className?: string;
+    bodyClassName?: string;
     hasShadow?: boolean;
     hasBottomMargin?: boolean;
 }
@@ -12,6 +13,7 @@ export default function FormCard({
     title,
     children,
     className,
+    bodyClassName,
     hasShadow,
     hasBottomMargin
 }: Props) {
@@ -29,7 +31,7 @@ export default function FormCard({
 
     return (
         <div className={mergedClassName}>
-            <div className="card-body">
+            <div className={`card-body ${bodyClassName ?? ""}`}>
                 {title && (
                     <h4 className="card-title">{title}</h4>
                 )}

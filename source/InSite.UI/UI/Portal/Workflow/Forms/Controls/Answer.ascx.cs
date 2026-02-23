@@ -5,8 +5,6 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Admin.Assets.Glossaries.Utilities;
 using InSite.Application.Files.Read;
 using InSite.Application.Responses.Write;
@@ -20,6 +18,7 @@ using InSite.UI.Portal.Workflow.Forms.Models;
 
 using Shift.Common;
 using Shift.Common.File;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Workflow.Forms.Controls
@@ -241,7 +240,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
             var submission = Current.Session;
             var noStatusChange = !string.Equals(submission.ResponseSessionStatus, ResponseSessionStatus.Created.ToString(), StringComparison.OrdinalIgnoreCase);
-            
+
             ServiceLocator.SendCommand(new StartResponseSession(
                 submission.ResponseSessionIdentifier,
                 submission.ResponseSessionCreated,

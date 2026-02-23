@@ -107,7 +107,7 @@ namespace InSite.UI.Admin.Messages.Messages.Utilities
                 for (var i = 0; ; i++)
                 {
                     if (i > 20)
-                        throw new Exception("Unable create session file");
+                        throw new InvalidOperationException("Unable to create session file");
 
                     key = Guid.NewGuid();
 

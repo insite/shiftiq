@@ -573,6 +573,42 @@ namespace InSite.Admin.Workflow.Forms
         protected global::System.Web.UI.WebControls.Literal DisplaySummaryChart;
 
         /// <summary>
+        /// EnableThirdPartyFormsUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel EnableThirdPartyFormsUpdatePanel;
+
+        /// <summary>
+        /// EnableThirdPartyFormsToggle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton EnableThirdPartyFormsToggle;
+
+        /// <summary>
+        /// EnableThirdPartyFormsLabel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label EnableThirdPartyFormsLabel;
+
+        /// <summary>
+        /// EnableThirdPartyForms control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal EnableThirdPartyForms;
+
+        /// <summary>
         /// IssueWorkflowLink control.
         /// </summary>
         /// <remarks>

@@ -4,10 +4,10 @@ namespace Shift.Contract
 {
     public partial class CaseGroupModel
     {
-        public Guid GroupIdentifier { get; set; }
-        public Guid CaseIdentifier { get; set; }
-        public Guid JoinIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid GroupId { get; set; }
+        public Guid CaseId { get; set; }
+        public Guid JoinId { get; set; }
+        public Guid OrganizationId { get; set; }
 
         public string CaseRole { get; set; }
     }

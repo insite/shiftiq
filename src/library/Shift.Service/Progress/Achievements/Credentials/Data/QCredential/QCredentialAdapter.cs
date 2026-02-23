@@ -7,8 +7,8 @@ public class QCredentialAdapter : IEntityAdapter
 {
     public void Copy(ModifyCredential modify, QCredentialEntity entity)
     {
-        entity.AchievementIdentifier = modify.AchievementIdentifier;
-        entity.UserIdentifier = modify.UserIdentifier;
+        entity.AchievementIdentifier = modify.AchievementId;
+        entity.UserIdentifier = modify.UserId;
         entity.CredentialGranted = modify.CredentialGranted;
         entity.CredentialRevoked = modify.CredentialRevoked;
         entity.CredentialExpired = modify.CredentialExpired;
@@ -35,7 +35,7 @@ public class QCredentialAdapter : IEntityAdapter
         entity.CredentialExpirationReminderDelivered3 = modify.CredentialExpirationReminderDelivered3;
         entity.CredentialNecessity = modify.CredentialNecessity;
         entity.CredentialPriority = modify.CredentialPriority;
-        entity.AuthorityIdentifier = modify.AuthorityIdentifier;
+        entity.AuthorityIdentifier = modify.AuthorityId;
         entity.AuthorityType = modify.AuthorityType;
         entity.CredentialRevokedReason = modify.CredentialRevokedReason;
         entity.CredentialGrantedDescription = modify.CredentialGrantedDescription;
@@ -44,8 +44,8 @@ public class QCredentialAdapter : IEntityAdapter
         entity.TransactionHash = modify.TransactionHash;
         entity.PublisherAddress = modify.PublisherAddress;
         entity.PublicationStatus = modify.PublicationStatus;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.EmployerGroupIdentifier = modify.EmployerGroupIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.EmployerGroupIdentifier = modify.EmployerGroupId;
         entity.EmployerGroupStatus = modify.EmployerGroupStatus;
 
     }
@@ -54,8 +54,8 @@ public class QCredentialAdapter : IEntityAdapter
     {
         var entity = new QCredentialEntity
         {
-            AchievementIdentifier = create.AchievementIdentifier,
-            UserIdentifier = create.UserIdentifier,
+            AchievementIdentifier = create.AchievementId,
+            UserIdentifier = create.UserId,
             CredentialGranted = create.CredentialGranted,
             CredentialRevoked = create.CredentialRevoked,
             CredentialExpired = create.CredentialExpired,
@@ -80,10 +80,10 @@ public class QCredentialAdapter : IEntityAdapter
             CredentialExpirationReminderDelivered1 = create.CredentialExpirationReminderDelivered1,
             CredentialExpirationReminderDelivered2 = create.CredentialExpirationReminderDelivered2,
             CredentialExpirationReminderDelivered3 = create.CredentialExpirationReminderDelivered3,
-            CredentialIdentifier = create.CredentialIdentifier,
+            CredentialIdentifier = create.CredentialId,
             CredentialNecessity = create.CredentialNecessity,
             CredentialPriority = create.CredentialPriority,
-            AuthorityIdentifier = create.AuthorityIdentifier,
+            AuthorityIdentifier = create.AuthorityId,
             AuthorityType = create.AuthorityType,
             CredentialRevokedReason = create.CredentialRevokedReason,
             CredentialGrantedDescription = create.CredentialGrantedDescription,
@@ -92,8 +92,8 @@ public class QCredentialAdapter : IEntityAdapter
             TransactionHash = create.TransactionHash,
             PublisherAddress = create.PublisherAddress,
             PublicationStatus = create.PublicationStatus,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            EmployerGroupIdentifier = create.EmployerGroupIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            EmployerGroupIdentifier = create.EmployerGroupId,
             EmployerGroupStatus = create.EmployerGroupStatus
         };
         return entity;
@@ -108,8 +108,8 @@ public class QCredentialAdapter : IEntityAdapter
     {
         var model = new CredentialModel
         {
-            AchievementIdentifier = entity.AchievementIdentifier,
-            UserIdentifier = entity.UserIdentifier,
+            AchievementId = entity.AchievementIdentifier,
+            UserId = entity.UserIdentifier,
             CredentialGranted = entity.CredentialGranted,
             CredentialRevoked = entity.CredentialRevoked,
             CredentialExpired = entity.CredentialExpired,
@@ -134,10 +134,10 @@ public class QCredentialAdapter : IEntityAdapter
             CredentialExpirationReminderDelivered1 = entity.CredentialExpirationReminderDelivered1,
             CredentialExpirationReminderDelivered2 = entity.CredentialExpirationReminderDelivered2,
             CredentialExpirationReminderDelivered3 = entity.CredentialExpirationReminderDelivered3,
-            CredentialIdentifier = entity.CredentialIdentifier,
+            CredentialId = entity.CredentialIdentifier,
             CredentialNecessity = entity.CredentialNecessity,
             CredentialPriority = entity.CredentialPriority,
-            AuthorityIdentifier = entity.AuthorityIdentifier,
+            AuthorityId = entity.AuthorityIdentifier,
             AuthorityType = entity.AuthorityType,
             CredentialRevokedReason = entity.CredentialRevokedReason,
             CredentialGrantedDescription = entity.CredentialGrantedDescription,
@@ -146,8 +146,8 @@ public class QCredentialAdapter : IEntityAdapter
             TransactionHash = entity.TransactionHash,
             PublisherAddress = entity.PublisherAddress,
             PublicationStatus = entity.PublicationStatus,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            EmployerGroupIdentifier = entity.EmployerGroupIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            EmployerGroupId = entity.EmployerGroupIdentifier,
             EmployerGroupStatus = entity.EmployerGroupStatus
         };
 
@@ -163,7 +163,7 @@ public class QCredentialAdapter : IEntityAdapter
     {
         var match = new CredentialMatch
         {
-            CredentialIdentifier = entity.CredentialIdentifier
+            CredentialId = entity.CredentialIdentifier
 
         };
 

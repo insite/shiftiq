@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common;
 using Shift.Service.Workflow;
 
 namespace Shift.Api;
@@ -9,10 +10,12 @@ namespace Shift.Api;
 public class SubmissionController : ShiftControllerBase
 {
     private readonly SubmissionService _submissionService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public SubmissionController(SubmissionService submissionService)
+    public SubmissionController(SubmissionService submissionService, IPrincipalProvider principalProvider)
     {
         _submissionService = submissionService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +23,17 @@ public class SubmissionController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific submission
     /// </summary>
-    [HttpHead("workflow/submissions/{submission:guid}")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Assert)]
+    [HttpHead("api/workflow/submissions/{submission:guid}")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertSubmission")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid responseSession, CancellationToken cancellation = default)
     {
-        var exists = await _submissionService.AssertAsync(responseSession, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _submissionService.AssertAsync(responseSession, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +41,8 @@ public class SubmissionController : ShiftControllerBase
     /// <summary>
     /// Collects the list of submissions that match specific criteria
     /// </summary>
-    [HttpPost("workflow/submissions/collect")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Collect)]
+    [HttpPost("api/workflow/submissions/collect")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<SubmissionModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectSubmissions")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectSubmissions query, CancellationToken cancellation = default)
@@ -43,8 +50,8 @@ public class SubmissionController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/submissions")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Collect)]
+    [HttpGet("api/workflow/submissions")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<SubmissionModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectSubmissions_get")]
     [AliasFor("collectSubmissions")]
@@ -56,6 +63,10 @@ public class SubmissionController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectSubmissions query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _submissionService.CollectAsync(query, cancellation);
 
         var count = await _submissionService.CountAsync(query, cancellation);
@@ -68,8 +79,8 @@ public class SubmissionController : ShiftControllerBase
     /// <summary>
     /// Counts the submissions that match specific criteria
     /// </summary>
-    [HttpPost("workflow/submissions/count")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Count)]
+    [HttpPost("api/workflow/submissions/count")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countSubmissions")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountSubmissions query, CancellationToken cancellation = default)
@@ -77,8 +88,8 @@ public class SubmissionController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/submissions/count")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Count)]
+    [HttpGet("api/workflow/submissions/count")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countSubmissions_get")]
     [AliasFor("countSubmissions")]
@@ -90,6 +101,10 @@ public class SubmissionController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountSubmissions query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _submissionService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +113,8 @@ public class SubmissionController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of submissions that match specific criteria
     /// </summary>    
-    [HttpPost("workflow/submissions/download")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Download)]
+    [HttpPost("api/workflow/submissions/download")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadSubmissions")]
@@ -108,8 +123,8 @@ public class SubmissionController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/submissions/download")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Download)]
+    [HttpGet("api/workflow/submissions/download")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadSubmissions_get")]
@@ -122,6 +137,10 @@ public class SubmissionController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectSubmissions query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Workflow", "Submissions", query.Filter.Format, User);
 
         var models = await _submissionService
@@ -142,22 +161,30 @@ public class SubmissionController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific submission
     /// </summary>
-    [HttpGet("workflow/submissions/{submission:guid}")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Retrieve)]
+    [HttpGet("api/workflow/submissions/{submission:guid}")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType<SubmissionModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveSubmission")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid responseSession, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _submissionService.RetrieveAsync(responseSession, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of submissions that match specific criteria
     /// </summary>
-    [HttpPost("workflow/submissions/search")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Search)]
+    [HttpPost("api/workflow/submissions/search")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<SubmissionMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchSubmissions")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchSubmissions query, CancellationToken cancellation = default)
@@ -165,8 +192,8 @@ public class SubmissionController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/submissions/search")]
-    [HybridAuthorize(Policies.Workflow.Submissions.Submission.Search)]
+    [HttpGet("api/workflow/submissions/search")]
+    [HybridPermission("workflow/submissions", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<SubmissionMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchSubmissions_get")]
     [AliasFor("searchSubmissions")]
@@ -178,6 +205,10 @@ public class SubmissionController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchSubmissions query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _submissionService.SearchAsync(query, cancellation);
 
         var count = await _submissionService.CountAsync(query, cancellation);

@@ -8,8 +8,8 @@ namespace Shift.Contract
     {
         QueryFilter Filter { get; set; }
         
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? SurveyFormIdentifier { get; set; }
+        Guid? OrganizationId { get; set; }
+        Guid? SurveyFormId { get; set; }
 
         bool? SurveyQuestionIsNested { get; set; }
         bool? SurveyQuestionIsRequired { get; set; }

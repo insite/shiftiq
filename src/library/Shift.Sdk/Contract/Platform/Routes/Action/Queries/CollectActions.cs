@@ -7,8 +7,8 @@ namespace Shift.Contract
 {
     public class CollectActions : Query<IEnumerable<ActionModel>>, IActionCriteria
     {
-        public Guid? NavigationParentActionIdentifier { get; set; }
-        public Guid? PermissionParentActionIdentifier { get; set; }
+        public Guid? NavigationParentActionId { get; set; }
+        public Guid? PermissionParentActionId { get; set; }
 
         public string ActionIcon { get; set; }
         public string ActionList { get; set; }

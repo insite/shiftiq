@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveUser : Query<UserModel>
     {
-        public Guid UserIdentifier { get; set; }
+        public Guid UserId { get; set; }
     }
 }

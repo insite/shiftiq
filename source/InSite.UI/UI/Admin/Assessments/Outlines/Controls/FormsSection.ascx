@@ -11,10 +11,10 @@
             <div class="col-lg-6 text-end">
                 <insite:DropDownButton runat="server" ID="AddButton" IconName="plus-circle" Text="Add" CssClass="d-inline-block" MenuCssClass="dropdown-menu-end">
                     <Items>
-                        <insite:DropDownButtonItem Name="AddForm" IconType="Regular" IconName="window" Text="Form" ToolTip="Add a new form" />
-                        <insite:DropDownButtonItem Name="AddSection" IconType="Regular" IconName="th-list" Text="Section" ToolTip="Add one or more sections to this form" />
-                        <insite:DropDownButtonItem Name="AddFields" IconType="Regular" IconName="question" Text="Existing Question" ToolTip="Add one or more questions to this section on this form" />
-                        <insite:DropDownButtonItem Name="AddQuestion" IconType="Regular" IconName="question" Text="New Question" ToolTip="Add a new question to this set" />
+                        <sdk:DropDownButtonItem Name="AddForm" IconType="Regular" IconName="window" Text="Form" ToolTip="Add a new form" />
+                        <sdk:DropDownButtonItem Name="AddSection" IconType="Regular" IconName="th-list" Text="Section" ToolTip="Add one or more sections to this form" />
+                        <sdk:DropDownButtonItem Name="AddFields" IconType="Regular" IconName="question" Text="Existing Question" ToolTip="Add one or more questions to this section on this form" />
+                        <sdk:DropDownButtonItem Name="AddQuestion" IconType="Regular" IconName="question" Text="New Question" ToolTip="Add a new question to this set" />
                     </Items>
                 </insite:DropDownButton>
 
@@ -22,14 +22,14 @@
 
                 <insite:DropDownButton runat="server" ID="ActionButton" IconName="tools" Text="Action" CssClass="d-inline-block" MenuCssClass="dropdown-menu-end">
                     <Items>
-                        <insite:DropDownButtonItem Name="Preview" IconType="Regular" IconName="window" Text="Preview" ToolTip="Preview the form" />
-                        <insite:DropDownButtonItem Name="Prepublish" IconType="Regular" IconName="file-alt" Text="Prepublish" ToolTip="Prepublish the form" />
-                        <insite:DropDownButtonItem Name="Publish" IconType="Regular" IconName="upload" Text="Publish" ToolTip="Publish the form" />
-                        <insite:DropDownButtonItem Name="Print" IconType="Regular" IconName="print" Text="Print" ToolTip="Print the form" />
-                        <insite:DropDownButtonItem Name="Unpublish" IconType="Regular" IconName="eraser" Text="Unpublish" ToolTip="Unpublish the form" />
-                        <insite:DropDownButtonItem Name="Duplicate" IconType="Regular" IconName="copy" Text="New Version" ToolTip="Duplicate the form with a new version number" />
-                        <insite:DropDownButtonItem Name="Archive" IconType="Regular" IconName="archive" Text="Archive" ToolTip="Archive the form" />
-                        <insite:DropDownButtonItem Name="Unarchive" IconType="Regular" IconName="box-open" Text="Unarchive" ToolTip="Unarchive the form" />
+                        <sdk:DropDownButtonItem Name="Preview" IconType="Regular" IconName="window" Text="Preview" ToolTip="Preview the form" />
+                        <sdk:DropDownButtonItem Name="Prepublish" IconType="Regular" IconName="file-alt" Text="Prepublish" ToolTip="Prepublish the form" />
+                        <sdk:DropDownButtonItem Name="Publish" IconType="Regular" IconName="upload" Text="Publish" ToolTip="Publish the form" />
+                        <sdk:DropDownButtonItem Name="Print" IconType="Regular" IconName="print" Text="Print" ToolTip="Print the form" />
+                        <sdk:DropDownButtonItem Name="Unpublish" IconType="Regular" IconName="eraser" Text="Unpublish" ToolTip="Unpublish the form" />
+                        <sdk:DropDownButtonItem Name="Duplicate" IconType="Regular" IconName="copy" Text="New Version" ToolTip="Duplicate the form with a new version number" />
+                        <sdk:DropDownButtonItem Name="Archive" IconType="Regular" IconName="archive" Text="Archive" ToolTip="Archive the form" />
+                        <sdk:DropDownButtonItem Name="Unarchive" IconType="Regular" IconName="box-open" Text="Unarchive" ToolTip="Unarchive the form" />
                     </Items>
                 </insite:DropDownButton>
 

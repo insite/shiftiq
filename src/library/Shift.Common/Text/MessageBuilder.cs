@@ -162,7 +162,7 @@ namespace Shift.Common
         private void ToHtmlList(StringBuilder html, int maxItems, DataItem[] items)
         {
             if (items.Length == 0)
-                throw new ApplicationError("List is empty");
+                throw new InvalidOperationException("List is empty");
 
             html.Append("<ul>");
 

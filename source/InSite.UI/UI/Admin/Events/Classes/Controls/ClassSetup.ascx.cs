@@ -38,6 +38,9 @@ namespace InSite.UI.Admin.Events.Classes.Controls
 
             AssessmentList.FormsShown += (a, b) => FormsShown?.Invoke(a, b);
             AssessmentList.FormsHidden += (a, b) => FormsHidden?.Invoke(a, b);
+
+            DisplayOnCalendar.AutoPostBack = true;
+            DisplayOnCalendar.CheckedChanged += DisplayOnCalendar_CheckedChanged;
         }
 
         private void InstructorRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
@@ -80,6 +83,8 @@ namespace InSite.UI.Admin.Events.Classes.Controls
             Waitlist.Text = ev.WaitlistEnabled ? "Enabled" : "Disabled";
             ClassCalendarColorBox.Text = ColorBoxHtml(ev.EventCalendarColor ?? DefaultColor);
             ClassCalendarColorName.Text = ColorName(ev.EventCalendarColor ?? DefaultColor);
+            DisplayOnCalendar.Checked = ev.DisplayOnCalendar;
+            DisplayOnCalendar.Enabled = isPublished;
 
             PersonCodeIsRequiredLabel.Text = $"Is {LabelHelper.GetLabelContentText("Person Code")} Required to register?";
             PersonCodeIsRequired.Text = ev.PersonCodeIsRequired ? "Yes" : "No";
@@ -136,6 +141,11 @@ namespace InSite.UI.Admin.Events.Classes.Controls
             ClassLimitAttendance.Visible = canEdit;
 
             return showForms;
+        }
+
+        private void DisplayOnCalendar_CheckedChanged(object sender, EventArgs e)
+        {
+            ServiceLocator.SendCommand(new ModifyEventDisplayOnCalendar(EventId, DisplayOnCalendar.Checked));
         }
 
         private void ReloadRegistrationLocked()

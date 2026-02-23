@@ -1,80 +1,66 @@
 ﻿using Shift.Common;
 using Shift.Contract;
 using Shift.Contract.Presentation;
+using Shift.Sdk.UI.Navigation;
 
-namespace Shift.Service.Presentation
+namespace Shift.Service.Orchestration
 {
     public class NavigationService : INavigationService
     {
         private readonly IActionService _actionService;
-        private readonly PermissionMatrixProvider _permissions;
-        private readonly ITranslator _translator;
+        private readonly PermissionCache _permissions;
+        private readonly ITranslatorService _translator;
 
         private readonly IPageService _pageService;
-        private readonly SecuritySettings _securitySettings;
+        private readonly AppSettings _appSettings;
 
-        public NavigationService(IActionService actionService, PermissionMatrixProvider permissions, ITranslator translator,
-            IPageService pageService, SecuritySettings securitySettings)
+        private MenuHelper? _menuHelper;
+
+        public NavigationService(
+            IActionService actionService,
+            PermissionCache permissions,
+            ITranslatorService translator,
+            IPageService pageService,
+            AppSettings appSettings
+            )
         {
             _actionService = actionService;
             _permissions = permissions;
             _translator = translator;
 
             _pageService = pageService;
-            _securitySettings = securitySettings;
+            _appSettings = appSettings;
         }
 
-        public List<BreadcrumbItem> CollectBreadcrumbs(ActionModel action)
+        public NavigationHome? GetHome(IPrincipal principal)
+        {
+            return NavigationRootFactory.Create(principal.Partition.Slug, GetResource)?.Home;
+        }
+
+        public List<BreadcrumbItem> CollectBreadcrumbs(ActionModel action, IPrincipal principal)
         {
             var route = WebRoute.Create(_actionService, action);
-            return BreadcrumbsHelper.CollectBreadcrumbs(route, null, _translator, null, null);
+            return BreadcrumbsHelper.CollectBreadcrumbs(route, null, _translator, principal.User.Language, principal.Organization.Identifier, null, null);
         }
 
-        public List<NavigationList> SearchMenus(IShiftPrincipal principal, bool isCmds)
+        public List<NavigationList> SearchMenus(IPrincipal principal, bool isCmds)
         {
-            var permissions = isCmds
-                ? _permissions.Matrix.GetPermissions("cmds")
-                : _permissions.Matrix.GetPermissions(principal.Organization.Slug)
-                ;
-
-            var isOperator = principal.Authority >= AuthorityAccess.Operator;
-            Func<string, bool> isGrantedByName = name => permissions.IsAllowed(name, principal.Roles);
-            Func<Guid?, bool> isGrantedById = id => id == null || permissions.IsAllowed(id.Value, principal.Roles);
-            Func<string, bool> isInGroup = group => principal.Roles.Any(x => string.Equals(x.Name, group, StringComparison.OrdinalIgnoreCase));
-
-            Func<string, List<MenuHelper.ActionModel>> searchActions = startsWith =>
-            {
-                var startsWith1 = startsWith + "/";
-                var startsWith2 = "ui/" + startsWith + "/";
-                return _actionService
-                    .Search(x => x.ActionUrl.StartsWith(startsWith1) || x.ActionUrl.StartsWith(startsWith2))
-                    .Select(ToModel)
-                    .ToList();
-            };
-
-            Func<string, MenuHelper.ActionModel?> retrieveActionByUrl = url => _actionService
-                .Search(x => x.ActionUrl == url)
-                .Select(ToModel)
-                .FirstOrDefault();
-
-            return new MenuHelper(
-                isOperator,
-                isGrantedByName,
-                isGrantedById,
-                isInGroup,
-                searchActions,
-                retrieveActionByUrl
-            ).GetNavigationGroups(isCmds);
+            return CreateMenuHelper().GetNavigationGroups(new NavigationIdentity(_permissions, principal, isCmds), isCmds);
         }
 
-        public async Task<List<NavigationItem>> SearchShortcutsAsync(IShiftPrincipal principal)
+        public List<NavigationList> SearchAdminMenus(IPrincipal principal, bool isCmds)
+        {
+            return CreateMenuHelper().GetAdminMenuGroups(new NavigationIdentity(_permissions, principal, isCmds));
+        }
+
+        public async Task<List<NavigationItem>> SearchShortcutsAsync(IPrincipal principal)
         {
             if (!principal.IsAuthenticated)
                 return new List<NavigationItem>();
 
             var organizationCode = principal.Organization.Name;
 
-            var domain = _securitySettings.Domain;
+            var domain = _appSettings.Partition.Domain;
 
             var criteria = new SearchPages()
             {
@@ -103,13 +89,55 @@ namespace Shift.Service.Presentation
 
             foreach (var tile in tiles)
             {
-                if (tile.Url.StartsWith("http") || permissionList.IsAllowed(tile.Url, principal.Roles))
+                if (tile.Url.StartsWith("http") || permissionList.IsAllowedByRoute(GetRouteFromUrl(tile.Url), principal.Roles))
                     result.Add(tile);
             }
 
             var list = result.OrderBy(x => x.Title).ToList();
 
             return list;
+        }
+
+        private static string GetRouteFromUrl(string url)
+        {
+            if (url.StartsWith("/"))
+                url = url.Substring(1);
+
+            var paramIndex = url.IndexOf("?");
+            if (paramIndex >= 0)
+                url = url.Substring(0, paramIndex);
+
+            return url;
+        }
+
+        private MenuHelper CreateMenuHelper()
+        {
+            if (_menuHelper != null)
+                return _menuHelper;
+
+            _menuHelper = new MenuHelper(SearchActions, RetrieveActionByUrl);
+
+            return _menuHelper;
+        }
+
+        private List<MenuHelper.ActionModel> SearchActions(string startsWith)
+        {
+            var startsWith1 = startsWith + "/";
+            var startsWith2 = "ui/" + startsWith + "/";
+            return _actionService
+                .Search(x => x.ActionUrl.StartsWith(startsWith1) || x.ActionUrl.StartsWith(startsWith2))
+                .Select(ToModel)
+                .ToList();
+        }
+
+        private MenuHelper.ActionModel? RetrieveActionByUrl(string url) => _actionService
+            .Search(x => x.ActionUrl == url)
+            .Select(ToModel)
+            .FirstOrDefault();
+
+        private string? GetResource(string url)
+        {
+            return RetrieveActionByUrl(url)?.PermissionParentActionUrl;
         }
 
         private static MenuHelper.ActionModel ToModel(ActionModel action)
@@ -121,7 +149,7 @@ namespace Shift.Service.Presentation
                 ActionNameShort = action.ActionNameShort,
                 ActionName = action.ActionName,
                 ActionIcon = action.ActionIcon,
-                PermissionParentActionIdentifier = action.PermissionParentActionIdentifier,
+                PermissionParentActionUrl = action.PermissionParentActionUrl
             };
         }
     }

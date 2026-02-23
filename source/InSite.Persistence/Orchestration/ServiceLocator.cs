@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-using Shift.Common.Timeline.Queries;
-using Shift.Common.Timeline.Snapshots;
-
 using InSite.Application;
 using InSite.Application.Attempts.Read;
 using InSite.Application.Attempts.Write;
@@ -48,7 +43,6 @@ using InSite.Application.Standards.Write;
 using InSite.Application.Surveys.Read;
 using InSite.Application.Surveys.Write.Handlers;
 using InSite.Application.Utility.Read;
-using InSite.Domain;
 using InSite.Domain.Messages;
 using InSite.Persistence;
 using InSite.Persistence.Integration.BCMail;
@@ -64,6 +58,10 @@ using Serilog;
 using Shift.Common;
 using Shift.Common.Integration.Google;
 using Shift.Common.Json;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
+using Shift.Common.Timeline.Queries;
+using Shift.Common.Timeline.Snapshots;
 using Shift.Constant;
 using Shift.Toolbox;
 using Shift.Toolbox.Integration.DirectAccess;
@@ -324,12 +322,12 @@ namespace InSite
 
             FilePaths = new FilePaths(settings.DataFolderShare, settings.DataFolderEnterprise);
             Maintenance = new Maintenance(FilePaths);
-            Urls = new Urls(settings.Environment, security.Domain, app.HelpUrl);
+            Urls = new Urls(settings.Environment, settings.Partition.Domain, app.HelpUrl);
 
-            DbSettings.Init(AppSettings.Database.ConnectionStrings.Shift, security.Domain, AppSettings.Database.IsReadOnly);
+            DbSettings.Init(AppSettings.Database.ConnectionStrings.Shift, settings.Partition.Domain, AppSettings.Database.IsReadOnly);
 
             Partition = partitionFactory == null
-                ? PartitionSearch.GetPartitionModel(requirements.RequirePartitionSettings)
+                ? settings.Partition
                 : partitionFactory();
 
             Persistence.MessageSearch.Init(AppSettings.Application.UseStrictModeForEmailEnabled);
@@ -341,7 +339,7 @@ namespace InSite
             AchievementTypes.RenameModuleToLearningModule = Partition.IsE03();
             MessageLinkExtractor.Initialize(StringHelper.Split(Partition.WhitelistDomains));
 
-            UuidFactory.NamespaceId = UuidFactory.CreateV5ForDns(settings.Security.Domain);
+            UuidFactory.NamespaceId = UuidFactory.CreateV5ForDns(settings.Partition.Domain);
         }
 
         public static void InitializeLogger(ILogger logger)
@@ -401,7 +399,7 @@ namespace InSite
 
             BankSearch = new BankSearch(AggregateSearch);
 
-            AchievementSearch = new AchievementSearch();
+            AchievementSearch = new AchievementSearch(Partition);
             AchievementStore = new AchievementStore();
 
             EventSearch = new EventSearch(SnapshotRepository);
@@ -430,7 +428,7 @@ namespace InSite
             IssueStore = new CaseStore();
 
             MessageSearch = Persistence.MessageSearch.Instance;
-            MessageStore = new MessageStore(AppSettings.Security.Domain);
+            MessageStore = new MessageStore(AppSettings.Partition.Domain);
 
             PaymentSearch = new PaymentSearch();
             PaymentStore = new PaymentStore();
@@ -448,7 +446,7 @@ namespace InSite
 
             OldStandardSearch = new OldStandardSearch();
 
-            PageSearch = new PageSearch(SnapshotRepository, ContentSearch);
+            PageSearch = new PageSearch(SnapshotRepository, ContentSearch, Partition);
             PageStore = new PageStore(error, IdentityService, OrganizationSearch);
 
             SiteSearch = new Persistence.SiteSearch();
@@ -573,7 +571,7 @@ namespace InSite
             RegistrationChangeProjector = new RegistrationChangeProjector(ChangeQueue, RegistrationStore, RegistrationSearch);
 
             ResponseCommandReceiver = new ResponseCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
-            ResponseChangeProjector = new ResponseChangeProjector(ChangeQueue, SurveyStore);
+            ResponseChangeProjector = new ResponseChangeProjector(ChangeQueue, ChangeStore, SurveyStore);
 
             RubricCommandReceiver = new RubricCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, RubricStore);
             RubricChangeProjector = new RubricChangeProjector(ChangeQueue, RubricStore);
@@ -609,7 +607,7 @@ namespace InSite
             SurveyCommandReceiver = new SurveyCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
             SurveyChangeProjector = new SurveyChangeProjector(ChangeQueue, SurveyStore);
 
-            OrganizationCommandReceiver = new OrganizationCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, OrganizationStore);
+            OrganizationCommandReceiver = new OrganizationCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, OrganizationStore, OrganizationSearch);
             OrganizationChangeSubscriber = new OrganizationChangeSubscriber(ChangeQueue, OrganizationStore);
 
             InitializeCustomProjectManagers();
@@ -637,11 +635,11 @@ namespace InSite
 
             // Core process managers
 
-            CoreProcessManager = new CoreProcessManager(ChangeQueue, EmailOutbox, RegistrationSearch, ContentSearch, ContactSearch);
+            CoreProcessManager = new CoreProcessManager(ChangeQueue, EmailOutbox, RegistrationSearch, ContentSearch, ContactSearch, Partition);
             _ = new AchievementChangeProcessor(commander, ChangeQueue, AlertMailer, AchievementSearch, CourseObjectSearch, AttemptSearch, JournalSearch, ProgramSearch, ProgramStore, ProgramService, MessageSearch, ContentSearch, ContactSearch, Partition.IsE03());
             _ = new EventChangeProcessor(commander, ChangeQueue, AlertMailer, ContactSearch, EventSearch, RegistrationSearch, RecordSearch);
             AttemptChangeProcessor = new AttemptChangeProcessor(commander, ChangeQueue, AlertMailer, AttemptSearch, BankSearch, ContactSearch, CourseObjectSearch, RecordSearch, OrganizationSearch);
-            _ = new BankChangeProcessor(commander, ChangeQueue, BankSearch, PageSearch, RecordSearch, UploadSearch, AppSettings.Security.Domain);
+            _ = new BankChangeProcessor(commander, ChangeQueue, BankSearch, PageSearch, RecordSearch, UploadSearch, AppSettings.Partition.Domain);
             ProgressRestarter = new ProgressRestarter(SendCommand, RecordSearch);
             _ = new CourseObjectChangeProcessor(commander, ChangeQueue, ProgressRestarter);
             _ = new IssueChangeProcessor(ChangeQueue, AlertMailer, IssueSearch);
@@ -661,16 +659,15 @@ namespace InSite
             // Custom process managers
 
             CmdsProcessor = new CmdsProcessor(ChangeQueue, EmailOutbox, ContactSearch);
-            _ = new EventProcessor(Urls, commander, ChangeQueue, CommandSearch, SnapshotRepository, EventSearch, BankSearch, AttemptSearch, ContactSearch, RegistrationSearch, OldStandardSearch, GroupSearch, DirectAccessServer, warning, error, AlertMailer, FilePaths, AppSettings.Security.Domain);
-            _ = new RegistrationProcessor(commander, ChangeQueue, CommandSearch, EventSearch, BankSearch, ContactSearch, RegistrationSearch, RegistrationStore, GroupSearch, DirectAccessServer, DirectAccessStore, warning, error, AlertMailer, FilePaths, AppSettings.Security.Domain);
+            _ = new EventProcessor(Urls, commander, ChangeQueue, CommandSearch, SnapshotRepository, EventSearch, BankSearch, AttemptSearch, ContactSearch, RegistrationSearch, OldStandardSearch, GroupSearch, DirectAccessServer, warning, error, AlertMailer, FilePaths, AppSettings.Partition.Domain);
+            _ = new RegistrationProcessor(commander, ChangeQueue, CommandSearch, EventSearch, BankSearch, ContactSearch, RegistrationSearch, RegistrationStore, GroupSearch, DirectAccessServer, DirectAccessStore, warning, error, AlertMailer, FilePaths, AppSettings.Partition.Domain);
             _ = new RcabcGradebookChangeProcessor(commander, ChangeQueue, SnapshotRepository, RegistrationSearch, RecordSearch);
             _ = new RcabcRegistrationChangeProcessor(commander, ChangeQueue, SnapshotRepository, EventSearch, RecordSearch);
-            _ = new SurveyResponseChangeProcessor(commander, ChangeQueue, SurveySearch);
         }
 
         public static void InitializeInfrastructure(IIdentityService identityService, IApiRequestLogger apiRequestLogger, Action<string> error)
         {
-            var domain = AppSettings.Security.Domain;
+            var domain = AppSettings.Partition.Domain;
 
             MailgunServer = new MailgunServer(
                 AppSettings.Integration.Mailgun,
@@ -680,7 +677,7 @@ namespace InSite
                 StringHelper.Split(Partition.WhitelistEmails),
                 AppSettings.Application.AlertsToForceSendList
             );
-            EmailOutbox = new EmailOutbox(MailgunServer, AppSettings.Environment.Name);
+            EmailOutbox = new EmailOutbox(MailgunServer, AppSettings.Environment.Name, Partition);
             FFmpeg = new FFmpeg(AppSettings.Application.FFmpegFolderPath);
             CountrySearch = new CountrySearch(AppSettings.Engine.Api.Google.BaseUrl);
             ProvinceSearch = new ProvinceSearch(AppSettings.Engine.Api.Google.BaseUrl, CountrySearch);
@@ -717,11 +714,11 @@ namespace InSite
 
         public static void QueueCommand(ICommand command)
         {
-            var api = AppSettings.Shift.Api.Hosting.V1;
+            var apiBaseUrl = AppSettings.v1ApiBaseUrl;
 
             var security = AppSettings.Security;
 
-            var client = new TimelineClient(api, security);
+            var client = new TimelineClient(apiBaseUrl, security);
 
             client.QueueCommand(command);
         }

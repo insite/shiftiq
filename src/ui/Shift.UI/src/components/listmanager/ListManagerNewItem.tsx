@@ -1,5 +1,6 @@
 import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
 import { Form } from "react-bootstrap";
+import Icon from "../icon/Icon";
 
 interface Props {
     titlePlaceholder?: string | undefined | null;
@@ -53,7 +54,7 @@ export default function ListManagerNewItem({ titlePlaceholder, addTooltip, onAdd
                 tabIndex={hasTitle ? undefined : -1}
                 onClick={() => handleAddClick()}
             >
-                <i className="fas fa-plus-circle"></i>
+                <Icon style="Solid" name="plus-circle" />
             </button>
         </div>
     );

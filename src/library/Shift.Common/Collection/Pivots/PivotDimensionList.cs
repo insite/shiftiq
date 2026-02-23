@@ -25,7 +25,7 @@ namespace Shift.Common
                 var units = (JArray)jObj["units"];
 
                 if (names.Count != units.Count)
-                    throw new ApplicationError("Invalid JSON data: " + jObj.ToString());
+                    throw new FormatException("Invalid JSON data: " + jObj.ToString());
 
                 var list = new PivotDimensionList();
 

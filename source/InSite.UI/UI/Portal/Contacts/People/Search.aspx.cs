@@ -4,7 +4,7 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
-using Shift.Constant;
+using Shift.Common;
 using Shift.Contract;
 
 namespace InSite.UI.Portal.Contacts.People
@@ -18,7 +18,7 @@ namespace InSite.UI.Portal.Contacts.People
             if (IsPostBack)
                 return;
 
-            if (Identity.IsGranted("Portal/Contacts", PermissionOperation.Write))
+            if (Identity.IsGranted("Portal/Contacts", DataAccess.Update))
                 PageHelper.AutoBindHeader(this, new BreadcrumbItem("Add new Contact", "/ui/portal/contacts/people/create", null, null));
             else
                 PageHelper.AutoBindHeader(this);

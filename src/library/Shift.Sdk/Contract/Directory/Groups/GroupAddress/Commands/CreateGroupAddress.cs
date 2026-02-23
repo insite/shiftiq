@@ -4,9 +4,9 @@ namespace Shift.Contract
 {
     public class CreateGroupAddress
     {
-        public Guid AddressIdentifier { get; set; }
-        public Guid GroupIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid AddressId { get; set; }
+        public Guid GroupId { get; set; }
+        public Guid? OrganizationId { get; set; }
 
         public string AddressType { get; set; }
         public string City { get; set; }

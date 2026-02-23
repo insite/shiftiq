@@ -6,7 +6,6 @@ using InSite.Domain.Messages;
 
 using Shift.Common;
 using Shift.Constant;
-using Shift.Toolbox;
 
 namespace InSite.Application.Messages.Write
 {
@@ -157,7 +156,7 @@ namespace InSite.Application.Messages.Write
                         continue;
 
                     if (Calendar.IsEmpty(email.MailoutScheduled))
-                        email.MailoutScheduled = DateTimeOffset.Now;
+                        email.MailoutScheduled = alert.Scheduled ?? DateTimeOffset.Now;
 
                     email.ContentAttachments.AddRange(attachments.EmptyIfNull());
 

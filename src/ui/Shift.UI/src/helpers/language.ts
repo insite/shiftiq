@@ -1,7 +1,7 @@
 export type Language = "ar" | "zh" | "nl" | "en" | "eo" | "fr" | "de" | "he" | "it" | "ja" | "ko" | "la" | "no" | "pa" | "pl" | "pt" | "ru" | "es" | "sv" | "uk";
 
 export type MultiLanguageText = {
-    [key in Language]?: string;
+    [key in Language]?: string | null;
 };
 
 type LanguageNames = {
@@ -30,3 +30,42 @@ export const languageNames: LanguageNames = {
     "sv": "Swedish",
     "uk": "Ukrainian",
 };
+
+export const localizedLanguageNames: LanguageNames = {
+    "ar": "عربي",
+    "zh": "中国人",
+    "nl": "Nederlands",
+    "en": "English",
+    "eo": "Esperanto",
+    "fr": "Français",
+    "de": "Deutsch",
+    "he": "עִברִית",
+    "it": "Italiana",
+    "ja": "日本語",
+    "ko": "한국인",
+    "la": "Latina",
+    "no": "Norsk",
+    "pa": "ਪੰਜਾਬੀ",
+    "pl": "Polski",
+    "pt": "Português",
+    "ru": "Русский",
+    "es": "Española",
+    "sv": "Suwet",
+    "uk": "Українська",
+};
+
+function validateOneLanguage(language: string): void {
+    if (!languageNames[language as Language]) {
+        throw new Error(`Unknown language: ${language}`);
+    }
+}
+
+export function validateLanguage(language: string | string[]): void {
+    if (typeof language === "string") {
+        validateOneLanguage(language);
+    } else {
+        for (const l of language) {
+            validateLanguage(l);
+        }
+    }
+}

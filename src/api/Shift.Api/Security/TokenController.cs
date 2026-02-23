@@ -6,7 +6,7 @@ namespace Shift.Api;
 
 [ApiController]
 [ApiExplorerSettings(GroupName = "Security API")]
-public class TokenController : ControllerBase
+public class TokenController : ShiftControllerBase
 {
     private readonly SecuritySettings _securitySettings;
 
@@ -21,65 +21,75 @@ public class TokenController : ControllerBase
         _claimConverter = claimConverter;
     }
 
-    [HttpPost("security/tokens/generate")]
+    [HttpPost("api/security/tokens/generate")]
     public IActionResult Generate([FromBody] JwtRequest request)
     {
-        var ip = GetClientIPAddress();
+        try
+        {
+            var ip = GetClientIPAddress();
 
-        if (ip.IsEmpty())
-            return ProblemFactory.Unauthorized("Missing IP address").ToActionResult(this);
+            if (ip.IsEmpty())
+                return Unauthorized("Your token request must originate from a recognized IP address");
 
-        if (request.Secret.IsEmpty())
-            return ProblemFactory.Unauthorized("Missing secret").ToActionResult(this);
+            if (request.Secret.IsEmpty())
+                return Unauthorized("Your token request is missing a valid client secret");
 
-        var errors = new List<string>();
+            ValidateLifetime(request);
 
-        var tokenSettings = _securitySettings.Token;
+            var tokenSettings = _securitySettings.Token;
 
-        var isWhitelisted = IsWhitelisted(ip, tokenSettings.Whitelist);
+            var isWhitelisted = IsWhitelisted(ip, tokenSettings.Whitelist);
 
+            var errors = new List<string>();
+
+            var principal = _principalSearch.GetPrincipal(request, ip, isWhitelisted, tokenSettings.Lifetime, errors);
+
+            if (errors.Count > 0)
+                return Unauthorized(string.Join(". ", errors));
+
+            if (!principal.IsDeveloper)
+                return Unauthorized("Developer access is not granted to your account");
+
+            var lifetimeInSeconds = principal.Claims.Lifetime ?? JwtRequest.DefaultLifetime;
+
+            var lifetimeDisplay = TimeSpan.FromSeconds(lifetimeInSeconds).Humanize();
+
+            var body = new
+            {
+                AccessToken = CreateToken(principal, lifetimeInSeconds, request.Debug),
+                TokenType = "Bearer",
+                ExpiresIn = lifetimeInSeconds,
+                Lifetime = $"{lifetimeInSeconds:n0} seconds (~{lifetimeDisplay})"
+            };
+
+            return Ok(body);
+        }
+        catch (SecretExpiredException)
+        {
+            return Unauthorized("Your client secret is expired");
+        }
+        catch (SecretNotFoundException)
+        {
+            return Unauthorized("Your client secret is not recognized");
+        }
+        catch (SentinelNotFoundException)
+        {
+            return Unauthorized("Sentinel not found");
+        }
+        catch (UserNotFoundException)
+        {
+            return Unauthorized("User not found");
+        }
+    }
+
+    private void ValidateLifetime(JwtRequest request)
+    {
         // Disallow a custom lifetime that exceeds 365 days.
 
         var oneYear = 365 * 24 * 60 * 60; // 365 days × 24 hours × 60 minutes × 60 seconds = 31,536,000 seconds
 
         if (request.Lifetime != null && request.Lifetime > oneYear)
             request.Lifetime = oneYear;
-
-        var principal = _principalSearch.GetPrincipal(request, ip, isWhitelisted, tokenSettings.Lifetime, errors);
-
-        if (principal == null)
-        {
-            var problem = errors.Count > 0
-                ? ProblemFactory.Unauthorized(string.Join(". ", errors))
-                : ProblemFactory.Unauthorized("Invalid secret");
-
-            return problem.ToActionResult(this);
-        }
-
-        if (!principal.IsDeveloper)
-        {
-            var problem = errors.Count > 0
-                ? ProblemFactory.Unauthorized(string.Join(". ", errors))
-                : ProblemFactory.Unauthorized("Developer access is not granted to your account");
-
-            return problem.ToActionResult(this);
-        }
-
-        var lifetimeInSeconds = principal.Claims.Lifetime ?? JwtRequest.DefaultLifetime;
-
-        var lifetimeDescription = TimeSpan.FromSeconds(lifetimeInSeconds).Humanize();
-
-        var lifetime = $"{lifetimeInSeconds:n0} seconds (~{lifetimeDescription})";
-
-        var body = new
-        {
-            AccessToken = CreateToken(principal, lifetimeInSeconds, request.Debug),
-            TokenType = "Bearer",
-            ExpiresIn = lifetimeInSeconds,
-            Lifetime = lifetime
-        };
-
-        return Ok(body);
     }
 
     private bool IsWhitelisted(string ipAddress, string whitelist)
@@ -95,7 +105,7 @@ public class TokenController : ControllerBase
         return ipAddress.MatchesAny(list);
     }
 
-    [HttpGet("security/tokens/introspect")]
+    [HttpGet("api/security/tokens/introspect")]
     [BearerAuthorize()]
     public IActionResult Introspect()
     {
@@ -116,7 +126,7 @@ public class TokenController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("security/tokens/validate")]
+    [HttpPost("api/security/tokens/validate")]
     public async Task<IActionResult> ValidateAsync()
     {
         var token = string.Empty;
@@ -152,7 +162,7 @@ public class TokenController : ControllerBase
         return Ok(new { result });
     }
 
-    private string CreateToken(IShiftPrincipal principal, int lifetime, bool debug)
+    private string CreateToken(IPrincipal principal, int lifetime, bool debug)
     {
         var securityClaims = _claimConverter.ToClaims(principal);
 
@@ -182,7 +192,7 @@ public class TokenController : ControllerBase
         return jwt;
     }
 
-    private void AddDebugClaims(IShiftPrincipal principal, Dictionary<ClaimName, List<string>> claims)
+    private void AddDebugClaims(IPrincipal principal, Dictionary<ClaimName, List<string>> claims)
     {
         if (principal.Roles != null && principal.Roles.Any())
         {

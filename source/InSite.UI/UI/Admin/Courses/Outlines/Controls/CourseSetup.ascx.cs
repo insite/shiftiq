@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using InSite.Admin.Assets.Contents.Controls.ContentEditor;
@@ -94,7 +93,8 @@ namespace InSite.Admin.Courses.Outlines.Controls
             CourseSaveButton.Click += CourseSaveButton_Click;
             CourseCancelButton.NavigateUrl = Request.RawUrl;
 
-            DeleteEnrollmentsButton.Click += DeleteEnrollmentsButton_Click;
+            GroupEnrollments.Refreshed += (s, a) => OnGroupEnrollmentsUpdated();
+            UserEnrollments.Refreshed += (s, a) => OnUserEnrollmentsUpdated();
         }
 
         public void BindModelToControls(Course course)
@@ -151,11 +151,12 @@ namespace InSite.Admin.Courses.Outlines.Controls
             CatalogIdentifier.ValueAsGuid = course.Catalog;
             CatalogSequence.ValueAsInt = course.Sequence;
             CourseIsHidden.Checked = course.IsHidden;
+            IsDisplayOverviewOnly.Checked = course.IsDisplayOverviewOnly;
             CourseFlagText.Text = course.FlagText;
             CourseFlagColor.Value = course.FlagColor;
             CourseClosed.Value = course.Closed;
 
-            BindModelToControlsForEnrollment(course.Gradebook?.Identifier);
+            BindModelToControlsForEnrollment(course.Gradebook?.Identifier, true);
             BindModelToControlsForGradebook(course.Gradebook?.Identifier, false, course.Gradebook != null);
 
             CourseHook.Text = course.Hook;
@@ -240,6 +241,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
             course.CatalogIdentifier = CatalogIdentifier.ValueAsGuid;
             course.CourseSequence = CatalogSequence.ValueAsInt ?? 0;
             course.CourseIsHidden = CourseIsHidden.Checked;
+            course.IsDisplayOverviewOnly = IsDisplayOverviewOnly.Checked;
 
             course.Closed = CourseClosed.Value;
 
@@ -613,37 +615,41 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
         #region Enrollments
 
-        private class EnrollmentRepeaterItem
+        public void BindModelToControlsForEnrollment(Guid? gradebookId, bool reload)
         {
-            public Guid LearnerIdentifier { get; set; }
-            public string LearnerName { get; set; }
-        }
-
-        public void BindModelToControlsForEnrollment(Guid? gradebookId)
-        {
-            var gradebook = gradebookId.HasValue ? ServiceLocator.RecordSearch.GetGradebookState(gradebookId.Value) : null;
-            var hasGradebook = gradebook != null;
+            var hasGradebook = gradebookId.HasValue && ServiceLocator.RecordSearch.GradebookExists(gradebookId.Value);
 
             EnrollmentsPanel.Visible = hasGradebook;
             EnrollmentsMissingGradebookPanel.Visible = !hasGradebook;
+            GroupEnrollmentContainer.Visible = hasGradebook;
+            UserEnrollmentContainer.Visible = hasGradebook;
 
-            if (hasGradebook)
+            if (!hasGradebook)
+                return;
+
+            if (reload)
             {
-                var filter = new QEnrollmentFilter { GradebookIdentifier = gradebookId.Value };
-                var enrollments = ServiceLocator.RecordSearch.GetEnrollments(filter, null, null, x => x.Learner)
-                    .Select(x => new EnrollmentRepeaterItem
-                    {
-                        LearnerIdentifier = x.LearnerIdentifier,
-                        LearnerName = x.Learner.UserFullName
-                    })
-                    .OrderBy(x => x.LearnerName)
-                    .ToArray();
-
-                EnrollmentList.DataSource = enrollments;
-                EnrollmentList.DataBind();
-
-                CommandButtons.Visible = enrollments.Length > 0;
+                GroupEnrollments.LoadData(gradebookId.Value);
+                UserEnrollments.LoadData(gradebookId.Value);
             }
+            else
+            {
+                GroupEnrollments.Refresh();
+                UserEnrollments.Refresh();
+            }
+
+            OnGroupEnrollmentsUpdated();
+            OnUserEnrollmentsUpdated();
+        }
+
+        private void OnGroupEnrollmentsUpdated()
+        {
+            GroupEnrollmentContainer.Visible = GroupEnrollments.RowCount > 0;
+        }
+
+        private void OnUserEnrollmentsUpdated()
+        {
+            UserEnrollmentContainer.Visible = UserEnrollments.RowCount > 0;
         }
 
         private void EnrollmentClassAdd_Click(object sender, EventArgs e)
@@ -667,7 +673,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 ServiceLocator.SendCommand(new AddEnrollment(gradebook, enrollment, learner, null, now, null));
             }
 
-            BindModelToControlsForEnrollment(gradebook);
+            BindModelToControlsForEnrollment(gradebook, false);
 
             EnrollmentClassIdentifier.Value = null;
         }
@@ -685,7 +691,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 return;
 
             ServiceLocator.SendCommand(new AddEnrollment(gradebook, enrollment, learner, null, DateTimeOffset.Now, null));
-            BindModelToControlsForEnrollment(gradebook);
+            BindModelToControlsForEnrollment(gradebook, false);
             EnrollmentPersonIdentifier.Value = null;
         }
 
@@ -694,69 +700,15 @@ namespace InSite.Admin.Courses.Outlines.Controls
             if (!EnrollmentGroupIdentifier.HasValue || !GradebookIdentifier.ValueAsGuid.HasValue)
                 return;
 
-            var gradebook = GradebookIdentifier.ValueAsGuid.Value;
-            var @group = EnrollmentGroupIdentifier.Value.Value;
-            var members = MembershipSearch.Select(x => x.GroupIdentifier == @group);
+            var gradebookId = GradebookIdentifier.ValueAsGuid.Value;
+            var groupId = EnrollmentGroupIdentifier.Value.Value;
+            var enrollmentId = UniqueIdentifier.Create();
 
-            foreach (var member in members)
-            {
-                var enrollment = UniqueIdentifier.Create();
+            ServiceLocator.SendCommand(new AddGradebookGroupEnrollment(gradebookId, enrollmentId, groupId));
 
-                if (ServiceLocator.RecordSearch.EnrollmentExists(gradebook, member.UserIdentifier))
-                    return;
+            BindModelToControlsForEnrollment(gradebookId, false);
 
-                ServiceLocator.SendCommand(new AddEnrollment(gradebook, enrollment, member.UserIdentifier, null, DateTimeOffset.Now, null));
-                BindModelToControlsForEnrollment(gradebook);
-                EnrollmentPersonIdentifier.Value = null;
-            }
-
-            //foreach (var registration in registrations)
-            //{
-            //    var now = DateTimeOffset.Now;
-
-            //    var learner = registration.CandidateIdentifier;
-            //    if (ServiceLocator.RecordSearch.EnrollmentExists(gradebook, learner))
-            //        continue;
-
-            //    var enrollment = UniqueIdentifier.Create();
-            //    ServiceLocator.SendCommand(new AddEnrollment(gradebook, enrollment, learner, null, now, null));
-            //}
-
-            //BindModelToControlsForEnrollment(gradebook);
-
-            //EnrollmentClassIdentifier.Value = null;
-        }
-
-        private void DeleteEnrollmentsButton_Click(object sender, EventArgs e)
-        {
-            var users = GetSelectedEnrollments();
-
-            if (users.Count == 0)
-                return;
-
-            var gradebook = GradebookIdentifier.ValueAsGuid.Value;
-
-            foreach (var id in users)
-                ServiceLocator.SendCommand(new DeleteEnrollment(gradebook, id));
-
-            BindModelToControlsForEnrollment(gradebook);
-        }
-
-        private List<Guid> GetSelectedEnrollments()
-        {
-            var result = new List<Guid>();
-
-            foreach (DataListItem item in EnrollmentList.Items)
-            {
-                var isSelected = (ICheckBoxControl)item.FindControl("IsSelected");
-                if (!isSelected.Checked)
-                    continue;
-
-                var learnerIdentifier = Guid.Parse(((ITextControl)item.FindControl("LearnerIdentifier")).Text);
-                result.Add(learnerIdentifier);
-            }
-
-            return result;
+            EnrollmentGroupIdentifier.Value = null;
         }
 
         #endregion

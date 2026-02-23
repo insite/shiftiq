@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using InSite.Application.Banks.Write;
 using InSite.Common.Web;
@@ -65,6 +66,9 @@ namespace InSite.Admin.Assessments.Sets.Forms
             var bank = ServiceLocator.BankSearch.GetBankState(BankID);
             if (bank == null)
                 RedirectToSearch();
+
+            if (Organization.Toolkits.Assessments.LockPublishedStandards && bank.GetAllQuestions().Any(x => x.FirstPublished.HasValue))
+                RedirectToReader();
 
             var set = bank.FindSet(SetID);
             if (set == null)

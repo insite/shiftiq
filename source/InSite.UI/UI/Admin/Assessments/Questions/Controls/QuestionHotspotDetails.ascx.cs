@@ -489,7 +489,7 @@ namespace InSite.UI.Admin.Assessments.Questions.Controls
                     continue;
 
                 if (!CanRemove(OptionItems.QuestionIdentifier, option.Number, out var removeError))
-                    throw new ApplicationError(removeError);
+                    throw new InvalidOperationException(removeError);
 
                 commands.Add(new DeleteQuestionHotspotOption(question.Set.Bank.Identifier, question.Identifier, option.Identifier));
             }

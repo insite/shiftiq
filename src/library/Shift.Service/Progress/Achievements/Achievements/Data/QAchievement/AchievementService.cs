@@ -17,9 +17,9 @@ public class AchievementService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid achievement, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid achievement, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(achievement, cancellation);
+        return await _reader.AssertAsync(achievement, organization, cancellation);
     }
 
     public async Task<IEnumerable<AchievementModel>> CollectAsync(IAchievementCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class AchievementService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyAchievement modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.AchievementIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.AchievementId, cancellation);
 
         if (entity == null)
             return false;

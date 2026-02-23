@@ -69,13 +69,13 @@ namespace InSite.UI.Admin.Contacts
             MembershipReasonCounter.Visible = membershipReasonCount > 0;
 
             var groupCountByLabel = ServiceLocator.GroupSearch.CountPerLabel(Organization.OrganizationIdentifier);
-            GroupLabelRepeater.Visible = Identity.IsActionAuthorized("/ui/admin/contacts/groups/search");
+            GroupLabelRepeater.Visible = Identity.IsGranted("/ui/admin/contacts/groups/search");
             GroupLabelRepeater.DataSource = GroupLabelRepeater.Visible ? groupCountByLabel : null;
             GroupLabelRepeater.DataBind();
             // GroupLabelPanel.Visible = GroupLabelRepeater.Visible && groupCountByLabel.Count > 0;
 
             var groupCountByType = ServiceLocator.GroupSearch.CountPerType(Organization.OrganizationIdentifier);
-            GroupTypeRepeater.Visible = Identity.IsActionAuthorized("/ui/admin/contacts/groups/search");
+            GroupTypeRepeater.Visible = Identity.IsGranted("/ui/admin/contacts/groups/search");
             GroupTypeRepeater.DataSource = GroupTypeRepeater.Visible ? groupCountByType : null;
             GroupTypeRepeater.DataBind();
             // GroupTypePanel.Visible = GroupTypeRepeater.Visible && groupCountByType.Count > 0;
@@ -117,7 +117,7 @@ namespace InSite.UI.Admin.Contacts
 
         public static void LoadCounter(HtmlGenericControl card, Literal counter, int count, HtmlAnchor link, string action)
         {
-            card.Visible = CurrentSessionState.Identity.IsActionAuthorized(action);
+            card.Visible = CurrentSessionState.Identity.IsGranted(action);
             link.HRef = action;
             counter.Text = $@"{count:n0}";
         }

@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class FileActivityController : ShiftControllerBase
 {
     private readonly FileActivityService _fileActivityService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public FileActivityController(FileActivityService fileActivityService)
+    public FileActivityController(FileActivityService fileActivityService, IPrincipalProvider principalProvider)
     {
         _fileActivityService = fileActivityService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class FileActivityController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific file activity
     /// </summary>
-    [HttpHead("content/files-activities/{activity:guid}")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Assert)]
+    [HttpHead("api/content/files-activities/{activity:guid}")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertFileActivity")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid activity, CancellationToken cancellation = default)
     {
-        var exists = await _fileActivityService.AssertAsync(activity, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _fileActivityService.AssertAsync(activity, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class FileActivityController : ShiftControllerBase
     /// <summary>
     /// Collects the list of file activities that match specific criteria
     /// </summary>
-    [HttpPost("content/files-activities/collect")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Collect)]
+    [HttpPost("api/content/files-activities/collect")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileActivityModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectFileActivities")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectFileActivities query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class FileActivityController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("content/files-activities")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Collect)]
+    [HttpGet("api/content/files-activities")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileActivityModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectFileActivities_get")]
     [AliasFor("collectFileActivities")]
@@ -56,6 +62,10 @@ public class FileActivityController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectFileActivities query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _fileActivityService.CollectAsync(query, cancellation);
 
         var count = await _fileActivityService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class FileActivityController : ShiftControllerBase
     /// <summary>
     /// Counts the file activities that match specific criteria
     /// </summary>
-    [HttpPost("content/files-activities/count")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Count)]
+    [HttpPost("api/content/files-activities/count")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countFileActivities")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountFileActivities query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class FileActivityController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("content/files-activities/count")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Count)]
+    [HttpGet("api/content/files-activities/count")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countFileActivities_get")]
     [AliasFor("countFileActivities")]
@@ -90,6 +100,10 @@ public class FileActivityController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountFileActivities query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _fileActivityService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class FileActivityController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of file activities that match specific criteria
     /// </summary>    
-    [HttpPost("content/files-activities/download")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Download)]
+    [HttpPost("api/content/files-activities/download")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadFileActivities")]
@@ -108,8 +122,8 @@ public class FileActivityController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("content/files-activities/download")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Download)]
+    [HttpGet("api/content/files-activities/download")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadFileActivities_get")]
@@ -122,6 +136,10 @@ public class FileActivityController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectFileActivities query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Content", "FileActivities", query.Filter.Format, User);
 
         var models = await _fileActivityService
@@ -142,22 +160,30 @@ public class FileActivityController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific file activity
     /// </summary>
-    [HttpGet("content/files-activities/{activity:guid}")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Retrieve)]
+    [HttpGet("api/content/files-activities/{activity:guid}")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType<FileActivityModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveFileActivity")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid activity, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _fileActivityService.RetrieveAsync(activity, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of file activities that match specific criteria
     /// </summary>
-    [HttpPost("content/files-activities/search")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Search)]
+    [HttpPost("api/content/files-activities/search")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileActivityMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchFileActivities")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchFileActivities query, CancellationToken cancellation = default)
@@ -165,8 +191,8 @@ public class FileActivityController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("content/files-activities/search")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Search)]
+    [HttpGet("api/content/files-activities/search")]
+    [HybridPermission("content/files-activities", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileActivityMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchFileActivities_get")]
     [AliasFor("searchFileActivities")]
@@ -178,6 +204,10 @@ public class FileActivityController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchFileActivities query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _fileActivityService.SearchAsync(query, cancellation);
 
         var count = await _fileActivityService.CountAsync(query, cancellation);
@@ -191,8 +221,8 @@ public class FileActivityController : ShiftControllerBase
 
     #region Commands
 
-    [HttpPost("content/files-activities")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Create)]
+    [HttpPost("api/content/files-activities")]
+    [HybridPermission("content/files-activities", DataAccess.Update)]
     [ProducesResponseType<FileActivityModel>(StatusCodes.Status201Created, "application/json")]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
     [EndpointName("createFileActivity")]
@@ -201,15 +231,15 @@ public class FileActivityController : ShiftControllerBase
         var created = await _fileActivityService.CreateAsync(create, cancellation);
 
         if (!created)
-            return BadRequest($"Duplicate not permitted: ActivityIdentifier {create.ActivityIdentifier}. You cannot insert a duplicate object with the same primary key.");
+            return BadRequest($"Duplicate not permitted: ActivityIdentifier {create.ActivityId}. You cannot insert a duplicate object with the same primary key.");
 
-        var model = await _fileActivityService.RetrieveAsync(create.ActivityIdentifier, cancellation);
+        var model = await _fileActivityService.RetrieveAsync(create.ActivityId, cancellation);
 
         return CreatedAtAction(nameof(CreateAsync), model);
     }
 
-    [HttpDelete("content/files-activities/{activity:guid}")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Delete)]
+    [HttpDelete("api/content/files-activities/{activity:guid}")]
+    [HybridPermission("content/files-activities", DataAccess.Delete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointName("deleteFileActivity")]
@@ -223,8 +253,8 @@ public class FileActivityController : ShiftControllerBase
         return Ok();
     }
 
-    [HttpPut("content/files-activities/{activity:guid}")]
-    [HybridAuthorize(Policies.Content.Files.FileActivity.Modify)]
+    [HttpPut("api/content/files-activities/{activity:guid}")]
+    [HybridPermission("content/files-activities", DataAccess.Update)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
@@ -234,7 +264,7 @@ public class FileActivityController : ShiftControllerBase
         var model = await _fileActivityService.RetrieveAsync(activity, cancellation);
 
         if (model is null)
-            return NotFound($"FileActivity not found: ActivityIdentifier {modify.ActivityIdentifier}. You cannot modify an object that is not in the database.");
+            return NotFound($"FileActivity not found: ActivityIdentifier {modify.ActivityId}. You cannot modify an object that is not in the database.");
 
         var modified = await _fileActivityService.ModifyAsync(modify, cancellation);
 

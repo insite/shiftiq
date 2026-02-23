@@ -58,7 +58,7 @@ namespace InSite.Admin.Assessments.Sets.Utilities
             foreach (var questionNode in questionNodes)
             {
                 var textNode = questionNode.Element("Text")
-                    ?? throw new ApplicationError("File has unsupported format. Node Occupation/Exam/Section/Question/Text is not found.");
+                    ?? throw new FormatException("File has unsupported format. Node Occupation/Exam/Section/Question/Text is not found.");
 
                 var question = new IcemsQuestion
                 {
@@ -71,7 +71,7 @@ namespace InSite.Admin.Assessments.Sets.Utilities
                 if (!isList)
                 {
                     listNode = questionNode.Element("AnswerTable")
-                        ?? throw new ApplicationError("File has unsupported format. Node Occupation/Exam/Section/Question/AnswerList is not found.");
+                        ?? throw new FormatException("File has unsupported format. Node Occupation/Exam/Section/Question/AnswerList is not found.");
 
                     var heading1 = listNode.Element("Heading1")?.Value;
                     var heading2 = listNode.Element("Heading2")?.Value;

@@ -8,6 +8,7 @@
 <%@ Register Src="~/UI/Admin/Standards/Occupations/Controls/CompetenciesPanel.ascx" TagName="CompetenciesPanel" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Assets/Glossaries/Terms/Controls/TermGrid.ascx" TagName="GlossaryTermGrid" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Standards/Standards/Controls/ScenarioQuestions.ascx" TagName="ScenarioQuestions" TagPrefix="uc" %>
+<%@ Register TagPrefix="uc" TagName="AttachmentsSection" Src="AttachmentsSection.ascx" %>
 
 <insite:Nav runat="server">
 
@@ -619,6 +620,14 @@
             </div>
         </div>
     </insite:NavItem>
+
+    <insite:NavItem runat="server" ID="AttachmentTab" Title="Attachments" Icon="fas fa-paperclip">
+			
+		<section class="pb-5 mb-md-2">
+            <uc:AttachmentsSection runat="server" ID="AttachmentSection" />
+		</section>
+
+	</insite:NavItem>
 
 </insite:Nav>
 

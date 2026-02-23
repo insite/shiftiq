@@ -10,7 +10,7 @@ namespace InSite.Persistence
         {
             ToTable(schema + ".RoleSummary");
             HasKey(x => new { x.GroupIdentifier });
-        
+
             Property(x => x.GroupIdentifier).IsRequired();
             Property(x => x.GroupName).IsRequired().IsUnicode(false).HasMaxLength(148);
             Property(x => x.GroupTenantCode).IsRequired().IsUnicode(false).HasMaxLength(32);

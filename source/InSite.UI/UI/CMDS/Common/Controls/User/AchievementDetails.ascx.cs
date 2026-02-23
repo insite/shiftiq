@@ -61,7 +61,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
             AchievementIdentifier = info.AchievementIdentifier;
 
             Title.Text = info.AchievementTitle;
-            AllowSelfDeclared.Checked = info.AchievementAllowSelfDeclared;
+            EnableSignOff.Checked = info.AchievementAllowSelfDeclared;
             IsTimeSensitive.Checked = info.ValidForCount.HasValue;
             ValidForCount.ValueAsInt = info.ValidForCount;
             ValidForUnit.Value = ValidForUnits.Months;
@@ -95,7 +95,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
                         ? 12 * ValidForCount.ValueAsInt.Value
                         : ValidForCount.ValueAsInt,
                 OrganizationIdentifier = organizationIdentifier,
-                AllowSelfDeclared = AllowSelfDeclared.Checked
+                AllowSelfDeclared = EnableSignOff.Checked
             };
         }
 

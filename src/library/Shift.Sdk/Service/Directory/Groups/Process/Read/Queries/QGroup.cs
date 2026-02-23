@@ -68,6 +68,7 @@ namespace InSite.Application.Contacts.Read
         public virtual ICollection<QGroupAddress> Addresses { get; set; } = new HashSet<QGroupAddress>();
         public virtual ICollection<QGroupConnection> ConnectionChildren { get; set; } = new HashSet<QGroupConnection>();
         public virtual ICollection<QGroupConnection> ConnectionParents { get; set; } = new HashSet<QGroupConnection>();
+        public virtual ICollection<QGroupEnrollment> GroupEnrollments { get; set; } = new HashSet<QGroupEnrollment>();
         public virtual ICollection<TGroupPermission> GroupPermissions { get; set; } = new HashSet<TGroupPermission>();
         public virtual ICollection<VEventGroupPermission> EventGroupPermissions { get; set; } = new HashSet<VEventGroupPermission>();
         public virtual ICollection<QCredential> Credentials { get; set; } = new HashSet<QCredential>();
@@ -76,5 +77,6 @@ namespace InSite.Application.Contacts.Read
         public virtual ICollection<QMembership> QMemberships { get; set; } = new HashSet<QMembership>();
         public virtual ICollection<QJournalSetupGroup> JournalSetupGroups { get; set; } = new HashSet<QJournalSetupGroup>();
         public virtual ICollection<TProgramGroupEnrollment> ProgramGroupEnrollments { get; set; } = new HashSet<TProgramGroupEnrollment>();
+        public virtual ICollection<TAchievementDepartment> AchievementDepartments { get; set; } = new HashSet<TAchievementDepartment>();
     }
 }

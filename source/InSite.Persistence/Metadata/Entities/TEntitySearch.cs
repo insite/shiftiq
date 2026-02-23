@@ -27,7 +27,7 @@ namespace InSite.Persistence
 SELECT E.*
 FROM metadata.TEntity AS E
 WHERE NOT EXISTS (SELECT * FROM databases.VTable AS T WHERE T.SchemaName = E.StorageSchema AND T.TableName = E.StorageTable)
-ORDER BY e.StorageStructure, E.StorageSchema, E.StorageTable, E.ComponentType, E.ComponentName, E.ComponentPart, E.EntityName
+ORDER BY e.StorageStructure, E.StorageSchema, E.StorageTable, E.SubsystemType, E.SubsystemName, E.SubsystemComponent, E.EntityName
                 ";
 
             using (var db = new ReportDbContext())
@@ -77,9 +77,9 @@ ORDER BY E.EntityName
 
                     foreach (var singular in segments)
                     {
-                        var isExternalPlatform = entity.ComponentName == "Integration" && singular == segments.First();
+                        var isExternalPlatform = entity.SubsystemName == "Integration" && singular == segments.First();
 
-                        var isNcshaSurveyTable = entity.ComponentPart == "NCSHA" && StringHelper.EqualsAny(singular, new[] { "ab", "hc", "hi", "mf", "mr", "pa" });
+                        var isNcshaSurveyTable = entity.SubsystemComponent == "NCSHA" && StringHelper.EqualsAny(singular, new[] { "ab", "hc", "hi", "mf", "mr", "pa" });
 
                         if (isExternalPlatform || isNcshaSurveyTable)
                         {
@@ -146,9 +146,9 @@ ORDER BY E.EntityName
             using (var context = new ReportDbContext())
             {
                 return CreateQuery(context, filter)
-                    .OrderBy(x => x.ComponentType)
-                    .ThenBy(x => x.ComponentName)
-                    .ThenBy(x => x.ComponentPart)
+                    .OrderBy(x => x.SubsystemType)
+                    .ThenBy(x => x.SubsystemName)
+                    .ThenBy(x => x.SubsystemComponent)
                     .ThenBy(x => x.EntityName)
                     .ApplyPaging(filter)
                     .ToList();
@@ -169,14 +169,14 @@ ORDER BY E.EntityName
                 if (!string.IsNullOrEmpty(filter.CollectionKey))
                     query = query.Where(x => x.CollectionKey.Contains(filter.CollectionKey));
 
-                if (!string.IsNullOrEmpty(filter.ComponentPart))
-                    query = query.Where(x => x.ComponentPart.Contains(filter.ComponentPart));
+                if (!string.IsNullOrEmpty(filter.SubsystemComponent))
+                    query = query.Where(x => x.SubsystemComponent.Contains(filter.SubsystemComponent));
 
-                if (!string.IsNullOrEmpty(filter.ComponentType))
-                    query = query.Where(x => x.ComponentType.Contains(filter.ComponentType));
+                if (!string.IsNullOrEmpty(filter.SubsystemType))
+                    query = query.Where(x => x.SubsystemType.Contains(filter.SubsystemType));
 
-                if (!string.IsNullOrEmpty(filter.ComponentName))
-                    query = query.Where(x => x.ComponentName.Contains(filter.ComponentName));
+                if (!string.IsNullOrEmpty(filter.SubsystemName))
+                    query = query.Where(x => x.SubsystemName.Contains(filter.SubsystemName));
 
                 if (!string.IsNullOrEmpty(filter.EntityName))
                     query = query.Where(x => x.EntityName.Contains(filter.EntityName));
@@ -196,9 +196,9 @@ ORDER BY E.EntityName
                 if (!string.IsNullOrEmpty(filter.Keyword))
                     query = query.Where(x => x.CollectionSlug.Contains(filter.Keyword)
                                           || x.CollectionKey.Contains(filter.Keyword)
-                                          || x.ComponentPart.Contains(filter.Keyword)
-                                          || x.ComponentType.Contains(filter.Keyword)
-                                          || x.ComponentName.Contains(filter.Keyword)
+                                          || x.SubsystemComponent.Contains(filter.Keyword)
+                                          || x.SubsystemType.Contains(filter.Keyword)
+                                          || x.SubsystemName.Contains(filter.Keyword)
                                           || x.EntityName.Contains(filter.Keyword)
                                           || x.StorageKey.Contains(filter.Keyword)
                                           || x.StorageSchema.Contains(filter.Keyword)

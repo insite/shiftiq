@@ -75,6 +75,9 @@ namespace InSite.Admin.Events.Classes.Forms
             RegistrationDeadline.Value = @event.RegistrationDeadline;
             RegistrationDeadlineField.Visible = allowPublish;
 
+            DisplayOnCalendar.Checked = @event.DisplayOnCalendar;
+            DisplayOnCalendarField.Visible = allowPublish;
+
             CancelButton.NavigateUrl = OutlineUrl;
         }
 
@@ -85,6 +88,7 @@ namespace InSite.Admin.Events.Classes.Forms
 
             ServiceLocator.SendCommand(new PublishEvent(EventIdentifier, RegistrationStart.Value, RegistrationDeadline.Value));
             ServiceLocator.SendCommand(new ModifyEventCalendarColor(EventIdentifier, ClassCalendarColor.Value));
+            ServiceLocator.SendCommand(new ModifyEventDisplayOnCalendar(EventIdentifier, DisplayOnCalendar.Checked));
 
             HttpResponseHelper.Redirect(OutlineUrl);
         }

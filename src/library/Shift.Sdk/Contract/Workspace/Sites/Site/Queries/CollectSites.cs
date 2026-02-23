@@ -7,7 +7,7 @@ namespace Shift.Contract
 {
     public class CollectSites : Query<IEnumerable<SiteModel>>, ISiteCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
 
         public string LastChangeType { get; set; }
         public string LastChangeUser { get; set; }

@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveFileClaim : Query<FileClaimModel>
     {
-        public Guid ClaimIdentifier { get; set; }
+        public Guid ClaimId { get; set; }
     }
 }

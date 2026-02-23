@@ -78,7 +78,7 @@ namespace InSite.Cmds.Controls.Employees.Employments
             var webUser = CurrentSessionState.Identity;
             var key = webUser.IsInRole(CmdsRole.Programmers) || webUser.IsInRole(CmdsRole.SystemAdministrators)
                 ? (Guid?)null
-                : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                : Organization.Identifier;
 
             Grid.DataSource = UserProfileRepository.SelectEmployments(UserIdentifier, key, Grid.PageIndex, Grid.PageSize);
         }
@@ -95,7 +95,7 @@ namespace InSite.Cmds.Controls.Employees.Employments
 
             var limitOrganizationIdentifier = webUser.IsInRole(CmdsRole.Programmers) || webUser.IsInRole(CmdsRole.SystemAdministrators)
                 ? (Guid?)null
-                : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                : Organization.Identifier;
 
             var rowCount = UserProfileRepository.SelectEmployments(UserIdentifier, limitOrganizationIdentifier, null, null).Rows.Count;
 

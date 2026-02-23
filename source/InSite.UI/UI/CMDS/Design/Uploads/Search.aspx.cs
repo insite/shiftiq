@@ -24,7 +24,7 @@ namespace InSite.Cmds.Design.Uploads
         #region Properties
 
         private Guid OrganizationIdentifier => Guid.TryParse(Request.QueryString["id"], out var value)
-            ? value : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            ? value : Organization.Identifier;
 
         private const string SearchUrl = "/ui/cmds/admin/organizations/search";
 

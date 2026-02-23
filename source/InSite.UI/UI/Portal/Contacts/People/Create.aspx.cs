@@ -11,6 +11,7 @@ using InSite.UI.Layout.Portal;
 using InSite.Web.Data;
 using InSite.Web.Security;
 
+using Shift.Common;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Contacts.People
@@ -31,7 +32,7 @@ namespace InSite.UI.Portal.Contacts.People
             if (IsPostBack)
                 return;
 
-            if (!Identity.IsGranted("Portal/Contacts", PermissionOperation.Write))
+            if (!Identity.IsGranted("Portal/Contacts", DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/portal/contacts/people/search");
 
             PortalMaster.ShowAvatar(dashboardUrl: "/ui/portal/management/dashboard/home");

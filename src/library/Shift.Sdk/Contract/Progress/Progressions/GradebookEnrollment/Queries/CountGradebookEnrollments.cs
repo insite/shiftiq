@@ -6,10 +6,10 @@ namespace Shift.Contract
 {
     public class CountGradebookEnrollments : Query<int>, IGradebookEnrollmentCriteria
     {
-        public Guid? GradebookIdentifier { get; set; }
-        public Guid? LearnerIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? PeriodIdentifier { get; set; }
+        public Guid? GradebookId { get; set; }
+        public Guid? LearnerId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? PeriodId { get; set; }
 
         public string EnrollmentComment { get; set; }
 

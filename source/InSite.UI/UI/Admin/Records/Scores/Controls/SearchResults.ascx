@@ -37,7 +37,7 @@
 
         <asp:TemplateField HeaderText="Score" ItemStyle-Wrap="False" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
             <ItemTemplate>
-                <%# GetScoreValue(Container.DataItem) %>
+                <%# GetScoreValue() %>
             </ItemTemplate>
         </asp:TemplateField>
 
@@ -65,8 +65,14 @@
         <asp:TemplateField HeaderText="Achievement">
             <ItemTemplate>
                 <div runat="server" visible='<%# Eval("Gradebook.AchievementIdentifier") != null %>'>
-                        <a href='/ui/admin/records/achievements/outline?<%# Eval("Gradebook.AchievementIdentifier", "id={0}") %>'><%# Eval("Gradebook.Achievement.AchievementTitle") %></a>
-                    </div>
+                    <a href='/ui/admin/records/achievements/outline?<%# Eval("Gradebook.AchievementIdentifier", "id={0}") %>'><%# Eval("Gradebook.Achievement.AchievementTitle") %></a>
+                </div>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="Department">
+            <ItemTemplate>
+                <%# GetDepartments() %>
             </ItemTemplate>
         </asp:TemplateField>
 

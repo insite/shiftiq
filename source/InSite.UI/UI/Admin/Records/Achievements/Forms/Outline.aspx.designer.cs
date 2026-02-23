@@ -373,5 +373,32 @@ namespace InSite.Admin.Achievements.Achievements.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal AchievementStatus;
+
+        /// <summary>
+        /// NotificationsTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NavItem NotificationsTab;
+
+        /// <summary>
+        /// NotificationsUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel NotificationsUpdatePanel;
+
+        /// <summary>
+        /// NotificationsDetails control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.UI.Admin.Records.Achievements.Controls.OutlineNotifications NotificationsDetails;
     }
 }

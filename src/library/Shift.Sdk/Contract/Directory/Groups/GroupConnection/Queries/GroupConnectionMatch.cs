@@ -4,7 +4,7 @@ namespace Shift.Contract
 {
     public partial class GroupConnectionMatch
     {
-        public Guid ChildGroupIdentifier { get; set; }
-        public Guid ParentGroupIdentifier { get; set; }
+        public Guid ChildGroupId { get; set; }
+        public Guid ParentGroupId { get; set; }
     }
 }

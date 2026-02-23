@@ -43,6 +43,10 @@ namespace InSite.Admin.Workflow.Forms.Submissions.Controls
             public string RespondentEmail { get; }
             public string RespondentHtml { get; set; }
 
+            public Guid? AssessorUserIdentifier { get; }
+            public string AssessorName { get; }
+            public string AssessorEmail { get; }
+
             public string GroupName { get; set; }
             public string PeriodName { get; set; }
 
@@ -91,6 +95,12 @@ namespace InSite.Admin.Workflow.Forms.Submissions.Controls
                     RespondentUserIdentifier = entity.RespondentUserIdentifier;
                     RespondentName = entity.RespondentName;
                     RespondentEmail = entity.RespondentEmail;
+                }
+
+                {
+                    AssessorUserIdentifier = entity.AssessorUserIdentifier;
+                    AssessorName = entity.AssessorName;
+                    AssessorEmail = entity.AssessorEmail;
                 }
 
                 GroupName = entity.GroupName;

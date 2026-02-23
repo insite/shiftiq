@@ -56,7 +56,7 @@ namespace InSite.Custom.CMDS.User.Programs.Controls
         {
             var partitionId = ServiceLocator.Partition.Identifier;
 
-            var partitionName = ServiceLocator.Partition.GetPlatformName();
+            var partitionName = ServiceLocator.Partition.Name;
 
             var partitionEvents = SearchUpcomingEvents(partitionId, partitionName, true);
 

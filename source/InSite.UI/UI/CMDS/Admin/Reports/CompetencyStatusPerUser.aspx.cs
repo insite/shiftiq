@@ -93,14 +93,14 @@ namespace InSite.Cmds.Actions.Reports
 
             PageHelper.AutoBindHeader(this);
 
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             DepartmentIdentifier.Value = null;
 
-            PersonIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            PersonIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             UpdatePersonIdentifier();
 
-            ProfileIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            ProfileIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             ProfileIdentifier.Value = null;
         }
 
@@ -305,7 +305,7 @@ namespace InSite.Cmds.Actions.Reports
         private static IEnumerable<ContactRepository2.CompanyEmployee> ApplyFilter(SearchParameters parameters)
         {
             var statuses = ContactRepository2.SelectCompetencyStatusPerPerson(
-                CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                Organization.Identifier,
                 parameters.DepartmentIdentifier,
                 parameters.PersonIdentifier,
                 parameters.ProfileIdentifier,
@@ -318,7 +318,7 @@ namespace InSite.Cmds.Actions.Reports
                 x => x.Group.GroupType == GroupTypes.Department
                   && x.UserIdentifier == User.UserIdentifier);
 
-            if (!Identity.IsInGroup(CmdsRole.SystemAdministrators) && !Identity.IsInGroup(CmdsRole.Programmers))
+            if (!Identity.IsInRole(CmdsRole.SystemAdministrators) && !Identity.IsInRole(CmdsRole.Programmers))
                 statuses = statuses.Where(
                     s => s.Employments.Any(
                         e => departments.Any(

@@ -9,7 +9,7 @@ public class SiteAdapter : IEntityAdapter
     {
         entity.SiteDomain = modify.SiteDomain;
         entity.SiteTitle = modify.SiteTitle;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.LastChangeTime = modify.LastChangeTime;
         entity.LastChangeType = modify.LastChangeType;
         entity.LastChangeUser = modify.LastChangeUser;
@@ -27,10 +27,10 @@ public class SiteAdapter : IEntityAdapter
     {
         var entity = new SiteEntity
         {
-            SiteIdentifier = create.SiteIdentifier,
+            SiteIdentifier = create.SiteId,
             SiteDomain = create.SiteDomain,
             SiteTitle = create.SiteTitle,
-            OrganizationIdentifier = create.OrganizationIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
             LastChangeTime = create.LastChangeTime,
             LastChangeType = create.LastChangeType,
             LastChangeUser = create.LastChangeUser
@@ -47,10 +47,10 @@ public class SiteAdapter : IEntityAdapter
     {
         var model = new SiteModel
         {
-            SiteIdentifier = entity.SiteIdentifier,
+            SiteId = entity.SiteIdentifier,
             SiteDomain = entity.SiteDomain,
             SiteTitle = entity.SiteTitle,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
             LastChangeTime = entity.LastChangeTime,
             LastChangeType = entity.LastChangeType,
             LastChangeUser = entity.LastChangeUser
@@ -68,7 +68,7 @@ public class SiteAdapter : IEntityAdapter
     {
         var match = new SiteMatch
         {
-            SiteIdentifier = entity.SiteIdentifier
+            SiteId = entity.SiteIdentifier
 
         };
 

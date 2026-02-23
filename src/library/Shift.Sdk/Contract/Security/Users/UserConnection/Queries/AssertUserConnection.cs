@@ -6,7 +6,7 @@ namespace Shift.Contract
 {
     public class AssertUserConnection : Query<bool>
     {
-        public Guid FromUserIdentifier { get; set; }
-        public Guid ToUserIdentifier { get; set; }
+        public Guid FromUserId { get; set; }
+        public Guid ToUserId { get; set; }
     }
 }

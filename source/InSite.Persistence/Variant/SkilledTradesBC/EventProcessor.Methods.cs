@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Banks.Read;
 using InSite.Application.Events.Read;
 using InSite.Application.Events.Write;
@@ -17,6 +14,8 @@ using InSite.Domain.Messages;
 using InSite.Persistence.Integration.DirectAccess;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Toolbox.Integration.DirectAccess;
 
@@ -236,7 +235,7 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
             foreach (var recipient in email.Recipients)
             {
                 if (recipient.Identifier == null)
-                    throw new Exception($"The identifier for this recipient ({recipient.Address}) cannot be null.");
+                    throw new InvalidOperationException($"The identifier for this recipient ({recipient.Address}) cannot be null.");
 
                 email.RecipientListTo.Add(recipient.Identifier.Value, recipient.Address);
             }
@@ -432,23 +431,22 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
         private string SubmitExamResultsToDirectAccess(IChange e, QEvent @event, List<QRegistration> registrations)
         {
             var request = ApiRequestBuilder.CreateExamRegistrationRequest(@event, registrations, _registrations, _assessments, _standards, _attempts, _contacts);
+            if (request.Sessions.Count == 0)
+                return null;
 
-            if (request.Sessions.Count > 0)
+            var response = _da.SubmitExamData(e.OriginUser, request);
+            if (response == null)
+                return null;
+
+            var code = $"Direct Access Transaction Receipt #{response.ReceiptId}";
+
+            foreach (var registration in registrations)
             {
-                var response = _da.SubmitExamData(e.OriginUser, request);
-
-                var code = $"Direct Access Transaction Receipt #{response.ReceiptId}";
-
-                foreach (var registration in registrations)
-                {
-                    var command = new ChangeGrading(registration.RegistrationIdentifier, "Published", code, null);
-                    _broker.Send(e, command);
-                }
-
-                return code;
+                var command = new ChangeGrading(registration.RegistrationIdentifier, "Published", code, null);
+                _broker.Send(e, command);
             }
 
-            return null;
+            return code;
         }
 
         private void ValidateAttempts(IChange e, QEvent @event, List<QRegistration> registrations)

@@ -14,21 +14,18 @@ public class FormReader : IEntityReader
 
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
-    public FormReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public FormReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid surveyForm, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid surveyForm, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
-            
-            return query.AnyAsync(x => x.SurveyFormIdentifier == surveyForm, cancellation);
+
+            return query.AnyAsync(x => x.SurveyFormIdentifier == surveyForm && (organization == null || x.OrganizationIdentifier == organization), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,7 @@ public class FormReader : IEntityReader
     /// </remarks>
     private IQueryable<FormEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
-        var query = db.Form
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+        var query = db.Form.AsNoTracking();
 
         return query;
     }
@@ -120,6 +113,9 @@ public class FormReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
 
         // TODO: Apply criteria
 
@@ -138,17 +134,11 @@ public class FormReader : IEntityReader
         var matches = await queryable
             .Select(entity => new FormMatch
             {
-                SurveyFormIdentifier = entity.SurveyFormIdentifier
+                SurveyFormId = entity.SurveyFormIdentifier
 
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

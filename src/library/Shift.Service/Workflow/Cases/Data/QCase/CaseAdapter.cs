@@ -13,10 +13,10 @@ public class CaseAdapter : IEntityAdapter
         entity.CaseSource = modify.CaseSource;
         entity.CaseStatusCategory = modify.CaseStatusCategory;
         entity.CaseType = modify.CaseType;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.AdministratorUserIdentifier = modify.AdministratorUserIdentifier;
-        entity.TopicUserIdentifier = modify.TopicUserIdentifier;
-        entity.LawyerUserIdentifier = modify.LawyerUserIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.AdministratorUserIdentifier = modify.AdministratorUserId;
+        entity.TopicUserIdentifier = modify.TopicUserId;
+        entity.LawyerUserIdentifier = modify.LawyerUserId;
         entity.AttachmentCount = modify.AttachmentCount;
         entity.CommentCount = modify.CommentCount;
         entity.PersonCount = modify.PersonCount;
@@ -25,15 +25,15 @@ public class CaseAdapter : IEntityAdapter
         entity.LastChangeUser = modify.LastChangeUser;
         entity.CaseTitle = modify.CaseTitle;
         entity.CaseNumber = modify.CaseNumber;
-        entity.EmployerGroupIdentifier = modify.EmployerGroupIdentifier;
+        entity.EmployerGroupIdentifier = modify.EmployerGroupId;
         entity.GroupCount = modify.GroupCount;
         entity.CaseReported = modify.CaseReported;
         entity.CaseOpenedBy = modify.CaseOpenedBy;
         entity.CaseClosedBy = modify.CaseClosedBy;
-        entity.CaseStatusIdentifier = modify.CaseStatusIdentifier;
+        entity.CaseStatusIdentifier = modify.CaseStatusId;
         entity.CaseStatusEffective = modify.CaseStatusEffective;
-        entity.OwnerUserIdentifier = modify.OwnerUserIdentifier;
-        entity.ResponseSessionIdentifier = modify.ResponseSessionIdentifier;
+        entity.OwnerUserIdentifier = modify.OwnerUserId;
+        entity.ResponseSessionIdentifier = modify.ResponseSessionId;
 
     }
 
@@ -50,15 +50,15 @@ public class CaseAdapter : IEntityAdapter
         {
             CaseClosed = create.CaseClosed,
             CaseDescription = create.CaseDescription,
-            CaseIdentifier = create.CaseIdentifier,
+            CaseIdentifier = create.CaseId,
             CaseOpened = create.CaseOpened,
             CaseSource = create.CaseSource,
             CaseStatusCategory = create.CaseStatusCategory,
             CaseType = create.CaseType,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            AdministratorUserIdentifier = create.AdministratorUserIdentifier,
-            TopicUserIdentifier = create.TopicUserIdentifier,
-            LawyerUserIdentifier = create.LawyerUserIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            AdministratorUserIdentifier = create.AdministratorUserId,
+            TopicUserIdentifier = create.TopicUserId,
+            LawyerUserIdentifier = create.LawyerUserId,
             AttachmentCount = create.AttachmentCount,
             CommentCount = create.CommentCount,
             PersonCount = create.PersonCount,
@@ -67,15 +67,15 @@ public class CaseAdapter : IEntityAdapter
             LastChangeUser = create.LastChangeUser,
             CaseTitle = create.CaseTitle,
             CaseNumber = create.CaseNumber,
-            EmployerGroupIdentifier = create.EmployerGroupIdentifier,
+            EmployerGroupIdentifier = create.EmployerGroupId,
             GroupCount = create.GroupCount,
             CaseReported = create.CaseReported,
             CaseOpenedBy = create.CaseOpenedBy,
             CaseClosedBy = create.CaseClosedBy,
-            CaseStatusIdentifier = create.CaseStatusIdentifier,
+            CaseStatusIdentifier = create.CaseStatusId,
             CaseStatusEffective = create.CaseStatusEffective,
-            OwnerUserIdentifier = create.OwnerUserIdentifier,
-            ResponseSessionIdentifier = create.ResponseSessionIdentifier
+            OwnerUserIdentifier = create.OwnerUserId,
+            ResponseSessionIdentifier = create.ResponseSessionId
         };
         return entity;
     }
@@ -91,15 +91,15 @@ public class CaseAdapter : IEntityAdapter
         {
             CaseClosed = entity.CaseClosed,
             CaseDescription = entity.CaseDescription,
-            CaseIdentifier = entity.CaseIdentifier,
+            CaseId = entity.CaseIdentifier,
             CaseOpened = entity.CaseOpened,
             CaseSource = entity.CaseSource,
             CaseStatusCategory = entity.CaseStatusCategory,
             CaseType = entity.CaseType,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            AdministratorUserIdentifier = entity.AdministratorUserIdentifier,
-            TopicUserIdentifier = entity.TopicUserIdentifier,
-            LawyerUserIdentifier = entity.LawyerUserIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            AdministratorUserId = entity.AdministratorUserIdentifier,
+            TopicUserId = entity.TopicUserIdentifier,
+            LawyerUserId = entity.LawyerUserIdentifier,
             AttachmentCount = entity.AttachmentCount,
             CommentCount = entity.CommentCount,
             PersonCount = entity.PersonCount,
@@ -108,15 +108,15 @@ public class CaseAdapter : IEntityAdapter
             LastChangeUser = entity.LastChangeUser,
             CaseTitle = entity.CaseTitle,
             CaseNumber = entity.CaseNumber,
-            EmployerGroupIdentifier = entity.EmployerGroupIdentifier,
+            EmployerGroupId = entity.EmployerGroupIdentifier,
             GroupCount = entity.GroupCount,
             CaseReported = entity.CaseReported,
             CaseOpenedBy = entity.CaseOpenedBy,
             CaseClosedBy = entity.CaseClosedBy,
-            CaseStatusIdentifier = entity.CaseStatusIdentifier,
+            CaseStatusId = entity.CaseStatusIdentifier,
             CaseStatusEffective = entity.CaseStatusEffective,
-            OwnerUserIdentifier = entity.OwnerUserIdentifier,
-            ResponseSessionIdentifier = entity.ResponseSessionIdentifier
+            OwnerUserId = entity.OwnerUserIdentifier,
+            ResponseSessionId = entity.ResponseSessionIdentifier
         };
 
         return model;
@@ -131,7 +131,7 @@ public class CaseAdapter : IEntityAdapter
     {
         var match = new CaseMatch
         {
-            CaseIdentifier = entity.CaseIdentifier
+            CaseId = entity.CaseIdentifier
 
         };
 

@@ -21,6 +21,8 @@ namespace InSite.Domain.Records
         public bool? HasBadgeImage { get; set; }
         public string BadgeImageUrl { get; set; }
 
+        public NotificationSettings NotificationSettings { get; set; }
+
         /// <summary>
         /// This property represents a table of Achievement options. Prerequisites are understood to be satisfied only if ALL prerequisite conditions 
         /// are satisfied. 
@@ -36,6 +38,7 @@ namespace InSite.Domain.Records
         public Achievement()
         {
             Expiration = new Expiration();
+            NotificationSettings = new NotificationSettings();  
             Prerequisites = new List<AchievementPrerequisite>();
         }
 
@@ -66,6 +69,11 @@ namespace InSite.Domain.Records
         public void When(AchievementLocked _)
         {
             Enabled = false;
+        }
+
+        public void When(AchievementNotificationChanged e)
+        {
+            NotificationSettings.Set(e.Settings);
         }
 
         public void When(AchievementNotChanged _)

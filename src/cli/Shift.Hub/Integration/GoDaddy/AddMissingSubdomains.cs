@@ -2,7 +2,7 @@
 
 public class AddMissingSubdomains
 {
-    public void Execute(string? connectionString, string? env, string? apiKey, string? apiSecret, string? data, string? lifetimeText)
+    public void Execute(string? connectionString, string hostName, string? env, string? apiKey, string? apiSecret, string? data, string? lifetimeText)
     {
         if (string.IsNullOrEmpty(connectionString))
         {
@@ -40,7 +40,7 @@ public class AddMissingSubdomains
 
         try
         {
-            missingSubdomains = DomainHelper.GetMissingSubdomains(db, env, apiKey, apiSecret);
+            missingSubdomains = DomainHelper.GetMissingSubdomains(db, hostName, env, apiKey, apiSecret);
         }
         catch (InternalException intex)
         {

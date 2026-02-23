@@ -141,6 +141,15 @@ namespace InSite.Admin.Issues.Controls
         protected global::InSite.Common.Web.UI.ItemNameComboBox CommentTag;
 
         /// <summary>
+        /// CommentText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox CommentText;
+
+        /// <summary>
         /// ManagerIdentifier control.
         /// </summary>
         /// <remarks>
@@ -202,6 +211,15 @@ namespace InSite.Admin.Issues.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.TextBox AssigneeOrganization;
+
+        /// <summary>
+        /// TopicDepartmentIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindDepartment TopicDepartmentIdentifier;
 
         /// <summary>
         /// MembershipStatus control.

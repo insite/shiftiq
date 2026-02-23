@@ -60,7 +60,7 @@ namespace InSite.UI.Admin.Records.Logbooks
             var journalSetup = ServiceLocator.JournalSearch.GetJournalSetup(JournalSetupId, x => x.Fields);
             if (journalSetup == null
                 || journalSetup.OrganizationIdentifier != Organization.OrganizationIdentifier
-                || !CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write)
+                || !CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Update)
                 || journalSetup.Fields.Count < 2
                 )
             {

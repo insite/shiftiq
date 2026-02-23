@@ -33,13 +33,22 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         protected global::InSite.Common.Web.UI.Alert ErrorAlert;
 
         /// <summary>
-        /// SessionPanel control.
+        /// MultiView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel SessionPanel;
+        protected global::System.Web.UI.WebControls.MultiView MultiView;
+
+        /// <summary>
+        /// LaunchView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.View LaunchView;
 
         /// <summary>
         /// SurveyFormInstructions control.
@@ -85,6 +94,33 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Portal.Workflow.Forms.Controls.SubmissionRepeater SubmissionRepeater;
+
+        /// <summary>
+        /// SelectLearnerView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.View SelectLearnerView;
+
+        /// <summary>
+        /// LearnerIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindPerson LearnerIdentifier;
+
+        /// <summary>
+        /// SelectLearnerContinue control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button SelectLearnerContinue;
 
         /// <summary>
         /// DebugPanel control.

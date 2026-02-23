@@ -11,8 +11,8 @@ using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
-using Shift.Constant;
 using Shift.Common.Events;
+using Shift.Constant;
 
 using CheckBox = System.Web.UI.WebControls.CheckBox;
 using Label = System.Web.UI.WebControls.Label;
@@ -21,7 +21,7 @@ using UserProfileRepository = InSite.Persistence.Plugin.CMDS.UserProfileReposito
 
 namespace InSite.Cmds.Controls.BulkTool.Assign
 {
-    public partial class AssignCompanyProfilesToEmployee : UserControl
+    public partial class AssignCompanyProfilesToEmployee : BaseUserControl
     {
         #region Events
 
@@ -36,7 +36,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
 
         public void LoadData(PersonFinderSecurityInfoWrapper finderSecurityInfo)
         {
-            PersonIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            PersonIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!finderSecurityInfo.CanSeeAllCompanyPeople && !CurrentSessionState.Identity.HasAccessToAllCompanies)
             {
@@ -48,7 +48,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
 
             PersonIdentifier.Filter.RoleType = new[] { MembershipType.Organization, MembershipType.Department };
 
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             LoadDepartments();
         }

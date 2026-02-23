@@ -84,7 +84,7 @@ namespace InSite.UI.Layout.Common.Controls.Editor
         protected override void OnPreRender(EventArgs e)
         {
             if (string.IsNullOrEmpty(UploadPath))
-                throw new ApplicationError("UploadPath is null");
+                throw new InvalidOperationException("UploadPath is null");
 
             ScriptManager.RegisterStartupScript(Page, GetType(), "init_" + ClientID, $"webTemplateHtml.init('#{HtmlInput.ClientID}');", true);
 

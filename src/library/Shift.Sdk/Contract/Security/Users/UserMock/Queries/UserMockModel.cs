@@ -4,7 +4,7 @@ namespace Shift.Contract
 {
     public partial class UserMockModel
     {
-        public Guid MockIdentifier { get; set; }
+        public Guid MockId { get; set; }
 
         public string AccountCode { get; set; }
         public string AddressPostalCode { get; set; }

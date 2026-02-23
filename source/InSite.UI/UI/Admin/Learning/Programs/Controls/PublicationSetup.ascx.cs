@@ -90,7 +90,7 @@ namespace InSite.Admin.Records.Programs.Controls
         private List<TaskInfo> GetTaskItems()
         {
             var organization = CurrentSessionState.Identity.Organization;
-            var taskObjectData = ProgramHelper.GetTaskObjectData(organization.OrganizationIdentifier, organization.ParentOrganizationIdentifier);
+            var taskObjectData = ProgramHelper.GetTaskObjectData(organization.OrganizationIdentifier);
 
             var filter = new TTaskFilter
             {

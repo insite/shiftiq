@@ -102,8 +102,8 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
                     if (watermark != null)
                         PdfHelper.AddWatermark(doc, watermark, PdfHelper.WatermarkPosition.Diagonal);
                 }
-                finally 
-                { 
+                finally
+                {
                     if (watermark != null)
                         watermark.Dispose();
                 }
@@ -113,9 +113,10 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
                 doc.Info.Author = organization.LegalName;
                 doc.Info.CreationDate = DateTime.Now;
 
-                var appRelease = ServiceLocator.AppSettings.Release;
-                if (appRelease != null)
-                    doc.Info.Creator = $"{appRelease.Brand} v{appRelease.Version}";
+                var release = ServiceLocator.AppSettings.Release;
+                var partition = ServiceLocator.AppSettings.Partition;
+                if (partition != null && release != null)
+                    doc.Info.Creator = $"{partition.Brand} v{release.Version}";
 
                 PdfHelper.SetReadOnly(doc);
 

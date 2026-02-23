@@ -1,6 +1,7 @@
 [
   {
     "Slug": "AchievementCredentialsExpiredToday",
+    "MessageType": "Alert",
     "Subject": "Time-Sensitive Items Now Expired",
     "Purpose": "This notification is sent when one or more credentials are now expired.",
     "Variables": "SignInUrl",
@@ -12,6 +13,7 @@
   },
   {
     "Slug": "AchievementCredentialsExpiringInOneMonth",
+    "MessageType": "Alert",
     "Subject": "Time-Sensitive Items Expiring Within 1 Month",
     "Purpose": "This notification is sent when one or more credentials are set to expire within the next month.",
     "Variables": "SignInUrl",
@@ -23,6 +25,7 @@
   },
   {
     "Slug": "AchievementCredentialsExpiringInThreeMonths",
+    "MessageType": "Alert",
     "Subject": "Time-Sensitive Items Expiring Within 3 Months",
     "Purpose": "This notification is sent when one or more credentials are set to expire within the next 3 months.",
     "Variables": "SignInUrl",
@@ -34,6 +37,7 @@
   },
   {
     "Slug": "AchievementCredentialsExpiringInTwoMonths",
+    "MessageType": "Alert",
     "Subject": "Time-Sensitive Items Expiring Within 2 Months",
     "Purpose": "This notification is sent when one or more credentials are set to expire within the next 2 months.",
     "Variables": "SignInUrl",
@@ -44,7 +48,26 @@
     "RecipientVariables": "FirstName,CredentialsMarkdown"
   },
   {
+    "Slug": "AchievementExpiring",
+    "MessageType": "Alert",
+    "Subject": "Achievement Expiring Soon",
+    "Purpose": "This notification is sent to learners when their achievement is approaching its expiration date.",
+    "Variables": "AchievementTitle,AchievementExpirationDate",
+    "Courier": "Mailgun",
+    "RecipientVariables": "AchievementTitle,AchievementExpirationDate"
+  },
+  {
+    "Slug": "AchievementExpired",
+    "MessageType": "Alert",
+    "Subject": "Achievement Expired",
+    "Purpose": "This notification is sent to learners when their achievement has expired.",
+    "Variables": "AchievementTitle,AchievementExpirationDate",
+    "Courier": "Mailgun",
+    "RecipientVariables": "AchievementTitle,AchievementExpirationDate"
+  },
+  {
     "Slug": "AddedToWaitingList",
+    "MessageType": "Alert",
     "Subject": "Added To Waiting List",
     "Purpose": "This notification is automatically sent to the person who completes any waitlist request for any class.",
     "Variables": "WaitlistedBy,CandidateFullName,CandidateEmail,ClassTitle,ClassStartTime,ClassAchievement,Employer,Organization",
@@ -52,6 +75,7 @@
   },
   {
     "Slug": "ApplicationAccessGranted",
+    "MessageType": "Alert",
     "Subject": "Application Access Granted",
     "Purpose": "This notification is sent to a user when access is granted to the platform after being requested.",
     "Variables": "ApproverEmail,ApproverName,Organization,UserAccess,UserFirstName",
@@ -59,6 +83,7 @@
   },
   {
     "Slug": "ApplicationAccessRequested",
+    "MessageType": "Alert",
     "Subject": "Application Access Requested",
     "Purpose": "This notification is sent to admin subscribers when a user requests access to the platform.",
     "Variables": "AppUrl,Organization,SourceUrl,UserEmail,UserIdentifier,UserName",
@@ -66,6 +91,7 @@
   },
   {
     "Slug": "AssessmentAttemptCompleted",
+    "MessageType": "Notification",
     "Subject": "Assessment Attempt Completed",
     "Purpose": "This notification is sent to admin subscribers when any learner completes any assessment attempt.",
     "Variables": "LearnerEmail,LearnerName,AssessmentFormName,AssessmentAttemptScore",
@@ -74,6 +100,7 @@
   },
   {
     "Slug": "AssessmentAttemptStarted",
+    "MessageType": "Notification",
     "Subject": "Assessment Attempt Started",
     "Purpose": "This notification is sent to admin subscribers when any learner starts any assessment attempt.",
     "Variables": "LearnerEmail,LearnerName,AssessmentFormName",
@@ -82,6 +109,7 @@
   },
   {
     "Slug": "AuthenticationAlarmTriggered",
+    "MessageType": "Alert",
     "Subject": "Authentication Failed (Brute-Force Login Attempt)",
     "Purpose": "This alert is sent to admin subscribers when a user fails multiple attempts to sign in to the platform.",
     "Variables": "FailedLoginCount,Organization,SignInUrl,UserEmail,UserHostAddress",
@@ -89,12 +117,14 @@
   },
   {
     "Slug": "BankNotification",
+    "MessageType": "Alert",
     "Purpose": "This notification is sent after correctly configuring notification notice for bank form.",
     "Variables": "LearnerEmail,LearnerName,LearnerPersonCode,AssessmentFormName,AssessmentAttemptScore",
     "Courier": "Mailgun"
   },
   {
     "Slug": "ClassReminderLearner",
+    "MessageType": "Notification",
     "Subject": "Class Reminder",
     "Purpose": "This notification is sent to a learner and/or admin subscribers before X days of a learner's class to start. (Configured in each event.)",
     "Variables": "EventTitle,EventDate,EventTime,VenueName,VenueStreet1,VenueCity,VenueProvince,VenuePostalCode,ClassURL",
@@ -102,6 +132,7 @@
   },
   {
     "Slug": "ClassReminderInstructor",
+    "MessageType": "Notification",
     "Subject": "Class Reminder",
     "Purpose": "This notification is sent to an instructor and/or admin subscribers before X days of a instructor's class to start. (Configured in each event.)",
     "Variables": "EventTitle,EventDate,EventTime,VenueName,VenueStreet1,VenueCity,VenueProvince,VenuePostalCode,GradebookURL",
@@ -109,6 +140,7 @@
   },
   {
     "Slug": "CmdsBlogSubscriptionRequested",
+    "MessageType": "Alert",
     "Subject": "CMDS Blog Subscription",
     "Purpose": "n/a",
     "Variables": "FirstName,LastName,Email",
@@ -119,6 +151,7 @@
   },
   {
     "Slug": "CmdsCollegeCertificationRequested",
+    "MessageType": "Alert",
     "Subject": "College Certification Requested",
     "Purpose": "This notification is sent when a user requests certification.",
     "Variables": "Name,Email,ProfileNumber,ProfileTitle,Institution,CoreHoursRequired,CoreHoursCompleted,NonCoreHoursRequired,NonCoreHoursCompleted",
@@ -129,6 +162,7 @@
   },
   {
     "Slug": "CmdsCompetenciesExpired",
+    "MessageType": "Alert",
     "Subject": "Time-Sensitive Competencies: Expiration Notice",
     "Purpose": "This notification is sent after one or more competencies have expired.",
     "Variables": "SignInUrl",
@@ -140,6 +174,7 @@
   },
   {
     "Slug": "CmdsCompetencyChanged",
+    "MessageType": "Alert",
     "Subject": "CMDS Competency Changed",
     "Purpose": "This notification is sent to an administrator when a CMDS competency is created or modified.",
     "Variables": "ChangeMarkdown",
@@ -150,6 +185,7 @@
   },
   {
     "Slug": "CmdsCompetencyValidationRequested",
+    "MessageType": "Alert",
     "Subject": "Validation Requested",
     "Purpose": "This notification is sent when a user requests validation on completed assignments from another user.",
     "Variables": "Name,Email,Phone,Company,CompetencyCount,CompetencyMarkdown",
@@ -160,6 +196,7 @@
   },
   {
     "Slug": "CmdsResourceChanged",
+    "MessageType": "Alert",
     "Subject": "Time-Sensitive Safety Certificate: $ChangeType",
     "Purpose": "This notification is sent to an administrator when a CMDS Global or Keyera (company-specific) time-sensitive safety certificate is created or modified.",
     "Variables": "ChangeType,AuthorName,AuthorEmail,ResourceTitle,ResourceDescription,ResourceHours,ResourceLifetime",
@@ -170,6 +207,7 @@
   },
   {
     "Slug": "CmdsTrainingRegistrationSubmitted",
+    "MessageType": "Alert",
     "Subject": "Validator Training Session Registration",
     "Purpose": "n/a",
     "Variables": "SessionIdentifier,SessionTitle,RegistrantName,RegistrantEmail,RegistrantCompany,Comment",
@@ -180,6 +218,7 @@
   },
   {
     "Slug": "CourseCompleted",
+    "MessageType": "Notification",
     "Subject": "Course Completed",
     "Purpose": "This notification is sent to a learner and/or admin subscribers when a course is completed. (Configured in each course.)",
     "Variables": "AppUrl,CourseName,CourseStarted,LearnerIdentifier,LearnerFirstName,LearnerLastName",
@@ -187,6 +226,7 @@
   },
   {
     "Slug": "CourseStalled",
+    "MessageType": "Notification",
     "Subject": "Course Stalled",
     "Purpose": "This notification is sent to a learner and/or admin subscribers when a learner hasn't made progress on a course for the specified time. (Configured in each course.)",
     "Variables": "AppUrl,CourseName,CourseStarted,LearnerIdentifier,LearnerFirstName,LearnerLastName",
@@ -194,6 +234,7 @@
   },
   {
     "Slug": "CredentialCreated",
+    "MessageType": "Alert",
     "Subject": "Credential Created",
     "Purpose": "This notification is sent to any user that is assigned or granted an achievement.",
     "Variables": "AchievementName,AchievementType,LearnerEmail,LearnerFirstName,LearnerIdentifier,LearnerLastName",
@@ -201,6 +242,7 @@
   },
   {
     "Slug": "EmployerGroupCreated",
+    "MessageType": "Alert",
     "Subject": "Employer Group Created",
     "Purpose": "This notification is sent to admin subscribers when an Employer group is created.",
     "Variables": "GroupName",
@@ -208,6 +250,7 @@
   },
   {
     "Slug": "EmployerOpportunityApplicationSubmitted",
+    "MessageType": "Alert",
     "Subject": "Employer Opportunity Application Submitted",
     "Purpose": "OBSOLETE ALERT",
     "Variables": "CandidateFirstName,CandidateLastName,CandidatePhoneNumber,CandidateEmailAddress,CandidateUrl,JobPosition,EmployerEmailAddress,Attachments",
@@ -216,6 +259,7 @@
   },
   {
     "Slug": "EventVenueChanged",
+    "MessageType": "Alert",
     "Subject": "Event Venue Changed",
     "Purpose": "This notification is sent to admin subscribers when a group is selected or changed as the venue for an event.",
     "Variables": "GroupIdentifier, GroupName, EventIdentifier, EventDate, EventName, EventNumber",
@@ -224,6 +268,7 @@
   },
   {
     "Slug": "HelpRequested",
+    "MessageType": "Alert",
     "Subject": "Workflow Assignment - Help Requested",
     "Purpose": "This notification is sent to admin subscribers when a portal user completes the Shift iQ Support request form.",
     "Variables": "BrowserAddress,BrowserName,Organization,RequestDescription,RequestSummary,RequestUrl,UserEmail,UserEmployer,UserName,UserPhone",
@@ -231,6 +276,7 @@
   },
   {
     "Slug": "JobsCandidateContactRequested",
+    "MessageType": "Alert",
     "Subject": "Jobs Candidate Contact Requested",
     "Purpose": "This notification is sent to the Candidate when an Employer asks to be connected with them.",
     "Variables": "CompanyName,CandidateFirstName,CandidateLastName,EmployerName,EmailAddress,Message",
@@ -238,6 +284,7 @@
   },
   {
     "Slug": "JobsCandidateAppliedForOpportunity",
+    "MessageType": "Alert",
     "Subject": "Job Application Submitted",
     "Purpose": "This notification is sent to admin subscribers when a Candidate applies for an opportunity.",
     "Variables": "JobPosition,CandidateFirstName,CandidateLastName,CandidatePhoneNumber,CandidateEmailAddress,CandidateUrl",
@@ -245,6 +292,7 @@
   },
   {
     "Slug": "InvoicePaid",
+    "MessageType": "Alert",
     "Subject": "Invoice Paid",
     "Purpose": "This notification is sent to any user who completes any payment transaction. ",
     "Variables": "CustomerEmail,CustomerFullName,InvoiceAmount,InvoiceDrafted,InvoicePaid,InvoiceStatus,InvoiceSubmitted,InvoiceNumber,LoginUrl,DashboardUrl,OrderInfo",
@@ -252,6 +300,7 @@
   },
   {
     "Slug": "ClassScheduled",
+    "MessageType": "Alert",
     "Subject": "Class Scheduled",
     "Purpose": "This notification is sent to any user who purchases an online class product. (SkillsCheck only.)",
     "Variables": "CustomerEmail,CustomerFullName,ClassEventUrl,ClassEventName",
@@ -259,6 +308,7 @@
   },
   {
     "Slug": "IssueOwnerChanged",
+    "MessageType": "Alert",
     "Subject": "Issue Owner Changed",
     "Purpose": "This notification is sent to admin subscribers when a case owner is assigned or changed on any case.",
     "Variables": "IssueNumber,IssueType,IssueStatus,IssueSummary,OwnerFirstName,OwnerLastName,OwnerEmail",
@@ -266,6 +316,7 @@
   },
   {
     "Slug": "ITA001",
+    "MessageType": "Alert",
     "Subject": "ITA {ActivityTitle} - {ActivityDate} - for session {ActivityClassCode} has been scheduled",
     "Purpose": "Training Provider Notice - Class Event",
     "Variables": "ActivityBillingCode,ActivityClassCode,ActivityDate,ActivityFormat,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTitle,CandidateRegistrationTable,DistributionExpected,FormTitle,MaterialsPermittedToCandidates,TrainingProviderList,VenueLocationPhysical,VenueName,VenueRoom,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
@@ -279,6 +330,7 @@
   },
   {
     "Slug": "ITA003",
+    "MessageType": "Alert",
     "Subject": "ITA Exam Passwords for $ActivityNumber - $ActivityTitle, $ActivityDate",
     "Purpose": "Invigilator Notice - Online Only - Class Event",
     "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTitle,CandidateAuthenticationTable,MaterialsPermittedToCandidates,TrainingProviderList003,VenueLocationPhysical,VenueName,VenueRoom,DistributionExpected,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
@@ -292,6 +344,7 @@
   },
   {
     "Slug": "ITA004",
+    "MessageType": "Alert",
     "Subject": "ITA {FormTitle} - scheduled on {ActivityDate} at {VenueName}",
     "Purpose": "Candidate Notice - Class Event",
     "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateCode,CandidateInstructionEligibility,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,RecipientAttachment",
@@ -304,6 +357,7 @@
   },
   {
     "Slug": "ITA005",
+    "MessageType": "Alert",
     "Subject": "Reminder - ITA {FormTitle} scheduled on {ActivityDate} at {VenueName}",
     "Purpose": "Candidate Reminder - Class Event",
     "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateCode,CandidateInstructionEligibility,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,RecipientAttachment",
@@ -316,6 +370,7 @@
   },
   {
     "Slug": "ITA006",
+    "MessageType": "Alert",
     "Subject": "ITA {FormTitle} - scheduled on {ActivityDate} at {VenueName}",
     "Purpose": "Candidate Notice - Sitting Event",
     "Variables": "ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityScheduledCountdownDays,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateFirstName,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected,FormTitle,RecipientAttachment,VenueLocationPhysical,VenueName,VenueRoom,",
@@ -328,6 +383,7 @@
   },
   {
     "Slug": "ITA007",
+    "MessageType": "Alert",
     "Subject": "Reminder - ITA {FormTitle} - scheduled on {ActivityDate} at {VenueName}",
     "Purpose": "Candidate Reminder - Sitting Event",
     "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityScheduledCountdownDays,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateInstructionEligibility,CandidateFirstName,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,ActivityInstructionUrl,RecipientAttachment,ActivityNumber",
@@ -340,6 +396,7 @@
   },
   {
     "Slug": "ITA008",
+    "MessageType": "Alert",
     "Subject": "ITA {FormTitle} scheduled at {VenueName}",
     "Purpose": "Candidate Notice - Individual Event",
     "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTimeLimit,CandidateAccommodation,CandidateAccommodationName,CandidateAccommodationTimeExtension,CandidateAddress,CandidateCode,CandidateFirstName,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected,FormTitle,VenueLocationPhysical,VenueName,VenuePhone,ActivityInstructionUrl,RecipientAttachment,ActivityDate,ActivityFormat",
@@ -352,6 +409,7 @@
   },
   {
     "Slug": "ITA009",
+    "MessageType": "Alert",
     "Subject": "Reminder - ITA {FormTitle} at {VenueName}",
     "Purpose": "Candidate Reminder - Individual Event",
     "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTimeLimit,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateFirstName,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,ActivityInstructionUrl,RecipientAttachment,ActivityDate,ActivityFormat",
@@ -364,6 +422,7 @@
   },
   {
     "Slug": "ITA013",
+    "MessageType": "Alert",
     "Subject": "ITA Exam Review Required - Results withheld for {ActivityType} {ActivityNumber}-{ActivityBillingCode}",
     "Purpose": "Administrator Notice - Exam Results Failed Validation",
     "Variables": "ActivityBillingCode,ActivityDate,ActivityInstructionUrl,ActivityNumber,ActivityTimeLess30Minutes,ActivityType,CandidateCompetencyTable,CandidatePublicationTable,CandidateSubmissionTable,DistributionExpected,EventIdentifier,FolderCompetencyTable,FormTitle,RecipientAttachment,VenueName,WarningList",
@@ -376,6 +435,7 @@
   },
   {
     "Slug": "ITA014",
+    "MessageType": "Alert",
     "Subject": "Reminder - ITA Exam Review Required - Results withheld for {ActivityType} {ActivityNumber}-{ActivityBillingCode}",
     "Purpose": "Administrator Reminder - Exam Results Failed Validation",
     "Variables": "ActivityBillingCode,ActivityNumber,ActivityType,CandidatePublicationTable,WarningList,DistributionExpected,ActivityTimeLess30Minutes,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
@@ -388,6 +448,7 @@
   },
   {
     "Slug": "ITA016",
+    "MessageType": "Alert",
     "Subject": "ITA Exam Results for session {ActivityClassCode} - {FormTitle}, {ActivityDate}",
     "Purpose": "Training Provider Notice - Class Event Results",
     "Variables": "ActivityBillingCode,ActivityClassCode,ActivityDate,ActivityNumber,ActivityType,CandidateCompetencyTable,CandidateSubmissionTable,FolderCompetencyTable,FormTitle,VenueName,DistributionExpected,ActivityTimeLess30Minutes,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
@@ -401,6 +462,7 @@
   },
   {
     "Slug": "ITA017",
+    "MessageType": "Alert",
     "Subject": "Outstanding Exam Materials Reminder",
     "Purpose": "Invigilator Notice - Outstanding Exam Materials Reminder: 5 Days/10 Days",
     "Variables": "ActivityBillingCode,ActivityNumber,ActivityTitle,ExamMaterialReturnShipmentReceived,VenueOffice,DistributionExpected,ActivityTimeLess30Minutes,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
@@ -413,6 +475,7 @@
   },
   {
     "Slug": "ITA020",
+    "MessageType": "Alert",
     "Subject": "Reminder - ITA {FormTitle} at {VenueName}",
     "Purpose": "Candidate Reminder - Individual Event",
     "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTimeLimit,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateFirstName,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected ,FormTitle,VenueLocationPhysical,VenueName,ActivityInstructionUrl,RecipientAttachment,ActivityDate,ActivityFormat",
@@ -425,6 +488,7 @@
   },
   {
     "Slug": "ITA021",
+    "MessageType": "Alert",
     "Subject": "ITA {FormTitle} - Candidate Not Eligible",
     "Purpose": "Candidate Notice - Class Event",
     "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityTime,CandidateAccommodation,CandidateCode,CandidateInstructionEligibility,CandidateName,CandidateTimeLimit,CurrentDate,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,DistributionExpected,ActivityTimeLess30Minutes,RecipientAttachment",
@@ -437,6 +501,7 @@
   },
   {
     "Slug": "ITA022",
+    "MessageType": "Alert",
     "Subject": "ITA {FormTitle} - Candidate Removed",
     "Purpose": "Candidate Notice - Class Event",
     "Variables": "ActivityBillingCode,ActivityDate,ActivityFormat,ActivityInstructionUrl,ActivityNumber,ActivityTime,CandidateAccommodation,CandidateCode,CandidateInstructionEligibility,CandidateName,CandidateTimeLimit,CurrentDate,FormTitle,VenueLocationPhysical,VenueName,VenueRoom,DistributionExpected,ActivityTimeLess30Minutes,RecipientAttachment",
@@ -449,6 +514,7 @@
   },
   {
     "Slug": "ITA023",
+    "MessageType": "Alert",
     "Subject": "ITA {ActivityTitle} - {ActivityDate} - for session {ActivityClassCode} has been scheduled",
     "Purpose": "Training Provider Notice - Class Event",
     "Variables": "ActivityBillingCode,ActivityClassCode,ActivityDate,ActivityFormat,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTitle,CandidateRegistrationTable,DistributionExpected,FormTitle,MaterialsPermittedToCandidates,TrainingProviderList,VenueLocationPhysical,VenueName,VenueRoom,ActivityInstructionUrl,RecipientAttachment,EventIdentifier",
@@ -462,6 +528,7 @@
   },
   {
     "Slug": "ITA024",
+    "MessageType": "Alert",
     "Subject": "ITA {FormTitle} scheduled at {VenueName}",
     "Purpose": "Candidate Notice - Individual Event.",
     "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTimeLimit,CandidateAccommodation,CandidateAddress,CandidateCode,CandidateFirstName,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected,FormTitle,VenueLocationPhysical,VenueName,VenuePhone,ActivityInstructionUrl,RecipientAttachment,ActivityDate,ActivityFormat",
@@ -474,6 +541,7 @@
   },
   {
     "Slug": "ITA025",
+    "MessageType": "Alert",
     "Subject": "ITA {ActivityTitle} - {ActivityDate} - for session {ActivityClassCode} has been approved",
     "Purpose": "Candidate and Training Provider Notice - Class Event",
     "Variables": "ActivityBillingCode,ActivityClassCode,ActivityDate,ActivityFormat,ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,ActivityTitle,VenueLocationPhysical,VenueName,VenueRoom,CandidateName,CandidateCode,CandidateAccommodation,CandidateTimeLimit,EventIdentifier,EventNumber",
@@ -486,6 +554,7 @@
   },
   {
     "Slug": "ITA026",
+    "MessageType": "Alert",
     "Subject": "No Return Shipment Received",
     "Purpose": "Invigilator Notice - No Return Shipment Received Reminder: 14/60 days",
     "Variables": "ActivityBillingCode,ActivityNumber,ActivityTitle,ExamMaterialReturnShipmentReceived,DistributionExpected,DistributionReturn,ExamType,VenueOffice",
@@ -498,6 +567,7 @@
   },
   {
     "Slug": "ITA027",
+    "MessageType": "Alert",
     "Subject": "Event Number {ActivityNumber} - SkilledTradesBC {FormTitle} scheduled at {VenueName}",
     "Purpose": "This notification is sent to the Invigilating Office/Invigilator contact when an Individual (Accommodated) exam event is modified with a candidate who has accommodations.",
     "Variables": "ActivityNumber,ActivityTime,ActivityTimeLess30Minutes,CandidateAccommodation,CandidateAccommodationName,CandidateAccommodationTimeExtension,CandidateAccommodationTable,CandidateAddress,CandidateCode,CandidateInstructionDeadline,CandidateInstructionSchedule,CandidateName,CandidateTimeLimit,CurrentDate,DistributionExpected,FormTitle,VenueLocationPhysical,VenueName,VenuePhone,RecipientAttachment,ActivityDate,ActivityFormat",
@@ -509,7 +579,26 @@
     "RecipientFunction": "Invigilating Office/Invigilator"
   },
   {
+    "Slug": "LearnerAchievementExpiring",
+    "MessageType": "Alert",
+    "Subject": "Learner Achievement Expiring Soon",
+    "Purpose": "This notification is sent to administrators when a learner's achievement is approaching its expiration date.",
+    "Variables": "AchievementTitle,AchievementExpirationDate",
+    "Courier": "Mailgun",
+    "RecipientVariables": "AchievementTitle,AchievementExpirationDate,LearnerIdentifier,LearnerName"
+  },
+  {
+    "Slug": "LearnerAchievementExpired",
+    "MessageType": "Alert",
+    "Subject": "Learner Achievement Expired",
+    "Purpose": "This notification is sent to administrators when a learner's achievement has expired.",
+    "Variables": "AchievementTitle,AchievementExpirationDate",
+    "Courier": "Mailgun",
+    "RecipientVariables": "AchievementTitle,AchievementExpirationDate,LearnerIdentifier,LearnerName"
+  },
+  {
     "Slug": "LearningWelcomeEmail",
+    "MessageType": "Alert",
     "Subject": "A new SkillsCheck was assigned to you!",
     "Purpose": "This notification is sent to a learner when they are invited to complete a SkillsCheck and provides instructions for accessing their account and dashboard.",
     "Variables": "AppUrl,FirstName,Email,Password,LoginUrl,DashboardUrl",
@@ -517,6 +606,7 @@
   },
   {
     "Slug": "LogbookJoined",
+    "MessageType": "Notification",
     "Subject": "Logbook Joined",
     "Purpose": "This notification is sent to a learner when they join a logbook.(Configured in each logbook.)",
     "Variables": "ActorName,AppUrl,LogbookTitle,LogbookUrl,ModificationType,OrganizationCode,OrganizationName",
@@ -524,6 +614,7 @@
   },
   {
     "Slug": "LogbookModified",
+    "MessageType": "Notification",
     "Subject": "Logbook Modified",
     "Purpose": "This notification is sent to a learner and/or admin subscribers when a logbook entry is created or modified.(Configured in each logbook.)",
     "Variables": "ActorName,AppUrl,LogbookTitle,LogbookUrl,ModificationType,OrganizationCode,OrganizationName",
@@ -531,6 +622,7 @@
   },
   {
     "Slug": "ManagementWelcomeEmail",
+    "MessageType": "Alert",
     "Subject": "Manager - Welcome!",
     "Purpose": "This notification is sent to a manager when he purchase a SkillsCheck for the first time.",
     "Variables": "FirstName,Email,SignInUrl,Password,CustomerEmail,CustomerFullName,InvoiceAmount,InvoiceDrafted,InvoicePaid,InvoiceStatus,InvoiceSubmitted,InvoiceNumber,LoginUrl,DashboardUrl,OrderInfo",
@@ -538,6 +630,7 @@
   },
   {
     "Slug": "MembershipEnded",
+    "MessageType": "Alert",
     "Subject": "Group Membership Ended",
     "Purpose": "This notification is sent to a learner and/or admin subscribers when a person is removed from a group.(Configured in each group.)",
     "Variables": "GroupIdentifier,GroupName,UserIdentifier,UserName,UserEmail,AppUrl,EditPersonUrl,Reason",
@@ -545,6 +638,7 @@
   },
   {
     "Slug": "MembershipStarted",
+    "MessageType": "Alert",
     "Subject": "Group Membership Started",
     "Purpose": "This notification is sent to a learner and/or admin subscribers when a person is added to a group. (Configured in each group.)",
     "Variables": "GroupIdentifier,GroupName,UserIdentifier,UserName,UserEmail,AppUrl,EditPersonUrl,Reason",
@@ -552,6 +646,7 @@
   },
   {
     "Slug": "PasswordChanged",
+    "MessageType": "Alert",
     "Subject": "Password Changed",
     "Purpose": "This alert is sent to any user that changes their password.",
     "Variables": "UserEmail,EventTime,BrowserAddress",
@@ -559,6 +654,7 @@
   },
   {
     "Slug": "PasswordResetRequested",
+    "MessageType": "Alert",
     "Subject": "Password Reset Requested",
     "Purpose": "This alert is sent to any user that requests a password reset.",
     "Variables": "ResetUrl",
@@ -566,6 +662,7 @@
   },
   {
     "Slug": "PersonCodeNotEntered",
+    "MessageType": "Alert",
     "Subject": "Person Code Was Not Entered",
     "Purpose": "This notification is sent to admin subscribers when a class registration was completed without a Person Code.",
     "Variables": "EventTitle,CandidateName,CandidateEmail,CandidatePhone,RegistrantEmail,RegistrantName,RegistrantPhone",
@@ -573,6 +670,7 @@
   },
   {
     "Slug": "PersonCommentFlagged",
+    "MessageType": "Alert",
     "Subject": "Person Flagged on Comment",
     "Purpose": "This notification is sent to admin subscribers when a flag is added to any comment on any contact record.",
     "Variables": "AuthorFirstName,AuthorLastName,AuthorEmail,TopicFirstName,TopicLastName,TopicEmail,CommentText",
@@ -580,6 +678,7 @@
   },
   {
     "Slug": "ProgramCompleted",
+    "MessageType": "Alert",
     "Subject": "Program Completed",
     "Purpose": "This notification is sent to a learner and/or admin subscribers when a program is completed. (Configured in each program.)",
     "Variables": "LearnerFirstName,LearnerLastName,ProgramName,ProgramStarted",
@@ -587,6 +686,7 @@
   },
   {
     "Slug": "ProgramStalled",
+    "MessageType": "Alert",
     "Subject": "Program Stalled",
     "Purpose": "This notification is sent to a learner and/or admin subscribers when a learner hasn't made progress on a program for the specified time. (Configured in each program.)",
     "Variables": "LearnerFirstName,LearnerLastName,ProgramName,ProgramStarted",
@@ -594,6 +694,7 @@
   },
   {
     "Slug": "ProgressCompleted",
+    "MessageType": "Alert",
     "Subject": "Progress Completed",
     "Purpose": "This notification is sent to admin subscribers when a grade item is completed. (Configured in each grade item.)",
     "Variables": "LearnerEmail,LearnerName,GradeItemName,GradeItemScore",
@@ -601,6 +702,7 @@
   },
   {
     "Slug": "RegistrantContactInformationChanged",
+    "MessageType": "Alert",
     "Subject": "Registrant Contact Information Changed",
     "Purpose": "This notification is sent to admin subscribers when any contact information is updated during a class registration.",
     "Variables": "ContactLoginName,ContactEmail,EventName,ContactChangedFields",
@@ -608,6 +710,7 @@
   },
   {
     "Slug": "RegistrationComplete",
+    "MessageType": "Alert",
     "Subject": "Registration Complete",
     "Purpose": "This notification is sent to the person who completed a class registration and to the registrant as well, if different.",
     "Variables": "CandidateName,CandidateEmail,CandidateStreet1,CandidateCity,CandidateProvince,CandidatePostalCode,EmployerStatus,CandidateBirthdate,CandidateTradeworkerNumber,CandidateWorkBasedHoursToDate,CandidatePhone,CandidateIsEnglishFirstLanguage,EmergencyContactName,EmergencyContactPhone,EmergencyContactRelationship,EmployerName,EmployerContactName,EmployerContactPhone,EmployerContactEmail,EmployerStreet1,EmployerCity,EmployerProvince,EmployerPostalCode,InvoiceNumber,EventTitle,EventDate,EventTime,VenueName,VenueStreet1,VenueCity,VenueProvince,VenuePostalCode,SeatTitle,SeatPrice,RegistrantEmail,RegistrantName,RegistrantPhone,CandidateAuthenticationDetails,PersonCode",
@@ -615,6 +718,7 @@
   },
   {
     "Slug": "RegistrationInvitation",
+    "MessageType": "Alert",
     "Subject": "Invitation for Registration",
     "Purpose": "This notification is sent to the person who requested a class waitlist spot when the Send Invitation button is clicked.",
     "Variables": "CandidateFullName,ClassTitle,RegistrationEndTime,ClassRegistrationLink,ClassStartTime,ClassAchievement",
@@ -622,6 +726,7 @@
   },
   {
     "Slug": "RegistrationInvitationExpired",
+    "MessageType": "Alert",
     "Subject": "Registration Invitation Expired",
     "Purpose": "This notification is sent to the person who requested a class waitlist spot when the registration invitation has expired or been marked as declined.",
     "Variables": "CandidateFirstName,CandidateLastName,CandidateEmail,ClassTitle,ClassRegistrationLink",
@@ -629,6 +734,7 @@
   },
   {
     "Slug": "ResponseCompleted",
+    "MessageType": "Notification",
     "Subject": "Response Completed",
     "Purpose": "This notification is sent to admin subscribers when a survey response is completed. (Configured in each survey.)",
     "Variables": "AppUrl,CurrentYear,OrganizationName,SurveyFormName,Tenant,UserEmail,UserFullName,UserIdentifier,UtcNow",
@@ -636,6 +742,7 @@
   },
   {
     "Slug": "ResponseConfirmed",
+    "MessageType": "Notification",
     "Subject": "Response Confirmed",
     "Purpose": "This notification is sent to a survey respondent when they submit their survey response. (Configured in each survey.)",
     "Variables": "AppUrl,CurrentYear,OrganizationName,SurveyFormName,Tenant,UserEmail,UserFullName,UserIdentifier,UtcNow",
@@ -643,6 +750,7 @@
   },
   {
     "Slug": "ResponseStarted",
+    "MessageType": "Notification",
     "Subject": "Response Started",
     "Purpose": "This notification is sent to admin subscribers when a survey response is started. (Configured in each survey.)",
     "Variables": "AppUrl,CurrentYear,OrganizationName,SurveyFormName,Tenant,UserEmail,UserFullName,UserIdentifier,UtcNow",
@@ -650,6 +758,7 @@
   },
   {
     "Slug": "UnhandledExceptionIntercepted",
+    "MessageType": "Alert",
     "Subject": "Unhandled Exception Intercepted",
     "Purpose": "This alert is sent to admin subscribers after an unhandled exception is intercepted (and NOT sent to Sentry).",
     "Variables": "ExceptionMessage",
@@ -660,6 +769,7 @@
   },
   {
     "Slug": "UserAccountArchived",
+    "MessageType": "Alert",
     "Subject": "Account Archived",
     "Purpose": "This notification is sent to admin subscribers each time a contact record is archived.",
     "Variables": "Name,Email,Status",
@@ -667,6 +777,7 @@
   },
   {
     "Slug": "UserAccountCreated",
+    "MessageType": "Alert",
     "Subject": "Account Created",
     "Purpose": "This notification is sent to admin subscribers after a new user account is created by another administrator.",
     "Variables": "Name,Email,Phone,City,Province,CompanyTitle",
@@ -674,6 +785,7 @@
   },
   {
     "Slug": "UserAccountWelcomed",
+    "MessageType": "Alert",
     "Subject": "User Account Approved - Welcome!",
     "Purpose": "This notification is sent to a user when an admin grants them access to the platform. It can also be sent manually to the user at any time.",
     "Variables": "FirstName,Email,CompanyTitle,SignInUrl,PasswordInstruction,PasswordInstruction:en,PasswordInstruction:fr,Password",
@@ -681,6 +793,7 @@
   },
   {
     "Slug": "UserEmailSubscriptionModified",
+    "MessageType": "Alert",
     "Subject": "Mailing List Subscriptions Modified",
     "Body": "Hi $RecipientName,\n\nThis is an automated notification to confirm your email subscriptions have been updated.\n\n$RecipientMemberships",
     "Purpose": "This notification is sent to any user who modifies their own mailing list group memberships. (Configured in each List group.)",
@@ -689,6 +802,7 @@
   },
   {
     "Slug": "UserEmailVerificationRequested",
+    "MessageType": "Alert",
     "Subject": "Email Verification Requested",
     "Purpose": "This notification is sent to every user that self registers for their own account that is automatically granted access.",
     "Variables": "AppUrl,Organization,UserEmail,UserIdentifier,VerifyEmailUrl",
@@ -696,6 +810,7 @@
   },
   {
     "Slug": "UserOTPActivationCode",
+    "MessageType": "Alert",
     "Subject": "Your verification code from InSite",
     "Purpose": "This alert is sent to any user who has multi-factor authentication enabled and is logging in, and it includes a one-time use code.",
     "Variables": "ConfirmationCode,Organization",
@@ -703,6 +818,7 @@
   },
   {
     "Slug": "UserRegistrationSubmitted",
+    "MessageType": "Alert",
     "Subject": "User Account Registered",
     "Purpose": "This notification is sent to any user who self-registers for a new account, confirming receipt of the registration information.",
     "Variables": "ApprovalUrl,City,Email,FirstName,LastName,Name,Organization,Phone,Province,RegistrationUrl,Thumbprint",
@@ -710,6 +826,7 @@
   },
   {
     "Slug": "UnsubscribeSuccess",
+    "MessageType": "Alert",
     "Subject": "Successfully Unsubscribed",
     "Purpose": "This notification is sent to any user who unsubscribes themselves from all marketing emails from an organization.",
     "Variables": "UserEmail,Organization,ResubscribeUrl",
@@ -717,6 +834,7 @@
   },
   {
     "Slug": "WelcomeLearner",
+    "MessageType": "Alert",
     "Subject": "A new SkillsCheck was assigned to you!",
     "Purpose": "This notification is sent to a learner when they are invited to complete a SkillsCheck and provides instructions for accessing their account and dashboard.",
     "Variables": "AppUrl,FirstName,LoginUrl,DashboardUrl",

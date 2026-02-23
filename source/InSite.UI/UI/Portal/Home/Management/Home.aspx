@@ -55,6 +55,7 @@
     <insite:Alert runat="server" ID="HomeStatus" />
     <insite:UserLicenseCheck runat="server" />
     <insite:UserPasswordCheck runat="server" />
+    <insite:UserEmailVerificationCheck runat="server" />
     <uc:AnnouncementToast runat="server" ID="AnnouncementToast" />
     <uc:MaintenanceToast runat="server" ID="MaintenanceToast" ShowOnEachRequest="true" />
 

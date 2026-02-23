@@ -1,0 +1,1 @@
+export type SidebarState = "expanded" | "collapsed" | "expanding1" | "expanding2" | "collapsing1" | "collapsing2";

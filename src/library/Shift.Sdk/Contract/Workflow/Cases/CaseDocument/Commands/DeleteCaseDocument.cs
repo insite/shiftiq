@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteCaseDocument
     {
-        public Guid AttachmentIdentifier { get; set; }
+        public Guid AttachmentId { get; set; }
     }
 }

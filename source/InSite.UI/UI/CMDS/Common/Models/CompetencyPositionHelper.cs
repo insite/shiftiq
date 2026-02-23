@@ -4,6 +4,7 @@ using InSite.Domain.Reports;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
+using Shift.Common;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -56,12 +57,12 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
             var workersPermission = PermissionNames.Custom_CMDS_Workers;
             var parentUserID =
                 identity.IsInRole(CmdsRole.Programmers)
-                || identity.IsGranted(workersPermission, PermissionOperation.Delete)
-                || identity.IsGranted(workersPermission, PermissionOperation.Configure)
+                || identity.IsGranted(workersPermission, DataAccess.Delete)
+                || identity.IsGranted(workersPermission, DataAccess.Configure)
                     ? (Guid?)null
                     : user.UserIdentifier;
 
-            filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            filter.OrganizationIdentifier = positionParameter.OrganizationIdentifier;
             filter.Paging = null;
 
             var table = UserCompetencyRepository.SelectSearchResults(filter, validatorID, parentUserID);

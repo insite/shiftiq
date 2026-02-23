@@ -2,13 +2,19 @@
 
 <%@ Register Src="~/UI/Admin/Contacts/Groups/Controls/DepartmentChecklist.ascx" TagName="DepartmentChecklist" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Records/Achievements/Controls/CredentialGrid.ascx" TagName="CredentialGrid" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Admin/Records/Achievements/Controls/OutlineNotifications.ascx" TagName="OutlineNotifications" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 <div id="desktop">
 
-    <insite:Alert runat="server" ID="StatusAlert" />
+    <insite:UpdatePanel runat="server" UpdateMode="Always">
+        <ContentTemplate>
+            <insite:Alert runat="server" ID="StatusAlert" />
+            <insite:ValidationSummary runat="server" ValidationGroup="NotificationSetup" />
+        </ContentTemplate>
+    </insite:UpdatePanel>
 
-	<div class="row mb-3">
+    <div class="row mb-3">
         <div class="col-lg-12">
             <insite:Button runat="server" ID="NewAchievementLink" Text="New" Icon="fas fa-file" ButtonStyle="Default" NavigateUrl="/ui/admin/records/achievements/define" />
 
@@ -25,27 +31,27 @@
     </div>
 
     <insite:Nav runat="server">               
-	    <insite:NavItem runat="server" Title="Learners" Icon="far fa-users" IconPosition="BeforeText">
+        <insite:NavItem runat="server" Title="Learners" Icon="far fa-users" IconPosition="BeforeText">
 
-	        <section class="pb-5 mb-md-2">        
-		        <div class="row">
-			        <div class="col-lg-12">
-				        <div class="card border-0 shadow-lg">
-					        <div class="card-body">
-						        <uc:CredentialGrid runat="server" ID="CredentialGrid" />
+            <section class="pb-5 mb-md-2">        
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-body">
+                                <uc:CredentialGrid runat="server" ID="CredentialGrid" />
 
                                 <div class="text-muted fs-sm">
                                     <i class="far fa-lightbulb-on me-1"></i>
                                     A specific achievement assigned to a specific learner is also known as a credential.
                                 </div>
 
-					        </div>
-				        </div>
-			        </div>
-		        </div>
-	        </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-	    </insite:NavItem>
+        </insite:NavItem>
 
         <insite:NavItem runat="server" ID="DepartmentSection" Title="Departments" Icon="far fa-building" IconPosition="BeforeText">
             <section>
@@ -57,13 +63,13 @@
             </section>
         </insite:NavItem>
 
-	    <insite:NavItem runat="server" ID="AchievementSetupTab" Title="Achievement Settings" Icon="far fa-trophy" IconPosition="BeforeText">
+        <insite:NavItem runat="server" ID="AchievementSetupTab" Title="Achievement Settings" Icon="far fa-trophy" IconPosition="BeforeText">
 
-	        <section class="pb-5 mb-md-2">        
-		        <div class="row">
-			        <div class="col-lg-12">
-				        <div class="card border-0 shadow-lg">
-					        <div class="card-body">
+            <section class="pb-5 mb-md-2">        
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-body">
 
                                 <div class="row">
                         
@@ -194,13 +200,23 @@
                                         </div>
                                     </div>
                                 </div>
-					        </div>
-				        </div>
-			        </div>
-		        </div>
-	        </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-	    </insite:NavItem>
+        </insite:NavItem>
+
+        <insite:NavItem runat="server" ID="NotificationsTab" Title="Notifications" Icon="far fa-bell" IconPosition="BeforeText">
+            <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="NotificationsUpdatePanel" />
+            <insite:UpdatePanel runat="server" ID="NotificationsUpdatePanel">
+                <ContentTemplate>
+                    <uc:OutlineNotifications runat="server" ID="NotificationsDetails" ValidationGroup="NotificationSetup" />
+                </ContentTemplate>
+            </insite:UpdatePanel>
+        </insite:NavItem>
+
     </insite:Nav>
 
 </div>

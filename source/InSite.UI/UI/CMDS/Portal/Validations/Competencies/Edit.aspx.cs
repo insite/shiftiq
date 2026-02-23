@@ -169,7 +169,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Assessment
 
             StatusLabel.Text = String.IsNullOrEmpty(info.ValidationStatus) ? "N/A" : info.ValidationStatus;
 
-            SelfAssessmentStatus.LoadData(Identity.Organization.Identifier, Identity.Organization.ParentOrganizationIdentifier);
+            SelfAssessmentStatus.LoadData(Identity.Organization.Identifier);
             SelfAssessmentStatus.SelectedValue = info.SelfAssessmentStatus;
 
             CompetencyAchievements.HideDownloads();

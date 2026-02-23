@@ -4,12 +4,12 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IFileClaimCriteria
+    public interface IFileClaimCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
-        Guid? FileIdentifier { get; set; }
-        Guid? ObjectIdentifier { get; set; }
+
+        Guid? FileId { get; set; }
+        Guid? ObjectId { get; set; }
 
         string ObjectType { get; set; }
 

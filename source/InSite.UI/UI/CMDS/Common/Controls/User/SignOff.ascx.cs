@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using System.Web.UI;
 
 using Humanizer;
 
+using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
@@ -12,7 +12,7 @@ using Shift.Common;
 
 namespace InSite.Custom.CMDS.User.Achievements.Controls
 {
-    public partial class SignOff : UserControl
+    public partial class SignOff : BaseUserControl
     {
         public event EventHandler SignedOff;
 
@@ -38,8 +38,6 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
         {
             SignedOff?.Invoke(this, new EventArgs());
         }
-
-        public string CurrentLanguage => CookieTokenModule.Current.Language;
 
         public void LoadData(Guid userId, Guid? credentialIdentifier)
         {
@@ -102,7 +100,7 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
 
         private bool LoadAchievementInfo(Guid userId)
         {
-            var organization = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            var organization = Organization.Identifier;
             var credential = VCmdsCredentialSearch.SelectForTrainingPlan(CredentialIdentifier.Value, organization);
 
             if (credential == null || credential.UserIdentifier != userId)
@@ -116,14 +114,14 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
 
         private void LoadProgramOnlyAchievementSummary(Guid organizationId, Guid achievementId)
         {
-            var tasks = TaskSearch.Select(x=>x.ObjectIdentifier ==  achievementId && x.OrganizationIdentifier == organizationId, y => y.Program).ToList();
+            var tasks = TaskSearch.Select(x => x.ObjectIdentifier == achievementId && x.OrganizationIdentifier == organizationId, y => y.Program).ToList();
 
-            if(tasks == null || tasks.Count == 0) 
+            if (tasks == null || tasks.Count == 0)
                 return;
 
             var summary = new StringBuilder();
 
-            foreach(var task in tasks)
+            foreach (var task in tasks)
             {
                 if (task.Program.ProgramType != "Achievements Only")
                     continue;

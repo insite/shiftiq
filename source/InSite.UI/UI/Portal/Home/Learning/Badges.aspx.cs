@@ -144,7 +144,7 @@ namespace InSite.UI.Portal.Home.Learning
             if (item.CredentialStatus != "Valid")
                 return string.Empty;
 
-            var brand = ServiceLocator.AppSettings.Release.Brand;
+            var brand = ServiceLocator.AppSettings.Partition.Brand;
 
             return $@"
 <div class='btn-group' role='group'>

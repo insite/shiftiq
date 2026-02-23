@@ -47,7 +47,7 @@ namespace InSite.UI.CMDS
 
             var linkGenerator = new ScoopLinkGenerator();
 
-            var scoopUrl = linkGenerator.GenerateLibraryUrl(Identity, Request.Url.Host, Organization.Code, Request.RawUrl);
+            var scoopUrl = linkGenerator.GenerateLibraryUrl(Identity, Request.Url.Host, Organization.Code, null, Request.RawUrl);
 
             ScoopLibraryLink.Text = $"<i class='fas fa-building-columns me-1'></i>{Organization.Name} SCO Library";
 

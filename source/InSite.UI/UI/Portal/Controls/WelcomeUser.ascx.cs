@@ -16,9 +16,9 @@ namespace InSite.UI.Portal.Controls
                 return;
 
             var time = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, User.TimeZone);
-            TimeLiteral.Text = $"{time:dddd, MMMM d, yyyy}";
+            TimeLiteral.Text = Translate($"{time:dddd, MMMM d, yyyy}");
 
-            var greeting = GetGreeting(time);
+            var greeting = Translate(GetGreeting(time));
             Greeting.Text = $"{greeting}, {User.FirstName}";
         }
 

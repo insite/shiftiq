@@ -43,7 +43,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         {
             _timeZone = (timeZone ?? CurrentSessionState.Identity.Organization.TimeZone.ToString());
             _allowDelete = CurrentSessionState.Identity
-                .IsGranted(PermissionIdentifiers.Admin_Surveys_Responses, PermissionOperation.Delete);
+                .IsGranted(PermissionIdentifiers.Admin_Surveys_Responses, DataAccess.Delete);
 
             SessionRepeater.DataSource = sessions.Select(x => new DataItem
             {
@@ -100,6 +100,8 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
         private void RestartButton_Click(object sender, EventArgs e)
         {
+            var user = CurrentSessionState.Identity.User;
+
             // Delete the existing submission session
             var id = Guid.Parse(((uxButton)sender).CommandArgument);
             var response = ServiceLocator.SurveySearch.GetResponseSession(id);
@@ -108,7 +110,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             // Create a new submission session.
             var survey = ServiceLocator.SurveySearch.GetSurveyState(response.SurveyFormIdentifier).Form;
             var session = UniqueIdentifier.Create();
-            var commands = Launch.BuildCommandScript("Restarted", session, survey, CurrentSessionState.Identity.User.UserIdentifier);
+            var commands = Launch.BuildCommandScript("Restarted", session, survey, user.UserIdentifier, user.UserIdentifier);
             foreach (var command in commands)
                 ServiceLocator.SendCommand(command);
 

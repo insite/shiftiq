@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -90,7 +89,7 @@ namespace InSite.UI.Portal.Learning
                     m.OverrideHomeLink("/ui/portal/learning/catalog");
 
             var groups = Identity.Groups.Select(x => x.Identifier).ToArray();
-            _search = new CourseCatalogSearch(Identity.Organization.Identifier, RequestedCatalogId, groups, ViewEntireCatalog);
+            _search = new CourseCatalogSearch(Identity.Organization.Identifier, RequestedCatalogId, groups, ViewEntireCatalog, ServiceLocator.Partition);
 
             CatalogRepeater.DataBinding += CatalogRepeater_DataBinding;
             CatalogRepeater.ItemCreated += CatalogRepeater_ItemCreated;
@@ -135,8 +134,8 @@ namespace InSite.UI.Portal.Learning
 
             Filter.AddOrganization(Organization.Identifier);
 
-            if (Organization.ParentOrganizationIdentifier.HasValue)
-                Filter.AddOrganization(Organization.ParentOrganizationIdentifier.Value);
+            if (Organization.Identifier != ServiceLocator.Partition.Identifier)
+                Filter.AddOrganization(ServiceLocator.Partition.Identifier);
 
             FilterButtonRepeater.DataBind();
 
@@ -291,15 +290,17 @@ namespace InSite.UI.Portal.Learning
 
         private void Search(int page)
         {
-            List<CourseCatalogItem> items = _search.ApplyFilter(SearchText.Text, Filter, SortBySelect.Value, page);
+            var items = _search.ApplyFilter(SearchText.Text, Filter, SortBySelect.Value, page);
 
             var cards = items.Select(card => new LaunchCard
             {
+                Identifier = card.ItemIdentifier,
                 Category = card.ItemSubcategories,
                 Flag = card.ItemFlag,
                 Image = card.ThumbnailImageUrl,
                 Title = card.ItemTitle,
-                Url = card.ItemStartUrl
+                Url = card.ItemStartUrl,
+                IsOverview = card.IsOverview
             })
                 .ToList();
 
@@ -349,5 +350,17 @@ namespace InSite.UI.Portal.Learning
         }
 
         #endregion
+
+        public override void ApplyAccessControl()
+        {
+            base.ApplyAccessControl();
+
+            var roles = Identity.Groups.Select(x => x.Name).ToList();
+
+            var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
+
+            if (permissions.IsDenied("ui/home#elearning", roles))
+                CreateAccessDeniedException();
+        }
     }
 }

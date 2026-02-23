@@ -62,7 +62,7 @@ namespace Shift.Sdk.UI
                     ? this[name]
                     : _items.ContainsKey(name)
                         ? _items[name]
-                        : throw new Exception("Variable not found: " + name);
+                        : throw new KeyNotFoundException("Variable not found: " + name);
 
                 if (value == null)
                     return string.Empty;

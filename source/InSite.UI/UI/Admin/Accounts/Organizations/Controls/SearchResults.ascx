@@ -25,7 +25,6 @@
         </asp:TemplateField>
 
         <asp:BoundField HeaderText="Code" HeaderStyle-Wrap="False" DataField="OrganizationCode" />
-        <asp:BoundField HeaderText="Domain" DataField="CompanyDomain" />
         <asp:BoundField HeaderText="Opened" DataField="AccountOpened" DataFormatString="{0:MMM d, yyyy}" ItemStyle-Wrap="false" />
         <asp:BoundField HeaderText="Closed" DataField="AccountClosed" DataFormatString="{0:MMM d, yyyy}" ItemStyle-Wrap="false" />
 

@@ -18,7 +18,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
         public string GetHomeUrl(ISecurityFramework identity)
         {
             return IsCmds && DefaultToCmds(identity)
-                ? Urls.CmdsHomeUrl
+                ? Urls.HomeUrl
                 : DefaultToAdmin(identity)
                 ? Urls.AdminHomeUrl
                 : Urls.PortalHomeUrl;

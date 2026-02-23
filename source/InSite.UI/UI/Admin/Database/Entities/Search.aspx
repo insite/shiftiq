@@ -24,20 +24,20 @@
 
             <div class="row">
                 <div class="col-4">
-                    <h5>Components</h5>
-                    <asp:Repeater runat="server" ID="ComponentSummary">
+                    <h5>Subsystems</h5>
+                    <asp:Repeater runat="server" ID="SubsystemSummary">
                         <HeaderTemplate>
                             <table class="table table-striped">
                                 <tr>
                                     <th>Type</th>
-                                    <th>Component</th>
+                                    <th>Subsystem</th>
                                     <th class="text-end">Entities</th>
                                 </tr>
                         </HeaderTemplate>
                         <ItemTemplate>
                             <tr>
-                                <td><%# Eval("ComponentType") %></td>
-                                <td><%# Eval("ComponentName") %></td>
+                                <td><%# Eval("SubsystemType") %></td>
+                                <td><%# Eval("SubsystemName") %></td>
                                 <td class="text-end"><%# Eval("Count", "{0:n0}") %></td>
                             </tr>
                         </ItemTemplate>
@@ -47,22 +47,22 @@
                     </asp:Repeater>
                 </div>
                 <div class="col-4">
-                    <h5>Subcomponents</h5>
-                    <asp:Repeater runat="server" ID="SubcomponentSummary">
+                    <h5>Components</h5>
+                    <asp:Repeater runat="server" ID="ComponentSummary">
                         <HeaderTemplate>
                             <table class="table table-striped">
                                 <tr>
                                     <th>Type</th>
+                                    <th>Subsystem</th>
                                     <th>Component</th>
-                                    <th>Subcomponent</th>
                                     <th class="text-end">Entities</th>
                                 </tr>
                         </HeaderTemplate>
                         <ItemTemplate>
                             <tr>
-                                <td><%# Eval("ComponentType") %></td>
-                                <td><%# Eval("ComponentName") %></td>
-                                <td><%# Eval("ComponentPart") %></td>
+                                <td><%# Eval("SubsystemType") %></td>
+                                <td><%# Eval("SubsystemName") %></td>
+                                <td><%# Eval("SubsystemComponent") %></td>
                                 <td class="text-end"><%# Eval("Count", "{0:n0}") %></td>
                             </tr>
                         </ItemTemplate>
@@ -210,9 +210,9 @@
                                     <th>Structure</th>
                                     <th>Schema</th>
                                     <th>Table</th>
-                                    <th>Component Type</th>
-                                    <th>Component Name</th>
-                                    <th>Component Feature</th>
+                                    <th>Subsystem Type</th>
+                                    <th>Subsystem Name</th>
+                                    <th>Subsystem Component</th>
                                     <th>Entity</th>
                                 </tr>
                         </HeaderTemplate>
@@ -221,9 +221,9 @@
                                 <td><%# Eval("StorageStructure") %></td>
                                 <td><%# Eval("StorageSchema") %></td>
                                 <td><%# Eval("StorageTable") %></td>
-                                <td><%# Eval("ComponentType") %></td>
-                                <td><%# Eval("ComponentName") %></td>
-                                <td><%# Eval("ComponentPart") %></td>
+                                <td><%# Eval("SubsystemType") %></td>
+                                <td><%# Eval("SubsystemName") %></td>
+                                <td><%# Eval("SubsystemComponent") %></td>
                                 <td><%# Eval("EntityName") %></td>
                             </tr>
                         </ItemTemplate>

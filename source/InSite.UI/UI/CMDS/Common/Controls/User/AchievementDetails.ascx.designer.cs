@@ -42,13 +42,13 @@ namespace InSite.Cmds.Controls.Training.Achievements
         protected global::InSite.Common.Web.UI.TextBox Title;
 
         /// <summary>
-        /// AllowSelfDeclared control.
+        /// EnableSignOff control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox AllowSelfDeclared;
+        protected global::InSite.Common.Web.UI.CheckBox EnableSignOff;
 
         /// <summary>
         /// IsTimeSensitive control.
@@ -57,7 +57,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox IsTimeSensitive;
+        protected global::InSite.Common.Web.UI.CheckBox IsTimeSensitive;
 
         /// <summary>
         /// RowValidForCount control.

@@ -48,7 +48,7 @@ public class GradebookEnrollmentService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyGradebookEnrollment modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.EnrollmentIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.EnrollmentId, cancellation);
 
         if (entity == null)
             return false;

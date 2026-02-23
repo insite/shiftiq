@@ -2,6 +2,7 @@ import { ChangeEvent, ForwardedRef, KeyboardEvent, useImperativeHandle, useRef, 
 import { translate } from "@/helpers/translate";
 
 import "./FinderSearchInput.css";
+import Icon from "../icon/Icon";
 
 export interface FinderSearchInputType {
     focus: () => void;
@@ -73,7 +74,7 @@ function FinderSearchInput({ ref, disabled, keyword, onFilter }: Props) {
                     tabIndex={-1}
                     disabled={disabled}
                 >
-                    <i className="fas fa-times"></i>
+                    <Icon style="Solid" name="times" />
                 </button>
             )}
             <button
@@ -83,7 +84,7 @@ function FinderSearchInput({ ref, disabled, keyword, onFilter }: Props) {
                 disabled={disabled}
                 onClick={handleFilter}
             >
-                <i className="fas fa-filter"></i>
+                <Icon style="Solid" name="filter" />
             </button>
         </div>
     );

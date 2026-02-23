@@ -54,7 +54,9 @@ namespace InSite.Admin.Assessments.Sets.Controls
             RenameSetLink.NavigateUrl = returnUrl.GetRedirectUrl($"/ui/admin/assessments/sets/rename?bank={set.Bank.Identifier}&set={set.Identifier}");
             DeleteSetLink.NavigateUrl = returnUrl.GetRedirectUrl($"/admin/assessments/sets/delete?bank={set.Bank.Identifier}&set={set.Identifier}");
 
-            EditStandardLink.Visible = canWrite;
+            EditStandardLink.Visible = canWrite && (
+                !Organization.Toolkits.Assessments.LockPublishedStandards 
+                || !set.Bank.GetAllQuestions().Any(x => x.FirstPublished.HasValue));
             EditRandomization.Visible = canWrite;
             RenameSetLink.Visible = canWrite;
             DeleteSetLink.Visible = canWrite;

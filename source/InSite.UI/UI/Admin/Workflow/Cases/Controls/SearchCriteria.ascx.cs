@@ -48,6 +48,8 @@ namespace InSite.Admin.Issues.Controls
         {
             base.OnInit(e);
 
+            TopicDepartmentIdentifier.OrganizationIdentifier = Organization.OrganizationIdentifier;
+
             IssueType.Settings.CollectionName = CollectionName.Cases_Classification_Type;
             IssueType.Settings.OrganizationIdentifier = Organization.OrganizationIdentifier;
 
@@ -102,6 +104,7 @@ namespace InSite.Admin.Issues.Controls
                     AssigneeEmployer = AssigneeEmployerIdentifiers.Values?.Select(x => (Guid?)x).ToList(),
                     PersonCode = PersonCode.Text,
                     AssigneeOrganization = AssigneeOrganization.Text,
+                    TopicDepartmentIdentifier = TopicDepartmentIdentifier.Value,
 
                     DateReportedSince = DateReportedSince.Value,
                     DateReportedBefore = DateReportedBefore.Value,
@@ -119,6 +122,7 @@ namespace InSite.Admin.Issues.Controls
                     IssueCommentSubCategory = CommentSubCategory.Value,
                     IssueCommentFlag = CommentFlag.Value,
                     IssueCommentTag = CommentTag.Value,
+                    IssueCommentText = CommentText.Text,
 
                     AttachmentFileStatus = AttachmentFileStatus.Value,
                     AttachmentFileCategory = AttachmentFileCategory.Value,
@@ -169,6 +173,7 @@ namespace InSite.Admin.Issues.Controls
                 AssigneeEmployerIdentifiers.Values = value.AssigneeEmployer?.Where(x => x.HasValue).Select(x => x.Value).ToArray();
                 PersonCode.Text = value.PersonCode;
                 AssigneeOrganization.Text = value.AssigneeOrganization;
+                TopicDepartmentIdentifier.Value = value.TopicDepartmentIdentifier;
 
                 DateReportedSince.Value = value.DateReportedSince;
                 DateReportedBefore.Value = value.DateReportedBefore;
@@ -189,6 +194,7 @@ namespace InSite.Admin.Issues.Controls
                 CommentSubCategory.Value = value.IssueCommentSubCategory;
                 CommentFlag.Value = value.IssueCommentFlag;
                 CommentTag.Value = value.IssueCommentTag;
+                CommentText.Text = value.IssueCommentText;
 
                 EnsureFileStatusBound();
                 AttachmentFileStatus.Value = value.AttachmentFileStatus;
@@ -233,6 +239,7 @@ namespace InSite.Admin.Issues.Controls
             ManagerIdentifier.Value = null;
             LawyerID.ValueAsGuid = null;
             MembershipStatus.ClearSelection();
+            TopicDepartmentIdentifier.Value = null;
 
             DateReportedSince.Value = null;
             DateReportedBefore.Value = null;
@@ -250,6 +257,7 @@ namespace InSite.Admin.Issues.Controls
             OnCommentCategoryChanged(null);
             CommentFlag.Value = null;
             CommentTag.Value = null;
+            CommentText.Text = null;
 
             AttachmentFileStatus.ClearSelection();
             AttachmentFileCategory.ClearSelection();

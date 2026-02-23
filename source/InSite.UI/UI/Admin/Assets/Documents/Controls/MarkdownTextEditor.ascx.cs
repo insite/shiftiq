@@ -41,13 +41,7 @@ namespace InSite.UI.Admin.Assets.Documents.Controls
         public string Text
         {
             get => MDText.Text;
-            set
-            {
-                //if (CurrentData == null)
-                //    throw new ApplicationError("The contol is not initialized.");
-
-                MDText.Text = value;
-            }
+            set => MDText.Text = value;
         }
 
         protected string TextEditorObject => $"markdownTextEditor_{ClientID}";

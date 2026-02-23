@@ -554,7 +554,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
                     LoadQuestions(GetForm(ControlData.FormIdentifier));
             }
             else
-                throw new Exception("Unexpected command: " + e.CommandName);
+                throw new NotSupportedException("Unexpected command: " + e.CommandName);
         }
 
         private void AddQuestionButton_Click(object sender, CommandEventArgs e)

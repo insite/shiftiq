@@ -117,6 +117,8 @@ namespace InSite.Application.Files.Read
 
         (Guid? FileIdentifier, string FileName) ParseFileUrl(string fileUrl);
 
+        List<(Guid FileIdentifier, string FileName)> ExtractAndParseFileUrls(string text);
+
         Task RenameFileAsync(Guid fileIdentifier, Guid userIdentifier, string newFileName);
     }
 }

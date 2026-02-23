@@ -32,7 +32,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
                 Title.Text = value.Title;
                 SubType.Value = value.AchievementType;
                 AccountScope.Value = value.AchievementVisibility;
-                Company.Value = Company.Enabled ? value.AchievementOrganizationIdentifier : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                Company.Value = Company.Enabled ? value.AchievementOrganizationIdentifier : Organization.Identifier;
                 IsTimeSensitive.ValueAsBoolean = value.IsTimeSensitive;
 
                 InitVisibility();
@@ -76,7 +76,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
             Title.Text = null;
             SubType.ClearSelection();
             AccountScope.ClearSelection();
-            Company.Value = AccountScope.IsGlobalItemVisible ? (Guid?)null : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Company.Value = AccountScope.IsGlobalItemVisible ? (Guid?)null : Organization.Identifier;
             IsTimeSensitive.ClearSelection();
             Description.Text = null;
 

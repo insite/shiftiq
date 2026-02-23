@@ -8,6 +8,7 @@ using Humanizer;
 
 using InSite.Admin.Workflow.Forms.Controls;
 using InSite.Application.Surveys.Read;
+using InSite.Application.Surveys.Write;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Surveys.Forms;
@@ -90,6 +91,8 @@ namespace InSite.Admin.Workflow.Forms
         {
             base.OnInit(e);
 
+            EnableThirdPartyFormsToggle.Click += EnableThirdPartyFormsToggle_Click;
+
             ConditionsRepeater.ItemDataBound += ConditionsRepeater_ItemDataBound;
             BranchesRepeater.ItemDataBound += BranchesRepeater_ItemDataBound;
 
@@ -162,11 +165,11 @@ namespace InSite.Admin.Workflow.Forms
                 return;
             }
 
-            var hasWrite = CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write);
+            var hasWrite = CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Update);
 
             CanCreate = hasWrite;
             CanEdit = survey.Form.Locked == null && hasWrite;
-            CanDelete = survey.Form.Locked == null && CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Delete);
+            CanDelete = survey.Form.Locked == null && CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Delete);
             CanLock = hasWrite;
 
             SurveyTitle.Text = (survey.Form.Content?.Title?.GetText(survey.Form.Language)).IfNullOrEmpty("None");
@@ -209,6 +212,9 @@ namespace InSite.Admin.Workflow.Forms
             DisplaySummaryChart.Text = survey.Form.DisplaySummaryChart ? "Display" : "Not Display";
             IssueWorkflowLink.NavigateUrl = $"/ui/admin/workflow/forms/configure-workflow?form={SurveyID}";
             IssueWorkflowText.Text = survey.WorkflowConfiguration == null ? "Disabled" : "Enabled";
+
+            EnableThirdPartyFormsToggle.Visible = CanEdit;
+            BindEnableThirdPartyForms(survey.Form.EnableThirdPartyForms);
 
             var responseCount = ServiceLocator.SurveySearch.CountResponseSessions(
                 new QResponseSessionFilter
@@ -274,6 +280,13 @@ namespace InSite.Admin.Workflow.Forms
             EnableControls(survey, responseCount);
 
             CommentRepeater.LoadData(survey.Form.Identifier);
+        }
+
+        private void BindEnableThirdPartyForms(bool enabled)
+        {
+            EnableThirdPartyForms.Text = enabled ? "Enabled" : "Disabled";
+            EnableThirdPartyFormsToggle.ToolTip = $"{(enabled ? "Disable" : "Enable")} third-party forms";
+            EnableThirdPartyFormsToggle.Text = $"<i class=\"fas fa-toggle-{(enabled ? "on" : "off")}\"></i>";
         }
 
         private void AddNonInstructionTabs(SurveyForm form, string panel, List<SurveyContentLabel> labels)
@@ -446,6 +459,16 @@ namespace InSite.Admin.Workflow.Forms
         }
 
         #region Event handlers
+
+        private void EnableThirdPartyFormsToggle_Click(object sender, EventArgs e)
+        {
+            var survey = ServiceLocator.SurveySearch.GetSurveyState(SurveyID.Value);
+            var enabled = !survey.Form.EnableThirdPartyForms;
+
+            ServiceLocator.SendCommand(new ChangeSurveyThirdPartyFormsSettings(survey.Form.Identifier, enabled));
+
+            BindEnableThirdPartyForms(enabled);
+        }
 
         private void BindConditionsRepeater(SurveyForm form)
         {

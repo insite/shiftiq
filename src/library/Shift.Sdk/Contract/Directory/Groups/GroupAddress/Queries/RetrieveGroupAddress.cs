@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveGroupAddress : Query<GroupAddressModel>
     {
-        public Guid AddressIdentifier { get; set; }
+        public Guid AddressId { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Shift.Common
+﻿using System;
+
+namespace Shift.Common
 {
     public class EngineSettings
     {
@@ -32,14 +34,43 @@
 
     public class ShiftSettingsApi
     {
-        public ShiftSettingsApiVersions Hosting { get; set; }
+        public ApiSettings Hosting { get; set; }
         public string[] Origins { get; set; }
         public TelemetrySettings Telemetry { get; set; }
     }
 
-    public class ShiftSettingsApiVersions
+    public class PartitionSettings : IPartitionModel
     {
-        public ApiSettings V1 { get; set; }
-        public ApiSettings V2 { get; set; }
+        public int Number { get; set; }
+
+        public string Name { get; set; }
+        public string Brand { get; set; }
+        public string Style { get; set; }
+        public string Domain { get; set; }
+        public string Email { get; set; }
+        public string Slug { get; set; }
+
+        public Guid Identifier { get; set; }
+
+        public string WhitelistDomains { get; set; }
+        public string WhitelistEmails { get; set; }
+
+        public bool IsE01() => Number == 1;
+        public bool IsE02() => Number == 2;
+        public bool IsE03() => Number == 3;
+        public bool IsE04() => Number == 4;
+        public bool IsE07() => Number == 7;
+
+        private string _tenant;
+        public string Tenant
+        {
+            get
+            {
+                if (_tenant == null)
+                    _tenant = "E" + StringHelper.PadLeft(Number.ToString(), "0", 2);
+
+                return _tenant;
+            }
+        }
     }
 }

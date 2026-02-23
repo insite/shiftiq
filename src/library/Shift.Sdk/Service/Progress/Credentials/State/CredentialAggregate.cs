@@ -1,8 +1,7 @@
 ﻿using System;
 
-using Shift.Common.Timeline.Changes;
-
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Domain.Records
@@ -121,6 +120,12 @@ namespace InSite.Domain.Records
         {
             if (AllowChanges())
                 Apply(new CredentialRevoked2(revoked, reason, score));
+        }
+
+        public void SendCredentialNotification(CredentialNotificationType notificationType, Guid? learnerMessageIdentifier, Guid? administratorMessageIdentifier)
+        {
+            if (AllowChanges())
+                Apply(new CredentialNotificationSent(notificationType, learnerMessageIdentifier, administratorMessageIdentifier));
         }
 
         public void RequestExpirationReminder(ReminderType type, DateTimeOffset requested)

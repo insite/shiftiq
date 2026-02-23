@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveUserMock : Query<UserMockModel>
     {
-        public Guid MockIdentifier { get; set; }
+        public Guid MockId { get; set; }
     }
 }

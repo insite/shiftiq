@@ -4,6 +4,8 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 
+using InSite.Application.Records.Read;
+
 
 
 namespace InSite.Persistence

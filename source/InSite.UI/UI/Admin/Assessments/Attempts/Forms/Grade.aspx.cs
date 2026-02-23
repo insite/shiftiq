@@ -147,7 +147,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Forms
 
             var groupIds = TGroupPermissionSearch.SelectGroupFromActionPermission(PermissionNames.Design_Grading_Assessors);
             var exists = MembershipSearch.Exists(groupIds, CurrentSessionState.Identity.User.UserIdentifier);
-            var isOnlyAssessor = !Identity.IsGranted(Route.ToolkitName, PermissionOperation.Read);
+            var isOnlyAssessor = !Identity.IsGranted(Route.ToolkitName, DataAccess.Read);
 
             if (exists && isOnlyAssessor && (attempt.GradingAssessorUserIdentifier != Identity.User.UserIdentifier))
                 HttpResponseHelper.Redirect(GetParentUrl($"attempt={AttemptId}&panel=rubrics"));

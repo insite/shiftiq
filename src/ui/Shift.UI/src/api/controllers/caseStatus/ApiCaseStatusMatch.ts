@@ -1,5 +1,5 @@
 export interface ApiCaseStatusMatch {
-    StatusIdentifier: string;
+    StatusId: string;
     StatusName: string;
     CaseType: string;
     StatusCategory: string;

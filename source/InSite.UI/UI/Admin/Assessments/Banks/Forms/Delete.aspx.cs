@@ -6,7 +6,7 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
-using Shift.Constant;
+using Shift.Common;
 
 namespace InSite.Admin.Assessments.Banks.Forms
 {
@@ -34,7 +34,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
 
         private void BindModelToControls()
         {
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Delete))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Delete))
                 RedirectToSearch();
 
             var bank = ServiceLocator.BankSearch.GetBankState(BankID);

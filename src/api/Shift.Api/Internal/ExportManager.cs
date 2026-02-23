@@ -1,6 +1,4 @@
-﻿using Shift.Common;
-
-namespace Shift.Api.Internal
+﻿namespace Shift.Api
 {
     public class ExportManager
     {
@@ -100,7 +98,7 @@ namespace Shift.Api.Internal
 
         private string GetFolderPath()
         {
-            var folder = Path.Combine(_databaseSettings.FileStorage, "exports", _component, _entity);
+            var folder = Path.Combine(_databaseSettings.FileStorage, "export", _component, _entity);
 
             Directory.CreateDirectory(folder);
 

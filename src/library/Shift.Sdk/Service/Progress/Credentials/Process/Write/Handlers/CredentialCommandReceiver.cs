@@ -28,6 +28,7 @@ namespace InSite.Application.Records.Write
             commander.Subscribe<GrantCredential>(Handle);
             commander.Subscribe<ExpireCredential>(Handle);
             commander.Subscribe<RevokeCredential>(Handle);
+            commander.Subscribe<SendCredentialNotification>(Handle);
             commander.Subscribe<DeleteCredential>(Handle);
 
             commander.Subscribe<RequestExpirationReminder>(Handle);
@@ -158,6 +159,15 @@ namespace InSite.Application.Records.Write
             _repository.LockAndRun<CredentialAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 aggregate.RevokeCredential(c.Revoked, c.Reason, c.Score);
+                Commit(aggregate, c);
+            });
+        }
+
+        public void Handle(SendCredentialNotification c)
+        {
+            _repository.LockAndRun<CredentialAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.SendCredentialNotification(c.NotificationType, c.LearnerMessageIdentifier, c.AdministratorMessageIdentifier);
                 Commit(aggregate, c);
             });
         }

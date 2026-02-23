@@ -12,23 +12,25 @@ public class UserSessionReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "SessionIdentifier";
 
-    public UserSessionReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public UserSessionReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid session, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid session, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.SessionIdentifier == session, cancellation);
+            if (organization != null)
+                query = query.Where(x => x.OrganizationIdentifier == organization.Value);
+
+            var exists = query.AnyAsync(x => x.SessionIdentifier == session, cancellation);
+
+            return exists;
 
         }, cancellation);
     }
@@ -106,11 +108,8 @@ public class UserSessionReader : IEntityReader
     /// </remarks>
     private IQueryable<UserSessionEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.TUserSession
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -120,6 +119,9 @@ public class UserSessionReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         // TODO: Apply criteria
 
@@ -138,7 +140,7 @@ public class UserSessionReader : IEntityReader
         var matches = await queryable
             .Select(entity => new UserSessionMatch
             {
-                SessionIdentifier = entity.SessionIdentifier
+                SessionId = entity.SessionIdentifier
 
             })
             .ToListAsync(cancellation);
@@ -146,9 +148,4 @@ public class UserSessionReader : IEntityReader
         return matches;
     }
 
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
-    }
 }

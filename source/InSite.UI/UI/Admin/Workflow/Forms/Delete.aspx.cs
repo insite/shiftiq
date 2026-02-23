@@ -42,7 +42,7 @@ namespace InSite.Admin.Workflow.Forms
             if (survey == null
                 || survey.Form.Tenant != CurrentSessionState.Identity.Organization.Identifier
                 || survey.Form.Locked.HasValue
-                || !CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Delete)
+                || !CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Delete)
                 )
             {
                 HttpResponseHelper.Redirect($"/ui/admin/workflow/forms/search", true);

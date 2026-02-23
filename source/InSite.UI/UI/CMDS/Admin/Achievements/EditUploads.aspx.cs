@@ -39,7 +39,7 @@ namespace InSite.Cmds.Admin.Achievements.Forms
                 return;
 
             var info = VCmdsAchievementSearch.Select(AchievementIdentifier.Value);
-            if (info.Visibility != AccountScopes.Organization || info.OrganizationIdentifier != CurrentIdentityFactory.ActiveOrganizationIdentifier)
+            if (info.Visibility != AccountScopes.Organization || info.OrganizationIdentifier != Organization.Identifier)
                 Access = Access.SetAll(false);
         }
 

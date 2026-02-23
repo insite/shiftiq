@@ -41,7 +41,7 @@ namespace InSite.Admin.Workflow.Forms
             if (surveyForm == null
                 || surveyForm.Tenant != Organization.Identifier
                 || surveyForm.Locked.HasValue
-                || !CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write)
+                || !CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Update)
                 )
             {
                 HttpResponseHelper.Redirect($"/ui/admin/workflow/forms/search", true);

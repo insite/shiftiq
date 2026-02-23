@@ -4,14 +4,13 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IPageCriteria
+    public interface IPageCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
 
-        Guid? ObjectIdentifier { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? ParentPageIdentifier { get; set; }
-        Guid? SiteIdentifier { get; set; }
+        Guid? ObjectId { get; set; }
+        Guid? ParentPageId { get; set; }
+        Guid? SiteId { get; set; }
 
         bool? IsAccessDenied { get; set; }
         bool? IsHidden { get; set; }

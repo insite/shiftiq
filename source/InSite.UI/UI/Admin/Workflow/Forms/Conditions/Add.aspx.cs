@@ -63,7 +63,7 @@ namespace InSite.Admin.Workflow.Forms.Conditions
             if (survey == null
                 || survey.Form.Tenant != Organization.Identifier
                 || survey.Form.Locked.HasValue
-                || !CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write)
+                || !CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Update)
                 )
             {
                 HttpResponseHelper.Redirect($"/ui/admin/workflow/forms/search", true);

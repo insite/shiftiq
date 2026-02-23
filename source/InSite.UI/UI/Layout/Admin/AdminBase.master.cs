@@ -24,7 +24,12 @@ namespace InSite.UI.Layout.Admin
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
-            HtmlBody.Attributes["class"] = $"{Request.Browser.Platform} {Request.Browser.Browser}{Request.Browser.MajorVersion}";
+
+            var className = $"{Request.Browser.Platform} {Request.Browser.Browser}{Request.Browser.MajorVersion}";
+            if (ModeSwitch.GetCurrentThemeMode() == "Dark")
+                className += " dark-theme";
+
+            HtmlBody.Attributes["class"] = className;
         }
     }
 }

@@ -1,4 +1,4 @@
 export interface ApiOrganizationModel {
-    OrganizationIdentifier: string;
+    OrganizationId: string;
     CompanyName: string | null | undefined;
 }

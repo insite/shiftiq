@@ -595,13 +595,13 @@ namespace InSite.Admin.Assessments.Specifications.Forms
                 return;
 
             if (setId == Guid.Empty)
-                throw new ApplicationError("Invalid SetIdentifier value");
+                throw new ArgumentException("Invalid SetIdentifier value");
 
             if (CurrentQuestionFilter.StandardIdentifier == Guid.Empty)
-                throw new ApplicationError("Invalid StandardIdentifier value");
+                throw new ArgumentException("Invalid StandardIdentifier value");
 
             if (CurrentQuestionFilter.Taxonomy == byte.MaxValue)
-                throw new ApplicationError("Invalid Taxonomy value");
+                throw new ArgumentException("Invalid Taxonomy value");
 
             var redirectUrl = GetReturnUrlInternal().GetRedirectUrl(
                 $"/ui/admin/assessments/questions/move?bank={BankID}&spec={SpecID}&set={setId}&filter={QuestionFilterSerializer.Serialize(CurrentQuestionFilter)}",

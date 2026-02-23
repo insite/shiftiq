@@ -33,13 +33,13 @@ namespace Shift.Common.File
 
             var lines = text.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             if (lines.Length <= 1)
-                throw new ApplicationError("Data stream contains no data.");
+                throw new FormatException("Data stream contains no data.");
 
             var table = new DataTable();
 
             var columns = ParseLxrMergeLine(lines[0]);
             if (columns.Length == 0)
-                throw new ApplicationError("Data stream contains no columns.");
+                throw new FormatException("Data stream contains no columns.");
 
             var requiredColumns = new HashSet<string>(options.RequiredColumns ?? new string[0]);
             var hasIncludeColumns = options.IncludeColumns.IsNotEmpty();
@@ -50,7 +50,7 @@ namespace Shift.Common.File
             {
                 var colName = columns[i];
                 if (string.IsNullOrEmpty(colName))
-                    throw new ApplicationError("Column name cannot be null.");
+                    throw new FormatException("Column name cannot be null.");
 
                 if (requiredColumns.Contains(colName))
                     requiredColumns.Remove(colName);
@@ -59,7 +59,7 @@ namespace Shift.Common.File
                     continue;
 
                 if (table.Columns.Contains(colName))
-                    throw new ApplicationError($"A column named '{colName}' already exists in the table.");
+                    throw new FormatException($"A column named '{colName}' already exists in the table.");
 
                 if (hasIncludeColumns)
                     columnsMapping.Add(new Tuple<int, int>(table.Columns.Count, i));
@@ -68,7 +68,7 @@ namespace Shift.Common.File
             }
 
             if (requiredColumns.Count > 0)
-                throw new ApplicationError("Required column(s) not found: " + string.Join(", ", requiredColumns));
+                throw new FormatException("Required column(s) not found: " + string.Join(", ", requiredColumns));
 
             var lastColumnArrayLength = -1;
 
@@ -80,12 +80,12 @@ namespace Shift.Common.File
                 {
                     var arrayLength = values.Length - columns.Length + 1;
                     if (arrayLength <= 1)
-                        throw new ApplicationError("The last column isn't array: " + lines[i]);
+                        throw new FormatException("The last column isn't array: " + lines[i]);
 
                     if (lastColumnArrayLength < 0)
                         lastColumnArrayLength = arrayLength;
                     else if (lastColumnArrayLength != arrayLength)
-                        throw new ApplicationError("Unexpected length of last column array: " + lines[i]);
+                        throw new FormatException("Unexpected length of last column array: " + lines[i]);
 
                     var newValues = new string[columns.Length];
 
@@ -103,7 +103,7 @@ namespace Shift.Common.File
                 }
 
                 if (values.Length != columns.Length)
-                    throw new ApplicationError("Unexpected columns count: " + lines[i]);
+                    throw new FormatException("Unexpected columns count: " + lines[i]);
 
                 var row = table.NewRow();
 
@@ -152,19 +152,19 @@ namespace Shift.Common.File
                     multilineState++;
 
                     if (multilineState > 2)
-                        throw new ApplicationError("Only one multiline closing symbol is allowed: " + line);
+                        throw new FormatException("Only one multiline closing symbol is allowed: " + line);
                 }
                 else
                 {
                     if (multilineState == 2)
-                        throw new ApplicationError("A text after multiline closing symbol is not allowed: " + line);
+                        throw new FormatException("A text after multiline closing symbol is not allowed: " + line);
 
                     buffer.Append(ch);
                 }
             }
 
             if (multilineState != 0)
-                throw new ApplicationError("Invalid line: " + line);
+                throw new FormatException("Invalid line: " + line);
 
             return result.ToArray();
         }

@@ -4,9 +4,10 @@ namespace Shift.Contract
 {
     public partial class FileClaimModel
     {
-        public Guid ClaimIdentifier { get; set; }
-        public Guid FileIdentifier { get; set; }
-        public Guid ObjectIdentifier { get; set; }
+        public Guid ClaimId { get; set; }
+        public Guid FileId { get; set; }
+        public Guid ObjectId { get; set; }
+        public Guid OrganizationId { get; set; }
 
         public string ObjectType { get; set; }
 

@@ -51,7 +51,8 @@ namespace InSite.Api.Controllers
             var filter = new QEventFilter
             {
                 OrganizationIdentifier = CurrentOrganization.Identifier,
-                EventPublicationStatus = PublicationStatus.Published.GetDescription()
+                EventPublicationStatus = PublicationStatus.Published.GetDescription(),
+                DisplayOnCalendar = true
             };
 
             if (DateTime.TryParse(date, out var start))

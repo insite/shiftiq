@@ -1,4 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
+
+using Newtonsoft.Json;
 
 namespace InSite.Domain.Organizations
 {
@@ -14,6 +17,12 @@ namespace InSite.Domain.Organizations
         public bool AllowClassRegistrationFields { get; set; }
         public RegisterEmployeesSearchRequirement RegisterEmployeesSearchRequirement { get; set; }
 
+        [DefaultValue(24), JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public int OnlineEventAutomationWindowHours { get; set; } = 24;
+
+        [DefaultValue(4), JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public int PaperEventAutomationWindowMonths { get; set; } = 4;
+
         public bool IsEqual(EventSettings other)
         {
             return AllowLoginAnyTime == other.AllowLoginAnyTime
@@ -23,7 +32,23 @@ namespace InSite.Domain.Organizations
                 && CompanySelectionAndCreationDisabledDuringRegistration == other.CompanySelectionAndCreationDisabledDuringRegistration
                 && ShowUnapplicableSeats == other.ShowUnapplicableSeats
                 && AllowClassRegistrationFields == other.AllowClassRegistrationFields
-                && RegisterEmployeesSearchRequirement == other.RegisterEmployeesSearchRequirement;
+                && RegisterEmployeesSearchRequirement == other.RegisterEmployeesSearchRequirement
+                && OnlineEventAutomationWindowHours == other.OnlineEventAutomationWindowHours
+                && PaperEventAutomationWindowMonths == other.PaperEventAutomationWindowMonths;
+        }
+
+        public void Set(EventSettings value)
+        {
+            AllowLoginAnyTime = value.AllowLoginAnyTime;
+            AllowUserAccountCreationDuringRegistration = value.AllowUserAccountCreationDuringRegistration;
+            AllowUsersRegisterEmployees = value.AllowUsersRegisterEmployees;
+            HideReturnToCalendar = value.HideReturnToCalendar;
+            CompanySelectionAndCreationDisabledDuringRegistration = value.CompanySelectionAndCreationDisabledDuringRegistration;
+            ShowUnapplicableSeats = value.ShowUnapplicableSeats;
+            AllowClassRegistrationFields = value.AllowClassRegistrationFields;
+            RegisterEmployeesSearchRequirement = value.RegisterEmployeesSearchRequirement;
+            OnlineEventAutomationWindowHours = value.OnlineEventAutomationWindowHours;
+            PaperEventAutomationWindowMonths = value.PaperEventAutomationWindowMonths;
         }
     }
 

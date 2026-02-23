@@ -7,5 +7,6 @@ namespace InSite.Persistence.Integration.Moodle
         public Guid EventIdentifier { get; set; }
         public string EventData { get; set; }
         public DateTimeOffset EventWhen { get; set; }
+        public string EventSource { get; set; }
     }
 }

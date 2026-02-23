@@ -22,7 +22,7 @@ namespace InSite.Common.Web.UI
             var filter = Filter.Clone();
 
             filter.ActionName = keyword;
-            filter.ActionType = "Permission";
+            filter.ActionType = "Resource";
 
             return filter;
         }

@@ -1,14 +1,17 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { ApiSiteSetting } from "@/api/models/ApiSiteSetting";
 import Alert from "@/components/Alert";
 import LoadingPanel from "@/components/LoadingPanel";
 import { shiftClient } from "@/api/shiftClient";
 import { urlHelper } from "@/helpers/urlHelper";
 import { cssHelper } from "@/helpers/cssHelper";
+import { validateLanguage } from "@/helpers/language";
 
 interface ContextData {
     siteSetting: ApiSiteSetting;
+    actionSubtitle: string | null;
     refreshSiteSetting: () => void;
+    setActionSubtitle: (subtitle: string | null) => void;
 }
 
 const _defaultValue: ContextData = {
@@ -17,7 +20,12 @@ const _defaultValue: ContextData = {
         OrganizationCode: "NA",
         CompanyName: "NA",
         IsCmds: false,
-        CmdsHomeLink: "NA",
+        Home: {
+            Text: "N/A",
+            Icon: "N/A",
+            Image: "N/A",
+            Url: "N/A",
+        },
         IsAdministrator: false,
         IsOperator: false,
         IsMultiOrganization: false,
@@ -35,15 +43,20 @@ const _defaultValue: ContextData = {
         Environment: {
             Name: "NA",
             Version: "NA",
+            Color: "NA",
         },
-        PlatformLogoSrc: "NA",
+        StylePath: "NA",
         AdminNavigationLogo: "NA",
         UserHostAddress: "NA",
         SessionTimeoutMinutes: 0,
         NavigationGroups: [],
+        AdminNavigationGroups: [],
+        CurrentLanguage: "en",
         SupportedLanguages: ["en"],
     },
+    actionSubtitle: null,
     refreshSiteSetting() {},
+    setActionSubtitle() {},
 };
 
 const SiteProviderContext = createContext<ContextData>(_defaultValue);
@@ -67,6 +80,27 @@ export default function SiteProvider({ children }: Props) {
 
     const [contextData, setContextData] = useState<ContextData>(_defaultValue);
 
+    const methods = useMemo(()=> ({
+        refreshSiteSetting() {
+            setState({
+                needToLoad: true,
+                isLoading: false,
+                error: null,
+            });
+        },
+        setActionSubtitle(subtitle: string | null) {
+            setContextData(prev => {
+                if (prev.actionSubtitle === subtitle) {
+                    return prev;
+                }
+                return {
+                    ...prev,
+                    actionSubtitle: subtitle,
+                };
+            });
+        },
+    }), []);
+
     useEffect(() => {
         if (!state.needToLoad) {
             return;
@@ -83,6 +117,8 @@ export default function SiteProvider({ children }: Props) {
         async function run() {
             try {
                 const newSiteSetting = await shiftClient.me.context(false);
+                validateLanguage(newSiteSetting.CurrentLanguage);
+                validateLanguage(newSiteSetting.SupportedLanguages);
                 setState({
                     needToLoad: false,
                     isLoading: false,
@@ -90,18 +126,11 @@ export default function SiteProvider({ children }: Props) {
                 });
                 setContextData({
                     siteSetting: newSiteSetting,
-                    refreshSiteSetting() {
-                        setState({
-                            needToLoad: true,
-                            isLoading: false,
-                            error: null,
-                        });
-                    },
+                    actionSubtitle: null,
+                    ...methods
                 });
                 urlHelper.setOrg(newSiteSetting.OrganizationCode);
-                if (newSiteSetting.StylePath) {
-                    cssHelper.setShiftCssFile(newSiteSetting.StylePath);
-                }
+                cssHelper.setShiftCssFile(newSiteSetting.StylePath);
             } catch (err) {
                 setState({
                     needToLoad: false,
@@ -110,7 +139,7 @@ export default function SiteProvider({ children }: Props) {
                 });
             }
         }
-    }, [state.needToLoad]);
+    }, [state.needToLoad, methods]);
 
     if (state.isLoading) {
         return <LoadingPanel />;

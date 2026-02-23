@@ -38,7 +38,7 @@ namespace Shift.Common
             if (bool.TryParse(value, out bool result))
                 return result;
 
-            throw new Exception("Unexpected Boolean Format: " + value);
+            throw new FormatException("Unexpected Boolean Format: " + value);
         }
 
         private void SetMode(bool value)

@@ -59,7 +59,7 @@ namespace InSite.Cmds.Controls.Contacts.Companies
             CompanyAttachmentEditorLink.NavigateUrl = $"/ui/cmds/design/uploads/search?id={organization.OrganizationIdentifier}";
             RowAttachments.Visible = organization.OrganizationIdentifier != Guid.Empty;
 
-            WebSiteUrl.Text = organization.CompanyDomain;
+            WebSiteUrl.Text = organization.PlatformCustomization.TenantUrl.WebSite;
 
             EnableDivisions.Checked = OrganizationHelper.EnableDivisions(organization.CompanyDescription.CompanySize);
 
@@ -72,7 +72,7 @@ namespace InSite.Cmds.Controls.Contacts.Companies
             organization.CompanyName = Acronym.Text;
             organization.OrganizationCode = OrganizationCode.Text;
             organization.CompanyDescription.CompanySummary = Description.Text;
-            organization.CompanyDomain = WebSiteUrl.Text;
+            organization.PlatformCustomization.TenantUrl.WebSite = WebSiteUrl.Text;
             organization.CompanyDescription.CompanySize = EnableDivisions.Checked ? CompanySize.Large : CompanySize.Medium;
         }
 

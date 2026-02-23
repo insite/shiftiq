@@ -227,6 +227,12 @@
                     </div>
                 </div>
 
+                <div runat="server" class="form-group mb-3" id="DisplayOnCalendarField">
+                    <div>
+                        <insite:CheckBox runat="server" ID="DisplayOnCalendar" Text="Display On Calendar" />
+                    </div>
+                </div>
+
             </div>
         </div>
                                     

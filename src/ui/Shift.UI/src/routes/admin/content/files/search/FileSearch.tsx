@@ -17,9 +17,9 @@ export default function FileSearch() {
         <Search<FileCriteria, FileRow>
             cacheKey="search.file"
             defaultCriteria={{
-                organizationIdentifier: "",
+                organizationId: "",
                 objectType: "",
-                objectIdentifier: "",
+                objectId: "",
                 fileName: "",
                 documentName: "",
                 fileUploadedSince: null,
@@ -42,17 +42,17 @@ async function load(pageIndex: number, criteria: FileCriteria, timeZoneId: TimeZ
     const result = await shiftClient.file.search(filter, pageIndex, criteria.sortByColumn);
 
     return mapQueryResult(result, row => ({
-        organizationId: row.OrganizationIdentifier,
+        organizationId: row.OrganizationId,
         organizationCode: row.OrganizationCode,
         objectType: row.ObjectType,
-        objectId: row.ObjectIdentifier,
-        fileId: row.FileIdentifier,
+        objectId: row.ObjectId,
+        fileId: row.FileId,
         fileLocation: row.FileLocation,
         fileName: row.FileName,
         documentName: row.DocumentName,
         fileSize: row.FileSize,
         fileUploaded: dateTimeHelper.parseServerDateTime(row.FileUploaded, timeZoneId)!,
-        userId: row.UserIdentifier,
+        userId: row.UserId,
         userName: row.UserFullName || "Someone Someone",
         visibility: row.HasClaims ? "Private" : "Public",
     }));

@@ -171,8 +171,8 @@ namespace InSite.Admin.Standards.Standards.Forms
                 PrevSiblingKey = prevSibling?.Key
             };
 
-            var canWrite = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards, PermissionOperation.Write);
-            var canDelete = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards, PermissionOperation.Delete);
+            var canWrite = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards, DataAccess.Update);
+            var canDelete = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards, DataAccess.Delete);
 
             SetContainerVisibility(ContainerType.Info);
 

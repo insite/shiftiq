@@ -688,7 +688,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
         {
             var sourceBank = ServiceLocator.BankSearch.GetBankState(BankID);
             if (sourceBank == null)
-                throw new ApplicationError("The source bank not found.");
+                throw new KeyNotFoundException("The source bank not found.");
 
             var commands = new List<AddQuestion>();
 
@@ -702,7 +702,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
                     foreach (var questionId in mapping.QuestionIdentifiers)
                     {
                         var sourceQuestion = sourceBank.FindQuestion(questionId)
-                            ?? throw new ApplicationError($"The source question ({questionId}) not found.");
+                            ?? throw new KeyNotFoundException($"The source question ({questionId}) not found.");
 
                         var destQuestion = sourceQuestion.Clone();
                         destQuestion.Identifier = UniqueIdentifier.Create();
@@ -718,7 +718,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
             }
 
             if (commands.Count == 0)
-                throw new ApplicationError("Nothing to migrate.");
+                throw new InvalidOperationException("Nothing to migrate.");
 
             var numbers = Persistence.Sequence.IncrementMany(Organization.OrganizationIdentifier, SequenceType.Asset, commands.Count);
             for (var i = 0; i < numbers.Length; i++)

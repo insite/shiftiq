@@ -88,7 +88,7 @@ namespace Shift.Common.File
             }
             else
             {
-                throw new Exception($"Unexpected type ID: {typeId}");
+                throw new NotSupportedException($"Unexpected type ID: {typeId}");
             }
         }
 

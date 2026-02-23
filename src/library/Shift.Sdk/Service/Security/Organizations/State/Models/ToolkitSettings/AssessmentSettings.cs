@@ -14,6 +14,7 @@ namespace InSite.Domain.Organizations
         public bool RubricReGradeKeepInitialScores { get; set; }
         public bool ShowPersonNameToGradingAssessor { get; set; }
         public bool RequireAutoStart { get; set; }
+        public bool LockPublishedStandards { get; set; }
         public ReportSettings PerformanceReport { get; set; }
 
         public AssessmentSettings()
@@ -29,7 +30,8 @@ namespace InSite.Domain.Organizations
                 && AttemptGradingAssessor == other.AttemptGradingAssessor
                 && RubricReGradeKeepInitialScores == other.RubricReGradeKeepInitialScores
                 && ShowPersonNameToGradingAssessor == other.ShowPersonNameToGradingAssessor
-                && RequireAutoStart == other.RequireAutoStart;
+                && RequireAutoStart == other.RequireAutoStart
+                && LockPublishedStandards == other.LockPublishedStandards;
         }
     }
 }

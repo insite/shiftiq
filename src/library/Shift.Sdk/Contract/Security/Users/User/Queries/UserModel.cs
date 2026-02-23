@@ -4,7 +4,7 @@ namespace Shift.Contract
 {
     public partial class UserModel
     {
-        public Guid UserIdentifier { get; set; }
+        public Guid UserId { get; set; }
 
         public bool AccessGrantedToCmds { get; set; }
         public bool MultiFactorAuthentication { get; set; }

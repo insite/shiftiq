@@ -213,7 +213,7 @@ namespace InSite.Cmds.Actions.Reports
 
         private void InitSelectorsByCompany()
         {
-            Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Department.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 Department.Filter.UserIdentifier = User.UserIdentifier;
@@ -222,7 +222,7 @@ namespace InSite.Cmds.Actions.Reports
 
             DepartmentCompetenciesField.Visible = false;
 
-            CurrentProfile.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            CurrentProfile.Filter.OrganizationIdentifier = Organization.Identifier;
             CurrentProfile.Filter.DepartmentIdentifier = null;
             CurrentProfile.Value = null;
         }

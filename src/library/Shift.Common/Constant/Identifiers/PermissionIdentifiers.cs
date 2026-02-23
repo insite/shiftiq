@@ -12,7 +12,6 @@ namespace Shift.Constant
         public static Guid Admin_Courses => Guid.Parse("527F1BE0-D525-44A4-BF6A-BDEC34A9FEAA");
         public static Guid Admin_Events => Guid.Parse("6CCD2BCE-CA5B-4640-9790-A8CFBC28DE70");
         public static Guid Admin_Integrations => Guid.Parse("9c88bfa9-1a9d-4269-b2f9-a84717c58921");
-        public static Guid Admin_Integrations_Canvas => Guid.Parse("b60f04d7-6c59-4ba4-9774-d511b872838a");
         public static Guid Admin_Records => Guid.Parse("F79772F9-1251-4B2E-B17F-91E0C662DCE8");
         public static Guid Admin_Records_Achievements => Guid.Parse("4E1ED633-214C-4E9F-8E87-FA13688A023A");
         public static Guid Admin_Settings => Guid.Parse("165EFD50-7B04-4CCD-8091-38D2D63C1106");

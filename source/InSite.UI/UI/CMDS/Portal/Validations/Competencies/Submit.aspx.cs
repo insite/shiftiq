@@ -75,7 +75,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Assessment
                 {
                     var filter = new EmployeeCompetencyFilter
                     {
-                        OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                        OrganizationIdentifier = Organization.Identifier,
                         Statuses = new[] { ValidationStatuses.NotApplicable, ValidationStatuses.SelfAssessed },
                         UserIdentifier = User.UserIdentifier,
                         ValidationDateMustBeNull = true

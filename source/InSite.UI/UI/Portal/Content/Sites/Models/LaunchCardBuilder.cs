@@ -33,7 +33,7 @@ namespace InSite.UI.Portal.Sites
             if (path == null)
                 HttpResponseHelper.Redirect(RelativeUrl.PortalHomeUrl);
 
-            var hasWriteAccess = identity.IsGranted(PermissionIdentifiers.Admin_Sites, PermissionOperation.Write);
+            var hasWriteAccess = identity.IsGranted(PermissionIdentifiers.Admin_Sites, DataAccess.Update);
 
             var appUrl = ServiceLocator.Urls.GetApplicationUrl(identity.Organization.Code);
 
@@ -207,7 +207,7 @@ namespace InSite.UI.Portal.Sites
 
             var caller = FormCaller.CreatePortal(portal.Slug).Serialize();
 
-            var helper = new LaunchCardAdapter();
+            var helper = new LaunchCardAdapter(ServiceLocator.Partition);
 
             var cards = helper.GetLaunchCards(appUrl, portal.Identifier, portal.Title, identity, caller, LabelHelper.GetTranslation, GetProgress);
 
@@ -228,7 +228,7 @@ namespace InSite.UI.Portal.Sites
             var item = new NavItem { Title = "Assessments", Icon = "fas fa-users-class" };
             item.Controls.Add(repeater);
 
-            var helper = new LaunchCardAdapter();
+            var helper = new LaunchCardAdapter(ServiceLocator.Partition);
 
             var cards = helper.GetAssessmentCards(identity, AttemptUrlForm.GetStartUrl);
 

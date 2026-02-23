@@ -18,7 +18,7 @@ namespace InSite.Common.Web.UI
         internal void Register(Nav nav)
         {
             if (_nav != null)
-                throw new ApplicationError("The content renderer control is already assigned to Nav: " + ClientID);
+                throw new InvalidOperationException("The content renderer control is already assigned to Nav: " + ClientID);
 
             _nav = nav ?? throw new ArgumentNullException(nameof(nav));
         }
@@ -30,7 +30,7 @@ namespace InSite.Common.Web.UI
         protected override void Render(HtmlTextWriter writer)
         {
             if (_nav == null)
-                throw new ApplicationError("The content renderer control is not assigned to Nav: " + ClientID);
+                throw new InvalidOperationException("The content renderer control is not assigned to Nav: " + ClientID);
 
             _nav.RenderTabContent(writer);
         }

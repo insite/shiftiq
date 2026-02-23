@@ -26,10 +26,10 @@ namespace InSite.Domain.Foundations
         internal void OnSerializingMethod(StreamingContext context)
         {
             if (string.IsNullOrEmpty(Url))
-                throw new ApplicationError("Url is required property.");
+                throw new InvalidOperationException("Url is required property.");
 
             if (string.IsNullOrEmpty(Icon) && string.IsNullOrEmpty(Text))
-                throw new ApplicationError("Content is required property.");
+                throw new InvalidOperationException("Content is required property.");
         }
 
         public SiteLink Clone()

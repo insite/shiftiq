@@ -125,7 +125,7 @@ namespace InSite.UI.Individual.Controls
         public void GetInputValues(QPerson person)
         {
             if (CurrentEntity != EntityType.User)
-                throw new ApplicationError("Unexpected entity type");
+                throw new InvalidOperationException("Unexpected entity type");
 
             foreach (var addressType in CurrentAddressTypes)
             {

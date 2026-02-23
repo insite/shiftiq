@@ -7,7 +7,6 @@ namespace InSite.Domain.Contacts
         public Guid OrganizationIdentifier { get; set; }
 
         public string OrganizationCode { get; set; }
-        public string OrganizationDomain { get; set; }
         public string OrganizationName { get; set; }
         public string OrganizationStatus { get; set; }
         public string OrganizationUrl { get; set; }

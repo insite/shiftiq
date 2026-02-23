@@ -178,7 +178,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void InitSelectors()
         {
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 DepartmentIdentifier.Filter.UserIdentifier = User.UserIdentifier;
@@ -191,7 +191,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         private void UpdateProfileIdentifier()
         {
             ProfileIdentifier.Value = null;
-            ProfileIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            ProfileIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             ProfileIdentifier.Filter.DepartmentIdentifier = DepartmentIdentifier.Value;
         }
 
@@ -463,7 +463,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             var filter = new PersonFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 DepartmentIdentifier = parameters.DepartmentIdentifier,
                 IsApproved = true,
                 RoleType = new[] { MembershipType.Department }
@@ -558,7 +558,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             var filter = new EmployeeCompetencyFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 DepartmentIdentifier = parameters.DepartmentIdentifier,
                 ProfileStandardIdentifier = profileStandardIdentifier,
                 UserIdentifier = userKey

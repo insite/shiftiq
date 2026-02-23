@@ -77,7 +77,7 @@ namespace Shift.Common.Base
                 tryCount++;
             }
 
-            throw new Exception("Failed to generate a unique random string value.");
+            throw new InvalidOperationException("Failed to generate a unique random string value.");
         }
 
         public static string Create(Random random, int length)
@@ -178,7 +178,7 @@ namespace Shift.Common.Base
                 case RandomStringType.Passcode:
                     return CharactersSet.Passcode;
                 default:
-                    throw new Exception($"Unexpected random string type: {type}");
+                    throw new NotSupportedException($"Unexpected random string type: {type}");
             }
         }
 

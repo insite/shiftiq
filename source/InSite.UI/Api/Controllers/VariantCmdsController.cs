@@ -122,7 +122,7 @@ namespace InSite.Api.Controllers
                 new PersonFilter
                 {
                     OrganizationIdentifier = organization.Identifier,
-                    EmailNotEndsWith = "@" + ServiceLocator.AppSettings.Security.Domain,
+                    EmailNotEndsWith = "@" + ServiceLocator.AppSettings.Partition.Domain,
                     IsApproved = true,
                     IsArchived = false,
                     IsCmds = true

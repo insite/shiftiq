@@ -32,7 +32,7 @@
                 </div>
             </section>
         </insite:NavItem>
-        
+
         <insite:NavItem runat="server" ID="GradebookTab" Title="Gradebooks" Icon="far fa-spell-check" IconPosition="BeforeText">
             <section class="pb-5 mb-md-2">        
                 <h2 class="h4 mb-1"></h2>

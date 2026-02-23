@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 using System.Web.UI;
 
 using InSite.Common.Web.UI;
@@ -15,25 +16,27 @@ using WebControl = System.Web.UI.WebControls.WebControl;
 
 namespace InSite.Admin.Assets.Contents.Utilities
 {
-    public class InputTranslator : ITranslator
+    public class InputTranslator : ITranslatorService
     {
         private readonly StringDictionary _from;
         private readonly StringDictionary _to;
         private readonly List<Control> _list;
-        private readonly Guid _organization;
-        private readonly string _language;
         private readonly HashSet<Control> _excludedControls;
+
+        private string _language;
+        private Guid _organization;
 
         public string Language => _language;
 
-        public InputTranslator(Guid organization, string language)
+        public InputTranslator(string language, Guid organization)
         {
             _from = new StringDictionary();
             _to = new StringDictionary();
             _list = new List<Control>();
-            _organization = organization;
-            _language = language;
             _excludedControls = new HashSet<Control>();
+
+            _language = language;
+            _organization = organization;
         }
 
         public void ExcludeFromAutoTranslate(Control control)
@@ -41,7 +44,25 @@ namespace InSite.Admin.Assets.Contents.Utilities
             _excludedControls.Add(control);
         }
 
-        public string Translate(string source) => Translate(source, source);
+        public string Translate(string source, string language, Guid organization)
+        {
+            _language = language;
+            _organization = organization;
+            return Translate(source);
+        }
+
+        public async Task<string> TranslateAsync(string source, string language, Guid organization)
+        {
+            _language = language;
+            _organization = organization;
+            return await TranslateAsync(source);
+        }
+
+        public Task<string> TranslateAsync(string source)
+            => Task.FromResult(Translate(source));
+
+        public string Translate(string source)
+            => Translate(source, source);
 
         public string Translate(string from, string to, string item)
         {

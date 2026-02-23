@@ -12,7 +12,7 @@ namespace InSite.UI.Layout.Admin
 {
     public static class PageHelper
     {
-        public static void AutoBindHeader(Page page, BreadcrumbItem create = null, string qualifier = null, string linkTitle = null)
+        public static void AutoBindHeader(Page page, BreadcrumbItem create = null, string qualifier = null, string linkTitle = null, string spacer = " - ")
         {
             if (!(page is LobbyBasePage lobbyPage) || lobbyPage.Route == null)
                 return;
@@ -21,9 +21,12 @@ namespace InSite.UI.Layout.Admin
             var overrideWebRouteParent = page as IOverrideWebRouteParent;
             var hasParentLinkParameters = page as IHasParentLinkParameters;
 
-            var breadcrumbs = BreadcrumbsHelper.CollectBreadcrumbs(lobbyPage.Route, linkTitle, translator, overrideWebRouteParent, hasParentLinkParameters);
+            var language = CookieTokenModule.Current.Language;
+            var organizationId = CurrentSessionState.Identity.OrganizationId;
 
-            BindHeader(page, breadcrumbs.ToArray(), create, qualifier);
+            var breadcrumbs = BreadcrumbsHelper.CollectBreadcrumbs(lobbyPage.Route, linkTitle, translator, language, organizationId, overrideWebRouteParent, hasParentLinkParameters);
+
+            BindHeader(page, breadcrumbs.ToArray(), create, qualifier, spacer);
         }
 
         public static void AutoBindFolderHeader(
@@ -69,8 +72,11 @@ namespace InSite.UI.Layout.Admin
             var overrideWebRouteParent = page as IOverrideWebRouteParent;
             var hasParentLinkParameters = page as IHasParentLinkParameters;
 
+            var language = CookieTokenModule.Current.Language;
+            var organizationId = CurrentSessionState.Identity.OrganizationId;
+
             var breadcrumbs = new List<BreadcrumbItem>();
-            BreadcrumbsHelper.AddBreadcrumbParentItems(page.Route, breadcrumbs, translator, overrideWebRouteParent, hasParentLinkParameters);
+            BreadcrumbsHelper.AddBreadcrumbParentItems(page.Route, breadcrumbs, translator, language, organizationId, overrideWebRouteParent, hasParentLinkParameters);
 
             if (parentLinkTitles != null)
             {
@@ -84,16 +90,16 @@ namespace InSite.UI.Layout.Admin
             return breadcrumbs;
         }
 
-        public static void BindHeader(Page page, BreadcrumbItem[] breadcrumbs, BreadcrumbItem create = null, string qualifier = null)
+        public static void BindHeader(Page page, BreadcrumbItem[] breadcrumbs, BreadcrumbItem create = null, string qualifier = null, string spacer = " - ")
         {
             if (page.Master is AdminHome adminHome)
             {
-                adminHome.AdminHeader.BindTitle(qualifier);
+                adminHome.AdminHeader.BindTitle(qualifier, spacer);
                 adminHome.AdminHeader.BindBreadcrumbs(breadcrumbs, create);
             }
             else if (page.Master is PortalMaster portal)
             {
-                portal.Breadcrumbs.BindTitle(qualifier);
+                portal.Breadcrumbs.BindTitle(qualifier, spacer);
                 portal.Breadcrumbs.BindBreadcrumbs(breadcrumbs, new[] { create });
             }
         }

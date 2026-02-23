@@ -7,10 +7,11 @@ namespace Shift.Contract
 {
     public class SearchPeople : Query<IEnumerable<PersonMatch>>, IPersonCriteria
     {
+        public Guid? UserId { get; set; }
+        public Guid? OrganizationId { get; set; }
+
         public string EmailExact { get; set; }
         public string EventRole { get; set; }
         public string FullName { get; set; }
-        public Guid? UserIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
     }
 }

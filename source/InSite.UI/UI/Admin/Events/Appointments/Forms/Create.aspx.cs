@@ -33,7 +33,7 @@ namespace InSite.Admin.Events.Appointments.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 HttpResponseHelper.Redirect(SearchUrl);
 
             if (IsPostBack)

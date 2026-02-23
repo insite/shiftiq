@@ -25,7 +25,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Validation
 
             PageHelper.AutoBindHeader(this);
 
-            int rowCount = UserCompetencyRepository.SelectItemCountForValidator(User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier, null, null).Rows.Count;
+            int rowCount = UserCompetencyRepository.SelectItemCountForValidator(User.UserIdentifier, Organization.Identifier, null, null).Rows.Count;
 
             SummaryGrid.Visible = rowCount > 0;
             NoItems.Visible = rowCount == 0;
@@ -35,7 +35,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Validation
 
         private void Summary_DataBinding(object sender, EventArgs e)
         {
-            var table = UserCompetencyRepository.SelectItemCountForValidator(User.UserIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier, SummaryGrid.PageIndex, SummaryGrid.PageSize);
+            var table = UserCompetencyRepository.SelectItemCountForValidator(User.UserIdentifier, Organization.Identifier, SummaryGrid.PageIndex, SummaryGrid.PageSize);
 
             SummaryGrid.DataSource = table;
         }

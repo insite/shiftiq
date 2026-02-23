@@ -154,7 +154,7 @@ namespace Shift.Common
                 if (typeof(Exception).IsAssignableFrom(result))
                     return result;
 
-                throw new Exception("The type must be assignable from System.Exception");
+                throw new ArgumentException("The type must be assignable from System.Exception");
             }
         }
 

@@ -4,11 +4,17 @@ namespace Shift.Hub.Integration.IIS;
 
 public class ListMissingBindings
 {
-    public void Execute(string? connectionString, string? siteName, string? protocolsText)
+    public void Execute(string? connectionString, string? hostName, string? siteName, string? protocolsText)
     {
         if (string.IsNullOrEmpty(connectionString))
         {
             Console.Error.WriteLine("ConnectionString is a required input parameter for this command.");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(hostName))
+        {
+            Console.Error.WriteLine("HostName is a required input parameter for this command.");
             return;
         }
 
@@ -46,13 +52,13 @@ public class ListMissingBindings
 
         try
         {
-            if (BindingHelper.IsWildcardDefined(site, db, protocols))
+            if (BindingHelper.IsWildcardDefined(site, db, hostName, protocols))
             {
                 Console.WriteLine($"Bindings defined using a wildcard");
                 return;
             }
 
-            missingBindings = BindingHelper.GetMissingBindings(site, db, protocols, true);
+            missingBindings = BindingHelper.GetMissingBindings(site, db, hostName, protocols, true);
         }
         catch (InternalException intex)
         {

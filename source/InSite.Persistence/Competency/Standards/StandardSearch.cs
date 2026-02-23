@@ -610,7 +610,9 @@ order by
 
         private static T[] GetAllTypes<T>(Guid organization, Expression<Func<TCollectionItem, T>> bind)
         {
-            var organizations = GetOrganizationsForFilter(organization);
+            var organizations = organization != ServiceLocator.Partition.Identifier
+                ? new[] { ServiceLocator.Partition.Identifier, organization }
+                : new[] { organization };
 
             using (var db = new InternalDbContext(false, true))
             {
@@ -621,25 +623,6 @@ order by
                     .Select(bind)
                     .ToArray();
             }
-        }
-
-        private static IEnumerable<Guid> GetOrganizationsForFilter(Guid child)
-        {
-            var organizations = new List<Guid> { child };
-
-            var parent = OrganizationSearch.Select(child)?.ParentOrganizationIdentifier;
-            if (parent == null || parent == Guid.Empty)
-                return organizations;
-
-            organizations.Add(parent.Value);
-
-            var grandparent = OrganizationSearch.Select(parent.Value)?.ParentOrganizationIdentifier;
-            if (grandparent == null || grandparent == Guid.Empty)
-                return organizations;
-
-            organizations.Add(grandparent.Value);
-
-            return organizations;
         }
 
         #endregion

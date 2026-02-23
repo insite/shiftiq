@@ -15,24 +15,6 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
     {
 
         /// <summary>
-        /// ParentLink control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.IconLink ParentLink;
-
-        /// <summary>
-        /// ParentOrganizationIdentifier control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.FindOrganization ParentOrganizationIdentifier;
-
-        /// <summary>
         /// OrganizationCodeValidator control.
         /// </summary>
         /// <remarks>
@@ -58,24 +40,6 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.TextBox CompanyName;
-
-        /// <summary>
-        /// DomainPatternValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.PatternValidator DomainPatternValidator;
-
-        /// <summary>
-        /// CompanyDomain control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox CompanyDomain;
 
         /// <summary>
         /// SetupContainer control.

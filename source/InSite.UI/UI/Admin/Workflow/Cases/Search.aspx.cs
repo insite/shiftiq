@@ -36,6 +36,7 @@ namespace InSite.UI.Admin.Issues.Issues
                 new DownloadColumn("IssueIdentifier", "Case Identifier"),
                 new DownloadColumn("IssueOpenedby", "Case Opened by"),
                 new DownloadColumn("TopicUserIdentifier"),
+                new DownloadColumn("TopicUserDepartment"),
                 new DownloadColumn("AdministratorUserName"),
                 new DownloadColumn("IssueDescription", "Case Description"),
                 new DownloadColumn("IssueEmployerGroupName", "Case Employer Group Name"),

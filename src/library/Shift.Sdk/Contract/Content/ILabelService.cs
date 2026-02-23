@@ -5,8 +5,8 @@ namespace Shift.Contract
 {
     public interface ILabelService
     {
-        Task Refresh();
+        Task RefreshAsync();
         string GetTranslation(string name, string language, Guid organization, bool allowNull, bool allowDefault);
-        Task SaveTranslation(string language, string label, string source, string target);
+        Task SaveTranslationAsync(string language, string label, string source, string target);
     }
 }

@@ -21,7 +21,7 @@ namespace InSite.Admin.Workflow.Forms.Controls
                     SurveyQuestionIdentifier = QuestionID.ValueAsGuid,
                     ResponseAnswerText = AnswerText.Value,
                     RespondentName = RespondentName.Text,
-                    IsPlatformAdministrator = Identity.IsOperator,
+                    IsOperator = Identity.IsOperator,
                     StartedSince = StartedSince.Value,
                     StartedBefore = StartedBefore.Value,
                     CompletedSince = CompletedSince.Value,

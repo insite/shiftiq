@@ -11,7 +11,6 @@ using InSite.UI.Layout.Lobby;
 using InSite.Web.Helpers;
 
 using Shift.Common;
-using Shift.Constant;
 
 namespace InSite.UI.Layout.Portal
 {
@@ -41,8 +40,11 @@ namespace InSite.UI.Layout.Portal
                 if (!IsManagerGroupEnable)
                     return false;
 
-                var groupId = Identity.Organization.Toolkits.Sales.ManagerGroup.Value;
-                return Identity.IsInGroup(groupId);
+                var roleId = Identity.Organization.Toolkits.Sales.ManagerGroup.Value;
+
+                var roleName = ServiceLocator.GroupSearch.GetGroupName(roleId);
+
+                return Identity.IsInRole(roleName);
             }
         }
 
@@ -64,8 +66,11 @@ namespace InSite.UI.Layout.Portal
                 if (!IsLearnerGroupEnable)
                     return false;
 
-                var groupId = Identity.Organization.Toolkits.Sales.LearnerGroup.Value;
-                return Identity.IsInGroup(groupId);
+                var roleId = Identity.Organization.Toolkits.Sales.LearnerGroup.Value;
+
+                var roleName = ServiceLocator.GroupSearch.GetGroupName(roleId);
+
+                return Identity.IsInRole(roleName);
             }
         }
 
@@ -95,6 +100,14 @@ namespace InSite.UI.Layout.Portal
                 AntiForgeryHelper.Validate();
 
             base.OnLoad(e);
+
+            if (string.Equals(CookieTokenModule.Current.Language, "ar")
+                && Request.RawUrl.StartsWith("/ui/portal/home", StringComparison.OrdinalIgnoreCase)
+                )
+            {
+                SideColumn.Attributes["dir"] = "rtl";
+                ContentPanel.Attributes["dir"] = "rtl";
+            }
         }
 
         public void HideBreadcrumbsAndTitle()
@@ -145,12 +158,14 @@ namespace InSite.UI.Layout.Portal
 
             var person = PersonSearch.Select(identity.Organization.OrganizationIdentifier, avatar.UserIdentifier);
 
+            var style = ServiceLocator.AppSettings.Partition.Style;
+
             MyAvatar.AlternateText = avatar.FullName;
             MyName.InnerText = avatar.FullName;
             MyEmail.InnerText = avatar.Email;
             MyCode.InnerText = IsSalesReady ? string.Empty : person.PersonCode;
             MyCodeContainer.Visible = !IsSalesReady;
-            MyAvatar.ImageUrl = ServiceLocator.AppSettings.Application.DefaultAvatarImageUrl;
+            MyAvatar.ImageUrl = $"/UI/Layout/Portal/Images/Default-{style}.png";
             var image = UserSearch.Bind(avatar.Identifier, x => x.ImageUrl);
             if (image != null)
                 MyAvatar.ImageUrl = image;
@@ -194,7 +209,7 @@ namespace InSite.UI.Layout.Portal
             heading.InnerText = Translate("Administrators Only");
             body.InnerHtml = $"<p>{Translate("You can post your own help content for this page to give your learners extra guidance, specific to your organization.")}</p>";
 
-            var allowEdit = Identity.IsGranted("Admin/Sites", PermissionOperation.Write);
+            var allowEdit = Identity.IsGranted("Admin/Sites", DataAccess.Update);
 
             heading.Visible = allowEdit;
             body.Visible = allowEdit;

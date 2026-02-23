@@ -4,7 +4,7 @@ namespace Shift.Contract
 {
     public partial class FormConditionMatch
     {
-        public Guid MaskedSurveyQuestionIdentifier { get; set; }
-        public Guid MaskingSurveyOptionItemIdentifier { get; set; }
+        public Guid MaskedSurveyQuestionId { get; set; }
+        public Guid MaskingSurveyOptionItemId { get; set; }
     }
 }

@@ -6,8 +6,8 @@ namespace Shift.Contract
 {
     public class CountCaseDocumentRequests : Query<int>, ICaseDocumentRequestCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? RequestedUserIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? RequestedUserId { get; set; }
 
         public string RequestedFileDescription { get; set; }
         public string RequestedFileSubcategory { get; set; }

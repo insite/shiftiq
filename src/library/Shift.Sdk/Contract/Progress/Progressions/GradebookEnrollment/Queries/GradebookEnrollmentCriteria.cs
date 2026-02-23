@@ -8,10 +8,10 @@ namespace Shift.Contract
     {
         QueryFilter Filter { get; set; }
 
-        Guid? GradebookIdentifier { get; set; }
-        Guid? LearnerIdentifier { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? PeriodIdentifier { get; set; }
+        Guid? GradebookId { get; set; }
+        Guid? LearnerId { get; set; }
+        Guid? OrganizationId { get; set; }
+        Guid? PeriodId { get; set; }
 
         string EnrollmentComment { get; set; }
 

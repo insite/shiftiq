@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common;
 using Shift.Service.Workspace;
 
 namespace Shift.Api;
@@ -9,10 +10,12 @@ namespace Shift.Api;
 public class SiteController : ShiftControllerBase
 {
     private readonly SiteService _siteService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public SiteController(SiteService siteService)
+    public SiteController(SiteService siteService, IPrincipalProvider principalProvider)
     {
         _siteService = siteService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +23,17 @@ public class SiteController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific site
     /// </summary>
-    [HttpHead("workspace/sites/{site:guid}")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Assert)]
+    [HttpHead("api/workspace/sites/{site:guid}")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertSite")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid site, CancellationToken cancellation = default)
     {
-        var exists = await _siteService.AssertAsync(site, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _siteService.AssertAsync(site, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +41,8 @@ public class SiteController : ShiftControllerBase
     /// <summary>
     /// Collects the list of sites that match specific criteria
     /// </summary>
-    [HttpPost("workspace/sites/collect")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Collect)]
+    [HttpPost("api/workspace/sites/collect")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<SiteModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectSites")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectSites query, CancellationToken cancellation = default)
@@ -43,8 +50,8 @@ public class SiteController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("workspace/sites")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Collect)]
+    [HttpGet("api/workspace/sites")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<SiteModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectSites_get")]
     [AliasFor("collectSites")]
@@ -56,6 +63,10 @@ public class SiteController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectSites query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _siteService.CollectAsync(query, cancellation);
 
         var count = await _siteService.CountAsync(query, cancellation);
@@ -68,8 +79,8 @@ public class SiteController : ShiftControllerBase
     /// <summary>
     /// Counts the sites that match specific criteria
     /// </summary>
-    [HttpPost("workspace/sites/count")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Count)]
+    [HttpPost("api/workspace/sites/count")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countSites")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountSites query, CancellationToken cancellation = default)
@@ -77,8 +88,8 @@ public class SiteController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("workspace/sites/count")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Count)]
+    [HttpGet("api/workspace/sites/count")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countSites_get")]
     [AliasFor("countSites")]
@@ -90,6 +101,10 @@ public class SiteController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountSites query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _siteService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +113,8 @@ public class SiteController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of sites that match specific criteria
     /// </summary>    
-    [HttpPost("workspace/sites/download")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Download)]
+    [HttpPost("api/workspace/sites/download")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadSites")]
@@ -108,8 +123,8 @@ public class SiteController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("workspace/sites/download")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Download)]
+    [HttpGet("api/workspace/sites/download")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadSites_get")]
@@ -122,6 +137,10 @@ public class SiteController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectSites query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Workspace", "Sites", query.Filter.Format, User);
 
         var models = await _siteService
@@ -142,22 +161,30 @@ public class SiteController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific site
     /// </summary>
-    [HttpGet("workspace/sites/{site:guid}")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Retrieve)]
+    [HttpGet("api/workspace/sites/{site:guid}")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType<SiteModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveSite")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid site, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _siteService.RetrieveAsync(site, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of sites that match specific criteria
     /// </summary>
-    [HttpPost("workspace/sites/search")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Search)]
+    [HttpPost("api/workspace/sites/search")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<SiteMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchSites")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchSites query, CancellationToken cancellation = default)
@@ -165,8 +192,8 @@ public class SiteController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("workspace/sites/search")]
-    [HybridAuthorize(Policies.Workspace.Sites.Site.Search)]
+    [HttpGet("api/workspace/sites/search")]
+    [HybridPermission("workspace/sites", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<SiteMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchSites_get")]
     [AliasFor("searchSites")]
@@ -178,6 +205,10 @@ public class SiteController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchSites query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _siteService.SearchAsync(query, cancellation);
 
         var count = await _siteService.CountAsync(query, cancellation);

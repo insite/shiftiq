@@ -1,0 +1,6 @@
+.FormField {
+    .btn.btn-link {
+        min-height: 0;
+        text-decoration: none;
+    }
+}

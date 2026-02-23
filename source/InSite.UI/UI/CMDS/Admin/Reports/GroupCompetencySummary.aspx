@@ -3,16 +3,12 @@
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/CompetencySummary.ascx" TagName="CompetencySummary" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
+
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
     <insite:Alert runat="server" ID="ScreenStatus" />
 
     <section runat="server" ID="ReportSection" class="mb-3">
-
-        <h2 class="h4 mb-3">
-            <i class="far fa-chart-bar me-1"></i>
-            Report
-        </h2>
-
         <div class="card border-0 shadow-lg h-100">
             <div class="card-body">
 
@@ -36,4 +32,5 @@
             </div>
         </div>
     </section>
+
 </asp:Content>

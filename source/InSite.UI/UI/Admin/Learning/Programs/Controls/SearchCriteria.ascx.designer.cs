@@ -69,6 +69,33 @@ namespace InSite.Admin.Records.Programs.Controls
         protected global::InSite.Custom.CMDS.Common.Controls.Server.FindDepartment DepartmentIdentifier;
 
         /// <summary>
+        /// ProgramTag control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox ProgramTag;
+
+        /// <summary>
+        /// ProgramAchievementIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindAchievement ProgramAchievementIdentifier;
+
+        /// <summary>
+        /// TaskAchievementIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindAchievement TaskAchievementIdentifier;
+
+        /// <summary>
         /// ShowColumns control.
         /// </summary>
         /// <remarks>

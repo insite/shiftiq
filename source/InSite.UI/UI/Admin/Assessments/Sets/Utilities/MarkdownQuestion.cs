@@ -175,7 +175,7 @@ namespace InSite.Admin.Assessments.Sets.Utilities
 
             Exception GetException(string text)
             {
-                return new ApplicationError($"Line {lineNumber}: {text}");
+                return ApplicationError.Create("Line {0}: {1}", lineNumber, text);
             }
         }
 

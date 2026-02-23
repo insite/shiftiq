@@ -16,7 +16,7 @@ namespace InSite.UI.Lobby
         {
             base.OnLoad(e);
 
-            var brand = ServiceLocator.AppSettings.Release.Brand;
+            var brand = ServiceLocator.AppSettings.Partition.Brand;
 
             var cid = Request.QueryString["cid"];
 

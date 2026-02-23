@@ -7,13 +7,13 @@ namespace Shift.Contract
 {
     public class SearchEvents : Query<IEnumerable<EventMatch>>, IEventCriteria
     {
-        public Guid? AchievementIdentifier { get; set; }
-        public Guid? LearnerRegistrationGroupIdentifier { get; set; }
-        public Guid? MandatorySurveyFormIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? VenueCoordinatorIdentifier { get; set; }
-        public Guid? VenueLocationIdentifier { get; set; }
-        public Guid? VenueOfficeIdentifier { get; set; }
+        public Guid? AchievementId { get; set; }
+        public Guid? LearnerRegistrationGroupId { get; set; }
+        public Guid? MandatorySurveyFormId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? VenueCoordinatorId { get; set; }
+        public Guid? VenueLocationId { get; set; }
+        public Guid? VenueOfficeId { get; set; }
 
         public bool? AllowMultipleRegistrations { get; set; }
         public bool? AllowRegistrationWithLink { get; set; }

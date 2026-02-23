@@ -232,7 +232,7 @@ namespace InSite.Api.Controllers
             var organization = GetOrganization();
 
             if (learner.Identifier == Guid.Empty)
-                throw new Exception("The learner is missing a unique identifier value. (Learner.Identifier is a required property.)");
+                throw new ArgumentException("The learner is missing a unique identifier value. (Learner.Identifier is a required property.)", nameof(learner));
 
             if (!ServiceLocator.PersonSearch.IsPersonExist(learner.Identifier, organization.Identifier))
                 Insert(learner, organization.Identifier, organization.TimeZone.Id, organization.Toolkits.Contacts?.DefaultMFA ?? false);
@@ -282,10 +282,10 @@ namespace InSite.Api.Controllers
             //   2 - The person is a learner in the organization account.
 
             if (!IsAdministrator)
-                throw new Exception($"Your developer account is not an Administrator in the {CurrentOrganization.Name} organization account, therefore you cannot apply changes to Learners using the API.");
+                throw new UnauthorizedAccessException($"Your developer account is not an Administrator in the {CurrentOrganization.Name} organization account, therefore you cannot apply changes to Learners using the API.");
 
             if (!learner.IsLearner)
-                throw new Exception($"{learner.FirstName} {learner.LastName} is not a Learner in the {CurrentOrganization.Name} organization account, therefore you cannot apply changes to this contact using the API.");
+                throw new InvalidOperationException($"{learner.FirstName} {learner.LastName} is not a Learner in the {CurrentOrganization.Name} organization account, therefore you cannot apply changes to this contact using the API.");
 
             var user = ServiceLocator.UserSearch.GetUser(learner.Identifier);
 

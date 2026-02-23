@@ -7,9 +7,9 @@ namespace Shift.Contract
 {
     public class SearchCaseGroups : Query<IEnumerable<CaseGroupMatch>>, ICaseGroupCriteria
     {
-        public Guid? GroupIdentifier { get; set; }
-        public Guid? CaseIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? GroupId { get; set; }
+        public Guid? CaseId { get; set; }
+        public Guid? OrganizationId { get; set; }
 
         public string CaseRole { get; set; }
     }

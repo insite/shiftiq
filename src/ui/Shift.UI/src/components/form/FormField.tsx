@@ -1,7 +1,12 @@
+import "./FormField.css";
+
 import { errorHelper } from "@/helpers/errorHelper";
 import { ReactNode } from "react";
 import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 import ActionLink from "../ActionLink";
+import Icon from "../icon/Icon";
+import { IconName } from "../icon/IconName";
+import { IconStyle } from "../icon/IconStyle";
 
 interface Props<T extends object> {
     children?: ReactNode;
@@ -10,9 +15,13 @@ interface Props<T extends object> {
     description?: string;
     editHref?: string | null;
     editTitle?: string | null;
+    editIcon?: IconName;
+    editIconStyle?: IconStyle;
+    editDisabled?: boolean;
     hasBottomMargin?: boolean;
     required?: boolean;
     error?: FieldError | Merge<FieldError, FieldErrorsImpl<T>> | null;
+    onEditClick?: () => void;
 }
 
 export default function FormField<T extends object>({
@@ -22,11 +31,15 @@ export default function FormField<T extends object>({
     description,
     editHref,
     editTitle,
+    editIcon,
+    editIconStyle,
+    editDisabled,
     hasBottomMargin,
     required,
-    error
+    error,
+    onEditClick
 }: Props<T>) {
-    let fieldClass = "form-group";
+    let fieldClass = "FormField form-group";
     if (className) {
         fieldClass += " " + className;
     }
@@ -40,9 +53,22 @@ export default function FormField<T extends object>({
         <div className={fieldClass}>
             {editHref && (
                 <div className="float-end">
-                    <ActionLink href={editHref}>
-                        <i className="fas icon fa-pencil" title={editTitle ?? ""}></i>
+                    <ActionLink href={editDisabled ? undefined : editHref}>
+                        <Icon style={editIconStyle ?? "Solid"} name={editIcon ?? "pencil"} className="icon" title={editTitle ?? ""} />
                     </ActionLink>
+                </div>
+            )}
+            {!editHref && onEditClick && (
+                <div className="float-end">
+                    <button
+                        type="button"
+                        title={editTitle ?? ""}
+                        disabled={editDisabled}
+                        className="btn btn-link m-0 p-0"
+                        onClick={onEditClick}
+                    >
+                        <Icon style="Solid" name={editIcon ?? "pencil"} />
+                    </button>
                 </div>
             )}
             {label && (
@@ -50,12 +76,12 @@ export default function FormField<T extends object>({
                     {label}
                     {(required || error) && (
                         <sup className="text-danger ms-1">
-                            <i className="far fa-asterisk fa-xs"></i>
+                            <Icon style="Regular" name="asterisk" className="fa-xs" />
                         </sup>
                     )}
                     {error && (
                         <sup className="text-danger">
-                            <i className="far fa-exclamation ms-1"></i>
+                            <Icon style="Regular" name="exclamation" className="ms-1" />
                         </sup>
                     )}
                 </label>

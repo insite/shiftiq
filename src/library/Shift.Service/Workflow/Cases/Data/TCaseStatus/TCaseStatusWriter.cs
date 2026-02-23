@@ -9,23 +9,21 @@ public class TCaseStatusWriter : IEntityWriter
 {
     private readonly IDbContextFactory<TableDbContext> _context;
     private readonly TCaseStatusAdapter _adapter = new();
-    private readonly IShiftIdentityService _identity;
 
-    public TCaseStatusWriter(IDbContextFactory<TableDbContext> context, IShiftIdentityService identity)
+    public TCaseStatusWriter(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _identity = identity;
     }
 
-    public async Task<TCaseStatusEntity?> CreateAsync(CreateCaseStatus command, CancellationToken cancellation = default)
+    public async Task<TCaseStatusEntity?> CreateAsync(CreateCaseStatus command, Guid organization, CancellationToken cancellation = default)
     {
         var entity = _adapter.ToEntity(command);
         entity.StatusIdentifier = UniqueIdentifier.Create();
-        entity.OrganizationIdentifier = _identity.OrganizationId;
+        entity.OrganizationIdentifier = organization;
 
         using var db = _context.CreateDbContext();
 
-        var exists = await AssertAsync(entity.StatusIdentifier, cancellation, db);
+        var exists = await AssertAsync(entity.StatusIdentifier, organization, cancellation, db);
         if (exists)
             return null;
 
@@ -38,7 +36,7 @@ public class TCaseStatusWriter : IEntityWriter
     {
         using var db = _context.CreateDbContext();
 
-        var exists = await AssertAsync(entity.StatusIdentifier, cancellation, db);
+        var exists = await AssertAsync(entity.StatusIdentifier, entity.OrganizationIdentifier, cancellation, db);
         if (!exists)
             return false;
 
@@ -47,13 +45,13 @@ public class TCaseStatusWriter : IEntityWriter
         return await db.SaveChangesAsync(cancellation) > 0;
     }
 
-    public async Task<bool> DeleteAsync(Guid statusId, CancellationToken cancellation = default)
+    public async Task<bool> DeleteAsync(Guid status, Guid organization, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 
         var entity = await db.TCaseStatus.SingleOrDefaultAsync(
-            x => x.StatusIdentifier == statusId
-              && x.OrganizationIdentifier == _identity.OrganizationId,
+            x => x.StatusIdentifier == status
+              && x.OrganizationIdentifier == organization,
             cancellation);
 
         if (entity == null)
@@ -64,6 +62,6 @@ public class TCaseStatusWriter : IEntityWriter
         return await db.SaveChangesAsync(cancellation) > 0;
     }
 
-    private async Task<bool> AssertAsync(Guid statusId, CancellationToken cancellation, TableDbContext db)
-        => await db.TCaseStatus.AsNoTracking().AnyAsync(x => x.StatusIdentifier == statusId, cancellation);
+    private async Task<bool> AssertAsync(Guid status, Guid organization, CancellationToken cancellation, TableDbContext db)
+        => await db.TCaseStatus.AsNoTracking().AnyAsync(x => x.StatusIdentifier == status && x.OrganizationIdentifier == organization, cancellation);
 }

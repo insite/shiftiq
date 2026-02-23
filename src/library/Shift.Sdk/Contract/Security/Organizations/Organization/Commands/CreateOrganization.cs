@@ -4,13 +4,11 @@ namespace Shift.Contract
 {
     public class CreateOrganization
     {
-        public Guid? AdministratorUserIdentifier { get; set; }
-        public Guid? GlossaryIdentifier { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid? ParentOrganizationIdentifier { get; set; }
+        public Guid? AdministratorUserId { get; set; }
+        public Guid? GlossaryId { get; set; }
+        public Guid OrganizationId { get; set; }
 
         public string AccountStatus { get; set; }
-        public string CompanyDomain { get; set; }
         public string CompanyName { get; set; }
         public string CompanySize { get; set; }
         public string CompanySummary { get; set; }

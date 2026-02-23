@@ -36,7 +36,7 @@ namespace InSite.Admin.Events.Appointments.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Delete))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Delete))
                 NavigateToSearch();
 
             if (!ValidateEvent())

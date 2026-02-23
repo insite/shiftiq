@@ -25,6 +25,12 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries
                 new DownloadColumn("Sequence", "Sequence", null, 60),
                 new DownloadColumn("Created", "Created", null, 60),
                 new DownloadColumn("Status", "Status", null, 60),
+                new DownloadColumn("TrainingType", "Training Type", null, 45),
+                new DownloadColumn("Employer", "Employer", null, 45),
+                new DownloadColumn("Supervisor", "Supervisor", null, 45),
+                new DownloadColumn("ExperienceStarted", "Start Date", "MMM d, yyyy", 45),
+                new DownloadColumn("ExperienceStopped", "End Date", "MMM d, yyyy", 45),
+                new DownloadColumn("UserDepartment", "Department", null, 45),
             };
         }
 

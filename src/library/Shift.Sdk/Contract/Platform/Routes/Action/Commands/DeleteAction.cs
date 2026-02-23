@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteAction
     {
-        public Guid ActionIdentifier { get; set; }
+        public Guid ActionId { get; set; }
     }
 }

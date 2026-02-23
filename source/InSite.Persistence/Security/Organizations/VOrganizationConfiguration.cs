@@ -10,7 +10,6 @@ namespace InSite.Persistence
             HasKey(x => new { x.OrganizationIdentifier });
 
             Property(x => x.AccountStatus).IsRequired().IsUnicode(false).HasMaxLength(6);
-            Property(x => x.CompanyDomain).IsUnicode(false).HasMaxLength(50);
             Property(x => x.CompanyName).IsUnicode(false).HasMaxLength(50);
             Property(x => x.CompanySize).IsUnicode(false).HasMaxLength(10);
             Property(x => x.CompanySummary).IsUnicode(false);

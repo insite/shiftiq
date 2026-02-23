@@ -7,21 +7,21 @@ public class SubmissionAdapter : IEntityAdapter
 {
     public void Copy(ModifySubmission modify, SubmissionEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.SurveyFormIdentifier = modify.SurveyFormIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.SurveyFormIdentifier = modify.SurveyFormId;
         entity.ResponseSessionStatus = modify.ResponseSessionStatus;
-        entity.RespondentUserIdentifier = modify.RespondentUserIdentifier;
+        entity.RespondentUserIdentifier = modify.RespondentUserId;
         entity.RespondentLanguage = modify.RespondentLanguage;
         entity.ResponseIsLocked = modify.ResponseIsLocked;
         entity.ResponseSessionCreated = modify.ResponseSessionCreated;
         entity.ResponseSessionStarted = modify.ResponseSessionStarted;
         entity.ResponseSessionCompleted = modify.ResponseSessionCompleted;
-        entity.GroupIdentifier = modify.GroupIdentifier;
-        entity.PeriodIdentifier = modify.PeriodIdentifier;
+        entity.GroupIdentifier = modify.GroupId;
+        entity.PeriodIdentifier = modify.PeriodId;
         entity.LastChangeTime = modify.LastChangeTime;
         entity.LastChangeType = modify.LastChangeType;
         entity.LastChangeUser = modify.LastChangeUser;
-        entity.LastAnsweredQuestionIdentifier = modify.LastAnsweredQuestionIdentifier;
+        entity.LastAnsweredQuestionIdentifier = modify.LastAnsweredQuestionId;
 
     }
 
@@ -36,22 +36,22 @@ public class SubmissionAdapter : IEntityAdapter
     {
         var entity = new SubmissionEntity
         {
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            SurveyFormIdentifier = create.SurveyFormIdentifier,
-            ResponseSessionIdentifier = create.ResponseSessionIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            SurveyFormIdentifier = create.SurveyFormId,
+            ResponseSessionIdentifier = create.ResponseSessionId,
             ResponseSessionStatus = create.ResponseSessionStatus,
-            RespondentUserIdentifier = create.RespondentUserIdentifier,
+            RespondentUserIdentifier = create.RespondentUserId,
             RespondentLanguage = create.RespondentLanguage,
             ResponseIsLocked = create.ResponseIsLocked,
             ResponseSessionCreated = create.ResponseSessionCreated,
             ResponseSessionStarted = create.ResponseSessionStarted,
             ResponseSessionCompleted = create.ResponseSessionCompleted,
-            GroupIdentifier = create.GroupIdentifier,
-            PeriodIdentifier = create.PeriodIdentifier,
+            GroupIdentifier = create.GroupId,
+            PeriodIdentifier = create.PeriodId,
             LastChangeTime = create.LastChangeTime,
             LastChangeType = create.LastChangeType,
             LastChangeUser = create.LastChangeUser,
-            LastAnsweredQuestionIdentifier = create.LastAnsweredQuestionIdentifier
+            LastAnsweredQuestionIdentifier = create.LastAnsweredQuestionId
         };
         return entity;
     }
@@ -65,22 +65,22 @@ public class SubmissionAdapter : IEntityAdapter
     {
         var model = new SubmissionModel
         {
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            SurveyFormIdentifier = entity.SurveyFormIdentifier,
-            ResponseSessionIdentifier = entity.ResponseSessionIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            SurveyFormId = entity.SurveyFormIdentifier,
+            ResponseSessionId = entity.ResponseSessionIdentifier,
             ResponseSessionStatus = entity.ResponseSessionStatus,
-            RespondentUserIdentifier = entity.RespondentUserIdentifier,
+            RespondentUserId = entity.RespondentUserIdentifier,
             RespondentLanguage = entity.RespondentLanguage,
             ResponseIsLocked = entity.ResponseIsLocked,
             ResponseSessionCreated = entity.ResponseSessionCreated,
             ResponseSessionStarted = entity.ResponseSessionStarted,
             ResponseSessionCompleted = entity.ResponseSessionCompleted,
-            GroupIdentifier = entity.GroupIdentifier,
-            PeriodIdentifier = entity.PeriodIdentifier,
+            GroupId = entity.GroupIdentifier,
+            PeriodId = entity.PeriodIdentifier,
             LastChangeTime = entity.LastChangeTime,
             LastChangeType = entity.LastChangeType,
             LastChangeUser = entity.LastChangeUser,
-            LastAnsweredQuestionIdentifier = entity.LastAnsweredQuestionIdentifier
+            LastAnsweredQuestionId = entity.LastAnsweredQuestionIdentifier
         };
 
         return model;
@@ -95,7 +95,7 @@ public class SubmissionAdapter : IEntityAdapter
     {
         var match = new SubmissionMatch
         {
-            ResponseSessionIdentifier = entity.ResponseSessionIdentifier
+            ResponseSessionId = entity.ResponseSessionIdentifier
 
         };
 

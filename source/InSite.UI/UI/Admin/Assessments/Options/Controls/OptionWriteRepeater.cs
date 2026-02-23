@@ -363,7 +363,7 @@ namespace InSite.Admin.Assessments.Options.Controls
                     continue;
 
                 if (!CanRemove(OptionItems.QuestionIdentifier, option.Number, out var removeError))
-                    throw new ApplicationError(removeError);
+                    throw new InvalidOperationException(removeError);
 
                 commands.Add(new DeleteOption(question.Set.Bank.Identifier, question.Identifier, option.Number));
             }

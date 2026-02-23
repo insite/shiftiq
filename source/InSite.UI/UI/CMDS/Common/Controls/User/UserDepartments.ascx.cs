@@ -166,7 +166,7 @@ namespace InSite.Custom.CMDS.Admin.People.Controls
                 }
                 else
                 {
-                    OrganizationIdentifier.Value = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                    OrganizationIdentifier.Value = Organization.Identifier;
                     OrganizationIdentifier.Enabled = false;
                 }
             }

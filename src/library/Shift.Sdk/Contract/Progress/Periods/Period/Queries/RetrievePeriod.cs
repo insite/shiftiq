@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrievePeriod : Query<PeriodModel>
     {
-        public Guid PeriodIdentifier { get; set; }
+        public Guid PeriodId { get; set; }
     }
 }

@@ -35,7 +35,7 @@ namespace InSite.UI.Admin.Standards
             CountCollections();
             CountDocuments();
 
-            var canWrite = Identity.IsGranted(PermissionIdentifiers.Admin_Standards, PermissionOperation.Write);
+            var canWrite = Identity.IsGranted(PermissionIdentifiers.Admin_Standards, DataAccess.Update);
 
             UploadStandardsRow.Visible = canWrite;
             TroubleshootStanradrs.Visible = canWrite;

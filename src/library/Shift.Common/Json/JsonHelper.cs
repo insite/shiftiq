@@ -38,7 +38,7 @@ namespace Shift.Common
 
             var jObj = JObject.Parse(json);
 
-            return IsSameType<T>(jObj) ? jObj.ToObject<T>() : throw new ApplicationError("Unexpected JSON object type");
+            return IsSameType<T>(jObj) ? jObj.ToObject<T>() : throw new FormatException("Unexpected JSON object type");
         }
 
         public static bool IsSameType<T>(string json)

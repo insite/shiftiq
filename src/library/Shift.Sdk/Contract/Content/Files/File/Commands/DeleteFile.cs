@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteFile
     {
-        public Guid FileIdentifier { get; set; }
+        public Guid FileId { get; set; }
     }
 }

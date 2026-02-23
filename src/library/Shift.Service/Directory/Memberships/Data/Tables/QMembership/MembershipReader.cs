@@ -13,32 +13,29 @@ public class MembershipReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "MembershipIdentifier";
 
-    public MembershipReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public MembershipReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid membership, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid membership, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, false);
+            var query = db.QMembership.AsNoTracking();
 
-            return query.AnyAsync(x => x.MembershipIdentifier == membership, cancellation);
+            return query.AnyAsync(x => x.MembershipIdentifier == membership && (organization == null || organization == x.OrganizationIdentifier), cancellation);
 
         }, cancellation);
     }
 
-    public Task<List<MembershipEntity>> CollectAsync(IMembershipCriteria criteria, CancellationToken cancellation = default)
+    public Task<List<MembershipEntity>> CollectAsync(IMembershipCriteria criteria, Guid currentUserId, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, criteria);
+            var query = BuildQueryable(db, criteria, currentUserId);
 
             return query
                 .OrderBy(criteria.Filter.Sort ?? DefaultSort)
@@ -48,22 +45,22 @@ public class MembershipReader : IEntityReader
         }, cancellation);
     }
 
-    public Task<int> CountAsync(IMembershipCriteria criteria, CancellationToken cancellation = default)
+    public Task<int> CountAsync(IMembershipCriteria criteria, Guid currentUserId, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, criteria);
+            var query = BuildQueryable(db, criteria, currentUserId);
 
             return query.CountAsync(cancellation);
 
         }, cancellation);
     }
 
-    public async IAsyncEnumerable<MembershipEntity> DownloadAsync(IMembershipCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation = default)
+    public async IAsyncEnumerable<MembershipEntity> DownloadAsync(IMembershipCriteria criteria, Guid currentUserId, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 
-        var query = BuildQueryable(db, criteria);
+        var query = BuildQueryable(db, criteria, currentUserId);
 
         await foreach (var entity in query.AsAsyncEnumerable().WithCancellation(cancellation))
         {
@@ -75,18 +72,18 @@ public class MembershipReader : IEntityReader
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, false);
+            var query = db.QMembership.AsNoTracking();
 
             return query.FirstOrDefaultAsync(x => x.MembershipIdentifier == membership, cancellation);
 
         }, cancellation);
     }
 
-    public Task<List<MembershipMatch>> SearchAsync(IMembershipCriteria criteria, CancellationToken cancellation = default)
+    public Task<List<MembershipMatch>> SearchAsync(IMembershipCriteria criteria, Guid currentUserId, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
-            var query = BuildQueryable(db, criteria);
+            var query = BuildQueryable(db, criteria, currentUserId);
 
             query = query
                 .OrderBy(criteria.Filter.Sort ?? DefaultSort)
@@ -107,30 +104,28 @@ public class MembershipReader : IEntityReader
     /// </remarks>
     private IQueryable<MembershipEntity> BuildQueryable(TableDbContext db, bool isPartitionQuery)
     {
-        ValidateOrganizationContext();
-
         var query = db.QMembership
-            .AsNoTracking()
-            .Where(x => isPartitionQuery || x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
 
-    private IQueryable<MembershipEntity> BuildQueryable(TableDbContext db, IMembershipCriteria criteria)
+    private IQueryable<MembershipEntity> BuildQueryable(TableDbContext db, IMembershipCriteria criteria, Guid currentUserId)
     {
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         // If the user is an operator for the partition then the user is allowed to run a partition-wide query.
 
-        var userId = _auth.GetPrincipal().User.Identifier;
-
         var partitionId = OrganizationIdentifiers.Global;
 
-        var allowPartitionQuery = db.QPerson.Any(p => p.UserIdentifier == userId && p.OrganizationIdentifier == partitionId && p.IsOperator);
+        var allowPartitionQuery = db.QPerson.Any(p => p.UserIdentifier == currentUserId && p.OrganizationIdentifier == partitionId && p.IsOperator);
 
         var query = BuildQueryable(db, allowPartitionQuery && criteria.AccountScope == "Partition");
 
         // TODO: Apply criteria
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
 
         return query;
     }
@@ -147,17 +142,11 @@ public class MembershipReader : IEntityReader
         var matches = await queryable
             .Select(entity => new MembershipMatch
             {
-                MembershipIdentifier = entity.MembershipIdentifier
+                MembershipId = entity.MembershipIdentifier
 
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

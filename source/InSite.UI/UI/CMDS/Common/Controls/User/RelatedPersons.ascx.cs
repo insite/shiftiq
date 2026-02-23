@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Web.UI;
 
+using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
+using Shift.Common;
 using Shift.Constant;
 
 using PersonFilter = InSite.Persistence.Plugin.CMDS.CmdsPersonFilter;
 
 namespace InSite.Cmds.Controls.User
 {
-    public partial class RelatedPersons : UserControl
+    public partial class RelatedPersons : BaseUserControl
     {
         #region Fields
 
@@ -56,7 +57,7 @@ namespace InSite.Cmds.Controls.User
 
             var filter = new PersonFilter
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 ParentUserIdentifier = personID,
                 ExcludeUserIdentifier = personID,
 
@@ -73,12 +74,12 @@ namespace InSite.Cmds.Controls.User
             var workersPermission = PermissionNames.Custom_CMDS_Workers;
 
             GroupCompetencySummary.Visible = employees.Rows.Count > 0 && (
-                   CurrentSessionState.Identity.IsGranted(workersPermission, PermissionOperation.Delete)
-                || CurrentSessionState.Identity.IsGranted(workersPermission, PermissionOperation.Configure)
-                || CurrentSessionState.Identity.IsGranted(workersPermission, PermissionOperation.Delete)
-                || CurrentSessionState.Identity.IsGranted(workersPermission, PermissionOperation.Configure));
+                   CurrentSessionState.Identity.IsGranted(workersPermission, DataAccess.Delete)
+                || CurrentSessionState.Identity.IsGranted(workersPermission, DataAccess.Configure)
+                || CurrentSessionState.Identity.IsGranted(workersPermission, DataAccess.Delete)
+                || CurrentSessionState.Identity.IsGranted(workersPermission, DataAccess.Configure));
 
-            GroupCompetencySummary.LoadData(personID, CurrentIdentityFactory.ActiveOrganizationIdentifier,
+            GroupCompetencySummary.LoadData(personID, Organization.Identifier,
                 CompetencySummaryType.ManagerGroup);
 
             //Students

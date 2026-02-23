@@ -6,10 +6,6 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Linq.Expressions;
 
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-using Shift.Common.Timeline.Snapshots;
-
 using InSite.Application;
 using InSite.Application.Attempts.Read;
 using InSite.Application.Banks.Read;
@@ -40,6 +36,9 @@ using InSite.Persistence.Integration.Moodle;
 using InSite.Persistence.Plugin.CMDS;
 using InSite.Persistence.Plugin.NCSHA;
 
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
+using Shift.Common.Timeline.Snapshots;
 using Shift.Toolbox.Integration.DirectAccess;
 
 namespace InSite.Persistence
@@ -59,7 +58,6 @@ namespace InSite.Persistence
         public DbSet<ApiRequest> ApiRequests { get; set; }
         public DbSet<ArchivedFollower> ArchivedFollowers { get; set; }
         public DbSet<ArchivedSubscriber> ArchivedSubscribers { get; set; }
-        public DbSet<TLearnerAttemptSummary> TLearnerAttemptSummaries { get; set; }
         public DbSet<CompanyDepartment> CompanyDepartments { get; set; }
         public DbSet<CompetencyValidationSummary> CompetencyValidationSummaries { get; set; }
         public DbSet<ContactExperience> ContactExperiences { get; set; }
@@ -77,42 +75,43 @@ namespace InSite.Persistence
         public DbSet<LtiLaunch> LtiLaunchs { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Occupation> Occupations { get; set; }
+        public DbSet<OrganizationPermission> OrganizationPermissions { get; set; }
+        public DbSet<OrphanFile> VOrphanFiles { get; set; }
         public DbSet<Person> Persons { get; set; }
-        public DbSet<QPerson> QPersons { get; set; }
-        public DbSet<QPersonSecret> QPersonSecrets { get; set; }
-        public DbSet<QPersonAddress> QPersonAddresses { get; set; }
-        public DbSet<VDevPerson> VDevPersons { get; set; }
         public DbSet<QAccommodation> Accommodations { get; set; }
         public DbSet<QAchievement> QAchievements { get; set; }
         public DbSet<QAchievementPrerequisite> QAchievementPrerequisites { get; set; }
+        public DbSet<QActivity> QActivities { get; set; }
+        public DbSet<QActivityCompetency> QActivityCompetencies { get; set; }
         public DbSet<QAreaRequirement> QAreaRequirements { get; set; }
         public DbSet<QAttempt> QAttempts { get; set; }
         public DbSet<QAttemptMatch> QAttemptMatches { get; set; }
         public DbSet<QAttemptOption> QAttemptOptions { get; set; }
-        public DbSet<QAttemptQuestion> QAttemptQuestions { get; set; }
         public DbSet<QAttemptPin> QAttemptPins { get; set; }
+        public DbSet<QAttemptQuestion> QAttemptQuestions { get; set; }
         public DbSet<QAttemptSection> QAttemptSections { get; set; }
         public DbSet<QAttemptSolution> QAttemptSolutions { get; set; }
-        public DbSet<VPerformanceReport> VPerformanceReports { get; set; }
         public DbSet<QBank> Banks { get; set; }
         public DbSet<QBankForm> BankForms { get; set; }
         public DbSet<QBankOption> BankOptions { get; set; }
         public DbSet<QBankQuestion> BankQuestions { get; set; }
-        public DbSet<QBankQuestionGradeItem> BankQuestionGradeItems { get; set; }
         public DbSet<QBankQuestionAttachment> BankQuestionAttachments { get; set; }
+        public DbSet<QBankQuestionGradeItem> BankQuestionGradeItems { get; set; }
         public DbSet<QBankQuestionSubCompetency> BankQuestionSubCompetencies { get; set; }
         public DbSet<QBankSpecification> BankSpecifications { get; set; }
         public DbSet<QClick> Clickthroughs { get; set; }
         public DbSet<QComment> QComments { get; set; }
         public DbSet<QCompetencyRequirement> QCompetencyRequirements { get; set; }
+        public DbSet<QCourse> QCourses { get; set; }
+        public DbSet<QCourseEnrollment> QCourseEnrollments { get; set; }
+        public DbSet<QCoursePrerequisite> QCoursePrerequisites { get; set; }
         public DbSet<QCredential> QCredentials { get; set; }
         public DbSet<QCredentialHistory> QCredentialHistories { get; set; }
-        public DbSet<QRecipient> Recipients { get; set; }
         public DbSet<QEnrollment> QEnrollments { get; set; }
         public DbSet<QEnrollmentHistory> QEnrollmentHistories { get; set; }
         public DbSet<QEvent> Events { get; set; }
-        public DbSet<QEventAttendee> EventAttendees { get; set; }
         public DbSet<QEventAssessmentForm> EventAssessmentForms { get; set; }
+        public DbSet<QEventAttendee> EventAttendees { get; set; }
         public DbSet<QEventTimer> EventTimers { get; set; }
         public DbSet<QExperience> QExperiences { get; set; }
         public DbSet<QExperienceCompetency> QExperienceCompetencies { get; set; }
@@ -120,25 +119,27 @@ namespace InSite.Persistence
         public DbSet<QGlossaryTerm> GlossaryTerms { get; set; }
         public DbSet<QGlossaryTermContent> GlossaryTermContents { get; set; }
         public DbSet<QGradebook> QGradebooks { get; set; }
+        public DbSet<QGradebookCompetencyValidation> QGradebookCompetencyValidations { get; set; }
         public DbSet<QGradebookEvent> QGradebookEvents { get; set; }
         public DbSet<QGradeItem> QGradeItems { get; set; }
         public DbSet<QGradeItemCompetency> QGradeItemCompetencies { get; set; }
         public DbSet<QGroup> QGroups { get; set; }
         public DbSet<QGroupAddress> QGroupAddresses { get; set; }
         public DbSet<QGroupConnection> QGroupConnections { get; set; }
+        public DbSet<QGroupEnrollment> QGroupEnrollments { get; set; }
         public DbSet<QGroupTag> QGroupTags { get; set; }
         public DbSet<QInvoice> QInvoices { get; set; }
         public DbSet<QInvoiceItem> QInvoiceItems { get; set; }
         public DbSet<QIssue> QIssues { get; set; }
         public DbSet<QIssueAttachment> QIssueAttachments { get; set; }
-        public DbSet<QIssueGroup> QIssueGroups { get; set; }
         public DbSet<QIssueFileRequirement> QIssueFileRequirements { get; set; }
+        public DbSet<QIssueGroup> QIssueGroups { get; set; }
         public DbSet<QIssueUser> QIssueUsers { get; set; }
         public DbSet<QJournal> QJournals { get; set; }
         public DbSet<QJournalSetup> QJournalSetups { get; set; }
         public DbSet<QJournalSetupField> QJournalSetupFields { get; set; }
-        public DbSet<QJournalSetupUser> QJournalSetupUsers { get; set; }
         public DbSet<QJournalSetupGroup> QJournalSetupGroups { get; set; }
+        public DbSet<QJournalSetupUser> QJournalSetupUsers { get; set; }
         public DbSet<QLearnerProgramSummary> QLearnerProgramSummaries { get; set; }
         public DbSet<QLink> Links { get; set; }
         public DbSet<QMailout> Mailouts { get; set; }
@@ -146,21 +147,26 @@ namespace InSite.Persistence
         public DbSet<QMembershipDeletion> QMembershipDeletions { get; set; }
         public DbSet<QMembershipReason> QMembershipReasons { get; set; }
         public DbSet<QMessage> Messages { get; set; }
+        public DbSet<QModule> QModules { get; set; }
         public DbSet<QOrganization> QOrganizations { get; set; }
         public DbSet<QPage> QPages { get; set; }
         public DbSet<QPayment> QPayments { get; set; }
         public DbSet<QPeriod> QPeriods { get; set; }
+        public DbSet<QPerson> QPersons { get; set; }
+        public DbSet<QPersonAddress> QPersonAddresses { get; set; }
+        public DbSet<QPersonSecret> QPersonSecrets { get; set; }
         public DbSet<QProgress> QProgresses { get; set; }
         public DbSet<QProgressHistory> QProgressHistories { get; set; }
+        public DbSet<QRecipient> Recipients { get; set; }
         public DbSet<QRegistration> Registrations { get; set; }
         public DbSet<QRegistrationInstructor> RegistrationInstructors { get; set; }
         public DbSet<QRegistrationTimer> Timers { get; set; }
         public DbSet<QResponseAnswer> QResponseAnswers { get; set; }
         public DbSet<QResponseOption> QResponseOptions { get; set; }
         public DbSet<QResponseSession> QResponseSessions { get; set; }
-        public DbSet<VResponse> VResponses { get; set; }
-        public DbSet<VResponseFirstComment> VResponseFirstComments { get; set; }
-        public DbSet<VResponseFirstSelection> VResponseFirstSelections { get; set; }
+        public DbSet<QRubric> QRubrics { get; set; }
+        public DbSet<QRubricCriterion> QRubricCriteria { get; set; }
+        public DbSet<QRubricRating> QRubricRatings { get; set; }
         public DbSet<QSeat> Seats { get; set; }
         public DbSet<QSite> QSites { get; set; }
         public DbSet<QStandard> QStandards { get; set; }
@@ -171,6 +177,8 @@ namespace InSite.Persistence
         public DbSet<QStandardGroup> QStandardGroups { get; set; }
         public DbSet<QStandardOrganization> QStandardOrganizations { get; set; }
         public DbSet<QStandardTier> QStandardTiers { get; set; }
+        public DbSet<QStandardValidation> QStandardValidations { get; set; }
+        public DbSet<QStandardValidationLog> QStandardValidationLogs { get; set; }
         public DbSet<QSubscriberGroup> SubscriberGroups { get; set; }
         public DbSet<QSubscriberUser> SubscriberUsers { get; set; }
         public DbSet<QSurveyCondition> QSurveyConditions { get; set; }
@@ -178,11 +186,15 @@ namespace InSite.Persistence
         public DbSet<QSurveyOptionItem> QSurveyOptionItems { get; set; }
         public DbSet<QSurveyOptionList> QSurveyOptionLists { get; set; }
         public DbSet<QSurveyQuestion> QSurveyQuestions { get; set; }
-        public DbSet<QGradebookCompetencyValidation> QGradebookCompetencyValidations { get; set; }
-        public DbSet<QStandardValidation> QStandardValidations { get; set; }
-        public DbSet<QStandardValidationLog> QStandardValidationLogs { get; set; }
+        public DbSet<QUnit> QUnits { get; set; }
+        public DbSet<QUser> QUsers { get; set; }
+        public DbSet<QUserConnection> QUserConnections { get; set; }
         public DbSet<ResourceCommentSummary> ResourceCommentSummaries { get; set; }
+        public DbSet<RoleRouteAccess> RoleRouteAccesses { get; set; }
         public DbSet<RoleSummary> RoleSummaries { get; set; }
+        public DbSet<Shift.Common.RouteEndpoint> RouteEndpoints { get; set; }
+        public DbSet<Shift.Common.RouteNavigationNode> RouteNavigationNodes { get; set; }
+        public DbSet<Shift.Common.RoutePermissionNode> RoutePermissionNodes { get; set; }
         public DbSet<SerializedAggregate> Aggregates { get; set; }
         public DbSet<SerializedChange> Changes { get; set; }
         public DbSet<SerializedCommand> Commands { get; set; }
@@ -196,46 +208,44 @@ namespace InSite.Persistence
         public DbSet<StandardOrganization> StandardOrganizations { get; set; }
         public DbSet<StandardValidation> StandardValidations { get; set; }
         public DbSet<StandardValidationChange> StandardValidationChanges { get; set; }
-        public DbSet<TCatalog> TCatalogs { get; set; }
-        public DbSet<TCourseCategory> TCourseCategories { get; set; }
         public DbSet<TAchievementCategory> TAchievementCategories { get; set; }
-        public DbSet<VAchievementCategory> VAchievementCategories { get; set; }
-        public DbSet<VAchievementClassification> VAchievementClassifications { get; set; }
         public DbSet<TAchievementDepartment> TAchievementDepartments { get; set; }
         public DbSet<TAchievementOrganization> TAchievementOrganizations { get; set; }
         public DbSet<TAchievementStandard> TAchievementStandards { get; set; }
         public DbSet<TAction> TActions { get; set; }
         public DbSet<TActivityCompetency> TActivityCompetencies { get; set; }
+        public DbSet<TCaseStatus> TCaseStatuses { get; set; }
+        public DbSet<TCatalog> TCatalogs { get; set; }
         public DbSet<TCertificateLayout> TCertificateLayouts { get; set; }
         public DbSet<TCollection> TCollections { get; set; }
         public DbSet<TCollectionItem> TCollectionItems { get; set; }
         public DbSet<TCollegeCertificate> TCollegeCertificates { get; set; }
         public DbSet<TContent> TContents { get; set; }
+        public DbSet<TCourseCategory> TCourseCategories { get; set; }
+        public DbSet<TCourseDistribution> TCourseDistributions { get; set; }
         public DbSet<TDepartmentStandard> TDepartmentStandards { get; set; }
         public DbSet<TDiscount> TDiscounts { get; set; }
-        public DbSet<VOrganization> Organizations { get; set; }
-        public DbSet<TCourseDistribution> TCourseDistributions { get; set; }
+        public DbSet<TFile> TFiles { get; set; }
+        public DbSet<TFileActivity> TFileActivities { get; set; }
+        public DbSet<TFileClaim> TFileClaims { get; set; }
         public DbSet<TGroupPermission> TGroupPermissions { get; set; }
         public DbSet<TGroupSetting> TGroupSetting { get; set; }
-        public DbSet<TCaseStatus> TCaseStatuses { get; set; }
+        public DbSet<TLearnerAttemptSummary> TLearnerAttemptSummaries { get; set; }
         public DbSet<TLtiLink> LtiLinks { get; set; }
         public DbSet<TMeasurement> Measurements { get; set; }
-        public DbSet<TPartitionSettingEntity> TPartitionSettings { get; set; }
+        public DbSet<TMoodleEvent> TMoodleEvents { get; set; }
+        public DbSet<TOrder> TOrders { get; set; }
+        public DbSet<TOrderItem> TOrderItems { get; set; }
         public DbSet<TPersonField> TPersonFields { get; set; }
         public DbSet<TPrerequisite> TPrerequisites { get; set; }
         public DbSet<TProduct> TProducts { get; set; }
-        public DbSet<TOrder> TOrders { get; set; }
-        public DbSet<TOrderItem> TOrderItems { get; set; }
         public DbSet<TProgram> TPrograms { get; set; }
         public DbSet<TProgramCategory> TProgramCategories { get; set; }
         public DbSet<TProgramEnrollment> TProgramEnrollments { get; set; }
         public DbSet<TProgramGroupEnrollment> TProgramGroupEnrollments { get; set; }
-        public DbSet<TTax> TTaxes { get; set; }
+        public DbSet<TQuiz> TQuizzes { get; set; }
+        public DbSet<TQuizAttempt> TQuizAttempts { get; set; }
         public DbSet<TReport> TReports { get; set; }
-        public DbSet<QRubric> QRubrics { get; set; }
-        public DbSet<QRubricCriterion> QRubricCriteria { get; set; }
-        public DbSet<QRubricRating> QRubricRatings { get; set; }
-        public DbSet<TMoodleEvent> TMoodleEvents { get; set; }
         public DbSet<TScormEvent> TScormEvents { get; set; }
         public DbSet<TScormRegistration> TScormRegistrations { get; set; }
         public DbSet<TScormRegistrationActivity> TScormRegistrationActivities { get; set; }
@@ -244,6 +254,7 @@ namespace InSite.Persistence
         public DbSet<TSenderOrganization> TSenderOrganizations { get; set; }
         public DbSet<TTask> TTasks { get; set; }
         public DbSet<TTaskEnrollment> TTaskEnrollments { get; set; }
+        public DbSet<TTax> TTaxes { get; set; }
         public DbSet<TUserAuthenticationFactor> TUserAuthenticationFactors { get; set; }
         public DbSet<TUserSession> TUserSessions { get; set; }
         public DbSet<TUserSessionCache> TUserSessionCaches { get; set; }
@@ -255,21 +266,22 @@ namespace InSite.Persistence
         public DbSet<User> Users { get; set; }
         public DbSet<UserConnection> UserConnections { get; set; }
         public DbSet<UserRegistrationDetail> UserRegistrationDetails { get; set; }
-        public DbSet<QUser> QUsers { get; set; }
-        public DbSet<QUserConnection> QUserConnections { get; set; }
         public DbSet<VAchievement> VAchievements { get; set; }
+        public DbSet<VAchievementCategory> VAchievementCategories { get; set; }
+        public DbSet<VAchievementClassification> VAchievementClassifications { get; set; }
         public DbSet<VActivityCompetency> VActivityCompetencies { get; set; }
         public DbSet<VAddress> VAddresses { get; set; }
         public DbSet<VAssessmentPage> VAssessmentPages { get; set; }
         public DbSet<VAttendance> Attendances { get; set; }
         public DbSet<VBank> VBanks { get; set; }
+        public DbSet<VCatalogCourse> VCatalogCourses { get; set; }
+        public DbSet<VCatalogProgram> VCatalogPrograms { get; set; }
         public DbSet<VClick> VClicks { get; set; }
         public DbSet<VComment> VComments { get; set; }
         public DbSet<VCompetency> VCompetencies { get; set; }
         public DbSet<VCourse> VCourses { get; set; }
-        public DbSet<VCatalogCourse> VCatalogCourses { get; set; }
-        public DbSet<VCatalogProgram> VCatalogPrograms { get; set; }
         public DbSet<VCredential> VCredentials { get; set; }
+        public DbSet<VDevPerson> VDevPersons { get; set; }
         public DbSet<VExamEventSchedule> VExamEventSchedules { get; set; }
         public DbSet<VFollower> XFollowers { get; set; }
         public DbSet<VFramework> Frameworks { get; set; }
@@ -287,13 +299,17 @@ namespace InSite.Persistence
         public DbSet<VMailout> XMailouts { get; set; }
         public DbSet<VMembership> VMemberships { get; set; }
         public DbSet<VMessage> XMessages { get; set; }
-        public DbSet<OrphanFile> VOrphanFiles { get; set; }
+        public DbSet<VOrganization> Organizations { get; set; }
         public DbSet<VOrganizationGroupAddress> VOrganizationGroupAddresses { get; set; }
         public DbSet<VOrganizationPersonAddress> VOrganizationPersonAddresses { get; set; }
+        public DbSet<VPerformanceReport> VPerformanceReports { get; set; }
         public DbSet<VPerson> VPersons { get; set; }
         public DbSet<VProgram> VPrograms { get; set; }
         public DbSet<VProgramEnrollment> VProgramEnrollments { get; set; }
         public DbSet<VReport> VReports { get; set; }
+        public DbSet<VResponse> VResponses { get; set; }
+        public DbSet<VResponseFirstComment> VResponseFirstComments { get; set; }
+        public DbSet<VResponseFirstSelection> VResponseFirstSelections { get; set; }
         public DbSet<VStandard> VStandards { get; set; }
         public DbSet<VStatement> VStatements { get; set; }
         public DbSet<VSubscriberGroup> VSubscriberGroups { get; set; }
@@ -307,18 +323,6 @@ namespace InSite.Persistence
         public DbSet<XRegistrationTimer> XTimers { get; set; }
         public DbSet<XSubscriberPerson> XSubscriberPersons { get; set; }
         public DbSet<XSubscriberUser> XSubscriberUsers { get; set; }
-        public DbSet<TFile> TFiles { get; set; }
-        public DbSet<TFileActivity> TFileActivities { get; set; }
-        public DbSet<TFileClaim> TFileClaims { get; set; }
-        public DbSet<TQuiz> TQuizzes { get; set; }
-        public DbSet<TQuizAttempt> TQuizAttempts { get; set; }
-        public DbSet<QActivityCompetency> QActivityCompetencies { get; set; }
-        public DbSet<QActivity> QActivities { get; set; }
-        public DbSet<QCourse> QCourses { get; set; }
-        public DbSet<QCourseEnrollment> QCourseEnrollments { get; set; }
-        public DbSet<QCoursePrerequisite> QCoursePrerequisites { get; set; }
-        public DbSet<QModule> QModules { get; set; }
-        public DbSet<QUnit> QUnits { get; set; }
 
         #endregion
 
@@ -473,6 +477,7 @@ namespace InSite.Persistence
             builder.Configurations.Add(new QGroupAddressConfiguration());
             builder.Configurations.Add(new QGroupConfiguration());
             builder.Configurations.Add(new QGroupConnectionConfiguration());
+            builder.Configurations.Add(new QGroupEnrollmentConfiguration());
             builder.Configurations.Add(new QGroupTagConfiguration());
             builder.Configurations.Add(new QInvoiceConfiguration());
             builder.Configurations.Add(new QInvoiceItemConfiguration());
@@ -540,7 +545,11 @@ namespace InSite.Persistence
             builder.Configurations.Add(new QStandardValidationConfiguration());
             builder.Configurations.Add(new QStandardValidationLogConfiguration());
             builder.Configurations.Add(new ResourceCommentSummaryConfiguration());
+            builder.Configurations.Add(new RoleRouteAccessConfiguration());
             builder.Configurations.Add(new RoleSummaryConfiguration());
+            builder.Configurations.Add(new RouteEndpointConfiguration());
+            builder.Configurations.Add(new RouteNavigationNodeConfiguration());
+            builder.Configurations.Add(new RoutePermissionNodeConfiguration());
             builder.Configurations.Add(new SnapshotConfiguration());
             builder.Configurations.Add(new StandardClassificationConfiguration());
             builder.Configurations.Add(new StandardConfiguration());
@@ -580,7 +589,6 @@ namespace InSite.Persistence
             builder.Configurations.Add(new TCaseStatusConfiguration());
             builder.Configurations.Add(new TLtiLinkConfiguration());
             builder.Configurations.Add(new TMeasurementConfiguration());
-            builder.Configurations.Add(new TPartitionSettingConfiguration());
             builder.Configurations.Add(new TPersonFieldConfiguration());
             builder.Configurations.Add(new TPrerequisiteConfiguration());
             builder.Configurations.Add(new TProductConfiguration());
@@ -677,6 +685,7 @@ namespace InSite.Persistence
             builder.Configurations.Add(new QModuleConfiguration());
             builder.Configurations.Add(new QUnitConfiguration());
             builder.Configurations.Add(new VCourseConfiguration());
+            builder.Configurations.Add(new OrganizationPermissionConfiguration());
 
             #region Custom
 

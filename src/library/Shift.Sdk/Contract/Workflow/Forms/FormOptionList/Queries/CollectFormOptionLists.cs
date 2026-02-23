@@ -7,8 +7,8 @@ namespace Shift.Contract
 {
     public class CollectFormOptionLists : Query<IEnumerable<FormOptionListModel>>, IFormOptionListCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? SurveyQuestionIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? SurveyQuestionId { get; set; }
 
         public int? SurveyOptionListSequence { get; set; }
     }

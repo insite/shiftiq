@@ -10,11 +10,11 @@
                 <div class="col-4">
                     <insite:UpdatePanel runat="server" ID="UpdatePanel">
                         <ContentTemplate>
-                    
+
                             <div class="mb-2">
                                 <insite:FindWorkflowForm runat="server" ID="SurveyID" EmptyMessage="Form" />
                             </div>  
-                    
+
                             <div class="mb-2">
                                 <insite:FormQuestionComboBox runat="server" ID="QuestionID" EmptyMessage="Question" MaxTextLength="40" ExcludeSpecialQuestions="true" />
                             </div>
@@ -33,7 +33,11 @@
                     <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="UpdatePanel" />
 
                     <div class="mb-2">
-                        <insite:TextBox runat="server" ID="RespondentName" EmptyMessage="Respondent" MaxLength="256" />
+                        <insite:TextBox runat="server" ID="RespondentName" EmptyMessage="Respondent Name" MaxLength="256" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:TextBox runat="server" ID="AssessorName" EmptyMessage="Assessor Name" MaxLength="256" />
                     </div>
 
                     <div class="mb-2">

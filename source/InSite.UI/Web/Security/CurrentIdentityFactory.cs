@@ -58,9 +58,7 @@ namespace InSite
         {
             try
             {
-                var search = new CurrentIdentitySearch();
-
-                var identity = search.Get(
+                var identity = CurrentIdentitySearch.Get(
                     token.UserEmail,
                     organizationCode,
                     token.Language,
@@ -120,20 +118,20 @@ namespace InSite
             HttpResponseHelper.Redirect(url);
         }
 
-        public static Guid ActiveOrganizationIdentifier
+        private static Guid OrganizationIdentifier
             => CurrentSessionState.Identity.Organization.Identifier;
 
         public static Guid? GetOrganizationIdentifier(Guid userThumbprint)
         {
-            return PersonalizationRepository.GetValue<Guid?>(Guid.Empty, userThumbprint, nameof(ActiveOrganizationIdentifier), false);
+            return PersonalizationRepository.GetValue<Guid?>(Guid.Empty, userThumbprint, nameof(OrganizationIdentifier), false);
         }
 
         public static void SetOrganization(Guid organizationId, string organizationCode, string url, Guid user)
         {
             if (user != null)
-                PersonalizationRepository.SetValue<Guid?>(Guid.Empty, user, nameof(ActiveOrganizationIdentifier), organizationId);
+                PersonalizationRepository.SetValue<Guid?>(Guid.Empty, user, nameof(OrganizationIdentifier), organizationId);
 
-            HttpContext.Current.Items[nameof(ActiveOrganizationIdentifier)] = organizationId;
+            HttpContext.Current.Items[nameof(OrganizationIdentifier)] = organizationId;
 
             SetOrganizationAndRedirect(organizationCode, url);
         }
@@ -173,7 +171,9 @@ namespace InSite
             if (organizationEntity == null)
                 throw ApplicationError.Create("Organization Not Found: " + organization);
 
-            var parentOrganizationId = organizationEntity.ParentOrganizationIdentifier;
+            var parentOrganizationId = organizationEntity.OrganizationIdentifier != ServiceLocator.Partition.Identifier
+                ? ServiceLocator.Partition.Identifier
+                : (Guid?)null;
 
             var roles = ServiceLocator.GroupSearch.BindGroups(g => g.GroupName,
                     g => (g.Organization.OrganizationCode == organization || (parentOrganizationId != null && g.OrganizationIdentifier == parentOrganizationId))

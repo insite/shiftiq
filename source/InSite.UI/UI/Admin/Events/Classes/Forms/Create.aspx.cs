@@ -5,9 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Events.Read;
 using InSite.Application.Events.Write;
 using InSite.Application.Gradebooks.Write;
@@ -21,6 +18,8 @@ using InSite.UI.Layout.Admin;
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Admin.Events.Classes.Forms
@@ -137,7 +136,7 @@ namespace InSite.Admin.Events.Classes.Forms
                 CopyEventScheduledEnd.Value = null;
 
                 CopyGradebooksField.Visible = false;
-                
+
                 DurationField.Visible = false;
             }
         }
@@ -331,6 +330,9 @@ namespace InSite.Admin.Events.Classes.Forms
             if (@event.VenueLocationIdentifier.HasValue)
                 commands.Add(new ChangeEventVenue(id, @event.VenueLocationIdentifier.Value, @event.VenueLocationIdentifier.Value, @event.VenueRoom));
 
+            if (@event.MandatorySurveyFormIdentifier.HasValue)
+                commands.Add(new ModifyMandatorySurvey(id, @event.MandatorySurveyFormIdentifier.Value));
+
             commands.Add(new ModifyEventCalendarColor(id, @event.EventCalendarColor ?? "Primary"));
 
             var waitlist = @event.WaitlistEnabled ? ToggleType.Enabled : ToggleType.Disabled;
@@ -342,6 +344,9 @@ namespace InSite.Admin.Events.Classes.Forms
             if (@event.PersonCodeIsRequired)
                 commands.Add(new ModifyPersonCodeIsRequired(id, @event.PersonCodeIsRequired));
 
+            if (@event.BillingCodeEnabled)
+                commands.Add(new EnableEventBillingCode(id, true));
+
             AddDescription(@event, id, CopyEventTitle.Text, commands);
             AddInstructors(@event, id, commands);
             AddSeats(@event, id, commands);
@@ -349,7 +354,7 @@ namespace InSite.Admin.Events.Classes.Forms
             AddNotifications(@event, id, commands);
 
             var registrationFields = @event.GetRegistrationFields();
-            foreach(var field in registrationFields)
+            foreach (var field in registrationFields)
                 commands.Add(new ModifyRegistrationField(id, field.Clone()));
 
             return commands;

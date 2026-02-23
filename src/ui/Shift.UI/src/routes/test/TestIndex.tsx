@@ -6,11 +6,12 @@ import TestValidation from "./TestValidation";
 import TestNewFeatures from "./TestNewFeatures";
 import TestFileUpload from "./TestFileUpload";
 import TestRichTextEditor from "./TestRichTextEditor";
+import TestContentEditor from "./TestContentEditor";
 
 export default function TestIndex() {
     return (
         <>
-            <Tabs defaultActiveKey="RichTextEditor" transition={false}>
+            <Tabs defaultActiveKey="ContentEditor" transition={false}>
                 <Tab eventKey="BasicControls" title="Basic Controls">
                     <FormCard>
                         <form onSubmit={e => {
@@ -47,6 +48,9 @@ export default function TestIndex() {
                     <FormCard>
                         <TestRichTextEditor />
                     </FormCard>
+                </Tab>
+                <Tab eventKey="ContentEditor" title="Content Editor">
+                    <TestContentEditor />
                 </Tab>
             </Tabs>
         </>

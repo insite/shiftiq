@@ -108,6 +108,11 @@ namespace InSite.Domain.Records
             Score = e.Score;
         }
 
+        public void When(CredentialNotificationSent e)
+        {
+
+        }
+
         public void When(CredentialAuthorityChanged e)
         {
             Authority = e.AuthorityIdentifier;

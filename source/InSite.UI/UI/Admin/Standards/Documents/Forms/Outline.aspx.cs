@@ -54,7 +54,7 @@ namespace InSite.Admin.Standards.Documents.Forms
         }
 
         protected bool AllowManageFields => _allowManageFields
-            ?? (_allowManageFields = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure)).Value;
+            ?? (_allowManageFields = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure)).Value;
 
         protected bool CanWrite { get; set; }
 

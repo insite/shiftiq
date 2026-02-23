@@ -52,6 +52,42 @@
             </ItemTemplate>
         </asp:TemplateField>
 
+        <asp:TemplateField HeaderText="Employer">
+            <ItemTemplate>
+                <%# Eval("Employer") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="Supervisor">
+            <ItemTemplate>
+                <%# Eval("Supervisor") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="Start Date">
+            <ItemTemplate>
+                <%# Eval("ExperienceStarted", "{0:MMM d, yyyy}") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="End Date">
+            <ItemTemplate>
+                <%# Eval("ExperienceStopped", "{0:MMM d, yyyy}") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="Hours">
+            <ItemTemplate>
+                <%# Eval("ExperienceHours", "{0:n2}") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="Department">
+            <ItemTemplate>
+                <%# Eval("UserDepartment") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
         <asp:TemplateField ItemStyle-Width="100" ItemStyle-HorizontalAlign="Right">
             <ItemTemplate>
                 <insite:IconLink runat="server" Name='<%# Eval("ValidateButtonIcon") %>' ToolTip='<%# Eval("ValidateButtonHint") %>'

@@ -145,18 +145,16 @@ namespace InSite.Persistence
             return organization;
         }
 
-        public static bool IsCmdsOrganization(Guid organization)
+        private static List<Guid> SelectCmdsOrganizationIdentifiers(Guid user)
         {
-            return OrganizationSearch.SelectEntity(organization).ParentOrganizationIdentifier == OrganizationIdentifiers.CMDS;
-        }
+            if (!ServiceLocator.Partition.IsE03())
+                return new List<Guid>();
 
-        public static List<Guid> SelectCmdsOrganizationIdentifiers(Guid user)
-        {
             using (var db = new InternalDbContext())
             {
                 return db.Persons
                     .Where(x => x.UserIdentifier == user 
-                        && x.Organization.ParentOrganizationIdentifier == OrganizationIdentifiers.CMDS
+                        && x.Organization.OrganizationIdentifier != OrganizationIdentifiers.CMDS
                         && x.Organization.AccountClosed == null
                         )
                     .Select(x => new { x.OrganizationIdentifier, x.Organization.OrganizationCode })

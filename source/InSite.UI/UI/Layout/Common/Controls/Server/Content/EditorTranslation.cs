@@ -415,6 +415,7 @@ namespace InSite.Common.Web.UI
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "hidden");
             writer.AddAttribute(HtmlTextWriterAttribute.Id, ClientID);
             writer.AddAttribute(HtmlTextWriterAttribute.Name, UniqueID);
+            writer.AddAttribute("data-editor-translation", "");
 
             writer.RenderBeginTag(HtmlTextWriterTag.Input);
             writer.RenderEndTag();

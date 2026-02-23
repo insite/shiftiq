@@ -49,7 +49,7 @@ public class InputService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyInput modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.ContentIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.ContentId, cancellation);
 
         if (entity == null)
             return false;

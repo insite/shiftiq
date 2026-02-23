@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public partial class SubmissionMatch
     {
-        public Guid ResponseSessionIdentifier { get; set; }
+        public Guid ResponseSessionId { get; set; }
     }
 }

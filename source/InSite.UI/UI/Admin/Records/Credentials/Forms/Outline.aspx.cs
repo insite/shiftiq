@@ -88,10 +88,11 @@ namespace InSite.Admin.Achievements.Credentials.Forms
             EmployerName.Text = credential.EmployerGroupIdentifier.HasValue ? $"<a href=\"/ui/admin/contacts/groups/edit?contact={credential.EmployerGroupIdentifier}\">{credential.EmployerGroupName}</a>" : "None";
             OrganizationAccessField.Visible = CurrentSessionState.Identity.User.AccessGrantedToCmds;
 
-            OrganizationAccess.Text = credential.OrganizationIdentifier == OrganizationIdentifiers.CMDS
-                    || credential.ParentOrganizationIdentifier == OrganizationIdentifiers.CMDS
-                ? "Granted to CMDS"
-                : "Not Granted to CMDS";
+            OrganizationAccess.Text = 
+                ServiceLocator.Partition.IsE03() 
+                && ServiceLocator.OrganizationSearch.GetModel(credential.OrganizationIdentifier) != null
+                    ? "Granted to CMDS"
+                    : "Not Granted to CMDS";
 
             CredentialExpiryLink.NavigateUrl = $"/ui/admin/records/credentials/configure?id={CredentialID}";
             CredentialNecessityLink.NavigateUrl = $"/ui/admin/records/credentials/configure?id={CredentialID}";

@@ -11,17 +11,17 @@ public static class GradebookExtensions
         var matches = await queryable
             .Select(entity => new GradebookMatch
             {
-                GradebookIdentifier = entity.GradebookIdentifier,
+                GradebookId = entity.GradebookIdentifier,
                 GradebookTitle = entity.GradebookTitle,
                 GradebookCreated = entity.GradebookCreated,
                 GradebookEnrollmentCount = entity.Enrollments.Count,
 
-                ClassIdentifier = entity.EventIdentifier,
+                ClassId = entity.EventIdentifier,
                 ClassTitle = entity.Event != null ? entity.Event.EventTitle : null,
                 ClassStarted = entity.Event != null ? entity.Event.EventScheduledStart : null,
                 ClassEnded = entity.Event != null ? entity.Event.EventScheduledEnd : null,
 
-                AchievementIdentifier = entity.AchievementIdentifier,
+                AchievementId = entity.AchievementIdentifier,
                 AchievementTitle = entity.Achievement != null ? entity.Achievement.AchievementTitle : null,
                 AchievementCountGranted = entity.Achievement != null ? entity.Achievement.Credentials.Count : 0,
 

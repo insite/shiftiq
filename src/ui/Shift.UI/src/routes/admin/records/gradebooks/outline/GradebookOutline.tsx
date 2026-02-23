@@ -13,6 +13,7 @@ import { ApiUnlockGradebook } from "@/api/controllers/command/gradebook/ApiUnloc
 import { useOutlineForm } from "@/hooks/useOutlineForm";
 import FormTabs from "@/components/form/FormTabs";
 import FormTab from "@/components/form/FormTab";
+import Icon from "@/components/icon/Icon";
 
 export default function GradebookOutline() {
     const { siteSetting } = useSiteProvider();
@@ -54,15 +55,15 @@ export default function GradebookOutline() {
 
     return (
         <FormTabs defaultTab="setup">
-            <FormTab tab="gradeItems" icon="far fa-list-ul" title="Grade Items">
+            <FormTab tab="gradeItems" icon={{ style: "Regular", name: "list-ul" }} title="Grade Items">
                 <FormSection title="Grade Items">
                     (Grade Items)
                 </FormSection>
             </FormTab>
-            <FormTab tab="setup" icon="far fa-spell-check" title={
+            <FormTab tab="setup" icon={{ style: "Regular", name: "spell-check" }} title={
                 <>
                     Gradebook Setup
-                    {model?.isLocked === true && <i className="fas fa-lock text-danger ms-2" title="Locked"></i>}
+                    {model?.isLocked === true && <Icon style="Solid" name="lock" className="text-danger ms-2" title="Locked" />}
                 </>
             }>
                 <GradebookOutline_Setup model={model} isSaving={isSaving} onLock={handleLock} />
@@ -78,8 +79,8 @@ async function load(gradebookId: string, timeZoneId: TimeZoneId): Promise<Gradeb
         achievement,
         event
     ] = await Promise.all([
-        apiModel.AchievementIdentifier ? shiftClient.achievement.retrieve(apiModel.AchievementIdentifier) : null,
-        apiModel.EventIdentifier ? shiftClient.event.retrieve(apiModel.EventIdentifier) : null,
+        apiModel.AchievementId ? shiftClient.achievement.retrieve(apiModel.AchievementId) : null,
+        apiModel.EventId ? shiftClient.event.retrieve(apiModel.EventId) : null,
     ]);
 
     return {
@@ -87,15 +88,15 @@ async function load(gradebookId: string, timeZoneId: TimeZoneId): Promise<Gradeb
         gradebookTitle: apiModel.GradebookTitle,
         gradebookType: apiModel.GradebookType,
         isLocked: apiModel.IsLocked,
-        achievementId: apiModel.AchievementIdentifier ?? null,
+        achievementId: apiModel.AchievementId ?? null,
         achievementTitle: achievement?.AchievementTitle ?? null,
-        eventId: apiModel.EventIdentifier ?? null,
+        eventId: apiModel.EventId ?? null,
         eventTitle: event?.EventTitle ?? null,
         eventScheduledStart: dateTimeHelper.parseServerDateTime(event?.EventScheduledStart, timeZoneId),
         eventScheduledEnd: dateTimeHelper.parseServerDateTime(event?.EventScheduledEnd, timeZoneId),
-        periodId: apiModel.PeriodIdentifier ?? null,
+        periodId: apiModel.PeriodId ?? null,
         periodTitle: null,
-        frameworkId: apiModel.FrameworkIdentifier ?? null,
+        frameworkId: apiModel.FrameworkId ?? null,
         frameworkTitle: null,
         reference: apiModel.Reference ?? null,
     }

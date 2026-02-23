@@ -140,11 +140,6 @@ namespace InSite.UI.Layout.Admin
             return pages.Length == 1 ? pages[0] : (Guid?)null;
         }
 
-        public void BindThemeMode(string mode)
-        {
-            DarkStyle.Visible = mode == "Dark";
-        }
-
         public void HideHelpColumn()
         {
             BodyColumn.Attributes["class"] = "col-lg-12";

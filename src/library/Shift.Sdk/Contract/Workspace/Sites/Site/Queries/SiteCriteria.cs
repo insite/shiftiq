@@ -4,11 +4,9 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface ISiteCriteria
+    public interface ISiteCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
-        
-        Guid? OrganizationIdentifier { get; set; }
 
         string LastChangeType { get; set; }
         string LastChangeUser { get; set; }

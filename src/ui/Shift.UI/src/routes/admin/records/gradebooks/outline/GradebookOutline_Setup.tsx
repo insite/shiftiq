@@ -8,6 +8,7 @@ import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 import { translate } from "@/helpers/translate";
 import Button from "@/components/Button";
 import ButtonSpacer from "@/components/ButtonSpacer";
+import Icon from "@/components/icon/Icon";
 
 interface Props {
     model: GradebookOutlineModel | null;
@@ -83,9 +84,9 @@ export default function GradebookOutline_Setup({ model, isSaving, onLock }: Prop
                     <FormField label="Current Status" description="Changes to a locked gradebook are not permitted.">
                         {model ? (
                             model.isLocked ? (
-                                <span className='badge bg-danger'><i className='far fa-lock'></i> Locked</span>
+                                <span className='badge bg-danger'><Icon style="Regular" name="lock" /> Locked</span>
                             ) : (
-                                <span className='badge bg-success'><i className='far fa-lock-open'></i> Unlocked</span>
+                                <span className='badge bg-success'><Icon style="Regular" name="lock-open" /> Unlocked</span>
                             )
                         ) : (
                             textHelper.none()

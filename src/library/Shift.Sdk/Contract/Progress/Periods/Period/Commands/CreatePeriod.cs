@@ -4,8 +4,8 @@ namespace Shift.Contract
 {
     public class CreatePeriod
     {
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid PeriodIdentifier { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid PeriodId { get; set; }
 
         public string PeriodName { get; set; }
 

@@ -1,8 +1,8 @@
 ﻿using System;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Domain.Courses;
+
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Application.Courses.Read
 {
@@ -201,6 +201,9 @@ namespace InSite.Application.Courses.Read
                     case CourseField.IsProgressReportEnabled:
                         x.IsProgressReportEnabled = e.Value.Value;
                         break;
+                    case CourseField.IsDisplayOverviewOnly:
+                        x.IsDisplayOverviewOnly = e.Value.Value;
+                        break;
                     default:
                         throw new ArgumentException($"Unsupported bool field: ${e.CourseField}");
                 }
@@ -340,7 +343,7 @@ namespace InSite.Application.Courses.Read
                         x.SendMessageStalledMaxCount = e.MaxCount;
                         break;
                     case CourseMessageType.StalledToAdministrator:
-                        x.StalledToAdministratorMessageIdentifier =  e.MessageId;
+                        x.StalledToAdministratorMessageIdentifier = e.MessageId;
                         break;
                     case CourseMessageType.CompletedToLearner:
                         x.CompletedToLearnerMessageIdentifier = e.MessageId;

@@ -4,11 +4,10 @@ using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using Humanizer;
 
 using InSite.Application.Achievements.Write;
+using InSite.Application.Credentials.Write;
 using InSite.Cmds.Admin.Achievements.Models;
 using InSite.Cmds.Infrastructure;
 using InSite.Common.Web;
@@ -19,6 +18,7 @@ using InSite.Persistence.Plugin.CMDS;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Cmds.Admin.Achievements.Forms
@@ -260,6 +260,40 @@ namespace InSite.Cmds.Admin.Achievements.Forms
                 commands.Add(new DescribeAchievement(AchievementIdentifier, info.AchievementLabel, info.AchievementTitle, info.AchievementDescription, info.AllowSelfDeclared));
             }
 
+            bool isSelfDeclarationRevoked = entity.AchievementAllowSelfDeclared && !info.AllowSelfDeclared; // before != after
+
+            if (isSelfDeclarationRevoked)
+            {
+                var credentials = VCmdsCredentialSearch.Bind(x => new
+                {
+                    x.CredentialIdentifier,
+                    x.AuthorityIdentifier,
+                    x.AuthorityName,
+                    x.AuthorityType,
+                    x.AuthorityLocation,
+                    x.AuthorityReference,
+                    x.CredentialHours
+                },
+                    x => x.AchievementIdentifier == AchievementIdentifier);
+
+                foreach (var credential in credentials)
+                {
+                    if (credential.AuthorityType != "Self")
+                        continue;
+
+                    var disallowSelfDeclaration = new ChangeCredentialAuthority(
+                        credential.CredentialIdentifier,
+                        credential.AuthorityIdentifier,
+                        credential.AuthorityName,
+                        null,
+                        credential.AuthorityLocation,
+                        credential.AuthorityReference,
+                        credential.CredentialHours);
+
+                    commands.Add(disallowSelfDeclaration);
+                }
+            }
+
             foreach (var command in commands)
                 ServiceLocator.SendCommand(command);
 
@@ -293,8 +327,11 @@ namespace InSite.Cmds.Admin.Achievements.Forms
 
             observer.Modified(after);
 
-            if (info.OrganizationIdentifier == OrganizationIdentifiers.CMDS && entity.AchievementLabel == "Module")
-                VCmdsAchievementSearch.PublishGlobalModule();
+            if (ServiceLocator.Partition.IsE03())
+            {
+                if (info.OrganizationIdentifier == OrganizationIdentifiers.CMDS && entity.AchievementLabel == "Module")
+                    VCmdsAchievementSearch.PublishGlobalModule();
+            }
 
             return true;
         }
@@ -309,7 +346,7 @@ namespace InSite.Cmds.Admin.Achievements.Forms
                 : new Expiration { Type = ExpirationType.None };
 
             var command = new CreateAchievement(UniqueIdentifier.Create(), Organization.Identifier, info.AchievementLabel, info.AchievementTitle, info.AchievementDescription, expiration);
-            command.OriginOrganization = info.OrganizationIdentifier == OrganizationIdentifiers.CMDS ? CurrentIdentityFactory.ActiveOrganizationIdentifier : info.OrganizationIdentifier;
+            command.OriginOrganization = info.OrganizationIdentifier == OrganizationIdentifiers.CMDS ? Organization.Identifier : info.OrganizationIdentifier;
 
             ServiceLocator.SendCommand(command);
 

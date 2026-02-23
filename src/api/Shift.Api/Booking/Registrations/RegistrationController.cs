@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class RegistrationController : ShiftControllerBase
 {
     private readonly RegistrationService _registrationService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public RegistrationController(RegistrationService registrationService)
+    public RegistrationController(RegistrationService registrationService, IPrincipalProvider principalProvider)
     {
         _registrationService = registrationService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class RegistrationController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific registration
     /// </summary>
-    [HttpHead("booking/registrations/{registration:guid}")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Assert)]
+    [HttpHead("api/booking/registrations/{registration:guid}")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertRegistration")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid registration, CancellationToken cancellation = default)
     {
-        var exists = await _registrationService.AssertAsync(registration, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _registrationService.AssertAsync(registration, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class RegistrationController : ShiftControllerBase
     /// <summary>
     /// Collects the list of registrations that match specific criteria
     /// </summary>
-    [HttpPost("booking/registrations/collect")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Collect)]
+    [HttpPost("api/booking/registrations/collect")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<RegistrationModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectRegistrations")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectRegistrations query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class RegistrationController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("booking/registrations")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Collect)]
+    [HttpGet("api/booking/registrations")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<RegistrationModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectRegistrations_get")]
     [AliasFor("collectRegistrations")]
@@ -56,6 +62,10 @@ public class RegistrationController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectRegistrations query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _registrationService.CollectAsync(query, cancellation);
 
         var count = await _registrationService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class RegistrationController : ShiftControllerBase
     /// <summary>
     /// Counts the registrations that match specific criteria
     /// </summary>
-    [HttpPost("booking/registrations/count")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Count)]
+    [HttpPost("api/booking/registrations/count")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countRegistrations")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountRegistrations query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class RegistrationController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("booking/registrations/count")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Count)]
+    [HttpGet("api/booking/registrations/count")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countRegistrations_get")]
     [AliasFor("countRegistrations")]
@@ -90,6 +100,10 @@ public class RegistrationController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountRegistrations query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _registrationService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class RegistrationController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of registrations that match specific criteria
     /// </summary>    
-    [HttpPost("booking/registrations/download")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Download)]
+    [HttpPost("api/booking/registrations/download")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadRegistrations")]
@@ -108,8 +122,8 @@ public class RegistrationController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("booking/registrations/download")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Download)]
+    [HttpGet("api/booking/registrations/download")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadRegistrations_get")]
@@ -122,6 +136,10 @@ public class RegistrationController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectRegistrations query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Booking", "Registrations", query.Filter.Format, User);
 
         var models = await _registrationService
@@ -142,22 +160,30 @@ public class RegistrationController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific registration
     /// </summary>
-    [HttpGet("booking/registrations/{registration:guid}")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Retrieve)]
+    [HttpGet("api/booking/registrations/{registration:guid}")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType<RegistrationModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveRegistration")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid registration, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _registrationService.RetrieveAsync(registration, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationIdentifier))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of registrations that match specific criteria
     /// </summary>
-    [HttpPost("booking/registrations/search")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Search)]
+    [HttpPost("api/booking/registrations/search")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<RegistrationMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchRegistrations")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchRegistrations query, CancellationToken cancellation = default)
@@ -165,8 +191,8 @@ public class RegistrationController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("booking/registrations/search")]
-    [HybridAuthorize(Policies.Booking.Registrations.Registration.Search)]
+    [HttpGet("api/booking/registrations/search")]
+    [HybridPermission("booking/registrations", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<RegistrationMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchRegistrations_get")]
     [AliasFor("searchRegistrations")]
@@ -178,6 +204,10 @@ public class RegistrationController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchRegistrations query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _registrationService.SearchAsync(query, cancellation);
 
         var count = await _registrationService.CountAsync(query, cancellation);

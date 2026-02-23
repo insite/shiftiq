@@ -1,14 +1,14 @@
 import { Control, Path, useController } from "react-hook-form";
-import { fieldRequiredMessage } from "@/helpers/errorHelper";
 import RichTextEditor, { RichTextEditorProps } from "./RichTextEditor";
 import { RichTextEditorValue } from "./RichTextEditorValue";
+import { errorHelper } from "@/helpers/errorHelper";
 
 interface Props<Fields extends object>
     extends Omit<RichTextEditorProps, "ref" | "value" | "defaultValue" | "error" | "onBlur" | "onChange">
 {
     name: Path<Fields>;
     control: Control<Fields>;
-    required?: boolean;
+    required?: boolean | string;
     validate?: (value: RichTextEditorValue | null) => string | undefined;
 }
 
@@ -25,7 +25,7 @@ export default function ControlledRichTextEditor<Fields extends object>({
         rules: {
             validate: (value: RichTextEditorValue | null | undefined) => {
                 if (required && !value?.html?.en && !value?.markdown?.en) {
-                    return fieldRequiredMessage;
+                    return errorHelper.createFieldRequiredMessage(required);
                 }
                 return validate?.(value ?? null);
             }

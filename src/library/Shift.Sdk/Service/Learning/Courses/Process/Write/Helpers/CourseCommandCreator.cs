@@ -166,6 +166,9 @@ namespace InSite.Application.Courses.Write
 
             if (_old?.IsProgressReportEnabled != _new.IsProgressReportEnabled)
                 _result.Add(new ModifyCourseFieldBool(_new.CourseIdentifier, CourseField.IsProgressReportEnabled, _new.IsProgressReportEnabled));
+
+            if (_old?.IsDisplayOverviewOnly != _new.IsDisplayOverviewOnly)
+                _result.Add(new ModifyCourseFieldBool(_new.CourseIdentifier, CourseField.IsDisplayOverviewOnly, _new.IsDisplayOverviewOnly));
         }
 
         private void AddIntChanges()

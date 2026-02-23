@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-using Shift.Common.Timeline.Changes;
-
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Domain.Records
@@ -33,6 +32,7 @@ namespace InSite.Domain.Records
         public List<Enrollment> Enrollments { get; set; }
         public List<GradebookValidationScore> ValidationScores { get; set; }
         public HashSet<Guid> Events { get; set; } = new HashSet<Guid>();
+        public List<GroupEnrollment> GroupEnrollments { get; set; }
 
         public bool IsOpen { get; set; }
         public bool IsLocked { get; set; }
@@ -146,6 +146,7 @@ namespace InSite.Domain.Records
             Framework = e.Framework;
             RootItems = new List<GradeItem>();
             Enrollments = new List<Enrollment>();
+            GroupEnrollments = new List<GroupEnrollment>();
 
             if (e.Event.HasValue)
                 Events.Add(e.Event.Value);
@@ -179,6 +180,20 @@ namespace InSite.Domain.Records
             Events.Remove(e.Event);
 
             PrimaryEvent = e.NewPrimaryEvent;
+        }
+
+        public void When(GradebookGroupEnrollmentAdded e)
+        {
+            GroupEnrollments.Add(new GroupEnrollment
+            {
+                Enrollment = e.Enrollment,
+                Group = e.Group
+            });
+        }
+
+        public void When(GradebookGroupEnrollmentRemoved e)
+        {
+            GroupEnrollments.RemoveAll(x => x.Enrollment == e.Enrollment);
         }
 
         public void When(GradebookLocked _)

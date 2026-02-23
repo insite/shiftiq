@@ -219,6 +219,7 @@ namespace InSite.Persistence
                 CourseIsHidden = DomainCourseState.Defaults.IsHidden,
                 IsMultipleUnitsEnabled = DomainCourseState.Defaults.IsMultipleUnitsEnabled,
                 IsProgressReportEnabled = DomainCourseState.Defaults.IsProgressReportEnabled,
+                IsDisplayOverviewOnly = DomainCourseState.Defaults.IsDisplayOverviewOnly,
                 AllowDiscussion = DomainCourseState.Defaults.AllowDiscussion,
                 Created = e.ChangeTime,
                 CreatedBy = e.OriginUser

@@ -90,7 +90,7 @@ namespace InSite.Admin.Accounts.Organizations.Forms
         {
             PageHelper.AutoBindHeader(Page, qualifier: organization.CompanyName);
 
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var environment = ServiceLocator.AppSettings.Environment;
 
             var custom = organization.PlatformCustomization;
@@ -137,7 +137,7 @@ namespace InSite.Admin.Accounts.Organizations.Forms
             fileUpload.InputText = fileUrl;
 
             var code = ServiceLocator.OrganizationSearch.Get(OrganizationIdentifier).OrganizationCode;
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
             var environment = ServiceLocator.AppSettings.Environment;
             var absoluteUrl = UrlHelper.GetAbsoluteUrl(domain, environment, fileUrl, code);
 

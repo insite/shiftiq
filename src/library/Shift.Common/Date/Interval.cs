@@ -305,18 +305,18 @@ namespace Shift.Common
         /// <summary>
         /// Determines validation errors in the interval.
         /// </summary>
-        public List<ValidationError> Validate()
+        public List<Problem> Validate()
         {
-            var errors = new List<ValidationError>();
+            var errors = new List<Problem>();
 
             if (!DateTime.TryParseExact(Date, RequiredDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
-                errors.Add(new ValidationError { Property = nameof(Date), Summary = $"{Date} is not an expected date format. Please use {RequiredDateFormat}." });
+                AddProblem(errors, nameof(Date), $"{Date} is not an expected date format. Please use {RequiredDateFormat}.");
 
             if (!DateTime.TryParseExact(Time, RequiredTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var time))
-                errors.Add(new ValidationError { Property = nameof(Time), Summary = $"{Time} is not an expected time format. Please use {RequiredTimeFormat}." });
+                AddProblem(errors, nameof(Time), $"{Time} is not an expected time format. Please use {RequiredTimeFormat}.");
 
             if (!Shift.Common.Base.TimeZones.IsValidZone(Zone))
-                errors.Add(new ValidationError { Property = nameof(Zone), Summary = $"{Zone} is not a valid time zone." });
+                AddProblem(errors, nameof(Zone), $"{Zone} is not a valid time zone.");
 
             try
             {
@@ -324,21 +324,30 @@ namespace Shift.Common
             }
             catch (ArgumentException ex)
             {
-                errors.Add(new ValidationError { Property = nameof(Length), Summary = ex.Message });
+                AddProblem(errors, nameof(Length), ex.Message);
             }
 
             if (Recurrences == null)
             {
-                errors.Add(new ValidationError { Property = nameof(Recurrences), Summary = "Recurrences cannot be null. Use an empty list for a non-recurring interval." });
+                AddProblem(errors, nameof(Recurrences), "Recurrences cannot be null. Use an empty list for a non-recurring interval.");
             }
             else if (Recurrences.Any())
             {
                 var effective = GetEffective();
                 if (!RecurrencesAsDays().Contains(effective.DayOfWeek))
-                    errors.Add(new ValidationError { Property = nameof(Recurrences), Summary = $"Recurrences for this interval must include {effective.DayOfWeek} because {Date} occurs on this day of the week." });
+                    AddProblem(errors, nameof(Recurrences), $"Recurrences for this interval must include {effective.DayOfWeek} because {Date} occurs on this day of the week.");
             }
 
             return errors;
+        }
+
+        private void AddProblem(List<Problem> problems, string property, string detail)
+        {
+            var problem = new Problem(422, detail);
+
+            problem.Extensions.Add("Property", property);
+
+            problems.Add(problem);
         }
 
         /// <summary>

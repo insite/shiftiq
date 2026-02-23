@@ -7,10 +7,12 @@ namespace Shift.Api;
 public class UserController : ShiftControllerBase
 {
     private readonly UserService _userService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public UserController(UserService userService)
+    public UserController(UserService userService, IPrincipalProvider principalProvider)
     {
         _userService = userService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -18,13 +20,17 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific user
     /// </summary>
-    [HttpHead("security/users/{user:guid}")]
-    [HybridAuthorize(Policies.Security.Users.User.Assert)]
+    [HttpHead("api/security/users/{user:guid}")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertUser")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid user, CancellationToken cancellation = default)
     {
-        var exists = await _userService.AssertAsync(user, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _userService.AssertAsync(user, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -32,8 +38,8 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Collects the list of users that match specific criteria
     /// </summary>
-    [HttpPost("security/users/collect")]
-    [HybridAuthorize(Policies.Security.Users.User.Collect)]
+    [HttpPost("api/security/users/collect")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserMatch>>(StatusCodes.Status200OK)]
     [EndpointName("collectUsers")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectUsers query, CancellationToken cancellation = default)
@@ -41,8 +47,8 @@ public class UserController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("security/users")]
-    [HybridAuthorize(Policies.Security.Users.User.Collect)]
+    [HttpGet("api/security/users")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserMatch>>(StatusCodes.Status200OK)]
     [EndpointName("collectUsers_get")]
     [AliasFor("collectUsers")]
@@ -54,10 +60,14 @@ public class UserController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectUsers query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = (await _userService.CollectAsync(query, cancellation))
             .Select(x => new UserMatch
             {
-                UserIdentifier = x.UserIdentifier,
+                UserId = x.UserId,
                 FullName = x.FullName
             })
             .ToList();
@@ -72,8 +82,8 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Counts the users that match specific criteria
     /// </summary>
-    [HttpPost("security/users/count")]
-    [HybridAuthorize(Policies.Security.Users.User.Count)]
+    [HttpPost("api/security/users/count")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countUsers")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountUsers query, CancellationToken cancellation = default)
@@ -81,8 +91,8 @@ public class UserController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("security/users/count")]
-    [HybridAuthorize(Policies.Security.Users.User.Count)]
+    [HttpGet("api/security/users/count")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countUsers_get")]
     [AliasFor("countUsers")]
@@ -94,6 +104,10 @@ public class UserController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountUsers query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _userService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -102,8 +116,8 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of users that match specific criteria
     /// </summary>    
-    [HttpPost("security/users/download")]
-    [HybridAuthorize(Policies.Security.Users.User.Download)]
+    [HttpPost("api/security/users/download")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadUsers")]
@@ -112,8 +126,8 @@ public class UserController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("security/users/download")]
-    [HybridAuthorize(Policies.Security.Users.User.Download)]
+    [HttpGet("api/security/users/download")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadUsers_get")]
@@ -126,6 +140,10 @@ public class UserController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectUsers query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Security", "Users", query.Filter.Format, User);
 
         var models = await _userService
@@ -146,20 +164,24 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific user
     /// </summary>
-    [HttpGet("security/users/{user:guid}")]
-    [HybridAuthorize(Policies.Security.Users.User.Retrieve)]
+    [HttpGet("api/security/users/{user:guid}")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType<UserModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveUser")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid user, CancellationToken cancellation = default)
     {
-        var model = await _userService.RetrieveAsync(user, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var model = await _userService.RetrieveAsync(user, organizationId, cancellation);
 
         if (model == null)
             return NotFound();
 
         return Ok(new UserMatch
         {
-            UserIdentifier = model.UserIdentifier,
+            UserId = model.UserId,
             FullName = model.FullName
         });
     }
@@ -167,8 +189,8 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Searches for the list of users that match specific criteria
     /// </summary>
-    [HttpPost("security/users/search")]
-    [HybridAuthorize(Policies.Security.Users.User.Search)]
+    [HttpPost("api/security/users/search")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchUsers")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchUsers query, CancellationToken cancellation = default)
@@ -176,8 +198,8 @@ public class UserController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("security/users/search")]
-    [HybridAuthorize(Policies.Security.Users.User.Search)]
+    [HttpGet("api/security/users/search")]
+    [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchUsers_get")]
     [AliasFor("searchUsers")]
@@ -189,6 +211,10 @@ public class UserController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchUsers query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _userService.SearchAsync(query, cancellation);
 
         var count = await _userService.CountAsync(query, cancellation);

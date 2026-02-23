@@ -61,7 +61,7 @@ namespace InSite.Admin.Events.Seats.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitName, DataAccess.Update))
                 ReturnToSearch(GetParentUrl(""));
 
             var seat = SeatIdentifier.HasValue ? ServiceLocator.EventSearch.GetSeat(SeatIdentifier.Value) : null;

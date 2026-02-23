@@ -229,7 +229,7 @@ namespace InSite.UI.Portal.Learning
 
             LoadOverviewPanel();
 
-            if (Organization.ParentOrganizationIdentifier == OrganizationIdentifiers.CMDS)
+            if (ServiceLocator.Partition.IsE03())
                 AlertRestartInfo.Visible = true;
 
             if (!model.CurrentPageIsValid)

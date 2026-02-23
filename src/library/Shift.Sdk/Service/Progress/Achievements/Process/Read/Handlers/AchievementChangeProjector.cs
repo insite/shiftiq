@@ -46,6 +46,7 @@ namespace InSite.Application.Records.Read
             publisher.Subscribe<AchievementUnlocked>(Handle);
             publisher.Subscribe<AchievementLocked>(Handle);
             publisher.Subscribe<AchievementDeleted>(Handle);
+            publisher.Subscribe<AchievementNotificationChanged>(Handle);
 
             publisher.Subscribe<AchievementBadgeImageChanged>(Handle);
 
@@ -62,6 +63,7 @@ namespace InSite.Application.Records.Read
             publisher.Subscribe<CredentialExpired2>(Handle);
             publisher.Subscribe<CredentialEmployerChanged>(Handle);
             publisher.Subscribe<CredentialGranted3>(Handle);
+            publisher.Subscribe<CredentialNotificationSent>(Handle);
             publisher.Subscribe<CredentialAuthorityChanged>(Handle);
             publisher.Subscribe<CredentialExpirationChanged>(Handle);
             publisher.Subscribe<CredentialTagged>(Handle);
@@ -124,6 +126,9 @@ namespace InSite.Application.Records.Read
         public void Handle(AchievementDeleted e)
             => _store.DeleteAchievement(e);
 
+        public void Handle(AchievementNotificationChanged e)
+            => _store.UpdateAchievement(e);
+
         public void Handle(CredentialCreated e)
             => _store.InsertCredential(e, CredentialStatus.Pending);
 
@@ -135,6 +140,9 @@ namespace InSite.Application.Records.Read
 
         public void Handle(CredentialGranted3 e)
             => _store.UpdateCredential(e, CredentialStatus.Valid);
+
+        public void Handle(CredentialNotificationSent e)
+            => _store.UpdateCredential(e);
 
         public void Handle(CredentialAuthorityChanged e)
             => _store.UpdateCredential(e);

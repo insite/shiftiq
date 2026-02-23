@@ -5,5 +5,6 @@
         public bool Console { get; set; }
         public string File { get; set; }
         public string Level { get; set; }
+        public bool Framework { get; set; }
     }
 }

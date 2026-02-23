@@ -20,6 +20,7 @@ namespace InSite.Domain.Courses
             public const bool IsHidden = false;
             public const bool IsMultipleUnitsEnabled = false;
             public const bool IsProgressReportEnabled = false;
+            public const bool IsDisplayOverviewOnly = false;
             public const bool AllowDiscussion = false;
         }
 
@@ -156,6 +157,7 @@ namespace InSite.Domain.Courses
             SetValue(CourseField.CourseIsHidden, Defaults.IsHidden, false);
             SetValue(CourseField.IsMultipleUnitsEnabled, Defaults.IsMultipleUnitsEnabled, false);
             SetValue(CourseField.IsProgressReportEnabled, Defaults.IsProgressReportEnabled, false);
+            SetValue(CourseField.IsDisplayOverviewOnly, Defaults.IsDisplayOverviewOnly, false);
             SetValue(CourseField.AllowDiscussion, Defaults.AllowDiscussion, false);
         }
 
@@ -167,7 +169,7 @@ namespace InSite.Domain.Courses
             {
                 var activity = module.Activities.Find(x => x.Identifier == activityAndSequence.ActivityId);
                 if (activity == null)
-                    throw new ApplicationError($"Activity {activityAndSequence.ActivityId} is not found the module {module.Identifier}");
+                    throw new KeyNotFoundException($"Activity {activityAndSequence.ActivityId} is not found the module {module.Identifier}");
 
                 activity.SetValue(ActivityField.ActivitySequence, activityAndSequence.Sequence, false);
             }

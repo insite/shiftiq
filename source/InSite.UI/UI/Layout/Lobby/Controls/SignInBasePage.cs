@@ -186,13 +186,20 @@ namespace InSite.UI.Layout.Lobby.Controls
         public static string RedirectReturnVerifiedUrl(User user, string returnBackUrl)
         {
             var person = PersonSearch.Select(Organization.Identifier, user.UserIdentifier);
+
             if (person == null)
             {
                 ServiceLocator.Logger.Information($"Person not found userId: {user.UserIdentifier} orgId: {Organization.Identifier}");
                 return null;
             }
 
-            var secret = TokenHelper.GetClientSecret(person.PersonIdentifier, false);
+            var tokenSettings = ServiceLocator.AppSettings.Security.Token;
+
+            var tokenLifetimeInMinutes = tokenSettings.Lifetime;
+
+            var secretExpiryInDays = tokenSettings.GetClientSecretLifetimeInDays();
+
+            var secret = TokenHelper.GetClientSecret(person.PersonIdentifier, false, secretExpiryInDays, tokenLifetimeInMinutes);
 
             var decodedReturnVerifiedUrl = TokenHelper.DecodeReturnBackUrl(returnBackUrl);
 

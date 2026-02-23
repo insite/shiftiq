@@ -25,7 +25,7 @@ namespace Shift.Common
         public Claim ToClaim(ClaimName name, string value)
             => new Claim(name.ToJwtName(), value);
 
-        public IEnumerable<Claim> ToClaims(IShiftPrincipal principal)
+        public IEnumerable<Claim> ToClaims(IPrincipal principal)
         {
             var claims = new List<Claim>
             {
@@ -70,9 +70,7 @@ namespace Shift.Common
                 var partition = principal.Partition;
 
                 claims.Add(ToClaim(ClaimName.PartitionId, partition.Identifier.ToString()));
-
-                if (partition.Slug.IsNotEmpty())
-                    claims.Add(ToClaim(ClaimName.PartitionSlug, partition.Slug));
+                claims.Add(ToClaim(ClaimName.PartitionSlug, partition.Slug));
             }
 
             if (principal.Person != null)
@@ -140,7 +138,7 @@ namespace Shift.Common
             return dictionary;
         }
 
-        public IShiftPrincipal ToPrincipal(IJwt jwt)
+        public IPrincipal ToPrincipal(IJwt jwt)
         {
             var list = new List<Claim>();
 
@@ -156,15 +154,16 @@ namespace Shift.Common
             return ToPrincipal(list);
         }
 
-        public IShiftPrincipal ToPrincipal(Dictionary<ClaimName, string> claims)
+        public IPrincipal ToPrincipal(Dictionary<ClaimName, string> claims)
         {
             return ToPrincipal(claims.Select(x => new Claim(x.Key.ToJwtName(), x.Value)));
         }
 
-        public IShiftPrincipal ToPrincipal(IEnumerable<Claim> claims)
+        public IPrincipal ToPrincipal(IEnumerable<Claim> claims)
         {
             var principal = new Principal
             {
+                CookieId = GetClaimAsGuid(ClaimName.CookieId),
                 User = new Actor
                 {
                     Identifier = GetClaimAsGuid(ClaimName.UserId),
@@ -184,7 +183,7 @@ namespace Shift.Common
                 Person = new Model { Identifier = GetClaimAsGuid(ClaimName.PersonId) },
                 Roles = GetRoles(ClaimName.Role),
                 IPAddress = GetClaim(ClaimName.UserIp),
-                Authority = GetAuthority(ClaimName.Authority)
+                Authority = GetAuthority(ClaimName.Authority),
             };
 
             principal.IsAuthenticated = principal.User.Identifier != Guid.Empty;
@@ -207,16 +206,16 @@ namespace Shift.Common
             Guid GetClaimAsGuid(ClaimName type)
             {
                 var claim = claims.FirstOrDefault(x => type.ToJwtName() == x.Type || x.Properties.Any(p => p.Value == type.ToJwtName()));
-                if (claim != null)
-                    return Guid.Parse(claim.Value);
+                if (claim != null && Guid.TryParse(claim.Value, out var result))
+                    return result;
                 return Guid.Empty;
             }
 
             int GetClaimAsInt(ClaimName type)
             {
                 var claim = claims.FirstOrDefault(x => type.ToJwtName() == x.Type || x.Properties.Any(p => p.Value == type.ToJwtName()));
-                if (claim != null)
-                    return int.Parse(claim.Value);
+                if (claim != null && int.TryParse(claim.Value, out var result))
+                    return result;
                 return 0;
             }
 
@@ -243,7 +242,7 @@ namespace Shift.Common
 
                 return Enum.TryParse<AuthorityAccess>(claim, out var result)
                     ? result
-                    : AuthorityAccess.None;
+                    : AuthorityAccess.Unspecified;
             }
 
             Proxy GetProxy()
@@ -256,32 +255,39 @@ namespace Shift.Common
             }
         }
 
-        public IShiftPrincipal ToSentinel(JwtRequest request)
+        public bool IsSentinel(string sentinelSecret)
         {
             if (_settings.Sentinels == null)
-                return null;
+                return false;
 
-            var sentinel = _settings.Sentinels.ToArray().FirstOrDefault(s => s?.Secret == request.Secret);
+            var sentinels = _settings.Sentinels.ToArray();
 
-            if (sentinel == null)
-                return null;
+            return sentinels.Any(s => s?.Secret == sentinelSecret);
+        }
+
+        public IPrincipal ToSentinel(JwtRequest request)
+        {
+            if (!IsSentinel(request.Secret))
+                throw new SentinelNotFoundException();
+
+            var sentinels = _settings.Sentinels.ToArray();
+
+            var sentinel = sentinels.Single(s => s?.Secret == request.Secret);
 
             var principal = new Principal();
 
-            var actor = sentinel;
-
             principal.User = new Actor
             {
-                Email = actor.Email,
-                Name = actor.Name,
-                Language = actor.Language ?? DefaultLanguage,
-                TimeZone = actor.TimeZone ?? DefaultTimeZone
+                Email = sentinel.Email,
+                Name = sentinel.Name,
+                Language = sentinel.Language ?? DefaultLanguage,
+                TimeZone = sentinel.TimeZone ?? DefaultTimeZone
             };
 
-            if (actor.Identifier != Guid.Empty)
-                principal.User.Identifier = actor.Identifier;
+            if (sentinel.Identifier != Guid.Empty)
+                principal.User.Identifier = sentinel.Identifier;
             else
-                principal.User.Identifier = UuidFactory.CreateV5(actor.Email);
+                principal.User.Identifier = UuidFactory.CreateV5(sentinel.Email);
 
             if (request.Organization.HasValue)
                 principal.Organization = new Model { Identifier = request.Organization.Value };
@@ -313,7 +319,7 @@ namespace Shift.Common
             if (sentinel.Roles != null && sentinel.Roles.Length > 0)
                 principal.Roles = sentinel.Roles.Select(x => new Role(x)).ToList();
 
-            principal.Roles.Add(new Role(actor.Email));
+            principal.Roles.Add(new Role(sentinel.Email));
 
             return principal;
         }

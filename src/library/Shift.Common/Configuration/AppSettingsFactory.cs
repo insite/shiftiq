@@ -13,6 +13,7 @@ namespace Shift.Common
     public static class AppSettingsFactory
     {
         private static Dictionary<string, bool> Cache = new Dictionary<string, bool>();
+        private static string _settingsFolder;
 
         public static AppSettings Create()
         {
@@ -33,9 +34,11 @@ namespace Shift.Common
 
             var settingsFile = FindAppSettingsFile(locations, null, extensions);
 
-            var settingsFolder = Path.GetDirectoryName(settingsFile);
+            _settingsFolder = Path.GetDirectoryName(settingsFile);
 
             var settings = LoadAppSettingsFromFile(settingsFile, null);
+
+            settings.RouteSettings = CreateRouteSettings();
 
             if (!settings.Environment.IsLocal())
                 return settings;
@@ -50,21 +53,9 @@ namespace Shift.Common
 
             var environment = settings.Release.GetEnvironment().Name;
 
-            settingsFile = Path.Combine(settingsFolder, $"appsettings.{environment}.json");
+            settingsFile = Path.Combine(_settingsFolder, $"appsettings.{environment}.json");
 
             settings = LoadAppSettingsFromFile(settingsFile, settings);
-
-            // Allow partition-specific settings to override the base settings and the environment-specific settings 
-            // only if this behaviour is explicitly enabled. This is sometimes useful (only) for testing purposes. 
-
-            if (settings.Application.LoadPartitionSpecificSettings)
-            {
-                var partition = settings.Release.Partition;
-
-                settingsFile = Path.Combine(settingsFolder, $"appsettings.{partition}.json");
-
-                settings = LoadAppSettingsFromFile(settingsFile, settings);
-            }
 
             return settings;
         }
@@ -148,7 +139,7 @@ namespace Shift.Common
                 var json = ioFile.ReadAllText(jsonPath);
 
                 if (json.IsEmpty())
-                    throw new Exception($"The application configuration setting file is empty: {jsonPath}");
+                    throw new InvalidOperationException($"The application configuration setting file is empty: {jsonPath}");
 
                 var settings = JsonConvert.DeserializeObject<AppSettings>(json, new AppSettingsConverter(defaultSettings));
 
@@ -194,6 +185,25 @@ namespace Shift.Common
             {
                 return _defaultSettings ?? new AppSettings();
             }
+        }
+
+        /// <summary>
+        /// Loads RouteSettings.json from the same folder where appsettings.json was found.
+        /// Returns an empty RouteSettings if the file does not exist.
+        /// </summary>
+        private static RouteSettings CreateRouteSettings()
+        {
+            var routeSettingsFile = Path.Combine(_settingsFolder, "RouteSettings.json");
+
+            if (!ioFile.Exists(routeSettingsFile))
+                return new RouteSettings();
+
+            var json = ioFile.ReadAllText(routeSettingsFile);
+
+            if (json.IsEmpty())
+                return new RouteSettings();
+
+            return JsonConvert.DeserializeObject<RouteSettings>(json) ?? new RouteSettings();
         }
     }
 }

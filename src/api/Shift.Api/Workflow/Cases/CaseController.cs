@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common;
 using Shift.Service.Workflow;
 
 namespace Shift.Api;
@@ -9,10 +10,12 @@ namespace Shift.Api;
 public class CaseController : ShiftControllerBase
 {
     private readonly CaseService _caseService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public CaseController(CaseService caseService)
+    public CaseController(CaseService caseService, IPrincipalProvider principalProvider)
     {
         _caseService = caseService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,22 +23,23 @@ public class CaseController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific case
     /// </summary>
-    [HttpHead("workflow/cases/{case:guid}")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Assert)]
+    [HttpHead("api/workflow/cases/{case:guid}")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertCase")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid issue, CancellationToken cancellation = default)
     {
-        var exists = await _caseService.AssertAsync(issue, cancellation);
-
+        var principal = _principalProvider.GetPrincipal();
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+        var exists = await _caseService.AssertAsync(issue, organizationId, cancellation);
         return exists ? Ok() : NotFound();
     }
 
     /// <summary>
     /// Collects the list of cases that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases/collect")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Collect)]
+    [HttpPost("api/workflow/cases/collect")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectCases")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectCases query, CancellationToken cancellation = default)
@@ -43,8 +47,8 @@ public class CaseController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Collect)]
+    [HttpGet("api/workflow/cases")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectCases_get")]
     [AliasFor("collectCases")]
@@ -56,6 +60,9 @@ public class CaseController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectCases query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _caseService.CollectAsync(query, cancellation);
 
         var count = await _caseService.CountAsync(query, cancellation);
@@ -68,8 +75,8 @@ public class CaseController : ShiftControllerBase
     /// <summary>
     /// Counts the cases that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases/count")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Count)]
+    [HttpPost("api/workflow/cases/count")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countCases")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountCases query, CancellationToken cancellation = default)
@@ -77,8 +84,8 @@ public class CaseController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases/count")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Count)]
+    [HttpGet("api/workflow/cases/count")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countCases_get")]
     [AliasFor("countCases")]
@@ -90,6 +97,9 @@ public class CaseController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountCases query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _caseService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +108,8 @@ public class CaseController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of cases that match specific criteria
     /// </summary>    
-    [HttpPost("workflow/cases/download")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Download)]
+    [HttpPost("api/workflow/cases/download")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadCases")]
@@ -108,8 +118,8 @@ public class CaseController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases/download")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Download)]
+    [HttpGet("api/workflow/cases/download")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadCases_get")]
@@ -122,6 +132,9 @@ public class CaseController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectCases query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Workflow", "Cases", query.Filter.Format, User);
 
         var models = await _caseService
@@ -142,22 +155,26 @@ public class CaseController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific case
     /// </summary>
-    [HttpGet("workflow/cases/{case:guid}")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Retrieve)]
+    [HttpGet("api/workflow/cases/{case:guid}")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType<CaseModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveCase")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid issue, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
         var model = await _caseService.RetrieveAsync(issue, cancellation);
-
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of cases that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases/search")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Search)]
+    [HttpPost("api/workflow/cases/search")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchCases")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchCases query, CancellationToken cancellation = default)
@@ -165,8 +182,8 @@ public class CaseController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases/search")]
-    [HybridAuthorize(Policies.Workflow.Cases.Case.Search)]
+    [HttpGet("api/workflow/cases/search")]
+    [HybridPermission("workflow/cases", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchCases_get")]
     [AliasFor("searchCases")]
@@ -178,6 +195,9 @@ public class CaseController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchCases query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _caseService.SearchAsync(query, cancellation);
 
         var count = await _caseService.CountAsync(query, cancellation);

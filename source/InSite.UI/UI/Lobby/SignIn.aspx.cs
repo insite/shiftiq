@@ -16,6 +16,7 @@ namespace InSite.UI.Lobby
 {
     public partial class SignIn : SignInBasePage
     {
+        private static AppSettings AppSettings => ServiceLocator.AppSettings;
         private static SecuritySettings SecuritySettings => ServiceLocator.AppSettings.Security;
         private static ReleaseSettings ReleaseSettings => ServiceLocator.AppSettings.Release;
 
@@ -185,7 +186,7 @@ namespace InSite.UI.Lobby
 
         private string CreateEnvironmentLinks()
         {
-            var domain = SecuritySettings.Domain;
+            var domain = AppSettings.Partition.Domain;
 
             var cmds = ServiceLocator.Partition.IsE03();
 

@@ -34,7 +34,7 @@ namespace Shift.Common
                 {
                     var keys = jProp.Name.Split(':');
                     if (keys.Length != 2)
-                        throw new ApplicationError("Invalid key value: " + jProp.Name);
+                        throw new FormatException("Invalid key value: " + jProp.Name);
 
                     var rowKey = GetKey(keys[0], rows);
                     var colKey = GetKey(keys[1], columns);
@@ -50,7 +50,7 @@ namespace Shift.Common
                 {
                     var path = input.Split('.');
                     if (path.Length != dimensions.Count)
-                        throw new ApplicationError("Invalid key value: " + input);
+                        throw new FormatException("Invalid key value: " + input);
 
                     var key = new MultiKey<string>(path.Length);
                     for (var i = 0; i < path.Length; i++)

@@ -3,8 +3,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
-using Shift.Common;
-
 namespace Shift.Api;
 
 public class AuthenticationHelper
@@ -52,11 +50,7 @@ public class AuthenticationHelper
         {
             foreach (var error in validation.Errors)
             {
-                var errorMessage = error.Summary;
-                if (error.Description != null)
-                    errorMessage += ": " + error.Description;
-
-                messages.Add(errorMessage);
+                messages.Add(error.Detail);
             }
         }
 

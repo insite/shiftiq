@@ -337,6 +337,24 @@ namespace Shift.Common
             }
         }
 
+        public TKey[] GetAllKeys()
+        {
+            if (_disposed)
+                return default;
+
+            _locker.EnterReadLock();
+
+            try
+            {
+                return _cache.Keys.ToArray();
+            }
+
+            finally
+            {
+                _locker.ExitReadLock();
+            }
+        }
+
         /// <summary>
         /// Tries to get the value for a specific key.
         /// </summary>

@@ -17,9 +17,9 @@ public class EventService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid @event, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid @event, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(@event, cancellation);
+        return await _reader.AssertAsync(@event, organization, cancellation);
     }
 
     public async Task<IEnumerable<EventModel>> CollectAsync(IEventCriteria criteria, CancellationToken cancellation = default)
@@ -54,7 +54,7 @@ public class EventService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyEvent modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.EventIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.EventId, cancellation);
 
         if (entity == null)
             return false;

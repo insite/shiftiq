@@ -7,38 +7,47 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-using Shift.Common.Timeline.Commands;
-
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 
 namespace Shift.Toolbox
 {
     public class TimelineClient
     {
-        private readonly ApiSettings _api;
+        private readonly string _apiBaseUrl;
         private readonly SecuritySettings _security;
         private readonly int _lifetimeLimitInSecond;
+        private readonly HttpClient _http;
+        private readonly JsonSerializer2 _serializer = new JsonSerializer2();
 
-        public TimelineClient(ApiSettings api, SecuritySettings security, int lifetimeLimitInSeconds = JwtRequest.DefaultLifetime)
+        public TimelineClient(string apiBaseUrl, SecuritySettings security, int lifetimeLimitInSeconds = JwtRequest.DefaultLifetime)
         {
-            _api = api;
+            _apiBaseUrl = apiBaseUrl;
             _security = security;
             _lifetimeLimitInSecond = lifetimeLimitInSeconds;
+            _http = new HttpClient()
+            {
+                BaseAddress = new Uri(_apiBaseUrl)
+            };
+        }
+
+        public async Task<ApiResult> QueueCommandAsync(ICommand command, string token)
+        {
+            var commandName = command.GetType().Name.ToKebabCase();
+            var serialized = _serializer.Serialize(command);
+
+            return await QueueCommandAsync(commandName, serialized, token);
         }
 
         public async Task<ApiResult> QueueCommandAsync(string name, string data, string token)
         {
             var content = new StringContent(data, Encoding.UTF8, "application/json");
 
-            var http = new HttpClient()
-            {
-                BaseAddress = new Uri(_api.BaseUrl)
-            };
+            var request = new HttpRequestMessage(HttpMethod.Post, $"api/timeline/commands?command={name}");
+            request.Content = content;
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var response = await http.PostAsync($"timeline/commands?command={name}", content);
-
+            var response = await _http.SendAsync(request);
             var result = new ApiResult<string>(response.StatusCode, response.Headers);
 
             try
@@ -62,7 +71,7 @@ namespace Shift.Toolbox
         {
             var commandName = command.GetType().Name.ToKebabCase();
 
-            var endpoint = $"timeline/commands?command={commandName}";
+            var endpoint = $"api/timeline/commands?command={commandName}";
 
             var responseContent = string.Empty;
 
@@ -72,7 +81,7 @@ namespace Shift.Toolbox
 
                 var client = new HttpClient();
 
-                client.BaseAddress = new Uri(_api.BaseUrl);
+                client.BaseAddress = new Uri(_apiBaseUrl);
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
 
@@ -148,23 +157,23 @@ namespace Shift.Toolbox
             return problem;
         }
 
-        public async Task<ApiResult<JwtResponse>> GetTokenAsync(string secret)
+        public async Task<ApiResult<JwtResponse>> GetTokenAsync(string secret, Guid? organizationId, int? lifetime)
         {
-            var secretBody = new JwtRequest { Secret = secret };
-
+            var secretBody = new JwtRequest
+            {
+                Organization = organizationId,
+                Secret = secret,
+                Lifetime = lifetime
+            };
             var secretJson = JsonSerializer.Serialize(secretBody);
-
             var secretContent = new StringContent(secretJson, Encoding.UTF8, "application/json");
 
-            var http = new HttpClient()
-            {
-                BaseAddress = new Uri(_api.BaseUrl)
-            };
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/token");
+            request.Content = secretContent;
 
-            var tokenResponse = await http.PostAsync("token", secretContent);
+            var tokenResponse = await _http.SendAsync(request);
 
             var result = new ApiResult<JwtResponse>(tokenResponse.StatusCode, tokenResponse.Headers);
-
             if (!result.IsOK())
                 return result;
 

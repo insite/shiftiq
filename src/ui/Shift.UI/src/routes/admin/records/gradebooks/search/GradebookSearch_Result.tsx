@@ -4,6 +4,7 @@ import SearchResult from "@/components/search/SearchResult";
 import { GradebookRow } from "./GradebookRow";
 import DateRangeField from "@/routes/_shared/fields/DateRangeField";
 import DateTimeField from "@/routes/_shared/fields/DateTimeField";
+import Icon from "@/components/icon/Icon";
 
 export default function GradebookSearch_Result() {
     return (
@@ -17,7 +18,7 @@ export default function GradebookSearch_Result() {
                         <ActionLink href={`/client/admin/records/gradebooks/outline/${row.gradebookId}`}>
                             {row.gradebookTitle}
                         </ActionLink>
-                        {row.isLocked ? <i className="fas fa-lock text-danger ms-2" title="Locked"></i> : null}
+                        {row.isLocked ? <Icon style="Solid" name="lock" className="text-danger ms-2" title="Locked" /> : null}
                     </>
                 )
             },

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 
 using InSite.Application.Groups.Write;
+using InSite.Application.Records.Read;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Persistence;

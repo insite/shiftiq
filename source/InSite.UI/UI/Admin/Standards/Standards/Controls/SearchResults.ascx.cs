@@ -33,7 +33,7 @@ namespace InSite.Admin.Standards.Standards.Controls
 
         protected override IListSource SelectData(StandardFilter filter)
         {
-            CanDelete = Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Delete);
+            CanDelete = Identity.IsGranted(Route.ToolkitNumber, DataAccess.Delete);
 
             filter.OrderBy = "StandardType,ContentTitle";
 

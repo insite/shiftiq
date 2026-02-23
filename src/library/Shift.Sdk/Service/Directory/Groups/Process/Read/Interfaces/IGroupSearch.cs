@@ -12,6 +12,7 @@ namespace InSite.Application.Contacts.Read
         // Groups
 
         QGroup GetGroup(Guid groupIdentifier, params Expression<Func<QGroup, object>>[] includes);
+        string GetGroupName(Guid groupId);
 
         bool GroupExists(QGroupFilter filter);
         int CountGroups(QGroupFilter filter);

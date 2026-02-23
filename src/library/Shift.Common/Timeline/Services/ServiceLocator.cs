@@ -34,7 +34,7 @@ namespace Shift.Common.Timeline.Services
         public T GetService<T>()
         {
             if (!_registry.ContainsKey(typeof(T)))
-                throw new Exception(string.Format("You must register an instance of type {0} with the Shift.Common.Timeline service locator.", typeof(T).Name));
+                throw new InvalidOperationException(string.Format("You must register an instance of type {0} with the Shift.Common.Timeline service locator.", typeof(T).Name));
 
             T serviceInstance = (T)_registry[typeof(T)];
             return serviceInstance;

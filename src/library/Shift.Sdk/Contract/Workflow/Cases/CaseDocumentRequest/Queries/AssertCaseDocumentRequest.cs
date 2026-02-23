@@ -6,7 +6,7 @@ namespace Shift.Contract
 {
     public class AssertCaseDocumentRequest : Query<bool>
     {
-        public Guid CaseIdentifier { get; set; }
+        public Guid CaseId { get; set; }
 
         public string RequestedFileCategory { get; set; }
     }

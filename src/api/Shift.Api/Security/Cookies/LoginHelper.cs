@@ -3,13 +3,13 @@ using Shift.Service.Directory;
 namespace Shift.Api;
 
 public class LoginHelper(
-    CookieSettings cookieSettings,
     PersonService personService,
     OrganizationService organizationService,
-    GroupService groupService
+    GroupService groupService,
+    IPrincipalProvider identityService
     )
 {
-    public async Task<string?> LoginAsync(string organizationCode, string email)
+    public async Task<CookieToken?> LoginAsync(string organizationCode, string email)
     {
         var orgs = await organizationService.SearchAsync(new SearchOrganizations
         {
@@ -20,12 +20,11 @@ public class LoginHelper(
         if (organization == null)
             return null;
 
-        var organizationId = organization.OrganizationIdentifier;
-        var parentOrganizationId = organization.ParentOrganizationIdentifier;
+        var organizationId = organization.OrganizationId;
 
         var people = await personService.SearchAsync(new SearchPeople
         {
-            OrganizationIdentifier = organizationId,
+            OrganizationId = organizationId,
             EmailExact = email
         });
 
@@ -33,14 +32,11 @@ public class LoginHelper(
         if (person == null)
             return null;
 
-        var userRoles = await groupService.SearchUserRolesAsync(parentOrganizationId, organizationId, person.UserId);
+        var principal = identityService.GetPrincipal();
 
-        var token = CreateToken(organizationCode, organizationId, person, userRoles);
+        var userRoles = await groupService.SearchUserRolesAsync(principal.Partition.Identifier, organizationId, person.UserId);
 
-        var encrypt = cookieSettings.Encrypt;
-        var secret = cookieSettings.Secret;
-
-        return new CookieTokenEncoder().Serialize(token, encrypt, secret);
+        return CreateToken(organizationCode, organizationId, person, userRoles);
     }
 
     private static CookieToken CreateToken(string organizationCode, Guid organizationId, PersonMatch person, string[] userRoles)

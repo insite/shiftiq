@@ -15,7 +15,7 @@ using Shift.Sdk.UI;
 
 namespace InSite.UI.CMDS.Portal.Achievements.Credentials
 {
-    public partial class SearchResults : UserControl
+    public partial class SearchResults : BaseUserControl
     {
         private List<AchievementTypeGroup> _groups;
         private List<AttachmentItem> _attachments;
@@ -132,7 +132,10 @@ namespace InSite.UI.CMDS.Portal.Achievements.Credentials
             filter.IsCompetencyTraining = IsCMDSTraining;
             filter.IsReportingDisabled = false;
 
-            var organization = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            if (InSite.UI.Portal.Learning.Plan.ShowSafetyAchievementsOnly())
+                filter.AchievementType = "Time-Sensitive Safety Certificate";
+
+            var organization = Organization.Identifier;
 
             var table = VCmdsCredentialSearch.SelectSearchResults(filter, organization, true).ToList();
             var groups = new List<AchievementTypeGroup>();
@@ -157,7 +160,7 @@ namespace InSite.UI.CMDS.Portal.Achievements.Credentials
                 }
                 else
                 {
-                    var categoryName = GetAchievementCategoryName(achievement.AchievementIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+                    var categoryName = GetAchievementCategoryName(achievement.AchievementIdentifier, Organization.Identifier);
 
                     var achievementCategoryGroup = group.AchievementCategoryGroups.FirstOrDefault(x => x.AchievementCategory == categoryName);
                     if (achievementCategoryGroup == null)

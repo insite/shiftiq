@@ -46,7 +46,7 @@ namespace InSite.Admin.Assets.Contents.Controls
                     lang = lang.Split(new[] { ':' })[0];
 
                     if (!Language.CodeExists(lang))
-                        throw new ApplicationError($"Invalid language code: {value}");
+                        throw new ArgumentException($"Invalid language code: {value}");
                 }
 
                 ViewState[nameof(DefaultLanguage)] = lang;

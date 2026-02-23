@@ -20,17 +20,17 @@ internal class BindingHelper
         }
     }
 
-    public static bool IsWildcardDefined(Site site, DbHelper db, string[] protocols)
+    public static bool IsWildcardDefined(Site site, DbHelper db, string hostName, string[] protocols)
     {
-        var (domain, organizations) = GetDomainAndOrganizations(db);
+        var (domain, organizations) = GetDomainAndOrganizations(db, hostName);
         var wildcardDomain = "*." + domain;
 
         return protocols.All(protocol => site.Bindings.Any(binding => binding.Host == wildcardDomain && binding.Protocol == protocol));
     }
 
-    public static List<MissingBindingInfo> GetMissingBindings(Site site, DbHelper db, string[] protocols, bool excludeWidcard)
+    public static List<MissingBindingInfo> GetMissingBindings(Site site, DbHelper db, string hostName, string[] protocols, bool excludeWidcard)
     {
-        var (domain, organizations) = GetDomainAndOrganizations(db);
+        var (domain, organizations) = GetDomainAndOrganizations(db, hostName);
         var wildcardDomain = "*." + domain;
         var result = new List<MissingBindingInfo>();
 
@@ -50,32 +50,17 @@ internal class BindingHelper
         return result;
     }
 
-    private static (string domain, DbHelper.OrganizationInfo[] organizations) GetDomainAndOrganizations(DbHelper db)
+    private static (string domain, DbHelper.OrganizationInfo[] organizations) GetDomainAndOrganizations(DbHelper db, string hostName)
     {
-        var partition = GetPartition(db);
-
-        var hostParts = partition.HostName.Split('.');
+        var hostParts = hostName.Split('.');
         if (hostParts.Length < 2)
-            throw new InternalException($"Invalid Partition.HostName parameter value: " + partition.HostName);
+            throw new InternalException($"Invalid HostName parameter value: " + hostName);
 
         var organizations = db.GetOpenOrganizations();
         if (organizations.Count == 0)
             throw new InternalException("No open organizations found.");
 
         return (hostParts[^2] + "." + hostParts[^1], organizations.ToArray());
-    }
-
-    private static DbHelper.PartitionInfo GetPartition(DbHelper db)
-    {
-        var partition = db.GetPartition();
-
-        if (partition.PartitionSlug.Length == 0)
-            throw new InternalException("The value of the \"Partition:Slug\" parameter is null.");
-
-        if (partition.HostName.Length == 0)
-            throw new InternalException("The value of the \"Host:Name\" parameter is null.");
-
-        return partition;
     }
 
     private static readonly HashSet<string> ValidProtocol = new HashSet<string> { "http", "https" };

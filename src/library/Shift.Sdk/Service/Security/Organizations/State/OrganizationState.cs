@@ -24,7 +24,6 @@ namespace InSite.Domain.Organizations
     {
         public string AccountWarning { get; set; }
         public string CompanyName { get; set; }
-        public string CompanyDomain { get; set; }
         public string OrganizationCode { get; set; }
         public string OrganizationSecret { get; set; }
         public string OrganizationType { get; set; }
@@ -33,7 +32,6 @@ namespace InSite.Domain.Organizations
         public Guid? AdministratorUserIdentifier { get; set; }
         public Guid? AdministratorGroupIdentifier { get; set; }
         public Guid? GlossaryIdentifier { get; set; }
-        public Guid? ParentOrganizationIdentifier { get; set; }
         public Guid OrganizationIdentifier { get; set; }
 
         public DateTimeOffset AccountOpened { get; set; }
@@ -139,6 +137,7 @@ namespace InSite.Domain.Organizations
             assessments.RubricReGradeKeepInitialScores = e.Assessments.RubricReGradeKeepInitialScores;
             assessments.ShowPersonNameToGradingAssessor = e.Assessments.ShowPersonNameToGradingAssessor;
             assessments.RequireAutoStart = e.Assessments.RequireAutoStart;
+            assessments.LockPublishedStandards = e.Assessments.LockPublishedStandards;
 
             if (e.Assessments.PerformanceReport != null)
             {
@@ -184,6 +183,8 @@ namespace InSite.Domain.Organizations
         public void When(OrganizationCreated e)
         {
             OrganizationIdentifier = e.AggregateIdentifier;
+            OrganizationCode = e.Code.IfNullOrEmpty(GetDefaultCode);
+            CompanyName = e.Name.IfNullOrEmpty(OrganizationCode);
             AccountOpened = e.Opened ?? e.ChangeTime;
             AccountStatus = AccountStatus.Opened;
         }
@@ -202,15 +203,7 @@ namespace InSite.Domain.Organizations
 
         public void When(OrganizationEventSettingsModified e)
         {
-            var events = Toolkits.Events;
-            events.AllowLoginAnyTime = e.Events.AllowLoginAnyTime;
-            events.AllowUserAccountCreationDuringRegistration = e.Events.AllowUserAccountCreationDuringRegistration;
-            events.AllowUsersRegisterEmployees = e.Events.AllowUsersRegisterEmployees;
-            events.HideReturnToCalendar = e.Events.HideReturnToCalendar;
-            events.CompanySelectionAndCreationDisabledDuringRegistration = e.Events.CompanySelectionAndCreationDisabledDuringRegistration;
-            events.ShowUnapplicableSeats = e.Events.ShowUnapplicableSeats;
-            events.AllowClassRegistrationFields = e.Events.AllowClassRegistrationFields;
-            events.RegisterEmployeesSearchRequirement = e.Events.RegisterEmployeesSearchRequirement;
+            Toolkits.Events.Set(e.Events);
         }
 
         public void When(OrganizationFieldsModified e)
@@ -242,9 +235,8 @@ namespace InSite.Domain.Organizations
 
         public void When(OrganizationIdentificationModified e)
         {
-            OrganizationCode = e.Code.NullIfEmpty();
+            OrganizationCode = e.Code.IfNullOrEmpty(GetDefaultCode);
             CompanyName = e.Name.NullIfEmpty();
-            CompanyDomain = e.Domain.NullIfEmpty();
         }
 
         public void When(OrganizationIntegrationSettingsModified e)
@@ -316,7 +308,7 @@ namespace InSite.Domain.Organizations
 
         public void When(OrganizationParentModified e)
         {
-            ParentOrganizationIdentifier = e.ParentOrganizationId;
+
         }
 
         public void When(OrganizationPlatformSettingsModified e)
@@ -324,6 +316,7 @@ namespace InSite.Domain.Organizations
             PlatformCustomization.InlineInstructionsUrl = e.InlineInstructionsUrl.NullIfEmpty();
             PlatformCustomization.InlineLabelsUrl = e.InlineLabelsUrl.NullIfEmpty();
             PlatformCustomization.SafeExamBrowserUserAgentSuffix = e.SafeExamBrowserUserAgentSuffix.NullIfEmpty();
+            PlatformCustomization.RequireEmailVerification = e.RequireEmailVerification;
         }
 
         public void When(OrganizationPlatformUrlModified e)
@@ -389,6 +382,7 @@ namespace InSite.Domain.Organizations
         {
             var settings = Toolkits.Standards;
             settings.ShowStandardCategories = e.Standards.ShowStandardCategories;
+            settings.EnableOccupationProfileForJobDescription = e.Standards.EnableOccupationProfileForJobDescription;
         }
 
         public void When(OrganizationSurveySettingsModified e)
@@ -426,6 +420,13 @@ namespace InSite.Domain.Organizations
             url.Other = e.Url.Other.NullIfEmpty();
             url.WebSite = e.Url.WebSite.NullIfEmpty();
         }
+
+        #endregion
+
+        #region Methods (helpers)
+
+        private string GetDefaultCode() =>
+            OrganizationIdentifier.ToString().ToLower().Replace("-", string.Empty).MaxLength(30);
 
         #endregion
     }

@@ -76,7 +76,7 @@ namespace InSite.Admin.Accounts.Permissions.Controls
             GroupType.Value = group.GroupType;
             OnGroupTypeChanged();
             GroupIdentifier.Value = group.GroupIdentifier;
-            
+
             PermissionIdentifier.Value = action.ActionIdentifier;
 
             PermissionIdentifier.Enabled = false;
@@ -99,10 +99,10 @@ namespace InSite.Admin.Accounts.Permissions.Controls
 
         public void Save(out Guid permissionId)
         {
-            var groupId = DefaultGroupID ?? GroupIdentifier.Value ?? throw new ApplicationError("Group is undefined");
-            var actionId = PermissionIdentifier.Value ?? DefaultActionID ?? throw new ApplicationError("Action is undefined");
+            var groupId = DefaultGroupID ?? GroupIdentifier.Value ?? throw new InvalidOperationException("Group is undefined");
+            var actionId = PermissionIdentifier.Value ?? DefaultActionID ?? throw new InvalidOperationException("Action is undefined");
 
-            permissionId = TGroupPermissionStore.Update(groupId, actionId, "Action", AllowExecute.Checked, AllowRead.Checked, AllowWrite.Checked, AllowCreate.Checked, AllowDelete.Checked, AllowAdministrate.Checked, AllowConfigure.Checked, AllowTrialAccess.Checked);
+            permissionId = TGroupPermissionStore.Update(groupId, actionId, "Action", AllowRead.Checked, AllowWrite.Checked, AllowCreate.Checked, AllowDelete.Checked, AllowAdministrate.Checked, AllowConfigure.Checked, AllowTrialAccess.Checked);
         }
     }
 }

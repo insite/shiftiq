@@ -446,8 +446,11 @@ These subscribers will not get this message because they have unsubscribed from 
                         Variables =
                         {
                             ["FirstName"] = recipient.UserFirstName,
+                            ["RecipientFirstName"] = recipient.UserFirstName,
                             ["LastName"] = recipient.UserLastName,
-                            ["PersonCode"] = recipient.PersonCode
+                            ["RecipientLastName"] = recipient.UserLastName,
+                            ["PersonCode"] = recipient.PersonCode,
+                            ["RecipientPersonCode"] = recipient.PersonCode
                         }
                     };
 
@@ -488,7 +491,7 @@ These subscribers will not get this message because they have unsubscribed from 
         public Guid AddToQueue(OrganizationState organization, EmailDraft email, DateTimeOffset scheduled)
         {
             if (email.SenderIdentifier == Guid.Empty)
-                throw new Exception("The sender identifier is missing.");
+                throw new InvalidOperationException("The sender identifier is missing.");
 
             email.MailoutIdentifier = UniqueIdentifier.Create();
             email.OrganizationIdentifier = organization.OrganizationIdentifier;

@@ -79,10 +79,6 @@
     <insite:Nav runat="server" ID="NavPanel">
         <insite:NavItem runat="server" ID="CriteriaTab" Title="Criteria" Icon="far fa-search" IconPosition="BeforeText">
 
-            <h2 class="h4 my-3">
-                Criteria
-            </h2>
-
             <div class="row">
                 <div class="col-lg-9">
 
@@ -205,7 +201,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-3">
+                            <div class="mt-4">
                                 <insite:SearchButton runat="server" ID="ReportButton" Text="Report" Icon="fas fa-chart-bar" ValidationGroup="Report" CausesValidation="true" />
                                 <insite:DownloadButton runat="server" ID="PreDownloadXlsx1" Text="Download XLSX" ValidationGroup="Report" CausesValidation="true" />
                             </div>
@@ -218,10 +214,6 @@
 
         </insite:NavItem>
         <insite:NavItem runat="server" ID="ReportTab" Title="Report" Icon="far fa-chart-bar" IconPosition="BeforeText" Visible="false">
-
-            <h2 class="h4 my-3">
-                Report
-            </h2>
 
             <div class="card border-0 shadow-lg">
                 <div class="card-body">

@@ -9,9 +9,9 @@ public class MembershipAdapter : IEntityAdapter
     {
         entity.MembershipEffective = modify.MembershipEffective;
         entity.MembershipFunction = modify.MembershipFunction;
-        entity.GroupIdentifier = modify.GroupIdentifier;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.UserIdentifier = modify.UserIdentifier;
+        entity.GroupIdentifier = modify.GroupId;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.UserIdentifier = modify.UserId;
         entity.MembershipExpiry = modify.MembershipExpiry;
         entity.Modified = modify.Modified;
         entity.ModifiedBy = modify.ModifiedBy;
@@ -29,12 +29,12 @@ public class MembershipAdapter : IEntityAdapter
     {
         var entity = new MembershipEntity
         {
-            MembershipIdentifier = create.MembershipIdentifier,
+            MembershipIdentifier = create.MembershipId,
             MembershipEffective = create.MembershipEffective,
             MembershipFunction = create.MembershipFunction,
-            GroupIdentifier = create.GroupIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            UserIdentifier = create.UserIdentifier,
+            GroupIdentifier = create.GroupId,
+            OrganizationIdentifier = create.OrganizationId,
+            UserIdentifier = create.UserId,
             MembershipExpiry = create.MembershipExpiry,
             Modified = create.Modified,
             ModifiedBy = create.ModifiedBy
@@ -51,12 +51,12 @@ public class MembershipAdapter : IEntityAdapter
     {
         var model = new MembershipModel
         {
-            MembershipIdentifier = entity.MembershipIdentifier,
+            MembershipId = entity.MembershipIdentifier,
             MembershipEffective = entity.MembershipEffective,
             MembershipFunction = entity.MembershipFunction,
-            GroupIdentifier = entity.GroupIdentifier,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            UserIdentifier = entity.UserIdentifier,
+            GroupId = entity.GroupIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            UserId = entity.UserIdentifier,
             MembershipExpiry = entity.MembershipExpiry,
             Modified = entity.Modified,
             ModifiedBy = entity.ModifiedBy
@@ -74,7 +74,7 @@ public class MembershipAdapter : IEntityAdapter
     {
         var match = new MembershipMatch
         {
-            MembershipIdentifier = entity.MembershipIdentifier
+            MembershipId = entity.MembershipIdentifier
 
         };
 

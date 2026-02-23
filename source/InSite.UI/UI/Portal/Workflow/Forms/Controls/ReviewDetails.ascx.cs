@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -110,6 +109,12 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         {
             public IEnumerable<CardInfo> Cards { get; set; }
             public IEnumerable<QuestionInfo> BarChartQuestions { get; set; }
+        }
+
+        public class ChartLegendInfo
+        {
+            public string Category { get; set; }
+            public string Color { get; set; }
         }
 
         #endregion
@@ -234,7 +239,15 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             BarChartPanel.Visible = dataSource.BarChartQuestions != null;
 
             if (dataSource.BarChartQuestions != null)
-                BuildSummaryBarChart(dataSource.BarChartQuestions, print);
+            {
+                var chartQuestions = dataSource.BarChartQuestions
+                    .Select(x => (x.Html, x.Answer.LikertScale))
+                    .ToArray();
+
+                (ChartBody.Text, ChartLegend.DataSource) = BuildSummaryBarChart(chartQuestions, print);
+
+                ChartLegend.DataBind();
+            }
 
             CardRepeater.DataSource = dataSource.Cards;
             CardRepeater.DataBind();
@@ -249,84 +262,49 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             CompletedInstructionsLiteral.Text = text;
         }
 
-        private void BuildSummaryBarChart(IEnumerable<QuestionInfo> questions, bool print)
+        internal static (string Html, ChartLegendInfo[] Legend) BuildSummaryBarChart((string Html, LikertScaleInfo LikertScale)[] questions, bool print)
         {
-            var firstQuestion = questions.FirstOrDefault();
+            var firstQuestion = questions.First();
+            var items = firstQuestion.LikertScale.Items;
+            var categories = items.Select(x => x.Category).ToList();
+            var count = categories.Count;
 
-            var categories = firstQuestion
-                .Answer.LikertScale.Items.Select(x => x.Category)
+            var colorsText = string.Join(",", Enumerable.Range(0, count).Select(i => "\"" + GetBarChartSeriesColor(i) + "\""));
+
+            var seriesText = string.Join(",", Enumerable.Range(0, count).Select(i =>
+            {
+                var values = questions.Select(q =>
+                    i < q.LikertScale.Items.Count
+                        ? q.LikertScale.Items[i].Average.ToString()
+                        : string.Empty);
+                return $"[{string.Join(",", values)}]";
+            }));
+
+            var labelsList = questions
+                .Select(x => StringHelper.StripHtml(x.Html?.Replace("\"", "")?.Replace("\n", " ")))
                 .ToList();
 
-            var legend = new List<Tuple<string, string>>();
-            var colorsText = new StringBuilder();
-            var seriesText = new StringBuilder();
-
-            for (int i = 0; i < categories.Count; i++)
-            {
-                var color = GetBarChartSeriesColor(i);
-                var reverseColor = GetBarChartSeriesColor(categories.Count - i - 1);
-
-                legend.Add(new Tuple<string, string>(categories[i], reverseColor));
-
-                if (colorsText.Length > 0)
-                    colorsText.Append(',');
-
-                colorsText.Append($@"""{color}""");
-
-                if (seriesText.Length > 0)
-                    seriesText.Append(",");
-
-                seriesText.Append('[');
-
-                var first = true;
-
-                foreach (var question in questions)
-                {
-                    if (!first)
-                        seriesText.Append(',');
-                    else
-                        first = false;
-
-                    var items = question.Answer.LikertScale.Items;
-
-                    if (i < items.Count)
-                        seriesText.Append(items[i].Average.ToString());
-                }
-
-                seriesText.Append(']');
-            }
-
-            var height = Number.CheckRange(70 + 10 * categories.Count, 100);
-            var labelsList = questions.Select(x => StringHelper.StripHtml(x.Html?.Replace("\"", "")?.Replace("\n", " ")));
             var labelsText = string.Join(",", labelsList.Select(x => $"\"{x}\""));
+            var height = Number.CheckRange(70 + 10 * labelsList.Count * count + 12 * labelsList.Count, 100);
+            var offset = labelsList.Any(x => !string.IsNullOrWhiteSpace(x)) ? (print ? 350 : 500) : 0;
 
-            var html = new StringBuilder();
-            html.Append($@"<div class=""ct-chart"" style=""height:{height}px;""");
-            html.Append($@" data-bar-chart='{{""labels"": [{labelsText}], ""series"": [{seriesText}] }}'");
-            html.Append($@" data-series-color='{{""colors"": [{colorsText}]}}'");
+            var options = print
+                ? $@"{{ ""horizontalBars"": true, ""reverseData"": true, ""seriesBarDistance"": 10, ""axisY"": {{ ""offset"": {offset} }}, ""width"": 750, ""height"": {height} }}"
+                : $@"{{ ""horizontalBars"": true, ""reverseData"": true, ""seriesBarDistance"": 10, ""axisY"": {{ ""offset"": {offset} }} }}";
 
-            var offset = labelsList.Any(x => !string.IsNullOrWhiteSpace(x))
-                ? print ? 350 : 500
-                : 0;
-
-            if (print)
-                html.Append(@" data-options='{ ""horizontalBars"": true, ""reverseData"": true, ""seriesBarDistance"": 10, ""axisY"": { ""offset"": " + offset + @" } , ""width"": 750, ""height"": " + height + "}'");
-            else
-                html.Append(@" data-options='{ ""horizontalBars"": true, ""reverseData"": true, ""seriesBarDistance"": 10, ""axisY"": { ""offset"": " + offset + @" } }'");
-
-            html.Append("></div>");
-
-            ChartLegend.DataSource = legend;
-            ChartLegend.DataBind();
-
-            Chart.Text = html.ToString();
+            return (
+                $@"<div class=""ct-chart"" style=""height:{height}px;"" data-bar-chart='{{""labels"": [{labelsText}], ""series"": [{seriesText}] }}' data-series-color='{{""colors"": [{colorsText}]}}' data-options='{options}'></div>",
+                categories.Select((cat, i) => new ChartLegendInfo
+                {
+                    Category = cat,
+                    Color = GetBarChartSeriesColor(count - i - 1)
+                }).ToArray()
+            );
         }
 
-        private static string GetBarChartSeriesColor(int index)
-        {
-            var colors = new[] { "#4472C4", "#ED7D31", "#F4C63D", "#453D3F", "#59922B" };
-            return colors[index % 5];
-        }
+        private static readonly string[] BarChartColors = { "#4472C4", "#ED7D31", "#F4C63D", "#453D3F", "#59922B" };
+
+        private static string GetBarChartSeriesColor(int index) => BarChartColors[index % BarChartColors.Length];
 
         #endregion
 

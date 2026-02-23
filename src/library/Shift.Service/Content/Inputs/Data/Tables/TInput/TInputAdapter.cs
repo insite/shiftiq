@@ -8,8 +8,8 @@ public class TInputAdapter : IEntityAdapter
 {
     public void Copy(ModifyInput modify, TInputEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.ContainerIdentifier = modify.ContainerIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.ContainerIdentifier = modify.ContainerId;
         entity.ContentLabel = modify.ContentLabel;
         entity.ContentLanguage = modify.ContentLanguage;
         entity.ContentSnip = modify.ContentSnip;
@@ -26,8 +26,8 @@ public class TInputAdapter : IEntityAdapter
     {
         var entity = new TInputEntity
         {
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            ContainerIdentifier = create.ContainerIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            ContainerIdentifier = create.ContainerId,
             ContentLabel = create.ContentLabel,
             ContentLanguage = create.ContentLanguage,
             ContentSnip = create.ContentSnip,
@@ -35,7 +35,7 @@ public class TInputAdapter : IEntityAdapter
             ContentHtml = create.ContentHtml,
             ContainerType = create.ContainerType,
             ContentSequence = create.ContentSequence,
-            ContentIdentifier = create.ContentIdentifier,
+            ContentIdentifier = create.ContentId,
             ReferenceFiles = create.ReferenceFiles,
             ReferenceCount = create.ReferenceCount
         };
@@ -51,8 +51,8 @@ public class TInputAdapter : IEntityAdapter
     {
         var model = new InputModel
         {
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            ContainerIdentifier = entity.ContainerIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            ContainerId = entity.ContainerIdentifier,
             ContentLabel = entity.ContentLabel,
             ContentLanguage = entity.ContentLanguage,
             ContentSnip = entity.ContentSnip,
@@ -60,7 +60,7 @@ public class TInputAdapter : IEntityAdapter
             ContentHtml = entity.ContentHtml,
             ContainerType = entity.ContainerType,
             ContentSequence = entity.ContentSequence,
-            ContentIdentifier = entity.ContentIdentifier,
+            ContentId = entity.ContentIdentifier,
             ReferenceFiles = entity.ReferenceFiles,
             ReferenceCount = entity.ReferenceCount
         };
@@ -77,7 +77,7 @@ public class TInputAdapter : IEntityAdapter
     {
         var match = new InputMatch
         {
-            ContentIdentifier = entity.ContentIdentifier
+            ContentId = entity.ContentIdentifier
 
         };
 

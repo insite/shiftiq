@@ -127,8 +127,8 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
 
         private Guid? GetUser()
         {
-            return Identity.IsGranted(PermissionName, PermissionOperation.Delete)
-                || Identity.IsGranted(PermissionName, PermissionOperation.Configure)
+            return Identity.IsGranted(PermissionName, DataAccess.Delete)
+                || Identity.IsGranted(PermissionName, DataAccess.Configure)
                     ? (Guid?)null
                     : User.UserIdentifier;
         }
@@ -136,7 +136,7 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
         private Guid? GetValidator()
         {
             return IsCompetenciesToValidate
-                && !Identity.IsGranted(PermissionName, PermissionOperation.Configure)
+                && !Identity.IsGranted(PermissionName, DataAccess.Configure)
                     ? User.UserIdentifier
                     : (Guid?)null;
         }

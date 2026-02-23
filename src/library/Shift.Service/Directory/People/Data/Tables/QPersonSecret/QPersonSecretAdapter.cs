@@ -11,7 +11,7 @@ public class QPersonSecretAdapter : IEntityAdapter
 {
     public void Copy(ModifyPersonSecret modify, QPersonSecretEntity entity)
     {
-        entity.PersonIdentifier = modify.PersonIdentifier;
+        entity.PersonIdentifier = modify.PersonId;
         entity.SecretType = modify.SecretType;
         entity.SecretName = modify.SecretName;
         entity.SecretExpiry = modify.SecretExpiry;
@@ -49,8 +49,8 @@ public class QPersonSecretAdapter : IEntityAdapter
     {
         var entity = new QPersonSecretEntity
         {
-            PersonIdentifier = create.PersonIdentifier,
-            SecretIdentifier = create.SecretIdentifier,
+            PersonIdentifier = create.PersonId,
+            SecretIdentifier = create.SecretId,
             SecretType = create.SecretType,
             SecretName = create.SecretName,
             SecretExpiry = create.SecretExpiry,
@@ -69,8 +69,8 @@ public class QPersonSecretAdapter : IEntityAdapter
     {
         var model = new PersonSecretModel
         {
-            PersonIdentifier = entity.PersonIdentifier,
-            SecretIdentifier = entity.SecretIdentifier,
+            PersonId = entity.PersonIdentifier,
+            SecretId = entity.SecretIdentifier,
             SecretType = entity.SecretType,
             SecretName = entity.SecretName,
             SecretExpiry = entity.SecretExpiry,
@@ -90,7 +90,7 @@ public class QPersonSecretAdapter : IEntityAdapter
     {
         var match = new PersonSecretMatch
         {
-            SecretIdentifier = entity.SecretIdentifier
+            SecretId = entity.SecretIdentifier
 
         };
 

@@ -2,14 +2,14 @@ import { expect, test } from "vitest";
 import { shiftClient } from "../shiftClient";
 import { ApiError } from "../apiError";
 
-test("/progress/achievements/*: non-authenticated", async () => {
+test("/api/progress/achievements/*: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.achievement.search({}, 0, 0)).rejects.toThrowError(new ApiError(401, ""));
     await expect(shiftClient.achievement.retrieve("f3ad8690-76e0-4ede-afb0-a0c2a21ed947")).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("/progress/achievements/search: authenticated", async () => {
+test("/api/progress/achievements/search: authenticated", async () => {
     await global.login();
 
     const result = await shiftClient.achievement.search({}, 0, 10);
@@ -23,7 +23,7 @@ test("/progress/achievements/search: authenticated", async () => {
     expect(result!.rows[0].AchievementTitle).toBeTypeOf("string");
 });
 
-test("/progress/achievements/<achievementId>: authenticated", async () => {
+test("/api/progress/achievements/<achievementId>: authenticated", async () => {
     await global.login();
 
     const searchResult = await shiftClient.achievement.search({}, 0, 10);
@@ -31,6 +31,6 @@ test("/progress/achievements/<achievementId>: authenticated", async () => {
 
     const result = await shiftClient.achievement.retrieve(achievementId);
 
-    expect(result!.AchievementIdentifier.toLowerCase()).toBe(achievementId.toLowerCase());
+    expect(result!.AchievementId.toLowerCase()).toBe(achievementId.toLowerCase());
     expect(result!.AchievementTitle).toBeTypeOf("string");
 });

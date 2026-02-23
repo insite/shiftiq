@@ -6,8 +6,9 @@ namespace Shift.Contract
 {
     public class CountInputs : Query<int>, IInputCriteria
     {
-        public Guid? ContainerIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? ContainerId { get; set; }
+        public Guid[] ContainerIds { get; set; }
+        public Guid? OrganizationId { get; set; }
 
         public string ContainerType { get; set; }
         public string ContentHtml { get; set; }

@@ -87,11 +87,11 @@ namespace InSite.Admin.Workflow.Forms
                 return;
             }
 
-            var hasWrite = CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Write);
+            var hasWrite = CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Update);
 
             CanCreate = hasWrite;
             CanEdit = survey.Form.Locked == null && hasWrite;
-            CanDelete = survey.Form.Locked == null && CurrentSessionState.Identity.IsGranted(Route.ToolkitName, PermissionOperation.Delete);
+            CanDelete = survey.Form.Locked == null && CurrentSessionState.Identity.IsGranted(Route.ToolkitName, DataAccess.Delete);
             CanLock = hasWrite;
 
             Guid? selectedQuestionId = null;

@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrievePersonAddress : Query<PersonAddressModel>
     {
-        public Guid AddressIdentifier { get; set; }
+        public Guid AddressId { get; set; }
     }
 }

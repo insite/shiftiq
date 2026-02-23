@@ -497,10 +497,10 @@ namespace Shift.Common
         {
             var byteData = Convert.FromBase64String(data);
             if (byteData == null)
-                throw new ApplicationError("Invalid input data");
+                throw new FormatException("Invalid input data");
 
             if (saltLength <= 0 || byteData.Length <= saltLength)
-                throw new ApplicationError("Invalid salt length: " + saltLength);
+                throw new FormatException("Invalid salt length: " + saltLength);
 
             var salt = ArrayHelper.Get(byteData, 0, saltLength);
 
@@ -511,7 +511,7 @@ namespace Shift.Common
         {
             var byteData = HttpHelper.UrlTokenDecode(data);
             if (byteData == null)
-                throw new ApplicationError("Invalid input data");
+                throw new FormatException("Invalid input data");
 
             return EncryptionHelper.Decode(byteData, 0, byteData.Length, key, null, read);
         }
@@ -520,10 +520,10 @@ namespace Shift.Common
         {
             var byteData = HttpHelper.UrlTokenDecode(data);
             if (byteData == null)
-                throw new ApplicationError("Invalid input data");
+                throw new FormatException("Invalid input data");
 
             if (saltLength <= 0 || byteData.Length <= saltLength)
-                throw new ApplicationError("Invalid salt length: " + saltLength);
+                throw new FormatException("Invalid salt length: " + saltLength);
 
             var salt = ArrayHelper.Get(byteData, 0, saltLength);
 

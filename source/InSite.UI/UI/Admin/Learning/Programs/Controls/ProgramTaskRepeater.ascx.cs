@@ -158,7 +158,7 @@ namespace InSite.UI.Admin.Records.Programs.Controls
             ProgramIdentifier = programId;
             AutoPostBack = true;
 
-            var (programTasks, items) = ProgramHelper.GetTasksAndItems(programId, ObjectType, Organization.OrganizationIdentifier, null);
+            var (programTasks, items) = ProgramHelper.GetTasksAndItems(programId, ObjectType, Organization.OrganizationIdentifier);
 
             ProgramTasks = programTasks;
 

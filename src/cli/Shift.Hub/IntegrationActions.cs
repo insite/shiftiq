@@ -37,7 +37,7 @@ internal class IntegrationActions
     private bool LoadIntegration()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var className = $"Arc.Cli.Integration.{_integrationName}.{_commandName}";
+        var className = $"Shift.Hub.Integration.{_integrationName}.{_commandName}";
         var classType = assembly.GetType(className);
         if (classType == null)
         {

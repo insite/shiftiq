@@ -56,7 +56,7 @@ namespace InSite.Persistence
             }
             catch (Exception ex)
             {
-                throw new ApplicationError($"The error for the file path: '{newFilePath}'", ex);
+                throw new InvalidOperationException($"A problem occurred saving the file '{newFilePath}'", ex);
             }
 
             if (newFileSize > 0)
@@ -64,7 +64,7 @@ namespace InSite.Persistence
 
             File.Delete(newFilePath);
 
-            throw new ApplicationError("File cannot be empty");
+            throw new InvalidOperationException("File cannot be empty");
         }
 
         private (bool, int) CheckSavedPreviously(string filePath, Stream file)

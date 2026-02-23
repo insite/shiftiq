@@ -17,6 +17,7 @@ using InSite.Domain.Users;
 
 using Shift.Common;
 using Shift.Constant;
+using InSite.Domain;
 
 namespace InSite.Persistence
 {
@@ -29,12 +30,15 @@ namespace InSite.Persistence
         private readonly IContentSearch _contents;
         private readonly IRegistrationSearch _registrations;
 
+        private readonly IPartitionModel _partition;
+
         public CoreProcessManager(
             IChangeQueue publisher,
             IEmailOutbox postOffice,
             IRegistrationSearch registrations,
             IContentSearch contents,
-            IContactSearch contacts
+            IContactSearch contacts,
+            IPartitionModel partition
             )
         {
             _publisher = publisher;
@@ -48,6 +52,8 @@ namespace InSite.Persistence
             _publisher.Subscribe<RegistrantContactInformationChanged>(Handle);
             _publisher.Subscribe<UserAccountArchived>(Handle);
             _publisher.Subscribe<UserAccountWelcomed>(Handle);
+
+            _partition = partition;
         }
 
         public void Handle(InvoicePaid e)
@@ -151,9 +157,9 @@ namespace InSite.Persistence
 
             var notice = Notifications.Select(NotificationType.UserAccountWelcomed, organization.Code);
 
-            if (notice == null && organization.ParentOrganizationIdentifier.HasValue)
+            if (notice == null && organizationId != _partition.Identifier)
             {
-                var parentOrganization = OrganizationSearch.Select(organization.ParentOrganizationIdentifier.Value);
+                var parentOrganization = OrganizationSearch.Select(_partition.Identifier);
                 if (parentOrganization != null)
                     notice = Notifications.Select(NotificationType.UserAccountWelcomed, parentOrganization.Code);
             }

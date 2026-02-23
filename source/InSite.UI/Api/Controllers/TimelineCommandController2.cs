@@ -4,13 +4,13 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 
-using Shift.Common.Timeline.Commands;
-using Shift.Common.Timeline.Exceptions;
-
+using InSite.Api.Settings;
 using InSite.Application.Groups.Write;
 
 using Shift.Common;
 using Shift.Common.Kernel;
+using Shift.Common.Timeline.Commands;
+using Shift.Common.Timeline.Exceptions;
 using Shift.Sdk.UI;
 
 namespace InSite.Api
@@ -39,49 +39,38 @@ namespace InSite.Api
      */
 
     [DisplayName("Timeline")]
-    [ApiAuthenticationRequirement(ApiAuthenticationType.None)]
-    [JwtAuthorize]
+    [ApiAuthenticationRequirement(ApiAuthenticationType.Jwt)]
     public class TimelineController : ApiController
     {
-        readonly string[] _excludeNamespaces = new[]
+        static readonly string[] _excludeNamespaces = new[]
         {
             "InSite.Application.Groups.Write.Old",
             "InSite.Application.People.Write.Old",
             "InSite.Application.Users.Write.Old"
         };
 
+        static readonly CommandTypeCollection _types = new CommandTypeCollection(typeof(RenameGroup).Assembly, typeof(Command), _excludeNamespaces);
+
+        static readonly CommandBuilder _commandBuilder = new CommandBuilder(_types, new JsonSerializer2());
+
         [HttpPost]
         [Route("api/timeline/commands")]
         public HttpResponseMessage ExecuteCommand(string command)
         {
-            var types = new CommandTypeCollection(typeof(RenameGroup).Assembly, typeof(Command), _excludeNamespaces);
+            var root = Global.GetRootSentinel();
+            var identity = HttpContext.Current.GetIdentity();
+            if (identity.User.Identifier != root.Identifier)
+                throw new ArgumentException("Only the root account is permitted to invoke this API method.");
 
-            var serializer = new JsonSerializer2();
-
-            var commandBuilder = new CommandBuilder(types, serializer);
-
-            var commandType = commandBuilder.GetCommandType(command);
-
-            // FIXME: Implement access control. We cannot permit every user to execute every command.
-            // ConfirmPermission(commandType);
-
-            var status = $"{HttpContext.Current.User.Identity.Name} is executing command {commandType.FullName}";
+            var commandType = _commandBuilder.GetCommandType(command);
 
             var requestBody = HttpHelper.ReadRequestBody(Request);
-
-            var commandObject = commandBuilder.BuildCommand(commandType, requestBody);
-
-            var co = (Command)commandObject;
-
-            var principal = HttpContext.Current.User as IShiftPrincipal;
-
-            co.OriginOrganization = principal.Organization.Identifier;
-
-            co.OriginUser = principal.User.Identifier;
+            var commandObject = (Command)_commandBuilder.BuildCommand(commandType, requestBody);
+            var principal = HttpContext.Current.User as IPrincipal;
 
             try
             {
-                ServiceLocator.ExecuteCommand(co);
+                ServiceLocator.ExecuteCommand(commandObject);
 
                 return HttpHelper.Ok(Request);
             }

@@ -58,7 +58,7 @@ namespace InSite.UI.Portal.Learning.Programs
                 if (_programSearch == null)
                 {
                     var groupIds = Identity.Groups.Select(x => x.Identifier).ToArray();
-                    _programSearch = VCatalogProgramSearch.Create(Identity.Organization.Identifier, RequestedCatalog, groupIds, ViewEntireCatalog);
+                    _programSearch = VCatalogProgramSearch.Create(Identity.Organization.Identifier, RequestedCatalog, groupIds, ViewEntireCatalog, ServiceLocator.Partition);
                 }
 
                 return _programSearch;

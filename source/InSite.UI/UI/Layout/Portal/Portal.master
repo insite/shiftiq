@@ -125,7 +125,7 @@
                 <!-- Content-->
                 <div class="flex-fill">
                     <div class="h-100 bg-light rounded-3 shadow-lg p-4">
-                        <div class="py-2 p-md-3" style="position: relative;">
+                        <div runat="server" id="ContentPanel" class="py-2 p-md-3" style="position: relative;">
                         
                             <uc:PortalBreadcrumbs runat="server" ID="BodyBreadcrumbs" />
                             <asp:ContentPlaceHolder ID="BodyContent" runat="server" />

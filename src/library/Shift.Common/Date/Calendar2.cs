@@ -193,7 +193,7 @@ namespace Shift.Common
         public static int GetMonthNumber(string name)
         {
             if (name == null)
-                throw new Exception($"Unexpected null parameter value: {nameof(name)}");
+                throw new ArgumentNullException(nameof(name));
 
             name = name.ToLower();
 

@@ -7,10 +7,10 @@ public class CaseGroupAdapter : IEntityAdapter
 {
     public void Copy(ModifyCaseGroup modify, CaseGroupEntity entity)
     {
-        entity.CaseIdentifier = modify.CaseIdentifier;
-        entity.GroupIdentifier = modify.GroupIdentifier;
+        entity.CaseIdentifier = modify.CaseId;
+        entity.GroupIdentifier = modify.GroupId;
         entity.CaseRole = modify.CaseRole;
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
 
     }
 
@@ -25,11 +25,11 @@ public class CaseGroupAdapter : IEntityAdapter
     {
         var entity = new CaseGroupEntity
         {
-            CaseIdentifier = create.CaseIdentifier,
-            GroupIdentifier = create.GroupIdentifier,
+            CaseIdentifier = create.CaseId,
+            GroupIdentifier = create.GroupId,
             CaseRole = create.CaseRole,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            JoinIdentifier = create.JoinIdentifier
+            OrganizationIdentifier = create.OrganizationId,
+            JoinIdentifier = create.JoinId
         };
         return entity;
     }
@@ -43,11 +43,11 @@ public class CaseGroupAdapter : IEntityAdapter
     {
         var model = new CaseGroupModel
         {
-            CaseIdentifier = entity.CaseIdentifier,
-            GroupIdentifier = entity.GroupIdentifier,
+            CaseId = entity.CaseIdentifier,
+            GroupId = entity.GroupIdentifier,
             CaseRole = entity.CaseRole,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            JoinIdentifier = entity.JoinIdentifier
+            OrganizationId = entity.OrganizationIdentifier,
+            JoinId = entity.JoinIdentifier
         };
 
         return model;
@@ -62,7 +62,7 @@ public class CaseGroupAdapter : IEntityAdapter
     {
         var match = new CaseGroupMatch
         {
-            JoinIdentifier = entity.JoinIdentifier
+            JoinId = entity.JoinIdentifier
 
         };
 

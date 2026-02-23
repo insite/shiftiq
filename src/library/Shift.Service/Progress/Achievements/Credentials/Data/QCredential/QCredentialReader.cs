@@ -202,7 +202,7 @@ public class QCredentialReader : IEntityReader
         var matches = await queryable
             .Select(entity => new CredentialMatch
             {
-                CredentialIdentifier = entity.CredentialIdentifier
+                CredentialId = entity.CredentialIdentifier
 
             })
             .ToListAsync(cancellation);

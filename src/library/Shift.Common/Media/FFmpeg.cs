@@ -574,7 +574,7 @@ namespace Shift.Common
                 return result;
             }
 
-            private static ApplicationError InvalidDataLineException(string data) =>
+            private static Exception InvalidDataLineException(string data) =>
                 ApplicationError.Create("Invalid data line: " + data);
         }
 

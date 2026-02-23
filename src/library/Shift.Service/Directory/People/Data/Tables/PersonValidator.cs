@@ -20,7 +20,7 @@ public class PersonValidator : IPersonValidator
         _userService = userService;
     }
 
-    public async Task<ValidationFailure> ValidateCommandAsync(ImportPerson item, int index,
+    public async Task<ValidationFailure> ValidateCommandAsync(ImportPerson item, Guid organizationId, int index,
         CancellationToken cancellation)
     {
         var result = new ValidationFailure();
@@ -28,7 +28,7 @@ public class PersonValidator : IPersonValidator
         if (item.Identifier == default)
             result.AddError($"{nameof(ImportPerson.Identifier)} is a required field. ({index})");
 
-        if (await _personService.AssertAsync(item.Identifier, cancellation))
+        if (await _personService.AssertAsync(item.Identifier, organizationId, cancellation))
             result.AddError($"{nameof(ImportPerson.Identifier)} must be unique. ({index})");
 
         if (string.IsNullOrEmpty(item.Email))

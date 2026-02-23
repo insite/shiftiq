@@ -43,7 +43,7 @@ namespace InSite.UI.Portal.Records.Programs
         {
             var identity = CurrentSessionState.Identity;
 
-            var hasWriteAccess = identity.IsGranted(PermissionIdentifiers.Admin_Sites, PermissionOperation.Write);
+            var hasWriteAccess = identity.IsGranted(PermissionIdentifiers.Admin_Sites, DataAccess.Update);
 
             var appUrl = ServiceLocator.Urls.GetApplicationUrl(identity.Organization.Code);
 

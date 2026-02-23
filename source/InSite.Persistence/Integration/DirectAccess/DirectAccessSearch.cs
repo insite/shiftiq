@@ -70,7 +70,7 @@ namespace InSite.Persistence.Integration.DirectAccess
             while (!unique && count <= MaximumDuplicates);
 
             if (!unique && count > MaximumDuplicates)
-                throw new Exception($"Unable to get a unique email address for {individualEmail}");
+                throw new InvalidOperationException($"Unable to get a unique email address for {individualEmail}");
 
             return email;
         }

@@ -7,7 +7,7 @@ namespace Shift.Contract
 {
     public interface IPageService
     {
-        Task<bool> AssertAsync(Guid page, CancellationToken cancellation = default);
+        Task<bool> AssertAsync(Guid page, Guid? organization, CancellationToken cancellation = default);
         Task<PageModel> RetrieveAsync(Guid page, CancellationToken cancellation = default);
 
         Task<int> CountAsync(IPageCriteria criteria, CancellationToken cancellation = default);

@@ -42,6 +42,15 @@ namespace InSite.UI.Admin.Database.Entities
         protected global::InSite.UI.Admin.Database.Entities.SearchResults SearchResults;
 
         /// <summary>
+        /// SubsystemSummary control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater SubsystemSummary;
+
+        /// <summary>
         /// ComponentSummary control.
         /// </summary>
         /// <remarks>
@@ -49,15 +58,6 @@ namespace InSite.UI.Admin.Database.Entities
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater ComponentSummary;
-
-        /// <summary>
-        /// SubcomponentSummary control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater SubcomponentSummary;
 
         /// <summary>
         /// SearchCriteriaTab control.

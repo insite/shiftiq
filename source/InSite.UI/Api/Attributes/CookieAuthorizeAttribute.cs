@@ -38,7 +38,7 @@ namespace InSite.Api
 
             var encoder = new CookieTokenEncoder();
 
-            var cookie = encoder.Deserialize(token, settings.Cookie.Encrypt, secret);
+            var cookie = encoder.Deserialize(token, settings.Cookie.Encrypt, secret, true);
 
             var converter = new ClaimConverter(Global.GetSecuritySettings());
 
@@ -52,7 +52,7 @@ namespace InSite.Api
             }
         }
 
-        private IShiftPrincipal ToPrincipal(CookieToken cookie)
+        private IPrincipal ToPrincipal(CookieToken cookie)
         {
             var principal = new Principal();
 

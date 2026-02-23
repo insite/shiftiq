@@ -7,8 +7,9 @@ namespace Shift.Contract
 {
     public class SearchFileClaims : Query<IEnumerable<FileClaimMatch>>, IFileClaimCriteria
     {
-        public Guid? FileIdentifier { get; set; }
-        public Guid? ObjectIdentifier { get; set; }
+        public Guid? FileId { get; set; }
+        public Guid? ObjectId { get; set; }
+        public Guid? OrganizationId { get; set; }
 
         public string ObjectType { get; set; }
 

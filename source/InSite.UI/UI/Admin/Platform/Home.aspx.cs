@@ -21,7 +21,7 @@ namespace InSite.UI.Admin.Settings
             LdcMonitorEnabled.AutoPostBack = true;
             LdcMonitorEnabled.CheckedChanged += (s, a) =>
             {
-                ServiceLocator.Partition.DatabaseMonitorLargeCommandSize = LdcMonitorEnabled.Checked ? 8192 : 0;
+                ServiceLocator.AppSettings.Database.MonitorCommandSize = LdcMonitorEnabled.Checked ? 8192 : 0;
 
                 AppSentry.UpdateDatabaseCommandMonitor();
 
@@ -31,7 +31,7 @@ namespace InSite.UI.Admin.Settings
             LdcMonitorIncludeStackTrace.AutoPostBack = true;
             LdcMonitorIncludeStackTrace.CheckedChanged += (s, a) =>
             {
-                ServiceLocator.Partition.DatabaseMonitorIncludeStackTrace = LdcMonitorIncludeStackTrace.Checked;
+                ServiceLocator.AppSettings.Database.MonitorStackTrace = LdcMonitorIncludeStackTrace.Checked;
 
                 AppSentry.UpdateDatabaseCommandMonitor();
 
@@ -117,8 +117,8 @@ namespace InSite.UI.Admin.Settings
 
         private void BindLdcMonitor()
         {
-            var size = ServiceLocator.Partition.DatabaseMonitorLargeCommandSize;
-            var trace = ServiceLocator.Partition.DatabaseMonitorIncludeStackTrace;
+            var size = ServiceLocator.AppSettings.Database.MonitorCommandSize;
+            var trace = ServiceLocator.AppSettings.Database.MonitorStackTrace;
 
             LdcMonitorEnabled.Checked = size > 0;
             LdcReportStatus.InnerText = AppSentry.IsDatabaseCommandMonitorEnabled ? "Working" : "Stopped";

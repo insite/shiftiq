@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveEvent : Query<EventModel>
     {
-        public Guid EventIdentifier { get; set; }
+        public Guid EventId { get; set; }
     }
 }

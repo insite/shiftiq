@@ -64,12 +64,12 @@ namespace InSite.Common.Web.Cmds
                        || StringHelper.Equals(_achievement.AchievementLabel, AchievementTypes.SafeOperatingPractice)
                        || StringHelper.Equals(_achievement.AchievementLabel, AchievementTypes.SiteSpecificOperatingProcedure)
                        || StringHelper.Equals(_achievement.AchievementLabel, AchievementTypes.TrainingGuide)
-                       || (allowSelfGranting && TypeAllowsSignOff(_achievement.AchievementLabel)));
+                       || (allowSelfGranting && AllowSignOff(_achievement.AchievementLabel)));
         }
 
-        public static bool TypeAllowsSignOff(string subtype)
+        public static bool AllowSignOff(string achievementType)
         {
-            return StringHelper.EqualsAny(subtype, new[] {
+            return StringHelper.EqualsAny(achievementType, new[] {
                 AchievementTypes.AdditionalComplianceRequirement,
                 AchievementTypes.CodeOfPractice,
                 AchievementTypes.HumanResourcesDocument,
@@ -77,6 +77,13 @@ namespace InSite.Common.Web.Cmds
                 AchievementTypes.SiteSpecificOperatingProcedure,
                 AchievementTypes.TrainingGuide
             });
+        }
+
+        public static bool AllowSignOff(Guid achievementId)
+        {
+            var achievement = ServiceLocator.AchievementSearch.GetAchievement(achievementId);
+
+            return achievement != null && achievement.AchievementAllowSelfDeclared;
         }
 
         public static bool IsSignedOff(VCmdsCredential credential)

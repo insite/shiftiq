@@ -103,20 +103,29 @@ namespace InSite.Persistence
             using (var db = new InternalDbContext())
             {
                 return CreateQuery(filter, db)
-                    .Select(x => new
-                    {
-                        x.GroupIdentifier,
-                        x.GroupName,
-                        x.ProgramCode,
-                        x.ProgramIdentifier,
-                        x.ProgramName,
-                        x.ProgramDescription,
-                        x.CatalogName,
-                        x.CategoryCount,
-                        x.EnrollmentCount,
-                        x.TaskCount
-
-                    })
+                    .GroupJoin(
+                        db.QAchievements,
+                        a => a.AchievementIdentifier,
+                        b => b.AchievementIdentifier,
+                        (a, b) => new { Program = a, Achievements = b })
+                    .SelectMany(
+                        x => x.Achievements.DefaultIfEmpty(),
+                        (x, achievement) => new
+                        {
+                            x.Program.GroupIdentifier,
+                            x.Program.GroupName,
+                            x.Program.ProgramCode,
+                            x.Program.ProgramIdentifier,
+                            x.Program.ProgramName,
+                            x.Program.ProgramDescription,
+                            x.Program.ProgramTag,
+                            x.Program.CatalogName,
+                            x.Program.CategoryCount,
+                            x.Program.EnrollmentCount,
+                            x.Program.TaskCount,
+                            x.Program.AchievementIdentifier,
+                            AchievementTitle = achievement.AchievementTitle
+                        })
                     .OrderBy(x => x.ProgramName)
                     .ThenBy(x => x.ProgramCode)
                     .ThenBy(x => x.GroupName)
@@ -144,6 +153,20 @@ namespace InSite.Persistence
 
             if (!string.IsNullOrEmpty(filter.ProgramDescription))
                 query = query.Where(x => x.ProgramDescription.Contains(filter.ProgramDescription));
+
+            if (filter.ProgramTag.IsNotEmpty())
+                query = query.Where(x => x.ProgramTag.Contains(filter.ProgramTag));
+
+            if (filter.AchievementIdentifiers.IsNotEmpty())
+                query = query.Where(x => filter.AchievementIdentifiers.Contains(x.AchievementIdentifier.Value));
+
+            if (filter.TaskObjectIdentifiers.IsNotEmpty())
+            {
+                query = query.Where(
+                    x => db.TTasks.Any(
+                        t => t.ProgramIdentifier == x.ProgramIdentifier
+                          && filter.TaskObjectIdentifiers.Contains(t.ObjectIdentifier)));
+            }
 
             return query;
         }

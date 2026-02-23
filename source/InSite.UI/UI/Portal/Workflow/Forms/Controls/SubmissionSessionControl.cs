@@ -9,6 +9,7 @@ using System.Web.UI.WebControls;
 using Humanizer;
 
 using InSite.Application.Surveys.Read;
+using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Portal.Workflow.Forms.Models;
 using InSite.Web.Routing;
@@ -18,7 +19,7 @@ using Shift.Constant;
 
 namespace InSite.UI.Portal.Workflow.Forms.Controls
 {
-    public class SubmissionSessionControl : UserControl
+    public class SubmissionSessionControl : BaseUserControl
     {
         protected SubmitPage AppPage => Page as SubmitPage;
 
@@ -77,7 +78,8 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
             Current.SessionIdentifier = query.ResponseSessionIdentifier;
             Current.FormIdentifier = query.SurveyFormIdentifier;
-            Current.UserIdentifier = query.RespondentUserIdentifier;
+            Current.RespondentUserIdentifier = query.RespondentUserIdentifier;
+            Current.AssessorUserIdentifier = query.AssessorUserIdentifier;
 
             return new string[0];
         }
@@ -106,22 +108,24 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
             if (queryString.User != null)
             {
-                Current.UserIdentifier = queryString.User.Value;
+                Current.RespondentUserIdentifier = queryString.User.Value;
             }
             else if (Current.Identity.IsAuthenticated)
             {
-                Current.UserIdentifier = Current.Identity.User.UserIdentifier;
+                Current.RespondentUserIdentifier = Current.Identity.User.UserIdentifier;
             }
+
+            Current.AssessorUserIdentifier = Current.RespondentUserIdentifier;
 
             return new string[0];
         }
 
         public static IEnumerable<string> LoadCurrentStateObjects(SubmissionSessionState current, SubmissionSessionNavigator navigator)
         {
-            if (current.UserIdentifier != Shift.Constant.UserIdentifiers.Someone)
+            if (current.RespondentUserIdentifier != Shift.Constant.UserIdentifiers.Someone)
             {
                 current.Sessions = ServiceLocator.SurveySearch
-                    .GetResponseSessions(current.FormIdentifier, current.UserIdentifier)
+                    .GetResponseSessions(current.FormIdentifier, current.RespondentUserIdentifier)
                     .OrderByDescending(x => x.ResponseSessionCreated)
                     .ToArray();
             }
@@ -144,7 +148,11 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 navigator.Initialize(current.Survey);
             }
 
-            current.Respondent = UserSearch.Select(current.UserIdentifier);
+            current.Respondent = UserSearch.Select(current.RespondentUserIdentifier);
+            current.Assessor = current.RespondentUserIdentifier == current.AssessorUserIdentifier
+                ? current.Respondent
+                : UserSearch.Select(current.AssessorUserIdentifier);
+
 
             return new string[0];
         }
@@ -173,7 +181,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                     AppPage.AddBreadcrumb("Forms", "/ui/portal/workflow/forms/submit/search");
                     if (Current.Survey != null)
                     {
-                        AppPage.AddBreadcrumb($"{Current.Survey.Content?.Title?.Text[Current.Language]}", $"/ui/portal/workflow/forms/submit/launch?form={Current.Survey.Asset}&user={Current.UserIdentifier}", false);
+                        AppPage.AddBreadcrumb($"{Current.Survey.Content?.Title?.Text[Current.Language]}", $"/ui/portal/workflow/forms/submit/launch?form={Current.Survey.Asset}&user={Current.RespondentUserIdentifier}", false);
                     }
                 }
             }
@@ -246,7 +254,5 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
         protected string LocalizeTime(object time) =>
             ((DateTimeOffset?)time).Format(Current.Respondent.TimeZone, "-");
-
-        protected string Translate(string text) => AppPage.Translate(text);
     }
 }

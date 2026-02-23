@@ -234,7 +234,9 @@
 
             <insite:NavItem runat="server" ID="LoginTab" Title="Login">
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
+
+                        <h3>User Account</h3>
 
                         <div class="form-group mb-3">
                             <label class="form-label">
@@ -242,6 +244,7 @@
                                 <insite:RequiredValidator runat="server" ControlToValidate="Status" FieldName="Status" ValidationGroup="ContactInfo" />
                             </label>
                             <cmds:PersonStatusSelector ID="Status" runat="server" AllowNull="false" />
+                            <div class="form-text"><asp:Literal runat="server" ID="StatusTimestamp" /></div>
                         </div>
 
                         <div runat="server" id="PasswordExpiryField" class="form-group mb-3">
@@ -251,19 +254,13 @@
                             <insite:DateTimeOffsetSelector runat="server" ID="PasswordExpires" />
                         </div>
 
-                        <div class="form-group mb-3">
-                            <asp:Literal runat="server" ID="StatusTimestamp"></asp:Literal>
-                        </div>
-
                     </div>
-                </div>
-            </insite:NavItem>
-
-            <insite:NavItem runat="server" ID="GroupsTab" Title="Groups">
-                <div class="row">
                     <div class="col-lg-4 mb-3 mb-lg-0">
+
                         <h3>Roles</h3>
-                        <asp:CheckBoxList ID="UserRoleList" runat="server" />
+
+                        <insite:CheckBoxList ID="UserRoleList" runat="server" />
+
                     </div>
                 </div>
             </insite:NavItem>

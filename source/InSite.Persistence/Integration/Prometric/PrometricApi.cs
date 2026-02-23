@@ -66,7 +66,7 @@ namespace InSite.Persistence.Integration.Prometric
             var prometricPassword = prometric?.Password;
 
             if (prometricUser == null || prometricPassword == null)
-                throw new Exception("Prometric API credentials not found.");
+                throw new InvalidOperationException("Prometric API credentials not found.");
 
             var data = new Dictionary<string, string>
             {
@@ -232,10 +232,10 @@ namespace InSite.Persistence.Integration.Prometric
             var registrationId = registration.RegistrationIdentifier;
 
             if (registration.Candidate?.User == null)
-                throw new Exception($"Registration {registrationId} is not assigned to a learner.");
+                throw new InvalidOperationException($"Registration {registrationId} is not assigned to a learner.");
 
             if (registration.ExamFormIdentifier == null)
-                throw new Exception($"Registration {registrationId} is not assigned to an assessment form.");
+                throw new InvalidOperationException($"Registration {registrationId} is not assigned to an assessment form.");
 
             var prometric = GetPrometricEndpoint();
 
@@ -293,10 +293,10 @@ namespace InSite.Persistence.Integration.Prometric
             var registrationId = registration.RegistrationIdentifier;
 
             if (registration.Candidate?.User == null)
-                throw new Exception($"Registration {registrationId} is not assigned to a learner.");
+                throw new InvalidOperationException($"Registration {registrationId} is not assigned to a learner.");
 
             if (registration.ExamFormIdentifier == null)
-                throw new Exception($"Registration {registrationId} is not assigned to an assessment form.");
+                throw new InvalidOperationException($"Registration {registrationId} is not assigned to an assessment form.");
 
             var prometric = GetPrometricEndpoint();
 

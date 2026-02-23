@@ -22,6 +22,7 @@ namespace InSite.Persistence.Content
         public string Url { get; set; }
 
         public bool Active { get; set; }
+        public bool IsOverview { get; set; }
 
         public Flag Flag { get; set; }
 

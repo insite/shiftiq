@@ -7,6 +7,9 @@ namespace InSite.Application.Contacts.Read
     [Serializable]
     public class QMembershipFilter : Filter
     {
+        public Guid? GroupOrganizationIdentifier { get; set; }
+        public string MembershipFunction { get; set; }
+
         public Guid[] GroupIdentifiers { get; set; }
         public Guid? GroupIdentifier
         {

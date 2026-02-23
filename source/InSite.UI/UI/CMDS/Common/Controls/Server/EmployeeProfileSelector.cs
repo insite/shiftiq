@@ -18,7 +18,7 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
 
         public Guid OrganizationIdentifier
         {
-            get { return ViewState[nameof(OrganizationIdentifier)] == null ? CurrentIdentityFactory.ActiveOrganizationIdentifier : (Guid)ViewState[nameof(OrganizationIdentifier)]; }
+            get { return ViewState[nameof(OrganizationIdentifier)] == null ? CurrentSessionState.Identity.Organization.Identifier : (Guid)ViewState[nameof(OrganizationIdentifier)]; }
             set { ViewState[nameof(OrganizationIdentifier)] = value; }
         }
 

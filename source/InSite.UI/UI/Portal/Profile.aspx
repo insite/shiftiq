@@ -311,6 +311,15 @@
 
                             <div class="form-group mb-3">
                                 <label class="form-label">
+                                    API Client Secret Expiry
+                                </label>
+                                <div class="px-3">
+                                    <asp:Literal runat="server" ID="PersonSecretExpiry" />
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
                                     API Endpoint (Base URL)
                                 </label>
                                 <div class="px-3">

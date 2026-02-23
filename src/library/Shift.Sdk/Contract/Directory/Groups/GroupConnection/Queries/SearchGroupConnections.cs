@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public class SearchGroupConnections : Query<IEnumerable<GroupConnectionMatch>>, IGroupConnectionCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
     }
 }

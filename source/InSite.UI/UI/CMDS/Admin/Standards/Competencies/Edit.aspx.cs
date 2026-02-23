@@ -133,7 +133,7 @@ namespace InSite.Cmds.Admin.Competencies.Forms
             var filter = new ProfileCompetencyFilter { CompetencyStandardIdentifier = StandardIdentifier };
 
             if (OnlyActiveCompanyProfiles.Checked)
-                filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                filter.OrganizationIdentifier = Organization.Identifier;
 
             var table = ProfileCompetencyRepository.SelectByFilter(filter, null);
 
@@ -150,7 +150,7 @@ namespace InSite.Cmds.Admin.Competencies.Forms
         {
             DepartmentGrid.DataSource =
                 DepartmentProfileCompetencyRepository2.SelectCompetenciesByOrganizationIdentifier(
-                    CurrentIdentityFactory.ActiveOrganizationIdentifier, StandardIdentifier, DepartmentGrid.PageIndex,
+                    Organization.Identifier, StandardIdentifier, DepartmentGrid.PageIndex,
                     DepartmentGrid.PageSize);
         }
 
@@ -256,7 +256,7 @@ namespace InSite.Cmds.Admin.Competencies.Forms
 
         private void LoadCompanyCompetencyDetails(Standard competency)
         {
-            var isFound = VCmdsCompetencyOrganizationRepository.Select(CurrentIdentityFactory.ActiveOrganizationIdentifier, StandardIdentifier) != null;
+            var isFound = VCmdsCompetencyOrganizationRepository.Select(Organization.Identifier, StandardIdentifier) != null;
 
             NoCompanyCompetencyPanel.Visible = !isFound;
             CompanyCompetencyPanel.Visible = isFound;
@@ -269,7 +269,7 @@ namespace InSite.Cmds.Admin.Competencies.Forms
 
         private void LoadDepartments(Standard competency)
         {
-            var rowCount = DepartmentProfileCompetencyRepository2.SelectCompetenciesByOrganizationIdentifier(CurrentIdentityFactory.ActiveOrganizationIdentifier, StandardIdentifier, null, null).Rows.Count;
+            var rowCount = DepartmentProfileCompetencyRepository2.SelectCompetenciesByOrganizationIdentifier(Organization.Identifier, StandardIdentifier, null, null).Rows.Count;
             var departmentText = rowCount == 1 ? "department" : "departments";
             DepartmentCount.Text = string.Format("{0} {1}", rowCount, departmentText);
 

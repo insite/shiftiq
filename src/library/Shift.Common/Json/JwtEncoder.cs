@@ -6,8 +6,6 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-using Shift.Common;
-
 namespace Shift.Common
 {
     public class JwtEncoder : IJwtEncoder
@@ -79,7 +77,7 @@ namespace Shift.Common
                     validation.AddError("Audience verification failed");
 
                 if (jwt.IsExpired())
-                    validation.AddError("Access token expired", $"This JWT expired {jwt.GetMinutesSinceExpiry():n0} minutes ago.");
+                    validation.AddError($"This JWT expired {jwt.GetMinutesSinceExpiry():n0} minutes ago.");
 
                 return validation.IsPassed();
             }
@@ -87,7 +85,7 @@ namespace Shift.Common
             {
                 if (ex.Message.StartsWith("JWT parsing failed"))
                 {
-                    validation.AddError("JWT parsing failed", ex.Message);
+                    validation.AddError(ex.Message);
 
                     principal = null;
 

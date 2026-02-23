@@ -40,8 +40,6 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
 
         protected override void OnInit(EventArgs e)
         {
-            DomainPatternValidator.ValidationExpression = Pattern.ValidDomain;
-
             OrganizationCodeValidator.ServerValidate += OrganizationCodeValidator_ServerValidate;
 
             ReopenOrganizationButton.Click += ReopenOrganizationButton_Click;
@@ -95,25 +93,8 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
         {
             OrganizationId = organization.OrganizationIdentifier;
 
-            ParentOrganizationIdentifier.Value = organization.ParentOrganizationIdentifier;
-
-            var hasParent = organization.ParentOrganizationIdentifier.HasValue;
-
-            if (hasParent)
-            {
-                var parent = OrganizationSearch.Select(organization.ParentOrganizationIdentifier.Value);
-
-                hasParent = parent != null;
-
-                if (hasParent)
-                    ParentLink.NavigateUrl = $"/ui/admin/accounts/organizations/edit?organization={parent.OrganizationIdentifier}";
-            }
-
-            ParentLink.Visible = hasParent;
-
             OrganizationCode.Text = organization.OrganizationCode;
             CompanyName.Text = organization.CompanyName;
-            CompanyDomain.Text = organization.CompanyDomain;
 
             if (organization.AccountClosed.HasValue)
             {
@@ -152,10 +133,8 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
 
         public void GetInputValues(OrganizationState organization)
         {
-            organization.ParentOrganizationIdentifier = ParentOrganizationIdentifier.Value ?? Guid.Empty;
             organization.OrganizationCode = OrganizationCode.Text?.ToLower();
             organization.CompanyName = CompanyName.Text;
-            organization.CompanyDomain = CompanyDomain.Text;
             organization.AccountWarning = OrganizationAnnouncement.Text;
 
             organization.AdministratorUserIdentifier = CompanyAdministratorIdentifier.Value;

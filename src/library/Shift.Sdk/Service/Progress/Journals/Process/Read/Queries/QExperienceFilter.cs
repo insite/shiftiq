@@ -11,10 +11,16 @@ namespace InSite.Application.Records.Read
         public Guid? JournalSetupIdentifier { get; set; }
         public Guid? JournalIdentifier { get; set; }
         public Guid? UserIdentifier { get; set; }
+        public Guid? UserDepratmentIdentifier { get; set; }
         public Guid? CompetencyStandardIdentifier { get; set; }
         public Guid? ValidatorUserIdentifier { get; set; }
 
-        public string TrainingType { get; set; }
+        public string TrainingTypeExact { get; set; }
+        public string EmployerContains { get; set; }
+        public string SupervisorContains { get; set; }
+        public DateTime? StartDateExact { get; set; }
+        public DateTime? EndDateExact { get; set; }
+        public int? HoursExact { get; set; }
 
         public DateTimeOffset? CreatedSince { get; set; }
         public DateTimeOffset? CreatedBefore { get; set; }

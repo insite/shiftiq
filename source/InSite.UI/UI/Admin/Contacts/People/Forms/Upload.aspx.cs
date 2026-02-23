@@ -1554,7 +1554,7 @@ namespace InSite.Admin.Contacts.People.Forms
             person.EmailEnabled = true;
             user.FirstName = FixCaseOnName(row.FirstName);
             user.LastName = FixCaseOnName(row.LastName);
-            user.FullName = string.IsNullOrEmpty(user.MiddleName) || user.Email != null && user.Email.EndsWith(ServiceLocator.AppSettings.Security.Domain) || !PersonSearch.IsUserAssignedToOrganization(user.UserIdentifier, OrganizationIdentifiers.RCABC)
+            user.FullName = string.IsNullOrEmpty(user.MiddleName) || user.Email != null && user.Email.EndsWith(ServiceLocator.AppSettings.Partition.Domain) || !PersonSearch.IsUserAssignedToOrganization(user.UserIdentifier, OrganizationIdentifiers.RCABC)
                 ? $"{user.FirstName} {user.LastName}"
                 : $"{user.FirstName} {user.MiddleName} {user.LastName}";
 

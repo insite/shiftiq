@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveCase : Query<CaseModel>
     {
-        public Guid CaseIdentifier { get; set; }
+        public Guid CaseId { get; set; }
     }
 }

@@ -24,12 +24,30 @@ namespace InSite.UI.Lobby
         protected global::InSite.Common.Web.UI.Alert ScreenStatus;
 
         /// <summary>
-        /// CloseLink control.
+        /// SendMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.CloseButton CloseLink;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SendMessage;
+
+        /// <summary>
+        /// SendButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button SendButton;
+
+        /// <summary>
+        /// CloseButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CloseButton CloseButton;
     }
 }

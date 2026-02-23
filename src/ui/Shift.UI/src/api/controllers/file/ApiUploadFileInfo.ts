@@ -1,5 +1,5 @@
 export interface ApiUploadFileInfo {
-    FileIdentifier: string;
+    FileId: string;
     DocumentName: string;
     FileName: string;
     FileSize: number;

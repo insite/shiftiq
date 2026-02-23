@@ -4,6 +4,7 @@ namespace Shift.Contract
 {
     public partial class PeriodModel
     {
+        public Guid OrganizationId { get; set; }
         public Guid PeriodId { get; set; }
 
         public string PeriodName { get; set; }

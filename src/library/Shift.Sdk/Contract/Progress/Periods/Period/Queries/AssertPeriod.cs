@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class AssertPeriod : Query<bool>
     {
-        public Guid PeriodIdentifier { get; set; }
+        public Guid PeriodId { get; set; }
     }
 }

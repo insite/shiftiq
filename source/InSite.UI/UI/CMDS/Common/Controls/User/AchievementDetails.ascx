@@ -34,10 +34,10 @@
                         Options
                     </label>
                     <div>
-                        <asp:CheckBox ID="AllowSelfDeclared" runat="server" Text="Allow self-declared" />
+                        <insite:CheckBox ID="EnableSignOff" runat="server" Text="Learners can sign off on this achievement themselves" />
                     </div>
                     <div>
-                        <asp:CheckBox ID="IsTimeSensitive" runat="server" Text="Time-sensitive" onclick="showHideDateExpired();" />
+                        <insite:CheckBox ID="IsTimeSensitive" runat="server" Text="This achievement is time-sensitive" SubText="(it expires after a set period)" onclick="showHideDateExpired();" />
                     </div>
                 </div>
                 <div runat="server" ID="RowValidForCount" style="display:none;" class="form-group mb-3">

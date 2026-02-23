@@ -1,15 +1,14 @@
 namespace Shift.Service.Security;
 
-using Shift.Contract;
-
 using Shift.Common;
+using Shift.Contract;
 
 public class TUserFieldAdapter : IEntityAdapter
 {
     public void Copy(ModifyUserField modify, TUserFieldEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.UserIdentifier = modify.UserIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.UserIdentifier = modify.UserId;
         entity.Name = modify.Name;
         entity.ValueType = modify.ValueType;
         entity.ValueJson = modify.ValueJson;
@@ -20,12 +19,12 @@ public class TUserFieldAdapter : IEntityAdapter
     {
         var entity = new TUserFieldEntity
         {
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            UserIdentifier = create.UserIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            UserIdentifier = create.UserId,
             Name = create.Name,
             ValueType = create.ValueType,
             ValueJson = create.ValueJson,
-            SettingIdentifier = create.SettingIdentifier
+            SettingIdentifier = create.SettingId
         };
         return entity;
     }
@@ -39,12 +38,12 @@ public class TUserFieldAdapter : IEntityAdapter
     {
         var model = new UserFieldModel
         {
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            UserIdentifier = entity.UserIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            UserId = entity.UserIdentifier,
             Name = entity.Name,
             ValueType = entity.ValueType,
             ValueJson = entity.ValueJson,
-            SettingIdentifier = entity.SettingIdentifier
+            SettingId = entity.SettingIdentifier
         };
 
         return model;
@@ -59,7 +58,7 @@ public class TUserFieldAdapter : IEntityAdapter
     {
         var match = new UserFieldMatch
         {
-            SettingIdentifier = entity.SettingIdentifier
+            SettingId = entity.SettingIdentifier
 
         };
 

@@ -29,7 +29,7 @@
                 <div class="row mt-4">
                     <div class="col-lg-12">
                         <a href="/ui/admin/workflow/cases/reports" class="me-3"><i class="fas fa-file-chart-line me-1"></i>Summary Reports</a>
-                        <a runat="server" id="CaseStatusesLink" href="/client/admin/workflows/case-statuses/search"><i class="fas fa-briefcase me-1"></i>Case Statuses</a>
+                        <a runat="server" id="CaseStatusesLink" href="/client/admin/workflows/cases-statuses/search"><i class="fas fa-briefcase me-1"></i>Case Statuses</a>
                     </div>
                 </div>
 

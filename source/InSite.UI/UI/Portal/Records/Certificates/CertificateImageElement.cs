@@ -101,7 +101,7 @@ namespace InSite.UI.Portal.Records.Certificates
                     return (Bitmap)Image.FromFile(physicalPath);
             }
 
-            throw new ApplicationError("File not found: " + path);
+            throw new FileNotFoundException("File not found: " + path);
         }
     }
 }

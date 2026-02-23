@@ -17,10 +17,14 @@
       <Link>AppSettings.json</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\config\AppSettings.Local.json" Condition="Exists('..\..\..\config\AppSettings.Local.json')">
-      <Link>AppSettings.Local.json</Link>
+    <Content Include="..\..\..\config\AppSettings.local.json" Condition="Exists('..\..\..\config\AppSettings.local.json')">
+      <Link>AppSettings.local.json</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	<Content Include="..\..\..\config\RouteSettings.json">
+	  <Link>RouteSettings.json</Link>
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -55,7 +59,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.2.0" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.3" />
+	<PackageReference Include="System.Linq.Async" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

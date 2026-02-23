@@ -65,9 +65,19 @@ namespace InSite.Domain.Records
             Apply(new GradebookEventAdded(@event, isPrimary));
         }
 
+        public void AddGradebookGroupEnrollment(Guid enrollment, Guid group)
+        {
+            Apply(new GradebookGroupEnrollmentAdded(enrollment, group));
+        }
+
         public void RemoveGradebookEvent(Guid @event, Guid? newPrimaryEvent)
         {
             Apply(new GradebookEventRemoved(@event, newPrimaryEvent));
+        }
+
+        public void RemoveGradebookGroupEnrollment(Guid enrollment)
+        {
+            Apply(new GradebookGroupEnrollmentRemoved(enrollment));
         }
 
         public void ChangeRecordType(GradebookType type, Guid? framework)

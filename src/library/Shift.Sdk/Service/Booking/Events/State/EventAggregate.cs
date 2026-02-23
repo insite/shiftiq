@@ -127,6 +127,14 @@ namespace InSite.Domain.Events
             var e = new AppointmentDescribed(title, description);
             Apply(e);
         }
+        public void DisplayEventOnCalendar(bool displayed)
+        {
+            if (Data.DisplayOnCalendar == displayed)
+                return;
+
+            var e = new EventDisplayOnCalendarModified(displayed);
+            Apply(e);
+        }
 
         public void ElapseEventTimer(Guid timer)
         {

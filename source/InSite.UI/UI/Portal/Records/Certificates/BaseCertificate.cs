@@ -106,7 +106,7 @@ namespace InSite.UI.Portal.Records.Certificates
             if (type == "custom")
                 return jObj.ToObject<CustomCertificate>(inSerializer);
 
-            throw new Exception("Unexpected certificate element type: " + type);
+            throw new NotSupportedException("Unexpected certificate element type: " + type);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -122,7 +122,7 @@ namespace InSite.UI.Portal.Records.Certificates
             else if (value is CustomCertificate)
                 type = "custom";
             else
-                throw new Exception("Unexpected certificate type: " + value.GetType());
+                throw new NotSupportedException("Unexpected certificate type: " + value.GetType());
 
             var inSerializer = new InternalJsonSerializer();
             var jObj = JObject.FromObject(value, inSerializer);

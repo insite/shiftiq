@@ -4,16 +4,16 @@ namespace Shift.Contract
 {
     public class CreateStandard
     {
-        public Guid? BankIdentifier { get; set; }
-        public Guid? BankSetIdentifier { get; set; }
-        public Guid? CategoryItemIdentifier { get; set; }
+        public Guid? BankId { get; set; }
+        public Guid? BankSetId { get; set; }
+        public Guid? CategoryItemId { get; set; }
         public Guid CreatedBy { get; set; }
-        public Guid? DepartmentGroupIdentifier { get; set; }
-        public Guid? IndustryItemIdentifier { get; set; }
+        public Guid? DepartmentGroupId { get; set; }
+        public Guid? IndustryItemId { get; set; }
         public Guid ModifiedBy { get; set; }
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid? ParentStandardIdentifier { get; set; }
-        public Guid StandardIdentifier { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid? ParentStandardId { get; set; }
+        public Guid StandardId { get; set; }
         public Guid? StandardStatusLastUpdateUser { get; set; }
 
         public bool IsCertificateEnabled { get; set; }

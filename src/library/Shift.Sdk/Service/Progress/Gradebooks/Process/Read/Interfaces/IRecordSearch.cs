@@ -27,6 +27,12 @@ namespace InSite.Application.Records.Read
         bool EnrollmentExists(Guid gradebook, Guid learner);
         QEnrollment GetEnrollment(Guid gradebook, Guid learner);
 
+        int CountGroupEnrollments(QGroupEnrollmentFilter filter);
+        List<QGroupEnrollment> GetGroupEnrollments(QGroupEnrollmentFilter filter, params Expression<Func<QGroupEnrollment, object>>[] includes);
+        bool GroupEnrollmentExists(QGroupEnrollmentFilter filter);
+        QGroupEnrollment GetGroupEnrollment(Guid enrollment);
+        QGroupEnrollment GetGroupEnrollment(Guid gradebook, Guid group);
+
         GradebookState GetGradebookState(Guid id);
 
         int CountGradebooks(QGradebookFilter filter);

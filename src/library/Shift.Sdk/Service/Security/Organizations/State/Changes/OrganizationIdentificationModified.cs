@@ -6,13 +6,11 @@ namespace InSite.Domain.Organizations
     {
         public string Code { get; set; }
         public string Name { get; set; }
-        public string Domain { get; set; }
 
-        public OrganizationIdentificationModified(string code, string name, string domain)
+        public OrganizationIdentificationModified(string code, string name)
         {
             Code = code;
             Name = name;
-            Domain = domain;
         }
     }
 }

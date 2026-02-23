@@ -348,7 +348,9 @@ namespace Shift.Common
         /// </summary>
         private void Sanitize()
         {
-            // Remove empty values for every key.
+            // Remove empty values for every key, collecting keys to remove.
+
+            var keysToRemove = new List<ClaimName>();
 
             foreach (var key in _claims.Keys)
             {
@@ -358,14 +360,18 @@ namespace Shift.Common
                 {
                     values.RemoveAll(item => item.IsEmpty());
                     if (values.Count == 0)
-                        values = null;
+                        keysToRemove.Add(key);
                 }
-
-                // If there are no remaining values then remove the claim.
-
-                if (values == null)
-                    _claims.Remove(key);
+                else
+                {
+                    keysToRemove.Add(key);
+                }
             }
+
+            // Remove claims with no remaining values.
+
+            foreach (var key in keysToRemove)
+                _claims.Remove(key);
 
             // Sort the remaining items by key, ensuring keys are lowercase.
 

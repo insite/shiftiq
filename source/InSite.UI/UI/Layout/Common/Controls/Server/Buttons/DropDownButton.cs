@@ -309,7 +309,7 @@ namespace InSite.Common.Web.UI
                 }
                 else
                 {
-                    throw new ApplicationError("Unexpected item type: " + baseItem.GetType().FullName);
+                    throw new InvalidOperationException("Unexpected item type: " + baseItem.GetType().FullName);
                 }
             }
 

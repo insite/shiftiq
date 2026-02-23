@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common;
 using Shift.Service.Workflow;
 
 namespace Shift.Api;
@@ -9,10 +10,12 @@ namespace Shift.Api;
 public class CaseUserController : ShiftControllerBase
 {
     private readonly CaseUserService _caseUserService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public CaseUserController(CaseUserService caseUserService)
+    public CaseUserController(CaseUserService caseUserService, IPrincipalProvider principalProvider)
     {
         _caseUserService = caseUserService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,22 +23,23 @@ public class CaseUserController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific case user
     /// </summary>
-    [HttpHead("workflow/cases-users/{relationship:guid}")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Assert)]
+    [HttpHead("api/workflow/cases-users/{relationship:guid}")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertCaseUser")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid join, CancellationToken cancellation = default)
     {
-        var exists = await _caseUserService.AssertAsync(join, cancellation);
-
+        var principal = _principalProvider.GetPrincipal();
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+        var exists = await _caseUserService.AssertAsync(join, organizationId, cancellation);
         return exists ? Ok() : NotFound();
     }
 
     /// <summary>
     /// Collects the list of case users that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-users/collect")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Collect)]
+    [HttpPost("api/workflow/cases-users/collect")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseUserModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectCaseUsers")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectCaseUsers query, CancellationToken cancellation = default)
@@ -43,8 +47,8 @@ public class CaseUserController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-users")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Collect)]
+    [HttpGet("api/workflow/cases-users")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseUserModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectCaseUsers_get")]
     [AliasFor("collectCaseUsers")]
@@ -56,6 +60,9 @@ public class CaseUserController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectCaseUsers query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _caseUserService.CollectAsync(query, cancellation);
 
         var count = await _caseUserService.CountAsync(query, cancellation);
@@ -68,8 +75,8 @@ public class CaseUserController : ShiftControllerBase
     /// <summary>
     /// Counts the case users that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-users/count")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Count)]
+    [HttpPost("api/workflow/cases-users/count")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countCaseUsers")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountCaseUsers query, CancellationToken cancellation = default)
@@ -77,8 +84,8 @@ public class CaseUserController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-users/count")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Count)]
+    [HttpGet("api/workflow/cases-users/count")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countCaseUsers_get")]
     [AliasFor("countCaseUsers")]
@@ -90,6 +97,9 @@ public class CaseUserController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountCaseUsers query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _caseUserService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +108,8 @@ public class CaseUserController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of case users that match specific criteria
     /// </summary>    
-    [HttpPost("workflow/cases-users/download")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Download)]
+    [HttpPost("api/workflow/cases-users/download")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadCaseUsers")]
@@ -108,8 +118,8 @@ public class CaseUserController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-users/download")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Download)]
+    [HttpGet("api/workflow/cases-users/download")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadCaseUsers_get")]
@@ -122,6 +132,9 @@ public class CaseUserController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectCaseUsers query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Workflow", "CaseUsers", query.Filter.Format, User);
 
         var models = await _caseUserService
@@ -142,22 +155,26 @@ public class CaseUserController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific case user
     /// </summary>
-    [HttpGet("workflow/cases-users/{relationship:guid}")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Retrieve)]
+    [HttpGet("api/workflow/cases-users/{relationship:guid}")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType<CaseUserModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveCaseUser")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid join, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
         var model = await _caseUserService.RetrieveAsync(join, cancellation);
-
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of case users that match specific criteria
     /// </summary>
-    [HttpPost("workflow/cases-users/search")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Search)]
+    [HttpPost("api/workflow/cases-users/search")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseUserMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchCaseUsers")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchCaseUsers query, CancellationToken cancellation = default)
@@ -165,8 +182,8 @@ public class CaseUserController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("workflow/cases-users/search")]
-    [HybridAuthorize(Policies.Workflow.Cases.CaseUser.Search)]
+    [HttpGet("api/workflow/cases-users/search")]
+    [HybridPermission("workflow/cases-users", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<CaseUserMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchCaseUsers_get")]
     [AliasFor("searchCaseUsers")]
@@ -178,6 +195,9 @@ public class CaseUserController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchCaseUsers query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _caseUserService.SearchAsync(query, cancellation);
 
         var count = await _caseUserService.CountAsync(query, cancellation);

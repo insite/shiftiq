@@ -12,23 +12,20 @@ public class PeriodReader : IEntityReader
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
     private string DefaultSort = "PeriodName, PeriodIdentifier";
 
-    public PeriodReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public PeriodReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid period, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid period, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.PeriodIdentifier == period, cancellation);
+            return query.AnyAsync(x => x.PeriodIdentifier == period && (organization == null || organization == x.OrganizationIdentifier), cancellation);
 
         }, cancellation);
     }
@@ -106,11 +103,8 @@ public class PeriodReader : IEntityReader
     /// </remarks>
     private IQueryable<PeriodEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
         var query = db.QPeriod
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
+            .AsNoTracking();
 
         return query;
     }
@@ -136,6 +130,9 @@ public class PeriodReader : IEntityReader
         if (criteria.EndBefore != null)
             query = query.Where(x => x.PeriodEnd < criteria.EndBefore);
 
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
+
         return query;
     }
 
@@ -157,11 +154,5 @@ public class PeriodReader : IEntityReader
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

@@ -24,7 +24,7 @@ namespace InSite.Admin.Events.Exams.Controls
 
         public int LoadData(Guid @event)
         {
-            CanWrite = Identity.IsGranted(PermissionIdentifiers.Admin_Assessments_Attempts, PermissionOperation.Write);
+            CanWrite = Identity.IsGranted(PermissionIdentifiers.Admin_Assessments_Attempts, DataAccess.Update);
 
             CommandPanel.Visible = CanWrite;
 

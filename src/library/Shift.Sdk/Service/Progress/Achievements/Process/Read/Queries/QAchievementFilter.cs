@@ -9,10 +9,13 @@ namespace InSite.Application.Records.Read
     public class QAchievementFilter : Filter
     {
         public List<Guid> OrganizationIdentifiers { get; set; } = new List<Guid>();
+        public Guid[] DepartmentIdentifiers { get; set; }
+        public Guid[] ProgramIdentifiers { get; set; }
         public string AchievementTitle { get; set; }
         public List<string> AchievementLabels { get; set; } = new List<string>();
         public string AchievementDescription { get; set; }
         public bool? AchievementIsEnabled { get; set; }
+        public bool? HasMandatoryCredential { get; set; }
         public string ExpirationType { get; set; }
         public int? ExpirationLifetimeQuantity { get; set; }
         public string ExpirationLifetimeUnit { get; set; }

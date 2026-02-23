@@ -61,7 +61,7 @@
                     <div class="col-lg-12">
                         <a class="me-3" href="/ui/admin/contacts/people/upload"><i class="fas fa-upload me-2"></i>Upload Contacts</a>
                         <a runat="server" id="DownloadXLSXSection" class="me-3" href="/ui/admin/contacts/reports/tax-form-t2202"><i class="fas fa-download me-2"></i>Canada Revenue Agency (CRA) Tax Form T2202</a>
-                        <a class="me-3" href="/ui/admin/contact/persons/anomalies"><i class="fas fa-triangle-exclamation me-2"></i>Data Anomalies</a>
+                        <a class="me-3" href="/ui/admin/reporting/contact-data-anomalies"><i class="fas fa-triangle-exclamation me-2"></i>Data Anomalies</a>
                     </div>
                 </div>
 

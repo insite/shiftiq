@@ -24,6 +24,15 @@ namespace InSite.UI.Admin.Records.Logbooks.Competencies.Controls
         protected global::InSite.Common.Web.UI.FindJournalSetup JournalSetupIdentifier;
 
         /// <summary>
+        /// CompetencyIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindStandard CompetencyIdentifier;
+
+        /// <summary>
         /// UserIdentifier control.
         /// </summary>
         /// <remarks>

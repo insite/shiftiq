@@ -44,16 +44,10 @@ namespace InSite.Admin.Accounts.Organizations.Forms
             var organization = new OrganizationState
             {
                 OrganizationIdentifier = UniqueIdentifier.Create(),
-                ParentOrganizationIdentifier = Guid.Empty,
                 AccountOpened = DateTimeOffset.UtcNow,
-                Toolkits = new ToolkitSettings
-                {
-                    Contacts = new ContactSettings
-                    {
-                        FullNamePolicy = "{First} {Middle} {Last}"
-                    }
-                }
             };
+            organization.Toolkits.Contacts.FullNamePolicy = "{First} {Middle} {Last}";
+            organization.PlatformCustomization.RequireEmailVerification = true;
 
             DetailOrganization.GetInputValues(organization);
             DetailLocationAddress.GetInputValues(organization);

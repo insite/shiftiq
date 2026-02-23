@@ -55,7 +55,7 @@ namespace InSite.Common.Web.UI
                         info = TimeZones.GetInfo(_defaultTimeZone);
 
                     if (info == null)
-                        throw new ApplicationError("Time zone not found: " + (Value.HasValue ? Value.Value.ToString() : _defaultTimeZone));
+                        throw new KeyNotFoundException("Time zone not found: " + (Value.HasValue ? Value.Value.ToString() : _defaultTimeZone));
 
                     return info.GetAbbreviation().Generic;
                 }

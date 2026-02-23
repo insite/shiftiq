@@ -104,7 +104,7 @@ namespace InSite.Api.Controllers
 
                 result.Add(new UploadFileInfo
                 {
-                    FileIdentifier = model.FileIdentifier,
+                    FileId = model.FileIdentifier,
                     FileName = model.Properties.DocumentName,
                     FileSize = model.FileSize
                 });

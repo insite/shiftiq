@@ -1,18 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 using Shift.Common.Integration.Google;
 using Shift.Contract.Presentation;
 
 namespace Shift.Api;
 
-[Route("content/translations")]
+[Route("api/content/translations")]
 [ApiController()]
 [HybridAuthorize()]
 [ApiExplorerSettings(GroupName = "Content API: Translations")]
 public class TranslationController(
-    IShiftIdentityService shiftIdentity,
+    IPrincipalProvider shiftIdentity,
     IReactService reactService,
     ITranslationClient translationClient
     ) : ControllerBase

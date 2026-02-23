@@ -342,6 +342,9 @@ namespace Shift.Common
 
         public static string SerializeCsv<T>(IEnumerable<T> items, string includes)
         {
+            if (items.Count() == 0)
+                return string.Empty;
+
             var csv = new CsvExportHelper(items);
 
             var properties = Reflector.GetSerializeProperties<T>(includes).Select(p => p.Name);

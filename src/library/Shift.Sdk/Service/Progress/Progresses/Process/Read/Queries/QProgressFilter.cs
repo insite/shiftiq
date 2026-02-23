@@ -16,6 +16,7 @@ namespace InSite.Application.Records.Read
         public Guid? GradebookIdentifier { get; set; }
         public Guid? StudentEmployerGroupIdentifier { get; set; }
         public Guid? StudentEmployerGroupStatusIdentifier { get; set; }
+        public Guid? DepartmentIdentifier { get; set; }
         public string GradebookTitle { get; set; }
 
         public DateTimeOffset? GradebookCreatedSince { get; set; }

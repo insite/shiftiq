@@ -7,6 +7,6 @@ namespace Shift.Contract
 {
     public class SearchFormConditions : Query<IEnumerable<FormConditionMatch>>, IFormConditionCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
     }
 }

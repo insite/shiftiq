@@ -4,8 +4,8 @@ namespace Shift.Contract
 {
     public class CreateSite
     {
-        public Guid OrganizationIdentifier { get; set; }
-        public Guid SiteIdentifier { get; set; }
+        public Guid OrganizationId { get; set; }
+        public Guid SiteId { get; set; }
 
         public string LastChangeType { get; set; }
         public string LastChangeUser { get; set; }

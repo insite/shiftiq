@@ -4,7 +4,7 @@ namespace Shift.Contract
 {
     public partial class GroupMatch
     {
-        public Guid GroupIdentifier { get; set; }
+        public Guid GroupId { get; set; }
         public string GroupName { get; set; }
     }
 }

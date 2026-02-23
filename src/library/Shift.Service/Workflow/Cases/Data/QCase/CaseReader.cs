@@ -14,21 +14,18 @@ public class CaseReader : IEntityReader
 
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    private readonly IShiftIdentityService _auth;
-
-    public CaseReader(IDbContextFactory<TableDbContext> context, IShiftIdentityService auth)
+    public CaseReader(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
-        _auth = auth;
     }
 
-    public Task<bool> AssertAsync(Guid issue, CancellationToken cancellation = default)
+    public Task<bool> AssertAsync(Guid issue, Guid? organization, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
             var query = BuildQueryable(db);
 
-            return query.AnyAsync(x => x.CaseIdentifier == issue, cancellation);
+            return query.AnyAsync(x => x.CaseIdentifier == issue && (organization == null || x.OrganizationIdentifier == organization), cancellation);
 
         }, cancellation);
     }
@@ -106,13 +103,7 @@ public class CaseReader : IEntityReader
     /// </remarks>
     private IQueryable<CaseEntity> BuildQueryable(TableDbContext db)
     {
-        ValidateOrganizationContext();
-
-        var query = db.QCase
-            .AsNoTracking()
-            .Where(x => x.OrganizationIdentifier == _auth.OrganizationId);
-
-        return query;
+        return db.QCase.AsNoTracking();
     }
 
     private IQueryable<CaseEntity> BuildQueryable(TableDbContext db, ICaseCriteria criteria)
@@ -120,6 +111,9 @@ public class CaseReader : IEntityReader
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
         var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
 
         // TODO: Apply criteria
 
@@ -138,17 +132,11 @@ public class CaseReader : IEntityReader
         var matches = await queryable
             .Select(entity => new CaseMatch
             {
-                CaseIdentifier = entity.CaseIdentifier
+                CaseId = entity.CaseIdentifier
 
             })
             .ToListAsync(cancellation);
 
         return matches;
-    }
-
-    private void ValidateOrganizationContext()
-    {
-        if (_auth.OrganizationId == Guid.Empty)
-            throw new InvalidOperationException("Organization context is required");
     }
 }

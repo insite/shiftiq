@@ -19,9 +19,9 @@ public class TCaseStatusService : IEntityService
 
     #region Read
 
-    public async Task<bool> AssertAsync(Guid statusId, CancellationToken cancellation)
+    public async Task<bool> AssertAsync(Guid statusId, Guid? organization, CancellationToken cancellation)
     {
-        return await _reader.AssertAsync(statusId, cancellation);
+        return await _reader.AssertAsync(statusId, organization, cancellation);
     }
 
     public async Task<CaseStatusModel?> RetrieveAsync(Guid statusId, CancellationToken cancellation)
@@ -81,9 +81,9 @@ public class TCaseStatusService : IEntityService
 
     #region Write
 
-    public async Task<CaseStatusModel?> CreateAsync(CreateCaseStatus command, CancellationToken cancellation)
+    public async Task<CaseStatusModel?> CreateAsync(CreateCaseStatus command, Guid organization, CancellationToken cancellation)
     {
-        var entity = await _writer.CreateAsync(command, cancellation);
+        var entity = await _writer.CreateAsync(command, organization, cancellation);
 
         return entity != null ? _adapter.ToModel(entity) : null;
     }
@@ -101,9 +101,9 @@ public class TCaseStatusService : IEntityService
         return _adapter.ToModel(entity);
     }
 
-    public async Task<bool> DeleteAsync(Guid statusId, CancellationToken cancellation)
+    public async Task<bool> DeleteAsync(Guid status, Guid organization, CancellationToken cancellation)
     {
-        return await _writer.DeleteAsync(statusId, cancellation);
+        return await _writer.DeleteAsync(status, organization, cancellation);
     }
 
     #endregion

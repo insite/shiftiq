@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class FileClaimController : ShiftControllerBase
 {
     private readonly FileClaimService _fileClaimService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public FileClaimController(FileClaimService fileClaimService)
+    public FileClaimController(FileClaimService fileClaimService, IPrincipalProvider principalProvider)
     {
         _fileClaimService = fileClaimService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class FileClaimController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific file claim
     /// </summary>
-    [HttpHead("content/files-claims/{claim:guid}")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Assert)]
+    [HttpHead("api/content/files-claims/{claim:guid}")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertFileClaim")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid claim, CancellationToken cancellation = default)
     {
-        var exists = await _fileClaimService.AssertAsync(claim, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _fileClaimService.AssertAsync(claim, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class FileClaimController : ShiftControllerBase
     /// <summary>
     /// Collects the list of file claims that match specific criteria
     /// </summary>
-    [HttpPost("content/files-claims/collect")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Collect)]
+    [HttpPost("api/content/files-claims/collect")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileClaimModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectFileClaims")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectFileClaims query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class FileClaimController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("content/files-claims")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Collect)]
+    [HttpGet("api/content/files-claims")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileClaimModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectFileClaims_get")]
     [AliasFor("collectFileClaims")]
@@ -56,6 +62,10 @@ public class FileClaimController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectFileClaims query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _fileClaimService.CollectAsync(query, cancellation);
 
         var count = await _fileClaimService.CountAsync(query, cancellation);
@@ -68,8 +78,8 @@ public class FileClaimController : ShiftControllerBase
     /// <summary>
     /// Counts the file claims that match specific criteria
     /// </summary>
-    [HttpPost("content/files-claims/count")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Count)]
+    [HttpPost("api/content/files-claims/count")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countFileClaims")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountFileClaims query, CancellationToken cancellation = default)
@@ -77,8 +87,8 @@ public class FileClaimController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("content/files-claims/count")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Count)]
+    [HttpGet("api/content/files-claims/count")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countFileClaims_get")]
     [AliasFor("countFileClaims")]
@@ -90,6 +100,10 @@ public class FileClaimController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountFileClaims query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _fileClaimService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -98,8 +112,8 @@ public class FileClaimController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of file claims that match specific criteria
     /// </summary>    
-    [HttpPost("content/files-claims/download")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Download)]
+    [HttpPost("api/content/files-claims/download")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadFileClaims")]
@@ -108,8 +122,8 @@ public class FileClaimController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("content/files-claims/download")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Download)]
+    [HttpGet("api/content/files-claims/download")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadFileClaims_get")]
@@ -122,6 +136,10 @@ public class FileClaimController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectFileClaims query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Content", "FileClaims", query.Filter.Format, User);
 
         var models = await _fileClaimService
@@ -142,22 +160,30 @@ public class FileClaimController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific file claim
     /// </summary>
-    [HttpGet("content/files-claims/{claim:guid}")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Retrieve)]
+    [HttpGet("api/content/files-claims/{claim:guid}")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType<FileClaimModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveFileClaim")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid claim, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _fileClaimService.RetrieveAsync(claim, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of file claims that match specific criteria
     /// </summary>
-    [HttpPost("content/files-claims/search")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Search)]
+    [HttpPost("api/content/files-claims/search")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileClaimMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchFileClaims")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchFileClaims query, CancellationToken cancellation = default)
@@ -165,8 +191,8 @@ public class FileClaimController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("content/files-claims/search")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Search)]
+    [HttpGet("api/content/files-claims/search")]
+    [HybridPermission("content/files-claims", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<FileClaimMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchFileClaims_get")]
     [AliasFor("searchFileClaims")]
@@ -178,6 +204,10 @@ public class FileClaimController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchFileClaims query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _fileClaimService.SearchAsync(query, cancellation);
 
         var count = await _fileClaimService.CountAsync(query, cancellation);
@@ -191,8 +221,8 @@ public class FileClaimController : ShiftControllerBase
 
     #region Commands
 
-    [HttpPost("content/files-claims")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Create)]
+    [HttpPost("api/content/files-claims")]
+    [HybridPermission("content/files-claims", DataAccess.Update)]
     [ProducesResponseType<FileClaimModel>(StatusCodes.Status201Created, "application/json")]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
     [EndpointName("createFileClaim")]
@@ -201,15 +231,15 @@ public class FileClaimController : ShiftControllerBase
         var created = await _fileClaimService.CreateAsync(create, cancellation);
 
         if (!created)
-            return BadRequest($"Duplicate not permitted: ClaimIdentifier {create.ClaimIdentifier}. You cannot insert a duplicate object with the same primary key.");
+            return BadRequest($"Duplicate not permitted: ClaimIdentifier {create.ClaimId}. You cannot insert a duplicate object with the same primary key.");
 
-        var model = await _fileClaimService.RetrieveAsync(create.ClaimIdentifier, cancellation);
+        var model = await _fileClaimService.RetrieveAsync(create.ClaimId, cancellation);
 
         return CreatedAtAction(nameof(CreateAsync), model);
     }
 
-    [HttpDelete("content/files-claims/{claim:guid}")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Delete)]
+    [HttpDelete("api/content/files-claims/{claim:guid}")]
+    [HybridPermission("content/files-claims", DataAccess.Delete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointName("deleteFileClaim")]
@@ -223,8 +253,8 @@ public class FileClaimController : ShiftControllerBase
         return Ok();
     }
 
-    [HttpPut("content/files-claims/{claim:guid}")]
-    [HybridAuthorize(Policies.Content.Files.FileClaim.Modify)]
+    [HttpPut("api/content/files-claims/{claim:guid}")]
+    [HybridPermission("content/files-claims", DataAccess.Update)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
@@ -234,7 +264,7 @@ public class FileClaimController : ShiftControllerBase
         var model = await _fileClaimService.RetrieveAsync(claim, cancellation);
 
         if (model is null)
-            return NotFound($"FileClaim not found: ClaimIdentifier {modify.ClaimIdentifier}. You cannot modify an object that is not in the database.");
+            return NotFound($"FileClaim not found: ClaimIdentifier {modify.ClaimId}. You cannot modify an object that is not in the database.");
 
         var modified = await _fileClaimService.ModifyAsync(modify, cancellation);
 

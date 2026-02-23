@@ -79,7 +79,7 @@ namespace InSite.UI.Portal.Accounts.Users.Controls
 
         public void BindControls(bool allowCancel)
         {
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
 
             TokenSecret = MFAHelpers.GenerateMFAToken();
             QRCodeText.Value = $"otpauth://totp/{domain}:{User.Email}?secret={TokenSecret.ToBase32()}&issuer=InSite";

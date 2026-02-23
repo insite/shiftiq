@@ -1,9 +1,15 @@
 import { ReactNode } from "react";
 import { Tab } from "react-bootstrap";
+import { IconName } from "../icon/IconName";
+import Icon from "../icon/Icon";
+import { IconStyle } from "../icon/IconStyle";
 
 interface Props {
     tab: string;
-    icon?: string;
+    icon?: {
+        style: IconStyle;
+        name: IconName;
+    };
     title: ReactNode;
     children?: ReactNode;
 }
@@ -19,7 +25,7 @@ export default function FormTab({
             eventKey={tab}
             title={(
                 <>
-                    {icon && <i className={`me-2 ${icon}`}></i>}
+                    {icon && <Icon style={icon.style} name={icon.name} className="me-2" />}
                     {title}
                 </>
             )}

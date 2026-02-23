@@ -1,8 +1,8 @@
-﻿using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-
-using InSite.Application.Achievements.Write;
+﻿using InSite.Application.Achievements.Write;
 using InSite.Domain.Records;
+
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
 
 namespace InSite.Application.Records.Write
 {
@@ -19,6 +19,7 @@ namespace InSite.Application.Records.Write
             commander.Subscribe<CreateAchievement>(Handle);
             commander.Subscribe<DescribeAchievement>(Handle);
             commander.Subscribe<ChangeAchievementExpiry>(Handle);
+            commander.Subscribe<ChangeAchievementNotification>(Handle);
             commander.Subscribe<ChangeAchievementOrganization>(Handle);
             commander.Subscribe<ChangeAchievementType>(Handle);
             commander.Subscribe<ChangeCertificateLayout>(Handle);
@@ -84,6 +85,13 @@ namespace InSite.Application.Records.Write
         {
             var aggregate = _repository.Get<AchievementAggregate>(c.AggregateIdentifier);
             aggregate.ChangeAchievementExpiry(c.Expiration);
+            Commit(aggregate, c);
+        }
+
+        public void Handle(ChangeAchievementNotification c)
+        {
+            var aggregate = _repository.Get<AchievementAggregate>(c.AggregateIdentifier);
+            aggregate.ChangeAchievementNotification(c.Settings);
             Commit(aggregate, c);
         }
 

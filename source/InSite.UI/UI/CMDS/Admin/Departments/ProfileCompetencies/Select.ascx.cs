@@ -17,7 +17,7 @@ namespace InSite.Cmds.Actions.Contact.Company.Competency.Popup
     {
         public event FilterHandler FilterApplied;
 
-        private Guid OrganizationIdentifier => Guid.TryParse(Request["id"], out var value) ? value : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+        private Guid OrganizationIdentifier => Guid.TryParse(Request["id"], out var value) ? value : CurrentSessionState.Identity.Organization.Identifier;
 
         protected override void OnInit(EventArgs e)
         {

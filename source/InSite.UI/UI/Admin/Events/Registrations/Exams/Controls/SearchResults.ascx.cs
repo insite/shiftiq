@@ -45,7 +45,7 @@ namespace InSite.Admin.Events.Registrations.Exams.Controls
 
         protected override IListSource SelectData(QRegistrationFilter filter)
         {
-            CanWrite = Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write);
+            CanWrite = Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update);
 
             filter.OrderBy = "RegistrationRequestedOn desc";
 

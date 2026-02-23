@@ -8,6 +8,6 @@ namespace Shift.Contract
         public string Url { get; set; }
         public string Title { get; set; }
         public string Icon { get; set; }
-        public Guid? PermissionActionIdentifier { get; set; }
+        public string PermissionActionUrl { get; set; }
     }
 }

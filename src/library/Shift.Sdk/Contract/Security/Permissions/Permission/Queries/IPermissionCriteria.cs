@@ -8,11 +8,11 @@ namespace Shift.Contract
     {
         QueryFilter Filter { get; set; }
 
-        Guid? GroupIdentifier { get; set; }
+        Guid? GroupId { get; set; }
 
-        Guid? ObjectIdentifier { get; set; }
+        Guid? ObjectId { get; set; }
 
-        Guid? OrganizationIdentifier { get; set; }
+        Guid? OrganizationId { get; set; }
 
         Guid? PermissionGrantedBy { get; set; }
 
@@ -24,8 +24,6 @@ namespace Shift.Contract
 
         bool? AllowDelete { get; set; }
 
-        bool? AllowExecute { get; set; }
-
         bool? AllowRead { get; set; }
 
         bool? AllowTrialAccess { get; set; }
@@ -33,8 +31,6 @@ namespace Shift.Contract
         bool? AllowWrite { get; set; }
 
         string ObjectType { get; set; }
-
-        int? PermissionMask { get; set; }
 
         DateTimeOffset? PermissionGranted { get; set; }
     }

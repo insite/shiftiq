@@ -7,16 +7,16 @@ public class GradebookAdapter : IEntityAdapter
 {
     public void Copy(ModifyGradebook modify, GradebookEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
-        entity.EventIdentifier = modify.EventIdentifier;
-        entity.AchievementIdentifier = modify.AchievementIdentifier;
-        entity.FrameworkIdentifier = modify.FrameworkIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
+        entity.EventIdentifier = modify.EventId;
+        entity.AchievementIdentifier = modify.AchievementId;
+        entity.FrameworkIdentifier = modify.FrameworkId;
         entity.GradebookCreated = modify.GradebookCreated;
         entity.GradebookTitle = modify.GradebookTitle;
         entity.GradebookType = modify.GradebookType;
         entity.IsLocked = modify.IsLocked;
         entity.Reference = modify.Reference;
-        entity.PeriodIdentifier = modify.PeriodIdentifier;
+        entity.PeriodIdentifier = modify.PeriodId;
         entity.LastChangeTime = modify.LastChangeTime;
         entity.LastChangeType = modify.LastChangeType;
         entity.LastChangeUser = modify.LastChangeUser;
@@ -33,17 +33,17 @@ public class GradebookAdapter : IEntityAdapter
     {
         var entity = new GradebookEntity
         {
-            GradebookIdentifier = create.GradebookIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            EventIdentifier = create.EventIdentifier,
-            AchievementIdentifier = create.AchievementIdentifier,
-            FrameworkIdentifier = create.FrameworkIdentifier,
+            GradebookIdentifier = create.GradebookId,
+            OrganizationIdentifier = create.OrganizationId,
+            EventIdentifier = create.EventId,
+            AchievementIdentifier = create.AchievementId,
+            FrameworkIdentifier = create.FrameworkId,
             GradebookCreated = create.GradebookCreated,
             GradebookTitle = create.GradebookTitle,
             GradebookType = create.GradebookType,
             IsLocked = create.IsLocked,
             Reference = create.Reference,
-            PeriodIdentifier = create.PeriodIdentifier,
+            PeriodIdentifier = create.PeriodId,
             LastChangeTime = create.LastChangeTime,
             LastChangeType = create.LastChangeType,
             LastChangeUser = create.LastChangeUser
@@ -51,26 +51,26 @@ public class GradebookAdapter : IEntityAdapter
         return entity;
     }
 
-    public IEnumerable<GradebookModel> ToModel(IEnumerable<GradebookEntity> entities, TimeZoneInfo timezone)
+    public IEnumerable<GradebookModel> ToModel(IEnumerable<GradebookEntity> entities, TimeZoneInfo? timezone)
     {
         return entities.Select(e => ToModel(e, timezone));
     }
 
-    public GradebookModel ToModel(GradebookEntity entity, TimeZoneInfo timezone)
+    public GradebookModel ToModel(GradebookEntity entity, TimeZoneInfo? timezone)
     {
         var model = new GradebookModel
         {
-            GradebookIdentifier = entity.GradebookIdentifier,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            EventIdentifier = entity.EventIdentifier,
-            AchievementIdentifier = entity.AchievementIdentifier,
-            FrameworkIdentifier = entity.FrameworkIdentifier,
+            GradebookId = entity.GradebookIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            EventId = entity.EventIdentifier,
+            AchievementId = entity.AchievementIdentifier,
+            FrameworkId = entity.FrameworkIdentifier,
             GradebookCreated = entity.GradebookCreated,
             GradebookTitle = entity.GradebookTitle,
             GradebookType = entity.GradebookType,
             IsLocked = entity.IsLocked,
             Reference = entity.Reference,
-            PeriodIdentifier = entity.PeriodIdentifier,
+            PeriodId = entity.PeriodIdentifier,
             LastChangeTime = entity.LastChangeTime,
             LastChangeType = entity.LastChangeType,
             LastChangeUser = entity.LastChangeUser
@@ -105,17 +105,17 @@ public class GradebookAdapter : IEntityAdapter
     {
         var match = new GradebookMatch
         {
-            GradebookIdentifier = entity.GradebookIdentifier,
+            GradebookId = entity.GradebookIdentifier,
             GradebookTitle = entity.GradebookTitle,
             GradebookCreated = entity.GradebookCreated,
             GradebookEnrollmentCount = entity.Enrollments.Count,
 
-            ClassIdentifier = entity.EventIdentifier,
+            ClassId = entity.EventIdentifier,
             ClassTitle = entity.Event?.EventTitle,
             ClassStarted = entity.Event?.EventScheduledStart,
             ClassEnded = entity.Event?.EventScheduledEnd,
 
-            AchievementIdentifier = entity.AchievementIdentifier,
+            AchievementId = entity.AchievementIdentifier,
             AchievementTitle = entity.Achievement?.AchievementTitle,
             AchievementCountGranted = entity.Achievement?.Credentials?.Count ?? 0
         };

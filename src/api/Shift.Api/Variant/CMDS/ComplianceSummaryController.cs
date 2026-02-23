@@ -2,7 +2,6 @@
 
 using Newtonsoft.Json;
 
-using Shift.Common;
 using Shift.Service.Variant.CMDS;
 
 namespace Shift.Api.Variant.CMDS;
@@ -13,23 +12,30 @@ public class ComplianceSummaryController : ShiftControllerBase
 {
     private readonly IMonitor _monitor;
     private readonly ComplianceSummaryReader _search;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public ComplianceSummaryController(IMonitor monitor, ComplianceSummaryReader search)
+    public ComplianceSummaryController(IMonitor monitor, ComplianceSummaryReader search, IPrincipalProvider principalProvider)
     {
         _monitor = monitor;
         _search = search;
+        _principalProvider = principalProvider;
     }
 
     [HttpPost("api/plugin/cmds/compliance-summaries")]
-    [BearerAuthorize(Policies.Variant.Cmds.Reporting.Read)]
+    [HttpPost("api/variant/cmds/compliance-summaries")]
+    [BearerPermission("variant/cmds")]
     [ProducesResponseType(typeof(ComplianceSummaryModel[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> ExportAsync([FromBody] ComplianceSummaryCriteria criteria, CancellationToken token)
     {
         var doingWhat = "Generating CMDS compliance summaries";
 
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
         try
         {
-            var entities = await _search.ExportAsync(criteria, token);
+            var entities = await _search.ExportAsync(criteria, organizationId!.Value, token);
 
             var adapter = new ComplianceSummaryAdapter();
 

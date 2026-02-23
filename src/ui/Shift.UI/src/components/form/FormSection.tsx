@@ -1,10 +1,12 @@
 import { ReactNode } from "react";
 import FormCard from "./FormCard";
+import { IconName } from "../icon/IconName";
+import Icon from "../icon/Icon";
 
 interface Props {
     className?: string;
     title?: string;
-    icon?: string;
+    icon?: IconName;
     children?: ReactNode;
 }
 
@@ -18,7 +20,7 @@ export default function FormSection({
         <section className={className}>
             {title && (
                 <h2>
-                    {icon && <i className={`${icon} me-3`}></i>}
+                    {icon && <Icon style="Solid" name={icon} className="me-3" />}
                     {title}
                 </h2>
             )}

@@ -20,7 +20,7 @@ namespace InSite.Persistence
         public static Guid Save(Membership membership, bool modifyFunction = false, bool modifyEffective = false, bool modifyExpiry = false)
         {
             if (_commander == null)
-                throw new Exception("The MembershipStore must be initialized before it is used.");
+                throw new InvalidOperationException("The MembershipStore must be initialized before it is used.");
 
             Guid membershipId;
 
@@ -160,7 +160,7 @@ namespace InSite.Persistence
         public static void Delete(Membership membership)
         {
             if (_commander == null)
-                throw new Exception("The MembershipStore must be initialized before it is used.");
+                throw new InvalidOperationException("The MembershipStore must be initialized before it is used.");
 
             if (membership == null)
                 return;

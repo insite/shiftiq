@@ -465,6 +465,15 @@ namespace InSite.Admin.Courses.Outlines.Controls
         protected global::InSite.Common.Web.UI.CheckBox CourseIsHidden;
 
         /// <summary>
+        /// IsDisplayOverviewOnly control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox IsDisplayOverviewOnly;
+
+        /// <summary>
         /// CategoryList control.
         /// </summary>
         /// <remarks>
@@ -807,58 +816,40 @@ namespace InSite.Admin.Courses.Outlines.Controls
         protected global::InSite.Common.Web.UI.Button EnrollmentGroupAdd;
 
         /// <summary>
-        /// ExistedEnrollmentsPanel control.
+        /// GroupEnrollmentContainer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ExistedEnrollmentsPanel;
+        protected global::System.Web.UI.WebControls.Panel GroupEnrollmentContainer;
 
         /// <summary>
-        /// CommandButtons control.
+        /// GroupEnrollments control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CommandButtons;
+        protected global::InSite.Admin.Courses.Outlines.Controls.EnrollmentGroupGrid GroupEnrollments;
 
         /// <summary>
-        /// SelectAllButton control.
+        /// UserEnrollmentContainer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Button SelectAllButton;
+        protected global::System.Web.UI.WebControls.Panel UserEnrollmentContainer;
 
         /// <summary>
-        /// UnselectAllButton control.
+        /// UserEnrollments control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Button UnselectAllButton;
-
-        /// <summary>
-        /// PreDeleteButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.Button PreDeleteButton;
-
-        /// <summary>
-        /// EnrollmentList control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DataList EnrollmentList;
+        protected global::InSite.Admin.Courses.Outlines.Controls.EnrollmentUserGrid UserEnrollments;
 
         /// <summary>
         /// FrameworkIdentifier control.
@@ -895,14 +886,5 @@ namespace InSite.Admin.Courses.Outlines.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.CancelButton CourseCancelButton;
-
-        /// <summary>
-        /// DeleteEnrollmentsButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button DeleteEnrollmentsButton;
     }
 }

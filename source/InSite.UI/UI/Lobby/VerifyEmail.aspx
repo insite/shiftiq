@@ -8,8 +8,13 @@
         <div class="view show" id="signin-view">
             <h2 class="mb-4"><insite:Literal runat="server" Text="Email Verification" /></h2>
             <insite:Alert runat="server" ID="ScreenStatus" />
+
+            <p runat="server" id="SendMessage" class="mb-3" visible="false">
+            </p>
+
             <div>
-                <insite:CloseButton runat="server" ID="CloseLink" CssClass="right" />
+                <insite:Button runat="server" ID="SendButton" ButtonStyle="Primary" Icon="fas fa-paper-plane" Visible="false" />
+                <insite:CloseButton runat="server" ID="CloseButton" CssClass="right" />
             </div>
         </div>
 

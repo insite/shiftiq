@@ -108,7 +108,7 @@ public class QGradebookEnrollmentReader : IEntityReader
         var matches = await queryable
             .Select(entity => new GradebookEnrollmentMatch
             {
-                EnrollmentIdentifier = entity.EnrollmentIdentifier
+                EnrollmentId = entity.EnrollmentIdentifier
 
             })
             .ToListAsync(cancellation);

@@ -8,8 +8,8 @@ namespace Shift.Contract
     {
         QueryFilter Filter { get; set; }
         
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? RespondentUserIdentifier { get; set; }
+        Guid? OrganizationId { get; set; }
+        Guid? RespondentUserId { get; set; }
 
         string ResponseAnswerText { get; set; }
     }

@@ -14,9 +14,6 @@
                         <insite:TextBox runat="server" ID="Code" EmptyMessage="Organization Code" MaxLength="256" />
                     </div>
                     <div class="mb-2">
-                        <insite:TextBox runat="server" ID="DomainName" EmptyMessage="Organization Domain" MaxLength="256" />
-                    </div>
-                    <div class="mb-2">
                         <insite:ComboBox runat="server" ID="IsClosed" EmptyMessage="Organization Status">
                             <Items>
                                 <insite:ComboBoxOption />

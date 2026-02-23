@@ -25,14 +25,14 @@ namespace InSite.UI.Admin.Integrations.Tests.Utilities
             var person = ServiceLocator.PersonSearch.GetPerson(userId, organizationId);
 
             if (person == null)
-                throw new Exception($"Person not found for user {userId} in organization {organizationId}");
+                throw new InvalidOperationException($"Person not found for user {userId} in organization {organizationId}");
 
             var personId = person.PersonIdentifier;
 
             var secret = ServiceLocator.PersonSecretSearch.GetByPerson(personId, SecretName.ShiftClientSecret)?.SecretValue;
 
             if (secret == null)
-                throw new Exception($"API Client Secret not found for person {personId}");
+                throw new InvalidOperationException($"API Client Secret not found for person {personId}");
 
             return secret;
         }

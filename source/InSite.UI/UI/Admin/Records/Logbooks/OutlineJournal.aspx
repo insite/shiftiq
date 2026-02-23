@@ -53,7 +53,7 @@
                                         </FooterTemplate>
                                         <ItemTemplate>
                                             <tr>
-                                                <td style="width:90px;">
+                                                <td style="width:100px;">
                                                     <insite:IconLink runat="server" Name='<%# Eval("ValidateButtonIcon") %>' ToolTip='<%# Eval("ValidateButtonHint") %>'
                                                         NavigateUrl='<%# Eval("ExperienceIdentifier", "/ui/admin/records/logbooks/validate-experience?experience={0}") %>'
                                                     />

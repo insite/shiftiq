@@ -6,10 +6,10 @@ namespace Shift.Contract
 {
     public class CountPages : Query<int>, IPageCriteria
     {
-        public Guid? ObjectIdentifier { get; set; }
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? ParentPageIdentifier { get; set; }
-        public Guid? SiteIdentifier { get; set; }
+        public Guid? ObjectId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? ParentPageId { get; set; }
+        public Guid? SiteId { get; set; }
 
         public bool? IsAccessDenied { get; set; }
         public bool? IsHidden { get; set; }

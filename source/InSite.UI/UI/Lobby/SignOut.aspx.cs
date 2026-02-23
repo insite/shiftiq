@@ -24,7 +24,8 @@ namespace InSite.UI.Lobby
 
             var cookiesToExpire = new List<string>
             {
-                ServiceLocator.AppSettings.Security.Cookie.Name
+                ServiceLocator.AppSettings.Security.Cookie.Name,
+                ServiceLocator.AppSettings.Security.IdCookie.Name,
             };
 
             var sessionCookieName = Global.GetSessionStateCookieName();
@@ -154,7 +155,7 @@ namespace InSite.UI.Lobby
 
                 HttpCookie expiredCookie = new HttpCookie(cookie)
                 {
-                    Domain = ServiceLocator.AppSettings.Security.Domain,
+                    Domain = ServiceLocator.AppSettings.Partition.Domain,
                     Expires = DateTime.UtcNow.AddMonths(-1),
                     HttpOnly = original.HttpOnly,
                     Path = original.Path,

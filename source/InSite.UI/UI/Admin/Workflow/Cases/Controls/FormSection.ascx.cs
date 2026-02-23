@@ -80,7 +80,8 @@ namespace InSite.Admin.Issues.Outlines.Controls
 
             Current.SessionIdentifier = query.ResponseSessionIdentifier;
             Current.FormIdentifier = query.SurveyFormIdentifier;
-            Current.UserIdentifier = query.RespondentUserIdentifier;
+            Current.RespondentUserIdentifier = query.RespondentUserIdentifier;
+            Current.AssessorUserIdentifier = query.AssessorUserIdentifier;
 
             SubmissionSessionControl.LoadCurrentStateObjects(Current, Navigator);
 

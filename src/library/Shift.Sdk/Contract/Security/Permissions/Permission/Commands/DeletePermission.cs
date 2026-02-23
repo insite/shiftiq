@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeletePermission
     {
-        public Guid PermissionIdentifier { get; set; }
+        public Guid PermissionId { get; set; }
     }
 }

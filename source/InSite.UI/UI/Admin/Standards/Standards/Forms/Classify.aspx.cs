@@ -92,7 +92,7 @@ namespace InSite.Admin.Standards.Standards.Forms
         {
             base.OnLoad(e);
 
-            if (!Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/admin/standards/home");
 
             Page.MaintainScrollPositionOnPostBack = false;

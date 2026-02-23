@@ -33,6 +33,7 @@ namespace InSite.Application.Events.Write
             commander.Subscribe<ConfigureIntegration>(Handle);
             commander.Subscribe<DescribeAppointment>(Handle);
             commander.Subscribe<DescribeEvent>(Handle);
+            commander.Subscribe<ModifyEventDisplayOnCalendar>(Handle);
             commander.Subscribe<ElapseEventTimer>(Handle);
             commander.Subscribe<EnableEventBillingCode>(Handle);
             commander.Subscribe<ImportExamAttempts>(Handle);
@@ -260,6 +261,15 @@ namespace InSite.Application.Events.Write
             _repository.LockAndRun<EventAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 aggregate.DescribeAppointment(c.Title, c.Description);
+                Commit(aggregate, c);
+            });
+        }
+
+        public void Handle(ModifyEventDisplayOnCalendar c)
+        {
+            _repository.LockAndRun<EventAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.DisplayEventOnCalendar(c.Display);
                 Commit(aggregate, c);
             });
         }

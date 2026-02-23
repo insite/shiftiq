@@ -40,6 +40,7 @@ namespace InSite.Domain.Contacts
             { UserField.UserPasswordExpired, new StateFieldMeta { FieldType = StateFieldType.DateOffset, Required = true, DirectlyModifiable = false } },
             { UserField.UtcArchived, new StateFieldMeta { FieldType = StateFieldType.DateOffset, DirectlyModifiable = false } },
             { UserField.UtcUnarchived, new StateFieldMeta { FieldType = StateFieldType.DateOffset, DirectlyModifiable = false } },
+            { UserField.EmailVerificationTokenIssued, new StateFieldMeta { FieldType = StateFieldType.DateOffset } },
         };
 
         public static IStateFieldMeta GetField(UserField userField) => _fields[userField];

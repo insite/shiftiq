@@ -45,6 +45,7 @@ namespace InSite.Application.Courses.Read
         public bool CourseIsHidden { get; set; }
         public bool IsMultipleUnitsEnabled { get; set; }
         public bool IsProgressReportEnabled { get; set; }
+        public bool IsDisplayOverviewOnly { get; set; }
 
         public int CourseAsset { get; set; }
         public int? CourseSequence { get; set; }

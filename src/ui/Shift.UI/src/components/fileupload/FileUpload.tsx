@@ -11,6 +11,7 @@ import ProgressBar, { ProgressBarIndicator } from "../ProgressBar";
 
 import "./FileUpload.css";
 import { filePickerHelper } from "@/helpers/filePickerHelper";
+import Icon from "../icon/Icon";
 
 interface FileUploadRef {
     focus: () => void;
@@ -183,7 +184,7 @@ export default function FileUpload({
                     tabIndex={-1}
                     onClick={handleButtonClick}
                 >
-                    {isBusy ? <Spinner animation="border" role="status" size="sm" /> : <i className="far fa-search"></i>}
+                    {isBusy ? <Spinner animation="border" role="status" size="sm" /> : <Icon style="Regular" name="search" />}
                 </button>
             </div>
             {showProgress && (

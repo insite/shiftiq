@@ -67,7 +67,7 @@ namespace InSite.Persistence
                 throw new ArgumentNullException(nameof(rootNode));
 
             if (!HasNode(rootNode))
-                throw new ApplicationError($"Root node not found: {rootNode.NodeId}");
+                throw new KeyNotFoundException($"Root node not found: {rootNode.NodeId}");
 
             var path = new Stack<TNode>();
             var keys = new HashSet<Guid>();
@@ -127,7 +127,7 @@ namespace InSite.Persistence
                 throw new ArgumentNullException(nameof(node));
 
             if (!HasNode(node))
-                throw new ApplicationError($"Node not found: {node.NodeId}");
+                throw new KeyNotFoundException($"Node not found: {node.NodeId}");
 
             var children = new Dictionary<Guid, TNode>();
 
@@ -159,7 +159,7 @@ namespace InSite.Persistence
                 throw new ArgumentNullException(nameof(node));
 
             if (!HasNode(node))
-                throw new ApplicationError($"Node not found: {node.NodeId}");
+                throw new KeyNotFoundException($"Node not found: {node.NodeId}");
 
             {
                 var stack = new Stack<TNode>();
@@ -200,7 +200,7 @@ namespace InSite.Persistence
                 throw new ArgumentNullException(nameof(rootNode));
 
             if (!HasNode(rootNode))
-                throw new ApplicationError($"Root node not found: {rootNode.NodeId}");
+                throw new KeyNotFoundException($"Root node not found: {rootNode.NodeId}");
 
             var path = new Stack<TNode>();
             var keys = new HashSet<Guid>();

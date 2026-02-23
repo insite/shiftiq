@@ -65,6 +65,7 @@ namespace InSite.Application.Events.Read
         public bool PersonCodeIsRequired { get; set; }
         public bool AllowMultipleRegistrations { get; set; }
         public bool BillingCodeEnabled { get; set; }
+        public bool DisplayOnCalendar { get; set; }
 
         public int EventNumber { get; set; }
         public int? CapacityMaximum { get; set; }

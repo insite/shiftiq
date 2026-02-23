@@ -3,14 +3,13 @@ using System.Collections.Concurrent;
 using System.Data.Entity;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application;
 using InSite.Application.Organizations.Read;
 using InSite.Application.Organizations.Write;
 using InSite.Domain.Organizations;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Persistence
@@ -275,6 +274,8 @@ namespace InSite.Persistence
             var entity = new QOrganization
             {
                 OrganizationIdentifier = e.AggregateIdentifier,
+                OrganizationCode = state.OrganizationCode,
+                CompanyName = state.Name,
                 AccountOpened = state.AccountOpened,
                 AccountStatus = state.AccountStatus.GetName(),
                 TimeZone = state.TimeZone.Id,
@@ -324,7 +325,6 @@ namespace InSite.Persistence
         {
             entity.OrganizationCode = state.OrganizationCode;
             entity.CompanyName = state.CompanyName.MaxLength(50);
-            entity.CompanyDomain = state.CompanyDomain.MaxLength(50);
         });
 
         public void Update(OrganizationIntegrationSettingsModified e) => UpdateOrganization(e, (entity, state) => { });
@@ -347,10 +347,7 @@ namespace InSite.Persistence
             entity.AccountStatus = state.AccountStatus.GetName();
         });
 
-        public void Update(OrganizationParentModified e) => UpdateOrganization(e, (entity, state) =>
-        {
-            entity.ParentOrganizationIdentifier = state.ParentOrganizationIdentifier;
-        });
+        public void Update(OrganizationParentModified e) { }
 
         public void Update(OrganizationPlatformSettingsModified e) => UpdateOrganization(e, (entity, state) => { });
 

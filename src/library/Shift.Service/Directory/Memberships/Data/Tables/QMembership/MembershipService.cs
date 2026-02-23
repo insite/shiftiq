@@ -17,21 +17,21 @@ public class MembershipService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid membership, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid membership, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(membership, cancellation);
+        return await _reader.AssertAsync(membership, organization, cancellation);
     }
 
-    public async Task<IEnumerable<MembershipModel>> CollectAsync(IMembershipCriteria criteria, CancellationToken cancellation = default)
+    public async Task<IEnumerable<MembershipModel>> CollectAsync(IMembershipCriteria criteria, Guid currentUserId, CancellationToken cancellation = default)
     {
-        var entities = await _reader.CollectAsync(criteria, cancellation);
+        var entities = await _reader.CollectAsync(criteria, currentUserId, cancellation);
 
         return _adapter.ToModel(entities);
     }
 
-    public async Task<int> CountAsync(IMembershipCriteria criteria, CancellationToken cancellation = default)
+    public async Task<int> CountAsync(IMembershipCriteria criteria, Guid currentUserId, CancellationToken cancellation = default)
     {
-        return await _reader.CountAsync(criteria, cancellation);
+        return await _reader.CountAsync(criteria, currentUserId, cancellation);
     }
 
     public async Task<bool> CreateAsync(CreateMembership create, CancellationToken cancellation = default)
@@ -46,9 +46,9 @@ public class MembershipService : IEntityService
         return await _writer.DeleteAsync(membership, cancellation);
     }
 
-    public async IAsyncEnumerable<MembershipModel> DownloadAsync(IMembershipCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation)
+    public async IAsyncEnumerable<MembershipModel> DownloadAsync(IMembershipCriteria criteria, Guid currentUserId, [EnumeratorCancellation] CancellationToken cancellation)
     {
-        await foreach (var entity in _reader.DownloadAsync(criteria, cancellation))
+        await foreach (var entity in _reader.DownloadAsync(criteria, currentUserId, cancellation))
         {
             yield return _adapter.ToModel(entity);
         }
@@ -56,7 +56,7 @@ public class MembershipService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyMembership modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.MembershipIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.MembershipId, cancellation);
 
         if (entity == null)
             return false;
@@ -73,9 +73,9 @@ public class MembershipService : IEntityService
         return entity != null ? _adapter.ToModel(entity) : null;
     }
 
-    public async Task<IEnumerable<MembershipMatch>> SearchAsync(IMembershipCriteria criteria, CancellationToken cancellation = default)
+    public async Task<IEnumerable<MembershipMatch>> SearchAsync(IMembershipCriteria criteria, Guid currentUserId, CancellationToken cancellation = default)
     {
-        return await _reader.SearchAsync(criteria, cancellation);
+        return await _reader.SearchAsync(criteria, currentUserId, cancellation);
     }
 
     public string Serialize<T>(IEnumerable<T> models, string format, string includes)

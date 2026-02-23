@@ -6,8 +6,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Domain.Banks;
 using InSite.Persistence;
 using InSite.Web.Infrastructure;
@@ -16,6 +14,7 @@ using Newtonsoft.Json;
 
 using Shift.Common;
 using Shift.Common.Integration.ImageMagick;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 using Shift.Sdk.UI;
 using Shift.Toolbox;
@@ -358,7 +357,7 @@ namespace InSite.Admin.Assessments.Attachments.Utilities
             }
             catch (Exception ex)
             {
-                throw ApplicationError.Create(ex, "The image is corrupted.");
+                throw new InvalidDataException("The image is corrupted", ex);
             }
         }
 

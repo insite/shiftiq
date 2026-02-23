@@ -97,6 +97,11 @@
         BankNotification,
         WelcomeLearner,
         ManagementWelcomeEmail,
-        LearningWelcomeEmail
+        LearningWelcomeEmail,
+
+        AchievementExpiring,
+        AchievementExpired,
+        LearnerAchievementExpiring,
+        LearnerAchievementExpired
     }
 }

@@ -35,6 +35,7 @@ namespace InSite.Application.Events.Read
             publisher.Subscribe<EventCancelled>(Handle);
             publisher.Subscribe<EventCompleted>(Handle);
             publisher.Subscribe<EventCreditAssigned>(Handle);
+            publisher.Subscribe<EventDisplayOnCalendarModified>(Handle);
             publisher.Subscribe<EventDescribed>(Handle);
             publisher.Subscribe<EventFormatChanged>(Handle);
             publisher.Subscribe<EventNotificationTriggered>(Handle);
@@ -259,6 +260,10 @@ namespace InSite.Application.Events.Read
         public void Handle(EventAttendeeRemoved e)
         {
             _eventStore.DeleteContact(e.AggregateIdentifier, e.Contact);
+        }
+        public void Handle(EventDisplayOnCalendarModified e)
+        {
+            _eventStore.UpdateEvent(e, x => x.DisplayOnCalendar = e.Display);
         }
 
         public void Handle(EventBillingCodeEnabled e)

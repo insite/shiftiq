@@ -22,7 +22,7 @@ namespace InSite.Common.Web.UI
         {
             var filter = Filter.Clone();
 
-            filter.Name = keyword;
+            filter.NameContains = keyword;
 
             return filter;
         }

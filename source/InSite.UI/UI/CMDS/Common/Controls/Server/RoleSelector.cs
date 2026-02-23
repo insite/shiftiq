@@ -13,16 +13,16 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
     public class RoleSelector : ComboBox
     {
         private static bool IsCollegeAdministrator(ISecurityFramework current)
-            => current.IsInGroup(CmdsRole.CollegeAdministrators);
+            => current.IsInRole(CmdsRole.CollegeAdministrators);
 
         private static bool IsOfficeAdministrator(ISecurityFramework current)
-            => current.IsInGroup(CmdsRole.OfficeAdministrators);
+            => current.IsInRole(CmdsRole.OfficeAdministrators);
 
         private static bool IsProgrammer(ISecurityFramework current)
-            => current.IsInGroup(CmdsRole.Programmers);
+            => current.IsInRole(CmdsRole.Programmers);
 
         private static bool IsSystemAdministrator(ISecurityFramework current)
-            => current.IsInGroup(CmdsRole.SystemAdministrators);
+            => current.IsInRole(CmdsRole.SystemAdministrators);
 
         protected override ListItemArray CreateDataSource()
         {

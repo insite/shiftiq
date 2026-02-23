@@ -3,8 +3,8 @@
 <div class="mb-3">
     <insite:DropDownButton runat="server" ID="ExportButton" DefaultAction="PostBack" IconName="download" Text="Download">
         <Items>
-            <insite:DropDownButtonItem Name="XLSX" IconName="file-excel" Text="Excel (*.xlsx)" />
-            <insite:DropDownButtonItem Name="CSV" IconName="file-csv" Text="Text (*.csv)" />
+            <sdk:DropDownButtonItem Name="XLSX" IconName="file-excel" Text="Excel (*.xlsx)" />
+            <sdk:DropDownButtonItem Name="CSV" IconName="file-csv" Text="Text (*.csv)" />
         </Items>
     </insite:DropDownButton>
 </div>

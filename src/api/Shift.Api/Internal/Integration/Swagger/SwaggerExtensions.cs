@@ -80,9 +80,9 @@ public static class SwaggerExtensions
         });
     }
 
-    public static void UseDocumentation(this WebApplication app, ReleaseSettings release)
+    public static void UseDocumentation(this WebApplication app, AppSettings settings)
     {
-        var environment = release.GetEnvironment();
+        var environment = settings.Release.GetEnvironment();
 
         var isLocal = environment.IsLocal();
 
@@ -99,7 +99,7 @@ public static class SwaggerExtensions
         {
             options.DefaultModelsExpandDepth(-1);
 
-            options.SwaggerEndpoint("v2/swagger.json", release.Brand + " API v2");
+            options.SwaggerEndpoint("v2/swagger.json", settings.Partition.Brand + " API v2");
 
             options.InjectStylesheet("../swagger-ui/custom.css");
 

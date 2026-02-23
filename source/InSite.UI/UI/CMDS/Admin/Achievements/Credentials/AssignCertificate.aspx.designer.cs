@@ -66,7 +66,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox EnableSignOff;
+        protected global::InSite.Common.Web.UI.CheckBox EnableSignOff;
 
         /// <summary>
         /// IsRequired control.
@@ -75,7 +75,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox IsRequired;
+        protected global::InSite.Common.Web.UI.CheckBox IsRequired;
 
         /// <summary>
         /// IsTimeSensitive control.
@@ -84,7 +84,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox IsTimeSensitive;
+        protected global::InSite.Common.Web.UI.CheckBox IsTimeSensitive;
 
         /// <summary>
         /// trValidFor control.

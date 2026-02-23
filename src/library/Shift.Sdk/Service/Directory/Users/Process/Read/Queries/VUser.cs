@@ -34,7 +34,8 @@ namespace InSite.Application.Contacts.Read
         public virtual ICollection<QGradebookCompetencyValidation> Validations { get; set; }
         public virtual ICollection<QEnrollment> Enrollments { get; set; }
         public virtual ICollection<VPerson> Persons { get; set; }
-        public virtual ICollection<QResponseSession> ResponseSessions { get; set; }
+        public virtual ICollection<QResponseSession> AssessorResponseSessions { get; set; }
+        public virtual ICollection<QResponseSession> RespondentResponseSessions { get; set; }
         public virtual ICollection<TQuizAttempt> LearnerQuizAttempts { get; set; }
 
         public virtual ICollection<VIssue> VAdministratorIssues { get; set; }
@@ -60,7 +61,7 @@ namespace InSite.Application.Contacts.Read
             Validations = new HashSet<QGradebookCompetencyValidation>();
             Enrollments = new HashSet<QEnrollment>();
             Persons = new HashSet<VPerson>();
-            ResponseSessions = new HashSet<QResponseSession>();
+            RespondentResponseSessions = new HashSet<QResponseSession>();
             LearnerQuizAttempts = new HashSet<TQuizAttempt>();
 
             VAdministratorIssues = new HashSet<VIssue>();

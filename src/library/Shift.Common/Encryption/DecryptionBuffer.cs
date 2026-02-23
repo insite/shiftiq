@@ -140,9 +140,9 @@ namespace Shift.Common
             lock (_lockObject)
             {
                 if (_gotAllData)
-                    throw new Exception("DecryptionStreamer.AddData - Can't add more data after entering last batch");
+                    throw new InvalidOperationException("Can't add more data after entering last batch");
                 if (data == null)
-                    throw new Exception("DecryptionStreamer.AddData - Can't add null data");
+                    throw new ArgumentNullException(nameof(data));
 
                 if (lastData)
                     _gotAllData = true;
@@ -163,10 +163,10 @@ namespace Shift.Common
         public void AddData(byte[] data, int offset, int length, bool lastData)
         {
             if (data == null)
-                throw new Exception("EncryptionBuffer.AddData - Can't add null data");
+                throw new ArgumentNullException(nameof(data));
 
             if (offset < 0 || offset + length > data.Length)
-                throw new Exception("EncryptionBuffer.AddData - Index out of bounds");
+                throw new ArgumentOutOfRangeException(nameof(offset), "Offset and length exceed the data array bounds");
 
             byte[] newArray = new byte[length];
             Buffer.BlockCopy(data, offset, newArray, 0, length);

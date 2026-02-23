@@ -697,18 +697,18 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         public static List<TCollectionItem> GetCollectionItems(string collection)
         {
-            var organization = CurrentSessionState.Identity.Organization;
+            var organizationId = CurrentSessionState.Identity.Organization.Identifier;
 
             var items = TCollectionItemCache.Select(new TCollectionItemFilter
             {
-                OrganizationIdentifier = organization.Identifier,
+                OrganizationIdentifier = organizationId,
                 CollectionName = collection
             });
 
-            if (items.Count == 0 && organization.ParentOrganizationIdentifier.HasValue)
+            if (items.Count == 0 && organizationId != ServiceLocator.Partition.Identifier)
                 items = TCollectionItemCache.Select(new TCollectionItemFilter
                 {
-                    OrganizationIdentifier = organization.ParentOrganizationIdentifier.Value,
+                    OrganizationIdentifier = ServiceLocator.Partition.Identifier,
                     CollectionName = collection
                 });
 

@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public partial class GroupAddressMatch
     {
-        public Guid AddressIdentifier { get; set; }
+        public Guid AddressId { get; set; }
     }
 }

@@ -55,14 +55,17 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label">
-                                Settings
+                                Options
                             </label>
                             <div>
-                                <asp:CheckBox runat="server" ID="EnableSignOff" Text="Enable Sign Off" />
-                                <asp:CheckBox runat="server" ID="IsRequired" Text="Required" />
-                                <asp:CheckBox runat="server" ID="IsTimeSensitive" Text="Time-Sensitive" onclick="showHideDateExpired();" />
+                                <insite:CheckBox runat="server" ID="EnableSignOff" Text="Learners can sign off on this achievement themselves" />
                             </div>
-                            <div class="form-text"></div>
+                            <div>
+                                <insite:CheckBox runat="server" ID="IsRequired" Text="This achievement is required for compliance" />
+                            </div>
+                            <div>
+                                <insite:CheckBox runat="server" ID="IsTimeSensitive" Text="This achievement is time-sensitive" SubText="(it expires after a set period)" onclick="showHideDateExpired();" />
+                            </div>
                         </div>
 
                         <div runat="server" ID="trValidFor" style="display:none;" class="form-group mb-3">

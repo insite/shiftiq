@@ -348,7 +348,7 @@ namespace InSite.UI.Layout.Common.Controls.Editor
         protected override void OnPreRender(EventArgs e)
         {
             if (AllowUpload && string.IsNullOrEmpty(UploadFolderPath))
-                throw new ApplicationError("UploadFolderPath is null");
+                throw new InvalidOperationException("UploadFolderPath is null");
 
             StateInput.Value = JsonConvert.SerializeObject(ClientState);
 
@@ -371,7 +371,7 @@ namespace InSite.UI.Layout.Common.Controls.Editor
             else if (ContentType == ContentTypeEnum.Html)
                 options.ContentType = "html";
             else
-                throw new ApplicationError("Content type is not implemented: " + ContentType.GetName());
+                throw new NotImplementedException("Content type is not implemented: " + ContentType.GetName());
 
             if (HttpRequestHelper.IsAjaxRequest)
                 options.CurrentState = StateInput.Value;

@@ -41,7 +41,7 @@ namespace InSite.UI.Portal.Contacts.Referral
             if (IsPostBack)
                 return;
 
-            if (!Identity.IsGranted("Portal/Contacts", PermissionOperation.Write))
+            if (!Identity.IsGranted("Portal/Contacts", DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/portal/contacts/referral/search");
 
             PageHelper.AutoBindHeader(Page);

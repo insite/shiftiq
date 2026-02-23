@@ -14,7 +14,7 @@ using Shift.Constant;
 
 namespace InSite.Cmds.Controls.BulkTool.Assign
 {
-    public partial class AssignSelectedProfilesToEmployees : UserControl
+    public partial class AssignSelectedProfilesToEmployees : BaseUserControl
     {
         #region Events
 
@@ -56,7 +56,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
 
         public void LoadData(PersonFinderSecurityInfoWrapper finderSecurityInfo)
         {
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             DepartmentIdentifier.Filter.UserIdentifier = finderSecurityInfo.CanSeeAllDepartments || CurrentSessionState.Identity.HasAccessToAllCompanies
                 ? (Guid?)null
                 : CurrentSessionState.Identity.User.UserIdentifier;
@@ -76,7 +76,7 @@ namespace InSite.Cmds.Controls.BulkTool.Assign
             if (!hasDepartment)
                 return;
 
-            DepartmentProfiles.DataSource = ProfileRepository.SelectCompanyProfilesForDepartment(CurrentIdentityFactory.ActiveOrganizationIdentifier, DepartmentIdentifier.Value.Value);
+            DepartmentProfiles.DataSource = ProfileRepository.SelectCompanyProfilesForDepartment(Organization.Identifier, DepartmentIdentifier.Value.Value);
             DepartmentProfiles.DataBind();
 
             DepartmentEmployees.DataSource = ContactRepository3.SelectEmployeesByDepartmentId(DepartmentIdentifier.Value.Value);

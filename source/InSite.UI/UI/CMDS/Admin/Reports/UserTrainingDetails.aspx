@@ -11,10 +11,6 @@
     <insite:Nav runat="server" ID="NavPanel">
         <insite:NavItem runat="server" ID="CriteriaTab" Title="Criteria" Icon="far fa-search" IconPosition="BeforeText">
 
-            <h2 class="h4 my-3">
-                Criteria
-            </h2>
-
             <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="ReportUpdatePanel" />
                 
             <insite:UpdatePanel runat="server" ID="ReportUpdatePanel">
@@ -58,7 +54,7 @@
 
                     <div class="mt-3">
                         <insite:SearchButton runat="server" ID="ReportButton" Text="Report" Icon="fas fa-chart-bar" ValidationGroup="Report" CausesValidation="true" />
-                        <insite:CloseButton runat="server" NavigateUrl="/ui/cmds/reports" />
+                        <insite:CloseButton runat="server" NavigateUrl="/ui/admin/reporting" />
                     </div>
 
                 </ContentTemplate>
@@ -79,7 +75,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <td colspan="6" class="fw-bold text-white" style="background-color:#696969;">
+                                <td colspan="6" class="fw-bold text-white" style="background-color: #2c2d3f;">
                                     Worker Training Details for <asp:Literal runat="server" ID="AchievementTitle" />
                                     <br />
                                     <asp:Literal runat="server" ID="CompanyName" /> :: <asp:Literal runat="server" ID="DepartmentName" />
@@ -110,7 +106,7 @@
             </div>
 
             <div class="mt-3">
-                <insite:CloseButton runat="server" NavigateUrl="/ui/cmds/reports" />
+                <insite:CloseButton runat="server" NavigateUrl="/ui/admin/reporting" />
             </div>
 
         </insite:NavItem>

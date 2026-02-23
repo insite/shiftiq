@@ -9,7 +9,6 @@ using System.Web.UI.WebControls;
 using InSite.Common.Web;
 using InSite.Domain.Foundations;
 using InSite.Domain.Organizations;
-using InSite.Persistence;
 using InSite.UI.Portal.Billing.Models;
 
 using Shift.Common;
@@ -36,10 +35,7 @@ namespace InSite.UI.Layout.Portal.Controls
 
             var identity = CurrentSessionState.Identity;
 
-            AdminMenu.Visible = identity != null && identity.IsActionAuthorized(RelativeUrl.AdminHomeUrl);
-
-            if (AdminMenu.Visible)
-                BindNavbar(AdminMenu);
+            AdminMenu.LoadData();
 
             BindHomeLink(identity);
             BindImpersonator();
@@ -49,40 +45,6 @@ namespace InSite.UI.Layout.Portal.Controls
             BindSalesNav(identity);
         }
 
-        public static void BindNavbar(Control menu)
-        {
-            var identity = CurrentSessionState.Identity;
-
-            foreach (var control in menu.Controls)
-            {
-                if (control is HtmlAnchor a)
-                {
-                    a.Visible = IsAccessGranted(a.HRef);
-                }
-                else if (control is HtmlGenericControl div)
-                {
-                    BindNavbar(div);
-                }
-            }
-
-            bool IsAccessGranted(string href)
-            {
-                if (!href.StartsWith("/ui/"))
-                    return true;
-
-                var actionUrl = href.TrimStart('/');
-
-                if (identity.IsActionAuthorized(actionUrl))
-                    return true;
-
-                var permission = TActionSearch.Get(actionUrl);
-                if (permission == null)
-                    return true;
-
-                return identity.IsGranted(permission.PermissionParentActionIdentifier);
-            }
-        }
-
         private void BindHomeLink(ISecurityFramework security)
         {
             var logoImageUrl = GetLogoImageUrl(security, Page.Server);
@@ -90,7 +52,7 @@ namespace InSite.UI.Layout.Portal.Controls
             var maxheight = "style='max-height:60px'";
 
             var p = (logoImageUrl == null)
-                ? $"<i class='fas fa-share-alt-square me-2'></i> {ServiceLocator.Partition.GetPlatformName()}"
+                ? $"<i class='fas fa-share-alt-square me-2'></i> {ServiceLocator.Partition.Name}"
                 : $"<img src='{logoImageUrl}' {maxheight} />";
 
             HomeLink.InnerHtml = p;
@@ -101,7 +63,7 @@ namespace InSite.UI.Layout.Portal.Controls
 
             var isCmds = ServiceLocator.Partition.IsE03() && security.User != null && security.User.AccessGrantedToCmds;
 
-            CmdsHomeLink.HRef = Urls.CmdsHomeUrl;
+            CmdsHomeLink.HRef = Urls.HomeUrl;
             CmdsHomeItem.Visible = isCmds;
 
             if (CmdsHomeItem.Visible && StringHelper.StartsWithAny(Request.RawUrl, new[] { "/ui/portal/accounts/my", "/ui/portal/reports/my" }))

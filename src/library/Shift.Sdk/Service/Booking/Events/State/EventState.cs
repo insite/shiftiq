@@ -50,6 +50,7 @@ namespace InSite.Domain.Events
 
         public string AppointmentType { get; set; }
         public bool BillingCodeEnabled { get; set; }
+        public bool DisplayOnCalendar { get; set; }
 
         public Guid? WhenEventReminderRequestedNotifyLearnerMessageIdentifier { get; set; }
         public Guid? WhenEventReminderRequestedNotifyInstructorMessageIdentifier { get; set; }
@@ -85,6 +86,11 @@ namespace InSite.Domain.Events
 
             if (e.Role == "Exam Candidate" && Candidates.Contains(e.Contact))
                 Candidates.Remove(e.Contact);
+        }
+
+        public void When(EventDisplayOnCalendarModified e)
+        {
+            DisplayOnCalendar = e.Display;
         }
 
         public void When(EventBillingCodeEnabled e)

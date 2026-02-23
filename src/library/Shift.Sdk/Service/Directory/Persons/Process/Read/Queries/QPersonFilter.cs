@@ -8,7 +8,6 @@ namespace InSite.Application.Contacts.Read
     public class QPersonFilter : Filter
     {
         public Guid? OrganizationIdentifier { get; set; }
-        public Guid? OrganizationOrParentOrganizationIdentifier { get; set; }
         public Guid? UserIdentifier
         {
             get => UserIdentifiers != null && UserIdentifiers.Length == 1 ? UserIdentifiers[0] : (Guid?)null;

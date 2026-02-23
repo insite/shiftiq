@@ -15,6 +15,15 @@ namespace InSite.Cmds.Admin.Organizations.Forms
     {
 
         /// <summary>
+        /// ScreenStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Alert ScreenStatus;
+
+        /// <summary>
         /// OrganizationSection control.
         /// </summary>
         /// <remarks>
@@ -22,15 +31,6 @@ namespace InSite.Cmds.Admin.Organizations.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl OrganizationSection;
-
-        /// <summary>
-        /// CompanyDomainValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CustomValidator CompanyDomainValidator;
 
         /// <summary>
         /// CompanyName control.

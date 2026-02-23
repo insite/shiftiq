@@ -28,11 +28,11 @@
                 <div class="col-4">
 
                     <div class="mb-2">
-                        <insite:RouteTypeComboBox runat="server" ID="ActionType" EmptyMessage="Action Type" />
+                        <insite:ActionTypeComboBox runat="server" ID="ActionType" EmptyMessage="Action Type" />
                     </div>
 
                     <div class="mb-2">
-                        <insite:RouteAuthorityComboBox runat="server" ID="AuthorityType" EmptyMessage="Authority Type" />
+                        <insite:ActionAuthorityComboBox runat="server" ID="AuthorityType" EmptyMessage="Authority Type" />
                     </div>
 
                     <div class="mb-2">

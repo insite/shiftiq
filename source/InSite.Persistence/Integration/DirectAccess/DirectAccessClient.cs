@@ -96,7 +96,7 @@ namespace InSite.Persistence.Integration.DirectAccess
                 var result = Shift.Common.TaskRunner.RunSync(HttpPostAsync, user, server, input.Serialize());
 
                 if (response == null)
-                    response = ExamSubmissionResponse.Deserialize(result.Content);
+                    response = ExamSubmissionResponse.Deserialize(result?.Content);
             }
 
             return response;
@@ -275,11 +275,11 @@ namespace InSite.Persistence.Integration.DirectAccess
             };
 
             if (500 <= status)
-                throw new Exception($"Direct Access API call failed with status code {status}: {content}");
+                throw new HttpRequestException($"Direct Access API call failed with status code {status}: {content}");
             else if (480 <= status && status < 500)
                 apiResponse.Error = _serializer.Deserialize<DirectAccessApiError>(content);
             else if (400 <= status && status < 480)
-                throw new Exception($"Direct Access API call failed with status code {status}: {content}");
+                throw new HttpRequestException($"Direct Access API call failed with status code {status}: {content}");
 
             return apiResponse;
         }

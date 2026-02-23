@@ -79,7 +79,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <td colspan="7" class="fw-bold text-white" style="background-color:#696969;">
+                                <td colspan="8" class="fw-bold text-white" style="background-color: #2c2d3f;">
                                     <asp:Literal runat="server" ID="CompanyName" /> :: <asp:Literal runat="server" ID="DepartmentName" />
                                 </td>
                             </tr>
@@ -88,6 +88,7 @@
                                 <th class="align-middle">Primary Profile</th>
                                 <th class="align-middle">Secondary Required for Compliance Profile(s)</th>
                                 <th class="align-middle">Secondary Not Required for Compliance Profile(s)</th>
+                                <th class="align-middle">Leader(s)</th>
                                 <th class="align-middle">Manager(s)</th>
                                 <th class="align-middle">Supervisor(s)</th>
                                 <th class="align-middle">Validator(s)</th>
@@ -101,6 +102,7 @@
                                         <td style="width: 12%;"><%# Eval("PrimaryProfileName") %></td>
                                         <td style="width: 15%;"><%# Eval("SecondaryRequiredProfiles") %></td>
                                         <td style="width: 15%;"><%# Eval("SecondaryProfiles") %></td>
+                                        <td style="width: 15%;"><%# Eval("Leaders") %></td>
                                         <td style="width: 15%;"><%# Eval("Managers") %></td>
                                         <td style="width: 15%;"><%# Eval("Supervisors") %></td>
                                         <td style="width: 15%;"><%# Eval("Validators") %></td>

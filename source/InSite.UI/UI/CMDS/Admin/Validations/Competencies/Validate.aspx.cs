@@ -50,7 +50,7 @@ namespace InSite.Cmds.Actions.BulkTool.Validate
             {
                 var filter = new EmployeeCompetencyFilter
                 {
-                    OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                    OrganizationIdentifier = Organization.Identifier,
                     UserIdentifier = Employee.Value,
                     ProfileStandardIdentifier = CurrentProfile.Value,
                     Statuses = new[] { ValidationStatuses.SubmittedForValidation },
@@ -67,7 +67,7 @@ namespace InSite.Cmds.Actions.BulkTool.Validate
             {
                 var filter = new EmployeeCompetencyFilter
                 {
-                    OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                    OrganizationIdentifier = Organization.Identifier,
                     UserIdentifier = User.UserIdentifier,
                     Statuses = new[] { ValidationStatuses.Validated, ValidationStatuses.Expired },
                     ValidationDateMustBeSet = true
@@ -204,7 +204,7 @@ namespace InSite.Cmds.Actions.BulkTool.Validate
 
             InitPredefinedComments();
 
-            Employee.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Employee.Filter.OrganizationIdentifier = Organization.Identifier;
             Employee.Filter.ParentUserIdentifier = User.UserIdentifier;
             Employee.Filter.RelationWithParent = new[] { RelationCategory.Validator };
             Employee.Filter.ExcludeUserIdentifier = User.UserIdentifier;
@@ -223,7 +223,7 @@ namespace InSite.Cmds.Actions.BulkTool.Validate
 
         private void LoadProfiles()
         {
-            CurrentProfile.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            CurrentProfile.Filter.OrganizationIdentifier = Organization.Identifier;
             CurrentProfile.Filter.ProfileUserIdentifier = Employee.Value ?? Guid.Empty;
             CurrentProfile.Value = null;
 

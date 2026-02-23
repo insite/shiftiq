@@ -1,4 +1,4 @@
-<%@ Control Language="C#" CodeBehind="DashboardUsers.ascx.cs" Inherits="InSite.UI.Admin.Reporting.Controls.OnlineUsersGrid" %>
+<%@ Control Language="C#" CodeBehind="DashboardUsers.ascx.cs" Inherits="InSite.UI.Admin.Reporting.Controls.DashboardUsers" %>
 
 <p runat="server" id="EmptyGrid" class="help">There are no online users.</p>
 

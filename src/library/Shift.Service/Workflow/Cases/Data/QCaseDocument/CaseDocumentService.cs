@@ -17,9 +17,9 @@ public class CaseDocumentService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid attachment, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid attachment, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(attachment, cancellation);
+        return await _reader.AssertAsync(attachment, organization, cancellation);
     }
 
     public async Task<IEnumerable<CaseDocumentModel>> CollectAsync(ICaseDocumentCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class CaseDocumentService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyCaseDocument modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.AttachmentIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.AttachmentId, cancellation);
 
         if (entity == null)
             return false;

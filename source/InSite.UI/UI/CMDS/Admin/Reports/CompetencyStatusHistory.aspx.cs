@@ -159,7 +159,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             PageHelper.AutoBindHeader(this);
 
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 DepartmentIdentifier.Filter.UserIdentifier = User.UserIdentifier;
@@ -228,7 +228,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         private void UpdateEmployeeIdentifier()
         {
             EmployeeIdentifier.Value = null;
-            EmployeeIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            EmployeeIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             EmployeeIdentifier.Filter.Departments = DepartmentIdentifier.Values;
 
             if (EmployeeIdentifier.Filter.Departments.Length == 0)
@@ -343,7 +343,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             CurrentParameters = new SearchParameters
             {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 Departments = DepartmentIdentifier.Values,
                 UserIdentifier = EmployeeIdentifier.Value,
                 StartDate = DateSince.Value.Value,

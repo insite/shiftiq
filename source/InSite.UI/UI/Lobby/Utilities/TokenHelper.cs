@@ -59,7 +59,7 @@ namespace InSite.UI.Lobby.Utilities
             }
         }
 
-        public static QPersonSecret GetClientSecret(Guid personId, bool refresh, int? lifetimeInMinutes = 20)
+        public static QPersonSecret GetClientSecret(Guid personId, bool refresh, int secretExpiryInDays, int tokenLifetimeInMinutes)
         {
             var type = SecretType.Authentication;
 
@@ -81,14 +81,11 @@ namespace InSite.UI.Lobby.Utilities
 
             var secretId = UniqueIdentifier.Create();
 
-            if (lifetimeInMinutes == null)
-                lifetimeInMinutes = 129600; // 129,600 minutes = 36 hours
-
             var value = Secret.CreateValue();
 
-            var expiry = DateTimeOffset.Now.AddMonths(3);
+            var expiry = DateTimeOffset.Now.AddDays(secretExpiryInDays);
 
-            var add = new AddPersonSecret(personId, secretId, type, name, value, expiry, lifetimeInMinutes);
+            var add = new AddPersonSecret(personId, secretId, type, name, value, expiry, tokenLifetimeInMinutes);
 
             ServiceLocator.SendCommand(add);
 

@@ -13,7 +13,8 @@ namespace InSite.Domain.Messages
 
         public Guid[] MessageIdentifiers { get; set; }
 
-        public string Name { get; set; }
+        public string NameExact { get; set; }
+        public string NameContains { get; set; }
         public string Title { get; set; }
 
         public string[] IncludeTypes { get; set; }

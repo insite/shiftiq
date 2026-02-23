@@ -16,7 +16,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
                 {
                     Title = Title.Text,
                     AchievementType = SubType.Value,
-                    AchievementOrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
+                    AchievementOrganizationIdentifier = Organization.Identifier,
                     CategoryIdentifier = CategoryPanel.Visible ? Category.ValueAsGuid : null,
                     IsTimeSensitive = IsTimeSensitive.ValueAsBoolean
                 };
@@ -68,7 +68,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
         {
             var oldCategoryIdentifier = Category.ValueAsGuid;
 
-            Category.ListFilter.OrganizationIdentifier = OrganizationSearch.Select(CurrentIdentityFactory.ActiveOrganizationIdentifier).OrganizationIdentifier;
+            Category.ListFilter.OrganizationIdentifier = OrganizationSearch.Select(Organization.Identifier).OrganizationIdentifier;
             Category.RefreshData();
 
             Category.ValueAsGuid = oldCategoryIdentifier;

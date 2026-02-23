@@ -11,23 +11,23 @@ export default function GradebookSearch_Download() {
     return (
         <SearchDownload
             columns={[
-                { value: "AchievementIdentifier", text: "Achievement Identifier" },
+                { value: "AchievementId", text: "Achievement Id" },
                 { value: "AchievementTitle", text: "Achievement Title" },
                 { value: "ClassInstructors", text: "Class Instructors" },
                 { value: "ClassScheduledEndDate", text: "Class Scheduled End Date" },
                 { value: "ClassScheduledStartDate", text: "Class Scheduled Start Date" },
                 { value: "ClassTitle", text: "Class Title" },
-                { value: "EventIdentifier", text: "Event Identifier" },
-                { value: "FrameworkIdentifier", text: "Framework Identifier" },
+                { value: "EventId", text: "Event Id" },
+                { value: "FrameworkId", text: "Framework Id" },
                 { value: "GradebookCreated", text: "Gradebook Created" },
-                { value: "GradebookIdentifier", text: "Gradebook Identifier" },
+                { value: "GradebookId", text: "Gradebook Id" },
                 { value: "GradebookTitle", text: "Gradebook Title" },
                 { value: "GradebookType", text: "Gradebook Type" },
                 { value: "IsLocked", text: "Is Locked" },
                 { value: "LastChangeTime", text: "Last Change Time" },
                 { value: "LastChangeType", text: "Last Change Type" },
                 { value: "LastChangeUser", text: "Last Change User" },
-                { value: "PeriodIdentifier", text: "Period Identifier" },
+                { value: "PeriodId", text: "Period Id" },
                 { value: "Reference", text: "Reference" },
             ]}
             onDownload={(format, visibleColumns) => shiftClient.gradebook.download(toApiSearchGradebooks(criteria), format, visibleColumns)}

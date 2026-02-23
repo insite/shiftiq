@@ -11,7 +11,7 @@ namespace InSite.UI.Admin.Reporting.Controls
 {
 
 
-    public partial class OnlineUsersGrid
+    public partial class DashboardUsers
     {
 
         /// <summary>

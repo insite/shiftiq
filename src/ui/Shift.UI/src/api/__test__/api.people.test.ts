@@ -2,13 +2,13 @@ import { expect, test } from "vitest";
 import { shiftClient } from "../shiftClient";
 import { ApiError } from "../apiError";
 
-test("/directory/people/search: non-authenticated", async () => {
+test("/api/directory/people/search: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.people.search({}, 0, 10, [])).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("/directory/people/search: authenticated", async () => {
+test("/api/directory/people/search: authenticated", async () => {
     await global.login();
 
     const searchResult = await shiftClient.people.search({

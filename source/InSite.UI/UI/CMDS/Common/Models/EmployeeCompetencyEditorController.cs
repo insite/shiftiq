@@ -33,7 +33,7 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
             if (CurrentIdentifier == Guid.Empty)
                 return;
 
-            if (!VCmdsProfileOrganizationRepository.IsCompetencyInCompany(CurrentIdentityFactory.ActiveOrganizationIdentifier, CurrentIdentifier))
+            if (!VCmdsProfileOrganizationRepository.IsCompetencyInCompany(Organization.Identifier, CurrentIdentifier))
                 Access = Access.SetAll(false);
         }
 
@@ -75,6 +75,7 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
             var position = CompetencyPositionHelper.GetPosition(new CompetencyPositionParameter
             {
                 CompetencyStandardIdentifier = CurrentIdentifier,
+                OrganizationIdentifier = Organization.Identifier,
                 UserIdentifier = UserId,
                 CriteriaType = typeof(EmployeeCompetencySearchResults),
                 SearchRouteAction = SearchRouteAction,
@@ -197,7 +198,7 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
 
             SetInputValues(info);
 
-            _profiles.DataSource = ProfileRepository.SelectEmployeeProfiles(UserId, CurrentIdentifier, CurrentIdentityFactory.ActiveOrganizationIdentifier);
+            _profiles.DataSource = ProfileRepository.SelectEmployeeProfiles(UserId, CurrentIdentifier, Organization.Identifier);
             _profiles.DataBind();
 
             BindStatusHistory();

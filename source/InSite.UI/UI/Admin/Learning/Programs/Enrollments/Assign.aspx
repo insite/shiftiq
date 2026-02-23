@@ -12,122 +12,127 @@
     <insite:Nav runat="server" ID="NavPanel">
 
         <insite:NavItem runat="server" ID="Step1" Title="Learners" Icon="far fa-users" IconPosition="BeforeText">
-
             <section>
 
                 <h2 class="h4 mt-4 mb-3">Select Learners</h2>
 
-                        <div class="card border-0 shadow-lg">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body">
 
-                            <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
 
-                                <div class="row">
-
-                                    <div class="col-6">
-
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">
-                                                Department
-                                                <insite:RequiredValidator runat="server" ControlToValidate="DepartmentIdentifier" FieldName="Department" ValidationGroup="Assign" />
-                                            </label>
-                                            <div>
-                                                <div>
-                                                    <cmds:FindDepartment ID="DepartmentIdentifier" runat="server" />
-                                                </div>
-                                            </div>
-                                            <div class="form-text"></div>
-                                        </div>
-
-                                        <div runat="server" id="TemplateField" class="form-group mb-3" visible="false">
-                                            <label class="form-label">
-                                                Program
-                                                <insite:RequiredValidator runat="server" ControlToValidate="ProgramIdentifier" FieldName="Program" ValidationGroup="Assign" />
-                                            </label>
-                                            <div>
-                                                <insite:FindAchievementList runat="server" ID="ProgramIdentifier" />
-                                            </div>
-                                            <div class="form-text"></div>
-                                        </div>
-
-                                        <div runat="server" id="LearnersPanel" visible="false" class="form-group mb-3">
-                                            <div class="float-end">
-                                                <insite:Button ID="SelectAllLearnersButton" runat="server" Text="Select All" Icon="far fa-check-square" ButtonStyle="Link" />
-                                                <insite:Button ID="UnselectAllLearnersButton" runat="server" Text="Deselect All" Icon="far fa-square" ButtonStyle="Link" />
-                                            </div>
-                                            <label class="form-label">
-                                                Learners
-                                            </label>
-                                            <div>
-
-                                                <div id="NoLearnersPanel" runat="server"><strong>No Learners</strong></div>
-
-                                                <asp:Repeater ID="LearnersRepeater" runat="server">
-                                                    <HeaderTemplate>
-                                                        <table class="table table-striped">
-                                                    </HeaderTemplate>
-                                                    <ItemTemplate>
-                                                        <tr>
-                                                            <td>
-                                                                <insite:CheckBox ID="IsSelected" runat="server" Checked="true" Text='<%# Eval("FullName") %>' />
-                                                                <asp:Literal ID="UserIdentifier" runat="server" Visible="false" Text='<%# Eval("UserIdentifier") %>' />
-                                                            </td>
-                                                        </tr>
-                                                    </ItemTemplate>
-                                                    <FooterTemplate>
-                                                        </table>
-                                                    </FooterTemplate>
-                                                </asp:Repeater>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-6">
-
-                                        <div class="form-group mb-3">
-
-                                            <label class="form-label">How to handle previously assigned achievements</label>
-
-                                            <div class="alert alert-info fs-sm" role="alert">
-                                                <p>
-                                                    When assigning a new program, the system automatically applies the settings 
-defined within the program to <strong>all achievements included in that 
-program</strong>.
-   
-                                                </p>
-                                                <p>
-                                                    If the learner already has those achievements assigned 
-with different settings, then <strong>the program's settings will override 
-the existing ones</strong>.
-                                                </p>
-                                                <p>
-                                                    For <strong>achievements outside the program 
-assigned previously</strong>, select one of these options to 
-determine how they should be handled.
-                                                </p>
-                                            </div>
-
-                                            <insite:RadioButton runat="server" ID="AssignStrategy_NoChange" GroupName="ModifyStrategy" Text="<strong>Do nothing</strong>. No changes will be made to any previously assigned achievements. Their existing Planned and Required statuses will remain as-is. <small>(Use this if you want to preserve each learner's current setup without overriding anything.)</small>"
-                                                Checked="true" />
-
-                                            <insite:RadioButton runat="server" ID="AssignStrategy_Unplan" GroupName="ModifyStrategy" Text="<strong>Make all unplanned and optional</strong>. All previously assigned achievements will be set to Planned = No and Required = No. <small>(Use this if you want to remove any previous assignments from the learner's plan and mark them as not required.)</small>" />
-
-                                            <insite:RadioButton runat="server" ID="AssignStrategy_Delete" GroupName="ModifyStrategy" Text="<strong>Delete all previously assigned achievements (outside the program)</strong>. All existing achievements outside this program will be removed from the learner's record. Only the achievements included in the new program will remain. <small>(This action cannot be undone.)</small>" />
-
-                                        </div>
-
-                                    </div>
-
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        Department
+                                        <insite:RequiredValidator runat="server" ControlToValidate="DepartmentIdentifier" FieldName="Department" ValidationGroup="Assign" />
+                                    </label>
+                                    <cmds:FindDepartment ID="DepartmentIdentifier" runat="server" />
                                 </div>
 
-                                <insite:NextButton runat="server" ID="Step1NextButton" ValidationGroup="Assign" />
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        Program
+                                        <insite:RequiredValidator runat="server" ControlToValidate="ProgramIdentifier" FieldName="Program" ValidationGroup="Assign" />
+                                    </label>
+                                    <insite:FindAchievementList runat="server" ID="ProgramIdentifier" Enabled="false" />
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        Group
+                                    </label>
+                                    <insite:FindGroup ID="GroupIdentifier" runat="server" CurrentOrganizationOnly="true" />
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        Learner Name
+                                    </label>
+                                    <insite:TextBox runat="server" ID="LearnerName" MaxLength="256" />
+                                </div>
+
+                                <div class="my-3">
+                                    <insite:FilterButton runat="server" ID="SearchButton" />
+                                </div>
+
+                                <div runat="server" id="LearnersPanel" visible="false" class="form-group mt-4 mb-3 pt-3 border-top">
+                                    <div class="float-end">
+                                        <insite:Button ID="SelectAllLearnersButton" runat="server" Text="Select All" Icon="far fa-check-square" ButtonStyle="Link" />
+                                        <insite:Button ID="UnselectAllLearnersButton" runat="server" Text="Deselect All" Icon="far fa-square" ButtonStyle="Link" />
+                                    </div>
+                                    <label class="form-label">
+                                        Learners
+                                    </label>
+                                    <div>
+
+                                        <div id="NoLearnersPanel" runat="server"><strong>No Learners</strong></div>
+
+                                        <asp:Repeater ID="LearnersRepeater" runat="server">
+                                            <HeaderTemplate>
+                                                <table class="table table-striped">
+                                            </HeaderTemplate>
+                                            <ItemTemplate>
+                                                <tr>
+                                                    <td>
+                                                        <insite:CheckBox ID="IsSelected" runat="server" Checked="true" Text='<%# Eval("FullName") %>' />
+                                                        <asp:Literal ID="UserIdentifier" runat="server" Visible="false" Text='<%# Eval("UserIdentifier") %>' />
+                                                    </td>
+                                                </tr>
+                                            </ItemTemplate>
+                                            <FooterTemplate>
+                                                </table>
+                                            </FooterTemplate>
+                                        </asp:Repeater>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-6">
+
+                                <div class="form-group mb-3">
+
+                                    <label class="form-label">How to handle previously assigned achievements</label>
+
+                                    <div class="alert alert-info fs-sm" role="alert">
+                                        <p>
+                                            When assigning a new program, the system automatically applies the settings defined within the program to 
+                                            <strong>all achievements included in that program</strong>.
+                                        </p>
+                                        <p>
+                                            If the learner already has those achievements assigned with different settings, then
+                                            <strong>the program's settings will override the existing ones</strong>.
+                                        </p>
+                                        <p>
+                                            For <strong>achievements outside the program  assigned previously</strong>, 
+                                            select one of these options to determine how they should be handled.
+                                        </p>
+                                    </div>
+
+                                    <insite:RadioButton runat="server" ID="AssignStrategy_NoChange" GroupName="ModifyStrategy" Checked="true"
+                                        Text="<strong>Do nothing</strong>. No changes will be made to any previously assigned achievements. Their existing Planned and Required statuses will remain as-is. <small>(Use this if you want to preserve each learner's current setup without overriding anything.)</small>"
+                                    />
+
+                                    <insite:RadioButton runat="server" ID="AssignStrategy_Unplan" GroupName="ModifyStrategy"
+                                        Text="<strong>Make all unplanned and optional</strong>. All previously assigned achievements will be set to Planned = No and Required = No. <small>(Use this if you want to remove any previous assignments from the learner's plan and mark them as not required.)</small>"
+                                    />
+
+                                    <insite:RadioButton runat="server" ID="AssignStrategy_Delete" GroupName="ModifyStrategy"
+                                        Text="<strong>Delete all previously assigned achievements (outside the program)</strong>. All existing achievements outside this program will be removed from the learner's record. Only the achievements included in the new program will remain. <small>(This action cannot be undone.)</small>"
+                                    />
+
+                                </div>
 
                             </div>
                         </div>
 
-            </section>
+                        <insite:NextButton runat="server" ID="Step1NextButton" ValidationGroup="Assign" Visible="false" />
 
+                    </div>
+                </div>
+
+            </section>
         </insite:NavItem>
 
         <insite:NavItem runat="server" ID="Step2" Title="Pending Changes" Icon="far fa-users" IconPosition="BeforeText" Visible="false">

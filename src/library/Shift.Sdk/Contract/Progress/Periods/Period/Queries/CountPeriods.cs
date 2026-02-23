@@ -6,7 +6,7 @@ namespace Shift.Contract
 {
     public class CountPeriods : Query<int>, IPeriodCriteria
     {
-        public Guid OrganizationId { get; set; }
+        public Guid? OrganizationId { get; set; }
 
         public string Name { get; set; }
 

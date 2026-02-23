@@ -4,6 +4,7 @@ import { FileRow } from "./FileRow";
 import DateTimeField from "@/routes/_shared/fields/DateTimeField";
 import { numberHelper } from "@/helpers/numberHelper";
 import { urlHelper } from "@/helpers/urlHelper";
+import Icon from "@/components/icon/Icon";
 
 export default function FileSearch_Result() {
     return (
@@ -28,7 +29,7 @@ export default function FileSearch_Result() {
                 title: translate("File"),
                 item: row => (
                     <>
-                        <i className='far fa-download me-1'></i>
+                        <Icon style="Regular" name="download" className="me-1" />
                         <a target="_blank" href={urlHelper.getFileUrl(row.fileId, row.fileName)}>{row.documentName}</a>
                         <span className="ms-2 badge bg-info float-end">{row.fileLocation}</span>
                         <div className="form-text text-body-secondary">

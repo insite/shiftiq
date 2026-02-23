@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -27,11 +28,12 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public Guid OrganizationIdentifier { get; set; }
             public Guid[] Departments { get; set; }
             public Guid[] Achievements { get; set; }
+            public Guid[] Learners { get; set; }
             public bool? IsRequired { get; set; }
             public DateTimeRange CredentialGranted { get; set; }
             public string CredentialStatus { get; set; }
             public string MembershipFunction { get; set; }
-            public bool? IncludeSelfDeclaredCredentials { get; set; }
+            public bool ExcludeSelfDeclaredCredentials { get; set; }
         }
 
         #endregion
@@ -52,14 +54,14 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             base.OnInit(e);
 
-            DepartmentIdentifierValidator.ServerValidate += (s, a) => a.IsValid = DepartmentIdentifier.Enabled;
-            AchievementSelectorValidator.ServerValidate += (s, a) => a.IsValid = AchievementSelector.HasValue();
+            FindDepartment.AutoPostBack = true;
+            FindDepartment.ValueChanged += (s, a) => OnDepartmentChanged();
 
-            DepartmentIdentifier.AutoPostBack = true;
-            DepartmentIdentifier.ValueChanged += (s, a) => LoadAchievements();
+            FindProgram.AutoPostBack = true;
+            FindProgram.ValueChanged += (s, a) => SetupFindAchievement();
 
             IsRequired.AutoPostBack = true;
-            IsRequired.SelectedIndexChanged += (s, a) => LoadAchievements();
+            IsRequired.SelectedIndexChanged += (s, a) => SetupFindAchievement();
 
             DownloadXlsx.Click += DownloadXlsx_Click;
 
@@ -79,17 +81,16 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             PageHelper.AutoBindHeader(this);
 
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            FindDepartment.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
-                DepartmentIdentifier.Filter.UserIdentifier = User.UserIdentifier;
+                FindDepartment.Filter.UserIdentifier = User.UserIdentifier;
 
-            var hasDepartments = DepartmentIdentifier.GetCount() > 0;
+            OnDepartmentChanged();
 
-            DepartmentIdentifier.Enabled = hasDepartments;
-            DepartmentIdentifier.EmptyMessage = hasDepartments ? "All Departments" : "None";
-
-            LoadAchievements();
+            var closeUrl = "/ui/admin/reporting";
+            CloseButton1.NavigateUrl = closeUrl;
+            CloseButton2.NavigateUrl = closeUrl;
         }
 
         private void BindMembershipFunctions(bool showAdmin, bool isOrganizationChecked)
@@ -120,10 +121,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void ReportButton_Click(object sender, EventArgs e)
         {
-            ReportTab.Visible = false;
-
-            if (Page.IsValid)
-                LoadReport();
+            LoadReport();
         }
 
         private void DownloadXlsx_Click(object sender, EventArgs e)
@@ -135,11 +133,12 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 .SelectTrainingCompletionDates(
                     CurrentParameters.Departments,
                     CurrentParameters.Achievements,
+                    CurrentParameters.Learners,
                     CurrentParameters.IsRequired,
                     CurrentParameters.CredentialGranted,
                     CurrentParameters.CredentialStatus,
                     CurrentParameters.MembershipFunction,
-                    CurrentParameters.IncludeSelfDeclaredCredentials)
+                    CurrentParameters.@ExcludeSelfDeclaredCredentials)
                 .OrderBy(x => x.FullName)
                 .ThenBy(x => x.CompanyName)
                 .ThenBy(x => x.DepartmentName)
@@ -180,78 +179,103 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         #region Data binding
 
+        private void OnDepartmentChanged()
+        {
+            FindLearner.Enabled = FindDepartment.HasValue;
+            FindLearner.Filter.OrganizationIdentifier = Organization.Identifier;
+            FindLearner.Filter.GroupDepartmentIdentifiers = FindDepartment.Values;
+            FindLearner.Value = null;
+
+            SetupFindAchievement();
+        }
+
+        private void SetupFindAchievement()
+        {
+            FindAchievement.Enabled = FindDepartment.HasValue;
+            FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
+            FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
+            FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
+            FindAchievement.Value = null;
+        }
+
         private void LoadReport()
         {
-            CurrentParameters = new SearchParameters
-            {
-                OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier,
-                Departments = DepartmentIdentifier.Values,
-                Achievements = AchievementSelector.GetSelectedAchievements(),
-                IsRequired = GetIsRequired(),
-                CredentialGranted = new DateTimeRange(CredentialGrantedStartDate.Value, CredentialGrantedEndDate.Value),
-                CredentialStatus = CredentialStatus.Value,
-                MembershipFunction = GetMembershipFunction(),
-                IncludeSelfDeclaredCredentials = IncludeSelfDeclaredCredentials.Checked
-            };
+            ReportTab.Visible = false;
 
-            if (CurrentParameters.Departments.Length == 0)
-                CurrentParameters.Departments = DepartmentIdentifier.GetDataItems().Select(x => x.Value).ToArray();
-
-            if (CurrentParameters.Departments.Length == 0)
+            if (!Page.IsValid)
                 return;
 
-            var dataSource = CmdsReportHelper.SelectTrainingCompletionDates(
-                CurrentParameters.Departments,
-                CurrentParameters.Achievements,
-                CurrentParameters.IsRequired,
-                CurrentParameters.CredentialGranted,
-                CurrentParameters.CredentialStatus,
-                CurrentParameters.MembershipFunction,
-                CurrentParameters.IncludeSelfDeclaredCredentials);
+            var departments = GetEffectiveDepartments();
+            if (departments.Length == 0)
+                return;
 
-            if (!dataSource.Any())
+            CurrentParameters = BuildSearchParameters(departments);
+
+            var dataSource = CmdsReportHelper
+                .SelectTrainingCompletionDates(
+                    CurrentParameters.Departments,
+                    CurrentParameters.Achievements,
+                    CurrentParameters.Learners,
+                    CurrentParameters.IsRequired,
+                    CurrentParameters.CredentialGranted,
+                    CurrentParameters.CredentialStatus,
+                    CurrentParameters.MembershipFunction,
+                    CurrentParameters.@ExcludeSelfDeclaredCredentials)
+                .ToList();
+
+            if (dataSource.Count == 0)
             {
                 ScreenStatus.AddMessage(AlertType.Error, "There is no data matching your criteria.");
                 return;
             }
 
-            var departmentsNames = DepartmentSearch.Bind(x => x.DepartmentName, x => CurrentParameters.Departments.Contains(x.DepartmentIdentifier), null, "DepartmentName");
-            DepartmentsList.Text = string.Join(", ", departmentsNames);
-
-            CompanyName.Text = OrganizationSearch
-                .Select(CurrentIdentityFactory.ActiveOrganizationIdentifier).CompanyName;
-
-            ReportTab.Visible = true;
-            ReportTab.IsSelected = true;
-
-            DataRepeater.DataSource = dataSource
-                .OrderBy(x => x.FullName)
-                .ThenBy(x => x.CompanyName)
-                .ThenBy(x => x.DepartmentName)
-                .ThenBy(x => x.AchievementTitle)
-                .ThenBy(x => x.DateCompleted)
-                .ThenBy(x => x.CredentialStatus);
-            DataRepeater.DataBind();
+            BindReportHeader();
+            BindReportData(dataSource);
         }
 
-        private void LoadAchievements()
+        private Guid[] GetEffectiveDepartments()
         {
-            Guid[] departments = null;
+            var selected = FindDepartment.Values;
+            return selected.Length > 0
+                ? selected
+                : FindDepartment.GetDataItems().Select(x => x.Value).ToArray();
+        }
 
-            if (DepartmentIdentifier.Enabled)
+        private SearchParameters BuildSearchParameters(Guid[] departments)
+        {
+            return new SearchParameters
             {
-                departments = DepartmentIdentifier.Values;
+                OrganizationIdentifier = Organization.Identifier,
+                Departments = departments,
+                Achievements = FindAchievement.Values,
+                Learners = FindLearner.Values,
+                IsRequired = GetIsRequired(),
+                CredentialGranted = new DateTimeRange(CredentialGrantedSince.Value, CredentialGrantedBefore.Value),
+                CredentialStatus = CredentialStatus.Value,
+                MembershipFunction = GetMembershipFunction(),
+                ExcludeSelfDeclaredCredentials = ExcludeSelfDeclaredCredentials.Checked
+            };
+        }
 
-                if (departments.Length == 0)
-                    departments = DepartmentIdentifier.GetDataItems().Select(x => x.Value).ToArray();
-            }
+        private void BindReportHeader()
+        {
+            var departmentNames = DepartmentSearch.Bind(
+                x => x.DepartmentName,
+                x => CurrentParameters.Departments.Contains(x.DepartmentIdentifier),
+                null,
+                "DepartmentName");
 
-            var hasAchievements = AchievementSelector.LoadData(departments, GetIsRequired());
+            DepartmentsList.Text = string.Join(", ", departmentNames);
+            CompanyName.Text = OrganizationSearch
+                .Select(Organization.Identifier).CompanyName;
+        }
 
-            AchievementSelector.Visible = hasAchievements;
-
-            if (!hasAchievements)
-                ScreenStatus.AddMessage(AlertType.Error, "The departments you have selected do not have any training achievements.");
+        private void BindReportData(List<CmdsReportHelper.TrainingCompletionDate> dataSource)
+        {
+            ReportTab.Visible = true;
+            ReportTab.IsSelected = true;
+            DataRepeater.DataSource = dataSource;
+            DataRepeater.DataBind();
         }
 
         #endregion

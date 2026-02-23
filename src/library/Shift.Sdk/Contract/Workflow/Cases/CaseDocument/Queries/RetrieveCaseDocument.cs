@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class RetrieveCaseDocument : Query<CaseDocumentModel>
     {
-        public Guid AttachmentIdentifier { get; set; }
+        public Guid AttachmentId { get; set; }
     }
 }

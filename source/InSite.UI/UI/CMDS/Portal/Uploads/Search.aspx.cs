@@ -12,7 +12,7 @@ namespace InSite.Cmds.Portal.Uploads
     public partial class Search : AdminBasePage, ICmdsUserControl
     {
         private Guid OrganizationIdentifier =>
-            Guid.TryParse(Request["id"], out var value) ? value : CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            Guid.TryParse(Request["id"], out var value) ? value : Organization.Identifier;
 
         protected override void OnInit(EventArgs e)
         {

@@ -34,7 +34,6 @@ using ChecklistRenderer = InSite.Admin.Standards.Standards.Utilities.ChecklistRe
 using DocumentPrint = InSite.Admin.Standards.Standards.Utilities.DocumentPrint;
 using DocumentType = Shift.Sdk.UI.DocumentType;
 using ListItem = System.Web.UI.WebControls.ListItem;
-using PermissionOperation = Shift.Constant.PermissionOperation;
 
 namespace InSite.UI.Portal.Standards.Documents
 {
@@ -159,7 +158,7 @@ namespace InSite.UI.Portal.Standards.Documents
                 || standard.OrganizationIdentifier != Organization.Identifier
                 || standard.StandardPrivacyScope.IfNullOrEmpty("Tenant") == "User"
                     && standard.CreatedBy != User.UserIdentifier
-                    && !CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure)
+                    && !CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure)
                 )
             {
                 HttpResponseHelper.Redirect("/ui/portal/standards/documents/search", true);

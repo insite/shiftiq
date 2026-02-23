@@ -107,7 +107,7 @@ namespace InSite.UI.Lobby.Integration.Lti
 
             var identityOrganization = CurrentSessionState.Identity?.Organization?.Code;
             if (identityOrganization != CurrentOrganization)
-                throw new Exception($"Organization Mismatch: {identityOrganization ?? "null"} <> {CurrentOrganization}");
+                throw new InvalidOperationException($"Organization Mismatch: {identityOrganization ?? "null"} <> {CurrentOrganization}");
 
             CurrentSessionState.DateSignedIn = DateTime.UtcNow;
 

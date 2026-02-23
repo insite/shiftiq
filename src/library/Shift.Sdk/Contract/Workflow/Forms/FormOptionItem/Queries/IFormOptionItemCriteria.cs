@@ -8,9 +8,9 @@ namespace Shift.Contract
     {
         QueryFilter Filter { get; set; }
         
-        Guid? BranchToQuestionIdentifier { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? SurveyOptionListIdentifier { get; set; }
+        Guid? BranchToQuestionId { get; set; }
+        Guid? OrganizationId { get; set; }
+        Guid? SurveyOptionListId { get; set; }
 
         string SurveyOptionItemCategory { get; set; }
 

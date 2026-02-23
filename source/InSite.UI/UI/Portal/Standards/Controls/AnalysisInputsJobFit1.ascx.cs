@@ -5,6 +5,7 @@ using InSite.Admin.Standards.Documents.Utilities;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
+using Shift.Common;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -41,14 +42,14 @@ namespace InSite.UI.Portal.Standards.Controls
 
             ProfileSelector.Filter.StandardTypes = new[] { StandardType.Document };
             ProfileSelector.Filter.DocumentType = new[] { DocumentType.CustomizedOccupationProfile };
-            ProfileSelector.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure);
+            ProfileSelector.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure);
             ProfileSelector.Filter.CreatedBy = User.UserIdentifier;
             ProfileSelector.Value = null;
 
             NosSelector.Filter.StandardTypes = new[] { StandardType.Document };
             NosSelector.Filter.DocumentType = new[] { DocumentType.NationalOccupationStandard };
             NosSelector.Filter.PortalUserIdentifier = User.UserIdentifier;
-            NosSelector.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, PermissionOperation.Configure);
+            NosSelector.Filter.IsPortal = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Standards_Documents, DataAccess.Configure);
             NosSelector.Filter.CreatedBy = User.UserIdentifier;
             NosSelector.Value = null;
         }

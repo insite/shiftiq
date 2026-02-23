@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { shiftClient } from "../shiftClient";
 import { ApiError } from "../apiError";
 
-test("/workflow/case-statuses/*: non-authenticated", async () => {
+test("/api/workflow/cases-statuses/*: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.caseStatus.search({}, 0, null)).rejects.toThrowError(new ApiError(401, ""));
@@ -26,7 +26,7 @@ test("/workflow/case-statuses/*: non-authenticated", async () => {
     await expect(shiftClient.caseStatus.delete("f3ad8690-76e0-4ede-afb0-a0c2a21ed947")).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("/workflow/case-statuses/search, create, delete: authenticated", async () => {
+test("/api/workflow/cases-statuses/search, create, delete: authenticated", async () => {
     await global.login();
 
     const createResult = await shiftClient.caseStatus.create({
@@ -42,7 +42,7 @@ test("/workflow/case-statuses/search, create, delete: authenticated", async () =
         CaseTypeExact: "PLA"
     }, 0, null);
 
-    await shiftClient.caseStatus.delete(createResult.StatusIdentifier);
+    await shiftClient.caseStatus.delete(createResult.StatusId);
 
     expect(createResult.CaseType).toBe("PLA");
     expect(createResult.StatusName).toBe("Appeal");

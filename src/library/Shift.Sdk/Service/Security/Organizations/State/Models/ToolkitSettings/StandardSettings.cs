@@ -6,10 +6,12 @@ namespace InSite.Domain.Organizations
     public class StandardSettings
     {
         public bool ShowStandardCategories { get; set; }
+        public bool EnableOccupationProfileForJobDescription { get; set; }
 
         public bool IsEqual(StandardSettings other)
         {
-            return ShowStandardCategories == other.ShowStandardCategories;
+            return ShowStandardCategories == other.ShowStandardCategories
+                && EnableOccupationProfileForJobDescription == other.EnableOccupationProfileForJobDescription;
         }
     }
 }

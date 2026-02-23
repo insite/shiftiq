@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public class DeleteSubmission
     {
-        public Guid ResponseSessionIdentifier { get; set; }
+        public Guid ResponseSessionId { get; set; }
     }
 }

@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class CountFormConditions : Query<int>, IFormConditionCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
     }
 }

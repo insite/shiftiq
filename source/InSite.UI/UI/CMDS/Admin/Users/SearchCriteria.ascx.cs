@@ -44,7 +44,7 @@ namespace InSite.Cmds.Controls.Contacts.Persons
                     DepartmentIdentifier = Department.Value,
                     IsArchived = ArchivedUsersPanel.Visible && IsArchived.ValueAsBoolean.HasValue && IsArchived.ValueAsBoolean.Value,
                     AccessGrantedToCmds = IsCmdsAccessGranted.ValueAsBoolean,
-                    OrganizationIdentifier = Company.Visible ? Company.Value : CurrentIdentityFactory.ActiveOrganizationIdentifier
+                    OrganizationIdentifier = Company.Visible ? Company.Value : Organization.Identifier
                 };
 
                 if (PersonAssignmentPanel.Visible)
@@ -188,7 +188,7 @@ namespace InSite.Cmds.Controls.Contacts.Persons
             if (Company.Visible)
                 Department.Filter.OrganizationIdentifier = Company.Value ?? Guid.Empty;
             else
-                Department.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+                Department.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 Department.Filter.UserIdentifier = User.UserIdentifier;

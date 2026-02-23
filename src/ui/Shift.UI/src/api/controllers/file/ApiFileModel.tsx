@@ -1,11 +1,11 @@
 export interface ApiFileModel {
-    ApprovedUserIdentifier: string | null | undefined;
-    FileIdentifier: string;
-    LastActivityUserIdentifier: string | null | undefined;
-    ObjectIdentifier: string;
-    OrganizationIdentifier: string;
-    ReviewedUserIdentifier: string | null | undefined;
-    UserIdentifier: string;
+    ApprovedUserId: string | null | undefined;
+    FileId: string;
+    LastActivityUserId: string | null | undefined;
+    ObjectId: string;
+    OrganizationId: string;
+    ReviewedUserId: string | null | undefined;
+    UserId: string;
     DocumentName: string;
     FileCategory: string | null | undefined;
     FileContentType: string;

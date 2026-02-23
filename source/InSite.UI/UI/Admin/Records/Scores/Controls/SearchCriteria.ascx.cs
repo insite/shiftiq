@@ -38,7 +38,8 @@ namespace InSite.Admin.Records.Scores.Controls
                     UserPeriodIdentifier = UserPeriodSelector.Value,
                     GradedSince = GradedSince.Value,
                     GradedBefore = GradedBefore.Value,
-                    IsScoreIgnored = IsScoreIgnored.ValueAsBoolean
+                    IsScoreIgnored = IsScoreIgnored.ValueAsBoolean,
+                    DepartmentIdentifier = DepartmentIdentifier.Value
                 };
 
                 GetCheckedShowColumns(filter);
@@ -70,6 +71,7 @@ namespace InSite.Admin.Records.Scores.Controls
                 GradedSince.Value = value.GradedSince;
                 GradedBefore.Value = value.GradedBefore;
                 IsScoreIgnored.ValueAsBoolean = value.IsScoreIgnored;
+                DepartmentIdentifier.Value = value.DepartmentIdentifier;
             }
         }
 
@@ -98,6 +100,7 @@ namespace InSite.Admin.Records.Scores.Controls
             GradedSince.Value = null;
             GradedBefore.Value = null;
             IsScoreIgnored.ValueAsBoolean = null;
+            DepartmentIdentifier.Value = null;
         }
 
         protected override void OnInit(EventArgs e)
@@ -106,6 +109,8 @@ namespace InSite.Admin.Records.Scores.Controls
 
             LearnerEmployerGroupStatusId.ListFilter.OrganizationIdentifier = Organization.Identifier;
             LearnerEmployerGroupStatusId.ListFilter.CollectionName = CollectionName.Contacts_Groups_Status_Name;
+
+            DepartmentIdentifier.OrganizationIdentifier = Organization.Identifier;
         }
 
         protected override void OnLoad(EventArgs e)

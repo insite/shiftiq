@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Messages.Read;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
@@ -16,6 +14,7 @@ using InSite.UI.Layout.Admin;
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Admin.Messages.Messages.Forms
@@ -224,7 +223,7 @@ namespace InSite.Admin.Messages.Messages.Forms
                 {
                     OrganizationIdentifier = Organization.Identifier,
                     Type = MessageTypeName.Alert,
-                    Name = model.MessageName,
+                    NameExact = model.MessageName,
                 });
 
                 if (count > 0)
@@ -244,7 +243,7 @@ namespace InSite.Admin.Messages.Messages.Forms
             {
                 var message = ServiceLocator.MessageSearch.GetMessage(new MessageFilter
                 {
-                    Name = model.MessageName,
+                    NameContains = model.MessageName,
                     OrganizationIdentifier = OrganizationIdentifiers.Global
                 });
 
@@ -417,13 +416,19 @@ Thank you!"
         {
             var value = NewMessageType.Value;
             var isInvitation = value == MessageTypeName.Invitation;
-            var isNotification = value == MessageTypeName.Alert || value == MessageTypeName.Notification;
+            var isAlert = value == MessageTypeName.Alert;
+            var isNotification = value == MessageTypeName.Notification;
 
             NewSurveyFormField.Visible = isInvitation || IsNewsletter || IsNotification;
 
             NewAssignmentLimitField.Visible = false;
-            NewNameField.Visible = !isNotification;
-            NewNotificationField.Visible = isNotification;
+            NewNameField.Visible = !isAlert && !isNotification;
+            NewNotificationField.Visible = isAlert || isNotification;
+
+            NewNotificationName.Value = null;
+            NewNotificationName.Enabled = isAlert || isNotification;
+            NewNotificationName.MessageType = isAlert ? NotificationMessageType.Alert : NotificationMessageType.Notification;
+            NewNotificationName.RefreshData();
 
             OnNewNotificationNameChanged();
         }

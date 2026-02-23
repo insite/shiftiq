@@ -7,8 +7,9 @@ namespace Shift.Contract
 {
     public class SearchFileActivities : Query<IEnumerable<FileActivityMatch>>, IFileActivityCriteria
     {
-        public Guid? FileIdentifier { get; set; }
-        public Guid? UserIdentifier { get; set; }
+        public Guid? FileId { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? UserId { get; set; }
 
         public string ActivityChanges { get; set; }
 

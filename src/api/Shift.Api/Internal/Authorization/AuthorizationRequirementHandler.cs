@@ -4,43 +4,48 @@ namespace Shift.Api;
 
 public class AuthorizationRequirementHandler : AuthorizationHandler<AuthorizationRequirement>
 {
-    private readonly PermissionMatrixProvider _permissionMatrixProvider;
-    private readonly IShiftIdentityService _identityService;
+    private readonly PermissionCache _permissionCache;
+    private readonly IPrincipalProvider _identityService;
 
-    public AuthorizationRequirementHandler(PermissionMatrixProvider permissionMatrixProvider, IShiftIdentityService identityService)
+    public AuthorizationRequirementHandler(
+        PermissionCache permissionCache,
+        IPrincipalProvider identityService)
     {
-        _permissionMatrixProvider = permissionMatrixProvider;
+        _permissionCache = permissionCache;
         _identityService = identityService;
     }
 
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AuthorizationRequirement requirement)
+    protected override Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        AuthorizationRequirement requirement)
     {
-        var matrix = _permissionMatrixProvider.Matrix;
-
         var identity = _identityService.GetPrincipal();
 
-        var isAuthenticated = identity != null && identity.IsAuthenticated;
+        if (identity?.IsAuthenticated != true)
+            return Fail(context, "User is not authenticated");
 
-        if (!isAuthenticated)
-        {
-            context.Fail(new AuthorizationFailureReason(this, "User is not authenticated"));
-        }
+        var organization = identity.Organization?.Slug;
+        if (string.IsNullOrEmpty(organization))
+            return Fail(context, "User has no organization");
 
-        if (identity != null && identity.Organization.Slug != null)
-        {
-            var organization = identity.Organization.Slug;
+        var matrix = _permissionCache.Matrix;
+        if (!matrix.TryGetPermissions(organization, out var permissions))
+            return Fail(context, $"Organization not found: {organization}");
 
-            if (!matrix.IsAllowed(organization, requirement.Policy, identity.Roles))
-            {
-                context.Fail(new AuthorizationFailureReason(this, "User is not granted permission"));
-            }
-        }
+        var roles = identity.Roles.Select(r => r.Name);
 
-        if (!context.HasFailed)
+        if (requirement.Evaluate(permissions, roles))
         {
             context.Succeed(requirement);
+            return Task.CompletedTask;
         }
 
+        return Fail(context, $"Permission denied: {requirement.Resource}");
+    }
+
+    private Task Fail(AuthorizationHandlerContext context, string reason)
+    {
+        context.Fail(new AuthorizationFailureReason(this, reason));
         return Task.CompletedTask;
     }
 }

@@ -7,7 +7,7 @@ public class AchievementAdapter : IEntityAdapter
 {
     public void Copy(ModifyAchievement modify, AchievementEntity entity)
     {
-        entity.OrganizationIdentifier = modify.OrganizationIdentifier;
+        entity.OrganizationIdentifier = modify.OrganizationId;
         entity.AchievementLabel = modify.AchievementLabel;
         entity.AchievementTitle = modify.AchievementTitle;
         entity.AchievementDescription = modify.AchievementDescription;
@@ -36,8 +36,8 @@ public class AchievementAdapter : IEntityAdapter
     {
         var entity = new AchievementEntity
         {
-            OrganizationIdentifier = create.OrganizationIdentifier,
-            AchievementIdentifier = create.AchievementIdentifier,
+            OrganizationIdentifier = create.OrganizationId,
+            AchievementIdentifier = create.AchievementId,
             AchievementLabel = create.AchievementLabel,
             AchievementTitle = create.AchievementTitle,
             AchievementDescription = create.AchievementDescription,
@@ -65,8 +65,9 @@ public class AchievementAdapter : IEntityAdapter
     {
         var model = new AchievementModel
         {
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            AchievementIdentifier = entity.AchievementIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
+            AchievementId = entity.AchievementIdentifier,
+
             AchievementLabel = entity.AchievementLabel,
             AchievementTitle = entity.AchievementTitle,
             AchievementDescription = entity.AchievementDescription,

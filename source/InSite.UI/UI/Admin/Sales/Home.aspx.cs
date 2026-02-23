@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO.Packaging;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
@@ -107,7 +106,7 @@ namespace InSite.UI.Admin.Invoices
 
         public static void LoadCounter(HtmlGenericControl card, Literal counter, int count, HtmlAnchor link, string action)
         {
-            card.Visible = CurrentSessionState.Identity.IsActionAuthorized(action);
+            card.Visible = CurrentSessionState.Identity.IsGranted(action);
             link.HRef = action;
             counter.Text = $@"{count:n0}";
         }

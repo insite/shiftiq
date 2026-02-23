@@ -15,7 +15,6 @@ using InSite.Web.Data;
 using Shift.Common;
 using Shift.Constant;
 
-using CheckBoxList = System.Web.UI.WebControls.CheckBoxList;
 using PersonFilter = InSite.Persistence.Plugin.CMDS.CmdsPersonFilter;
 
 namespace InSite.Cmds.Admin.People.Controls
@@ -47,6 +46,18 @@ namespace InSite.Cmds.Admin.People.Controls
 
         private void ApplyUserGroupAssignmentPermissions()
         {
+            var roleNames = Identity.Groups.Select(x => x.Name).ToArray();
+
+            var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
+
+            var allowAdmin = permissions.IsAllowed(PermissionNames.Custom_CMDS_Workers, roleNames, DataAccess.Administrate);
+
+            Status.Enabled = allowAdmin;
+
+            PasswordExpires.Enabled = allowAdmin;
+
+            EnableEmailNotificationField.Visible = IsApproved && allowAdmin;
+
             ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.Administrators, CmdsRole.Programmers);
             ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.CollegeAdministrators, CmdsRole.Programmers);
             ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.FieldAdministrators, CmdsRole.Programmers, CmdsRole.SystemAdministrators, CmdsRole.OfficeAdministrators);
@@ -66,7 +77,7 @@ namespace InSite.Cmds.Admin.People.Controls
             ApplyUserGroupAssignmentPermission(UserRoleList, "TSSC Only Users", CmdsRole.Administrators, CmdsRole.Programmers, CmdsRole.SystemAdministrators);
         }
 
-        private void ApplyUserGroupAssignmentPermission(CheckBoxList list, string role, params string[] accessors)
+        private void ApplyUserGroupAssignmentPermission(InSite.Common.Web.UI.CheckBoxList list, string role, params string[] accessors)
         {
             var item = list.Items.FindByText(role);
             if (item == null)
@@ -85,6 +96,12 @@ namespace InSite.Cmds.Admin.People.Controls
         {
             get => (Guid?)ViewState[nameof(UserID)];
             set => ViewState[nameof(UserID)] = value;
+        }
+
+        public bool IsApproved
+        {
+            get => (bool?)ViewState[nameof(IsApproved)] ?? false;
+            set => ViewState[nameof(IsApproved)] = value;
         }
 
         public bool IsUserDetailsVisible => LoginTab.Visible;
@@ -200,13 +217,7 @@ namespace InSite.Cmds.Admin.People.Controls
 
                 EmailEnabled.Checked = person.EmailEnabled;
 
-                bool approved = hasPerson && person.UserAccessGranted != null;
-
-                EnableEmailNotificationField.Visible = approved && (
-                       Identity.IsInRole(CmdsRole.Programmers)
-                    || Identity.IsInRole(CmdsRole.SystemAdministrators)
-                    || Identity.IsInRole(CmdsRole.OfficeAdministrators)
-                    || Identity.IsInRole(CmdsRole.FieldAdministrators));
+                IsApproved = hasPerson && person.UserAccessGranted != null;
             }
             else
             {
@@ -216,7 +227,6 @@ namespace InSite.Cmds.Admin.People.Controls
             var isUserDetailsVisible = Identity.IsGranted(FieldPermission);
 
             LoginTab.Visible = isUserDetailsVisible;
-            GroupsTab.Visible = isUserDetailsVisible;
 
             if (isUserDetailsVisible)
             {
@@ -233,13 +243,6 @@ namespace InSite.Cmds.Admin.People.Controls
                     StatusTimestamp.Text = string.Empty;
                 }
 
-                Status.Enabled = Identity.IsInRole(CmdsRole.Programmers)
-                                 || Identity.IsInRole(CmdsRole.SystemAdministrators)
-                                 || Identity.IsInRole(CmdsRole.OfficeAdministrators)
-                                 || Identity.IsInRole(CmdsRole.FieldAdministrators)
-                                 || Identity.IsOperator;
-
-                PasswordExpires.Enabled = Status.Enabled;
                 PasswordExpires.Value = user.UserPasswordExpired;
 
                 LoadRoles1(user.UserIdentifier);
@@ -437,7 +440,7 @@ namespace InSite.Cmds.Admin.People.Controls
             ApplyUserGroupAssignmentPermissions();
         }
 
-        private void SaveCmdsUserGroups(CheckBoxList list, Guid userKey)
+        private void SaveCmdsUserGroups(InSite.Common.Web.UI.CheckBoxList list, Guid userKey)
         {
             if (!list.Visible)
                 return;

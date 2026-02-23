@@ -24,10 +24,12 @@ namespace InSite.Application.Contacts.Read
 
         public Guid? AnyParentGroupIdentifier { get; set; }
         public Guid? UserIdentifier { get; set; }
-        public Guid? MembershipUserIdentifier { get; set; }
         public Guid[] OrganizationIdentifiers { get; set; }
         public Guid[] Statuses { get; set; }
         public Guid? ExcludeContainerIdentifier { get; set; }
+
+        public Guid[] MembershipUserIdentifiers { get; set; }
+        public string MembershipFunction { get; set; }
 
         public string GroupCategory { get; set; }
         public string GroupLabel { get; set; }

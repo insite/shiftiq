@@ -1,13 +1,13 @@
 import { Control, Path, useController } from "react-hook-form";
 import MultiSelect, { MultiSelectProps } from "./MultiSelect";
-import { fieldRequiredMessage } from "@/helpers/errorHelper";
+import { errorHelper } from "@/helpers/errorHelper";
 
 interface Props<Criteria extends object>
     extends Omit<MultiSelectProps, "ref" | "values" | "defaultValues" | "error" | "onBlur" | "onChange">
 {
     name: Path<Criteria>;
     control: Control<Criteria>;
-    required?: boolean;
+    required?: boolean | string;
     validate?: (values: string[]) => string | undefined;
 }
 
@@ -25,7 +25,7 @@ export default function ControlledMultiSelect<Criteria extends object>({
             ? {
                 validate: (values: string[] | null | undefined) => {
                     if (required && !values?.length) {
-                        return fieldRequiredMessage;
+                        return errorHelper.createFieldRequiredMessage(required);
                     }
                     return validate?.(values ?? []);
                 }

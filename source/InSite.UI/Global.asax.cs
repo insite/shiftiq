@@ -76,7 +76,7 @@ namespace InSite
 
             _exceptionHandlers = ExceptionHandler.FromArray(appSettings.Platform.Integrity.ExceptionHandlers);
 
-            var domain = appSettings.Security.Domain;
+            var domain = appSettings.Partition.Domain;
             var oAuthRedirectUrl = new OAuthRedirectUrl(appSettings.Environment, ServiceLocator.Partition.Slug, domain, appSettings.Integration.OAuthSecret.AzureADSecret.RedirectUrl);
 
             AzureAD = new AzureAD(appSettings.Integration.OAuthSecret.AzureADSecret, oAuthRedirectUrl);
@@ -95,6 +95,7 @@ namespace InSite
 
             // Initialize static data sets
             OrganizationSearch.Refresh();
+            LoadPermissionMatrix();
 
             // Configure JSON serialization.
             Shift.Common.Json.JsonSettings.Register();
@@ -105,8 +106,8 @@ namespace InSite
             // Configure internal frameworks.
             ApplicationContext.Initialize(
                 TActionSearch.CreateActionNodes(),
-                TActionSearch.CreateActionTree(ActionMapType.Navigation),
-                TActionSearch.CreateActionTree(ActionMapType.Permission));
+                TActionSearch.CreateActionTree(RouteHierarchyType.Navigation),
+                TActionSearch.CreateActionTree(RouteHierarchyType.Permission));
 
             RouteTable.Routes.RouteExistingFiles = true;
 
@@ -131,6 +132,19 @@ namespace InSite
             AddRemoteShares();
 
             Shift.Sdk.UI.ControlLinkerCache.Init(typeof(Global).Assembly);
+        }
+
+        private void LoadPermissionMatrix()
+        {
+            var partition = ServiceLocator.AppSettings.Partition;
+
+            var routeSettings = ServiceLocator.AppSettings.RouteSettings;
+
+            CurrentIdentity.Partition = partition.Slug;
+
+            PermissionContext.GetMatrix = () => PermissionCache.Matrix;
+
+            PermissionCache.Initialize(partition.Slug, routeSettings);
         }
 
         private void InitializeFileSystem()
@@ -250,7 +264,7 @@ namespace InSite
                 SameSite = SameSiteMode.None,
                 Secure = true,
                 HttpOnly = true,
-                Domain = ServiceLocator.AppSettings.Security.Domain
+                Domain = ServiceLocator.AppSettings.Partition.Domain
             };
 
             Response.SetCookie(cookie);
@@ -266,7 +280,7 @@ namespace InSite
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error retrieving session state cookie name from web.config: {ex.Message}", ex);
+                throw new InvalidOperationException($"Error retrieving session state cookie name from web.config: {ex.Message}", ex);
             }
         }
 
@@ -278,7 +292,7 @@ namespace InSite
             {
                 var sessionStateCookieName = GetSessionStateCookieName();
 
-                var cookieDomain = ServiceLocator.AppSettings.Security.Domain;
+                var cookieDomain = ServiceLocator.AppSettings.Partition.Domain;
 
                 foreach (string cookieName in Response.Cookies)
                 {

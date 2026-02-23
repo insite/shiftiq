@@ -15,7 +15,7 @@ namespace Shift.Contract.Presentation
         public bool DisplayCalendar { get; set; } = false;
         public string ActionTitle { get; set; }
         public bool FullWidth { get; set; } = true;
-        public List<Error> Errors { get; set; } = new List<Error>();
+        public List<Problem> Problems { get; set; } = new List<Problem>();
 
         public DownloadSettings Download { get; set; }
 
@@ -27,7 +27,7 @@ namespace Shift.Contract.Presentation
 
         public void AddError(string text, int code)
         {
-            Errors.Add(new Error(text, code));
+            Problems.Add(new Problem(code, text));
         }
 
         private DownloadSettings MockDownloadSettings()

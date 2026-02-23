@@ -9,14 +9,16 @@ import GradebookOpen from "./admin/records/gradebooks/open/GradebookOpen";
 import FileSearch from "./admin/content/files/search/FileSearch";
 import SignIn from "./react/signin/SignIn";
 import ReactHome from "./react/home/ReactHome";
-import CaseStatusSearch from "./admin/workflows/case-statuses/search/CaseStatusSearch";
-import CaseStatusCreate from "./admin/workflows/case-statuses/create/CaseStatusCreate";
-import CaseStatusEdit from "./admin/workflows/case-statuses/edit/CaseStatusEdit";
-import CaseStatusDelete from "./admin/workflows/case-statuses/delete/CaseStatusDelete";
+import CaseStatusSearch from "./admin/workflows/cases-statuses/search/CaseStatusSearch";
+import CaseStatusCreate from "./admin/workflows/cases-statuses/create/CaseStatusCreate";
+import CaseStatusEdit from "./admin/workflows/cases-statuses/edit/CaseStatusEdit";
+import CaseStatusDelete from "./admin/workflows/cases-statuses/delete/CaseStatusDelete";
+import { IconName } from "@/components/icon/IconName";
+import PageContent from "./admin/sites/pages/content/PageContent";
 
 export interface MenuItem {
     href: string;
-    icon: string;
+    icon: IconName;
     title: string;
 }
 
@@ -72,7 +74,7 @@ export const formRoutes: FormRoute[] = [
                 menu: [
                     {
                         href: "/client/admin/records/gradebooks/open",
-                        icon: "fas fa-plus-circle",
+                        icon: "plus-circle",
                         title: "Add New Gradebook"
                     },
                 ],
@@ -116,12 +118,12 @@ export const formRoutes: FormRoute[] = [
                 title: "Case Statuses",
                 category: "Case Statuses",  
                 menuTitle: "Search",
-                path: "/client/admin/workflows/case-statuses/search",
+                path: "/client/admin/workflows/cases-statuses/search",
                 element: <CaseStatusSearch />,
                 menu: [
                     {
-                        href: "/client/admin/workflows/case-statuses/create",
-                        icon: "fas fa-plus-circle",
+                        href: "/client/admin/workflows/cases-statuses/create",
+                        icon: "plus-circle",
                         title: "Add New Case Status"
                     },
                 ],
@@ -129,25 +131,32 @@ export const formRoutes: FormRoute[] = [
                     {
                         title: "New Case Status",
                         menuTitle: "New",
-                        path: "/client/admin/workflows/case-statuses/create",
+                        path: "/client/admin/workflows/cases-statuses/create",
                         element: <CaseStatusCreate />,
                     },
                     {
                         title: "Edit Case Status",
                         menuTitle: "Edit",
-                        path: "/client/admin/workflows/case-statuses/edit/:id",
+                        path: "/client/admin/workflows/cases-statuses/edit/:id",
                         element: <CaseStatusEdit />,
                         children:[
                             {
                                 title: "Delete Case Status",
                                 menuTitle: "Delete",
-                                path: "/client/admin/workflows/case-statuses/delete/:id",
+                                path: "/client/admin/workflows/cases-statuses/delete/:id",
                                 element: <CaseStatusDelete />,
                             },
                         ]
                     },
                 ]
-            }
+            },
+            {
+                title: "Page Content",
+                category: "Pages",  
+                menuTitle: "Content",
+                path: "/client/admin/sites/pages/content/:id",
+                element: <PageContent />
+            },
         ]
     },
 ];

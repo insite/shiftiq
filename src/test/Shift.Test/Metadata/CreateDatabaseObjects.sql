@@ -2122,7 +2122,7 @@ CREATE TABLE [accounts].[QOrganization](
 	[AccountOpened] [datetimeoffset](7) NULL,
 	[AccountStatus] [varchar](6) NOT NULL,
 	[CompanyDomain] [varchar](50) NULL,
-	[CompanyName] [varchar](50) NULL,
+    [CompanyName] [varchar](50) NULL,
 	[CompanySize] [varchar](10) NULL,
 	[CompanySummary] [varchar](900) NULL,
 	[CompanyTitle] [varchar](100) NULL,

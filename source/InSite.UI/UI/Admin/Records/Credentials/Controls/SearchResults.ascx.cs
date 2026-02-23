@@ -41,6 +41,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
             public string AchievementCertificateLayoutCode { get; set; }
             public bool? HasBadgeImage { get; set; }
             public string BadgeImageUrl { get; set; }
+            public string Department { get; set; }
         }
 
         public class ExportDataItem
@@ -63,7 +64,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
             public string EmployerGroupRegion { get; set; }
             public string AchievementCertificateLayoutCode { get; set; }
             public bool? HasBadgeImage { get; set; }
-
+            public string Department { get; set; }
         }
 
         #endregion  
@@ -126,7 +127,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
         protected override IListSource SelectData(VCredentialFilter filter)
         {
             return ServiceLocator.AchievementSearch
-                .GetCredentials(filter)
+                .GetCredentialSearchResults(filter)
                 .Select(x => new SearchDataItem
                 {
                     CredentialIdentifier = x.CredentialIdentifier,
@@ -138,17 +139,20 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                     CredentialStatus = x.CredentialStatus,
                     CredentialGranted = x.CredentialGranted,
                     CredentialRevoked = x.CredentialRevoked,
-                    EmployerGroupIdentifier = x.OriginalEmployerGroupIdentifier ?? x.EmployerGroupIdentifier,
-                    EmployerGroupName = x.OriginalEmployerGroupName ?? x.EmployerGroupName,
-                    EmployerGroupStatus = x.OriginalEmployerGroupIdentifier.HasValue ? x.OriginalEmployerGroupStatus : x.EmployerGroupStatus,
-                    EmployerGroupRegion = x.OriginalEmployerGroupIdentifier.HasValue ? x.OriginalEmployerGroupRegion : x.EmployerGroupRegion,
+                    EmployerGroupIdentifier = x.EmployerGroupIdentifier,
+                    EmployerGroupName = x.EmployerGroupName,
+                    EmployerGroupStatus = x.EmployerGroupStatus,
+                    EmployerGroupRegion = x.EmployerGroupRegion,
                     AchievementCertificateLayoutCode = x.AchievementCertificateLayoutCode,
                     BadgeImageUrl = x.BadgeImageUrl,
                     HasBadgeImage = x.HasBadgeImage,
                     PersonCode = x.PersonCode,
-                    AchievementTag = x.AchievementLabel,
-                    CredentialExpiryDate = GetCredentialExpiryDate(x),
-                    CredentialExpiryHtml = GetCredentialExpiryHtml(x)
+                    AchievementTag = x.AchievementTag,
+                    CredentialExpiryDate = Achievements.Controls.CredentialGrid.GetCredentialExpiryDate(
+                        x.CredentialExpirationExpected, x.CredentialExpired, "yyyy-MM-dd"),
+                    CredentialExpiryHtml = Achievements.Controls.CredentialGrid.GetCredentialExpiry(
+                        x.CredentialExpirationExpected, x.CredentialExpired),
+                    Department = x.Department
                 })
                 .ToList()
                 .ToSearchResult();
@@ -157,6 +161,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
         #endregion
 
         #region Export Data
+
         public override IListSource GetExportData(VCredentialFilter filter, bool empty)
         {
             var query = SelectData(filter).GetList().Cast<SearchDataItem>().AsQueryable();
@@ -184,8 +189,8 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                     EmployerGroupStatus = x.EmployerGroupStatus,
                     EmployerGroupRegion = x.EmployerGroupRegion,
                     AchievementCertificateLayoutCode = x.AchievementCertificateLayoutCode,
-                    HasBadgeImage = x.HasBadgeImage
-
+                    HasBadgeImage = x.HasBadgeImage,
+                    Department = x.Department
                 })
                 .ToList()
                 .ToSearchResult();
@@ -201,16 +206,6 @@ namespace InSite.Admin.Achievements.Credentials.Controls
             if (when == null)
                 return string.Empty;
             return TimeZones.Format(when.Value, User.TimeZone, true, true);
-        }
-
-        private string GetCredentialExpiryHtml(VCredential item)
-        {
-            return Achievements.Controls.CredentialGrid.GetCredentialExpiry(item);
-        }
-
-        private string GetCredentialExpiryDate(VCredential item)
-        {
-            return Achievements.Controls.CredentialGrid.GetCredentialExpiryDate(item, "yyyy-MM-dd");
         }
 
         public string IsInQueue(string flag)

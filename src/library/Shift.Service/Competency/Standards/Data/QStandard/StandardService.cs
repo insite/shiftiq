@@ -17,9 +17,9 @@ public class StandardService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid standard, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid standard, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(standard, cancellation);
+        return await _reader.AssertAsync(standard, organization, cancellation);
     }
 
     public async Task<IEnumerable<StandardModel>> CollectAsync(IStandardCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class StandardService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyStandard modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.StandardIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.StandardId, cancellation);
 
         if (entity == null)
             return false;

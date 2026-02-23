@@ -39,7 +39,7 @@ namespace InSite.Persistence.Integration.Moodle
                 var error = $"An unexpected error occurred generating the URL for a learner ({learnerId}) to launch "
                     + $"a Moodle course ({courseHook}) from a Shift iQ learning activity ({activityId}).";
 
-                throw new Exception(error, ex);
+                throw new InvalidOperationException(error, ex);
             }
         }
 

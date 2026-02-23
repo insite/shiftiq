@@ -13,12 +13,18 @@ const _items = [
     { text: translate("Badge"), value: "Badge" },
     { text: translate("Product"), value: "Product" },
     { text: translate("Logbook Experience"), value: "LogbookExperience" },
-    { text: translate("Credential"), value: "Credential" }
+    { text: translate("Credential"), value: "Credential" },
+    { text: translate("Course"), value: "Course" },
+    { text: translate("Program"), value: "Program" },
+    { text: translate("Program Task"), value: "ProgramTask" },
+    { text: translate("Standard"), value: "Standard" },
+    { text: translate("Page"), value: "Page" },
 ];
 
 export default function FileObjectTypeComboBox<Criteria extends object>(props: Props<Criteria>) {
     return (
         <ControlledComboBox
+            maxHeight={300}
             {...props}
             items={_items}
         />

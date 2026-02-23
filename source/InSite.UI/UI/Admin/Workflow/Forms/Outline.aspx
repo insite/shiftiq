@@ -295,6 +295,23 @@
                                                     </div>
 				                                </div>
 
+                                                <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="EnableThirdPartyFormsUpdatePanel" />
+
+                                                <insite:UpdatePanel runat="server" ID="EnableThirdPartyFormsUpdatePanel" CssClass="form-group mb-3">
+                                                    <ContentTemplate>
+                                                        <div class="float-end">
+                                                            <asp:LinkButton runat="server" ID="EnableThirdPartyFormsToggle" ToolTip="Enable third-party forms"><i class="fas fa-toggle-off"></i></asp:LinkButton>
+                                                        </div>
+                                                        <asp:Label runat="server" ID="EnableThirdPartyFormsLabel" AssociatedControlID="EnableThirdPartyForms" Text="Third-Party Forms" CssClass="form-label" />
+				                                        <div>
+                                                            <asp:Literal runat="server" ID="EnableThirdPartyForms" />
+                                                        </div>
+                                                        <div class="form-text">
+                                                            Allow a third party assessor to use this form in the evaluation of a learner.
+                                                        </div>
+                                                    </ContentTemplate>
+                                                </insite:UpdatePanel>
+
                                                 <div class="form-group mb-3">
                                                     <div class="float-end">
                                                         <insite:IconLink Name="pencil" runat="server" id="IssueWorkflowLink" style="padding:8px" ToolTip="Change Configuration" />

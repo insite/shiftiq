@@ -4,17 +4,16 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface IEventCriteria
+    public interface IEventCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
 
-        Guid? AchievementIdentifier { get; set; }
-        Guid? LearnerRegistrationGroupIdentifier { get; set; }
-        Guid? MandatorySurveyFormIdentifier { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? VenueCoordinatorIdentifier { get; set; }
-        Guid? VenueLocationIdentifier { get; set; }
-        Guid? VenueOfficeIdentifier { get; set; }
+        Guid? AchievementId { get; set; }
+        Guid? LearnerRegistrationGroupId { get; set; }
+        Guid? MandatorySurveyFormId { get; set; }
+        Guid? VenueCoordinatorId { get; set; }
+        Guid? VenueLocationId { get; set; }
+        Guid? VenueOfficeId { get; set; }
 
         bool? AllowMultipleRegistrations { get; set; }
         bool? AllowRegistrationWithLink { get; set; }

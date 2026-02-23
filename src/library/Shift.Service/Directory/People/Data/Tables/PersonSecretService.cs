@@ -58,7 +58,7 @@ public class PersonSecretService : IEntityService
         ModifyPersonSecret modify, 
         CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.SecretIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.SecretId, cancellation);
 
         if (entity == null)
             return false;

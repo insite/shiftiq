@@ -4,21 +4,20 @@ using Shift.Common;
 
 namespace Shift.Contract
 {
-    public interface ICaseCriteria
+    public interface ICaseCriteria : IQueryByOrganization
     {
         QueryFilter Filter { get; set; }
 
-        Guid? AdministratorUserIdentifier { get; set; }
-        Guid? EmployerGroupIdentifier { get; set; }
+        Guid? AdministratorUserId { get; set; }
+        Guid? EmployerGroupId { get; set; }
         Guid? CaseClosedBy { get; set; }
         Guid? CaseOpenedBy { get; set; }
-        Guid? CaseStatusIdentifier { get; set; }
+        Guid? CaseStatusId { get; set; }
         Guid? LastChangeUser { get; set; }
-        Guid? LawyerUserIdentifier { get; set; }
-        Guid? OrganizationIdentifier { get; set; }
-        Guid? OwnerUserIdentifier { get; set; }
-        Guid? ResponseSessionIdentifier { get; set; }
-        Guid? TopicUserIdentifier { get; set; }
+        Guid? LawyerUserId { get; set; }
+        Guid? OwnerUserId { get; set; }
+        Guid? ResponseSessionId { get; set; }
+        Guid? TopicUserId { get; set; }
 
         string CaseDescription { get; set; }
         string CaseSource { get; set; }

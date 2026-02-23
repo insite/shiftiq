@@ -76,7 +76,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             PageHelper.AutoBindHeader(this);
 
-            DepartmentIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
 
             if (!Identity.HasAccessToAllCompanies)
                 DepartmentIdentifier.Filter.UserIdentifier = User.UserIdentifier;
@@ -84,7 +84,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             LoadAchievementTypes();
 
             AchievementIdentifier.Filter.AchievementType = "NA";
-            AchievementIdentifier.Filter.OrganizationIdentifier = CurrentIdentityFactory.ActiveOrganizationIdentifier;
+            AchievementIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementIdentifier.Filter.GlobalOrCompanySpecific = true;
             AchievementIdentifier.IncludeUserAchievement = true;
         }
@@ -143,7 +143,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             DataRepeater.DataBind();
 
             AchievementTitle.Text = VCmdsAchievementSearch.SelectFirst(x => x.AchievementIdentifier == AchievementIdentifier.Value.Value).AchievementTitle;
-            CompanyName.Text = OrganizationSearch.Select(CurrentIdentityFactory.ActiveOrganizationIdentifier).Name;
+            CompanyName.Text = OrganizationSearch.Select(Organization.Identifier).Name;
             DepartmentName.Text = DepartmentIdentifier.Item.Text;
         }
 

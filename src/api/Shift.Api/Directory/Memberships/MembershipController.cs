@@ -9,10 +9,12 @@ namespace Shift.Api;
 public class MembershipController : ShiftControllerBase
 {
     private readonly MembershipService _membershipService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public MembershipController(MembershipService membershipService)
+    public MembershipController(MembershipService membershipService, IPrincipalProvider principalProvider)
     {
         _membershipService = membershipService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -20,13 +22,17 @@ public class MembershipController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific membership
     /// </summary>
-    [HttpHead("directory/memberships/{membership:guid}")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Assert)]
+    [HttpHead("api/directory/memberships/{membership:guid}")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertMembership")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid membership, CancellationToken cancellation = default)
     {
-        var exists = await _membershipService.AssertAsync(membership, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _membershipService.AssertAsync(membership, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -34,8 +40,8 @@ public class MembershipController : ShiftControllerBase
     /// <summary>
     /// Collects the list of memberships that match specific criteria
     /// </summary>
-    [HttpPost("directory/memberships/collect")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Collect)]
+    [HttpPost("api/directory/memberships/collect")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<MembershipModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectMemberships")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectMemberships query, CancellationToken cancellation = default)
@@ -43,8 +49,8 @@ public class MembershipController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("directory/memberships")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Collect)]
+    [HttpGet("api/directory/memberships")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<MembershipModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectMemberships_get")]
     [AliasFor("collectMemberships")]
@@ -56,9 +62,15 @@ public class MembershipController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectMemberships query, CancellationToken cancellation)
     {
-        var models = await _membershipService.CollectAsync(query, cancellation);
+        var principal = _principalProvider.GetPrincipal();
 
-        var count = await _membershipService.CountAsync(query, cancellation);
+        _principalProvider.ValidateOrganizationId(principal, query);
+
+        var currentUserId = principal.User.Identifier;
+
+        var models = await _membershipService.CollectAsync(query, currentUserId, cancellation);
+
+        var count = await _membershipService.CountAsync(query, currentUserId, cancellation);
 
         Response.AddPagination(query.Filter, count);
 
@@ -68,8 +80,8 @@ public class MembershipController : ShiftControllerBase
     /// <summary>
     /// Counts the memberships that match specific criteria
     /// </summary>
-    [HttpPost("directory/memberships/count")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Count)]
+    [HttpPost("api/directory/memberships/count")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countMemberships")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountMemberships query, CancellationToken cancellation = default)
@@ -77,8 +89,8 @@ public class MembershipController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("directory/memberships/count")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Count)]
+    [HttpGet("api/directory/memberships/count")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countMemberships_get")]
     [AliasFor("countMemberships")]
@@ -90,7 +102,13 @@ public class MembershipController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountMemberships query, CancellationToken cancellation)
     {
-        var count = await _membershipService.CountAsync(query, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
+        var currentUserId = principal.User.Identifier;
+
+        var count = await _membershipService.CountAsync(query, currentUserId, cancellation);
 
         return Ok(new CountResult(count));
     }
@@ -98,8 +116,8 @@ public class MembershipController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of memberships that match specific criteria
     /// </summary>    
-    [HttpPost("directory/memberships/download")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Download)]
+    [HttpPost("api/directory/memberships/download")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadMemberships")]
@@ -108,8 +126,8 @@ public class MembershipController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("directory/memberships/download")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Download)]
+    [HttpGet("api/directory/memberships/download")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadMemberships_get")]
@@ -122,10 +140,16 @@ public class MembershipController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectMemberships query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
+        var currentUserId = principal.User.Identifier;
+
         var exporter = new ExportHelper("Directory", "Memberships", query.Filter.Format, User);
 
         var models = await _membershipService
-            .DownloadAsync(query, cancellation)
+            .DownloadAsync(query, currentUserId, cancellation)
             .ToListAsync(cancellation);
 
         var content = _membershipService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
@@ -142,22 +166,30 @@ public class MembershipController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific membership
     /// </summary>
-    [HttpGet("directory/memberships/{membership:guid}")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Retrieve)]
+    [HttpGet("api/directory/memberships/{membership:guid}")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType<MembershipModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveMembership")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid membership, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _membershipService.RetrieveAsync(membership, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of memberships that match specific criteria
     /// </summary>
-    [HttpPost("directory/memberships/search")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Search)]
+    [HttpPost("api/directory/memberships/search")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<MembershipMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchMemberships")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchMemberships query, CancellationToken cancellation = default)
@@ -165,8 +197,8 @@ public class MembershipController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("directory/memberships/search")]
-    [HybridAuthorize(Policies.Directory.Memberships.Membership.Search)]
+    [HttpGet("api/directory/memberships/search")]
+    [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<MembershipMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchMemberships_get")]
     [AliasFor("searchMemberships")]
@@ -178,9 +210,15 @@ public class MembershipController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchMemberships query, CancellationToken cancellation)
     {
-        var matches = await _membershipService.SearchAsync(query, cancellation);
+        var principal = _principalProvider.GetPrincipal();
 
-        var count = await _membershipService.CountAsync(query, cancellation);
+        _principalProvider.ValidateOrganizationId(principal, query);
+
+        var currentUserId = principal.User.Identifier;
+
+        var matches = await _membershipService.SearchAsync(query, currentUserId, cancellation);
+
+        var count = await _membershipService.CountAsync(query, currentUserId, cancellation);
 
         Response.AddPagination(query.Filter, count);
 

@@ -17,9 +17,9 @@ public class UserSessionService : IEntityService
         _writer = writer;
     }
 
-    public async Task<bool> AssertAsync(Guid session, CancellationToken cancellation = default)
+    public async Task<bool> AssertAsync(Guid session, Guid? organization, CancellationToken cancellation = default)
     {
-        return await _reader.AssertAsync(session, cancellation);
+        return await _reader.AssertAsync(session, organization, cancellation);
     }
 
     public async Task<IEnumerable<UserSessionModel>> CollectAsync(IUserSessionCriteria criteria, CancellationToken cancellation = default)
@@ -56,7 +56,7 @@ public class UserSessionService : IEntityService
 
     public async Task<bool> ModifyAsync(ModifyUserSession modify, CancellationToken cancellation = default)
     {
-        var entity = await _reader.RetrieveAsync(modify.SessionIdentifier, cancellation);
+        var entity = await _reader.RetrieveAsync(modify.SessionId, cancellation);
 
         if (entity == null)
             return false;

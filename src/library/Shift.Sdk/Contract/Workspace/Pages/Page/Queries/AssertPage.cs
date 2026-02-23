@@ -6,6 +6,6 @@ namespace Shift.Contract
 {
     public class AssertPage : Query<bool>
     {
-        public Guid PageIdentifier { get; set; }
+        public Guid PageId { get; set; }
     }
 }

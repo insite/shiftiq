@@ -57,6 +57,8 @@ namespace InSite.UI.Admin.Identity.Permissions
 
                     AllowAdministrate.Checked = permission.AllowAdministrate;
                     AllowConfigure.Checked = permission.AllowConfigure;
+
+                    AllowTrialAccess.Checked = permission.AllowTrialAccess;
                 }
             }
 
@@ -102,13 +104,14 @@ namespace InSite.UI.Admin.Identity.Permissions
 
                     ObjectIdentifier = ActionIdentifier.Value,
                     ObjectType = "Action",
-                    
+
                     AllowRead = AllowRead.Checked,
                     AllowWrite = AllowWrite.Checked,
                     AllowCreate = AllowCreate.Checked,
                     AllowDelete = AllowDelete.Checked,
                     AllowAdministrate = AllowAdministrate.Checked,
                     AllowConfigure = AllowConfigure.Checked,
+                    AllowTrialAccess = AllowTrialAccess.Checked,
 
                     PermissionGranted = DateTimeOffset.Now,
                     PermissionGrantedBy = User.Identifier
@@ -125,6 +128,8 @@ namespace InSite.UI.Admin.Identity.Permissions
                 permission.AllowDelete = AllowDelete.Checked;
                 permission.AllowAdministrate = AllowAdministrate.Checked;
                 permission.AllowConfigure = AllowConfigure.Checked;
+                permission.AllowTrialAccess = AllowTrialAccess.Checked;
+
                 TGroupPermissionStore.Update(permission);
             }
 

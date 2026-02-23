@@ -14,7 +14,6 @@ public class OrganizationAdapter : IEntityAdapter
         entity.AccountClosed = modify.AccountClosed;
         entity.AccountOpened = modify.AccountOpened;
         entity.AccountStatus = modify.AccountStatus;
-        entity.CompanyDomain = modify.CompanyDomain;
         entity.CompanyName = modify.CompanyName;
         entity.CompanySize = modify.CompanySize;
         entity.CompanySummary = modify.CompanySummary;
@@ -27,9 +26,8 @@ public class OrganizationAdapter : IEntityAdapter
         entity.OrganizationCode = modify.OrganizationCode;
         entity.OrganizationLogoUrl = modify.OrganizationLogoUrl;
         entity.TimeZone = modify.TimeZone;
-        entity.AdministratorUserIdentifier = modify.AdministratorUserIdentifier;
-        entity.GlossaryIdentifier = modify.GlossaryIdentifier;
-        entity.ParentOrganizationIdentifier = modify.ParentOrganizationIdentifier;
+        entity.AdministratorUserIdentifier = modify.AdministratorUserId;
+        entity.GlossaryIdentifier = modify.GlossaryId;
         entity.OrganizationData = modify.OrganizationData;
         entity.PersonFullNamePolicy = modify.PersonFullNamePolicy;
 
@@ -49,7 +47,6 @@ public class OrganizationAdapter : IEntityAdapter
             AccountClosed = create.AccountClosed,
             AccountOpened = create.AccountOpened,
             AccountStatus = create.AccountStatus,
-            CompanyDomain = create.CompanyDomain,
             CompanyName = create.CompanyName,
             CompanySize = create.CompanySize,
             CompanySummary = create.CompanySummary,
@@ -62,10 +59,9 @@ public class OrganizationAdapter : IEntityAdapter
             OrganizationCode = create.OrganizationCode,
             OrganizationLogoUrl = create.OrganizationLogoUrl,
             TimeZone = create.TimeZone,
-            AdministratorUserIdentifier = create.AdministratorUserIdentifier,
-            GlossaryIdentifier = create.GlossaryIdentifier,
-            ParentOrganizationIdentifier = create.ParentOrganizationIdentifier,
-            OrganizationIdentifier = create.OrganizationIdentifier,
+            AdministratorUserIdentifier = create.AdministratorUserId,
+            GlossaryIdentifier = create.GlossaryId,
+            OrganizationIdentifier = create.OrganizationId,
             OrganizationData = create.OrganizationData,
             PersonFullNamePolicy = create.PersonFullNamePolicy
         };
@@ -84,7 +80,6 @@ public class OrganizationAdapter : IEntityAdapter
             AccountClosed = entity.AccountClosed,
             AccountOpened = entity.AccountOpened,
             AccountStatus = entity.AccountStatus,
-            CompanyDomain = entity.CompanyDomain,
             CompanyName = entity.CompanyName,
             CompanySize = entity.CompanySize,
             CompanySummary = entity.CompanySummary,
@@ -97,10 +92,9 @@ public class OrganizationAdapter : IEntityAdapter
             OrganizationCode = entity.OrganizationCode,
             OrganizationLogoUrl = entity.OrganizationLogoUrl,
             TimeZone = entity.TimeZone,
-            AdministratorUserIdentifier = entity.AdministratorUserIdentifier,
-            GlossaryIdentifier = entity.GlossaryIdentifier,
-            ParentOrganizationIdentifier = entity.ParentOrganizationIdentifier,
-            OrganizationIdentifier = entity.OrganizationIdentifier,
+            AdministratorUserId = entity.AdministratorUserIdentifier,
+            GlossaryId = entity.GlossaryIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
             OrganizationData = entity.OrganizationData,
             PersonFullNamePolicy = entity.PersonFullNamePolicy
         };
@@ -117,8 +111,7 @@ public class OrganizationAdapter : IEntityAdapter
     {
         var match = new OrganizationMatch
         {
-            OrganizationIdentifier = entity.OrganizationIdentifier,
-            ParentOrganizationIdentifier = entity.ParentOrganizationIdentifier,
+            OrganizationId = entity.OrganizationIdentifier,
             CompanyName = entity.CompanyName
         };
 

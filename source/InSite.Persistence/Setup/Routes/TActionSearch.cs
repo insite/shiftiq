@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Entity;
 using System.Linq;
 
 using InSite.Domain.Foundations;
@@ -134,7 +135,9 @@ namespace InSite.Persistence
 
         private static IQueryable<TAction> CreateQuery(TActionFilter filter)
         {
-            var query = _actions.AsQueryable();
+            var query = _actions
+                .AsQueryable()
+                .Include(x => x.PermissionParent);
 
             if (filter.ActionList.IsNotEmpty())
                 query = query.Where(x => x.ActionList == filter.ActionList);
@@ -254,7 +257,8 @@ namespace InSite.Persistence
 
         public static IEnumerable<TAction> Search(Func<TAction, bool> predicate)
         {
-            return _actions.Where(predicate);
+            return _actions
+                .Where(predicate);
         }
 
         public static List<TAction> Search(TActionFilter filter)
@@ -323,16 +327,16 @@ namespace InSite.Persistence
             return ToNodes(_actions, null);
         }
 
-        public static ActionTree CreateActionTree(ActionMapType map)
+        public static ActionTree CreateActionTree(RouteHierarchyType type)
         {
-            if (map == ActionMapType.Navigation)
+            if (type == RouteHierarchyType.Navigation)
             {
                 var actions = _actions.Where(x => x.NavigationParent != null || x.NavigationChildren.Any());
                 return ActionTreeBuilder.BuildTree(ToNodes(actions, x => x.NavigationParentActionIdentifier));
             }
             else
             {
-                var actions = _actions.Where(x => x.PermissionParent != null || x.PermissionChildren.Any());
+                var actions = _actions.Where(x => x.ActionType == "Resource" || x.PermissionParent != null || x.PermissionChildren.Any());
                 return ActionTreeBuilder.BuildTree(ToNodes(actions, x => x.PermissionParentActionIdentifier));
             }
         }
@@ -356,7 +360,7 @@ namespace InSite.Persistence
             var node = new ActionNode
             {
                 Identifier = action.ActionIdentifier,
-                Permission = action.PermissionParentActionIdentifier,
+                Permission = action.PermissionParent?.ActionUrl,
                 Icon = action.ActionIcon,
                 List = action.ActionList,
                 Name = action.ActionName,
@@ -371,30 +375,128 @@ namespace InSite.Persistence
             return node;
         }
 
-        public static List<RouteNode> GetRouteNavigationNodes()
+        public static List<RoleRouteAccess> SearchRoleRouteAccesses()
         {
-            var query = "select * from setup.VRouteNavigationNode order by SortPath";
-
             using (var db = new InternalDbContext())
-                return db.Database.SqlQuery<RouteNode>(query).ToList();
+            {
+                return db.RoleRouteAccesses
+                    .OrderBy(x => x.OrganizationCode)
+                    .ThenBy(x => x.RoleName)
+                    .ThenBy(x => x.RouteUrl)
+                    .ToList();
+            }
         }
 
-        public static List<RouteNode> GetRoutePermissionNodes()
+        public static List<RouteNavigationNode> SearchRouteNavigationNodes()
         {
-            var query = "select * from setup.VRoutePermissionNode order by SortPath";
-
             using (var db = new InternalDbContext())
-                return db.Database.SqlQuery<RouteNode>(query).ToList();
+            {
+                return db.RouteNavigationNodes
+                    .OrderBy(x => x.SortPath)
+                    .ToList();
+            }
         }
 
-        public static List<RoleRouteOperation> GetRoleRouteOperations()
+        public static List<RoutePermissionNode> SearchRoutePermissionNodes()
         {
-            var query = "select * from security.RoleRouteOperation order by OrganizationCode, RoleName, RouteUrl";
-
             using (var db = new InternalDbContext())
-                return db.Database.SqlQuery<RoleRouteOperation>(query).ToList();
+            {
+                return db.RoutePermissionNodes.ToList();
+            }
         }
 
         #endregion
+
+        public static ResourcePermissions[] SearchPermissionsGroupedByResource(string organizationCode)
+        {
+            var roleRouteAccesses = TActionSearch.SearchRoleRouteAccesses();
+
+            var items = roleRouteAccesses.Where(x => x.OrganizationCode == organizationCode);
+
+            var resourcePermissions = items
+                .GroupBy(item => item.RouteUrl)
+                .OrderBy(g => g.Key)
+                .Select(resourceGroup => new ResourcePermissions
+                {
+                    Resource = resourceGroup.Key,
+                    Permissions = resourceGroup
+                        .GroupBy(item => BuildAccessKey(item))
+                        .OrderBy(g => g.Key)
+                        .Select(accessGroup => new RoleAccessBundle
+                        {
+                            Roles = accessGroup
+                                .Select(x => x.RoleName)
+                                .Distinct()
+                                .OrderBy(r => r)
+                                .ToList(),
+                            Access = BuildAccessSet(accessGroup.First())
+                        })
+                        .ToList()
+                })
+                .ToArray();
+
+            return resourcePermissions;
+        }
+
+        public static RolePermissions[] SearchPermissionsGroupedByRole(string organizationCode)
+        {
+            var roleRouteAccesses = TActionSearch.SearchRoleRouteAccesses();
+
+            var items = roleRouteAccesses.Where(x => x.OrganizationCode == organizationCode);
+
+            var rolePermissions = items
+                .GroupBy(item => item.RoleName)
+                .OrderBy(g => g.Key)
+                .Select(roleGroup => new RolePermissions
+                {
+                    Role = roleGroup.Key,
+                    Permissions = roleGroup
+                        .GroupBy(item => BuildAccessKey(item))
+                        .OrderBy(g => g.Key)
+                        .Select(accessGroup => new ResourceAccessBundle
+                        {
+                            Resources = accessGroup
+                                .Select(x => x.RouteUrl)
+                                .Distinct()
+                                .OrderBy(r => r)
+                                .ToList(),
+                            Access = BuildAccessSet(accessGroup.First())
+                        })
+                        .ToList()
+                })
+                .ToList();
+
+            return rolePermissions.ToArray();
+        }
+
+        private static string BuildAccessKey(RoleRouteAccess item)
+        {
+            return BuildAccessSet(item).ToString();
+        }
+
+        private static AccessSet BuildAccessSet(RoleRouteAccess item)
+        {
+            var access = new AccessSet();
+
+            if (item.AllowRead)
+                access.Data |= DataAccess.Read;
+
+            if (item.AllowWrite)
+                access.Data |= DataAccess.Update;
+
+            if (item.AllowCreate)
+                access.Data |= DataAccess.Create;
+
+            if (item.AllowDelete)
+                access.Data |= DataAccess.Delete;
+
+            if (item.AllowAdministrate)
+                access.Data |= DataAccess.Administrate;
+
+            if (item.AllowConfigure)
+                access.Data |= DataAccess.Configure;
+
+            return access;
+        }
     }
 }

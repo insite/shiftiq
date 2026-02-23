@@ -103,9 +103,9 @@ namespace InSite.UI.Portal.Security
             var relativeUrl = RelativeUrl.PortalHomeUrl;
 
             if (ServiceLocator.Partition.IsE03() && User.AccessGrantedToCmds)
-                relativeUrl = Shift.Common.Urls.CmdsHomeUrl;
+                relativeUrl = Shift.Common.Urls.HomeUrl;
 
-            else if (Identity.IsAdministrator && Identity.IsActionAuthorized(RelativeUrl.AdminHomeUrl))
+            else if (Identity.IsAdministrator && Identity.IsGranted(RelativeUrl.AdminHomeUrl))
                 relativeUrl = RelativeUrl.AdminHomeUrl;
 
             return PathHelper.GetOrganizationUrl(ServiceLocator.AppSettings.Environment, organizationCode, relativeUrl);
@@ -127,7 +127,7 @@ namespace InSite.UI.Portal.Security
                 if (organizations.Count == 1)
                 {
                     var organization = organizations.FirstOrDefault().OrganizationCode;
-                    url = PathHelper.GetOrganizationUrl(ServiceLocator.AppSettings.Environment, organization, Urls.CmdsHomeUrl);
+                    url = PathHelper.GetOrganizationUrl(ServiceLocator.AppSettings.Environment, organization, Urls.HomeUrl);
                 }
             }
             else if (IsLogin)
@@ -192,7 +192,7 @@ namespace InSite.UI.Portal.Security
             var item = (TUserSessionCacheSummary)e.Item.DataItem;
 
             var url = ServiceLocator.Partition.IsE03()
-                ? Urls.CmdsHomeUrl
+                ? Urls.HomeUrl
                 : "/ui/admin/home";
 
             var link = (HyperLink)e.Item.FindControl("StartLink");

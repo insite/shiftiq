@@ -290,7 +290,7 @@ namespace InSite.Admin.Standards.Standards.Forms
             if (IsPostBack)
                 return;
 
-            if (!Identity.IsGranted(Route.ToolkitNumber, PermissionOperation.Write))
+            if (!Identity.IsGranted(Route.ToolkitNumber, DataAccess.Update))
                 HttpResponseHelper.Redirect("/ui/admin/standards/home");
 
             PageHelper.AutoBindHeader(this, null, "Upload Standards");

@@ -31,7 +31,7 @@ namespace InSite.Api.Models.Records.OpenBadges
             if (badgeUrl.StartsWith("/"))
                 badgeUrl = $"https://{host}" + badgeUrl;
 
-            var domain = ServiceLocator.AppSettings.Security.Domain;
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
 
             var environment = ServiceLocator.AppSettings.Release.GetEnvironment();
 

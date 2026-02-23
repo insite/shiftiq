@@ -8,7 +8,6 @@ namespace InSite.Persistence
     public class OrganizationFilter : Filter
     {
         public string CompanyName { get; set; }
-        public string CompanyDomain { get; set; }
         public string[] IncludeOrganizationCode { get; set; }
         public string[] ExcludeOrganizationCode { get; set; }
         public string OrganizationCode { get; set; }

@@ -7,10 +7,12 @@ namespace Shift.Api;
 public class UserSessionController : ShiftControllerBase
 {
     private readonly UserSessionService _userSessionService;
+    private readonly IPrincipalProvider _principalProvider;
 
-    public UserSessionController(UserSessionService userSessionService)
+    public UserSessionController(UserSessionService userSessionService, IPrincipalProvider principalProvider)
     {
         _userSessionService = userSessionService;
+        _principalProvider = principalProvider;
     }
 
     #region Queries
@@ -18,13 +20,17 @@ public class UserSessionController : ShiftControllerBase
     /// <summary>
     /// Checks for the existence of one specific user session
     /// </summary>
-    [HttpHead("security/users-sessions/{session:guid}")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Assert)]
+    [HttpHead("api/security/users-sessions/{session:guid}")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [EndpointName("assertUserSession")]
     public async Task<IActionResult> AssertAsync([FromRoute] Guid session, CancellationToken cancellation = default)
     {
-        var exists = await _userSessionService.AssertAsync(session, cancellation);
+        var principal = _principalProvider.GetPrincipal();
+
+        var organizationId = _principalProvider.GetOrganizationId(principal);
+
+        var exists = await _userSessionService.AssertAsync(session, organizationId, cancellation);
 
         return exists ? Ok() : NotFound();
     }
@@ -32,8 +38,8 @@ public class UserSessionController : ShiftControllerBase
     /// <summary>
     /// Collects the list of user sessions that match specific criteria
     /// </summary>
-    [HttpPost("security/users-sessions/collect")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Collect)]
+    [HttpPost("api/security/users-sessions/collect")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserSessionModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectUserSessions")]
     public async Task<IActionResult> PostCollectAsync([FromBody] CollectUserSessions query, CancellationToken cancellation = default)
@@ -41,8 +47,8 @@ public class UserSessionController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    [HttpGet("security/users-sessions")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Collect)]
+    [HttpGet("api/security/users-sessions")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserSessionModel>>(StatusCodes.Status200OK)]
     [EndpointName("collectUserSessions_get")]
     [AliasFor("collectUserSessions")]
@@ -54,6 +60,10 @@ public class UserSessionController : ShiftControllerBase
 
     private async Task<IActionResult> CollectAsync(CollectUserSessions query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var models = await _userSessionService.CollectAsync(query, cancellation);
 
         var count = await _userSessionService.CountAsync(query, cancellation);
@@ -66,8 +76,8 @@ public class UserSessionController : ShiftControllerBase
     /// <summary>
     /// Counts the user sessions that match specific criteria
     /// </summary>
-    [HttpPost("security/users-sessions/count")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Count)]
+    [HttpPost("api/security/users-sessions/count")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countUserSessions")]
     public async Task<IActionResult> PostCountAsync([FromBody] CountUserSessions query, CancellationToken cancellation = default)
@@ -75,8 +85,8 @@ public class UserSessionController : ShiftControllerBase
         return await CountAsync(query, cancellation);
     }
 
-    [HttpGet("security/users-sessions/count")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Count)]
+    [HttpGet("api/security/users-sessions/count")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType<CountResult>(StatusCodes.Status200OK)]
     [EndpointName("countUserSessions_get")]
     [AliasFor("countUserSessions")]
@@ -88,6 +98,10 @@ public class UserSessionController : ShiftControllerBase
 
     private async Task<IActionResult> CountAsync(CountUserSessions query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var count = await _userSessionService.CountAsync(query, cancellation);
 
         return Ok(new CountResult(count));
@@ -96,8 +110,8 @@ public class UserSessionController : ShiftControllerBase
     /// <summary>
     /// Downloads the list of user sessions that match specific criteria
     /// </summary>    
-    [HttpPost("security/users-sessions/download")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Download)]
+    [HttpPost("api/security/users-sessions/download")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadUserSessions")]
@@ -106,8 +120,8 @@ public class UserSessionController : ShiftControllerBase
         return await DownloadAsync(query, cancellation);
     }
 
-    [HttpGet("security/users-sessions/download")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Download)]
+    [HttpGet("api/security/users-sessions/download")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Produces("application/octet-stream")]
     [EndpointName("downloadUserSessions_get")]
@@ -120,6 +134,10 @@ public class UserSessionController : ShiftControllerBase
 
     private async Task<FileContentResult> DownloadAsync(CollectUserSessions query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var exporter = new ExportHelper("Security", "UserSessions", query.Filter.Format, User);
 
         var models = await _userSessionService
@@ -140,22 +158,33 @@ public class UserSessionController : ShiftControllerBase
     /// <summary>
     /// Retrieves one specific user session
     /// </summary>
-    [HttpGet("security/users-sessions/{session:guid}")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Retrieve)]
+    [HttpGet("api/security/users-sessions/{session:guid}")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType<UserSessionModel>(StatusCodes.Status200OK)]
     [EndpointName("retrieveUserSession")]
     public async Task<IActionResult> RetrieveAsync([FromRoute] Guid session, CancellationToken cancellation = default)
     {
+        var principal = _principalProvider.GetPrincipal();
+
         var model = await _userSessionService.RetrieveAsync(session, cancellation);
 
-        return model != null ? Ok(model) : NotFound();
+        if (model == null)
+            return NotFound();
+
+        // If the session exists in another organization then we could return Unauthorized here - but this would
+        // reveal that the ID exists. Returning Not Found is more secure and also helps to prevent enumeration attacks.
+
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+            return NotFound();
+
+        return Ok(model);
     }
 
     /// <summary>
     /// Searches for the list of user sessions that match specific criteria
     /// </summary>
-    [HttpPost("security/users-sessions/search")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Search)]
+    [HttpPost("api/security/users-sessions/search")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserSessionMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchUserSessions")]
     public async Task<IActionResult> PostSearchAsync([FromBody] SearchUserSessions query, CancellationToken cancellation = default)
@@ -163,8 +192,8 @@ public class UserSessionController : ShiftControllerBase
         return await SearchAsync(query, cancellation);
     }
 
-    [HttpGet("security/users-sessions/search")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Search)]
+    [HttpGet("api/security/users-sessions/search")]
+    [HybridPermission("security/users-sessions", DataAccess.Read)]
     [ProducesResponseType<IEnumerable<UserSessionMatch>>(StatusCodes.Status200OK)]
     [EndpointName("searchUserSessions_get")]
     [AliasFor("searchUserSessions")]
@@ -176,6 +205,10 @@ public class UserSessionController : ShiftControllerBase
 
     private async Task<IActionResult> SearchAsync(SearchUserSessions query, CancellationToken cancellation)
     {
+        var principal = _principalProvider.GetPrincipal();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
         var matches = await _userSessionService.SearchAsync(query, cancellation);
 
         var count = await _userSessionService.CountAsync(query, cancellation);
@@ -189,8 +222,8 @@ public class UserSessionController : ShiftControllerBase
 
     #region Commands
 
-    [HttpPost("security/users-sessions")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Create)]
+    [HttpPost("api/security/users-sessions")]
+    [HybridPermission("security/users-sessions", DataAccess.Create)]
     [ProducesResponseType<UserSessionModel>(StatusCodes.Status201Created, "application/json")]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
     [EndpointName("createUserSession")]
@@ -199,15 +232,15 @@ public class UserSessionController : ShiftControllerBase
         var created = await _userSessionService.CreateAsync(create, cancellation);
 
         if (!created)
-            return BadRequest($"Duplicate not permitted: SessionIdentifier {create.SessionIdentifier}. You cannot insert a duplicate object with the same primary key.");
+            return BadRequest($"Duplicate not permitted: SessionIdentifier {create.SessionId}. You cannot insert a duplicate object with the same primary key.");
 
-        var model = await _userSessionService.RetrieveAsync(create.SessionIdentifier, cancellation);
+        var model = await _userSessionService.RetrieveAsync(create.SessionId, cancellation);
 
         return CreatedAtAction(nameof(CreateAsync), model);
     }
 
-    [HttpDelete("security/users-sessions/{session:guid}")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Delete)]
+    [HttpDelete("api/security/users-sessions/{session:guid}")]
+    [HybridPermission("security/users-sessions", DataAccess.Delete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointName("deleteUserSession")]
@@ -221,8 +254,8 @@ public class UserSessionController : ShiftControllerBase
         return Ok();
     }
 
-    [HttpPut("security/users-sessions/{session:guid}")]
-    [HybridAuthorize(Policies.Security.Users.UserSession.Modify)]
+    [HttpPut("api/security/users-sessions/{session:guid}")]
+    [HybridPermission("security/users-sessions", DataAccess.Update)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
@@ -232,7 +265,7 @@ public class UserSessionController : ShiftControllerBase
         var model = await _userSessionService.RetrieveAsync(session, cancellation);
 
         if (model is null)
-            return NotFound($"UserSession not found: SessionIdentifier {modify.SessionIdentifier}. You cannot modify an object that is not in the database.");
+            return NotFound($"UserSession not found: SessionIdentifier {modify.SessionId}. You cannot modify an object that is not in the database.");
 
         var modified = await _userSessionService.ModifyAsync(modify, cancellation);
 

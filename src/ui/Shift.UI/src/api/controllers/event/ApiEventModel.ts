@@ -1,12 +1,12 @@
 export interface ApiEventModel {
-    AchievementIdentifier: string | null | undefined;
-    EventIdentifier: string;
-    LearnerRegistrationGroupIdentifier: string | null | undefined;
-    MandatorySurveyFormIdentifier: string | null | undefined;
-    OrganizationIdentifier: string;
-    VenueCoordinatorIdentifier: string | null | undefined;
-    VenueLocationIdentifier: string | null | undefined;
-    VenueOfficeIdentifier: string | null | undefined;
+    AchievementId: string | null | undefined;
+    EventId: string;
+    LearnerRegistrationGroupId: string | null | undefined;
+    MandatorySurveyFormId: string | null | undefined;
+    OrganizationId: string;
+    VenueCoordinatorId: string | null | undefined;
+    VenueLocationId: string | null | undefined;
+    VenueOfficeId: string | null | undefined;
     AllowMultipleRegistrations: boolean;
     AllowRegistrationWithLink: boolean | null | undefined;
     BillingCodeEnabled: boolean;

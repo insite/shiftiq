@@ -6,8 +6,8 @@ namespace Shift.Contract
 {
     public class CountFormOptionLists : Query<int>, IFormOptionListCriteria
     {
-        public Guid? OrganizationIdentifier { get; set; }
-        public Guid? SurveyQuestionIdentifier { get; set; }
+        public Guid? OrganizationId { get; set; }
+        public Guid? SurveyQuestionId { get; set; }
 
         public int? SurveyOptionListSequence { get; set; }
     }

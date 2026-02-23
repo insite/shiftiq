@@ -15,7 +15,7 @@
                     <div class="mb-2">
                         <insite:TextBox ID="ProgramCode" runat="server" EmptyMessage="Program Code" MaxLength="20" />
                     </div>
-    
+
                     <div class="mb-2">
                         <insite:TextBox ID="ProgramDescription" runat="server" EmptyMessage="Program Description" MaxLength="500" />
                     </div>
@@ -32,11 +32,23 @@
                         <cmds:FindDepartment runat="server" ID="DepartmentIdentifier" EmptyMessage="Department" />
                     </div>
 
+                    <div class="mb-2">
+                        <insite:TextBox ID="ProgramTag" runat="server" EmptyMessage="Program Tag" MaxLength="40" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:FindAchievement runat="server" ID="ProgramAchievementIdentifier" EmptyMessage="Program Achievement" MaxSelectionCount="0" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:FindAchievement runat="server" ID="TaskAchievementIdentifier" EmptyMessage="Task Achievement" MaxSelectionCount="0" />
+                    </div>
+
                 </div>
             </div> 
         </div>
     </div>
-    <div class="col-3">       
+    <div class="col-3">
         <div class="mb-2">
             <h4>Settings</h4>
             <insite:MultiComboBox ID="ShowColumns" runat="server" />

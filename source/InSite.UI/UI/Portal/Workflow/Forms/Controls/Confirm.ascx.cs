@@ -82,7 +82,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                         ServiceLocator.SendCommand(new TermsConsentResponseSession(Current.SessionIdentifier,
                         question.Identifier,
                         Current.Survey.Tenant,
-                        Current.UserIdentifier));
+                        Current.RespondentUserIdentifier));
                 }
             }
 
@@ -98,8 +98,8 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             // Survey.AssignRespondentToGroups can assign the respondent to groups
             // therefore we need to make sure the respondent has the updated permissions
 
-            if (Current.UserIdentifier != Current.Respondent?.UserIdentifier
-                || !MembershipSearch.Exists(x => x.UserIdentifier == Current.UserIdentifier && x.Assigned >= dateCompleted)
+            if (Current.RespondentUserIdentifier != Current.Respondent?.UserIdentifier
+                || !MembershipSearch.Exists(x => x.UserIdentifier == Current.RespondentUserIdentifier && x.Assigned >= dateCompleted)
                 )
             {
                 return;

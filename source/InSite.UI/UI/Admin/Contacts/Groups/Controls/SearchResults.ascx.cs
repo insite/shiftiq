@@ -265,7 +265,7 @@ namespace InSite.Admin.Contacts.Groups.Controls
 
         #endregion
 
-        protected bool CanWrite => CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Contacts, PermissionOperation.Write);
+        protected bool CanWrite => CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Contacts, DataAccess.Update);
 
         protected string Humanize(DateTimeOffset value) => $"{value.Humanize()}";
 

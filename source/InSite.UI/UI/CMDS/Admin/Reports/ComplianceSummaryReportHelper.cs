@@ -189,7 +189,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
             public void Append(CmdsReportHelper.ComplianceSummary row)
             {
                 if (_isEmpty)
-                    throw new ApplicationError("The operation is not applicable to this object.");
+                    throw new InvalidOperationException("The operation is not applicable to this object.");
 
                 Expired = Sum(Expired, row.Expired);
                 NotCompleted = Sum(NotCompleted, row.NotCompleted);
@@ -307,7 +307,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
             public void Append(CmdsReportHelper.EmployeeComplianceHistory row)
             {
                 if (_isEmpty)
-                    throw new ApplicationError("The operation is not applicable to this object.");
+                    throw new InvalidOperationException("The operation is not applicable to this object.");
 
                 Expired = Sum(Expired, row.Expired);
                 NotCompleted = Sum(NotCompleted, row.NotCompleted);

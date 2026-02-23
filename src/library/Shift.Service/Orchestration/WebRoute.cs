@@ -1,7 +1,7 @@
 ﻿using Shift.Common;
 using Shift.Contract;
 
-namespace Shift.Service.Presentation
+namespace Shift.Service.Orchestration
 {
     internal class WebRoute : IWebRoute
     {
@@ -27,8 +27,7 @@ namespace Shift.Service.Presentation
 
         public static WebRoute Create(IActionService actionService, ActionModel action)
         {
-            var permissionParentId = action.PermissionParentActionIdentifier ?? Guid.Empty;
-            var permissionParent = permissionParentId != Guid.Empty ? actionService.Retrieve(permissionParentId) : null;
+            var permissionParent = action.PermissionParentActionUrl != null ? actionService.Retrieve(action.PermissionParentActionUrl) : null;
 
             return new WebRoute(actionService, action, permissionParent);
         }
@@ -37,8 +36,8 @@ namespace Shift.Service.Presentation
         {
             _actionService = actionService;
 
-            RouteIdentifier = action.ActionIdentifier;
-            ParentRouteIdentifier = action.NavigationParentActionIdentifier;
+            RouteIdentifier = action.ActionId;
+            ParentRouteIdentifier = action.NavigationParentActionId;
             IsModal = action.ActionType == "Modal";
             Name = action.ActionUrl;
             Title = action.ActionName;
@@ -49,7 +48,7 @@ namespace Shift.Service.Presentation
             CssClass = action.ActionType;
 
             ToolkitName = "None";
-            ToolkitNumber = permissionParent?.ActionIdentifier ?? Guid.Empty;
+            ToolkitNumber = permissionParent?.ActionId ?? Guid.Empty;
             ToolkitName = permissionParent?.ActionName;
         }
 

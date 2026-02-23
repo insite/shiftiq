@@ -1,7 +1,7 @@
 import { fetchHelper } from "@/api/fetchHelper";
 import { ApiEventModel } from "./ApiEventModel";
 
-const _baseUrl = "/booking/events";
+const _baseUrl = "/api/booking/events";
 
 export const _eventController = {
     async retrieve(eventId: string) {

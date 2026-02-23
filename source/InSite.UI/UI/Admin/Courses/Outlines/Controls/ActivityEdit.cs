@@ -169,7 +169,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
             var dataItem = (AssetContentSection)e.Item.DataItem;
             if (ContentIdentifiers.ContainsKey(dataItem.Id))
-                throw new Exception("Invalid section ID: " + dataItem.Id);
+                throw new InvalidOperationException("Invalid section ID: " + dataItem.Id);
 
             var container = (DynamicControl)e.Item.FindControl("Container");
             var section = (SectionBase)container.LoadControl(dataItem.ControlPath);

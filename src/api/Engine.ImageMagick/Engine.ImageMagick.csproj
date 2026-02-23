@@ -35,16 +35,19 @@
     </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.10.2" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\..\library\Engine.Common\Engine.Common.csproj" />
 		<ProjectReference Include="..\..\library\Shift.Common\Shift.Common.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Analyzer Include="..\..\..\build\references\EyeSpy.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="NetVips" Version="3.2.0" />
+	  <PackageReference Include="NetVips.Extensions" Version="3.2.0" />
+	  <PackageReference Include="NetVips.Native.win-x64" Version="8.18.0" />
+	  <PackageReference Include="System.Drawing.Common" Version="10.0.2" />
 	</ItemGroup>
 
 </Project>

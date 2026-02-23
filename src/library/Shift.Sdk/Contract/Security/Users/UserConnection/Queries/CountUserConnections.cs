@@ -6,6 +6,8 @@ namespace Shift.Contract
 {
     public class CountUserConnections : Query<int>, IUserConnectionCriteria
     {
+        public Guid? OrganizationId { get; set; }
+
         public bool? IsLeader { get; set; }
         public bool? IsManager { get; set; }
         public bool? IsSupervisor { get; set; }

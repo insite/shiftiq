@@ -4,6 +4,6 @@ namespace Shift.Contract
 {
     public partial class EventMatch
     {
-        public Guid EventIdentifier { get; set; }
+        public Guid EventId { get; set; }
     }
 }
