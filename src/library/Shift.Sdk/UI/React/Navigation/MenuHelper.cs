@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Constant;
 using Shift.Sdk.UI.Navigation;
 
 namespace Shift.Contract
@@ -64,30 +63,37 @@ namespace Shift.Contract
 
         public List<NavigationList> GetAdminMenuGroups(INavigationIdentity identity)
         {
-            var result = new List<NavigationList>();
-            if (!identity.IsGranted(PermissionNames.Admin_Courses))
-                return result;
+            var menu = new List<NavigationList>();
 
-            foreach (var inputGroup in AdminMenu.Groups)
+            foreach (var adminGroups in AdminMenu.Groups)
             {
-                var outputItems = new List<NavigationItem>();
-                foreach (var inputItem in inputGroup.MenuItems)
+                var items = new List<NavigationItem>();
+
+                foreach (var adminGroupMenuItem in adminGroups.MenuItems)
                 {
-                    var actionName = inputItem.Url.Substring(1);
-                    if (!identity.IsGranted(actionName))
+                    var adminActionUrl = adminGroupMenuItem.Url.Substring(1);
+
+                    if (!identity.IsGranted(adminActionUrl))
                     {
-                        var action = _retrieveActionByUrl(actionName);
-                        if (action == null || !identity.IsGranted(action.PermissionParentActionUrl))
+                        var action = _retrieveActionByUrl(adminActionUrl);
+
+                        if (action == null)
+                            continue;
+
+                        var resource = action.PermissionParentActionUrl;
+
+                        if (resource == null || !identity.IsGranted(resource))
                             continue;
                     }
-                    outputItems.Add(new NavigationItem { Url = inputItem.Url, Icon = inputItem.Icon, Title = inputItem.Title });
+
+                    items.Add(new NavigationItem { Url = adminGroupMenuItem.Url, Icon = adminGroupMenuItem.Icon, Title = adminGroupMenuItem.Title });
                 }
 
-                if (outputItems.Count > 0)
-                    result.Add(new NavigationList { Title = inputGroup.Title, MenuItems = outputItems.ToArray() });
+                if (items.Count > 0)
+                    menu.Add(new NavigationList { Title = adminGroups.Title, MenuItems = items.ToArray() });
             }
 
-            return result;
+            return menu;
         }
     }
 }

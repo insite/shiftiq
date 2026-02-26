@@ -1,16 +1,15 @@
-# Progress / Achievements / Data
+# Record / Achievements / Data
 
-Achievements is part of the Progress subsystem.
+Achievements is a feature set in the Record application component.
   
-The **Data** folder contains code for - including entities, entity type configurations, entity readers and readers, entity adapters, and entity services. This is the **persistence** (or entity) layer for Progress Achievements.
+Classes in this Data folder implement data access for this feature set. This is the persistence layer for Achievements.
 
-## Proposed Improvements
+## (Proposed) Future Schema Changes
 
-When time and opportunity permit, the following database schema changes should be considered, to improve alignment with current naming conventions:
+When time and opportunity permit, the following database schema changes should be considered, to improve alignment with current database naming conventions:
 
-* Move table `QAchievement` from schema `achievements` to schema `progress`.
-* Move table `QAchievementPrerequisite` from schema `records` to schema `progress`.
-* Move table `TAchievementCategory` from schema `record` to schema `progress`.
-* Move table `TAchievementDepartment` from schema `achievements` to schema `progress`.
+* Move table `QAchievement` from schema `achievements` to schema `record`.
+* Move table `QAchievementPrerequisite` from schema `records` to schema `record`.
+* Move table `TAchievementDepartment` from schema `achievements` to schema `record`.
 * Rename table from `TAchievementDepartment` to `TAchievementGroup`.
-* Move table `TAchievementOrganization` from schema `achievements` to schema `progress`.
+* Move table `TAchievementOrganization` from schema `achievements` to schema `record`.

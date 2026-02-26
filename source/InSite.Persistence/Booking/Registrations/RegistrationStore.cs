@@ -216,6 +216,11 @@ namespace InSite.Persistence
                     registration.GradeWithheld = e.ChangeTime;
                     registration.GradeWithheldReason = e.Process?.Description;
                 }
+                else if (e.Status == "Unpublished")
+                {
+                    registration.GradingStatus = null;
+                    registration.GradePublished = null;
+                }
             });
         }
 

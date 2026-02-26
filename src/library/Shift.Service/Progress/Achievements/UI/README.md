@@ -1,5 +1,5 @@
-# Progress / Achievements / UI
+# Record / Achievements / UI
 
-Achievements is part of the Progress subsystem.
+Achievements is a feature set in the Record application component.
   
-The **UI** folder contains code for presentation logic. This is the code *behind* the **user interface** layer for Progress Achievements.
+Classes in this UI folder implement presentation logic for this feature set. This is the code behind the user interface layer for Achievements.

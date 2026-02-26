@@ -23,8 +23,6 @@ namespace InSite.Cmds.Admin.People.Controls
     {
         #region Constants
 
-        private const string TraineeGroupName = "Skills Passport";
-
         public static readonly string FieldPermission = PermissionNames.Custom_CMDS_Fields;
 
         #endregion
@@ -69,10 +67,10 @@ namespace InSite.Cmds.Admin.People.Controls
             ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.Testers, CmdsRole.Programmers);
             ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.Validators, CmdsRole.Programmers, CmdsRole.SystemAdministrators);
 
-            ApplyUserGroupAssignmentPermission(UserRoleList, $"{TraineeGroupName} Administrators", $"{TraineeGroupName} Administrators", $"{TraineeGroupName} Developers");
-            ApplyUserGroupAssignmentPermission(UserRoleList, $"{TraineeGroupName} Developers", $"{TraineeGroupName} Developers");
-            ApplyUserGroupAssignmentPermission(UserRoleList, $"{TraineeGroupName} Instructors", $"{TraineeGroupName} Administrators");
-            ApplyUserGroupAssignmentPermission(UserRoleList, $"{TraineeGroupName} Users", $"{TraineeGroupName} Administrators");
+            ApplyUserGroupAssignmentPermission(UserRoleList, $"{GroupNames.Trainee} Administrators", $"{GroupNames.Trainee} Administrators", $"{GroupNames.Trainee} Developers");
+            ApplyUserGroupAssignmentPermission(UserRoleList, $"{GroupNames.Trainee} Developers", $"{GroupNames.Trainee} Developers");
+            ApplyUserGroupAssignmentPermission(UserRoleList, $"{GroupNames.Trainee} Instructors", $"{GroupNames.Trainee} Administrators");
+            ApplyUserGroupAssignmentPermission(UserRoleList, $"{GroupNames.Trainee} Users", $"{GroupNames.Trainee} Administrators");
 
             ApplyUserGroupAssignmentPermission(UserRoleList, "TSSC Only Users", CmdsRole.Administrators, CmdsRole.Programmers, CmdsRole.SystemAdministrators);
         }
@@ -459,13 +457,13 @@ namespace InSite.Cmds.Admin.People.Controls
                 {
                     MembershipHelper.Save(groupId, user.UserIdentifier, "Membership");
 
-                    if (item.Text.StartsWith($"{TraineeGroupName} Users") &&
+                    if (item.Text.StartsWith(GroupNames.Trainee + " Users") &&
                         Organization.Toolkits.Contacts.EnableTraineeDepartment
                         )
                     {
                         var departmentId = DepartmentSearch.BindFirst(
                             x => (Guid?)x.DepartmentIdentifier,
-                            x => x.DepartmentName == TraineeGroupName && x.OrganizationIdentifier == organizationId);
+                            x => x.DepartmentName == GroupNames.Trainee && x.OrganizationIdentifier == organizationId);
 
                         if (departmentId != null)
                             MembershipStore.Save(MembershipFactory.Create(userKey, departmentId.Value, organizationId, "Department"));

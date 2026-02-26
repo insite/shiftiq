@@ -82,7 +82,10 @@ namespace InSite.UI.Layout.Portal.Controls
             ImpersonatorItem.Visible = isImpersonation;
 
             if (isImpersonation)
+            {
                 ImpersonatorName.Text = CurrentSessionState.Identity.Impersonator.User.FullName;
+                ImpersonatorAnchor.HRef = Urls.StopImpersonation;
+            }
         }
 
         public static string GetLogoImageUrl(ISecurityFramework security, HttpServerUtility server)

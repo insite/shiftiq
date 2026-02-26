@@ -6,8 +6,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-using Shift.Common;
-
 namespace Shift.Common
 {
     public abstract class ApiClientBase
@@ -207,6 +205,12 @@ namespace Shift.Common
                     {
                         status.Problem = CreateProblem(JsonDeserializationError, ex, endpoint, responseContent);
                     }
+                }
+                else
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    status.Problem = CreateProblem(response.StatusCode, endpoint, responseContent);
                 }
 
                 return status;

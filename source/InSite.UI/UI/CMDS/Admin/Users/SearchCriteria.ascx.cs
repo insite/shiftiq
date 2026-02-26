@@ -137,6 +137,9 @@ namespace InSite.Cmds.Controls.Contacts.Persons
             if (IsPostBack)
                 return;
 
+            IsCmdsAccessGranted.TrueText = "CMDS";
+            IsCmdsAccessGranted.FalseText = GroupNames.Trainee;
+
             if (!Identity.HasAccessToAllCompanies)
                 Company.Filter.UserIdentifier = User.UserIdentifier;
 

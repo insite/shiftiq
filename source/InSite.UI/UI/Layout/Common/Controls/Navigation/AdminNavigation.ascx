@@ -86,7 +86,7 @@
                             <li><a class="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/validator.pdf">Validator guide</a></li>
                             <li><a class="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/administrator.pdf">Administrator guide</a></li>
                             <li>
-                                <h6 class="dropdown-header pb-1">Orientation Guides (Skills Passport)</h6>
+                                <h6 class="dropdown-header pb-1">Orientation Guides</h6>
                             </li>
                             <li><a class="dropdown-item ms-2" href="https://hub.cmds.app/lobby/docs/guides/orientation.pdf">Orientations and certificates</a></li>
                             <li runat="server" id="KeyeraHeading">

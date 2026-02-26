@@ -107,6 +107,26 @@
                     <div class="px-3">
                         <asp:Literal runat="server" ID="UserIdentifierOutput" />
                     </div>
+                    <div class="form-text">
+                        Uniquely identifies this user across all organization accounts.
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <div class="float-end">
+                        
+                    </div>
+                    <label class="form-label">
+                        Person Identifier
+                    </label>
+                    <div class="px-3">
+                        <asp:Literal runat="server" ID="PersonIdentifierOutput" />
+                    </div>
+                    <div class="form-text">
+                        Uniquely identifies this user within the context of the 
+                        <strong><asp:Literal runat="server" ID="PersonOrganizationCode" /></strong>
+                        organization account.
+                    </div>
                 </div>
 
             </div>

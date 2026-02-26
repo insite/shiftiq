@@ -356,7 +356,7 @@
                                     
                                     <asp:Literal runat="server" ID="ApiAccessTokenInstruction" />
 
-                                    <div class="api-key-container">
+                                    <div runat="server" id="ApiAccessTokenContainer" visible="false" class="api-key-container">
                                         <div class="api-key-display">
                                             <span class="api-key-text" runat="server" id="ApiAccessToken"></span>
                                             <a href="javascript:void(0)" class="copy-link" onclick="copyApiKey('api-key-text', this); return false;">Copy</a>

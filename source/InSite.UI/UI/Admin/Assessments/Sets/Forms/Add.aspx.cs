@@ -220,7 +220,7 @@ namespace InSite.Admin.Assessments.Sets.Forms
                     CreatorStatus.AddMessage(AlertType.Error, $@"The file has no data.");
                 }
             }
-            catch (ApplicationError ex)
+            catch (Exception ex) when (ex is ApplicationError || ex is FormatException)
             {
                 ClearUploads();
                 CreatorStatus.AddMessage(AlertType.Error, $@"The uploaded file could not be parsed. " + ex.Message);

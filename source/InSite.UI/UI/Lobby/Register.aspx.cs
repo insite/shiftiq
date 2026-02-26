@@ -462,7 +462,7 @@ namespace InSite.UI.Lobby
                 MembershipHelper.Save(group.Value, user, null);
 
             if (CurrentSessionState.EnableUserRegistration && ServiceLocator.Partition.IsE03())
-                MembershipHelper.Save(OrganizationIdentifiers.CMDS, GroupTypes.Role, "Skills Passport Users", user, "Membership");
+                MembershipHelper.Save(OrganizationIdentifiers.CMDS, GroupTypes.Role, GroupNames.Trainee + " Users", user, "Membership");
 
             foreach (RepeaterItem outer in GroupList.Items)
             {

@@ -41,11 +41,11 @@ namespace InSite.Application.Events.Write
                 now,
                 eventSettings.OnlineEventAutomationWindowHours,
                 eventSettings.PaperEventAutomationWindowMonths,
-                x => x.Registrations);
+                x => x.Registrations.Select(y => y.Attempt));
 
             foreach (var @event in events)
             {
-                if (@event.Registrations.IsEmpty())
+                if (@event.Registrations.IsEmpty() || @event.Registrations.All(x => x.Attempt?.AttemptGraded == null))
                     continue;
 
                 var regIds = @event.Registrations.Select(x => x.RegistrationIdentifier).ToArray();

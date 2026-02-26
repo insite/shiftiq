@@ -60,10 +60,10 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
                             list.Add(id.ToString(), name);
                         break;
 
-                    case "Skills Passport Administrators":
-                    case "Skills Passport Developers":
-                    case "Skills Passport Instructors":
-                    case "Skills Passport Users":
+                    case GroupNames.Trainee + " Administrators":
+                    case GroupNames.Trainee + " Developers":
+                    case GroupNames.Trainee + " Instructors":
+                    case GroupNames.Trainee + " Users":
                         if (current.IsInRole(name))
                             list.Add(id.ToString(), name);
                         break;

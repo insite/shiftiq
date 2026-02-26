@@ -42,7 +42,7 @@
                                 </div>
                                 <div class="col-lg-2">
                                     <label class="form-label">Exclude</label>
-                                    <insite:TextBox runat="server" ID="ExcludeGroup" Text="Skills Passport" />
+                                    <insite:TextBox runat="server" ID="ExcludeGroup" />
                                 </div>
                                 <div class="col-lg-8">
                                     <label class="form-label d-block">Filter by</label>

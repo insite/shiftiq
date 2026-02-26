@@ -1,5 +1,5 @@
-# Progress / Achievements / Process
+# Record / Achievements / Process
 
-Achievements is part of the Progress subsystem.
+Achievements is a feature set in the Record application component.
   
-The **Process** folder contains application logic and business rules - including commands, command generators, command handlers, change handlers (projectors and processors), queries, and query handlers. This is the **application** layer for Achievements.
+Classes in this Process folder implement business logic and business rules for this feature set. This is the application layer for Achievements.

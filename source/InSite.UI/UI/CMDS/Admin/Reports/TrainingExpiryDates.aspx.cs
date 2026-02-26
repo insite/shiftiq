@@ -197,6 +197,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
             FindLearner.Enabled = FindDepartment.HasValue;
             FindLearner.Filter.OrganizationIdentifier = Organization.Identifier;
             FindLearner.Filter.GroupDepartmentIdentifiers = FindDepartment.Values;
+            if (ServiceLocator.Partition.IsE03())
+                FindLearner.Filter.GroupDepartmentFunctions = new[] { "Department" };
             FindLearner.Value = null;
 
             SetupFindAchievement();

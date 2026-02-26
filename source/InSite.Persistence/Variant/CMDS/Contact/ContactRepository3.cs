@@ -1921,7 +1921,10 @@ SELECT COUNT(*)
 
         public static List<CmdsRoleEntity> SelectRoles()
         {
-            const string query = @"
+            var cmdsGroupName = "CMDS %";
+            var traineeGroupName = GroupNames.Trainee + " %";
+
+            string query = $@"
 SELECT
     GroupIdentifier
   , GroupName
@@ -1931,8 +1934,8 @@ WHERE
     GroupType = 'Role'
     AND
         (
-            GroupName LIKE 'CMDS %'
-            OR GroupName LIKE 'Skills Passport %'
+            GroupName    LIKE '{cmdsGroupName}'
+            OR GroupName LIKE '{traineeGroupName}'
         )
 ORDER BY
     GroupName;

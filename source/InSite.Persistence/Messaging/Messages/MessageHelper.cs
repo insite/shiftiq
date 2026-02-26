@@ -277,7 +277,7 @@ namespace InSite.Persistence
             var html = ReplaceVariables(variables, text);
             html = CreateHtmlBody(null, html, false);
             html = ReplaceTemplates(html, MultilingualString.DefaultLanguage);
-            html = ReplacePlaceholdersForSmarterMail(organizationId, senderId, surveyFormAsset, html);
+            html = ReplacePlaceholdersForMailgun(organizationId, senderId, surveyFormAsset, html, new EmailVariables());
             html = ReplaceVariables(variables, html);
             html = HtmlBuilder.MoveCssInline(html);
             return html;

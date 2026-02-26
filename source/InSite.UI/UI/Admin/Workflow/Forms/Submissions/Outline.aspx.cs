@@ -194,40 +194,50 @@ namespace InSite.Admin.Workflow.Forms.Submissions
 
             BindAnswers();
 
-            if (Current.Survey.DisplaySummaryChart)
-            {
-                var chartQuestions = Current.Survey.Questions
-                    .Where(q => q.HasInput && q.Type == SurveyQuestionType.Likert)
-                    .Select(q =>
-                    {
-                        var likertType = ReviewDetails.GetLikertType(q.LikertAnalysis);
-                        if (likertType != ReviewDetails.LikertAnalysisType.Strategy1 && likertType != ReviewDetails.LikertAnalysisType.Strategy2)
-                            return default;
-
-                        var options = Current.Session.QResponseOptions
-                            .Where(x => x.SurveyQuestionIdentifier == q.Identifier)
-                            .OrderBy(x => x.OptionSequence)
-                            .ToArray();
-
-                        var likertScale = ReviewDetails.GetLikertScale(q, options, Current.Session.QResponseOptions, likertType);
-
-                        return likertScale?.Items == null || likertScale.Items.Count == 0
-                            ? default
-                            : (q.Content.Title.GetHtml(Current.Language, true), likertScale);
-                    })
-                    .Where(q => q != default)
-                    .ToArray();
-
-                SummaryChartPanel.Visible = chartQuestions.Length > 0;
-
-                (ChartBody.Text, ChartLegend.DataSource) = ReviewDetails.BuildSummaryBarChart(chartQuestions, false);
-
-                ChartLegend.DataBind();
-            }
+            BindSummaryChart();
 
             PageHelper.AutoBindHeader(
                 this,
                 qualifier: $"{Current.Survey.Name} <span class='form-text'>Form #{Current.Survey.Asset}</span>");
+        }
+
+        private void BindSummaryChart()
+        {
+            if (!Current.Survey.DisplaySummaryChart)
+                return;
+
+            var chartQuestions = Current.Survey.Questions
+                .Where(q => q.HasInput && q.Type == SurveyQuestionType.Likert)
+                .Select(q =>
+                {
+                    var likertType = ReviewDetails.GetLikertType(q.LikertAnalysis);
+                    if (likertType != ReviewDetails.LikertAnalysisType.Strategy1 && likertType != ReviewDetails.LikertAnalysisType.Strategy2)
+                        return default;
+
+                    var options = Current.Session.QResponseOptions
+                        .Where(x => x.SurveyQuestionIdentifier == q.Identifier)
+                        .OrderBy(x => x.OptionSequence)
+                        .ToArray();
+
+                    var likertScale = ReviewDetails.GetLikertScale(q, options, Current.Session.QResponseOptions, likertType);
+
+                    return likertScale?.Items == null || likertScale.Items.Count == 0
+                        ? default
+                        : (q.Content.Title.GetHtml(Current.Language, true), likertScale);
+                })
+                .Where(q => q != default)
+                .ToArray();
+
+            SummaryChartPanel.Visible = chartQuestions.Length > 0;
+
+            if (chartQuestions.Length == 0)
+                return;
+
+            var (html, legend) = ReviewDetails.BuildSummaryBarChart(chartQuestions, false);
+
+            ChartBody.Text = html;
+            ChartLegend.DataSource = legend;
+            ChartLegend.DataBind();
         }
 
         private void BindRespondentSection()

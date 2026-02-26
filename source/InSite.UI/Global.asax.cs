@@ -74,6 +74,9 @@ namespace InSite
 
             var appSettings = ServiceLocator.AppSettings;
 
+            // Test the new permission matrix only outside the Production environment.
+            CurrentIdentity.CompareOldAndNewPermissionLogic = !appSettings.Environment.IsProduction();
+
             _exceptionHandlers = ExceptionHandler.FromArray(appSettings.Platform.Integrity.ExceptionHandlers);
 
             var domain = appSettings.Partition.Domain;

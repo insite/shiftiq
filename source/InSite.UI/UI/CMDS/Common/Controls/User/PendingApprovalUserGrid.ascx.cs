@@ -74,7 +74,7 @@ namespace InSite.Cmds.Controls.User
                 .Where(x =>
                     string.Equals(x.OrganizationCode, "cmds", StringComparison.OrdinalIgnoreCase)
                     && x.GroupType == GroupTypes.Role
-                    && (x.Name.StartsWith("CMDS") || x.Name.StartsWith("Skills Passport"))
+                    && (x.Name.StartsWith("CMDS") || x.Name.StartsWith(GroupNames.Trainee))
                 )
                 .Select(x => x.Name)
                 .OrderBy(x => x)

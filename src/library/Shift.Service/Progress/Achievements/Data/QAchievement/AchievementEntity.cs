@@ -2,7 +2,7 @@ namespace Shift.Service.Progress;
 
 public partial class AchievementEntity
 {
-    public ICollection<QCredentialEntity> Credentials { get; set; } = new List<QCredentialEntity>();
+    public ICollection<CredentialEntity> Credentials { get; set; } = new List<CredentialEntity>();
     public ICollection<GradebookEntity> Gradebooks { get; set; } = new List<GradebookEntity>();
 
     public Guid AchievementIdentifier { get; set; }

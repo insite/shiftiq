@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-
-using Shift.Common;
 
 namespace Shift.Contract
 {
@@ -11,8 +8,11 @@ namespace Shift.Contract
         public Guid? AuthorityId { get; set; }
         public Guid CredentialId { get; set; }
         public Guid? EmployerGroupId { get; set; }
-        public Guid? OrganizationId { get; set; }
+        public Guid OrganizationId { get; set; }
         public Guid UserId { get; set; }
+
+        public bool AfterExpiryNotificationSent { get; set; }
+        public bool BeforeExpiryNotificationSent { get; set; }
 
         public string AuthorityLocation { get; set; }
         public string AuthorityName { get; set; }

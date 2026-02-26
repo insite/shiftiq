@@ -166,9 +166,9 @@ namespace InSite.UI
 
             var orientationRoles = new string[]
             {
-                "Skills Passport Administrators",
-                "Skills Passport Developers",
-                "Skills Passport Users"
+                GroupNames.Trainee + " Administrators",
+                GroupNames.Trainee + " Developers",
+                GroupNames.Trainee + " Users"
             };
 
             var isAssignedToOrientationRole = orientationRoles.Any(x => Identity.IsInRole(x));

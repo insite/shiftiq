@@ -39,7 +39,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th colspan="4"><strong>Skills Passport</strong></th>
+                <th colspan="4"><strong>Orientations</strong></th>
             </tr>
         </thead>
         <tbody>

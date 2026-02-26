@@ -119,11 +119,24 @@ namespace InSite.Admin.Contacts.People.Utilities
 
             user.SetDefaultPassword(Default.CmdsPassword);
 
-            user.Email = user.UserIdentifier.ToString().Substring(0, 8) + "@keyeracmds.com";
+            user.Email = CreateUniqueEmail();
             user.UtcArchived = DateTimeOffset.UtcNow;
             user.UtcUnarchived = null;
 
             UserStore.Update(user, null);
+        }
+
+        private static string CreateUniqueEmail()
+        {
+            string email;
+
+            do
+            {
+                email = UniqueIdentifier.Create().ToString().Substring(0, 8) + "@keyeracmds.com";
+            }
+            while (ServiceLocator.UserSearch.IsUserExist(email));
+
+            return email;
         }
 
         public void CmdsUnarchive(QUser user)

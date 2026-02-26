@@ -51,7 +51,7 @@ public class TableDbContext : DbContext
 
     // Feature: Progress
     internal DbSet<AchievementEntity> QAchievement { get; set; }
-    internal DbSet<QCredentialEntity> QCredential { get; set; }
+    internal DbSet<CredentialEntity> QCredential { get; set; }
     internal DbSet<GradebookEntity> QGradebook { get; set; }
     internal DbSet<QGradebookEnrollmentEntity> QGradebookEnrollment { get; set; }
     internal DbSet<PeriodEntity> QPeriod { get; set; }
@@ -125,7 +125,7 @@ public class TableDbContext : DbContext
 
         // Feature: Progress
         builder.ApplyConfiguration(new AchievementConfiguration());
-        builder.ApplyConfiguration(new QCredentialConfiguration());
+        builder.ApplyConfiguration(new CredentialConfiguration());
         builder.ApplyConfiguration(new GradebookConfiguration());
         builder.ApplyConfiguration(new QGradebookEnrollmentConfiguration());
         builder.ApplyConfiguration(new PeriodConfiguration());

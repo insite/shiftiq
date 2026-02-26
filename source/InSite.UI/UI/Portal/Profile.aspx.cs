@@ -57,50 +57,9 @@ namespace InSite.UI.Portal
 
             ProfilePictureUploadControl.ProfileUploadCompleted += ProfilePictureUploadCompletedHandler;
 
-            RegenerateSecret.Click += (x, y) =>
-            {
-                var person = ServiceLocator.PersonSearch.GetPerson(User.Identifier, Organization.Identifier);
+            RegenerateSecret.Click += RegenerateSecret_Click;
 
-                var personId = person.PersonIdentifier;
-
-                var tokenSettings = ServiceLocator.AppSettings.Security.Token;
-
-                var tokenLifetimeInMinutes = tokenSettings.Lifetime;
-
-                var secretExpiryInDays = tokenSettings.GetClientSecretLifetimeInDays();
-
-                TokenHelper.GetClientSecret(personId, true, secretExpiryInDays, tokenLifetimeInMinutes);
-
-                HttpResponseHelper.Redirect("/ui/portal/profile");
-            };
-
-            GenerateBearer.Click += (x, y) =>
-            {
-                var person = ServiceLocator.PersonSearch.GetPerson(User.Identifier, Organization.Identifier, p => p.Secrets);
-
-                var secret = person.Secrets.FirstOrDefault(s => s.SecretName == SecretName.ShiftClientSecret);
-
-                var response = RetrieveJwt(secret.SecretValue);
-
-                var token = response.AccessToken;
-
-                var expiry = DateTimeOffset.Now.AddSeconds(response.ExpiresIn);
-
-                var lifetime = TimeSpan.FromSeconds(response.ExpiresIn).Humanize();
-
-                var validUntil = Shift.Common.TimeZones.Format(expiry, User.TimeZone) + $" ({lifetime} from now)";
-
-                var instructions = $@"
-<div class='alert alert-success fs-sm'>
-<p>Your new token has been created successfully. It is valid until <strong>{validUntil}</strong>. Copy it now, because you will not be able to retrieve it again after leaving this page. (For your security, this token is <strong>not</strong> saved on our servers, so if you lose it before it expires, you will need to generate a new one.)</p>
-<p>Store your token in a secure place within your application or password manager.</p>
-<p>Your token is a <em>Bearer Authorization JSON Web Token</em>. Use it in your API requests via the Authorization header.</p>
-</div>
-";
-                ApiAccessToken.InnerText = token;
-                ApiAccessTokenInstruction.Text = instructions;
-                ApiAccessTokenPanel.Visible = true;
-            };
+            GenerateBearer.Click += GenerateBearer_Click;
         }
 
         private JwtResponse RetrieveJwt(string secret)
@@ -119,7 +78,15 @@ namespace InSite.UI.Portal
 
             var response = client.HttpPost<JwtResponse>("api/security/tokens/generate", request);
 
-            return response.Data;
+            if (response.Status == System.Net.HttpStatusCode.OK)
+                return response.Data;
+
+            var problem = response.Problem;
+
+            if (problem != null)
+                throw new ApiException($"{problem.Title}: {problem.Detail}");
+
+            throw new InvalidOperationException($"JWT retrieval failed. API request returned an unexpected response with status code {response.Status}");
         }
 
         protected override void OnLoad(EventArgs e)
@@ -195,6 +162,83 @@ namespace InSite.UI.Portal
 
             repeater.DataSource = memberships;
             repeater.DataBind();
+        }
+
+        private void RegenerateSecret_Click(object sender, EventArgs e)
+        {
+            if (User == null)
+                throw new ArgumentNullException("User");
+
+            if (Organization == null)
+                throw new ArgumentNullException("User");
+
+            var person = ServiceLocator.PersonSearch.GetPerson(User.Identifier, Organization.Identifier)
+                ?? throw new ArgumentNullException("person");
+
+            var personId = person.PersonIdentifier;
+
+            var tokenSettings = ServiceLocator.AppSettings.Security.Token;
+
+            var tokenLifetimeInMinutes = tokenSettings.Lifetime;
+
+            var secretExpiryInDays = tokenSettings.GetClientSecretLifetimeInDays();
+
+            TokenHelper.GetClientSecret(personId, true, secretExpiryInDays, tokenLifetimeInMinutes);
+
+            HttpResponseHelper.Redirect("/ui/portal/profile");
+        }
+
+        private void GenerateBearer_Click(object sender, EventArgs e)
+        {
+            if (User == null)
+                throw new ArgumentNullException("User");
+
+            if (Organization == null)
+                throw new ArgumentNullException("User");
+
+            var person = ServiceLocator.PersonSearch.GetPerson(User.Identifier, Organization.Identifier, p => p.Secrets);
+
+            var secret = person.Secrets.FirstOrDefault(s => s.SecretName == SecretName.ShiftClientSecret)
+                ?? throw new ArgumentNullException("secret");
+
+            var token = string.Empty;
+
+            var instructions = string.Empty;
+
+            try
+            {
+                var response = RetrieveJwt(secret.SecretValue) ?? throw new ArgumentNullException("response");
+
+                token = response.AccessToken;
+
+                var expiry = DateTimeOffset.Now.AddSeconds(response.ExpiresIn);
+
+                var lifetime = TimeSpan.FromSeconds(response.ExpiresIn).Humanize();
+
+                var validUntil = Shift.Common.TimeZones.Format(expiry, User.TimeZone) + $" ({lifetime} from now)";
+
+                instructions = $@"
+                    <div class='alert alert-success fs-sm'>
+                    <p>Your new token has been created successfully. It is valid until <strong>{validUntil}</strong>. Copy it now, because you will not be able to retrieve it again after leaving this page. (For your security, this token is <strong>not</strong> saved on our servers, so if you lose it before it expires, you will need to generate a new one.)</p>
+                    <p>Store your token in a secure place within your application or password manager.</p>
+                    <p>Your token is a <em>Bearer Authorization JSON Web Token</em>. Use it in your API requests via the Authorization header.</p>
+                    </div>
+                    ";
+
+                ApiAccessToken.InnerText = token;
+                ApiAccessTokenContainer.Visible = true;
+            }
+            catch (ApiException ex)
+            {
+                instructions = $@"
+                    <div class='alert alert-danger fs-sm'>
+                    <p>{ex.Message}</p>
+                    </div>
+                    ";
+            }
+
+            ApiAccessTokenInstruction.Text = instructions;
+            ApiAccessTokenPanel.Visible = true;
         }
 
         #endregion

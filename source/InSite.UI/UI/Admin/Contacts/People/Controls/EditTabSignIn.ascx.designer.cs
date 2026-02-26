@@ -186,6 +186,24 @@ namespace InSite.UI.Admin.Contacts.People.Controls
         protected global::System.Web.UI.WebControls.Literal UserIdentifierOutput;
 
         /// <summary>
+        /// PersonIdentifierOutput control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal PersonIdentifierOutput;
+
+        /// <summary>
+        /// PersonOrganizationCode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal PersonOrganizationCode;
+
+        /// <summary>
         /// MfaDisabled control.
         /// </summary>
         /// <remarks>

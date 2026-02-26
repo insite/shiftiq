@@ -114,6 +114,9 @@ namespace InSite.UI.Admin.Contacts.People.Controls
             UserIdentifierOutput.Text = person.UserIdentifier.ToString();
             DeleteLink.NavigateUrl = $"/ui/admin/contacts/people/delete?user={UserIdentifier}";
 
+            PersonIdentifierOutput.Text = person.PersonIdentifier.ToString();
+            PersonOrganizationCode.Text = Organization.OrganizationCode;
+
             IsUserAccessGranted.Checked = person.UserAccessGranted.HasValue;
             if (person.UserAccessGranted.HasValue && person.UserAccessGrantedBy.HasValue())
             {

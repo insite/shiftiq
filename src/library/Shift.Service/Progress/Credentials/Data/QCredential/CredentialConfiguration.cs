@@ -3,13 +3,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Shift.Service.Progress;
 
-public class QCredentialConfiguration : IEntityTypeConfiguration<QCredentialEntity>
+public class CredentialConfiguration : IEntityTypeConfiguration<CredentialEntity>
 {
-    public void Configure(EntityTypeBuilder<QCredentialEntity> builder)
+    public void Configure(EntityTypeBuilder<CredentialEntity> builder) 
     {
         builder.ToTable("QCredential", "achievements");
         builder.HasKey(x => new { x.CredentialIdentifier });
-
+            
         builder.Property(x => x.AchievementIdentifier).HasColumnName("AchievementIdentifier").IsRequired();
         builder.Property(x => x.UserIdentifier).HasColumnName("UserIdentifier").IsRequired();
         builder.Property(x => x.CredentialGranted).HasColumnName("CredentialGranted");
@@ -51,6 +51,8 @@ public class QCredentialConfiguration : IEntityTypeConfiguration<QCredentialEnti
         builder.Property(x => x.OrganizationIdentifier).HasColumnName("OrganizationIdentifier");
         builder.Property(x => x.EmployerGroupIdentifier).HasColumnName("EmployerGroupIdentifier");
         builder.Property(x => x.EmployerGroupStatus).HasColumnName("EmployerGroupStatus").IsUnicode(false).HasMaxLength(100);
+        builder.Property(x => x.BeforeExpiryNotificationSent).HasColumnName("BeforeExpiryNotificationSent").IsRequired();
+        builder.Property(x => x.AfterExpiryNotificationSent).HasColumnName("AfterExpiryNotificationSent").IsRequired();
 
     }
 }

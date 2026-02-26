@@ -229,17 +229,26 @@ namespace InSite.Domain.Foundations
 
         public bool IsGranted(Guid? actionId, DataAccess? operation = null)
         {
-            var isGrantedWithOldLogic = IsGrantedWithOldLogic(actionId, operation);
-
             var isGrantedWithNewLogic = IsGrantedWithNewLogic(actionId, operation);
 
-            if (isGrantedWithOldLogic != isGrantedWithNewLogic)
-                throw new InvalidOperationException($"The old authorization logic {(isGrantedWithOldLogic ? "grants" : "denies")} access"
-                    + $" to {Name} on action"
-                    + $" {actionId} and the new authorization logic {(isGrantedWithNewLogic ? "grants" : "denies")} access."
-                    + " This means there is an unexpected problem in the new permission matrix.");
+            if (CompareOldAndNewPermissionLogic)
+            {
+                var isGrantedWithOldLogic = IsGrantedWithOldLogic(actionId, operation);
 
-            return isGrantedWithOldLogic;
+                if (isGrantedWithOldLogic != isGrantedWithNewLogic)
+                {
+                    var action = ApplicationContext.GetAction(actionId.Value);
+
+                    var resource = action.Url;
+
+                    throw new InvalidOperationException($"The old authorization logic {(isGrantedWithOldLogic ? "grants" : "denies")} access"
+                        + $" to {Name} on action"
+                        + $" {actionId} ({resource}) and the new authorization logic {(isGrantedWithNewLogic ? "grants" : "denies")} access."
+                        + " This means there is an unexpected problem in the new permission matrix.");
+                }
+            }
+
+            return isGrantedWithNewLogic;
         }
 
         private bool IsGrantedWithOldLogic(Guid? actionId, DataAccess? operation = null)
@@ -258,9 +267,9 @@ namespace InSite.Domain.Foundations
             if (action == null)
                 return false;
 
-            var isLearner = Person?.IsLearner ?? false;
+            var isLearnerOrAdmin = Person != null && (Person.IsLearner || Person.IsAdministrator || Person.IsDeveloper);
 
-            var isPortal = isLearner && (action.Identifier == PortalActionIdentifier || action.Parent == PortalActionIdentifier);
+            var isPortal = isLearnerOrAdmin && (action.Identifier == PortalActionIdentifier || action.Parent == PortalActionIdentifier);
             if (isPortal)
                 return true;
 
@@ -300,15 +309,22 @@ namespace InSite.Domain.Foundations
 
         public bool IsGranted(string actionUrl, DataAccess? operation = null)
         {
-            if (actionUrl.Contains("?"))
-                actionUrl = actionUrl.Substring(0, actionUrl.IndexOf("?"));
+            Guid? actionId = null;
 
-            if (actionUrl.StartsWith("/"))
-                actionUrl = actionUrl.Substring(1);
+            if (!string.IsNullOrEmpty(actionUrl))
+            {
+                if (actionUrl.Contains("?"))
+                    actionUrl = actionUrl.Substring(0, actionUrl.IndexOf("?"));
 
-            var action = ApplicationContext.GetAction(actionUrl);
+                if (actionUrl.StartsWith("/"))
+                    actionUrl = actionUrl.Substring(1);
 
-            return IsGranted(action?.Identifier, operation);
+                var action = ApplicationContext.GetAction(actionUrl);
+
+                actionId = action?.Identifier;
+            }
+
+            return IsGranted(actionId, operation);
         }
 
         public bool IsInRole(string role)
@@ -316,6 +332,8 @@ namespace InSite.Domain.Foundations
 
         public string Name
             => IsAuthenticated ? User.Email : UserNames.Someone;
+
+        public static bool CompareOldAndNewPermissionLogic { get; set; }
 
         public string ChangeLanguage(string language)
         {

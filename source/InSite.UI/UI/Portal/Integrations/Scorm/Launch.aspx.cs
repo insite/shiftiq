@@ -93,8 +93,9 @@ namespace InSite.UI.Portal.Integrations.Scorm
 
             var encodedExitUrl = StringHelper.EncodeBase64(activityUrl);
 
-            var progressUrl = StringHelper.Replace(
-                PathHelper.GetAbsoluteUrl(scoop.CallbackPath), "{activity}", activityId.ToString());
+            var progressUrl = StringHelper.Replace(PathHelper.GetAbsoluteUrl(scoop.CallbackPath), "{activity}", activityId.ToString());
+
+            progressUrl = StringHelper.Replace(progressUrl, "{learner}", User.Identifier.ToString());
 
             var encodedProgressUrl = StringHelper.EncodeBase64(progressUrl);
 

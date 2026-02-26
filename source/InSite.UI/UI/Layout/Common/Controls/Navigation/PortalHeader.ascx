@@ -43,12 +43,6 @@
 
                         <uc:AdminMenu runat="server" ID="AdminMenu" />
 
-                        <li runat="server" id="ImpersonatorItem" class="nav-item fs-sm">
-                            <a runat="server" id="ImpersonationAnchor" class="nav-link text-warning" href="#">
-                                <i class="fa-regular fa-user-secret me-1"></i>
-                                <asp:Literal runat="server" ID="ImpersonatorName" />
-                            </a>
-                        </li>
                         <li runat="server" id="CartItem" class="nav-item fs-sm pe-2" visible="false">
                             <a runat="server" id="CartLink" class="nav-link position-relative" href="#" title="Cart">
                                 <i class="fas fa-shopping-cart fs-5"></i>
@@ -61,6 +55,14 @@
                         <li runat="server" id="UserNavItem" class="nav-item fs-sm dropdown">
                             <uc:UserNavMenu runat="server" ID="UserNav"/>
                         </li>
+
+                        <li runat="server" id="ImpersonatorItem" class="nav-item fs-sm">
+                            <a runat="server" id="ImpersonatorAnchor" class="nav-link text-danger">
+                                <i class="fa-regular fa-user-secret me-2 fa-width-auto"></i>
+                                <asp:Literal runat="server" ID="ImpersonatorName" />
+                            </a>
+                        </li>
+
                         <li runat="server" id="HelpMenuItem" class="nav-item fs-sm dropdown">
     
                             <a runat="server" id="HelpMenuAnchor" href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fa-regular fa-question-circle me-1"></i>Help</a>

@@ -78,33 +78,6 @@ namespace InSite.UI.Layout.Portal.Controls
         protected global::InSite.UI.Layout.Common.Controls.Navigation.AdminMenu AdminMenu;
 
         /// <summary>
-        /// ImpersonatorItem control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ImpersonatorItem;
-
-        /// <summary>
-        /// ImpersonationAnchor control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor ImpersonationAnchor;
-
-        /// <summary>
-        /// ImpersonatorName control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ImpersonatorName;
-
-        /// <summary>
         /// CartItem control.
         /// </summary>
         /// <remarks>
@@ -148,6 +121,33 @@ namespace InSite.UI.Layout.Portal.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Layout.Common.Controls.UserNavMenu UserNav;
+
+        /// <summary>
+        /// ImpersonatorItem control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ImpersonatorItem;
+
+        /// <summary>
+        /// ImpersonatorAnchor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor ImpersonatorAnchor;
+
+        /// <summary>
+        /// ImpersonatorName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ImpersonatorName;
 
         /// <summary>
         /// HelpMenuItem control.

@@ -15,8 +15,6 @@ namespace InSite.UI.Layout.Lobby
 
         protected CultureInfo CurrentLanguageCulture => CultureInfo.GetCultureInfo(CurrentLanguage);
 
-        protected static Domain.Organizations.OrganizationState Organization => OrganizationSearch.Select(CookieTokenModule.Current.OrganizationCode);
-
         protected static bool IsContentItem(RepeaterItemEventArgs e) => IsContentItem(e.Item);
 
         protected static bool IsContentItem(RepeaterItem item)
@@ -36,6 +34,6 @@ namespace InSite.UI.Layout.Lobby
         }
 
         protected string GetDisplayText(string attribute) 
-            => LabelSearch.GetTranslation(attribute, CurrentLanguage, Organization.OrganizationIdentifier);
+            => LabelSearch.GetTranslation(attribute, CurrentLanguage, CurrentSessionState.Identity.OrganizationId);
     }
 }

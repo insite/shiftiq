@@ -46,6 +46,8 @@ namespace InSite.Cmds.Actions.Reports
             if (IsPostBack)
                 return;
 
+            ExcludeGroup.Text = GroupNames.Trainee;
+
             PageHelper.AutoBindHeader(this);
 
             BindModelToControls();

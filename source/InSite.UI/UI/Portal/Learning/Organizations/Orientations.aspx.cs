@@ -63,8 +63,10 @@ namespace InSite.UI.Portal.Learning.Organizations
 
             PersonStore.Insert(PersonFactory.Create(user, organizationId, null, false, null));
 
+            var traineeGroupName = GroupNames.Trainee + " Users";
+
             var group = ServiceLocator.GroupSearch
-                .GetGroups(new QGroupFilter { GroupName = "Skills Passport Users", OrganizationIdentifier = OrganizationIdentifiers.CMDS })
+                .GetGroups(new QGroupFilter { GroupName = traineeGroupName, OrganizationIdentifier = OrganizationIdentifiers.CMDS })
                 .FirstOrDefault();
 
             if (MembershipPermissionHelper.CanModifyMembership(group.GroupIdentifier))

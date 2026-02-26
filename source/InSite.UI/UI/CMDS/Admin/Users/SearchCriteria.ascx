@@ -99,9 +99,7 @@
         </div>
 
         <div class="mb-2">
-            <insite:BooleanComboBox ID="IsCmdsAccessGranted" runat="server"
-                TrueText="CMDS"
-                FalseText="Skills Passport" />
+            <insite:BooleanComboBox ID="IsCmdsAccessGranted" runat="server" />
         </div>
 
     </div>

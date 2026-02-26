@@ -2,7 +2,7 @@
 
 <div runat="server" ID="SummaryTableWrapper" class="training-panel mb-3">
 
-    <h3>Orientation Summary (Skills Passport)</h3>
+    <h3>Orientation Summary</h3>
 
     <asp:Repeater runat="server" ID="Repeater">
         <HeaderTemplate>

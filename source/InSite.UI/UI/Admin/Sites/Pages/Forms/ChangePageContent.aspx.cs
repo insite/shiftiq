@@ -119,15 +119,15 @@ namespace InSite.Admin.Sites.Pages
 
             ServiceLocator.SendCommand(new InSite.Application.Pages.Write.ChangePageContent(page.PageIdentifier, content));
 
-            var title = content["Title"]?.Text?.Default;
+            var title = StringHelper.StripMarkdown(content["Title"]?.Text?.Default);
 
-            if (title != null)
+            if (!string.IsNullOrEmpty(title))
             {
+                if (title.Length > 128)
+                    title = title.Substring(0, 128);
+
                 var commands = new PageCommandGenerator().
-                GetDifferencePageSetupCommands(
-                    GetEntityValues(),
-                    GetInputValues(title)
-                );
+                GetDifferencePageSetupCommands(GetEntityValues(), GetInputValues(title));
 
                 foreach (var command in commands)
                 {

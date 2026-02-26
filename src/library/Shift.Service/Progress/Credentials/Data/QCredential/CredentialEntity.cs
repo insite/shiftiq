@@ -1,6 +1,6 @@
 namespace Shift.Service.Progress;
 
-public partial class QCredentialEntity
+public partial class CredentialEntity
 {
     public AchievementEntity? Achievement { get; set; }
 
@@ -8,8 +8,11 @@ public partial class QCredentialEntity
     public Guid? AuthorityIdentifier { get; set; }
     public Guid CredentialIdentifier { get; set; }
     public Guid? EmployerGroupIdentifier { get; set; }
-    public Guid? OrganizationIdentifier { get; set; }
+    public Guid OrganizationIdentifier { get; set; }
     public Guid UserIdentifier { get; set; }
+
+    public bool AfterExpiryNotificationSent { get; set; }
+    public bool BeforeExpiryNotificationSent { get; set; }
 
     public string? AuthorityLocation { get; set; }
     public string? AuthorityName { get; set; }

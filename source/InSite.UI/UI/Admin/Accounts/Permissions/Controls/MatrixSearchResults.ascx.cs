@@ -98,6 +98,7 @@ namespace InSite.Admin.Accounts.Permissions.Controls
         {
             var row = e.Row;
             var rowIndex = e.Row.RowIndex;
+            var colIndex = 0;
             var k = new List<string>();
             foreach (TableCell item in e.Row.Cells)
             {
@@ -108,7 +109,7 @@ namespace InSite.Admin.Accounts.Permissions.Controls
             for (int i = 1; i < row.Cells.Count; i++)
             {
                 var value = row.Cells[i].Text;
-                var ddl = GetDropDownList(rowIndex, i, value);
+                var ddl = GetDropDownList(rowIndex, colIndex, value);
                 var cell = e.Row.Cells[i];
 
                 var color = _colors[0];
@@ -133,6 +134,8 @@ namespace InSite.Admin.Accounts.Permissions.Controls
                 cell.Text = ddl;
                 cell.Style[HtmlTextWriterStyle.BackgroundColor] = color;
                 cell.Style[HtmlTextWriterStyle.TextAlign] = "center";
+
+                colIndex++;
             }
         }
 

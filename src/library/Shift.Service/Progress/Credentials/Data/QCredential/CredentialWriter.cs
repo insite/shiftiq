@@ -4,16 +4,16 @@ using Shift.Common;
 
 namespace Shift.Service.Progress;
 
-public class QCredentialWriter : IEntityWriter
+public class CredentialWriter : IEntityWriter
 {
     private readonly IDbContextFactory<TableDbContext> _context;
 
-    public QCredentialWriter(IDbContextFactory<TableDbContext> context)
+    public CredentialWriter(IDbContextFactory<TableDbContext> context)
     {
         _context = context;
     }
 
-    public async Task<bool> CreateAsync(QCredentialEntity entity, CancellationToken cancellation = default)
+    public async Task<bool> CreateAsync(CredentialEntity entity, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 
@@ -22,18 +22,6 @@ public class QCredentialWriter : IEntityWriter
             return false;
 
         await db.QCredential.AddAsync(entity, cancellation);
-        return await db.SaveChangesAsync(cancellation) > 0;
-    }
-
-    public async Task<bool> ModifyAsync(QCredentialEntity entity, CancellationToken cancellation = default)
-    {
-        using var db = _context.CreateDbContext();
-
-        var exists = await AssertAsync(entity.CredentialIdentifier, cancellation, db);
-        if (!exists)
-            return false;
-
-        db.Entry(entity).State = EntityState.Modified;
         return await db.SaveChangesAsync(cancellation) > 0;
     }
 
@@ -46,6 +34,18 @@ public class QCredentialWriter : IEntityWriter
             return false;
 
         db.QCredential.Remove(entity);
+        return await db.SaveChangesAsync(cancellation) > 0;
+    }
+
+    public async Task<bool> ModifyAsync(CredentialEntity entity, CancellationToken cancellation = default)
+    {
+        using var db = _context.CreateDbContext();
+
+        var exists = await AssertAsync(entity.CredentialIdentifier, cancellation, db);
+        if (!exists)
+            return false;
+
+        db.Entry(entity).State = EntityState.Modified;
         return await db.SaveChangesAsync(cancellation) > 0;
     }
 
