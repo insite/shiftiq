@@ -7,6 +7,7 @@ using InSite.Domain.Foundations;
 using InSite.Domain.Organizations;
 
 using Shift.Common;
+using Shift.Constant;
 
 using PersonModel = InSite.Domain.Foundations.Person;
 using UserModel = InSite.Domain.Foundations.User;
@@ -97,7 +98,11 @@ namespace InSite.Persistence
                 if (!enabled)
                     continue;
 
-                model.Groups.Add(GroupAdapter.CreateGroupPacket(group));
+                var groupModel = GroupAdapter.CreateGroupPacket(group);
+                model.Groups.Add(groupModel);
+
+                if (groupModel.Type != GroupType.Role)
+                    continue;
 
                 var permissions = TGroupPermissionSearch.Select(x => x.GroupIdentifier == group.GroupIdentifier);
                 foreach (var permission in permissions)

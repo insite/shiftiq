@@ -7,6 +7,8 @@ using System.Xml;
 using InSite.Application.Attempts.Read;
 using InSite.Persistence;
 
+using Shift.Common;
+
 namespace InSite.Admin.Attempts.Reports.Downloads
 {
     public static class QTIWriter
@@ -16,14 +18,18 @@ namespace InSite.Admin.Attempts.Reports.Downloads
             var attempts = ServiceLocator.AttemptSearch.GetAttempts(filter, x => x.Form.Bank);
 
             var registrationIdentifiers = attempts.Where(x => x.RegistrationIdentifier != null).Select(x => x.RegistrationIdentifier.Value).Distinct().ToList();
-            var learnerTypes = ServiceLocator.RegistrationSearch.GetLearnerTypes(registrationIdentifiers);
-            var learners = PersonCriteria.Bind(
-                x => new { x.UserIdentifier, x.PersonCode },
-                new PersonFilter
-                {
-                    OrganizationIdentifier = CurrentSessionState.Identity.Organization.Identifier,
-                    IncludeUserIdentifiers = attempts.Select(x => x.LearnerUserIdentifier).Distinct().ToArray()
-                });
+            var learnerTypes = ServiceLocator.RegistrationSearch
+                .GetLearnerTypes(registrationIdentifiers)
+                .ToDictionary(x => x.RegistrationIdentifier, x => x.LearnerType);
+            var learners = PersonCriteria
+                .Bind(
+                    x => new { x.UserIdentifier, x.PersonCode },
+                    new PersonFilter
+                    {
+                        OrganizationIdentifier = CurrentSessionState.Identity.Organization.Identifier,
+                        IncludeUserIdentifiers = attempts.Select(x => x.LearnerUserIdentifier).Distinct().ToArray()
+                    })
+                .ToDictionary(x => x.UserIdentifier, x => x.PersonCode);
 
             byte[] xml;
 
@@ -45,8 +51,10 @@ namespace InSite.Admin.Attempts.Reports.Downloads
 
                     foreach (var attempt in attempts)
                     {
-                        var code = learners.FirstOrDefault(x => x.UserIdentifier == attempt.LearnerUserIdentifier)?.PersonCode;
-                        var type = learnerTypes.FirstOrDefault(x => x.RegistrationIdentifier == attempt.RegistrationIdentifier)?.LearnerType;
+                        var code = learners.GetOrDefault(attempt.LearnerUserIdentifier);
+                        var type = attempt.RegistrationIdentifier.HasValue
+                            ? learnerTypes.GetOrDefault(attempt.RegistrationIdentifier.Value)
+                            : null;
                         WriteAttempt(code, type, attempt, writer);
                     }
 

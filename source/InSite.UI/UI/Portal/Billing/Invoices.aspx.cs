@@ -28,6 +28,7 @@ namespace InSite.UI.Portal.Billing
         public string InvoiceStatus { get; set; }
         public string InvoiceSubmitted { get; set; }
         public string ItemsHtml { get; set; }
+        public bool HasRegistrationItem { get; set; }
     }
 
     public partial class Invoices : PortalBasePage
@@ -63,16 +64,7 @@ namespace InSite.UI.Portal.Billing
             var invoices = ServiceLocator
                 .InvoiceSearch
                 .GetInvoices(invoiceFilter)
-                .Select(x => new SearchResultPacket()
-                {
-                    InvoiceAmount = x.InvoiceAmount,
-                    InvoiceDrafted = GetDateString(x.InvoiceDrafted),
-                    InvoiceIdentifier = x.InvoiceIdentifier,
-                    InvoicePaid = GetDateString(x.InvoicePaid),
-                    InvoiceSubmitted = GetDateString(x.InvoiceSubmitted),
-                    InvoiceStatus = x.InvoiceStatus,
-                    ItemsHtml = GetInvoiceItemsHtml(x.InvoiceIdentifier)
-                })
+                .Select(GetPacket)
                 .ToList();
 
             if (invoices.Count > 0)
@@ -98,16 +90,7 @@ namespace InSite.UI.Portal.Billing
             var invoices = ServiceLocator
                .InvoiceSearch
                .GetInvoices(receiptFilter)
-               .Select(x => new SearchResultPacket()
-               {
-                   InvoiceAmount = x.InvoiceAmount,
-                   InvoiceDrafted = GetDateString(x.InvoiceDrafted),
-                   InvoiceIdentifier = x.InvoiceIdentifier,
-                   InvoicePaid = GetDateString(x.InvoicePaid),
-                   InvoiceSubmitted = GetDateString(x.InvoiceSubmitted),
-                   InvoiceStatus = x.InvoiceStatus,
-                   ItemsHtml = GetInvoiceItemsHtml(x.InvoiceIdentifier)
-               })
+               .Select(GetPacket)
                .ToList();
 
             if (invoices.Count > 0)
@@ -119,6 +102,33 @@ namespace InSite.UI.Portal.Billing
             PaidInvoicePanel.Visible = invoices.Count > 0;
 
             return invoices.Count > 0;
+        }
+
+        private SearchResultPacket GetPacket(VInvoice invoice)
+        {
+            var html = new StringBuilder();
+            var items = ServiceLocator.InvoiceSearch.GetInvoiceItems(invoice.InvoiceIdentifier);
+            if (items.Count > 0)
+            {
+                html.Append("<ul>");
+                foreach (var item in items)
+                    html.Append($"<li>{item.ItemDescription}</li>");
+                html.Append("</ul>");
+            }
+
+            var hasRegistrationItem = items.Any(x => x.ItemDescription.Contains("activity registration", StringComparison.OrdinalIgnoreCase));
+
+            return new SearchResultPacket
+            {
+                InvoiceAmount = invoice.InvoiceAmount,
+                InvoiceDrafted = GetDateString(invoice.InvoiceDrafted),
+                InvoiceIdentifier = invoice.InvoiceIdentifier,
+                InvoicePaid = GetDateString(invoice.InvoicePaid),
+                InvoiceSubmitted = GetDateString(invoice.InvoiceSubmitted),
+                InvoiceStatus = invoice.InvoiceStatus,
+                ItemsHtml = html.ToString(),
+                HasRegistrationItem = hasRegistrationItem
+            };
         }
 
         private void LoadData()
@@ -152,20 +162,6 @@ namespace InSite.UI.Portal.Billing
                 StatusAlert.AddMessage(AlertType.Warning, Translate("There are no invoices for you"));
         }
 
-        private string GetInvoiceItemsHtml(Guid invoice)
-        {
-            var items = ServiceLocator.InvoiceSearch.GetInvoiceItems(invoice);
-            if (items.Count == 0)
-                return null;
-
-            var html = new StringBuilder();
-            html.Append("<ul>");
-            foreach (var item in items)
-                html.Append($"<li>{item.ItemDescription}</li>");
-            html.Append("</ul>");
-            return html.ToString();
-        }
-
         private void Repeater_ItemCreated(object sender, RepeaterItemEventArgs e)
         {
             if (!RepeaterHelper.IsContentItem(e))
@@ -189,6 +185,10 @@ namespace InSite.UI.Portal.Billing
 
             var printInvoiceButton = (UxButton)e.Item.FindControl("PrintInvoiceButton");
             printInvoiceButton.Visible = canPrintReport;
+
+            var payButton = (UxButton)e.Item.FindControl("PayInvoiceButton");
+            payButton.Visible = (packet.InvoiceStatus == "Submitted" || packet.InvoiceStatus == "PaymentFailed")
+                && !packet.HasRegistrationItem;
 
             var invoiceIdentifierLiteral = (Literal)e.Item.FindControl("InvoiceIdentifier");
             invoiceIdentifierLiteral.Text = invoiceIdentifier.ToString();

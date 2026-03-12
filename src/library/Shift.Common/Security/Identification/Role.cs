@@ -34,6 +34,7 @@ namespace Shift.Common
     {
         private const string Prefix = "(System) ";
 
+        public const string Any = Prefix + "Any";
         public const string Guest = Prefix + "Guest";
         public const string Member = Prefix + "Member";
         public const string Trainee = Prefix + "Trainee";

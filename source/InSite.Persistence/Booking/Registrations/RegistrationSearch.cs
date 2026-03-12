@@ -858,17 +858,27 @@ namespace InSite.Persistence
 
         public List<RegistrationLearnerTypeModel> GetLearnerTypes(List<Guid> registrations)
         {
+            const int batchSize = 1500;
+
+            var itemsCount = registrations.Count;
+            var result = new List<RegistrationLearnerTypeModel>();
+
             using (var db = CreateContext())
             {
-                return db.Registrations.AsNoTracking().AsQueryable()
-                    .Where(x => registrations.Any(r => r == x.RegistrationIdentifier))
-                    .Select(x => new RegistrationLearnerTypeModel
-                    {
-                        RegistrationIdentifier = x.RegistrationIdentifier,
-                        LearnerType = x.CandidateType
-                    })
-                    .ToList();
+                for (var i = 0; i < itemsCount; i += batchSize)
+                {
+                    var batch = registrations.Skip(i).Take(batchSize).ToArray();
+                    result.AddRange(db.Registrations.AsNoTracking()
+                        .Where(x => batch.Contains(x.RegistrationIdentifier))
+                        .Select(x => new RegistrationLearnerTypeModel
+                        {
+                            RegistrationIdentifier = x.RegistrationIdentifier,
+                            LearnerType = x.CandidateType
+                        }));
+                }
             }
+
+            return result;
         }
     }
 }

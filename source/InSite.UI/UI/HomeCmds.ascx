@@ -136,8 +136,10 @@
                                                     <asp:Repeater ID="SecondaryProfilesNotForCompliance" runat="server">
                                                         <ItemTemplate>
                                                             <div class="mb-3">
-                                                                <%# Eval("ProfileName") %>
-                                                                <%# Eval("ProfileStatusName") != DBNull.Value ? "(" + Eval("ProfileStatusName") + ")": "" %>
+                                                                <asp:HyperLink runat="server" NavigateUrl='<%# "/ui/cmds/portal/validations/competencies/search?profile=" + Eval("ProfileStandardIdentifier") + "&userID=" + Eval("UserIdentifier") + "&department=" + Eval("DepartmentIdentifier") %>'>
+                                                                    <%# Eval("ProfileName") %>
+                                                                    <%# Eval("ProfileStatusName") != DBNull.Value ? "(" + Eval("ProfileStatusName") + ")": "" %>
+                                                                </asp:HyperLink>
                                                             </div>
                                                         </ItemTemplate>
                                                     </asp:Repeater>

@@ -136,7 +136,7 @@
                     </div>
 
                     <div class="modal-body">
-                        <textarea name="text" class="form-control" rows="2" cols="20" style="width:100%;height:150px;resize:none;" required></textarea>
+                        <textarea name="text" class="form-control" rows="2" cols="20" style="width:100%;height:150px;resize:none;" required maxlength="1200"></textarea>
                     </div>
 
                     <div class="modal-footer">

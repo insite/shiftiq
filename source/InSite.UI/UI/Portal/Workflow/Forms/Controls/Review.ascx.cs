@@ -30,6 +30,8 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 DownloadAnsweredButton.Visible = Current.Survey.UserFeedback == UserFeedbackType.Answered;
             }
 
+            HomeButton.Visible = Current.AssessorUserIdentifier != UserIdentifiers.Someone;
+
             SetupBackButton();
         }
 

@@ -39,9 +39,9 @@ namespace InSite.UI.Portal.Learning
 
             var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
 
-            var roles = Identity.Groups.Select(x => x.Name).ToList();
+            var roleNames = Identity.GetRoleNames();
 
-            if (permissions.IsDenied("ui/home#training-plan", roles))
+            if (permissions.IsDenied("ui/home#training-plan", roleNames))
                 HttpResponseHelper.SendHttp403();
         }
 
@@ -182,11 +182,11 @@ namespace InSite.UI.Portal.Learning
 
         public static bool ShowSafetyAchievementsOnly()
         {
-            var roles = Identity.Groups.Select(x => x.Name).ToList();
+            var roleNames = Identity.GetRoleNames();
 
             var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
 
-            var safetyAchievementsOnly = permissions.IsDenied("ui/home#safety-achievements-only", roles);
+            var safetyAchievementsOnly = permissions.IsDenied("ui/home#safety-achievements-only", roleNames);
 
             return safetyAchievementsOnly;
         }

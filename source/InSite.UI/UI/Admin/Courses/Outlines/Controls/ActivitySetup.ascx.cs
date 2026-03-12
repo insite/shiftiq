@@ -11,6 +11,7 @@ using InSite.Domain.Courses;
 using InSite.Persistence;
 
 using Shift.Common;
+using Shift.Common.Timeline.Exceptions;
 using Shift.Constant;
 
 namespace InSite.Admin.Courses.Outlines.Controls
@@ -73,6 +74,13 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 Course2Store.UpdateActivity(CourseIdentifier, activity, null);
 
                 HttpResponseHelper.Redirect(UrlParser.BuildRelativeUrl(Request.RawUrl, "panel", "activity", "tab", "activity"));
+            }
+            catch (UnhandledCommandException unex)
+            {
+                if (unex.InnerException is Application.Records.LockedGradebookException)
+                    ActivitySetupAlert.AddMessage(AlertType.Error, $"Modifications are not permitted while the gradebook is locked. Please unlock it before making any changes.");
+                else
+                    throw;
             }
             catch (Application.Records.AchievementException ex)
             {

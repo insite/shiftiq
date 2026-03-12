@@ -475,14 +475,8 @@ namespace Shift.Common
             // Explicitly grant full access on all resources to all system operators.
             GrantAccess(Wildcard, SystemRole.Operator, Wildcard, resourcePermissions);
 
-            // Explicitly grant portal access to all learners.
-            GrantAccess("Portal", SystemRole.Learner, "data:read", resourcePermissions);
-
-            // Explicitly grant portal access to all administrators.
-            GrantAccess("Portal", SystemRole.Administrator, "data:read", resourcePermissions);
-
-            // Explicitly grant portal access to all developers.
-            GrantAccess("Portal", SystemRole.Developer, "data:read", resourcePermissions);
+            // Explicitly grant portal access to all users including non-authenticated.
+            GrantAccess("Portal", SystemRole.Any, "data:read", resourcePermissions);
 
             // TODO: Instead of having access control rules above hardcoded like this, instead we should read the list
             // of partition-wide access control rules from a configuration file. This will allow permission changes

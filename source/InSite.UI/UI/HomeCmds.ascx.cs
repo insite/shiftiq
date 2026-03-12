@@ -323,7 +323,7 @@ namespace InSite.UI
             SearchUploadsLink.Visible = isGrantedFields;
             ManageUploadsLink.Visible = isGrantedFields;
 
-            var roles = Identity.Groups.Select(x => x.Name).ToList();
+            var roleNames = Identity.GetRoleNames();
 
             var denials = new[]
             {
@@ -342,7 +342,7 @@ namespace InSite.UI
             var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
 
             foreach (var denial in denials)
-                if (permissions.IsDenied(denial.Resource, roles))
+                if (permissions.IsDenied(denial.Resource, roleNames))
                     denial.Control.Visible = false;
         }
 

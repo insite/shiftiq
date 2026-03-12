@@ -87,14 +87,17 @@ namespace InSite.UI.Admin.Records.Gradebooks.Controls
 
         private List<PersonItem> GetRegistrations(QUserFilter filter)
         {
-            var result = new List<PersonItem>();
+            var paging = filter.Paging;
+
+            filter.Paging = null;
+
             var learnerData = ServiceLocator.ContactSearch
                 .Bind(x => x, filter)
                 .Select(x => x.UserIdentifier)
                 .ToArray();
 
             if (learnerData.IsEmpty())
-                return result;
+                return new List<PersonItem>();
 
             var registrationFilter = new QRegistrationFilter()
             {
@@ -102,10 +105,12 @@ namespace InSite.UI.Admin.Records.Gradebooks.Controls
                 EventIdentifier = RegistrationEventIdentifier.Value,
                 ApprovalStatus = "Registered",
                 CandidateIdentifiers = learnerData,
-                HasCandidate = true
+                HasCandidate = true,
+                Paging = paging,
+                OrderBy = "Candidate.UserFullName"
             };
 
-            result = ServiceLocator.RegistrationSearch.GetRegistrations(
+            var result = ServiceLocator.RegistrationSearch.GetRegistrations(
                 registrationFilter,
                 x => x.Candidate
             )
@@ -117,7 +122,6 @@ namespace InSite.UI.Admin.Records.Gradebooks.Controls
                 UserEmailAlternate = x.Candidate.UserEmailAlternate,
                 ApprovalStatus = x.ApprovalStatus
             })
-            .OrderBy(x => x.UserFullName)
             .ToList();
 
             return result;

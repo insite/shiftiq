@@ -28,7 +28,7 @@ namespace InSite
         public static CookieSettings CookieSettings
             => ServiceLocator.AppSettings.Security.Cookie;
 
-        public static IdCookieSettings IdCookieSettings
+        private static IdCookieSettings IdCookieSettings
             => ServiceLocator.AppSettings.Security.IdCookie;
 
         #region Constants
@@ -309,13 +309,15 @@ namespace InSite
 
                 var secret = GetSecret();
 
+                var oldToken = token;
+
                 try
                 {
                     token = encoder.Deserialize(data, encrypt, secret, true);
                 }
                 catch (CookieSerializationException)
                 {
-                    token = null;
+                    token = oldToken;
                 }
 
                 if (!IsValid(token))

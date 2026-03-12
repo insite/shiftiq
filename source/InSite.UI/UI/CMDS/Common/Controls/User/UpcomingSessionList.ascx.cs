@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Humanizer;
+
 using InSite.Application.Events.Read;
 using InSite.Common.Web.UI;
 
@@ -19,6 +21,10 @@ namespace InSite.Custom.CMDS.User.Programs.Controls
         public string Title { get; set; }
         public string Format { get; set; }
         public string Badge { get; set; }
+
+        public string Href => IsGlobal
+            ? $"/ui/cmds/portal/events/register?id={Identifier}"
+            : $"/ui/portal/events/classes/outline?event={Identifier}";
 
         public int? CapacityMinimum { get; set; }
         public int? CapacityMaximum { get; set; }
@@ -111,8 +117,20 @@ namespace InSite.Custom.CMDS.User.Programs.Controls
                 };
 
                 item.Badge = isGlobal
-                    ? $"<span class='badge bg-secondary fs-xs'>{organizationName}</span>"
+                    ? $"<span class='badge bg-secondary fs-xs me-1'>{organizationName}</span>"
                     : "";
+
+                if (isFull)
+                {
+                    item.Badge += $"<span class='badge bg-danger fs-xs'>Full</span>";
+                }
+
+                if (hasMaximum && !hasMaximumRegistrations)
+                {
+                    var seats = "seat".ToQuantity(item.CapacityMaximum.Value - item.RegistrationCount);
+
+                    item.Badge += $"<span class='badge bg-success fs-xs'>{seats} remaining</span>";
+                }
 
                 return item;
 

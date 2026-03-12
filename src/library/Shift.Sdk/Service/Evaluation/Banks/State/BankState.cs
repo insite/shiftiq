@@ -882,6 +882,7 @@ namespace InSite.Domain.Banks
             var bank = form.Specification.Bank;
 
             form.Publication.Status = PublicationStatus.Archived;
+            form.Publication.IsPublished = false;
 
             if (!e.Questions)
                 return;
@@ -993,6 +994,7 @@ namespace InSite.Domain.Banks
             var bank = form.Specification.Bank;
 
             form.Publication.Status = PublicationStatus.Drafted;
+            form.Publication.IsPublished = false;
 
             if (e.Questions)
             {

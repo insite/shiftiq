@@ -7,6 +7,7 @@ using InSite.Admin.Records.Gradebooks.Controls;
 using InSite.Application.Gradebooks.Write;
 using InSite.Application.Records.Read;
 using InSite.Common.Web;
+using InSite.Domain.Foundations;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
@@ -87,6 +88,8 @@ namespace InSite.Admin.Records.Gradebooks.Forms
         {
             ServiceLocator.SendCommand(new LockGradebook(GradebookID.Value));
 
+            DomainCache.Instance.RemoveCourses(x => x.Gradebook?.Identifier == GradebookID.Value);
+
             LoadData();
 
             StatusAlert.AddMessage(AlertType.Success, "Gradebook is locked");
@@ -95,6 +98,8 @@ namespace InSite.Admin.Records.Gradebooks.Forms
         private void UnlockButton_Click(object sender, EventArgs e)
         {
             ServiceLocator.SendCommand(new UnlockGradebook(GradebookID.Value));
+
+            DomainCache.Instance.RemoveCourses(x => x.Gradebook?.Identifier == GradebookID.Value);
 
             LoadData();
 

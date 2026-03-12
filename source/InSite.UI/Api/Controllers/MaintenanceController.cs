@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
 using Shift.Constant;
+using Shift.Sdk.Service.Progress.Credentials;
 using Shift.Sdk.UI;
 
 namespace InSite.UI.Api
@@ -158,48 +160,6 @@ namespace InSite.UI.Api
             });
         }
 
-        private HttpResponseMessage ExecuteMaintenanceRoutine(Func<HttpResponseMessage> routine)
-        {
-            var root = Global.GetRootSentinel();
-
-            var identity = HttpContext.Current.GetIdentity();
-
-            if (identity.User.Identifier != root.Identifier)
-                return JsonError("Only the root account is permitted to invoke this API method.");
-
-            try
-            {
-                _mutex.WaitOne(); // Wait until it is safe to enter.
-
-                SetServiceIdentity(identity);
-
-                return routine();
-            }
-            catch (Exception ex)
-            {
-                AppSentry.SentryError(ex);
-
-                return JsonError(GetDescription(ex));
-            }
-            finally
-            {
-                _mutex.ReleaseMutex(); // Release the mutual-exclusion lock.
-            }
-        }
-
-        private static void SetServiceIdentity(Principal identity) =>
-            SetServiceIdentity(identity.Organization.Identifier, identity.User.Identifier, $"API Developer {identity.User.Name}");
-
-        private static void SetServiceIdentity(Guid organizationId, Guid userId, string userName)
-        {
-            ServiceLocator.IdentityService.SetCurrentService(new ServiceIdentity
-            {
-                Organization = organizationId,
-                User = userId,
-                Name = $"API Developer {userName}"
-            });
-        }
-
         [HttpPost]
         [Route("api/maintenance/send-achievement-notifications")]
         public HttpResponseMessage AchievementNotifications()
@@ -240,6 +200,80 @@ namespace InSite.UI.Api
                 var count = classReminder.ValidateAndPublishGrades();
 
                 return JsonSuccess(count);
+            });
+        }
+
+        [HttpPost]
+        [Route("api/maintenance/expire-credentials")]
+        public HttpResponseMessage ExpireCredentials()
+        {
+            return ExecuteMaintenanceRoutine(() =>
+            {
+                var partition = ServiceLocator.Partition;
+
+                if (partition.IsE03())
+                    return JsonSuccess($"Skipped. Expiration for CMDS credentials done in a separate task.");
+
+                var expirer = new CredentialExpirer(new Commander(), ServiceLocator.AchievementSearch);
+                var expiredCredentials = expirer.GetExpiredCredentials();
+                var organizationIds = expiredCredentials.Select(x => x.OrganizationIdentifier).Distinct().OrderBy(x => x).ToList();
+                var expiredCount = 0;
+
+                foreach (var organizationId in organizationIds)
+                {
+                    SetServiceIdentity(organizationId, UserIdentifiers.Maintenance, "Maintenance");
+
+                    var organizationCredentials = expiredCredentials
+                        .Where(x => x.OrganizationIdentifier == organizationId)
+                        .OrderBy(x => x.CredentialIdentifier)
+                        .ToList();
+
+                    expiredCount += expirer.Expire(organizationCredentials);
+                }
+
+                return JsonSuccess(new { Status = "ok", ExpiredCount = expiredCount });
+            });
+        }
+
+        private HttpResponseMessage ExecuteMaintenanceRoutine(Func<HttpResponseMessage> routine)
+        {
+            var root = Global.GetRootSentinel();
+
+            var identity = HttpContext.Current.GetIdentity();
+
+            if (identity.User.Identifier != root.Identifier)
+                return JsonError("Only the root account is permitted to invoke this API method.");
+
+            try
+            {
+                _mutex.WaitOne(); // Wait until it is safe to enter.
+
+                SetServiceIdentity(identity);
+
+                return routine();
+            }
+            catch (Exception ex)
+            {
+                AppSentry.SentryError(ex);
+
+                return JsonError(GetDescription(ex));
+            }
+            finally
+            {
+                _mutex.ReleaseMutex(); // Release the mutual-exclusion lock.
+            }
+        }
+
+        private static void SetServiceIdentity(Principal identity) =>
+            SetServiceIdentity(identity.Organization.Identifier, identity.User.Identifier, $"API Developer {identity.User.Name}");
+
+        private static void SetServiceIdentity(Guid organizationId, Guid userId, string userName)
+        {
+            ServiceLocator.IdentityService.SetCurrentService(new ServiceIdentity
+            {
+                Organization = organizationId,
+                User = userId,
+                Name = $"API Developer {userName}"
             });
         }
 

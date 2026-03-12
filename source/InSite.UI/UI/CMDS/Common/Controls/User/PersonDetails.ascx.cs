@@ -44,7 +44,7 @@ namespace InSite.Cmds.Admin.People.Controls
 
         private void ApplyUserGroupAssignmentPermissions()
         {
-            var roleNames = Identity.Groups.Select(x => x.Name).ToArray();
+            var roleNames = Identity.GetRoleNames();
 
             var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
 

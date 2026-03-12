@@ -31,7 +31,7 @@ namespace InSite.UI.CMDS.Portal.Achievements.Credentials
         public string EmployeeLastFirstName { get; set; }
         public string EmployeeFirstLastName { get; set; }
         public bool? IsSuccess { get; set; }
-        public bool? IsSkillsPassport { get; set; }
+        public bool? IsTraineeGroup { get; set; }
 
         public string DateCompletedHtml
         {

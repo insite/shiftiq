@@ -355,11 +355,11 @@ namespace InSite.UI.Portal.Learning
         {
             base.ApplyAccessControl();
 
-            var roles = Identity.Groups.Select(x => x.Name).ToList();
+            var roleNames = Identity.GetRoleNames();
 
             var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
 
-            if (permissions.IsDenied("ui/home#elearning", roles))
+            if (permissions.IsDenied("ui/home#elearning", roleNames))
                 CreateAccessDeniedException();
         }
     }

@@ -141,7 +141,6 @@ namespace InSite.UI.Portal.Records.Logbooks
             var journalSetupPDFModel = LogbookResultHelper.GetLogbookResultPdfModel(
                 JournalSetupIdentifier,
                 UserIdentifier,
-                Page.Server,
                 CurrentSessionState.Identity.Organization.Identifier,
                 User.TimeZone,
                 Identity.Language);

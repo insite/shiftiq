@@ -198,9 +198,9 @@ namespace InSite.UI.CMDS.Portal.Achievements.Credentials
                 "Title").ToList();
         }
 
-        public static void BindDataItem(System.Web.UI.Control control, VCmdsCredentialAndExperience row, bool isSkillsPassport)
+        public static void BindDataItem(System.Web.UI.Control control, VCmdsCredentialAndExperience row, bool isTraineeGroup)
         {
-            var item = GetAchievementItem(row, isSkillsPassport);
+            var item = GetAchievementItem(row, isTraineeGroup);
 
             BindDataItem(control, item);
         }
@@ -287,7 +287,7 @@ namespace InSite.UI.CMDS.Portal.Achievements.Credentials
             return date == null ? null : ((DateTime)date).Year.ToString();
         }
 
-        private static AchievementItem GetAchievementItem(VCmdsCredentialAndExperience row, bool isSkillsPassport)
+        private static AchievementItem GetAchievementItem(VCmdsCredentialAndExperience row, bool isTraineeGroup)
         {
             var item = new AchievementItem();
 
@@ -317,7 +317,7 @@ namespace InSite.UI.CMDS.Portal.Achievements.Credentials
             item.EmployeeLastFirstName = row.UserLastName;
             item.EmployeeFirstLastName = row.UserFirstName;
             item.IsSuccess = row.IsSuccess;
-            item.IsSkillsPassport = isSkillsPassport;
+            item.IsTraineeGroup = isTraineeGroup;
 
             return item;
         }

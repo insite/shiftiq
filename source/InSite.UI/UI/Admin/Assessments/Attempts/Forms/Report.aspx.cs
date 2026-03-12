@@ -182,7 +182,29 @@ namespace InSite.Admin.Assessments.Attempts.Forms
 
         private void DownloadButton_Click(object sender, EventArgs e)
         {
-            Response.SendFile("attempt_report", "xlsx", AttemptReportExport.GetXlsx(Filter, IncludeAdditionalSheets.Checked));
+            try
+            {
+                var data = AttemptReportExport.GetXlsx(Filter, IncludeAdditionalSheets.Checked);
+
+                Response.SendFile("attempt_report", "xlsx", data);
+            }
+            catch (ArgumentException argex)
+            {
+                if (argex.Message == "Row out of range")
+                {
+                    ScreenStatus.AddMessage(
+                        AlertType.Error,
+                        @"The report cannot be downloaded because the data exceeds the maximum number of rows supported by Excel (1,048,576). Please try one of the following:
+<ul>
+<li>Uncheck ""Include additional metadata sheets"" to download only the Attempts sheet.</li>
+<li>Apply additional filters to reduce the number of results.</li>
+</ul>");
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         #endregion
@@ -203,7 +225,7 @@ namespace InSite.Admin.Assessments.Attempts.Forms
             var form = filter.FormIdentifier.HasValue
                 ? ServiceLocator.BankSearch.GetForm(filter.FormIdentifier.Value)
                 : null;
-                SearchCriteriaExamForm.Text = form != null ? form.FormName : GetValueString(null);
+            SearchCriteriaExamForm.Text = form != null ? form.FormName : GetValueString(null);
 
             var candidate = filter.LearnerUserIdentifier.HasValue
                 ? ServiceLocator.ContactSearch.GetPerson(filter.LearnerUserIdentifier.Value, Organization.Identifier)

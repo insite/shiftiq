@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Web.UI.WebControls;
 
 using InSite.Common.Web.Cmds;
@@ -368,7 +367,7 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
 
             DownloadGrid.LoadData(containerGuid, containerType);
 
-            var roleNames = Identity.Groups.Select(x => x.Name).ToArray();
+            var roleNames = Identity.GetRoleNames();
 
             var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
 

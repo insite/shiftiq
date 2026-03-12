@@ -7,8 +7,6 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 
-using Shift.Common.Timeline.Exceptions;
-
 using Humanizer;
 
 using InSite.Application.Attempts.Read;
@@ -25,6 +23,7 @@ using InSite.UI.Portal.Assessments.Attempts.Controls;
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Exceptions;
 using Shift.Constant;
 
 using SessionUpdateStatus = InSite.UI.Portal.Assessments.Attempts.Utilities.AttemptSessionInfoCollection.UpdateStatus;
@@ -269,7 +268,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             AttemptUrlBase baseUrl;
             QAttempt attempt = null;
             AttemptHelper.IAction result;
-            Guid?  whenCompleted;
+            Guid? whenCompleted;
 
             if (loader.IsForm)
             {
@@ -912,7 +911,10 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             if (text.IsEmpty())
                 text = "No comment.";
 
-            ServiceLocator.SendCommand(new AuthorComment(examAttempt.AttemptIdentifier, attemptQuestion.QuestionIdentifier, text));
+            ServiceLocator.SendCommand(new AuthorComment(
+                examAttempt.AttemptIdentifier,
+                attemptQuestion.QuestionIdentifier,
+                text.MaxLength(1200, true)));
 
             return "OK";
         }

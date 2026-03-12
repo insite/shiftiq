@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Domain;
 using InSite.Domain.Contacts;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Exceptions;
 using Shift.Sdk.UI;
 
 namespace InSite.UI.Admin.Reports.Changes.Models
@@ -253,27 +253,39 @@ namespace InSite.UI.Admin.Reports.Changes.Models
 
             foreach (var id in userIds)
             {
-                var info = groups.GetOrDefault(id);
-
-                if (info == null)
-                {
-                    var aggregate = ServiceLocator.SnapshotRepository.Get<UserAggregate>(id);
-                    if (aggregate != null)
-                    {
-                        var state = aggregate.Data;
-                        info = new UserInfo
-                        {
-                            UserId = id,
-                            HasPerson = true,
-                            FullName = state.GetTextValue(UserField.FullName)
-                        };
-                    }
-                }
+                var info = groups.GetOrDefault(id)
+                    ?? LoadUserInfoFromAggregate(id);
 
                 result.Add(id, info);
             }
 
             return result;
+        }
+
+        private static UserInfo LoadUserInfoFromAggregate(Guid userId)
+        {
+            UserAggregate aggregate;
+
+            try
+            {
+                aggregate = ServiceLocator.SnapshotRepository.Get<UserAggregate>(userId);
+            }
+            catch (AggregateNotFoundException)
+            {
+                aggregate = null;
+            }
+
+            if (aggregate == null)
+                return null;
+
+            var state = aggregate.Data;
+
+            return new UserInfo
+            {
+                UserId = aggregate.AggregateIdentifier,
+                HasPerson = true,
+                FullName = state.GetTextValue(UserField.FullName)
+            };
         }
 
         private static ChangeInfo[] GetGroupChanges(Guid groupId)

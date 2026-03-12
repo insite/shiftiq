@@ -43,8 +43,11 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
             SurveyFormTitle.InnerText = Current.Survey.Content?.Title?.Text[Current.Language];
 
-            LearnerIdentifier.Filter.AlwaysIncludeUserIdentifiers = new[] { User.Identifier };
-            LearnerIdentifier.Filter.UpstreamUserIdentifiers = new[] { User.Identifier };
+            if (User != null) // Anonymous
+            {
+                LearnerIdentifier.Filter.AlwaysIncludeUserIdentifiers = new[] { User.Identifier };
+                LearnerIdentifier.Filter.UpstreamUserIdentifiers = new[] { User.Identifier };
+            }
 
             if (!IsSurveyOpen())
                 return;
@@ -141,6 +144,12 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
         private void Continue()
         {
+            if (User == null) // Anonymous
+            {
+                var sessionId = CreateNewSession(UserIdentifiers.Someone);
+                SubmissionSessionNavigator.RedirectToStart(sessionId);
+            }
+
             (ResponseVerb action, Guid sessionId) info;
 
             try
@@ -207,7 +216,8 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         private Guid CreateNewSession(Guid respondent)
         {
             var session = UniqueIdentifier.Create();
-            var commands = BuildCommandScript("Launched", session, Current.Survey, User.Identifier, respondent);
+            var assessor = User != null ? User.Identifier : respondent;
+            var commands = BuildCommandScript("Launched", session, Current.Survey, assessor, respondent);
             foreach (var command in commands)
                 ServiceLocator.SendCommand(command);
             return session;

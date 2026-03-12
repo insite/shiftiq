@@ -705,16 +705,16 @@ namespace InSite.Persistence
                     .Join(db.QCredentials.Where(x => x.CredentialGranted != null),
                         i => i.AchievementIdentifier,
                         c => c.AchievementIdentifier,
-                        (i, c) => c
+                        (i, c) => new { GradebookIdentifier = i.GradebookIdentifier, Credential = c }
                     )
-                    .Join(db.QEnrollments.Where(x => gradebookIds.Contains(x.GradebookIdentifier)),
-                        c => c.UserIdentifier,
-                        e => e.LearnerIdentifier,
+                    .Join(db.QEnrollments,
+                        c => new { c.GradebookIdentifier, UserIdentifier = c.Credential.UserIdentifier },
+                        e => new { e.GradebookIdentifier, UserIdentifier = e.LearnerIdentifier },
                         (c, e) => new
                         {
                             e.GradebookIdentifier,
-                            c.AchievementIdentifier,
-                            c.UserIdentifier
+                            c.Credential.AchievementIdentifier,
+                            c.Credential.UserIdentifier
                         }
                     );
 
@@ -723,16 +723,16 @@ namespace InSite.Persistence
                     .Join(db.QCredentials.Where(x => x.CredentialGranted != null),
                         i => i.AchievementIdentifier,
                         c => c.AchievementIdentifier,
-                        (i, c) => c
+                        (i, c) => new { GradebookIdentifier = i.GradebookIdentifier, Credential = c }
                     )
-                    .Join(db.QEnrollments.Where(x => gradebookIds.Contains(x.GradebookIdentifier)),
-                        c => c.UserIdentifier,
-                        e => e.LearnerIdentifier,
+                    .Join(db.QEnrollments,
+                        c => new { c.GradebookIdentifier, UserIdentifier = c.Credential.UserIdentifier },
+                        e => new { e.GradebookIdentifier, UserIdentifier = e.LearnerIdentifier },
                         (c, e) => new
                         {
                             e.GradebookIdentifier,
-                            c.AchievementIdentifier,
-                            c.UserIdentifier
+                            c.Credential.AchievementIdentifier,
+                            c.Credential.UserIdentifier
                         }
                     );
 

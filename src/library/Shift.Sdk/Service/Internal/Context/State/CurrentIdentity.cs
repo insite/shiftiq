@@ -35,6 +35,8 @@ namespace InSite.Domain.Foundations
 
         bool IsGranted(Guid? action, DataAccess? operation = null);
         bool IsGranted(string action, DataAccess? operation = null);
+
+        string[] GetRoleNames();
     }
 
     /// <summary>
@@ -173,6 +175,8 @@ namespace InSite.Domain.Foundations
 
             var roles = identity.Groups;
 
+            AddSystemGroup(SystemRole.Any);
+
             var person = identity.Person;
 
             if (person == null)
@@ -267,9 +271,7 @@ namespace InSite.Domain.Foundations
             if (action == null)
                 return false;
 
-            var isLearnerOrAdmin = Person != null && (Person.IsLearner || Person.IsAdministrator || Person.IsDeveloper);
-
-            var isPortal = isLearnerOrAdmin && (action.Identifier == PortalActionIdentifier || action.Parent == PortalActionIdentifier);
+            var isPortal = action.Identifier == PortalActionIdentifier || action.Parent == PortalActionIdentifier;
             if (isPortal)
                 return true;
 
@@ -294,15 +296,15 @@ namespace InSite.Domain.Foundations
 
             var resource = action.Url;
 
-            var roles = Groups.Select(x => new Role(x.Name)).ToList();
+            var roleNames = GetRoleNames();
 
             var matrix = PermissionContext.GetMatrix();
 
-            if (matrix.IsAllowed(Organization.Code, resource, roles))
+            if (matrix.IsAllowed(Organization.Code, resource, roleNames))
                 return true;
 
             if (!string.IsNullOrEmpty(Partition))
-                return matrix.IsAllowed(Partition, resource, roles);
+                return matrix.IsAllowed(Partition, resource, roleNames);
 
             return false;
         }
@@ -342,6 +344,15 @@ namespace InSite.Domain.Foundations
 
             Language = language;
             return language;
+        }
+
+        public string[] GetRoleNames()
+        {
+            return Groups
+                .Where(x => x.Type == GroupType.Role)
+                .Select(x => x.Name)
+                .OrderBy(x => x)
+                .ToArray();
         }
     }
 }

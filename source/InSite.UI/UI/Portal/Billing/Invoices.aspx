@@ -49,9 +49,13 @@
                         <td>
                             <asp:Literal runat="server" ID="InvoiceIdentifier" Visible="false" />
 
-                            <insite:Button runat="server" ID="PayInvoiceButton" ButtonStyle="Primary" Text="Pay" Icon="far fa-file-invoice-dollar"
+                            <insite:Button runat="server"
+                                ID="PayInvoiceButton"
+                                ButtonStyle="Primary"
+                                Text="Pay"
+                                Icon="far fa-file-invoice-dollar"
                                 NavigateUrl='<%# Eval("InvoiceIdentifier", "/ui/portal/billing/invoice?invoice={0}") %>'
-                                Visible='<%# Eval("InvoiceStatus").ToString() == "Submitted" || Eval("InvoiceStatus").ToString() == "PaymentFailed" %>' />
+                            />
 
                             <insite:Button runat="server" ID="PrintInvoiceButton" ButtonStyle="Primary" Icon="far fa-print" Text="Print" />
                         </td>

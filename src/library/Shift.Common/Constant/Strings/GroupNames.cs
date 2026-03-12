@@ -7,6 +7,6 @@
         // "Orientation" is self-documenting. For example, the group name "Orientation Users" is more clear than the
         // name "Skills Passport Users". Also, it is much more flexible for open-source use.
 
-        public const string Trainee = "Skills Passport"; // <-- Change this to "Orientation" in the next hotfix
+        public const string Trainee = "Orientation"; // <-- Changed this from "Skills Passport" in hotfix v26.1b
     }
 }

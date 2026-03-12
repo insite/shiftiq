@@ -28,16 +28,15 @@ namespace InSite.UI.Portal.Records.Logbooks.Utilities
         public static LogbookModel GetLogbookResultPdfModel(
             Guid journalSetupIdentifier,
             Guid userIdentifier,
-            HttpServerUtility server,
             Guid organizationIdentifier,
             TimeZoneInfo timeZone,
             string language)
         {
             var person = ServiceLocator.ContactSearch.GetPerson(userIdentifier, organizationIdentifier);
-
+            
             var logoImageUrl = QuestPDFImageHelper.GetOrganizationLogoUrl(CurrentSessionState.Identity.Organization.Code);
             if (logoImageUrl != null)
-                logoImageUrl = server.MapPath(logoImageUrl);
+                logoImageUrl = HttpContext.Current.Server.MapPath(logoImageUrl);
 
             var journalSetup = ServiceLocator.JournalSearch
                 .GetJournalSetup(journalSetupIdentifier);
@@ -100,9 +99,8 @@ namespace InSite.UI.Portal.Records.Logbooks.Utilities
         private static List<Area> MapAreas(QJournalSetup journalSetup, Guid userIdentifier, string language)
         {
             var areas = CompetencyHelper.GetAreas(journalSetup.JournalSetupIdentifier, language, true);
-
             if (areas == null)
-                return null;
+                return new List<Area>();
 
             var userCompetencies = ServiceLocator.JournalSearch.GetExperienceCompetencies(new QExperienceCompetencyFilter
             {

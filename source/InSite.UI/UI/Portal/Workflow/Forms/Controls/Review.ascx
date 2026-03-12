@@ -18,7 +18,7 @@
 <insite:Button runat="server" ID="DownloadSummaryButton" ButtonStyle="Default" Text="Download Summary" CssClass="ms-1" Icon="fas fa-download" Visible="false" />
 <insite:Button runat="server" ID="DownloadDetailsButton" ButtonStyle="Default" Text="Download Details" CssClass="ms-1" Icon="fas fa-download"  Visible="false" />
 <insite:Button runat="server" ID="DownloadAnsweredButton" ButtonStyle="Default" Text="Download Details, answered questions only" CssClass="ms-1" Icon="fas fa-download"  Visible="false" />
-<insite:Button runat="server" ID="HomeButton" ButtonStyle="Success" Text="Home" CssClass="ms-1" Icon="fas fa-home" NavigateUrl="/ui/portal/home" />
+<insite:Button runat="server" ID="HomeButton" ButtonStyle="Success" Text="Home" CssClass="ms-1" Icon="fas fa-home" NavigateUrl="/ui/portal/home" Visible="false" />
 
 <div style="clear:both;"></div>
     

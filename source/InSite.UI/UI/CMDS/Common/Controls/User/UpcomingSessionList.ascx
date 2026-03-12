@@ -4,8 +4,8 @@
     <asp:Repeater runat="server" ID="EventRepeater">
         <ItemTemplate>
             <li class="list-group-item">
-                <a href="<%# Eval("Identifier", "/ui/cmds/portal/events/register?id={0}") %>"><%# Eval("Title") %></a>
-                <%# Eval("Badge") %>
+                <a href="<%# Eval("Href") %>"><%# Eval("Title") %></a>
+                <div class="mt-1"><%# Eval("Badge") %></div>
             </li>
         </ItemTemplate>
     </asp:Repeater>
