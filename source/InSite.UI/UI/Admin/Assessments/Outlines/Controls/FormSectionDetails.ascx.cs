@@ -67,30 +67,9 @@ namespace InSite.Admin.Assessments.Outlines.Controls
             set => ViewState[nameof(AllowEdit)] = value;
         }
 
-        public bool ProcessDownload
-        {
-            get => (bool?)ViewState[nameof(ProcessDownload)] ?? false;
-            set => ViewState[nameof(ProcessDownload)] = value;
-        }
         #endregion
 
         #region Loading
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-
-            if (Page.IsPostBack && ProcessDownload)
-            {
-                var bank = ServiceLocator.BankSearch.GetBankState(BankID);
-                var form = bank.FindForm(FormID);
-
-                ProcessDownload = false;
-                var data = QuestionStatisticsPanel.GetXlsx(form);
-
-                Response.SendFile("form-summaries", "xlsx", data);
-            }
-        }
 
         protected override void OnInit(EventArgs e)
         {
@@ -106,11 +85,21 @@ namespace InSite.Admin.Assessments.Outlines.Controls
             DownloadSummariesButton.Click += DownloadSummariesButton_Click;
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            ScriptManager.GetCurrent(Page).RegisterPostBackControl(DownloadSummariesButton);
+        }
+
         private void DownloadSummariesButton_Click(object sender, EventArgs e)
         {
-            ProcessDownload = true;
-            ScriptManager.RegisterStartupScript(this, GetType(),
-                  "postback", "javascript:__doPostBack('', '');", true);
+            var bank = ServiceLocator.BankSearch.GetBankState(BankID);
+            var form = bank.FindForm(FormID);
+
+            var data = QuestionStatisticsPanel.GetXlsx(form);
+
+            Response.SendFile("form-summaries", "xlsx", data);
         }
 
         protected override void OnPreRender(EventArgs e)

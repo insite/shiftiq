@@ -329,17 +329,20 @@ namespace InSite.Persistence
             if (filter.ExpirationFixedDateBefore.HasValue)
                 query = query.Where(x => x.ExpirationFixedDate < filter.ExpirationFixedDateBefore.Value);
 
-            if (filter.HasMandatoryCredential == true)
+            if (filter.HasMandatoryCredential.HasValue)
             {
-                query = query.Where(x => db.QCredentials
-                                           .Any(c => c.CredentialNecessity == "Mandatory"
-                                                  && c.AchievementIdentifier == x.AchievementIdentifier));
-            }
-            else if (filter.HasMandatoryCredential == false)
-            {
-                query = query.Where(x => db.QCredentials
-                                           .All(c => c.CredentialNecessity != "Mandatory"
-                                                  && c.AchievementIdentifier == x.AchievementIdentifier));
+                if (filter.HasMandatoryCredential.Value)
+                {
+                    query = query.Where(x => db.QCredentials
+                                               .Any(c => c.CredentialNecessity == "Mandatory"
+                                                      && c.AchievementIdentifier == x.AchievementIdentifier));
+                }
+                else
+                {
+                    query = query.Where(x => db.QCredentials
+                                               .All(c => c.CredentialNecessity != "Mandatory"
+                                                      && c.AchievementIdentifier == x.AchievementIdentifier));
+                }
             }
 
             return query;
@@ -634,9 +637,6 @@ namespace InSite.Persistence
 
             // String
 
-            if (filter.AchievementTitle.HasValue())
-                query = query.Where(x => x.AchievementTitle.Contains(filter.AchievementTitle));
-
             if (filter.CredentialStatus.HasValue())
                 query = query.Where(x => x.CredentialStatus == filter.CredentialStatus);
 
@@ -666,6 +666,9 @@ namespace InSite.Persistence
 
             if (filter.EmployerGroupStatus.HasValue())
                 query = query.Where(x => x.EmployerGroupStatus == filter.EmployerGroupStatus);
+
+            if (!string.IsNullOrEmpty(filter.CredentialDescriptionExact))
+                query = query.Where(x => x.CredentialDescription == filter.CredentialDescriptionExact);
 
             // DateTimeOffset
 

@@ -1417,6 +1417,13 @@
     <Compile Include="UI\Admin\Records\Logbooks\ChangeArea.aspx.designer.cs">
       <DependentUpon>ChangeArea.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Records\Logbooks\Controls\ExperienceFields\DropDown.ascx.cs">
+      <DependentUpon>DropDown.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Records\Logbooks\Controls\ExperienceFields\DropDown.ascx.designer.cs">
+      <DependentUpon>DropDown.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Records\Logbooks\Controls\GroupGrid.ascx.cs">
       <DependentUpon>GroupGrid.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1950,6 +1957,13 @@
     </Compile>
     <Compile Include="UI\Lobby\Logs\500.aspx.designer.cs">
       <DependentUpon>500.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Lobby\Integration\Saml\Launch.aspx.cs">
+      <DependentUpon>Launch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Lobby\Integration\Saml\Launch.aspx.designer.cs">
+      <DependentUpon>Launch.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\MenuHelperFactory.cs" />
     <Compile Include="UI\Portal\Billing\Cart.aspx.cs">
@@ -6496,6 +6510,7 @@
     <Content Include="UI\Admin\Records\Achievements\Controls\OutlineNotifications.ascx" />
     <Content Include="UI\Admin\Records\Gradebooks\Controls\ScormEventGrid.ascx" />
     <Content Include="UI\Admin\Records\Logbooks\ChangeArea.aspx" />
+    <Content Include="UI\Admin\Records\Logbooks\Controls\ExperienceFields\DropDown.ascx" />
     <Content Include="UI\Admin\Records\Logbooks\Controls\GroupGrid.ascx" />
     <Content Include="UI\Admin\Records\Logbooks\ReorderFields.aspx" />
     <Content Include="UI\Admin\Records\Reports\Controls\RecentCredentialList.ascx" />
@@ -7354,6 +7369,7 @@
     <Content Include="UI\Lobby\Logs\400.aspx" />
     <Content Include="UI\Lobby\Logs\404.aspx" />
     <Content Include="UI\Lobby\Logs\500.aspx" />
+    <Content Include="UI\Lobby\Integration\Saml\Launch.aspx" />
     <Content Include="UI\Portal\Billing\Cart.aspx" />
     <Content Include="UI\Portal\Billing\Catalog.aspx" />
     <Content Include="UI\Lobby\SignOutCompleted.aspx" />

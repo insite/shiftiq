@@ -963,7 +963,7 @@ namespace InSite.Admin.Records.Gradebooks.Controls
             if (score == null)
                 return null;
 
-            if (score.ProgressIsIgnored && score.ProgressGraded == null && score.NoScore)
+            if (score.ProgressIsIgnored && score.NoScore)
                 return "N/A";
 
             if (item.Format == GradeItemFormat.Boolean)

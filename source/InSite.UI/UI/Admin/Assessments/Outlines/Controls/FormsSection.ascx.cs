@@ -413,6 +413,8 @@ namespace InSite.Admin.Assessments.Outlines.Controls
 
             AddButton.Items["AddFields"].Visible = hasSections;
             AddButton.Items["AddQuestion"].Visible = hasSections && !bank.IsAdvanced;
+            AddButton.Items["AddForm"].Visible = !bank.IsAdvanced;
+            AddButton.Items["AddSection"].Visible = true;
 
             ReorderFieldsButton.Visible = isStaticSpec && hasSections && !isPublished && canWrite;
 

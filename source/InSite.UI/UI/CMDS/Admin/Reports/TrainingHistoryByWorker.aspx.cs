@@ -29,6 +29,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public Guid[] Achievements { get; set; }
             public Guid[] Learners { get; set; }
             public bool? IsRequired { get; set; }
+            public string AchievementType { get; set; }
         }
 
         private class UserDataItem
@@ -71,6 +72,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             FindProgram.AutoPostBack = true;
             FindProgram.ValueChanged += (s, a) => SetupFindAchievement();
+
+            AchievementType.AutoPostBack = true;
+            AchievementType.ValueChanged += (s, a) => SetupFindAchievement();
 
             IsRequired.AutoPostBack = true;
             IsRequired.SelectedIndexChanged += (s, a) => SetupFindAchievement();
@@ -124,6 +128,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
             FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
             FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
             FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
+            FindAchievement.Filter.AchievementLabels.Clear();
+            FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
             FindAchievement.Value = null;
         }
 
@@ -336,7 +342,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private IEnumerable<UserDataItem> GetReportDataSource()
         {
-            return CmdsReportHelper.SelectTrainingHistoryPerUser(CurrentParameters.Departments, CurrentParameters.Achievements, CurrentParameters.Learners, CurrentParameters.IsRequired)
+            return CmdsReportHelper.SelectTrainingHistoryPerUser(CurrentParameters.Departments, CurrentParameters.Achievements, CurrentParameters.Learners, CurrentParameters.IsRequired, CurrentParameters.AchievementType)
                 .GroupBy(x => x.PersonFullName)
                 .Select(userGroup =>
                 {

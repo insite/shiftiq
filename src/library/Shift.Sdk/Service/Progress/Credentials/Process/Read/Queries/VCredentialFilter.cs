@@ -32,6 +32,7 @@ namespace InSite.Application.Records.Read
         public string AchievementLabel { get; set; }
         public string[] AchievementLabels { get; set; }
         public string AchievementTitle { get; set; }
+        public string CredentialDescriptionExact { get; set; }
 
         public Guid[] AchievementIdentifiers { get; set; }
         public Guid[] CredentialIdentifiers { get; set; }

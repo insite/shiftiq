@@ -101,7 +101,7 @@ namespace InSite.UI.Lobby
             if (token.IsNotEmpty())
                 HandleVerification(token);
             else if (!HandleVerificationRequired())
-                Failure();
+                Failure(5);
         }
 
         private void HandleVerification(string data)
@@ -109,7 +109,7 @@ namespace InSite.UI.Lobby
             var token = Token.Deserialize(data);
             if (token == null)
             {
-                Failure();
+                Failure(1);
                 return;
             }
 
@@ -119,27 +119,26 @@ namespace InSite.UI.Lobby
 
             if (token.Expired)
             {
-                Failure();
+                Failure(2);
                 return;
             }
 
             var user = ServiceLocator.UserSearch.GetUser(token.UserId);
             if (user?.EmailVerificationTokenIssued == null || token.Issued != user.EmailVerificationTokenIssued.Value)
             {
-                Failure();
+                Failure(3);
                 return;
             }
 
             if (!string.Equals(token.Email, user.Email, StringComparison.OrdinalIgnoreCase))
             {
-                Failure();
+                Failure(4);
                 return;
             }
 
             if (!string.Equals(user.EmailVerified, user.Email, StringComparison.OrdinalIgnoreCase))
             {
                 user.EmailVerified = user.Email;
-                user.EmailVerificationTokenIssued = null;
                 UserStore.Update(user, null);
             }
 
@@ -215,7 +214,7 @@ namespace InSite.UI.Lobby
             if (user == null)
             {
                 ScreenStatus.AddMessage(
-                    AlertType.Error, 
+                    AlertType.Error,
                     Translate("Unable to send verification email. Please refresh the page and try again."));
 
                 SendMessage.Visible = false;
@@ -255,11 +254,11 @@ namespace InSite.UI.Lobby
                 Translate("Thank you for verifying your email address!"));
         }
 
-        private void Failure()
+        private void Failure(int number)
         {
-            ScreenStatus.AddMessage(
-                AlertType.Error,
-                Translate("Your email address verification link is expired or invalid. Please try again, and if you are still unable to verify your email address then contact your account administrator."));
+            var message = Translate("Your email address verification link is expired or invalid. Please try again, and if you are still unable to verify your email address then contact your account administrator.");
+
+            ScreenStatus.AddMessage(AlertType.Error, message + $" ({number})");
         }
     }
 }

@@ -35,7 +35,7 @@
         <insite:RequiredValidator runat="server" ControlToValidate="CertificateLayoutData" FieldName="Layout Data" />
     </label>
     <div>
-        <insite:TextBox runat="server" ID="CertificateLayoutData" TextMode="MultiLine" Width="100%" CssClass="json-editor" MaxLength="1200" />
+        <insite:TextBox runat="server" ID="CertificateLayoutData" TextMode="MultiLine" Width="100%" CssClass="json-editor" MaxLength="2400" />
     </div>
     <div class="form-text">
         This is a JSON representation of the organization.

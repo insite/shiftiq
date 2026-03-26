@@ -27,7 +27,7 @@ namespace InSite.Admin.Records.Programs
 
             public AchievementInfo[] Achievements { get; }
 
-            public TemplateInfo(TProgram list)
+            public TemplateInfo(TProgram list, string scope)
             {
                 ProgramIdentifier = list.ProgramIdentifier;
 
@@ -36,8 +36,6 @@ namespace InSite.Admin.Records.Programs
                 var enterpriseId = ServiceLocator.AppSettings.Application.Organizations.Global;
 
                 var organizationId = Organization.Identifier;
-
-                var scope = "Organization";
 
                 Achievements = VCmdsAchievementSearch
                     .SelectDepartmentTemplateAchievements(enterpriseId, organizationId, scope, null, ProgramIdentifier)
@@ -118,7 +116,9 @@ namespace InSite.Admin.Records.Programs
                 if (asset == null)
                     Search.Redirect();
 
-                SourceTemplate = new TemplateInfo(asset);
+                var scope = ServiceLocator.Partition.IsE03() ? "Partition" : "Organization";
+
+                SourceTemplate = new TemplateInfo(asset, scope);
 
                 PageHelper.AutoBindHeader(Page);
 

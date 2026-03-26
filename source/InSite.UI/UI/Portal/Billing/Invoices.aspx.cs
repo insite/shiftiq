@@ -116,7 +116,7 @@ namespace InSite.UI.Portal.Billing
                 html.Append("</ul>");
             }
 
-            var hasRegistrationItem = items.Any(x => x.ItemDescription.Contains("activity registration", StringComparison.OrdinalIgnoreCase));
+            var hasRegistrationItem = items.Any(x => !string.IsNullOrEmpty(x.ItemDescription) && x.ItemDescription.Contains("activity registration", StringComparison.OrdinalIgnoreCase));
 
             return new SearchResultPacket
             {

@@ -35,14 +35,14 @@
                                             Department
                                             <insite:RequiredValidator runat="server" ControlToValidate="FindDepartment" FieldName="Department" ValidationGroup="Report" />
                                         </label>
-                                        <cmds:FindDepartment runat="server" ID="FindDepartment" MaxSelectionCount="0" CausesValidation="true" ValidationGroup="Other" />
+                                        <cmds:FindDepartment runat="server" ID="FindDepartment" MaxSelectionCount="0" CausesValidation="true" ValidationGroup="Other" EmptyMessage="All departments" />
                                     </div>
 
                                     <div class="form-group mb-3">
                                         <label class="form-label">
                                             Learner
                                         </label>
-                                        <insite:FindPerson runat="server" ID="FindLearner" MaxSelectionCount="0" Enabled="false" />
+                                        <insite:FindPerson runat="server" ID="FindLearner" MaxSelectionCount="0" Enabled="false" EmptyMessage="All learners" />
                                     </div>
 
                                     <div class="form-group mb-3">
@@ -104,15 +104,21 @@
                                         <label class="form-label">
                                             Program
                                         </label>
-                                        <insite:FindProgram runat="server" ID="FindProgram" MaxSelectionCount="0" CausesValidation="true" ValidationGroup="Other" />
+                                        <insite:FindProgram runat="server" ID="FindProgram" MaxSelectionCount="0" CausesValidation="true" ValidationGroup="Other" EmptyMessage="All programs" />
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            Achievement Type
+                                        </label>
+                                        <cmds:AchievementTypeSelector runat="server" ID="AchievementType" AllowBlank="true" NullText="" />
                                     </div>
 
                                     <div class="form-group mb-3">
                                         <label class="form-label">
                                             Achievement
-                                            <insite:RequiredValidator runat="server" ControlToValidate="FindAchievement" FieldName="Achievement" ValidationGroup="Report" />
                                         </label>
-                                        <insite:FindAchievement runat="server" ID="FindAchievement" MaxSelectionCount="0" Enabled="false" />
+                                        <insite:FindAchievement runat="server" ID="FindAchievement" MaxSelectionCount="0" Enabled="false" EmptyMessage="All achievements" />
                                     </div>
 
                                 </div>

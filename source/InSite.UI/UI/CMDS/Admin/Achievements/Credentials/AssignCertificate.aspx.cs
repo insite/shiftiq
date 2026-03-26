@@ -278,7 +278,13 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             {
                 PageHelper.AutoBindHeader(this);
 
-                SubType.LoadItems(new[] { AchievementTypes.TimeSensitiveSafetyCertificate, AchievementTypes.TrainingGuide });
+                var organization = Identity.Organization.Code;
+
+                var achievementTypes = new List<string>();
+                achievementTypes.Add(AchievementTypes.Display(AchievementTypes.TimeSensitiveSafetyCertificate, organization));
+                achievementTypes.Add(AchievementTypes.Display(AchievementTypes.TrainingGuide, organization));
+
+                SubType.LoadItems(achievementTypes);
 
                 Category.ListFilter.OrganizationIdentifier = OrganizationSearch.Select(Organization.Identifier).OrganizationIdentifier;
                 Category.RefreshData();

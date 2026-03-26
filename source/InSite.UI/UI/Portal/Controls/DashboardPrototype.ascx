@@ -98,7 +98,7 @@
 
 <div class="alert alert-info d-flex justify-content-between">
     <div>
-        <%= Translate("You started the Pain Management and Opioids course on September 13, 2025. Please continue your course before it expires to avoid losing access.") %>
+        <%= Translate("You started <b>Change Management: Driving Engagement &amp; Performance During Change</b>. Please continue your course to complete it and earn points.") %>
     </div>
     <div class="d-flex align-items-start justify-content-end ms-5">
         <button type="button" class="btn btn-sm btn-primary">
@@ -110,7 +110,7 @@
 
 <div class="alert alert-info d-flex justify-content-between mt-3">
     <div>
-        <%= Translate("You were enrolled in the Sickle Cell Disease course. Please click the Start button to begin your course.") %>
+        <%= Translate("You were enrolled in <b>Develop and Implement HR Policies</b>. Please click Start to begin your course and start earning points.") %>
     </div>
     <div class="d-flex align-items-start justify-content-end ms-5">
         <button type="button" class="btn btn-sm btn-primary">
@@ -162,42 +162,49 @@
     <div class="card" style="flex-grow: 1;">
         <div class="card-body">
             <h3 class="text-center">
-                <%= Translate("My CE Credits") %>
+                <%= Translate("My Points") %>
             </h3>
 
             <div class="bar-grid">
                 <div class="bar-limit bar-limit1"></div>
                 <div class="bar-limit bar-limit2"></div>
 
-                <div>2025</div>
+                <div><%= Translate("Mar") %></div>
                 <div class="bar-container">
                     <div class="bg-warning" style="width: 40%;"></div>
-                    <span><%= Translate("12 completed") %></span>
+                    <span><%= Translate("12 points") %></span>
                 </div>
 
-                <div>2024</div>
+                <div><%= Translate("Feb") %></div>
                 <div class="bar-container">
                     <div class="bg-danger" style="width: 30%;"></div>
-                    <span><span><%= Translate("9 completed") %></span></span>
+                    <span><span><%= Translate("9 points") %></span></span>
                 </div>
 
-                <div>2023</div>
+                <div><%= Translate("Jan") %></div>
                 <div class="bar-container">
                     <div class="bg-success" style="width: 70%;"></div>
-                    <span><%= Translate("21 completed") %></span>
+                    <span><%= Translate("21 points") %></span>
                 </div>
 
-                <div>2022</div>
+                <div><%= Translate("Dec") %></div>
                 <div class="bar-container">
                     <div class="bg-success" style="width: 99%;">
-                        <span><%= Translate("30 completed") %></span>
+                        <span><%= Translate("30 points") %></span>
                     </div>
                 </div>
 
-                <div>2021</div>
+                <div><%= Translate("Nov") %></div>
                 <div class="bar-container">
                     <div class="bg-success" style="width: 99%;">
-                        <span><%= Translate("30 completed") %></span>
+                        <span><%= Translate("30 points") %></span>
+                    </div>
+                </div>
+
+                <div><%= Translate("Oct") %></div>
+                <div class="bar-container">
+                    <div class="bg-success" style="width: 99%;">
+                        <span><%= Translate("30 points") %></span>
                     </div>
                 </div>
 
@@ -205,17 +212,17 @@
                 <div class="bar-label-container">
                     <div>
                         <div class="bar-label1">
-                            1 CEU/10 CEC
+                            10 points
                         </div>
                     </div>
                     <div>
                         <div class="bar-label2">
-                            2 CEU/20 CEC
+                            20 points
                         </div>
                     </div>                    
                     <div>
                         <div class="bar-label3">
-                            3 CEU/30 CEC
+                            30 points
                         </div>
                     </div>                    
                 </div>

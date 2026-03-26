@@ -68,7 +68,7 @@ namespace InSite.UI.Admin.Records
                         OrganizationIdentifier = Organization.OrganizationIdentifier
                     }),
                     Icon = "far fa-ruler-combined",
-                    Title = "Achievement Templates"
+                    Title = "Achievement Layouts"
                 }
             );
             AchievementsSection.Visible = AchievementsCounterRepeater.ItemsCount > 0;

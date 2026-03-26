@@ -132,6 +132,15 @@ namespace InSite.Cmds.Actions.Reporting.Report
         protected global::InSite.Common.Web.UI.FindProgram FindProgram;
 
         /// <summary>
+        /// AchievementType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Custom.CMDS.Common.Controls.Server.AchievementTypeSelector AchievementType;
+
+        /// <summary>
         /// FindAchievement control.
         /// </summary>
         /// <remarks>

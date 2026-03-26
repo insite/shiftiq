@@ -278,8 +278,7 @@ namespace InSite.Domain.Foundations
             var parentId = action.Parent ?? Guid.Empty;
 
             if (operation != null)
-                if (Claims.IsGranted(action.Identifier, operation.Value) || Claims.IsGranted(parentId, operation.Value))
-                    return true;
+                return Claims.IsGranted(action.Identifier, operation.Value) || Claims.IsGranted(parentId, operation.Value);
 
             if (Claims.Contains(action.Identifier) || Claims.Contains(parentId))
                 return true;
@@ -287,7 +286,7 @@ namespace InSite.Domain.Foundations
             return false;
         }
 
-        private bool IsGrantedWithNewLogic(Guid? actionId, DataAccess? operation = null)
+        private bool IsGrantedWithNewLogic(Guid? actionId, DataAccess? operation)
         {
             if (actionId == null || actionId.Value == Guid.Empty)
                 return true;
@@ -300,11 +299,11 @@ namespace InSite.Domain.Foundations
 
             var matrix = PermissionContext.GetMatrix();
 
-            if (matrix.IsAllowed(Organization.Code, resource, roleNames))
+            if (matrix.IsAllowed(Organization.Code, resource, roleNames, operation))
                 return true;
 
             if (!string.IsNullOrEmpty(Partition))
-                return matrix.IsAllowed(Partition, resource, roleNames);
+                return matrix.IsAllowed(Partition, resource, roleNames, operation);
 
             return false;
         }

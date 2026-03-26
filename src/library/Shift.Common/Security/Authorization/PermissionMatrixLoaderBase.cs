@@ -476,7 +476,7 @@ namespace Shift.Common
             GrantAccess(Wildcard, SystemRole.Operator, Wildcard, resourcePermissions);
 
             // Explicitly grant portal access to all users including non-authenticated.
-            GrantAccess("Portal", SystemRole.Any, "data:read", resourcePermissions);
+            GrantAccess("Portal", SystemRole.Any, "data:read data:create data:update data:delete", resourcePermissions);
 
             // TODO: Instead of having access control rules above hardcoded like this, instead we should read the list
             // of partition-wide access control rules from a configuration file. This will allow permission changes

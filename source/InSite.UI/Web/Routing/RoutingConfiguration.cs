@@ -80,6 +80,8 @@ namespace InSite.Web.Routing
             }
 
             Register($"Lobby/Integration/Lti/Launch", "ui/lobby/integration/lti/launch", "~/UI/Lobby/Integration/Lti/Launch.aspx");
+            Register($"SAML", "saml", "~/UI/Lobby/Integration/Saml/Launch.aspx");
+
             Register($"Lobby/Messages/Links", "ui/lobby/messages/links/click", "~/UI/Lobby/Messages/Links/Click.aspx");
             Register($"Lobby/Messages/Links (Legacy MVC)", "mvc/messages/links/click", "~/UI/Lobby/Messages/Links/Click.aspx");
         }
@@ -93,7 +95,7 @@ namespace InSite.Web.Routing
         {
             Register("Sites/Standby", "standby", "~/UI/Lobby/Standby.aspx");
         }
-        
+
         private static void RegisterSurveys()
         {
             Routes.MapPageRoute($"Portal/Surveys/WithIdentification/Launch", "form/{form}/{user}", $"~/UI/Portal/Workflow/Forms/Submit.aspx", false, null, new RouteValueDictionary { { "form", @"^\d+$" } });

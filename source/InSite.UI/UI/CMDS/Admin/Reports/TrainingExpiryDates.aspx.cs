@@ -30,6 +30,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public Guid[] Achievements { get; set; }
             public Guid[] Learners { get; set; }
             public bool? IsRequired { get; set; }
+            public string AchievementType { get; set; }
         }
 
         internal class CompanyGroupNode : GroupNode<DefaultGroupLeaf>, IComparable<CompanyGroupNode>
@@ -156,6 +157,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
             FindProgram.AutoPostBack = true;
             FindProgram.ValueChanged += (s, a) => SetupFindAchievement();
 
+            AchievementType.AutoPostBack = true;
+            AchievementType.ValueChanged += (s, a) => SetupFindAchievement();
+
             IsRequired.AutoPostBack = true;
             IsRequired.SelectedIndexChanged += (s, a) => SetupFindAchievement();
 
@@ -210,6 +214,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
             FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
             FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
             FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
+            FindAchievement.Filter.AchievementLabels.Clear();
+            FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
             FindAchievement.Value = null;
         }
 
@@ -372,12 +378,16 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 Departments = FindDepartment.Values,
                 Achievements = FindAchievement.Values,
                 Learners = FindLearner.Values,
-                IsRequired = GetIsRequired()
+                IsRequired = GetIsRequired(),
+                AchievementType = AchievementType.Value
             };
 
-            if (CurrentParameters.Departments.Length == 0 || CurrentParameters.Achievements.Length == 0)
+            var hasSelectedAchievement = CurrentParameters.Achievements.Length > 0;
+            var hasSelectedAchievementType = !string.IsNullOrEmpty(CurrentParameters.AchievementType);
+
+            if (CurrentParameters.Departments.Length == 0 || (!hasSelectedAchievement && !hasSelectedAchievementType))
             {
-                ScreenStatus.AddMessage(AlertType.Error, "The departments you have selected do not have any training achievements.");
+                ScreenStatus.AddMessage(AlertType.Error, "Select a department and select an achievement (or an achievement type).");
                 return;
             }
 
@@ -426,7 +436,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 CurrentParameters.Achievements,
                 CurrentParameters.Learners,
                 CurrentParameters.IsRequired,
-                Constants.DefaultPassingGrade);
+                CurrentParameters.AchievementType);
 
             var result = new ReportDataSource();
 

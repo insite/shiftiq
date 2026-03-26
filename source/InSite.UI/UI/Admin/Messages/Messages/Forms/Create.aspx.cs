@@ -213,7 +213,7 @@ namespace InSite.Admin.Messages.Messages.Forms
 
             if (model.MessageType == MessageTypeName.Notification)
             {
-                model.MessageName = NewSubject.Text.Default;
+                model.MessageName = NewNotificationName.Value;
             }
             else if (model.MessageType == MessageTypeName.Alert)
             {

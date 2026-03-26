@@ -33,6 +33,7 @@ namespace InSite.Domain.Records
             if (!AllowChanges())
                 return;
 
+            var initialStatus = Data?.Status ?? CredentialStatus.Undefined;
             var isNew = Data == null || Data.Status == CredentialStatus.Undefined;
 
             if (isNew || Data?.Assigned == null)
@@ -52,6 +53,16 @@ namespace InSite.Domain.Records
                 )
             {
                 Apply(new CredentialExpirationChanged(expiration));
+            }
+
+            var actualStatus = Data.Status;
+            var expectedStatus = CredentialState.ExpectedStatus(Data.Granted, Data.Revoked, Data.Expiration, DateTimeOffset.UtcNow);
+
+            if ((actualStatus == CredentialStatus.Valid || initialStatus == CredentialStatus.Expired) && expectedStatus == CredentialStatus.Expired)
+            {
+                var expectedExpiry = CredentialState.CalculateExpectedExpiry(Data.Expiration, Data.Granted);
+                if (expectedExpiry.HasValue)
+                    Apply(new CredentialExpired2(expectedExpiry.Value));
             }
         }
 

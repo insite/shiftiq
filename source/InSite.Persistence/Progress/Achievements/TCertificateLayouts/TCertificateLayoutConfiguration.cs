@@ -12,7 +12,7 @@ namespace InSite.Persistence
             HasKey(x => new { x.CertificateLayoutIdentifier });
 
             Property(x => x.CertificateLayoutCode).IsRequired().IsUnicode(false).HasMaxLength(100);
-            Property(x => x.CertificateLayoutData).IsRequired().IsUnicode(true).HasMaxLength(1200);
+            Property(x => x.CertificateLayoutData).IsRequired().IsUnicode(true).HasMaxLength(2400);
             Property(x => x.OrganizationIdentifier).IsRequired();
         }
     }

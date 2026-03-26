@@ -17,6 +17,9 @@
         // when the user authenticates with Google
         public const string Google = "Google";
 
+        // when the user is authenticated by a token issued by a Security Assertion Markup Language identity provider
+        public const string Saml = "SAML";
+
         // when the user is not authenticated
         public const string None = "None";
     }

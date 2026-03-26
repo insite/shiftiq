@@ -494,20 +494,24 @@ namespace InSite.Persistence.Plugin.CMDS
                 Guid[] departments,
                 Guid[] achievements,
                 Guid[] learners,
-                bool? isRequired
+                bool? isRequired,
+                string achievementType
             )
         {
             using (var db = new InternalDbContext(false, false))
             {
-                var allDepartments = departments.Length == 0;
+                var anyDepartment = departments.Length == 0;
+                var anyAchievement = achievements.Length == 0;
+                var anyAchievementType = string.IsNullOrEmpty(achievementType);
 
                 var credentials = db.VCmdsCredentials.Where(
                     x => x.UserUtcArchived == null
                       && db.Memberships.Any(
                           y => y.UserIdentifier == x.UserIdentifier
-                            && (allDepartments || departments.Contains(y.GroupIdentifier))
+                            && (anyDepartment || departments.Contains(y.GroupIdentifier))
                             && y.MembershipType == "Department")
-                      && achievements.Contains(x.AchievementIdentifier)
+                      && (anyAchievementType || achievementType == x.AchievementLabel)
+                      && (anyAchievement || achievements.Contains(x.AchievementIdentifier))
                 );
 
                 if (learners.IsNotEmpty())
@@ -532,7 +536,7 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
-        public static IEnumerable<TrainingExpiryDate> SelectTrainingExpiryDates(Guid[] departments, Guid[] resources, Guid[] learners, bool? isRequired, decimal minimumPassingGrade)
+        public static IEnumerable<TrainingExpiryDate> SelectTrainingExpiryDates(Guid[] departments, Guid[] resources, Guid[] learners, bool? isRequired, string achievementType)
         {
             var sqlParameters = new SqlParameter[]
             {
@@ -540,13 +544,13 @@ namespace InSite.Persistence.Plugin.CMDS
                 new SqlParameter("@Achievements", resources.IsNotEmpty() ? string.Join(",", resources) : (object)DBNull.Value),
                 new SqlParameter("@Learners", learners.IsNotEmpty() ? string.Join(",", learners) : (object)DBNull.Value),
                 new SqlParameter("@IsRequired", isRequired ?? (object)DBNull.Value),
-                new SqlParameter("@MinimumPassingGrade", minimumPassingGrade)
+                new SqlParameter("@AchievementType", achievementType.IsNotEmpty() ? achievementType : (object)DBNull.Value)
             };
 
             using (var db = new InternalDbContext())
             {
                 return db.Database
-                    .SqlQuery<TrainingExpiryDate>("EXEC custom_cmds.SelectTrainingExpiryDates @Departments, @Achievements, @Learners, @IsRequired, @MinimumPassingGrade", sqlParameters)
+                    .SqlQuery<TrainingExpiryDate>("EXEC custom_cmds.SelectTrainingExpiryDates @Departments, @Achievements, @Learners, @IsRequired, @AchievementType", sqlParameters)
                     .ToList();
             }
         }
@@ -559,19 +563,21 @@ namespace InSite.Persistence.Plugin.CMDS
             DateTimeRange credentialGranted,
             string credentialStatus,
             string membershipFunction,
-            bool? allowSelfDeclaredAchievements)
+            bool? allowSelfDeclaredAchievements,
+            string achievementType)
         {
             var sqlParameters = new SqlParameter[]
             {
                 new SqlParameter("@Departments", string.Join(",", departments)),
-                new SqlParameter("@Achievements", string.Join(",", achievements)),
+                new SqlParameter("@Achievements", achievements.IsNotEmpty() ? string.Join(",", achievements) : (object)DBNull.Value),
                 new SqlParameter("@Learners", learners.IsNotEmpty() ? string.Join(",", learners) : (object)DBNull.Value),
                 new SqlParameter("@IsRequired", isRequired ?? (object)DBNull.Value),
                 new SqlParameter("@CredentialGrantedStartDate", credentialGranted?.Since ?? (object)DBNull.Value),
                 new SqlParameter("@CredentialGrantedEndDate", credentialGranted?.Before ?? (object)DBNull.Value),
                 new SqlParameter("@CredentialStatus", string.IsNullOrEmpty(credentialStatus) ? (object)DBNull.Value : credentialStatus),
                 new SqlParameter("@MembershipType", string.IsNullOrEmpty(membershipFunction) ? (object)DBNull.Value : membershipFunction),
-                new SqlParameter("@AllowSelfDeclared", allowSelfDeclaredAchievements ?? (object)DBNull.Value)
+                new SqlParameter("@AllowSelfDeclared", allowSelfDeclaredAchievements ?? (object)DBNull.Value),
+                new SqlParameter("@AchievementType", achievementType.IsNotEmpty() ? achievementType : (object)DBNull.Value)
             };
 
             using (var db = new InternalDbContext())
@@ -589,7 +595,8 @@ namespace InSite.Persistence.Plugin.CMDS
                         ", @CredentialGrantedEndDate" +
                         ", @CredentialStatus" +
                         ", @MembershipType" +
-                        ", @AllowSelfDeclared"
+                        ", @AllowSelfDeclared" +
+                        ", @AchievementType"
                         , sqlParameters)
                     .ToList();
             }

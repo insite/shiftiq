@@ -59,8 +59,8 @@ namespace InSite.UI.Admin.Contacts.People.Forms
         private void DeleteButton_Click(object sender, EventArgs e)
         {
             var connection = UserConnectionSearch.Select(FromKey.Value, ToKey.Value);
-
-            UserConnectionStore.Delete(connection);
+            if (connection != null)
+                UserConnectionStore.Delete(connection);
 
             HttpResponseHelper.Redirect($"/ui/admin/contacts/people/edit?contact={FromIdentifier}&panel=people");
         }

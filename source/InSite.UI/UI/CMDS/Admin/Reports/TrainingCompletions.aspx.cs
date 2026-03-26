@@ -34,6 +34,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public string CredentialStatus { get; set; }
             public string MembershipFunction { get; set; }
             public bool ExcludeSelfDeclaredCredentials { get; set; }
+            public string AchievementType { get; set; }
         }
 
         #endregion
@@ -59,6 +60,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             FindProgram.AutoPostBack = true;
             FindProgram.ValueChanged += (s, a) => SetupFindAchievement();
+
+            AchievementType.AutoPostBack = true;
+            AchievementType.ValueChanged += (s, a) => SetupFindAchievement();
 
             IsRequired.AutoPostBack = true;
             IsRequired.SelectedIndexChanged += (s, a) => SetupFindAchievement();
@@ -138,7 +142,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     CurrentParameters.CredentialGranted,
                     CurrentParameters.CredentialStatus,
                     CurrentParameters.MembershipFunction,
-                    CurrentParameters.@ExcludeSelfDeclaredCredentials)
+                    CurrentParameters.@ExcludeSelfDeclaredCredentials,
+                    CurrentParameters.AchievementType)
                 .OrderBy(x => x.FullName)
                 .ThenBy(x => x.CompanyName)
                 .ThenBy(x => x.DepartmentName)
@@ -197,6 +202,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
             FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
             FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
             FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
+            FindAchievement.Filter.AchievementLabels.Clear();
+            FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
             FindAchievement.Value = null;
         }
 
@@ -222,7 +229,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     CurrentParameters.CredentialGranted,
                     CurrentParameters.CredentialStatus,
                     CurrentParameters.MembershipFunction,
-                    CurrentParameters.@ExcludeSelfDeclaredCredentials)
+                    CurrentParameters.@ExcludeSelfDeclaredCredentials,
+                    CurrentParameters.AchievementType
+                    )
                 .ToList();
 
             if (dataSource.Count == 0)
@@ -255,7 +264,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 CredentialGranted = new DateTimeRange(CredentialGrantedSince.Value, CredentialGrantedBefore.Value),
                 CredentialStatus = CredentialStatus.Value,
                 MembershipFunction = GetMembershipFunction(),
-                ExcludeSelfDeclaredCredentials = ExcludeSelfDeclaredCredentials.Checked
+                ExcludeSelfDeclaredCredentials = ExcludeSelfDeclaredCredentials.Checked,
+                AchievementType = AchievementType.Value
             };
         }
 

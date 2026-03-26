@@ -235,6 +235,18 @@ namespace InSite.Common.Web
             response.End();
         }
 
+        public static void SendHttp401(HttpResponse response)
+        {
+            response.Clear();
+            response.ClearHeaders();
+            response.ClearContent();
+
+            response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            response.StatusDescription = HttpStatusCode.Unauthorized.GetStatusDescription();
+
+            response.End();
+        }
+
         public static void SendHttp403(bool redirect = true)
             => SendHttp403(HttpContext.Current.Response, HttpContext.Current.Request.RawUrl, null, redirect);
 

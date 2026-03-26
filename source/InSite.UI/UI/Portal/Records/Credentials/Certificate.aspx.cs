@@ -201,7 +201,7 @@ namespace InSite.UI.Portal.Records.Credentials
             BaseCertificate LoadCmdsCertificate(QAchievement achievement, VCredential credential)
             {
                 var certificate = achievement.CertificateLayoutCode;
-                if (certificate == null)
+                if (certificate.IsEmpty())
                     certificate = "Keyera-CMDS";
 
                 var result = LoadCertificate(certificate);

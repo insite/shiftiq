@@ -5,6 +5,7 @@
         public string Autologin { get; set; }
         public string Secret { get; set; }
         public SentinelsSettings Sentinels { get; set; }
+        public SamlSettings Saml { get; set; }
         public TokenSettings Token { get; set; }
         public CookieSettings Cookie { get; set; }
         public IdCookieSettings IdCookie { get; set; }

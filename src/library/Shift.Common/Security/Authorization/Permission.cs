@@ -508,16 +508,27 @@ namespace Shift.Common
         public bool IsAllowed(string organization, string resource, string role, AuthorityAccess access)
             => TryGetPermissions(organization, out var list) && list.IsAllowed(resource, role, access);
 
-        public bool IsAllowed(string organization, string resource, string[] roles)
+        public bool IsAllowed(string organization, string resource, string[] roles, DataAccess? access)
         {
             if (!TryGetPermissions(organization, out var list))
                 return false;
 
-            if (roles.Any(role => list.IsAllowed(resource, role)))
-                return true;
+            if (access == null)
+            {
+                if (roles.Any(role => list.IsAllowed(resource, role)))
+                    return true;
 
-            if (roles.Any(role => list.IsAllowedByRoute(resource, role)))
-                return true;
+                if (roles.Any(role => list.IsAllowedByRoute(resource, role)))
+                    return true;
+            }
+            else
+            {
+                if (roles.Any(role => list.IsAllowed(resource, role, access.Value)))
+                    return true;
+
+                if (roles.Any(role => list.IsAllowedByRoute(resource, role, access.Value)))
+                    return true;
+            }
 
             return false;
         }

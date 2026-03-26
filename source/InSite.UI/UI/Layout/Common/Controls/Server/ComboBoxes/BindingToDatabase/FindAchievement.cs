@@ -10,8 +10,37 @@ namespace InSite.Common.Web.UI
     {
         #region Properties
 
-        public QAchievementFilter Filter => (QAchievementFilter)(ViewState[nameof(Filter)]
-            ?? (ViewState[nameof(Filter)] = new QAchievementFilter(CurrentSessionState.Identity.Organization.Identifier)));
+        public QAchievementFilter Filter
+        {
+            get
+            {
+                var organization = CurrentSessionState.Identity.Organization;
+
+                var filter = (QAchievementFilter)ViewState[nameof(Filter)];
+
+                if (filter == null)
+                {
+                    filter = new QAchievementFilter(organization.Identifier);
+
+                    var partition = ServiceLocator.Partition;
+
+                    if (partition.IsE03())
+                    {
+                        var global = ServiceLocator.AppSettings.Application.Organizations.Global;
+
+                        filter.OrganizationIdentifiers.Add(global);
+                    }
+                }
+
+                ViewState[nameof(Filter)] = filter;
+
+                return filter;
+            }
+            set
+            {
+                ViewState[nameof(Filter)] = value;
+            }
+        }
 
         #endregion
 
