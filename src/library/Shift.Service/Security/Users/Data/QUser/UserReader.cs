@@ -127,6 +127,9 @@ public class UserReader : IEntityReader
 
         var query = BuildQueryable(db, criteria.OrganizationId);
 
+        if (criteria.UserIds != null && criteria.UserIds.Length > 0)
+            query = query.Where(x => criteria.UserIds.Contains(x.UserIdentifier));
+
         if (criteria.UserEmailExact.IsNotEmpty())
             query = query.Where(x => x.Email == criteria.UserEmailExact);
 

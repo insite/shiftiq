@@ -297,6 +297,7 @@ namespace InSite.Persistence
         public DbSet<VJournalSetupUser> VJournalSetupUsers { get; set; }
         public DbSet<VLearnerActivity> VLearnerActivities { get; set; }
         public DbSet<VMailout> XMailouts { get; set; }
+        public DbSet<VMailoutFailure> VMailoutFailures { get; set; }
         public DbSet<VMembership> VMemberships { get; set; }
         public DbSet<VMessage> XMessages { get; set; }
         public DbSet<VOrganization> Organizations { get; set; }
@@ -686,6 +687,7 @@ namespace InSite.Persistence
             builder.Configurations.Add(new QUnitConfiguration());
             builder.Configurations.Add(new VCourseConfiguration());
             builder.Configurations.Add(new OrganizationPermissionConfiguration());
+            builder.Configurations.Add(new VMailoutFailureConfiguration());
 
             #region Custom
 

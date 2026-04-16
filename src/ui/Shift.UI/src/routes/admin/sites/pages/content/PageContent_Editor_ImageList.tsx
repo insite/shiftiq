@@ -69,7 +69,7 @@ export default function PageContent_Editor_ImageList({ block, fieldName }: Props
                     disabled={readOnly}
                     onClick={handleAddImage}
                 >
-                    <Icon style="Solid" name="plus-circle" />
+                    <Icon style="solid" name="plus-circle" />
                 </button>
             </label>
             {images?.length ? (
@@ -93,6 +93,7 @@ export default function PageContent_Editor_ImageList({ block, fieldName }: Props
                                     defaultValue={v?.url ?? ""}
                                     readOnly={readOnly}
                                     onBlur={value => handleModifyUrl(index, value)}
+                                    onFileUploaded={value => handleModifyUrl(index, value)}
                                 />
                             </div>
                             <Button

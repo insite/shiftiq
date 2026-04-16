@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Shift.Contract.Presentation;
+using Shift.Sdk.Service.Security.Cookies;
 using Shift.Service.Directory;
 
 namespace Shift.Api;
@@ -29,6 +30,8 @@ public partial class CookieController : ShiftControllerBase
 
     private readonly IReactService _reactService;
 
+    private readonly ICookieService _cookieService;
+
     public CookieController(
         AppSettings appSettings,
         PersonService personService,
@@ -36,7 +39,8 @@ public partial class CookieController : ShiftControllerBase
         OrganizationAdapter organizationAdapter,
         GroupService groupService,
         IPrincipalProvider identityService,
-        IReactService reactService
+        IReactService reactService,
+        ICookieService cookieService
         )
     {
         _appSettings = appSettings;
@@ -52,22 +56,23 @@ public partial class CookieController : ShiftControllerBase
         _identityService = identityService;
 
         _reactService = reactService;
+
+        _cookieService = cookieService;
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync(string organizationCode, string email)
+    public async Task<IActionResult> LoginAsync(string organizationCode, string email, string? impersonatorOrganizationCode, string? impersonatorUserEmail)
     {
-        var domain = GetSecurityDomain();
-        var settings = _appSettings.Security.Cookie;
-
-        if (domain != "localhost" && !settings.Debug)
+        if (_cookieService.GetSecurityDomain() != "localhost" && !_cookieService.Debug)
             return BadRequest("An untrusted cookie can be injected by the client only for debugging purposes.");
 
-        var token = await new LoginHelper(_personService, _organizationService, _groupService, _identityService).LoginAsync(organizationCode, email);
+        var token = await new LoginHelper(_personService, _organizationService, _groupService, _identityService)
+            .LoginAsync(organizationCode, email, impersonatorOrganizationCode, impersonatorUserEmail);
+
         if (token == null)
             return BadRequest("Failed to create the token");
 
-        AppendSecurityCookie(token);
+        _cookieService.AppendSecurityCookie(token);
 
         return Ok(new { token });
     }
@@ -75,38 +80,7 @@ public partial class CookieController : ShiftControllerBase
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        var environment = _appSettings.Release.GetEnvironment();
-
-        var settings = _appSettings.Security.Cookie;
-        var idSettings = _appSettings.Security.IdCookie;
-
-        var domain = environment.IsLocal() ? "localhost" : _appSettings.Partition.Domain;
-
-        var sameSite = settings.Encrypt ? SameSiteMode.Lax : SameSiteMode.None;
-
-        Response.Cookies.Delete(
-            settings.Name,
-            new CookieOptions
-            {
-                Domain = domain,
-                Path = settings.Path,
-                SameSite = sameSite,
-                Secure = true,
-                HttpOnly = true
-            }
-        );
-
-        Response.Cookies.Delete(
-            idSettings.Name,
-            new CookieOptions
-            {
-                Domain = domain,
-                Path = settings.Path,
-                SameSite = sameSite,
-                Secure = true,
-                HttpOnly = true
-            }
-        );
+        _cookieService.DeleteSecurityCookie();
 
         return Ok();
     }
@@ -328,13 +302,13 @@ public partial class CookieController : ShiftControllerBase
         }
     }
 
+    [HybridAuthorize()]
     [HttpPost("change-language/{language}")]
     public async Task<IActionResult> ChangeLanguageAsync([FromRoute] string language)
     {
-        var cookieSettings = _appSettings.Security.Cookie;
-        var cookie = Request.Cookies[cookieSettings.Name];
-        if (cookie == null)
-            return BadRequest($"Cookie is missing: {cookieSettings.Name}");
+        var token = _cookieService.GetCookieToken();
+        if (token == null)
+            return BadRequest($"Cookie is missing or broken");
 
         var principal = _identityService.GetPrincipal();
         if (principal.UserId == Guid.Empty)
@@ -346,33 +320,19 @@ public partial class CookieController : ShiftControllerBase
         if (organizationData == null || !organizationData.Languages.Any(x => x.TwoLetterISOLanguageName == language))
             return BadRequest($"Unsupported language: {language}");
 
-        CookieToken token;
-
-        try
-        {
-            token = new CookieTokenEncoder().Deserialize(cookie, cookieSettings.Encrypt, cookieSettings.Secret, false);
-        }
-        catch (CookieSerializationException)
-        {
-            return BadRequest($"Cookie is broken: {cookieSettings.Name}");
-        }
-
-        token.ResetCreated();
-        token.ResetID();
         token.Language = language;
 
-        AppendSecurityCookie(token);
+        _cookieService.AppendSecurityCookie(token);
 
         return Ok();
     }
 
+    [HybridAuthorize()]
     [HttpPost("change-theme/{theme}")]
     public IActionResult ChangeTheme([FromRoute] string theme)
     {
-        var domain = GetSecurityDomain();
-        var settings = _appSettings.Security.Cookie;
-
-        if (domain != "localhost" && !settings.Debug)
+        var domain = _cookieService.GetSecurityDomain();
+        if (domain != "localhost" && !_cookieService.Debug)
             return BadRequest("This endpoint is available only for debugging purposes");
 
         string normalizedTheme;
@@ -391,7 +351,7 @@ public partial class CookieController : ShiftControllerBase
             {
                 Domain = domain,
                 Expires = DateTime.Now.AddDays(90),
-                Path = settings.Path,
+                Path = _cookieService.Path,
                 SameSite = SameSiteMode.Lax,
                 HttpOnly = false
             }
@@ -400,52 +360,14 @@ public partial class CookieController : ShiftControllerBase
         return Ok();
     }
 
-    private void AppendSecurityCookie(CookieToken token)
+    [HybridAuthorize()]
+    [HttpPost("refresh-session")]
+    public IActionResult RefreshSession()
     {
-        var domain = GetSecurityDomain();
-        var settings = _appSettings.Security.Cookie;
-        var idSettings = _appSettings.Security.IdCookie;
-        var now = DateTimeOffset.UtcNow;
-        var expiry = now.AddMinutes(settings.Lifetime);
-        var sameSite = settings.Encrypt ? SameSiteMode.Lax : SameSiteMode.None;
+        var token = _cookieService.GetCookieToken();
+        if (token != null)
+            _cookieService.AppendSecurityCookie(token);
 
-        token.ValidationKey = CookieToken.CreateValidationKey(token, settings.Secret);
-
-        var serializedToken = new CookieTokenEncoder().Serialize(token, settings.Encrypt, settings.Secret, false);
-
-        Response.Cookies.Append(
-            settings.Name,
-            serializedToken,
-            new CookieOptions
-            {
-                Domain = domain,
-                Expires = expiry,
-                Path = settings.Path,
-                SameSite = sameSite,
-                Secure = true,
-                HttpOnly = true
-            }
-        );
-
-        Response.Cookies.Append(
-            idSettings.Name,
-            token.ID.ToString().ToLower(),
-            new CookieOptions
-            {
-                Domain = domain,
-                Expires = expiry,
-                Path = settings.Path,
-                SameSite = sameSite,
-                Secure = true,
-                HttpOnly = true
-            }
-        );
-    }
-
-    private string GetSecurityDomain()
-    {
-        return string.Equals(Request.Host.Host, "localhost", StringComparison.OrdinalIgnoreCase)
-            ? Request.Host.Host
-            : _appSettings.Partition.Domain;
+        return Ok();
     }
 }

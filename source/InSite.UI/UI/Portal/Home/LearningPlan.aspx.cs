@@ -61,7 +61,7 @@ namespace InSite.UI.Portal.Home
             PortalMaster.ShowAvatar();
             PortalMaster.EnableSidebarToggle(true);
 
-            var list = VCmdsCredentialSearch.SelectForTrainingPlan(User.Identifier, Organization.OrganizationIdentifier, null);
+            var list = VCmdsCredentialSearch.SelectForTrainingPlan(User.Identifier, Organization.OrganizationIdentifier, (string)null);
 
             if (!StringHelper.Equals(ShowWhat.SelectedValue, "All"))
                 list = list.Where(x => x.CredentialStatus == ShowWhat.SelectedValue).ToList();

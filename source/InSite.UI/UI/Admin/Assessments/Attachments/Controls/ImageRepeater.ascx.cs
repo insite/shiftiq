@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+using InSite.Common.Web;
 using InSite.Common.Web.Infrastructure;
 using InSite.Domain.Banks;
 using InSite.Persistence;
@@ -21,6 +22,14 @@ namespace InSite.Admin.Assessments.Attachments.Controls
     {
         #region Classes
 
+        private class FileInfo
+        {
+            public Guid Identifier { get; set; }
+            public string FileName { get; set; }
+            public string DocumentName { get; set; }
+            public string NavigateUrl { get; set; }
+        }
+
         private class UploadedImage
         {
             #region Properties
@@ -32,7 +41,6 @@ namespace InSite.Admin.Assessments.Attachments.Controls
 
             public string Name { get; private set; }
             public string Url { get; private set; }
-            public string Path { get; private set; }
 
             public string Icon
             {
@@ -78,13 +86,26 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                 RegexOptions.IgnoreCase | RegexOptions.Compiled
             );
 
+            private static readonly Regex _environmentPattern = new Regex(
+                @"https://(?:(?<Environment>dev|local|sandbox)-)?(?<Organization>.*)\.",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled
+            );
+
             #endregion
 
             #region Construction
 
-            public UploadedImage(string url)
+            public UploadedImage(string url, Guid id, string fileName, string documentName)
             {
                 url = HttpUtility.UrlDecode(url);
+
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    Name = documentName;
+                    Url = HttpRequestHelper.CurrentRootUrl + ServiceLocator.StorageService.GetFileUrl(id, fileName);
+                    _environment = ServiceLocator.AppSettings.Environment.Name;
+                    return;
+                }
 
                 var image = _urlPattern.Match(url);
 
@@ -104,11 +125,11 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                 if (query.Success)
                     url = url.Substring(0, url.Length - query.Length);
 
-                Path = image.Groups["Path"].Value;
                 Url = url;
 
-                if (Path.IndexOfAny(System.IO.Path.GetInvalidPathChars()) < 0)
-                    Name = System.IO.Path.GetFileName(Path);
+                var path = image.Groups["Path"].Value;
+                if (path.IndexOfAny(System.IO.Path.GetInvalidPathChars()) < 0)
+                    Name = System.IO.Path.GetFileName(path);
 
                 if (string.IsNullOrEmpty(Name))
                     Name = url;
@@ -194,8 +215,33 @@ namespace InSite.Admin.Assessments.Attachments.Controls
             BankID = bank.Identifier;
 
             var organization = CurrentSessionState.Identity.Organization;
+            var attachments = bank.EnumerateAllAttachments().GroupBy(x => x.FileIdentifier ?? x.Upload).ToDictionary(x => x.Key, x => x.First());
             var images = new Dictionary<string, UploadedImage>(StringComparer.OrdinalIgnoreCase);
 
+            var files = GetFiles(bank);
+
+            foreach (var file in files)
+            {
+                var image = new UploadedImage(file.NavigateUrl, file.Identifier, file.FileName, file.DocumentName);
+                if (!images.ContainsKey(image.Url))
+                    images.Add(image.Url, image);
+
+                if (attachments.TryGetValue(file.Identifier, out var attachment))
+                    image.Attachment = new AttachmentInfo(attachment);
+
+                image.IsUploaded = true;
+            }
+
+            ParseQuestions(bank, attachments, images);
+
+            Repeater.DataSource = images.Select(x => x.Value)
+                .OrderBy(x => !x.IsAttached)
+                .ThenBy(x => (x.Attachment?.Title).IfNullOrEmpty(x.Name));
+            Repeater.DataBind();
+        }
+
+        private void ParseQuestions(BankState bank, Dictionary<Guid, Attachment> attachments, Dictionary<string, UploadedImage> images)
+        {
             foreach (var question in bank.Sets.SelectMany(x => x.EnumerateAllQuestions()))
             {
                 var title = question.Content.Title?.Default;
@@ -208,33 +254,45 @@ namespace InSite.Admin.Assessments.Attachments.Controls
 
                 foreach (Match match in matches)
                 {
-                    var image = new UploadedImage(match.Groups["Url"].Value);
+                    var url = match.Groups["Url"].Value;
+                    var files = ServiceLocator.StorageService.ExtractAndParseFileUrls(url);
+
+                    var image = files.Count > 0 && attachments.ContainsKey(files[0].FileIdentifier)
+                        ? new UploadedImage(null, files[0].FileIdentifier, files[0].FileName, files[0].FileName)
+                        : new UploadedImage(url, Guid.Empty, null, null);
+
                     if (!images.ContainsKey(image.Url))
                         images.Add(image.Url, image);
                 }
             }
+        }
 
-            var uploads = UploadSearch.Bind(
-                x => new { x.UploadIdentifier, x.Name, x.NavigateUrl },
-                bank.EnumerateAllAttachments().Where(x => x.Type == AttachmentType.Image));
-            var attachments = bank.EnumerateAllAttachments().GroupBy(x => x.Upload).ToDictionary(x => x.Key, x => x.First());
+        private static List<FileInfo> GetFiles(BankState bank)
+        {
+            var attachments = bank.EnumerateAllAttachments().Where(x => x.Type == AttachmentType.Image).ToList();
 
-            foreach (var upload in uploads)
-            {
-                var url = FileHelper.GetUrl(upload.NavigateUrl);
-                if (!images.TryGetValue(url, out var image))
-                    images.Add(url, image = new UploadedImage(url));
+            var uploads = UploadSearch.Bind(x => new { x.UploadIdentifier, x.Name, x.NavigateUrl }, attachments)
+                .Select(x => new FileInfo
+                {
+                    Identifier = x.UploadIdentifier,
+                    NavigateUrl = FileHelper.GetUrl(x.NavigateUrl)
+                })
+                .ToList();
 
-                if (attachments.TryGetValue(upload.UploadIdentifier, out var attachment))
-                    image.Attachment = new AttachmentInfo(attachment);
+            var fileIds = attachments.Where(x => x.FileIdentifier.HasValue).Select(x => x.FileIdentifier.Value).ToArray();
+            var files = ServiceLocator.FileSearch
+                .GetModels(fileIds, false)
+                .Select(x => new FileInfo
+                {
+                    Identifier = x.FileIdentifier,
+                    FileName = x.FileName,
+                    DocumentName = x.Properties.DocumentName,
+                })
+                .ToList();
 
-                image.IsUploaded = true;
-            }
+            files.AddRange(uploads);
 
-            Repeater.DataSource = images.Select(x => x.Value)
-                .OrderBy(x => !x.IsAttached)
-                .ThenBy(x => (x.Attachment?.Title).IfNullOrEmpty(x.Name));
-            Repeater.DataBind();
+            return files;
         }
 
         #endregion

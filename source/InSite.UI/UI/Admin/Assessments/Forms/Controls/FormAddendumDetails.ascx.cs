@@ -37,6 +37,7 @@ namespace InSite.Admin.Assessments.Forms.Controls
                 .ToDictionary(x => (x.Asset, x.AssetVersion), x => x);
             var addendum = form.Addendum;
             var dataSource = AddendumHelper.GetRepeaterDataSource(
+                form.Specification.Bank.Identifier,
                 GetAttachments(addendum.Acronyms),
                 GetAttachments(addendum.Formulas),
                 GetAttachments(addendum.Figures));

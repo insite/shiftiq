@@ -110,7 +110,8 @@ namespace InSite.UI
                 UserIdentifier = User.UserIdentifier,
                 Statuses = new[] { ValidationStatuses.SelfAssessed }
             };
-            var count = UserCompetencyRepository.CountSearchResults(filter, null, null);
+
+            var count = UserCompetencyRepository.CountSearchResults(filter, null);
 
             InfoToast.Visible = count > 0;
 
@@ -138,7 +139,7 @@ namespace InSite.UI
             })
                 .ToList();
 
-            if (InSite.UI.Portal.Learning.Plan.ShowSafetyAchievementsOnly())
+            if (InSite.UI.Portal.Learning.LearningHelper.ShowSafetyAchievementsOnly())
                 ProgressItems = ProgressItems.Where(x => x.Title == "Time-Sensitive Safety Certificates").ToList();
         }
 

@@ -1170,7 +1170,11 @@ namespace InSite.Persistence
                         if (group == null)
                             continue;
 
-                        MembershipStore.Save(MembershipFactory.Create(response.RespondentUserIdentifier, group.GroupIdentifier, organizationId, "Survey Respondent", null));
+                        var function = string.Equals(group.GroupType, "Department", StringComparison.OrdinalIgnoreCase)
+                            ? "Department"
+                            : "Survey Respondent";
+
+                        MembershipStore.Save(MembershipFactory.Create(response.RespondentUserIdentifier, group.GroupIdentifier, organizationId, function, null));
                     }
                 }
             }

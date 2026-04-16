@@ -1,6 +1,6 @@
 import { translate } from "@/helpers/translate";
 import { ChangeFileFormatHandler, ChangeHiddenColumnsHandler, ChangeRemoveSpacesHandler } from "./useSearchDownload";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { numberHelper } from "@/helpers/numberHelper";
 
 interface Props {

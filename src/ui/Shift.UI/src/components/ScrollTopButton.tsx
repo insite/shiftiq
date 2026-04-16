@@ -50,7 +50,7 @@ export default function ScrollTopButton() {
             <svg viewBox="0 0 40 40" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <circle ref={circleRef} cx="20" cy="20" r="19" fill="none" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"></circle>
             </svg>
-            <Icon style="Regular" name="arrow-up" />
+            <Icon style="regular" name="arrow-up" />
         </a>
     );
 }

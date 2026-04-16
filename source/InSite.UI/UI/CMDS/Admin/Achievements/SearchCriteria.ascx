@@ -7,16 +7,17 @@
             <h4>Criteria</h4>
             <div class="row">
                 <div class="col-6">
+
                     <div class="mb-2">
-                        <cmds:AchievementTypeSelector ID="SubType" runat="server" EmptyMessage="Type" NullText="" />
+                        <cmds:AchievementTypeSelector ID="AchievementType" runat="server" EmptyMessage="Achievement Type" NullText="" />
                     </div>
     
                     <div class="mb-2">
-                        <insite:TextBox ID="Title" runat="server" EmptyMessage="Title" MaxLength="256" />
+                        <insite:TextBox ID="Title" runat="server" EmptyMessage="Achievement Title" MaxLength="256" />
                     </div>
 
                     <div class="mb-2">
-                        <insite:TextBox ID="Description" runat="server" EmptyMessage="Description" MaxLength="256" />
+                        <insite:TextBox ID="Description" runat="server" EmptyMessage="Achievement Description" MaxLength="256" />
                     </div>
 
                     <div class="mb-2">
@@ -28,6 +29,17 @@
                             </Items>
                         </insite:ComboBox>
                     </div>
+
+                    <div class="mb-2">
+                        <insite:ComboBox ID="AllowSelfDeclaration" runat="server">
+                            <Items>
+                                <insite:ComboBoxOption Text="All" />
+                                <insite:ComboBoxOption Value="True" Text="Allow self-declaration" />
+                                <insite:ComboBoxOption Value="False" Text="Disallow self-declaration" />
+                            </Items>
+                        </insite:ComboBox>
+                    </div>
+
                 </div>
                 <div class="col-6">
                     <div class="mb-2">

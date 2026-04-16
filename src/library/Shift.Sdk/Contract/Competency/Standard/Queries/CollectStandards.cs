@@ -16,7 +16,9 @@ namespace Shift.Contract
         public Guid? ModifiedBy { get; set; }
         public Guid? OrganizationId { get; set; }
         public Guid? ParentStandardId { get; set; }
+        public Guid[] ParentStandardIds { get; set; }
         public Guid? StandardStatusLastUpdateUser { get; set; }
+        public Guid[] StandardIds { get; set; }
 
         public bool? IsCertificateEnabled { get; set; }
         public bool? IsFeedbackEnabled { get; set; }

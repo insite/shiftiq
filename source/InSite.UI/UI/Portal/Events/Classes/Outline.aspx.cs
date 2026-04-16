@@ -192,24 +192,27 @@ namespace InSite.UI.Portal.Events.Classes
         {
             PageHelper.AutoBindHeader(this);
 
+            var lang = Identity.Language;
+            var content = ContentEventClass.Deserialize(@event.Content);
+            var summary = content.Summary.Get(lang);
+            var description = content.Description.Get(lang);
+            var materialsForParticipation = content.MaterialsForParticipation.Get(lang);
+            var contactInstruction = content.Get(EventInstructionType.Contact.GetName())?.Get(lang);
+            var accommodationInstruction = content.Get(EventInstructionType.Accommodation.GetName())?.Get(lang);
+            var additionalInstruction = content.Get(EventInstructionType.Additional.GetName())?.Get(lang);
+            var cancellationInstruction = content.Get(EventInstructionType.Cancellation.GetName())?.Get(lang);
+            var registrationCompetedInstruction = content.Get(EventInstructionType.Completion.GetName())?.Get(lang);
+
             var scheduledDate = @event.EventScheduledEnd.HasValue && @event.EventScheduledEnd.Value.Date != @event.EventScheduledStart.Date
                 ? $"{@event.EventScheduledStart.FormatDateOnly(User.TimeZone)} - {@event.EventScheduledEnd.Value.FormatDateOnly(User.TimeZone)}"
                 : $"{@event.EventScheduledStart.FormatDateOnly(User.TimeZone)}";
 
             PortalMaster.Breadcrumbs.BindTitleAndSubtitleNoTranslate(
-                @event.EventTitle,
-                Translate("Scheduled ") + scheduledDate);
+                content.Title.Get(lang).IfNullOrEmpty(@event.EventTitle),
+                Translate("Scheduled") + " " + scheduledDate);
 
-            var content = ContentEventClass.Deserialize(@event.Content);
-            var contactInstruction = content.Get(EventInstructionType.Contact.GetName());
-            var accommodationInstruction = content.Get(EventInstructionType.Accommodation.GetName());
-            var additionalInstruction = content.Get(EventInstructionType.Additional.GetName());
-            var cancellationInstruction = content.Get(EventInstructionType.Cancellation.GetName());
-            var registrationCompetedInstruction = content.Get(EventInstructionType.Completion.GetName());
-
-            var summary = content.Summary != null && content.Summary.Default.HasValue() ? Markdown.ToHtml(content.Summary.Default) : string.Empty;
-            SummaryPanel.Visible = !string.IsNullOrEmpty(summary);
-            Summary.Text = summary;
+            SummaryPanel.Visible = summary.HasValue();
+            Summary.Text = summary.HasValue() ? Markdown.ToHtml(summary) : string.Empty;
 
             Date.Text = GetEventDateAndTimeText(@event.EventScheduledStart, @event.EventScheduledEnd);
 
@@ -221,9 +224,9 @@ namespace InSite.UI.Portal.Events.Classes
                 var location = @event.VenueLocationName;
                 var helper = new CalendarHelper();
 
-                AddToGoogleLink.Text = helper.GenerateGoogleCalendarLink(start, end, title, location);
-                AddToOfficeLink.Text = helper.GenerateOffice365CalendarLink(start, end, title, location);
-                DownloadIcsLink.Text = helper.GenerateIcsDownloadLink(start, end, title, location);
+                AddToGoogleLink.Text = helper.GenerateGoogleCalendarLink(start, end, title, location, translate: Translate);
+                AddToOfficeLink.Text = helper.GenerateOffice365CalendarLink(start, end, title, location, translate: Translate);
+                DownloadIcsLink.Text = helper.GenerateIcsDownloadLink(start, end, title, location, translate: Translate);
             }
 
             RegistrationStartField.Visible = @event.RegistrationStart.HasValue;
@@ -235,35 +238,25 @@ namespace InSite.UI.Portal.Events.Classes
 
             Venue.BindVenue(@event, "Location", "Venue");
 
-            var description = content.Description != null && content.Description.Default.HasValue() ? Markdown.ToHtml(content.Description.Default) : string.Empty;
-            DescriptionPanel.Visible = !string.IsNullOrEmpty(description);
-            Description.Text = description;
+            DescriptionPanel.Visible = description.HasValue();
+            Description.Text = description.HasValue() ? Markdown.ToHtml(description) : string.Empty;
 
-            var materialsForParticipation = content.MaterialsForParticipation != null && content.MaterialsForParticipation.Default.HasValue()
-                ? Markdown.ToHtml(content.MaterialsForParticipation.Default)
-                : string.Empty;
+            MaterialsForParticipationCard.Visible = materialsForParticipation.HasValue();
+            MaterialsForParticipation.Text = materialsForParticipation.HasValue() ? Markdown.ToHtml(materialsForParticipation) : string.Empty;
 
-            MaterialsForParticipationCard.Visible = !string.IsNullOrEmpty(materialsForParticipation);
-            MaterialsForParticipation.Text = materialsForParticipation;
+            ContactPanel.Visible = contactInstruction.HasValue();
+            ContactInstruction.Text = contactInstruction.HasValue() ? Markdown.ToHtml(contactInstruction) : string.Empty;
 
-            var contactInstructionText = contactInstruction != null && contactInstruction.Default.HasValue() ? Markdown.ToHtml(contactInstruction.Default) : string.Empty;
-            ContactPanel.Visible = !string.IsNullOrEmpty(contactInstructionText);
-            ContactInstruction.Text = contactInstructionText;
+            AccommodationsPanel.Visible = accommodationInstruction.HasValue();
+            AccommodationInstruction.Text = accommodationInstruction.HasValue() ? Markdown.ToHtml(accommodationInstruction) : string.Empty;
 
-            var accommodationInstructionText = accommodationInstruction != null && accommodationInstruction.Default.HasValue() ? Markdown.ToHtml(accommodationInstruction.Default) : string.Empty;
-            AccommodationsPanel.Visible = !string.IsNullOrEmpty(accommodationInstructionText);
-            AccommodationInstruction.Text = accommodationInstructionText;
+            AdditionalInstructionPanel.Visible = additionalInstruction.HasValue();
+            AdditionalInstruction.Text = additionalInstruction.HasValue() ? Markdown.ToHtml(additionalInstruction) : string.Empty;
 
-            var additionalInstructionText = additionalInstruction != null && additionalInstruction.Default.HasValue() ? Markdown.ToHtml(additionalInstruction.Default) : string.Empty;
-            AdditionalInstructionPanel.Visible = !string.IsNullOrEmpty(additionalInstructionText);
-            AdditionalInstruction.Text = additionalInstructionText;
+            CancellationInstructionPanel.Visible = cancellationInstruction.HasValue();
+            CancellationInstruction.Text = cancellationInstruction.HasValue() ? Markdown.ToHtml(cancellationInstruction) : string.Empty;
 
-            var cancellationInstructionText = cancellationInstruction != null && cancellationInstruction.Default.HasValue() ? Markdown.ToHtml(cancellationInstruction.Default) : string.Empty;
-            CancellationInstructionPanel.Visible = !string.IsNullOrEmpty(cancellationInstructionText);
-            CancellationInstruction.Text = cancellationInstructionText;
-
-            var registrationCompetedText = registrationCompetedInstruction != null && registrationCompetedInstruction.Default.HasValue() ? Markdown.ToHtml(registrationCompetedInstruction.Default) : string.Empty;
-            RegistrationCompeted.Text = registrationCompetedText;
+            RegistrationCompeted.Text = registrationCompetedInstruction.HasValue() ? Markdown.ToHtml(registrationCompetedInstruction) : string.Empty;
 
             var localeDate = TimeZoneInfo.ConvertTime(@event.EventScheduledStart, User.TimeZone).Date;
             ReturnToCalendar.NavigateUrl = $"/ui/portal/events/calendar?date={localeDate.ToShortDateString()}";
@@ -378,10 +371,16 @@ namespace InSite.UI.Portal.Events.Classes
 
         #region Methods (helpers)
 
-        protected static string GetDescription(object item)
+        protected string GetSeatTitle()
         {
-            var seat = (QSeat)item;
-            return ContentSeat.Deserialize(seat.Content).Description.Default;
+            var seat = (QSeat)Page.GetDataItem();
+            return ContentSeat.Deserialize(seat.Content).Title.Get(Identity.Language);
+        }
+
+        protected string GetSeatDescription()
+        {
+            var seat = (QSeat)Page.GetDataItem();
+            return ContentSeat.Deserialize(seat.Content).Description.Get(Identity.Language);
         }
 
         [Serializable]

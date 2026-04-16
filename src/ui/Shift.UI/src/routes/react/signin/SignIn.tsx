@@ -5,10 +5,11 @@ import FormField from "@/components/form/FormField";
 import FormSection from "@/components/form/FormSection";
 import Icon from "@/components/icon/Icon";
 import TextBox from "@/components/TextBox";
-import { useSiteProvider } from "@/contexts/SiteProvider";
-import { useStatusProvider } from "@/contexts/StatusProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { cookieHelper } from "@/helpers/cookieHelper";
 import { cssHelper } from "@/helpers/cssHelper";
+import { localStorageHelper } from "@/helpers/localStorageHelper";
 import { shiftConfig } from "@/helpers/shiftConfig";
 import { useState } from "react";
 import { Spinner } from "react-bootstrap";
@@ -18,17 +19,28 @@ import { useNavigate, useSearchParams } from "react-router";
 interface FormFields {
     email: string;
     organizationCode: string;
+    impersonate: boolean;
+    impersonatorUserEmail: string;
+    impersonatorOrganizationCode: string;
 }
 
 export default function SignIn() {
     const [isLogginIn, setIsLogginIn] = useState(false);
     const [isChangingTheme, setIsChangingTheme] = useState(false);
     const [theme, setTheme] = useState(cookieHelper.getTheme);
+    const [impersonate, setImpersonate] = useState(false);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<FormFields>({
-        defaultValues: {
-            email: shiftConfig.localUser ?? "",
-            organizationCode: shiftConfig.localOrganization ?? "",
+    const { register, handleSubmit, getValues, formState: { errors } } = useForm<FormFields>({
+        defaultValues: async () => {
+            const account = localStorageHelper.getTempAccount();
+
+            return Promise.resolve({
+                email: account?.email ?? shiftConfig.localUser ?? "",
+                organizationCode: account?.organization ?? shiftConfig.localOrganization ?? "",
+                impersonate: account?.impersonate ?? false,
+                impersonatorUserEmail: account?.impersonatorEmail ?? shiftConfig.localUser ?? "",
+                impersonatorOrganizationCode: account?.impersonatorOrganization ?? shiftConfig.localOrganization ?? "",
+            });
         }
     });
 
@@ -39,12 +51,23 @@ export default function SignIn() {
     const [searchParams] = useSearchParams();
 
     async function handleValidSubmit(fields: FormFields) {
+        const impersonatorOrganizationCode = fields.impersonate ? fields.impersonatorOrganizationCode : null;
+        const impersonatorUserEmail = fields.impersonate ? fields.impersonatorUserEmail : null;
+
         setIsLogginIn(true);
 
         try {
-            await shiftClient.cookie.login(fields.organizationCode, fields.email);
+            await shiftClient.cookie.login(fields.organizationCode, fields.email, impersonatorOrganizationCode, impersonatorUserEmail);
             refreshSiteSetting();
             cache.clear();
+
+            localStorageHelper.setTempAccount({
+                email: fields.email,
+                organization: fields.organizationCode,
+                impersonate: fields.impersonate,
+                impersonatorOrganization: fields.impersonatorOrganizationCode,
+                impersonatorEmail: fields.impersonatorUserEmail,
+            });
 
             const url = searchParams.get("returnUrl") ?? "/client/react/home";
             navigate(url);
@@ -94,6 +117,10 @@ export default function SignIn() {
         setTheme(latestTheme);
     }
 
+    function handleImpersonateChange() {
+        setImpersonate(Boolean(getValues("impersonate")));
+    }
+
     return (
         <>
             <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
@@ -117,6 +144,47 @@ export default function SignIn() {
                             disabled={isLogginIn}
                         />
                     </FormField>
+                    <FormField>
+                        <label>
+                            <input
+                                type="checkbox"
+                                {...register("impersonate", {
+                                    onChange: handleImpersonateChange,
+                                })}
+                                disabled={isLogginIn}
+                            /> Impersonate
+                        </label>
+                    </FormField>
+                    {impersonate && (
+                        <>
+                            <FormField label="Impersonator Organization" required>
+                                <TextBox
+                                    {...register("impersonatorOrganizationCode", {
+                                        required: true
+                                    })}
+                                    error={errors.impersonatorOrganizationCode}
+                                    disabled={isLogginIn}
+                                />
+                            </FormField>
+                            <FormField label="Impersonator Email" required>
+                                <TextBox
+                                    {...register("impersonatorUserEmail", {
+                                        validate: value => {
+                                            if (!value) {
+                                                return "The field is required";
+                                            }
+                                            if (value.toLowerCase() === getValues("email").toLowerCase()) {
+                                                return "Impersonator Email and Email cannot be the same"
+                                            }
+                                            return undefined;
+                                        }
+                                    })}
+                                    error={errors.impersonatorUserEmail}
+                                    disabled={isLogginIn}
+                                />
+                            </FormField>
+                        </>
+                    )}
                     <FormField hasBottomMargin={false}>
                         <Button
                             variant="save"
@@ -147,10 +215,10 @@ export default function SignIn() {
                                 defaultChecked={theme === "dark"}
                             />
                             <label className="form-check-label">
-                                <Icon style="Light" name="sun-bright" className="fs-lg" />
+                                <Icon style="light" name="sun-bright" className="fs-lg" />
                             </label>
                             <label className="form-check-label">
-                                <Icon style="Light" name="moon" className="fs-lg" />
+                                <Icon style="light" name="moon" className="fs-lg" />
                             </label>
                         </div>
 

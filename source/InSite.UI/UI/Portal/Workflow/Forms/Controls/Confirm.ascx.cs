@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 
+using InSite.Application.Contacts.Read;
 using InSite.Application.Responses.Write;
 using InSite.Common.Web;
 using InSite.Persistence;
@@ -48,7 +49,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             if (instructions.HasValue())
                 return instructions;
 
-            var buttonText = GetDisplayText("Submit My Submission");
+            var buttonText = GetDisplayText("Submit");
 
             instructions = GetDisplayHtml("Form Submission Completed: Ending Instructions")
                 .Replace("$ConfirmMyResponse", buttonText);
@@ -58,12 +59,15 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
         private void Continue()
         {
-            if(Current.Session.ResponseIsLocked)
+            if (Current.Session.ResponseIsLocked)
                 HttpResponseHelper.Redirect("/");
 
             var dateCompleted = DateTimeOffset.UtcNow;
+            var supervisor = Organization.Toolkits.Surveys.DefaultCaseOwnerToSupervisor
+                ? GetSupervisorUserId(Current.Session.RespondentUserIdentifier)
+                : (Guid?)null;
 
-            ServiceLocator.SendCommand(new CompleteResponseSession(Current.SessionIdentifier, DateTimeOffset.Now));
+            ServiceLocator.SendCommand(new CompleteResponseSession(Current.SessionIdentifier, DateTimeOffset.Now, supervisor, Organization.Toolkits.Surveys.FirstQuestionCaseSummary));
             ServiceLocator.SendCommand(new LockResponseSession(Current.SessionIdentifier));
 
             RefreshUserIdentity(dateCompleted);
@@ -91,6 +95,18 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 HttpResponseHelper.Redirect(returnUrl, true);
 
             Navigator.RedirectToCompletePage(Current.SessionIdentifier);
+        }
+
+        private static Guid? GetSupervisorUserId(Guid userId)
+        {
+            var connections = ServiceLocator.UserSearch.GetConnections(new QUserConnectionFilter
+            {
+                ToUserId = userId,
+                FromUserOrganizationId = Organization.Identifier,
+                IsSupervisor = true,
+            });
+
+            return connections.Count > 0 ? connections[0].FromUserIdentifier : (Guid?)null;
         }
 
         private void RefreshUserIdentity(DateTimeOffset dateCompleted)

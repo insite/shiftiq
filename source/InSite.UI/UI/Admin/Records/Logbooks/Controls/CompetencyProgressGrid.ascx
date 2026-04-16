@@ -30,7 +30,10 @@
         <asp:Repeater runat="server" ID="CompetencyRepeater">
             <ItemTemplate>
                 <tr>
-                    <td style="padding-left:45px;"><a href='<%# "/ui/admin/standards/edit?id=" + Eval("Identifier") %>'><%# Eval("Name") %> </a></td>
+                    <td style="padding-left:45px;">
+                        <a href='<%# "/ui/admin/standards/edit?id=" + Eval("Identifier") %>'><%# Eval("Name") %></a>
+                        <%# EvalSummaryHtml("Summary") %>
+                    </td>
                     <td style="text-align:center;">
                         <asp:Literal runat="server" ID="Hours" />
                     </td>
@@ -46,3 +49,13 @@
         </asp:Repeater>
     </ItemTemplate>
 </asp:Repeater>
+
+<insite:PageHeadContent runat="server" ID="CommonStyle">
+    <style type="text/css">
+        
+        .competency-summary p {
+            margin-bottom: 0.5rem;
+        }
+
+    </style>
+</insite:PageHeadContent>

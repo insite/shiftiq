@@ -295,7 +295,7 @@ namespace InSite.Application.Attempts.Write
         {
             _repository.LockAndRun<AttemptAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.SwitchAttemptQuestion(c.NextQuestionIndex);
+                aggregate.SwitchAttemptQuestion(c.NextQuestionIndex, c.IsForced);
                 Commit(aggregate, c);
             });
         }

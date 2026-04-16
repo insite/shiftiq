@@ -11,8 +11,9 @@ namespace Shift.Service.Content
     public partial class StorageService : IStorageServiceAsync
     {
         private static readonly Encoding LatinEncoding = Encoding.GetEncoding("ISO-8859-1");
-        private static readonly Regex FileUrlRegex = RelativePathToRetrieveFile();
-        private static readonly Regex FileUrlRegex2 = RelativePathToRetrieveFile2();
+
+        private static readonly Regex FileUrlRegex = new Regex("^/api/(content|assets)/files/(?<fileId>[^/]+)/(?<fileName>[^/]+)$");
+        private static readonly Regex FileUrlRegex2 = new Regex("/(content|assets)/files/(?<fileId>[0-9a-fA-F-]+)/(?<fileName>[0-9a-zA-Z-.]+)");
 
         private readonly IFileSearchAsync _fileSearch;
         private readonly IFileStoreAsync _fileStore;
@@ -35,12 +36,14 @@ namespace Shift.Service.Content
             _files = new ConcurrentDictionary<Guid, FileStorageModel>();
         }
 
-        public string GetFileUrl(FileStorageModel model, bool download = false) =>
-            GetFileUrl(model.FileIdentifier, model.FileName, download);
+        public string GetFileUrl(FileStorageModel model, bool download = false, bool legacyLink = false) =>
+            GetFileUrl(model.FileIdentifier, model.FileName, download, legacyLink);
 
-        public string GetFileUrl(Guid fileId, string fileName, bool download = false)
+        public string GetFileUrl(Guid fileId, string fileName, bool download = false, bool legacyLink = false)
         {
-            var url = $"content/files/{fileId}/{fileName}".ToLower();
+            var url = legacyLink
+                ? $"/api/assets/files/{fileId}/{fileName}".ToLower()
+                : $"/api/content/files/{fileId}/{fileName}".ToLower();
 
             if (download)
                 url += "?download=1";
@@ -73,7 +76,7 @@ namespace Shift.Service.Content
             if (string.IsNullOrEmpty(text))
                 return result;
 
-            var matches = FileUrlRegex.Matches(text);
+            var matches = FileUrlRegex2.Matches(text);
             foreach (Match match in matches)
             {
                 if (!Guid.TryParse(match.Groups["fileId"].Value, out var fileId))
@@ -444,11 +447,5 @@ namespace Shift.Service.Content
 
             return FileGrantStatus.Denied;
         }
-
-        [GeneratedRegex("^content/files/(?<fileId>[^/]+)/(?<fileName>[^/]+)$")]
-        public static partial Regex RelativePathToRetrieveFile();
-
-        [GeneratedRegex("/content/files/(?<fileId>[0-9a-fA-F-]+)/(?<fileName>[0-9a-fA-F-.]+)")]
-        public static partial Regex RelativePathToRetrieveFile2();
     }
 }

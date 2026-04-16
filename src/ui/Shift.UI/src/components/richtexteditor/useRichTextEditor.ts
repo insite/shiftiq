@@ -1,6 +1,6 @@
 import { RefObject, useState } from "react";
 import { useSaveAction } from "@/hooks/useSaveAction";
-import { useStatusProvider } from "@/contexts/StatusProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
 import { shiftClient } from "@/api/shiftClient";
 import { urlHelper } from "@/helpers/urlHelper";
@@ -18,6 +18,7 @@ export function useRichTextEditor(
     defaultValue: RichTextEditorValue | null | undefined,
     defaultLanguage: Language,
     supportedFileTypes: string[],
+    onTranslate: ((value: RichTextEditorValue) => void) | undefined,
     onChange: ((value: RichTextEditorValue) => void) | undefined,
 ) {
     const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
@@ -73,8 +74,10 @@ export function useRichTextEditor(
         setCurrentHtml(newHtml);
     }
 
-    function handleTranslate() {
-        runSave(async () => {
+    async function handleTranslate() {
+        let newValue: RichTextEditorValue | null = null;
+
+        if (await runSave(async () => {
             const englishTexts: string[] = [];
             let markdownIndex: number | null = null;
             let htmlIndex: number | null = null;
@@ -100,9 +103,15 @@ export function useRichTextEditor(
 
             const newMarkdown = markdownIndex !== null ? translatedTexts[markdownIndex] : currentValue?.markdown;
             const newHtml = htmlIndex !== null ? translatedTexts[htmlIndex] : currentValue?.html;
+            
+            newValue = { markdown: newMarkdown, html: newHtml };
 
-            setCurrentValue({ markdown: newMarkdown, html: newHtml });
-        });
+            setCurrentValue(newValue);
+        })
+        && newValue
+        ) {
+            onTranslate?.(newValue);
+        }
     }
 
     function handleSelectLanguage(language: Language) {
@@ -149,6 +158,14 @@ export function useRichTextEditor(
         const isImage = file.type.toLowerCase().startsWith("image/");
         const fileUrl = urlHelper.getFileUrl(fileId, fileName);
 
+        handleInsertFileUrl(fileUrl, documentName, isImage);
+    }
+
+    function handleInsertFileUrl(fileUrl: string, documentName: string, isImage: boolean) {
+        if (!markdownRef.current && !htmlRef.current) {
+            return;
+        }
+
         if (markdownRef.current && mode === "markdown") {
             let text = `[${documentName}](${fileUrl})`;
 
@@ -178,6 +195,7 @@ export function useRichTextEditor(
         handleHtmlChange,
         handleTranslate,
         handleUploadFileAndInsert,
+        handleInsertFileUrl,
         handleSelectLanguage,
     };
 }

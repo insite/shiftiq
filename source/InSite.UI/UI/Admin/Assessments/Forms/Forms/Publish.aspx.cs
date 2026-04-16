@@ -20,6 +20,7 @@ using Shift.Common;
 using Shift.Constant;
 
 using Label = System.Web.UI.WebControls.Label;
+using AspListItem = System.Web.UI.WebControls.ListItem;
 
 namespace InSite.Admin.Assessments.Forms.Forms
 {
@@ -65,6 +66,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             UnpublishButton.Click += UnpublishButton_Click;
 
             AccessFieldValidator.ServerValidate += AccessFieldValidator_ServerValidate;
+            PermissionListValidator.ServerValidate += PermissionListValidator_ServerValidate;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -82,6 +84,12 @@ namespace InSite.Admin.Assessments.Forms.Forms
         private void AccessFieldValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
             args.IsValid = PortalAccessModule.Checked || PortalAccessStandalone.Checked;
+        }
+
+        private void PermissionListValidator_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            args.IsValid = PortalAccessStandalone.Checked
+                && PermissionList.Items.Cast<AspListItem>().Any(x => x.Selected);
         }
 
         private void PublicationOption_SelectedIndexChanged(object sender, EventArgs e)

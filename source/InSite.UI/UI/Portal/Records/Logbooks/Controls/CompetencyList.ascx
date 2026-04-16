@@ -1,6 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="CompetencyList.ascx.cs" Inherits="InSite.UI.Portal.Records.Logbooks.Controls.CompetencyList" %>
 
-
 <insite:UpdatePanel runat="server" ID="UpdatePanel">
     <ContentTemplate>
 
@@ -28,7 +27,7 @@
                     </ul>
                 </FooterTemplate>
                 <ItemTemplate>
-                    <li class="outline-item competency-check" data-key="<%# Eval("Name") %>" data-competency="0" />
+                    <li class="outline-item competency-check" data-key="<%#: Eval("Name") %>" data-competency="0" />
                         <div>
                             <div>
                                 <div class="node-title fw-bold">
@@ -45,14 +44,15 @@
                                     </ul>
                                 </FooterTemplate>
                             <ItemTemplate>
-                                <li class="outline-item competency-check" data-key="<%# EscapeText(Eval("Name")) %>" data-competency="0" />
+                                <li class="outline-item competency-check" data-key="<%#: Eval("Name") %>" data-competency="0" />
                                     <div>
                                         <div>
                                             <div class="node-title">
                                                 <div class="form-group row competency competency-row">
-                                                    <div class="col-md-7 d-flex">
+                                                    <div class="col-md-7">
                                                         <insite:CheckBox runat="server" ID="Selected" Text='<%# Eval("Name") %>' Checked='<%# Eval("Selected") %>' />
                                                         <asp:Literal runat="server" ID="Identifier" Visible="false" Text='<%# Eval("Identifier") %>' />
+                                                        <%# EvalSummaryHtml("Summary") %>
                                                     </div>
                                                     <div class="col-md-3 text-center">
                                                         <asp:Literal runat="server" ID="JournalItems" Text='<%# Eval("JournalItems") %>' />
@@ -80,7 +80,6 @@
     </ContentTemplate>
 </insite:UpdatePanel>
 
-
 <insite:PageHeadContent runat="server" ID="CommonStyle">
     <style type="text/css">
 
@@ -103,6 +102,10 @@
             display: block;
         }
         
+        .competency-summary p {
+            margin-bottom: 0.5rem;
+        }
+
     </style>
 
 </insite:PageHeadContent>

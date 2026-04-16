@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router";
+import { useState } from "react";
+import { Outlet } from "react-router";
 import ScrollTopButton from "@/components/ScrollTopButton";
-import SiteProvider, { useSiteProvider } from "@/contexts/SiteProvider";
-import StatusProvider from "@/contexts/StatusProvider";
-import LoadingContext from "@/contexts/LoadingProvider";
+import SiteProvider from "@/contexts/site/SiteProvider";
+import StatusProvider from "@/contexts/status/StatusProvider";
+import LoadingProvider from "@/contexts/loading/LoadingProvider";
 import AdminHomeLayout_Navigation from "./AdminHomeLayout_Navigation";
 import AdminHomeLayout_FormHeader from "./AdminHomeLayout_FormHeader";
 import { SidebarState } from "../models/SidebarState";
 import { localStorageHelper } from "@/helpers/localStorageHelper";
+import SessionProvider from "@/contexts/session/SessionProvider";
+import PageProvider from "@/contexts/page/PageProvider";
 
 function getStateClass(state: SidebarState): string {
     switch (state) {
@@ -28,44 +30,33 @@ function getStateClass(state: SidebarState): string {
 }
 
 export default function AdminHomeLayout() {
+    const [state, setState] = useState<SidebarState>(localStorageHelper.getSidebarState());
     return (
         <SiteProvider>
-            <AdminHomeLayoutInternal />
+            <SessionProvider>
+                <PageProvider>
+
+                    <AdminHomeLayout_Navigation onStateChange={setState} />
+
+                    <main className={`admin-container ${getStateClass(state)}`}>
+                        <div className="row pb-3 pb-md-4">
+                            <div className="col-xxl-12">
+                                <AdminHomeLayout_FormHeader />
+                                <LoadingProvider>
+                                    <StatusProvider>
+                                        <Outlet />
+                                    </StatusProvider>
+                                </LoadingProvider>
+                            </div>
+                        </div>
+                    </main>
+
+                    <ScrollTopButton />
+
+                    <div id="bottom"></div>
+
+                </PageProvider>
+            </SessionProvider>
         </SiteProvider>
-    );
-}
-
-function AdminHomeLayoutInternal() {
-    const [state, setState] = useState<SidebarState>(localStorageHelper.getSidebarState());
-
-    const location = useLocation();
-
-    const { setActionSubtitle } = useSiteProvider();
-
-    useEffect(() => {
-        setActionSubtitle(null);
-    }, [location, setActionSubtitle]);
-
-    return (
-        <>
-            <AdminHomeLayout_Navigation onStateChange={setState} />
-
-            <main className={`admin-container ${getStateClass(state)}`}>
-                <div className="row pb-3 pb-md-4">
-                    <div className="col-xxl-12">
-                        <AdminHomeLayout_FormHeader />
-                        <LoadingContext>
-                            <StatusProvider>
-                                <Outlet />
-                            </StatusProvider>
-                        </LoadingContext>
-                    </div>
-                </div>
-            </main>
-
-            <ScrollTopButton />
-
-            <div id="bottom"></div>
-        </>
     );
 }

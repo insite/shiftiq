@@ -1,7 +1,7 @@
-﻿using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
+﻿using InSite.Domain.Messages;
 
-using InSite.Domain.Messages;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
 
 namespace InSite.Application.Messages.Write
 {
@@ -28,11 +28,14 @@ namespace InSite.Application.Messages.Write
             commander.Subscribe<CompleteMailout>(Handle);
             commander.Subscribe<CreateMessage>(Handle);
             commander.Subscribe<DisableMessage>(Handle);
+            commander.Subscribe<DraftMailout>(Handle);
             commander.Subscribe<EnableMessage>(Handle);
             commander.Subscribe<DisableAutoBccSubscribers>(Handle);
             commander.Subscribe<EnableAutoBccSubscribers>(Handle);
             commander.Subscribe<FollowSubscriber>(Handle);
-            commander.Subscribe<RemoveMessageSubscriber>(Handle);
+            commander.Subscribe<HandleMailoutCallback>(Handle);
+            commander.Subscribe<QueueMailout>(Handle);
+            commander.Subscribe<RejectMailout>(Handle);
             commander.Subscribe<RemoveMessageSubscribers>(Handle);
             commander.Subscribe<RenameMessage>(Handle);
             commander.Subscribe<ResetLinkCounter>(Handle);
@@ -50,7 +53,10 @@ namespace InSite.Application.Messages.Write
             aggregate.Identify(c.OriginOrganization, c.OriginUser);
             var changes = _repository.Save(aggregate);
             foreach (var change in changes)
+            {
+                change.AggregateState = aggregate.State;
                 _publisher.Publish(change);
+            }
         }
 
         public void Handle(AbortMailout c)
@@ -74,10 +80,43 @@ namespace InSite.Application.Messages.Write
             Commit(aggregate, c);
         }
 
+        public void Handle(HandleMailoutCallback c)
+        {
+            var aggregate = _repository.Get<MessageAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
+            aggregate.HandleMailoutCallback(c.Mailout, c.CallbackId, c.Recipient, c.Timestamp, c.Status, c.Data);
+            Commit(aggregate, c);
+        }
+
+        public void Handle(QueueMailout c)
+        {
+            var aggregate = _repository.Get<MessageAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
+            aggregate.QueueMailout(c.MailoutId, c.Recipient, c.Data);
+            Commit(aggregate, c);
+        }
+
+        public void Handle(RejectMailout c)
+        {
+            var aggregate = _repository.Get<MessageAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
+            aggregate.RejectMailout(c.MailoutId, c.Recipient, c.Description, c.Data);
+            Commit(aggregate, c);
+        }
+
         public void Handle(DisableMessage c)
         {
             var aggregate = _repository.Get<MessageAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
             aggregate.DisableMessage();
+            Commit(aggregate, c);
+        }
+
+        public void Handle(DraftMailout c)
+        {
+            var aggregate = _repository.Get<MessageAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
+            aggregate.DraftMailout(
+                c.MailoutId, c.ScheduledOn,
+                c.SenderId, c.SenderType,
+                c.To, c.Cc, c.Bcc,
+                c.Subject, c.BodyText, c.BodyHtml, c.Attachments,
+                c.EventId);
             Commit(aggregate, c);
         }
 

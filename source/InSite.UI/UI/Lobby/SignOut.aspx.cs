@@ -73,7 +73,7 @@ namespace InSite.UI.Lobby
             ClientScript.RegisterStartupScript(GetType(), nameof(SignOut), script, true);
         }
 
-        public static void Redirect(object redirector, string reason)
+        public static void Redirect(object redirector, string reason, string returnUrl = null)
         {
             const string redirectFlagKey = "Redirect_AlreadyPerformed";
 
@@ -92,22 +92,22 @@ namespace InSite.UI.Lobby
 
             httpContext.Items[redirectFlagKey] = true;
 
-            var targetUrlString = GetWebUrl().ToString(); // Assume the target is always root-relative
+            var targetUrl = GetWebUrl(); // Assume the target is always root-relative
 
-            if (string.IsNullOrWhiteSpace(targetUrlString))
+            if (string.IsNullOrWhiteSpace(targetUrl.Path))
                 throw new InvalidOperationException("Target URL is null or empty.");
 
             if (!string.IsNullOrEmpty(reason))
-            {
-                var separator = targetUrlString.Contains("?") ? "&" : "?";
-                targetUrlString += $"{separator}reason={Uri.EscapeDataString(reason)}";
-            }
+                targetUrl.QueryString["reason"] = reason;
+
+            if (!string.IsNullOrEmpty(returnUrl))
+                targetUrl.QueryString["returnurl"] = returnUrl;
 
             // Resolve target URI relative to current request
 
             var currentRequest = httpContext.Request;
 
-            var resolvedTargetUri = new Uri(currentRequest.Url, targetUrlString);
+            var resolvedTargetUri = new Uri(currentRequest.Url, targetUrl.ToString());
 
             // Get original requested path (RawUrl without query)
 
@@ -134,7 +134,7 @@ namespace InSite.UI.Lobby
 
             var data = ServiceLocator.Serializer.Serialize(context);
 
-            HttpResponseHelper.Redirect(targetUrlString);
+            HttpResponseHelper.Redirect(targetUrl);
         }
 
         public static string GetUrl() => "/ui/lobby/signout";

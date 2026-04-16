@@ -24,7 +24,7 @@ namespace InSite.Web.Injection
             ServiceLocator.InitializeAppSettings(appSettings, requirements);
             ServiceLocator.InitializeLogger(ConfigureLogger());
             ServiceLocator.InitializeTimeline(identity);
-            ServiceLocator.InitializeInfrastructure(identity, logger, AppSentry.SentryError);
+            ServiceLocator.InitializeInfrastructure(commander, identity, logger, AppSentry.SentryError);
             ServiceLocator.InitializeApplication(AppSentry.SentryError);
             ServiceLocator.InitializeCustomization(logger);
 

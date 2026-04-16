@@ -11,7 +11,10 @@ public class ContentRetrieveService(
 {
     public async Task<PageContentModel> RetrievePageContentAsync(PageModel pageModel)
     {
-        var blockPages = (await pageReader.CollectAsync(new CollectPages { ParentPageId = pageModel.PageId }))
+        var criteria = new CollectPages { ParentPageId = pageModel.PageId };
+        criteria.Filter.Page = 0;
+
+        var blockPages = (await pageReader.CollectAsync(criteria))
             .Where(x => x.ContentControl != null)
             .OrderBy(x => x.Sequence)
             .ToList();
@@ -33,10 +36,14 @@ public class ContentRetrieveService(
 
     private async Task<Dictionary<Guid, ContentContainer>> CollectContentsAsync(Guid[] containerIds)
     {
-        var inputs = await inputReader.CollectAsync(new CollectInputs
+        var criteria = new CollectInputs
         {
             ContainerIds = containerIds
-        });
+        };
+
+        criteria.Filter.Page = 0;
+
+        var inputs = await inputReader.CollectAsync(criteria);
 
         var result = new Dictionary<Guid, ContentContainer>();
 
@@ -66,10 +73,10 @@ public class ContentRetrieveService(
             content = new ContentContainer();
         else
         {
-            var labels = content.GetLabels();
+            var labels = content.GetLabels().ToList();
             foreach (var label in labels)
             {
-                if (!contentFields.Any(x => !x.Equals(label, StringComparison.OrdinalIgnoreCase)))
+                if (!contentFields.Any(x => x.Equals(label, StringComparison.OrdinalIgnoreCase)))
                     content.Remove(label);
             }
         }

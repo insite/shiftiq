@@ -64,6 +64,7 @@ namespace InSite.Admin.Assessments.Outlines.Controls
 
             ReorderFieldsButton.Click += ReorderFieldsButton_Click;
             FormWorkshopButton.Click += FormWorkshopButton_Click;
+            FormWorkshopNewButton.Click += FormWorkshopNewButton_Click;
 
             AddButton.Click += AddButton_Click;
             ActionButton.Click += ActionButton_Click;
@@ -235,6 +236,13 @@ namespace InSite.Admin.Assessments.Outlines.Controls
             HttpResponseHelper.Redirect($"/ui/admin/assessments/forms/workshop?bank={BankID}&form={form.Identifier}");
         }
 
+        private void FormWorkshopNewButton_Click(object sender, EventArgs e)
+        {
+            var form = GetSelectedForm();
+
+            HttpResponseHelper.Redirect($"/client/admin/assessment/forms/workshop/{form.Identifier}");
+        }
+
         #endregion
 
         #region Data binding
@@ -260,6 +268,7 @@ namespace InSite.Admin.Assessments.Outlines.Controls
             ReorderFieldsButton.Visible = hasForms;
             ReportButton.Visible = hasForms;
             FormWorkshopButton.Visible = hasForms && bank.IsAdvanced;
+            FormWorkshopNewButton.Visible = hasForms && bank.IsAdvanced && (ServiceLocator.AppSettings.Environment.Name == EnvironmentName.Development || ServiceLocator.AppSettings.Environment.Name == EnvironmentName.Local);
             FormRow.Visible = hasForms;
 
             ActionButton.Visible = hasForms;
@@ -459,6 +468,7 @@ namespace InSite.Admin.Assessments.Outlines.Controls
 
             AddButton.Visible = isStaticSpec && canWrite;
             FormWorkshopButton.Visible = isStaticSpec && canWrite;
+            FormWorkshopNewButton.Visible = isStaticSpec && canWrite && (ServiceLocator.AppSettings.Environment.Name == EnvironmentName.Development || ServiceLocator.AppSettings.Environment.Name == EnvironmentName.Local);
         }
 
         #endregion

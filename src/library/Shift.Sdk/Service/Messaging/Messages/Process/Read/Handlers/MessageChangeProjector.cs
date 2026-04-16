@@ -1,11 +1,10 @@
 ﻿using System;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Contents.Read;
 using InSite.Domain.Messages;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Application.Messages.Read
@@ -36,8 +35,12 @@ namespace InSite.Application.Messages.Read
             publisher.Subscribe<FollowerRemoved>(Handle);
             publisher.Subscribe<LinkCounterReset>(Handle);
             publisher.Subscribe<MailoutAborted>(Handle);
+            publisher.Subscribe<MailoutCallbackHandled>(Handle);
             publisher.Subscribe<MailoutCancelled>(Handle);
             publisher.Subscribe<MailoutCompleted>(Handle);
+            publisher.Subscribe<MailoutDrafted>(Handle);
+            publisher.Subscribe<MailoutQueued>(Handle);
+            publisher.Subscribe<MailoutRejected>(Handle);
             publisher.Subscribe<MailoutScheduled2>(Handle);
             publisher.Subscribe<MailoutStarted>(Handle);
             publisher.Subscribe<MessageArchived>(Handle);
@@ -111,12 +114,36 @@ namespace InSite.Application.Messages.Read
         }
 
         public void Handle(MailoutAborted e)
-            => _store.UpdateMessage(e);
+        {
+            _store.UpdateMessage(e);
+        }
+
+        public void Handle(MailoutCallbackHandled e)
+        {
+            _store.UpdateMessage(e);
+        }
 
         public void Handle(MailoutCancelled e)
-            => _store.UpdateMessage(e);
+        {
+            _store.UpdateMessage(e);
+        }
 
         public void Handle(MailoutCompleted e)
+        {
+            _store.UpdateMessage(e);
+        }
+
+        public void Handle(MailoutDrafted e)
+        {
+            _store.UpdateMessage(e);
+        }
+
+        public void Handle(MailoutQueued e)
+        {
+            _store.UpdateMessage(e);
+        }
+
+        public void Handle(MailoutRejected e)
         {
             _store.UpdateMessage(e);
         }

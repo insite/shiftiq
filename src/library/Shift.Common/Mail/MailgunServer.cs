@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Shift.Common
 {
@@ -80,11 +80,7 @@ namespace Shift.Common
         #region Fields
 
         private readonly Mailgun _mailgun;
-        private readonly bool _emailOutboxDisabled;
-        private readonly bool _emailOutboxFiltered;
-        private readonly string[] _domains;
-        private readonly string[] _testers;
-        private readonly List<string> _forcedTypes;
+        private readonly MailgunServerSettings _settings;
 
         private static readonly Regex _inlineTagPattern;
         private static readonly Dictionary<string, Regex> _inlineAttributePatterns;
@@ -108,14 +104,10 @@ namespace Shift.Common
 
         #region Constructors
 
-        public MailgunServer(Mailgun mailgun, bool emailOutboxDisabled, bool emailOutboxFiltered, string[] domains, string[] testers, List<string> forcedTypes)
+        public MailgunServer(Mailgun mailgun, MailgunServerSettings settings)
         {
             _mailgun = mailgun;
-            _emailOutboxDisabled = emailOutboxDisabled;
-            _emailOutboxFiltered = emailOutboxFiltered;
-            _domains = domains;
-            _testers = testers;
-            _forcedTypes = forcedTypes;
+            _settings = settings;
         }
 
         static MailgunServer()
@@ -150,87 +142,90 @@ namespace Shift.Common
         /// Send an email message
         /// </summary>
         /// <param name="email">Pre-built email message with fields like from, to, subject, body</param>
-        public bool SendEmail(EmailDraft email, string tag, string type, bool isUnitTest = false)
+        public MailgunStatus SendEmail(EmailDraft email, string tag, string type, bool isUnitTest = false)
         {
             if (email == null)
-                return false;
+                return MailgunStatus.Reject($"{nameof(email)} parameter is null.");
 
-            bool forceSend = type.HasValue()
-                ? _forcedTypes.Any(x => x.Equals(type, StringComparison.OrdinalIgnoreCase))
+            var forceSend = type.HasValue()
+                ? _settings.ForcedTypes.Any(x => x.Equals(type, StringComparison.OrdinalIgnoreCase))
                 : false;
 
-            if (_emailOutboxDisabled && !isUnitTest && !forceSend)
-                return false;
+            if (_settings.EmailOutboxDisabled && !isUnitTest && !forceSend)
+                return MailgunStatus.Reject("Email outbox is disabled.");
 
-            if (_emailOutboxFiltered && !forceSend)
+            if (_settings.EmailOutboxFiltered && !forceSend)
             {
-                email.RecipientListTo = EmailAddress.Filter(email.RecipientListTo, _domains, _testers);
-                email.RecipientListCc = EmailAddress.Filter(email.RecipientListCc, _domains, _testers);
-                email.RecipientListBcc = EmailAddress.Filter(email.RecipientListBcc, _domains, _testers);
+                email.RecipientListTo = EmailAddress.Filter(email.RecipientListTo, _settings.WhitelistDomains, _settings.WhitelistTesters);
+                email.RecipientListCc = EmailAddress.Filter(email.RecipientListCc, _settings.WhitelistDomains, _settings.WhitelistTesters);
+                email.RecipientListBcc = EmailAddress.Filter(email.RecipientListBcc, _settings.WhitelistDomains, _settings.WhitelistTesters);
             }
 
             if (email.RecipientListTo.Count == 0)
-                return false;
+                return MailgunStatus.Reject("The email has no recipients.");
 
-            SendEmail(email, tag);
-
-            return true;
+            return SendEmail(email, tag);
         }
 
-        private void SendEmail(EmailDraft email, string tag)
+        private MailgunStatus SendEmail(EmailDraft email, string tag)
         {
-            if (email.SenderEmail.IsEmpty() || email.RecipientListTo.IsEmpty() || email.ContentSubject.Default.IsEmpty())
-                return;
+            if (email.SenderEmail.IsEmpty())
+                return MailgunStatus.Reject("The sender's email address is not specified.");
+
+            if (email.RecipientListTo.IsEmpty())
+                return MailgunStatus.Reject("The email has no recipients.");
+
+            if (email.ContentSubject.Default.IsEmpty())
+                return MailgunStatus.Reject("The subject of the email is not specified.");
 
             var form = CreateContent(email, tag);
 
             var (response, responseContent) = Shift.Common.TaskRunner.RunSync(SendRequest, form, email.SystemMailbox);
 
-            email.MailoutStatusCode = response.StatusCode.ToString();
-            email.MailoutStatus = response.IsSuccessStatusCode ? "Completed" : "Error";
-            email.MailoutSucceeded = response.IsSuccessStatusCode;
+            var result = response.IsSuccessStatusCode
+                ? MailgunStatus.Queue()
+                : MailgunStatus.Reject("Rejected by Mailgun");
+
+            result.Data["code"] = response.StatusCode.ToString();
 
             if (response.IsSuccessStatusCode)
             {
-                email.SenderStatus = ExtractMailgunStatusId(responseContent);
+                result.Data["statusId"] = ExtractMailgunStatusId(responseContent);
             }
             else
             {
-                email.MailoutErrorReason = $"Reason Phrase = {response.ReasonPhrase} -- Response Content = {responseContent}";
+                result.Data["reason"] = response.ReasonPhrase;
+                result.Data["content"] = responseContent;
             }
+
+            return result;
         }
 
         private string ExtractMailgunStatusId(string json)
         {
-            string id = null;
+            if (json.IsEmpty())
+                return null;
 
             try
             {
-                var status = JsonConvert.DeserializeObject<MailgunStatus>(json);
+                var status = JToken.Parse(json);
+                if (status.Type != JTokenType.Object)
+                    return null;
 
-                if (status == null || string.IsNullOrEmpty(status.id))
-                    return id;
-
-                id = status.id;
+                var id = status["id"]?.ToString();
+                if (id.IsEmpty())
+                    return null;
 
                 // If the identifier is enclosed in angle brackes then trim the brackets.
-                if ('<' == id.First() && id.Length > 3 && status.id.Last() == '>')
-                    id = status.id.Substring(1, status.id.Length - 2);
+                if ('<' == id.First() && id.Length > 3 && id.Last() == '>')
+                    id = id.Substring(1, id.Length - 2);
 
                 return id;
             }
             catch
             {
-
+                return null;
             }
-
-            return id;
-        }
-
-        class MailgunStatus
-        {
-            public string id { get; set; }
-            public string message { get; set; }
         }
 
         private async Task<(HttpResponseMessage, string)> SendRequest(MultipartFormDataContent content, string systemMailbox)
@@ -258,6 +253,9 @@ namespace Shift.Common
 
         private MultipartFormDataContent CreateContent(EmailDraft email, string tag)
         {
+            if (email.MailoutIdentifier == Guid.Empty)
+                throw new InvalidOperationException("Mailout ID is undefined.");
+
             // An email sent using Mailgun is permitted only if the To recipient list contains one
             // and only one item.
 
@@ -274,6 +272,10 @@ namespace Shift.Common
             var address = new EmailAddress(email.SystemMailbox);
             var domain = GetDomain(address.Domain);
             var (html, resources) = AddInlineResources(email.ContentBody.Default);
+
+            AddParameter(form, "v:mailout-id", email.MailoutIdentifier.ToString().ToLowerInvariant());
+            AddParameter(form, "v:sender-domain", address.Domain);
+            AddParameter(form, "v:environment-domain", _settings.Domain);
 
             AddParameter(form, "from", $"{email.SenderName} <{email.SystemMailbox}>");
 

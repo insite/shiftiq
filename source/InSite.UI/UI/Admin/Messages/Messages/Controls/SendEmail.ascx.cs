@@ -36,6 +36,12 @@ namespace InSite.UI.Admin.Messages.Messages.Controls
             set => ViewState[nameof(Templates)] = value;
         }
 
+        public Guid? MessageId
+        {
+            get => (Guid?)ViewState[nameof(MessageId)];
+            set => ViewState[nameof(MessageId)] = value;
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -120,9 +126,14 @@ namespace InSite.UI.Admin.Messages.Messages.Controls
         {
             var templateId = MessageTemplate.ValueAsGuid;
             var template = Templates.FirstOrDefault(x => x.MessageIdentifier == templateId);
-            if (template == null)
-                return;
 
+            if (template == null)
+            {
+                MessageId = null;
+                return;
+            }
+
+            MessageId = templateId;
             MessageSubject.Text = template.MessageTitle;
             MessageBody.Value = template.ContentText;
         }
@@ -189,6 +200,10 @@ namespace InSite.UI.Admin.Messages.Messages.Controls
 
             email.ContentSubject.Default = message.Subject;
             email.ContentBody.Default = message.Body;
+
+            if (!email.MessageIdentifier.HasValue)
+                email.MessageIdentifier = MessageId ?? MessageHelper.GetOrCreateDefaultNotificationId(
+                    Organization.OrganizationIdentifier, ServiceLocator.SendCommand);
 
             ServiceLocator.EmailOutbox.SendAndReplacePlaceholders(email, Model.RecipientType);
         }

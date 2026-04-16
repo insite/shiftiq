@@ -132,7 +132,7 @@ namespace InSite.UI.CMDS.Portal.Achievements.Credentials
             filter.IsCompetencyTraining = IsCMDSTraining;
             filter.IsReportingDisabled = false;
 
-            if (InSite.UI.Portal.Learning.Plan.ShowSafetyAchievementsOnly())
+            if (InSite.UI.Portal.Learning.LearningHelper.ShowSafetyAchievementsOnly())
                 filter.AchievementType = "Time-Sensitive Safety Certificate";
 
             var organization = Organization.Identifier;

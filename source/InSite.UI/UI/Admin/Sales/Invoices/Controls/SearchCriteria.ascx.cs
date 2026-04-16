@@ -33,6 +33,8 @@ namespace InSite.Admin.Invoices.Controls
 
                 GetCheckedShowColumns(filter);
 
+                filter.OrderBy = SortColumns.Value;
+
                 return filter;
             }
             set
@@ -54,6 +56,8 @@ namespace InSite.Admin.Invoices.Controls
                 Employer.Text = value.CustomerEmployer;
 
                 Product.Value = value.ProductIdentifier;
+
+                SortColumns.Value = value.OrderBy;
             }
         }
 

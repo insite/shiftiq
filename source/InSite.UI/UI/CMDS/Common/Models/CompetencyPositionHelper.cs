@@ -64,8 +64,9 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
 
             filter.OrganizationIdentifier = positionParameter.OrganizationIdentifier;
             filter.Paging = null;
+            filter.ValidatorUserIdentifier = validatorID;
 
-            var table = UserCompetencyRepository.SelectSearchResults(filter, validatorID, parentUserID);
+            var table = UserCompetencyRepository.SelectSearchResults(filter, parentUserID);
 
             var view = table.DefaultView;
             view.Sort = "Number";

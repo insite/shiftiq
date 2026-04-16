@@ -7,7 +7,6 @@ namespace Shift.Sdk.Service
 {
     public interface ICommanderAsync
     {
-        Task SendCommandAsync(ICommand command);
         Task SendCommandsAsync(IEnumerable<ICommand> commands);
     }
 }

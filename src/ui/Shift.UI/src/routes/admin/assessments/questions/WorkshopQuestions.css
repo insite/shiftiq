@@ -1,0 +1,198 @@
+.WorkshopQuestions {
+    .WorkshopQuestions_Filter {
+        .multiselect,
+        .datepicker,
+        .insite-combobox {
+            width: 100%;
+        }
+    }
+
+    .question-filter-actions {
+        margin-bottom: 0.25rem;
+    }
+
+    .questions-header {
+        margin-bottom: 1rem;
+
+        .form-text {
+            margin-left: 0.35rem;
+        }
+    }
+
+    .question-grid {
+        > tbody > tr > td {
+            padding: 20px 0 20px 20px;
+            vertical-align: top;
+        }
+
+        img,
+        iframe {
+            max-width: 100% !important;
+        }
+
+        > tbody > tr > td:first-child {
+            text-align: center;
+            width: 70px;
+            border-left: 1px solid transparent;
+        }
+
+        > tbody > tr:first-child > td {
+            border-top: none;
+        }
+
+        .sequence {
+            font-size: 27px;
+            color: #265f9f;
+            white-space: nowrap;
+        }
+
+        .option-grid {
+            margin-left: 10px;
+
+            td,
+            th {
+                vertical-align: top;
+                padding: 5px;
+            }
+
+            & > tbody {
+                td,
+                th {
+                    height: 52px;
+
+                    &.option-points {
+                        padding-top: 8px;
+                    }
+
+                    &.option-title .InlineEditor textarea {
+                        width: 400px;
+                    }
+                }
+            }
+        }
+    }
+
+    .question-right-cell {
+        width: 340px;
+    }
+
+    .option-points,
+    .pair-points {
+        padding-top: 8px;
+        padding-left: 0;
+        white-space: nowrap;
+    }
+
+    .property-grid {
+        width: 100%;
+        margin-bottom: 0;
+
+        > tbody > tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        > tbody > tr > td {
+            border: 1px solid #ddd;
+            padding: 5px !important;
+            vertical-align: top;
+        }
+
+        > tbody > tr > td:first-child {
+            width: 90px;
+            white-space: nowrap;
+        }
+    }
+
+    .word-break {
+        word-break: break-word;
+    }
+
+    .form-ref-row + .form-ref-row {
+        margin-top: 8px;
+    }
+
+    .bubble {
+        position: relative;
+        width: 30px;
+        text-align: center;
+        color: white;
+        line-height: 1.3em;
+        margin: 5px auto 15px;
+        background-color: #f74f78;
+        border-radius: 7px;
+        font-size: 18px;
+
+        &.speech::before {
+            content: " ";
+            position: absolute;
+            left: 13px;
+            bottom: -9px;
+            width: 0;
+            height: 0;
+            border: 5px solid;
+            border-color: #f74f78 #f74f78 transparent transparent;
+        }
+    }
+
+    .posted-comments {
+        .question-comment {
+            &.comment-hidden {
+                display: none;
+            }
+        }
+
+        &.show-hidden {
+            .question-comment {
+                &.comment-hidden {
+                    display: block;
+                    opacity: 0.6;
+                }
+            }
+        }
+    }
+
+    .comments-actions {
+        line-height: 26px;
+    }
+
+    .candidate-comments-link {
+        margin-right: 6px;
+    }
+
+    .question-comment:last-child {
+        hr {
+            display: none;
+        }
+    }
+
+    .InlineEditor {
+        color: var(--ar-dark);
+        text-decoration: none;
+        border-bottom: none;
+
+        &.standard-selector .insite-combobox {
+            width: 420px !important;
+        }
+
+        input,
+        textarea {
+            color: var(--ar-dark);
+        }
+    }
+
+    @media only screen and (max-width: 1700px) {
+        .competency-alert {
+            .insite-combobox {
+                max-width: 260px;
+            }
+        }
+    }
+
+    @media only screen and (max-width: 992px) {
+        .question-grid {
+            > tbody > tr > td {
+                padding-left: 10px;
+            }
+        }
+    }
+}

@@ -8,6 +8,7 @@ using System.Transactions;
 
 using InSite.Application.Attempts.Read;
 using InSite.Application.Contents.Read;
+using InSite.Application.Logs.Read;
 using InSite.Domain.Attempts;
 using InSite.Persistence.Foundation;
 
@@ -19,6 +20,13 @@ namespace InSite.Persistence
 {
     public class AttemptSearch : IAttemptSearch
     {
+        private readonly IAggregateSearch _aggregateSearch;
+
+        public AttemptSearch(IAggregateSearch aggregateSearch)
+        {
+            _aggregateSearch = aggregateSearch;
+        }
+
         internal InternalDbContext CreateContext() => new InternalDbContext(false);
 
         #region Classes
@@ -211,6 +219,11 @@ where form.OrganizationIdentifier = @OrganizationIdentifier";
 
         #region Attempts
 
+        public AttemptState GetAttemptState(Guid attempt)
+        {
+            return _aggregateSearch.GetState<AttemptAggregate>(attempt) as AttemptState;
+        }
+
         public int CountAttempts(QAttemptFilter filter)
         {
             using (var db = CreateContext())
@@ -396,6 +409,9 @@ where form.OrganizationIdentifier = @OrganizationIdentifier";
 
             if (!string.IsNullOrEmpty(filter.LearnerCompany))
                 query = query.Where(x => x.LearnerPerson.EmployerGroupName.Contains(filter.LearnerCompany));
+
+            if (!string.IsNullOrEmpty(filter.LearnerCode))
+                query = query.Where(x => x.LearnerPerson.PersonCode.Contains(filter.LearnerCode));
 
             if (!string.IsNullOrEmpty(filter.Form))
             {

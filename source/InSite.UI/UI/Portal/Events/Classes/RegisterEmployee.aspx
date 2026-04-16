@@ -44,20 +44,20 @@
 
         <div class="card-body">
 
-            <div class="d-flex">
-                <div runat="server" id="PersonNameColumn" class="me-3">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <div runat="server" id="PersonNameColumn" class="">
                     <insite:TextBox ID="LastName" runat="server" MaxLength="40" Width="200" EmptyMessage="Last Name" />
                 </div>
-                <div class="me-3">
+                <div class="">
                     <insite:TextBox ID="Email" runat="server" MaxLength="100" Width="200" EmptyMessage="Email" />
                 </div>
-                <div runat="server" id="PersonCodeColumn" class="me-3">
+                <div runat="server" id="PersonCodeColumn" class="">
                     <insite:TextBox ID="PersonCode" runat="server" MaxLength="100" Width="200" EmptyMessage="Tradeworker ID" />
                 </div>
-                <div class="me-3">
+                <div class="">
                     <insite:Button runat="server" ID="SearchButton" Text="Search" ButtonStyle="Default" Icon="fas fa-search" />
                 </div>
-                <div class="me-3">
+                <div class="">
                     <asp:Label runat="server" ID="SearchHint" Text="Your search..." CssClass="fs-sm text-muted" />
                 </div>
             </div>

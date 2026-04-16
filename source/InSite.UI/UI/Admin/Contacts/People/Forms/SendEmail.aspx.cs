@@ -113,6 +113,12 @@ namespace InSite.UI.Admin.Contacts.People.Forms
             set => ViewState[nameof(Templates)] = value;
         }
 
+        private Guid? MessageId
+        {
+            get => (Guid?)ViewState[nameof(MessageId)];
+            set => ViewState[nameof(MessageId)] = value;
+        }
+
         #endregion
 
         #region IHasParentLinkParameters
@@ -191,8 +197,12 @@ namespace InSite.UI.Admin.Contacts.People.Forms
             var templateId = MessageTemplateCombobox.ValueAsGuid;
             var template = Templates.FirstOrDefault(x => x.MessageIdentifier == templateId);
             if (template == null)
+            {
+                MessageId = null;
                 return;
+            }
 
+            MessageId = templateId;
             ComposeEmailSubject.Text = template.MessageTitle;
             ComposeEmailBody.Value = template.ContentText;
         }
@@ -462,12 +472,18 @@ namespace InSite.UI.Admin.Contacts.People.Forms
             email.ContentSubject[Email.Recipient.Language] = ComposeEmailSubject.Text;
             email.ContentBody[Email.Recipient.Language] = ComposeEmailBody.Value;
 
+            if (!email.MessageIdentifier.HasValue)
+                email.MessageIdentifier = MessageId ?? MessageHelper.GetOrCreateDefaultNotificationId(
+                    Organization.OrganizationIdentifier, ServiceLocator.SendCommand);
+
             try
             {
                 ServiceLocator.EmailOutbox.Send(email, "Person");
 
                 if (email.MailoutSucceeded)
-                    ScreenStatus.AddMessage(AlertType.Success, $"The email message has been sent to <strong>{Email.Recipient.Email}</strong>.");
+                    ScreenStatus.AddMessage(AlertType.Success, $"The email message has been submitted for delivery <strong>{Email.Recipient.Email}</strong>.");
+                else if (email.MailoutStatus == "Queued")
+                    ScreenStatus.AddMessage(AlertType.Success, $"The email message has been queued for delivery to <strong>{Email.Recipient.Email}</strong>.");
                 else
                     ScreenStatus.AddMessage(AlertType.Warning, $"No email message has been sent.");
             }

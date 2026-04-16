@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-using Shift.Common.Timeline.Changes;
-
 using Newtonsoft.Json;
 
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Domain.Attempts
@@ -332,11 +331,13 @@ namespace InSite.Domain.Attempts
     {
         public int NextSectionIndex { get; set; }
         public int NextQuestionIndex { get; set; }
+        public bool IsForced { get; set; }
 
-        public AttemptQuestionSwitched(int nextSectionIndex, int nextQuestionIndex)
+        public AttemptQuestionSwitched(int nextSectionIndex, int nextQuestionIndex, bool isForced)
         {
             NextSectionIndex = nextSectionIndex;
             NextQuestionIndex = nextQuestionIndex;
+            IsForced = isForced;
         }
     }
 

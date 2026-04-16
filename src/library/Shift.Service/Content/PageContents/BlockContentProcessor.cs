@@ -26,15 +26,16 @@ internal static class BlockContentProcessor
     {
         var dst = new ContentContainer();
         var processedFields = new HashSet<string>();
+        var labels = src.GetLabels().ToList();
 
-        foreach (var label in dst.GetLabels())
+        foreach (var label in labels)
         {
             var fieldName = label.Split(':')[0];
             if (processedFields.Contains(fieldName))
                 continue;
 
             if (!_blockFields.TryGetValue(fieldName, out var blockFieldType))
-                throw new ArgumentException($"Non-supported field: {label}");
+                throw new ArgumentException($"Non-supported field: {fieldName}");
 
             switch (blockFieldType)
             {

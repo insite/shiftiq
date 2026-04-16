@@ -54,24 +54,24 @@ namespace InSite.Admin.Records.Programs
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
-            {
-                var program = ProgramId.HasValue ? ProgramSearch.GetProgram(ProgramId.Value) : null;
-                if (program == null)
-                    Search.Redirect();
+            if (IsPostBack)
+                return;
 
-                PageHelper.AutoBindHeader(this, null, program.ProgramName);
+            var program = ProgramId.HasValue ? ProgramSearch.GetProgram(ProgramId.Value) : null;
+            if (program == null || program.OrganizationIdentifier != Organization.Identifier)
+                Search.Redirect();
 
-                ProgramCode.Text = program.ProgramCode;
-                ProgramName.Text = program.ProgramName;
-                ProgramIdentifier.Text = program.ProgramIdentifier.ToString();
-                ProgramDescription.Text = program.ProgramDescription;
-                ProgramTag.Text = program.ProgramTag.HasValue() ? program.ProgramTag : "None";
+            PageHelper.AutoBindHeader(this, null, program.ProgramName);
 
-                CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramId.Value);
+            ProgramCode.Text = program.ProgramCode;
+            ProgramName.Text = program.ProgramName;
+            ProgramIdentifier.Text = program.ProgramIdentifier.ToString();
+            ProgramDescription.Text = program.ProgramDescription;
+            ProgramTag.Text = program.ProgramTag.HasValue() ? program.ProgramTag : "None";
 
-                BindTasks(program.ProgramIdentifier);
-            }
+            CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramId.Value);
+
+            BindTasks(program.ProgramIdentifier);
         }
 
         #endregion
@@ -85,7 +85,6 @@ namespace InSite.Admin.Records.Programs
                 return;
 
             var program = ProgramSearch.GetProgram(ProgramId.Value);
-
             if (program == null)
                 return;
 
@@ -104,7 +103,6 @@ namespace InSite.Admin.Records.Programs
                 return;
 
             var program = ProgramSearch.GetProgram(ProgramId.Value);
-
             if (program == null)
                 return;
 

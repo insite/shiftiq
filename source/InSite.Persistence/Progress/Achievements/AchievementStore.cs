@@ -262,8 +262,9 @@ DELETE FROM achievements.QAchievement WHERE AchievementIdentifier = @Achievement
                 {
                     credential = new QCredential
                     {
-                        CredentialIdentifier = e.AggregateIdentifier,
                         AchievementIdentifier = e.Achievement,
+                        CredentialIdentifier = e.AggregateIdentifier,
+                        OrganizationIdentifier = e.Tenant,
                         UserIdentifier = e.User,
                     };
                     db.QCredentials.Add(credential);

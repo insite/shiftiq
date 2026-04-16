@@ -15,8 +15,7 @@
 
         <div class="row">
 
-            <div class="col-lg-6">
-
+            <div class="col-lg-6 mb-3 mb-lg-0">
                 <div class="card border-0 shadow-lg h-100">
                     <div class="card-body">
                         <h3>Details</h3>
@@ -30,17 +29,96 @@
                 <div class="card border-0 shadow-lg h-100">
                     <div class="card-body">
                         <h3>Settings</h3>
-                        <label class="form-label">Print Settings</label>
-                        <div>
-                            <insite:CheckBox ID="IncludeImages" runat="server" Text="Include Images" Checked="true" />
-                            <insite:CheckBox ID="IncludeAdminComments" runat="server" Text="Include Admin Comments" Checked="true" />
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Print Settings</label>
+                            <div>
+                                <insite:CheckBox ID="IncludeImages" runat="server" Text="Include Images" Checked="true" />
+                                <insite:CheckBox ID="IncludeAdminComments" runat="server" Text="Include Admin Comments" Checked="true" />
+                                <insite:CheckBox ID="ExcludeHiddenComments" runat="server" Text="Exclude Hidden Comments" Checked="true" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Taxonomy</label>
+                                    <insite:TaxonomyMultiComboBox runat="server" ID="QuestionTaxonomy" Multiple-ActionsBox="true" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Condition</label>
+                                    <insite:QuestionConditionMultiComboBox runat="server" ID="QuestionCondition" Multiple-ActionsBox="true" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-xxl-3">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">LIG</label>
+                                    <insite:BooleanComboBox runat="server" ID="IsQuestionHasLig" TrueText="LIG" FalseText="No LIG" AllowBlank="true" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-xxl-4">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Reference</label>
+                                    <insite:BooleanComboBox runat="server" ID="IsQuestionHasReference" TrueText="Reference" FalseText="No Reference" AllowBlank="true" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-xxl-5">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Question Flag</label>
+                                    <insite:FlagMultiComboBox runat="server" ID="QuestionFlag" AllowBlank="false" Multiple-ActionsBox="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div runat="server" id="CompetencyField" class="form-group mb-3">
+                            <label class="form-label">Competency</label>
+                            <div class="tree-view-container">
+                                <asp:Repeater runat="server" ID="AreaRepeater">
+                                    <HeaderTemplate><ul class="tree-view" data-default-level="1"></HeaderTemplate>
+                                    <FooterTemplate></ul></FooterTemplate>
+                                    <ItemTemplate>
+                                        <li class="outline-item">
+                                            <div>
+                                                <div>
+                                                    <div class="node-title">
+                                                        <%# GetStandardTitle() %>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <asp:Repeater runat="server" ID="CompetencyRepeater">
+                                                <HeaderTemplate><ul class="tree-view"></HeaderTemplate>
+                                                <FooterTemplate></ul></FooterTemplate>
+                                                <ItemTemplate>
+                                                    <li class="outline-item">
+                                                        <div>
+                                                            <div>
+                                                                <div class="node-title">
+                                                                    <insite:CheckBox runat="server" ID="IsSelected" Text='<%# GetStandardTitle() %>' CssClass="m-0" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ItemTemplate>
+                                            </asp:Repeater>
+
+                                        </li>
+                                    </ItemTemplate>
+                                </asp:Repeater>
+                            </div>
                         </div>
 
                     </div>
-
                 </div>
 
             </div>
+
         </div>
 
     </section>
@@ -50,6 +128,7 @@
             <insite:DropDownButton runat="server" ID="BuildImagesButton" ButtonStyle="Success" DefaultAction="None" IconName="download" Text="Print Images" CssClass="d-inline-block" disabled="disabled"></insite:DropDownButton>
             <insite:Button runat="server" ID="BuildQuestionsInternal" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Questions (internal)" />
             <insite:Button runat="server" ID="BuildQuestionsCompact" ButtonStyle="Info" Icon="fas fa-download" Text="Print Questions (compact)" />
+            <insite:Button runat="server" ID="BuildQuestionsExternal" ButtonStyle="Success" Icon="fas fa-download" Text="Print Questions (external)" />
             <insite:CloseButton runat="server" ID="GoBackButton" />
         </div>
     </div>
@@ -115,6 +194,20 @@
                     e.preventDefault();
                     e.stopPropagation();
                 });
+            })();
+
+            (function () {
+                const chkIncludeAdminComments = document.getElementById('<%= IncludeAdminComments.ClientID %>');
+                const chkExcludeHiddenComments = document.getElementById('<%= ExcludeHiddenComments.ClientID %>');
+                if (!chkIncludeAdminComments || !chkExcludeHiddenComments)
+                    return;
+
+                document.addEventListener('DOMContentLoaded', onIncludeAdminCommentsChanged);
+                chkIncludeAdminComments.addEventListener('change', onIncludeAdminCommentsChanged);
+
+                function onIncludeAdminCommentsChanged() {
+                    chkExcludeHiddenComments.disabled = !chkIncludeAdminComments.checked;
+                }
             })();
         </script>
     </insite:PageFooterContent>

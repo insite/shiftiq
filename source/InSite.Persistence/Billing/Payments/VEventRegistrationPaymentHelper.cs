@@ -24,6 +24,9 @@ namespace InSite.Persistence
             if (filter.EmployerName.HasValue())
                 query = query.Where(x => x.EmployerName.Contains(filter.EmployerName));
 
+            if (filter.EmployerStatus.HasValue())
+                query = query.Where(x => x.EmployerStatus == filter.EmployerStatus);
+
             if (filter.RegistrantName.HasValue())
                 query = query.Where(x => x.RegistrantCardholder.Contains(filter.RegistrantName));
 

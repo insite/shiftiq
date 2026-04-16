@@ -22,6 +22,9 @@ internal class TestJsonSerializer : IJsonSerializer
     public string SerializeCommand(Shift.Common.Timeline.Commands.ICommand command)
         => JsonConvert.SerializeObject(command);
 
+    public string SerializeCommandForApi(Shift.Common.Timeline.Commands.ICommand command)
+        => JsonConvert.SerializeObject(command);
+
     public string SerializeChange(Shift.Common.Timeline.Changes.IChange command)
         => JsonConvert.SerializeObject(command);
 

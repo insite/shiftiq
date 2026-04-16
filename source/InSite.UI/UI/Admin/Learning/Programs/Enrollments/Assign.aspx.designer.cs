@@ -177,6 +177,15 @@ namespace InSite.Cmds.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.NextButton Step1NextButton;
 
         /// <summary>
+        /// Step1CloseButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CloseButton Step1CloseButton;
+
+        /// <summary>
         /// Step2 control.
         /// </summary>
         /// <remarks>
@@ -238,5 +247,14 @@ namespace InSite.Cmds.Admin.Records.Programs
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Button ConfirmButton;
+
+        /// <summary>
+        /// Step2CloseButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CloseButton Step2CloseButton;
     }
 }

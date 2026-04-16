@@ -50,6 +50,8 @@ namespace InSite.Application.Events.Read
         public DateTimeOffset? EventScheduleEndSince { get; set; }
         public DateTimeOffset? EventScheduledSince { get; set; }
         public DateTimeOffset? EventScheduledBefore { get; set; }
+        public DateTimeOffset? EventScheduledPeriodSince { get; set; }
+        public DateTimeOffset? EventScheduledPeriodBefore { get; set; }
         public DateTimeOffset? AttemptCompletedSince { get; set; }
         public DateTimeOffset? AttemptCompletedBefore { get; set; }
         public DateTimeOffset? DistributionExpectedSince { get; set; }

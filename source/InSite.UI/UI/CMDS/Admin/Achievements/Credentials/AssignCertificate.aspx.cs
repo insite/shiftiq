@@ -242,8 +242,8 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
             base.OnInit(e);
 
-            SubType.AutoPostBack = true;
-            SubType.ValueChanged += SubType_ValueChanged;
+            AchievementType.AutoPostBack = true;
+            AchievementType.ValueChanged += SubType_ValueChanged;
 
             Category.AutoPostBack = true;
             Category.ValueChanged += Category_ValueChanged;
@@ -280,11 +280,15 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
                 var organization = Identity.Organization.Code;
 
-                var achievementTypes = new List<string>();
-                achievementTypes.Add(AchievementTypes.Display(AchievementTypes.TimeSensitiveSafetyCertificate, organization));
-                achievementTypes.Add(AchievementTypes.Display(AchievementTypes.TrainingGuide, organization));
+                var achievementTypes = new List<Shift.Common.ListItem>();
 
-                SubType.LoadItems(achievementTypes);
+                var item1 = new Shift.Common.ListItem { Text = AchievementTypes.Display(AchievementTypes.TimeSensitiveSafetyCertificate, organization), Value = AchievementTypes.TimeSensitiveSafetyCertificate };
+                achievementTypes.Add(item1);
+
+                var item2 = new Shift.Common.ListItem { Text = AchievementTypes.Display(AchievementTypes.TrainingGuide, organization), Value = AchievementTypes.TrainingGuide };
+                achievementTypes.Add(item2);
+
+                AchievementType.LoadItems(achievementTypes);
 
                 Category.ListFilter.OrganizationIdentifier = OrganizationSearch.Select(Organization.Identifier).OrganizationIdentifier;
                 Category.RefreshData();
@@ -551,7 +555,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
             LoadEmployees();
 
-            SubType.Value = AchievementTypes.TimeSensitiveSafetyCertificate;
+            AchievementType.Value = AchievementTypes.TimeSensitiveSafetyCertificate;
 
             SetEnableSignOffAvailability();
         }
@@ -623,7 +627,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             {
                 var necessity = IsRequired.Checked ? "Mandatory" : "Optional";
                 var priority = "Planned";
-                var authorityType = EmployeeAchievementHelper.AllowSignOff(SubType.Value) ? "Self" : null;
+                var authorityType = EmployeeAchievementHelper.AllowSignOff(AchievementType.Value) ? "Self" : null;
 
                 var achievement = AchievementIdentifier.Value.Value;
                 credentialIdentifier = ServiceLocator.AchievementSearch.GetCredentialIdentifier(null, achievement, userIdentifier);
@@ -891,7 +895,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
         private void LoadAchievements()
         {
-            AchievementIdentifier.Filter.AchievementType = SubType.Value;
+            AchievementIdentifier.Filter.AchievementType = AchievementType.Value;
             AchievementIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementIdentifier.Filter.CategoryIdentifier = Category.ValueAsGuid;
             AchievementIdentifier.Value = null;
@@ -899,7 +903,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
         private void SetEnableSignOffAvailability()
         {
-            EnableSignOff.Visible = EmployeeAchievementHelper.AllowSignOff(SubType.Value);
+            EnableSignOff.Visible = EmployeeAchievementHelper.AllowSignOff(AchievementType.Value);
             EnableSignOff.Checked = false;
         }
 

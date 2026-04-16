@@ -74,6 +74,28 @@ namespace InSite.Persistence
             return EntitiesToModels(files, includeClaims);
         }
 
+        public List<FileStorageModel> GetModels(Guid[] fileIds, bool includeClaims)
+        {
+            if (fileIds.Length == 0)
+                return new List<FileStorageModel>();
+
+            List<TFile> files;
+
+            using (var db = new InternalDbContext())
+            {
+                var query = db.TFiles
+                    .AsNoTracking()
+                    .Where(x => fileIds.Contains(x.FileIdentifier));
+
+                if (includeClaims)
+                    query = query.Include(x => x.FileClaims);
+
+                files = query.ToList();
+            }
+
+            return EntitiesToModels(files, includeClaims);
+        }
+
         public List<FileStorageModel> GetExpiredModels(DateTimeOffset expiredAt)
         {
             List<TFile> files;

@@ -35,6 +35,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
             string IconHtml { get; }
             string Text { get; }
             bool HasFlag { get; }
+            bool IsHidden { get; }
         }
 
         private class QuestionCollection : List<QuestionInfo>
@@ -85,7 +86,8 @@ namespace InSite.Admin.Assessments.Questions.Utilities
                             PostedOn = y.Posted,
                             IconHtml = y.Flag.ToIconHtml(),
                             Text = Markdown.ToHtml(y.Text),
-                            HasFlag = y.Flag != FlagType.None
+                            HasFlag = y.Flag != FlagType.None,
+                            IsHidden = y.IsHidden
                         }).ToArray());
                 }
 
@@ -123,6 +125,17 @@ namespace InSite.Admin.Assessments.Questions.Utilities
             public string IconHtml { get; set; }
             public string Text { get; set; }
             public bool HasFlag { get; set; }
+            public bool IsHidden { get; set; }
+        }
+
+        public class QuestionFilter
+        {
+            public HashSet<int> QuestionTaxonomy { get; set; }
+            public HashSet<string> QuestionCondition { get; set; }
+            public HashSet<FlagType> QuestionFlag { get; set; }
+            public HashSet<Guid> QuestionCompetency { get; set; }
+            public bool? IsQuestionHasLig { get; set; }
+            public bool? IsQuestionHasReference { get; set; }
         }
 
         public static IQuestionInfo[] GetQuestions(BankState bank)
@@ -297,6 +310,103 @@ namespace InSite.Admin.Assessments.Questions.Utilities
 
             if (q.Classification.Reference != null)
                 yield return new Tuple<string, string>("Reference", WebUtility.HtmlDecode(q.Classification.Reference));
+        }
+
+        public static IEnumerable<IQuestionInfo> FilterQuestions(IEnumerable<IQuestionInfo> questions, QuestionFilter filter) =>
+            FilterQuestions(questions, filter.QuestionTaxonomy, filter.QuestionCondition, filter.QuestionFlag, filter.QuestionCompetency, filter.IsQuestionHasLig, filter.IsQuestionHasReference);
+
+        public static IEnumerable<IQuestionInfo> FilterQuestions(
+            IEnumerable<IQuestionInfo> questions,
+            HashSet<int> taxonomy,
+            HashSet<string> condition,
+            HashSet<FlagType> flag,
+            HashSet<Guid> competency,
+            bool? hasLig,
+            bool? hasReference)
+        {
+            var result = questions.AsQueryable();
+
+            if (taxonomy.IsNotEmpty())
+            {
+                result = result
+                    .Where(x => x.BankQuestion.Classification.Taxonomy.HasValue
+                             && taxonomy.Contains(x.BankQuestion.Classification.Taxonomy.Value));
+            }
+
+            if (condition.IsNotEmpty())
+            {
+                result = result
+                    .Where(x => condition.Contains(x.BankQuestion.Condition));
+            }
+
+            if (flag.IsNotEmpty())
+            {
+                result = result
+                    .Where(x => flag.Contains(x.BankQuestion.Flag));
+            }
+
+            if (competency.IsNotEmpty())
+            {
+                result = result
+                    .Where(x => competency.Contains(x.BankQuestion.Standard));
+            }
+
+            if (hasLig.HasValue)
+            {
+                if (hasLig.Value)
+                    result = result
+                        .Where(x => x.BankQuestion.Classification.LikeItemGroup != null);
+                else
+                    result = result
+                        .Where(x => x.BankQuestion.Classification.LikeItemGroup == null);
+            }
+
+            if (hasReference.HasValue)
+            {
+                if (hasReference.Value)
+                    result = result
+                        .Where(x => x.BankQuestion.Classification.Reference != null);
+                else
+                    result = result
+                        .Where(x => x.BankQuestion.Classification.Reference == null);
+            }
+
+            return result.ToArray();
+        }
+
+        public static bool IsQuestionMatch(Question question, QuestionFilter filter) =>
+            IsQuestionMatch(question, filter.QuestionTaxonomy, filter.QuestionCondition, filter.QuestionFlag, filter.QuestionCompetency, filter.IsQuestionHasLig, filter.IsQuestionHasReference);
+
+        public static bool IsQuestionMatch(
+            Question question,
+            HashSet<int> taxonomy,
+            HashSet<string> condition,
+            HashSet<FlagType> flag,
+            HashSet<Guid> competency,
+            bool? hasLig,
+            bool? hasReference)
+        {
+            var classification = question.Classification;
+
+            if (taxonomy.IsNotEmpty() && (!classification.Taxonomy.HasValue || !taxonomy.Contains(classification.Taxonomy.Value)))
+                return false;
+
+            if (condition.IsNotEmpty() && !condition.Contains(question.Condition))
+                return false;
+
+            if (flag.IsNotEmpty() && !flag.Contains(question.Flag))
+                return false;
+
+            if (competency.IsNotEmpty() && !competency.Contains(question.Standard))
+                return false;
+
+            if (hasLig == true && classification.LikeItemGroup == null || hasLig == false && classification.LikeItemGroup != null)
+                return false;
+
+            if (hasReference == true && classification.Reference == null || hasReference == false && classification.Reference != null)
+                return false;
+
+            return true;
         }
     }
 }

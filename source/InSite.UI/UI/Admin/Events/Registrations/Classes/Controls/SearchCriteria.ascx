@@ -10,7 +10,7 @@
                     <div class="mb-2">
                         <insite:TextBox runat="server" ID="CandidateName" EmptyMessage="Registrant Name" MaxLength="256" />
                     </div>
-    
+
                     <div class="mb-2">
                         <insite:TextBox runat="server" ID="CandidateCode" MaxLength="256" />
                     </div>
@@ -88,6 +88,10 @@
                     <div class="mb-2">
                         <insite:ItemNameComboBox runat="server" ID="RegistrationEmployerRegion" EmptyMessage="Employer Region" />
                     </div>
+
+                    <div class="mb-2">
+                        <insite:FindGroup runat="server" ID="DepartmentId" EmptyMessage="Department" />
+                    </div>
                 </div>
                 <div class="col-4">
                     <div class="mb-2">
@@ -122,13 +126,13 @@
                     </div>
 
                     <div class="mb-2">
-                        <insite:FindGroup runat="server" ID="DepartmentId" EmptyMessage="Department" />
+                        <insite:FindBankForm runat="server" ID="ExamFormIdentifier" EmptyMessage="Assessment Form Name" />
                     </div>
                 </div>
             </div> 
         </div>
     </div>
-    <div class="col-3">       
+    <div class="col-3">
         <div class="mb-2">
             <h4>Settings</h4>
             <insite:MultiComboBox ID="ShowColumns" runat="server" />

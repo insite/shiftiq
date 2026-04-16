@@ -22,21 +22,21 @@ namespace InSite.Admin.Records.Programs
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
-            {
-                var program = ProgramID.HasValue ? ProgramSearch.GetProgram(ProgramID.Value, x => x.Tasks, x => x.Enrollments) : null;
-                if (program == null || program.OrganizationIdentifier != Organization.Identifier)
-                    Search.Redirect();
+            if (IsPostBack)
+                return;
 
-                ProgramDetails.BindProgram(program);
+            var program = ProgramID.HasValue ? ProgramSearch.GetProgram(ProgramID.Value, x => x.Tasks, x => x.Enrollments) : null;
+            if (program == null || program.OrganizationIdentifier != Organization.Identifier)
+                Search.Redirect();
 
-                LearnersCount.Text = program.Enrollments?.Count.ToString();
-                TasksCount.Text = program.Tasks?.Count.ToString();
+            ProgramDetails.BindProgram(program);
 
-                CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramID.Value);
+            LearnersCount.Text = program.Enrollments?.Count.ToString();
+            TasksCount.Text = program.Tasks?.Count.ToString();
 
-                PageHelper.AutoBindHeader(Page, null, program.ProgramName);
-            }
+            CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramID.Value);
+
+            PageHelper.AutoBindHeader(Page, null, program.ProgramName);
         }
 
         private void DeleteButton_Click(object sender, EventArgs e)

@@ -8,13 +8,14 @@ import { usePageContent_Provider } from "./PageContent_Provider";
 import { translate } from "@/helpers/translate";
 import { BlockId } from "./models/BlockId";
 import { blockTypeNameList } from "./blockTypeNameList";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface Props {
     block: BlockState;
+    selected: boolean;
 }
 
-export default function PageContent_Blocks_Edit({ block }: Props) {
+export default function PageContent_Blocks_Edit({ block, selected }: Props) {
     const { readOnly, modifyBlockTitle, modifyBlockHook, deleteBlock } = usePageContent_Provider();
 
     const blockTitleRef = useRef<HTMLInputElement>(null);
@@ -23,6 +24,12 @@ export default function PageContent_Blocks_Edit({ block }: Props) {
     if (!blockInfo) {
         throw new Error(`Block type ${block.blockType} doe snot exist`);
     }
+
+    useEffect(() => {
+        if (selected && blockTitleRef.current) {
+            blockTitleRef.current.focus();
+        }
+    }, [selected])
 
     function handleDeleteBlock(blockId: BlockId) {
         if (window.confirm(translate("Are you sure to delete this block?"))) {
@@ -71,7 +78,7 @@ export default function PageContent_Blocks_Edit({ block }: Props) {
                         tabIndex={-1}
                     >
                         <span className="btn-scroll-bottom-tooltip text-body-secondary fs-sm me-2">{translate("Bottom")}</span>
-                        <Icon style="Regular" name="arrow-down" className="btn-scroll-bottom-icon" />
+                        <Icon style="regular" name="arrow-down" className="btn-scroll-bottom-icon" />
                     </a>
                 </div>
             </div>

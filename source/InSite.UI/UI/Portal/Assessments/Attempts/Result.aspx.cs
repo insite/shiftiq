@@ -286,7 +286,7 @@ namespace InSite.Portal.Assessments.Attempts
 
             var logoImageUrl = PortalHeader.GetLogoImageUrl(CurrentSessionState.Identity, Page.Server);
             var logoImageElement = (logoImageUrl == null)
-                ? ServiceLocator.Partition.Name
+                ? ServiceLocator.Partition.Brand
                 : $"<img alt='' src='{logoImageUrl}' />";
 
             var bodyHtml = GetFileContent("~/UI/Portal/Assessments/Attempts/Content/ResultPdfBody.html");

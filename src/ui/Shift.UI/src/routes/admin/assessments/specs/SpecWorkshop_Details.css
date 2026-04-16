@@ -1,0 +1,14 @@
+.table.table-criterion,
+.table.table-competency {
+    > thead > tr > th {
+        background-color: white;
+    }
+}
+
+.spec-workshop-input-sm {
+    width: 45px;
+}
+
+.table-danger {
+    background-color: #ecdede !important;
+}

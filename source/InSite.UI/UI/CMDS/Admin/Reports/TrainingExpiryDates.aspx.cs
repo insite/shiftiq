@@ -215,7 +215,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
             FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
             FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
             FindAchievement.Filter.AchievementLabels.Clear();
-            FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
+            if (!string.IsNullOrEmpty(AchievementType.Value))
+                FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
             FindAchievement.Value = null;
         }
 
@@ -385,9 +386,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
             var hasSelectedAchievement = CurrentParameters.Achievements.Length > 0;
             var hasSelectedAchievementType = !string.IsNullOrEmpty(CurrentParameters.AchievementType);
 
-            if (CurrentParameters.Departments.Length == 0 || (!hasSelectedAchievement && !hasSelectedAchievementType))
+            if (CurrentParameters.Departments.Length == 0 && !hasSelectedAchievement && !hasSelectedAchievementType)
             {
-                ScreenStatus.AddMessage(AlertType.Error, "Select a department and select an achievement (or an achievement type).");
+                ScreenStatus.AddMessage(AlertType.Error, "Select at least one department, achievement, or achievement type.");
                 return;
             }
 
@@ -437,6 +438,13 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 CurrentParameters.Learners,
                 CurrentParameters.IsRequired,
                 CurrentParameters.AchievementType);
+
+            var organizations = new List<Guid> { Organization.Identifier };
+
+            if (ServiceLocator.Partition.IsE03())
+                organizations.Add(ServiceLocator.AppSettings.Application.Organizations.Global);
+
+            rows = rows.Where(x => organizations.Contains(x.OrganizationIdentifier)).ToList();
 
             var result = new ReportDataSource();
 

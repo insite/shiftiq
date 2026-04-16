@@ -66,7 +66,7 @@ namespace InSite.UI.Portal.Learning
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater AchievementTypes;
+        protected global::InSite.UI.Portal.Learning.Controls.PlanAchievementTypeRepeater AchievementTypes;
 
         /// <summary>
         /// SignOff control.

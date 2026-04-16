@@ -23,6 +23,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
             public Guid RegistrationIdentifier { get; set; }
             public string RegisteredBy { get; set; }
             public string EmployerAtTimeOfRegistration { get; set; }
+            public string EmployerGroupStatus { get; set; }
             public string Registrant { get; set; }
             public string LearnerCode { get; set; }
             public string CurrentRegistrationStatus { get; set; }
@@ -66,6 +67,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
         }
 
         #region Export Data
+
         public override IListSource GetExportData(VEventRegistrationPaymentFilter filter, bool empty)
         {
             var query = SelectData(filter).GetList().Cast<VEventRegistrationPayment>().AsQueryable();
@@ -81,6 +83,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                 RegistrationIdentifier = x.RegistrationIdentifier,
                 RegisteredBy = x.RegistrantCardholder,
                 EmployerAtTimeOfRegistration = x.EmployerName,
+                EmployerGroupStatus = x.EmployerStatus,
                 Registrant = x.LearnerAttendee,
                 LearnerCode = x.LearnerCode,
                 CurrentRegistrationStatus = x.CurrentRegistrationStatus,

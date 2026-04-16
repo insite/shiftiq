@@ -42,7 +42,7 @@ namespace InSite.Admin.Issues.Issues.Forms
                 return;
 
             var issue = ServiceLocator.IssueSearch.GetIssue(CaseIdentifier);
-            if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue.OrganizationIdentifier, issue.TopicUserIdentifier))
+            if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue))
                 RedirectToSearch();
 
             PageHelper.AutoBindHeader(this, qualifier: $"{issue.IssueTitle} <span class='fw-normal fs-md text-body-secondary'>Case #{issue.IssueNumber} - {issue.IssueType}</span>");

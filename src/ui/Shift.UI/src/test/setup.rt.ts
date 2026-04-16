@@ -17,15 +17,15 @@ declare global {
 }
 
 global.login = async () => {
-    await shiftClient.cookie.login("e01", "aleksey@shiftiq.com");
+    await shiftClient.cookie.login("e01", "aleksey@shiftiq.com", null, null);
 }
 
 global.loginUser1 = async () => {
-    await shiftClient.cookie.login("e01", "react1@shiftiq.com");
+    await shiftClient.cookie.login("e01", "react1@shiftiq.com", null, null);
 }
 
 global.loginUser2 = async () => {
-    await shiftClient.cookie.login("e01", "react2@shiftiq.com");
+    await shiftClient.cookie.login("e01", "react2@shiftiq.com", null, null);
 }
 
 global.logout = async () => {

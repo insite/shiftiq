@@ -274,7 +274,7 @@ namespace InSite.UI.Admin.Assets.Files.Controls
         private (bool, string) ValidateIssue(Guid objectIdentifier)
         {
             var issue = ServiceLocator.IssueSearch.GetIssue(objectIdentifier);
-            if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue.OrganizationIdentifier, issue.TopicUserIdentifier))
+            if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue))
                 return (false, null);
 
             return (true, issue.IssueTitle);

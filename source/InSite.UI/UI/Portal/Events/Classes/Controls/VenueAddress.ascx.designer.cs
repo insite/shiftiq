@@ -30,7 +30,7 @@ namespace InSite.UI.Portal.Events.Classes.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl VenueAddressLabel;
+        protected global::InSite.Common.Web.UI.Literal VenueAddressLabel;
 
         /// <summary>
         /// VenueDetails control.

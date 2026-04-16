@@ -5,7 +5,7 @@ import { useSearch } from "@/components/search/Search";
 import SearchCriteria from "@/components/search/SearchCriteria";
 import { GradebookCriteria } from "./GradebookCriteria";
 import ControlledDatePicker from "@/components/date/ControlledDatePicker";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import PeriodFinder from "@/routes/_shared/finders/PeriodFinder";
 import GradebookStatusComboBox from "@/routes/_shared/comboboxes/GradebookStatusComboBox";
 import FrameworkFinder from "@/routes/_shared/finders/FrameworkFinder";

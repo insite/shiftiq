@@ -87,6 +87,15 @@ namespace InSite.Admin.Contacts.People.Forms
         protected global::InSite.Common.Web.UI.Button UploadContactLink;
 
         /// <summary>
+        /// IsLeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox IsLeader;
+
+        /// <summary>
         /// IsManager control.
         /// </summary>
         /// <remarks>

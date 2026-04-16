@@ -21,7 +21,13 @@
             <div runat="server" id="UploadQueryPanel" class="mt-3">
                 <strong>Upload New Query</strong>
                 <div class="w-75">
-                    <insite:FileUploadV2 runat="server" ID="QueryFile" AllowMultiple="false" LabelText="" FileUploadType="Unlimited" />
+                    <insite:FileUploadV2 runat="server"
+                        ID="QueryFile"
+                        AllowMultiple="false"
+                        LabelText=""
+                        FileUploadType="Unlimited"
+                        AllowedExtensions=".sql"
+                    />
                 </div>
             </div>
 

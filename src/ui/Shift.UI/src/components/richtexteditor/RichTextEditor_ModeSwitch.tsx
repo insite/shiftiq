@@ -24,11 +24,11 @@ export default function RichTextEditor_ModeSwitch({
                 title={translate("Change Mode")}
             >
                 <span className="markdown-switch">
-                    <Icon style="Brands" name="markdown" className="me-1" />
+                    <Icon style="brands" name="markdown" className="me-1" />
                     MD
                 </span>
                 <span className="html-switch">
-                    <Icon style="Regular" name="code" className="me-1" />
+                    <Icon style="regular" name="code" className="me-1" />
                     HTML
                 </span>
                 <span className="handle">

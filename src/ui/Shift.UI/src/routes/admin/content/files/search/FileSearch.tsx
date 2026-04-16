@@ -4,7 +4,7 @@ import Search from "@/components/search/Search";
 import { FileCriteria, toApiSearchFiles } from "./FileCriteria";
 import { FileRow } from "./FileRow";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { TimeZoneId } from "@/helpers/date/timeZones";
 import FileSearch_Download from "./FileSearch_Download";
 import { shiftClient } from "@/api/shiftClient";

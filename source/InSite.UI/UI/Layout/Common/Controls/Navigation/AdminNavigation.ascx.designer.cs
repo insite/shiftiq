@@ -33,24 +33,6 @@ namespace InSite.UI.Layout.Admin
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl RecentMenu;
 
         /// <summary>
-        /// RecentAnchor control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor RecentAnchor;
-
-        /// <summary>
-        /// RecentLinks control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.RecentLinkCache RecentLinks;
-
-        /// <summary>
         /// PortalAnchor control.
         /// </summary>
         /// <remarks>

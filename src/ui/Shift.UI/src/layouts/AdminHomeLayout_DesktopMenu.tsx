@@ -81,7 +81,7 @@ export default function AdminHomeLayout_DesktopMenu({ onStateChange }: Props) {
             <div className="admin-sidebar-header">
                 <div className="admin-sidebar-toggle">
                     <div title="Toggle Sidebar" onClick={onToggleClick}>
-                        <Icon style="Solid" name="angle-left" className="fa-fw" />
+                        <Icon style="solid" name="angle-left" className="fa-fw" />
                     </div>
                 </div>
                 <h5 className="m-0 d-inline-block">

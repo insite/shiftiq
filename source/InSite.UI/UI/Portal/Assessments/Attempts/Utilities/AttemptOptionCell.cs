@@ -1,10 +1,12 @@
-﻿using Shift.Common;
+﻿using InSite.Domain.Banks;
+
+using Shift.Common;
 
 namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 {
     public class AttemptOptionCell
     {
-        public AttemptOptionCell(QuestionTable.CellData cell)
+        public AttemptOptionCell(BankQuestionTable.CellData cell)
         {
             CssClass = "text";
             if (cell.CssClass.IsNotEmpty())

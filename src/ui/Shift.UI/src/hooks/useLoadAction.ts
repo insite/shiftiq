@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useStatusProvider } from "@/contexts/StatusProvider";
-import { useLoadingProvider } from "@/contexts/LoadingProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
+import { useLoadingProvider } from "@/contexts/loading/LoadingProviderContext";
 
 let _counter = 1;
 

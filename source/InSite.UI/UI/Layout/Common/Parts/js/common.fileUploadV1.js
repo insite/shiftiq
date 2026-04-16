@@ -140,6 +140,12 @@
         }
 
         function checkFileExtension(settings, file) {
+            const extMatch = file.name.match(/^(.+?)(\.[a-z0-9]+)?$/i);
+            if (!extMatch || !extMatch[2]) {
+                alert(file.name + " does not have a file extension. Please rename the file to include an extension (e.g., 'image.png') before uploading.");
+                return false;
+            }
+
             if (settings.AllowedExtensionsRegex == null) {
                 return true;
             }

@@ -1,6 +1,6 @@
 import ActionLink from "@/components/ActionLink";
 import Icon from "@/components/icon/Icon";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 
 export default function AdminHomeLayout_FormHeader_Env() {
     const { siteSetting } = useSiteProvider();
@@ -19,7 +19,7 @@ export default function AdminHomeLayout_FormHeader_Env() {
         siteSetting.Environment.Name.toLowerCase() !== "production" ? (
             <div className={`float-end text-${theme}`}>
                 <small className="me-1">
-                    <Icon style="Solid" name="circle-info" className="me-2" />
+                    <Icon style="solid" name="circle-info" className="me-2" />
                     Remember you are <strong>not</strong> working in a live version
                 </small>
                 {badge}

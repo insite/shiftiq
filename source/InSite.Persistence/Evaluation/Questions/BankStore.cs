@@ -6,14 +6,13 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Attempts.Read;
 using InSite.Application.Banks.Read;
 using InSite.Application.Contents.Read;
 using InSite.Domain.Banks;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Persistence
@@ -153,7 +152,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
         {
             InsertCursor(e, bank, (db) =>
             {
-                SyncQuestions(db, bank, true, true, true);
+                SyncQuestions(db, bank, e, true, true, true);
 
                 foreach (var specification in bank.Specifications)
                 {
@@ -818,6 +817,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                 var query = new QBankQuestion();
                 var question = bank.FindQuestion(e.Question);
 
+                SetCreate(query, e);
                 BindQuestionQuery(db, query, question);
 
                 db.BankQuestions.Add(query);
@@ -869,6 +869,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                 var query = new QBankQuestion();
                 var question = bank.FindQuestion(e.DestinationQuestion);
 
+                SetCreate(query, e);
                 BindQuestionQuery(db, query, question);
 
                 db.BankQuestions.Add(query);
@@ -997,6 +998,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             var query = new QBankQuestion();
             var row = bank.FindQuestion(e.QuestionIdentifier).Likert.GetRow(e.RowIdentifier);
 
+            SetCreate(query, e);
             BindLikertRowQuery(query, row);
             SetLastChange(query, e);
 
@@ -1064,6 +1066,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                 var question = bank.FindQuestion(e.Question.Identifier);
                 var query = new QBankQuestion();
 
+                SetCreate(query, e);
                 BindQuestionQuery(db, query, question);
 
                 db.BankQuestions.Add(query);
@@ -1110,7 +1113,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             }
         });
 
-        public void Update(QuestionMovedOut e) => UpdateCursor(e, (db, bank) => OnQuestionRemoved(db, bank, e.Question));
+        public void Update(QuestionMovedOut e) => UpdateCursor(e, (db, bank) => OnQuestionRemoved(db, bank, e.Question, e));
 
         public void Update(QuestionOrderingOptionAdded e) => UpdateCursor(e, null);
 
@@ -1158,9 +1161,9 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             BindQuestionQuery(db, query, question);
         });
 
-        public void Update(QuestionDeleted e) => UpdateCursor(e, (db, bank) => OnQuestionRemoved(db, bank, e.RemoveAllVersions ? (Guid?)null : e.Question));
+        public void Update(QuestionDeleted e) => UpdateCursor(e, (db, bank) => OnQuestionRemoved(db, bank, e.RemoveAllVersions ? (Guid?)null : e.Question, e));
 
-        private void OnQuestionRemoved(InternalDbContext db, BankState bank, Guid? questionId)
+        private void OnQuestionRemoved(InternalDbContext db, BankState bank, Guid? questionId, IChange change)
         {
             UpdateFormCounts(db, bank);
 
@@ -1171,7 +1174,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             else
             {
                 SyncQuestions(
-                    db, bank,
+                    db, bank, change,
                     insert: false,
                     update: false,
                     delete: true);
@@ -1257,6 +1260,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                 var query = new QBankQuestion();
                 var question = bank.FindQuestion(e.UpgradedQuestion);
 
+                SetCreate(query, e);
                 BindQuestionQuery(db, query, question);
                 SyncQuestionSubCompetencies(db, question);
 
@@ -1351,7 +1355,19 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             });
         }
 
-        public void Update(SetRenamed e) => UpdateCursor(e, null);
+        public void Update(SetRenamed e) => UpdateCursor(e, (db, bank) =>
+        {
+            var set = bank.FindSet(e.Set);
+            var questionFilter = set.Questions.Select(x => x.Identifier).ToArray();
+
+            var entities = db.BankQuestions.Where(x => questionFilter.Contains(x.QuestionIdentifier));
+            foreach (var entity in entities)
+            {
+                var question = bank.FindQuestion(entity.QuestionIdentifier);
+
+                BindQuestionQuery(db, entity, question);
+            }
+        });
 
         public void Update(SetsMerged e) => UpdateCursor(e, (db, bank) =>
         {
@@ -1537,7 +1553,16 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             spec.CriterionPivotCount = calc.CountPivots(spec.SpecIdentifier);
         }
 
-        private void SetLastChange(QBankQuestion question, IChange e)
+        private static void SetCreate(QBankQuestion question, IChange e)
+        {
+            if (question.CreateTime.HasValue)
+                return;
+
+            question.CreateTime = e.ChangeTime;
+            question.CreateUser = UserSearch.GetFullName(e.OriginUser);
+        }
+
+        private static void SetLastChange(QBankQuestion question, IChange e)
         {
             // Only changes made to the Question Stem and Question Options/Answers should affect the LastChange value
 
@@ -1610,7 +1635,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             }
         }
 
-        public void SyncLikertRows(BankState bank)
+        public void SyncLikertRows(BankState bank, IChange e)
         {
             var models = bank.Sets
                 .SelectMany(x => x.Questions)
@@ -1624,13 +1649,13 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                     .ToArray();
 
                 foreach (var model in models)
-                    SyncLikertRows(db, entities, model);
+                    SyncLikertRows(db, entities, model, e);
 
                 db.SaveChanges();
             }
         }
 
-        private static void SyncLikertRows(InternalDbContext db, QBankQuestion[] entities, Question question)
+        private static void SyncLikertRows(InternalDbContext db, QBankQuestion[] entities, Question question, IChange e)
         {
             foreach (var row in question.Likert.Rows)
             {
@@ -1640,6 +1665,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
                 db.BankQuestions.Add(entity = new QBankQuestion());
 
+                SetCreate(entity, e);
                 BindLikertRowQuery(entity, row);
                 SyncQuestionSubCompetencies(db, row.Identifier, row.SubStandards);
             }
@@ -1688,7 +1714,7 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             }
         }
 
-        private static void SyncQuestions(InternalDbContext db, BankState bank, bool insert, bool update, bool delete)
+        private static void SyncQuestions(InternalDbContext db, BankState bank, IChange change, bool insert, bool update, bool delete)
         {
             var entities = db.BankQuestions.Where(x => x.BankIdentifier == bank.Identifier).ToArray();
             var models = bank.Sets.SelectMany(x => x.Questions).SelectMany(x => x.EnumerateAllVersions()).ToArray();
@@ -1704,10 +1730,10 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             }
 
             if (insert || update)
-                SyncRootQuestions(db, bank, insert, update);
+                SyncRootQuestions(db, bank, change, insert, update);
         }
 
-        private static void SyncRootQuestions(InternalDbContext db, BankState bank, bool insert, bool update)
+        private static void SyncRootQuestions(InternalDbContext db, BankState bank, IChange change, bool insert, bool update)
         {
             var entities = db.BankQuestions.Where(x => x.BankIdentifier == bank.Identifier).ToArray();
             var models = bank.Sets.SelectMany(x => x.Questions).SelectMany(x => x.EnumerateAllVersions()).ToArray();
@@ -1724,12 +1750,13 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                 {
                     db.BankQuestions.Add(entity = new QBankQuestion());
 
+                    SetCreate(entity, change);
                     InsertOptions(db, bank, model.Options);
                 }
 
                 BindQuestionQuery(db, entity, model);
                 SyncQuestionSubCompetencies(db, model);
-                SyncLikertRows(db, entities, model);
+                SyncLikertRows(db, entities, model, change);
             }
         }
 
@@ -1923,6 +1950,11 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             query.QuestionType = question.Type.ToString();
             query.RubricIdentifier = question.Rubric;
             query.QuestionPublicationStatus = question.PublicationStatus.GetName();
+            query.QuestionPoints = question.Points;
+            query.QuestionCutScore = question.CutScore;
+            query.QuestionCalculationMethod = question.CalculationMethod.GetName();
+            query.SetName = question.Set.Name.MaxLength(64, true);
+            query.SubStandardIdentifiers = question.SubStandards.IsEmpty() ? null : string.Join(",", question.SubStandards);
 
             BindQuestionQuerySource(db, query, question);
         }

@@ -62,9 +62,9 @@ namespace InSite.Custom.CMDS.User.Programs.Controls
         {
             var partitionId = ServiceLocator.Partition.Identifier;
 
-            var partitionName = ServiceLocator.Partition.Name;
+            var partitionBrand = ServiceLocator.Partition.Brand;
 
-            var partitionEvents = SearchUpcomingEvents(partitionId, partitionName, true);
+            var partitionEvents = SearchUpcomingEvents(partitionId, partitionBrand, true);
 
             var organizationEvents = SearchUpcomingEvents(Organization.Identifier, Organization.Name, false);
 
@@ -76,7 +76,7 @@ namespace InSite.Custom.CMDS.User.Programs.Controls
             return list;
         }
 
-        private static List<UpcomingSessionListItem> SearchUpcomingEvents(Guid organizationId, string organizationName, bool isGlobal)
+        private static List<UpcomingSessionListItem> SearchUpcomingEvents(Guid organizationId, string partitionBrand, bool isGlobal)
         {
             var now = DateTimeOffset.UtcNow;
 
@@ -117,7 +117,7 @@ namespace InSite.Custom.CMDS.User.Programs.Controls
                 };
 
                 item.Badge = isGlobal
-                    ? $"<span class='badge bg-secondary fs-xs me-1'>{organizationName}</span>"
+                    ? $"<span class='badge bg-secondary fs-xs me-1'>{partitionBrand}</span>"
                     : "";
 
                 if (isFull)

@@ -189,7 +189,9 @@ namespace InSite.Persistence
             if (filter.TopicUserConnectedFromUserIdentifier.HasValue)
             {
                 query = query.Where(x =>
-                    x.TopicUserIdentifier == filter.TopicUserConnectedFromUserIdentifier
+                       x.AdministratorUserIdentifier == filter.TopicUserConnectedFromUserIdentifier
+                    || x.OwnerUserIdentifier == filter.TopicUserConnectedFromUserIdentifier
+                    || x.TopicUserIdentifier == filter.TopicUserConnectedFromUserIdentifier
                     || db.QUserConnections.Any(y =>
                         y.FromUserIdentifier == filter.TopicUserConnectedFromUserIdentifier
                         && y.ToUserIdentifier == x.TopicUserIdentifier
@@ -291,7 +293,7 @@ namespace InSite.Persistence
                 query = query.Where(x => x.TopicAccountStatus != null && filter.MembershipStatuses.Contains(x.TopicAccountStatus));
 
             if (filter.AssigneeEmployer.IsNotEmpty())
-                query = query.Where(x => filter.AssigneeEmployer.Contains(x.IssueEmployerGroupIdentifier));
+                query = query.Where(x => filter.AssigneeEmployer.Contains(x.IssueEmployerGroupIdentifier.Value));
 
             if (filter.PersonCode.IsNotEmpty())
             {

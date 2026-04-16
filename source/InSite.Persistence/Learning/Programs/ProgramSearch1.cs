@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 
 using InSite.Application.Records.Read;
+using InSite.Persistence.Foundation;
 
 using Shift.Common;
 using Shift.Common.Linq;
@@ -192,14 +193,14 @@ namespace InSite.Persistence
             }
         }
 
-        public static List<TProgramEnrollment> GetUserProgramEnrollments(Guid userId, Guid[] organizationId)
+        public static List<TProgramEnrollment> GetUserProgramEnrollments(Guid userId, Guid[] organizationId, params Expression<Func<TProgramEnrollment, object>>[] includes)
         {
             using (var db = new InternalDbContext())
             {
                 return db.TProgramEnrollments
                     .AsNoTracking()
-                    .Where(x => x.LearnerUserIdentifier == userId && organizationId.Any(y => y == x.OrganizationIdentifier)
-                    )
+                    .Where(x => x.LearnerUserIdentifier == userId && organizationId.Any(y => y == x.OrganizationIdentifier))
+                    .ApplyIncludes(includes)
                     .ToList();
             }
         }
@@ -283,7 +284,7 @@ namespace InSite.Persistence
                 if (filter.ObjectIdentifier.HasValue)
                     query = query.Where(x => x.ObjectIdentifier == filter.ObjectIdentifier);
 
-                if (filter.OrganizationIdentifiers != null && filter.OrganizationIdentifiers.Any())
+                if (filter.OrganizationIdentifiers.IsNotEmpty())
                     query = query.Where(x => filter.OrganizationIdentifiers.Contains(x.OrganizationIdentifier));
 
                 if (filter.ProgramIdentifier.HasValue)
@@ -295,8 +296,11 @@ namespace InSite.Persistence
                 if (filter.ExcludedObject.HasValue)
                     query = query.Where(x => x.ObjectIdentifier != filter.ExcludedObject);
 
-                if (filter.ExcludeObjectTypes != null && filter.ExcludeObjectTypes.Length > 0)
+                if (filter.ExcludeObjectTypes.IsNotEmpty())
                     query = query.Where(x => !filter.ExcludeObjectTypes.Contains(x.ObjectType));
+
+                if (filter.IncludeObjectTypes.IsNotEmpty())
+                    query = query.Where(x => filter.IncludeObjectTypes.Contains(x.ObjectType));
 
                 return query.ToList();
             }

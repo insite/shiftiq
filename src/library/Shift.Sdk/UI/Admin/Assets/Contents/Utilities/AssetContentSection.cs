@@ -49,6 +49,7 @@ namespace Shift.Sdk.UI
         public abstract class ContentSectionViewer : AssetContentSection
         {
             public string EditUrl { get; set; }
+            public string EditUrl2 { get; set; }
             public string Label { get; set; }
             public string Description { get; set; }
             public bool IsRequired { get; set; }

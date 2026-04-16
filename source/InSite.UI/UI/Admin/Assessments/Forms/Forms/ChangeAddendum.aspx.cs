@@ -116,7 +116,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
                 this,
                 qualifier: $"{(form.Content.Title?.Default).IfNullOrEmpty(form.Name)} <span class=\"form-text\">Asset #{form.Asset}</span>");
 
-            var attachments = AddendumHelper.GetRepeaterDataSource(form.Specification.Bank.EnumerateAllAttachments())[0];
+            var attachments = AddendumHelper.GetRepeaterDataSource(form.Specification.Bank.Identifier, form.Specification.Bank.EnumerateAllAttachments())[0];
             if (attachments.Length == 0)
             {
                 EditorStatus.AddMessage(

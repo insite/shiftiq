@@ -103,6 +103,12 @@ namespace InSite.UI.Admin.Issues.Outlines.Forms
             set => ViewState[nameof(Templates)] = value;
         }
 
+        public Guid? MessageId
+        {
+            get => (Guid?)ViewState[nameof(MessageId)];
+            set => ViewState[nameof(MessageId)] = value;
+        }
+
         #endregion
 
         #region IHasParentLinkParameters
@@ -151,12 +157,18 @@ namespace InSite.UI.Admin.Issues.Outlines.Forms
 
         private void MessageTemplateCombobox_ValueChanged(object sender, ComboBoxValueChangedEventArgs e)
         {
-            var template = Templates.Where(x => x.MessageIdentifier.ToString() == MessageTemplateCombobox.Value).FirstOrDefault();
-            if (template != null)
+            var templateId = MessageTemplateCombobox.ValueAsGuid;
+            var template = Templates.FirstOrDefault(x => x.MessageIdentifier == templateId);
+
+            if (template == null)
             {
-                ComposeEmailSubject.Text = template.MessageTitle;
-                ComposeEmailBody.Value = template.ContentText;
+                MessageId = templateId;
+                return;
             }
+
+            MessageId = templateId;
+            ComposeEmailSubject.Text = template.MessageTitle;
+            ComposeEmailBody.Value = template.ContentText;
         }
 
         private void OnSenderChanged()
@@ -384,6 +396,10 @@ namespace InSite.UI.Admin.Issues.Outlines.Forms
             email.MailoutIdentifier = UniqueIdentifier.Create();
             email.ContentSubject[Email.Recipient.Language] = ComposeEmailSubject.Text;
             email.ContentBody[Email.Recipient.Language] = ComposeEmailBody.Value;
+
+            if (!email.MessageIdentifier.HasValue)
+                email.MessageIdentifier = MessageId ?? MessageHelper.GetOrCreateDefaultNotificationId(
+                    Organization.OrganizationIdentifier, ServiceLocator.SendCommand);
 
             try
             {

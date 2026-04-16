@@ -13,6 +13,7 @@
                     <th>Document</th>
                     <th>Permissions</th>
                     <th>Uploaded</th>
+                    <th>Date Received</th>
                     <th>Reviewed</th>
                     <th>Approved</th>
                 </tr>
@@ -78,6 +79,9 @@
                 <div class="form-text text-body-secondary">
                     <%# Eval("UploadedBy") %>
                 </div>
+            </td>
+            <td>
+                <%# Eval("ReceivedTime") %>
             </td>
             <td>
                 <div runat="server" visible='<%# Eval("ReviewedTime") != null %>'>

@@ -12,6 +12,8 @@ using Shift.Service.Metadata;
 using Shift.Service.Progress;
 using Shift.Service.Security;
 using Shift.Service.Setup;
+using Shift.Service.Timeline;
+using Shift.Service.Utility;
 using Shift.Service.Workflow;
 using Shift.Service.Workspace;
 
@@ -27,6 +29,8 @@ public class TableDbContext : DbContext
     internal DbSet<AssessmentEntity> Assessment { get; set; }
     internal DbSet<AttemptEntity> Attempt { get; set; }
     internal DbSet<BankEntity> Bank { get; set; }
+    internal DbSet<BankQuestionEntity> BankQuestion { get; set; }
+    internal DbSet<BankSpecificationEntity> BankSpecification { get; set; }
 
     // Feature: Booking
     internal DbSet<EventEntity> QEvent { get; set; }
@@ -48,6 +52,7 @@ public class TableDbContext : DbContext
     internal DbSet<FileClaimEntity> TFileClaim { get; set; }
     internal DbSet<FileEntity> TFile { get; set; }
     internal DbSet<TInputEntity> TInput { get; set; }
+    internal DbSet<UploadEntity> Upload { get; set; }
 
     // Feature: Progress
     internal DbSet<AchievementEntity> QAchievement { get; set; }
@@ -85,6 +90,13 @@ public class TableDbContext : DbContext
     // Utility: Setup
     internal DbSet<RouteEndpoint> RouteEndpoint { get; set; }
 
+    // Feature: Timeline
+    internal DbSet<ChangeEntity> Change { get; set; }
+
+    // Feature: Utility
+    internal DbSet<CollectionEntity> TCollection { get; set; }
+    internal DbSet<CollectionItemEntity> TCollectionItem { get; set; }
+
     #endregion
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -101,6 +113,8 @@ public class TableDbContext : DbContext
         builder.ApplyConfiguration(new AssessmentConfiguration());
         builder.ApplyConfiguration(new AttemptConfiguration());
         builder.ApplyConfiguration(new BankConfiguration());
+        builder.ApplyConfiguration(new BankQuestionConfiguration());
+        builder.ApplyConfiguration(new BankSpecificationConfiguration());
 
         // Feature: Booking
         builder.ApplyConfiguration(new EventConfiguration());
@@ -122,6 +136,7 @@ public class TableDbContext : DbContext
         builder.ApplyConfiguration(new FileClaimConfiguration());
         builder.ApplyConfiguration(new FileConfiguration());
         builder.ApplyConfiguration(new TInputConfiguration());
+        builder.ApplyConfiguration(new UploadConfiguration());
 
         // Feature: Progress
         builder.ApplyConfiguration(new AchievementConfiguration());
@@ -158,6 +173,13 @@ public class TableDbContext : DbContext
 
         // Utility: Setup
         builder.ApplyConfiguration(new RouteEndpointConfiguration());
+
+        // Feature: Timeline
+        builder.ApplyConfiguration(new ChangeConfiguration());
+
+        // Feature: Utility
+        builder.ApplyConfiguration(new CollectionConfiguration());
+        builder.ApplyConfiguration(new CollectionItemConfiguration());
     }
 
     /// <remarks>

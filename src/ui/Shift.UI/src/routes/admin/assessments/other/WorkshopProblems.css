@@ -1,0 +1,7 @@
+.FormWorkshop_Problems {
+    .question-title {
+        & > div > p {
+            margin: 0;
+        }
+    }
+}

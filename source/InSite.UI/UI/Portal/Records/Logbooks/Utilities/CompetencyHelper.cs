@@ -18,6 +18,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
             public Guid Identifier { get; set; }
             public int Sequence { get; set; }
             public string Name { get; set; }
+            public string Summary { get; set; }
             public bool Selected { get; set; }
             public decimal? Hours { get; set; }
             public int? JournalItems { get; set; }
@@ -135,12 +136,19 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
                 if (competency.AreaIdentifier == null)
                     return;
 
+                var areaContent = ServiceLocator.ContentSearch.GetBlock(
+                    competency.CompetencyIdentifier,
+                    null,
+                    new[] { ContentLabel.Title }
+                );
+
                 area = new AreaItem
                 {
                     Identifier = competency.AreaIdentifier.Value,
                     Sequence = competency.AreaSequence.Value,
                     Name = GetStandardName(
                         competency.AreaIdentifier.Value,
+                        areaContent,
                         competency.AreaAsset.Value,
                         competency.AreaStandardType,
                         competency.AreaLabel,
@@ -155,12 +163,19 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
                 areas.Add(area);
             }
 
+            var competencyContent = ServiceLocator.ContentSearch.GetBlock(
+                competency.CompetencyIdentifier,
+                null,
+                new[] { ContentLabel.Title, ContentLabel.Summary }
+            );
+
             var competencyItem = new CompetencyItem
             {
                 Identifier = competency.CompetencyIdentifier,
                 Sequence = competency.CompetencySequence,
                 Name = GetStandardName(
                     competency.CompetencyIdentifier,
+                    competencyContent,
                     competency.CompetencyAsset,
                     "Competency",
                     competency.CompetencyLabel,
@@ -169,6 +184,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
                     language,
                     useSimpleNameConvention
                 ),
+                Summary = competencyContent.Summary.Text.Get(language),
                 Hours = hours,
                 JournalItems = journalItems,
                 SkillRating = skillRating,
@@ -181,6 +197,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
 
         private static string GetStandardName(
             Guid standardIdentifier,
+            ContentContainer content,
             int assetNumber,
             string standardType,
             string standardLabel,
@@ -191,13 +208,6 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
             )
         {
             var classification = standardType;
-
-            var content = ServiceLocator.ContentSearch.GetBlock(
-                standardIdentifier,
-                null,
-                new[] { ContentLabel.Title }
-            );
-
             var title = content.Title.Text.Get(language);
             var typeName = standardLabel.IfNullOrEmpty(standardType);
             var name = useSimpleNameConvention ? $"{title}" : $"{title} {typeName} Asset #{assetNumber}";

@@ -1,8 +1,11 @@
 using System;
 
+using InSite.Api.Models.MailgunWebhook;
 using InSite.Common.Web.UI;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
+
+using Newtonsoft.Json;
 
 namespace InSite.UI.CMDS
 {

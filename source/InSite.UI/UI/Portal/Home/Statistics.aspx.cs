@@ -36,7 +36,7 @@ namespace InSite.UI.Portal.Home
 
         private void BindLearningPlan()
         {
-            var achievements = VCmdsCredentialSearch.SelectForTrainingPlan(User.Identifier, Organization.OrganizationIdentifier, null);
+            var achievements = VCmdsCredentialSearch.SelectForTrainingPlan(User.Identifier, Organization.OrganizationIdentifier, (string)null);
             var y = achievements.Count;
 
             if (y > 0)

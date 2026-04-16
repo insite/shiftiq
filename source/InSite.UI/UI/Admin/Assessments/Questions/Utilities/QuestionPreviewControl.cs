@@ -6,7 +6,7 @@ using System.Web.UI.WebControls;
 
 using InSite.Common.Web.UI;
 using InSite.Domain.Attempts;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
+using InSite.Domain.Banks;
 
 using Shift.Common;
 using Shift.Constant;
@@ -41,7 +41,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
             {
                 headerRepeater.Visible = true;
 
-                var tableData = QuestionTable.Build(
+                var tableData = BankQuestionTable.Build(
                 model.BankQuestion.Layout.Columns,
                 question.Options.Select(x => x.Text));
                 var tableHeader = tableData.GetHeader();

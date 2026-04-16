@@ -156,8 +156,8 @@
                     <ItemTemplate>
                         <tr>
                             <td runat="server" visible='<%# ShowFirstPriceColumn %>'>
-                                <b><%# Eval("SeatTitle") %></b>
-                                <p><%# GetDescription(Container.DataItem) %></p>
+                                <b><%# GetSeatTitle() %></b>
+                                <p><%# GetSeatDescription() %></p>
                             </td>
                             <td style="text-align:right;">
                                 <b><insite:Literal ID="FreePrice" runat="server" Text="Free" /></b>

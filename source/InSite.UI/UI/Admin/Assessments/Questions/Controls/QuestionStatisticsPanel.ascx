@@ -16,7 +16,7 @@
                 <asp:Repeater runat="server" ID="QuestionPerTaxonomyRepeater">
                     <ItemTemplate>
                         <tr>
-                            <td><%# Eval("Taxonomy") %></td>
+                            <td><%# HtmlEncode(Eval("Item")) %></td>
                             <td class="text-end"><%# Eval("Count", "{0:n0}") %></td>
                         </tr>
                     </ItemTemplate>
@@ -37,7 +37,7 @@
                 <asp:Repeater runat="server" ID="QuestionPerDifficultyRepeater">
                     <ItemTemplate>
                         <tr>
-                            <td><%# Eval("Difficulty") %></td>
+                            <td><%# HtmlEncode(Eval("Item")) %></td>
                             <td class="text-end"><%# Eval("Count", "{0:n0}") %></td>
                         </tr>
                     </ItemTemplate>
@@ -58,7 +58,7 @@
                 <asp:Repeater runat="server" ID="QuestionPerLigRepeater">
                     <ItemTemplate>
                         <tr>
-                            <td><%# Eval("LikeItemGroup") %></td>
+                            <td><%# HtmlEncode(Eval("Item")) %></td>
                             <td class="text-end"><%# Eval("Count", "{0:n0}") %></td>
                         </tr>
                     </ItemTemplate>
@@ -83,7 +83,7 @@
                     <ItemTemplate>
                         <tr>
                             <td>
-                                <%# Eval("Standard") %>
+                                <%# HtmlEncode(Eval("Item")) %>
                             </td>
                             <td class="text-end"><%# Eval("Count", "{0:n0}") %></td>
                         </tr>
@@ -106,7 +106,7 @@
                     <ItemTemplate>
                         <tr>
                             <td>
-                                <%# Eval("Code") %>
+                                <%# HtmlEncode(Eval("Item")) %>
                             </td>
                             <td class="text-end"><%# Eval("Count", "{0:n0}") %></td>
                         </tr>
@@ -185,7 +185,7 @@
                     <th class="text-end">Questions</th>
                     <asp:Repeater runat="server" ID="TagsTaxonomyRepeater">
                         <ItemTemplate>
-                            <th class="text-end">Tax <%# Eval("Taxonomy") %></th>
+                            <th class="text-end">Tax <%# HtmlEncode(Eval("Item")) %></th>
                         </ItemTemplate>
                     </asp:Repeater>
                 </tr>
@@ -194,8 +194,10 @@
                 <asp:Repeater runat="server" ID="QuestionPerTagAndTaxonomyRepeater">
                     <ItemTemplate>
                         <tr>
-                            <td><%# Eval("Tag") %></td>
-                            <td class="text-end"><%# Eval("Questions", "{0:n0}") %></td>
+                            <td><%# HtmlEncode(Eval("Tag")) %></td>
+                            <td class="text-end">
+                                <asp:Literal runat="server" ID="Questions" />
+                            </td>
                             <asp:Repeater runat="server" ID="QuestionPerTaxonomyRepeater">
                                 <ItemTemplate>
                                     <td class="text-end"><%# string.Format("{0:n0}", Container.DataItem) %></td>

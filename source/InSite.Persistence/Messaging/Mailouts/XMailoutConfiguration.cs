@@ -21,6 +21,7 @@ namespace InSite.Persistence
             Property(x => x.SenderEmail).IsUnicode(false).HasMaxLength(254);
             Property(x => x.SenderName).IsUnicode(false).HasMaxLength(100);
             Property(x => x.SenderType).IsUnicode(false).HasMaxLength(50);
+            Property(x => x.MailoutStatusDescription).IsUnicode(false).HasMaxLength(128);
         }
     }
 }

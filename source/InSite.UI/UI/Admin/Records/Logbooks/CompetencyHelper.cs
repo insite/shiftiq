@@ -17,6 +17,7 @@ namespace InSite.Admin.Records.Logbooks
             public Guid Identifier { get; set; }
             public int Sequence { get; set; }
             public string Name { get; set; }
+            public string Summary { get; set; }
             public decimal? Hours { get; set; }
             public int? JournalItems { get; set; }
             public int? SkillRating { get; set; }
@@ -114,12 +115,18 @@ namespace InSite.Admin.Records.Logbooks
             }
 
             var requirement = requirements.Find(x => x.CompetencyStandardIdentifier == competency.StandardIdentifier);
+            var competencyContent = ServiceLocator.ContentSearch.GetBlock(
+                competency.StandardIdentifier,
+                ContentContainer.DefaultLanguage,
+                new[] { ContentLabel.Title, ContentLabel.Summary }
+            );
 
             var competencyItem = new CompetencyItem
             {
                 Identifier = competency.StandardIdentifier,
                 Sequence = competency.Sequence,
-                Name = GetStandardName(competency),
+                Name = GetStandardName(competency, competencyContent),
+                Summary = competencyContent.Summary.Text.Get(ContentContainer.DefaultLanguage),
                 Hours = requirement?.CompetencyHours,
                 JournalItems = requirement?.JournalItems,
                 SkillRating = requirement?.SkillRating
@@ -130,8 +137,27 @@ namespace InSite.Admin.Records.Logbooks
 
         public static string GetStandardName(Standard standard)
         {
+            var content = ServiceLocator.ContentSearch.GetBlock(
+                standard.StandardIdentifier,
+                ContentContainer.DefaultLanguage,
+                new[] { ContentLabel.Title }
+            );
+
             return GetStandardName(
                 standard.StandardIdentifier,
+                content,
+                standard.AssetNumber,
+                standard.StandardLabel,
+                standard.Code,
+                standard.StandardType
+                );
+        }
+
+        public static string GetStandardName(Standard standard, ContentContainer content)
+        {
+            return GetStandardName(
+                standard.StandardIdentifier,
+                content,
                 standard.AssetNumber,
                 standard.StandardLabel,
                 standard.Code,
@@ -149,10 +175,29 @@ namespace InSite.Admin.Records.Logbooks
         {
             var content = ServiceLocator.ContentSearch.GetBlock(
                 standardIdentifier,
-                Shift.Common.ContentContainer.DefaultLanguage,
+                ContentContainer.DefaultLanguage,
                 new[] { ContentLabel.Title }
             );
 
+            return GetStandardName(
+                standardIdentifier,
+                content,
+                assetNumber,
+                standardLabel,
+                standardCode,
+                classification
+            );
+        }
+
+        public static string GetStandardName(
+            Guid standardIdentifier,
+            ContentContainer content,
+            int assetNumber,
+            string standardLabel,
+            string standardCode,
+            string classification
+            )
+        {
             var title = content.Title.Text.Default;
             var typeName = standardLabel.IfNullOrEmpty(classification);
             var name = $"{title} {typeName} Asset #{assetNumber}";

@@ -4,7 +4,7 @@ import { usePageContent_Provider } from "./PageContent_Provider";
 import { BlockState } from "./models/BlockState";
 import RichTextEditor from "@/components/richtexteditor/RichTextEditor";
 import { RichTextEditorValue } from "@/components/richtexteditor/RichTextEditorValue";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 
 interface Props {
     block: BlockState;
@@ -27,6 +27,7 @@ export default function PageContent_Editor_Html({ block, fieldName }: Props) {
                 markdownTitle={fieldName}
                 enableModeSwitch={true}
                 disabled={readOnly}
+                onTranslate={value => modifyBlockField(block.blockId, fieldName, value)}
                 onBlur={value => modifyBlockField(block.blockId, fieldName, value)}
             />
         </FormField>

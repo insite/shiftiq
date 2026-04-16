@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,8 +13,6 @@ using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Attempts;
 using InSite.Domain.Banks;
-using InSite.Domain.Organizations;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 using InSite.Web.Helpers;
 
 using Shift.Common;
@@ -21,7 +20,6 @@ using Shift.Constant;
 using Shift.Sdk.UI;
 
 using IQuestionInfo = InSite.Admin.Assessments.Questions.Utilities.QuestionPrintHelper.IQuestionInfo;
-using UserModel = InSite.Domain.Foundations.User;
 
 namespace InSite.Admin.Assessments.Questions.Controls
 {
@@ -33,8 +31,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid BankID { get; }
 
-            public BankOptions(OrganizationState organization, UserModel user, Guid bankId, bool includeImages, bool includeAdminComments)
-                : base(organization, user, includeImages, includeAdminComments)
+            public BankOptions(Guid organizationId, TimeZoneInfo timeZone, Guid bankId)
+                : base(organizationId, timeZone)
             {
                 BankID = bankId;
             }
@@ -44,8 +42,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid FormID { get; }
 
-            public FormOptions(OrganizationState organization, UserModel user, Guid formId, bool includeImages, bool includeAdminComments)
-                : base(organization, user, includeImages, includeAdminComments)
+            public FormOptions(Guid organizationId, TimeZoneInfo timeZone, Guid formId)
+                : base(organizationId, timeZone)
             {
                 FormID = formId;
             }
@@ -59,21 +57,21 @@ namespace InSite.Admin.Assessments.Questions.Controls
             public string CurrentUrl { get; }
             public string HeaderUrl { get; }
 
-            public bool IncludeImages { get; }
-            public bool IncludeAdminComments { get; }
+            public bool IncludeImages { get; set; }
+            public bool IncludeAdminComments { get; set; }
+            public bool ExcludeHiddenComments { get; set; }
 
-            public Options(OrganizationState organization, UserModel user, bool includeImages, bool includeAdminComments)
+            public QuestionPrintHelper.QuestionFilter QuestionFilter { get; set; }
+
+            public Options(Guid organizationId, TimeZoneInfo timeZone)
             {
-                OrganizationID = organization.Identifier;
-                TimeZone = user.TimeZone;
+                OrganizationID = organizationId;
+                TimeZone = timeZone;
 
                 var request = HttpContext.Current.Request;
 
                 CurrentUrl = request.Url.Scheme + "://" + request.Url.Host + request.RawUrl;
                 HeaderUrl = HttpRequestHelper.GetAbsoluteUrl("~/UI/Admin/Assessments/Questions/Html/PrintInternalHeader.html");
-
-                IncludeImages = includeImages;
-                IncludeAdminComments = includeAdminComments;
             }
         }
 
@@ -82,7 +80,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             public string AssetNumber { get; }
             public string Title { get; }
             public string Name { get; }
-            public IQuestionInfo[] Questions { get; private set; }
+            public IQuestionInfo[] Questions { get; }
 
             public ControlData(BankState bank)
             {
@@ -105,7 +103,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         #region Fields
 
-        private QuestionTable _questionTable = null;
+        private BankQuestionTable _questionTable = null;
         private Options _options;
 
         #endregion
@@ -114,7 +112,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         private void QuestionRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            if (!IsContentItem(e))
                 return;
 
             var info = (IQuestionInfo)e.Item.DataItem;
@@ -127,7 +125,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             var aQuestionDefault = info.AttemptQuestion as AttemptQuestionDefault;
 
             _questionTable = aQuestionDefault != null && bQuestion.Layout.Type == OptionLayoutType.Table
-                ? QuestionTable.Build(bQuestion.Layout.Columns, aQuestionDefault.Options.Select(x => x.Text))
+                ? BankQuestionTable.Build(bQuestion.Layout.Columns, aQuestionDefault.Options.Select(x => x.Text))
                 : null;
 
             if (aQuestion.Type == QuestionItemType.SingleCorrect)
@@ -168,6 +166,10 @@ namespace InSite.Admin.Assessments.Questions.Controls
                 return;
 
             var comments = info.GetAdminComments();
+
+            if (_options.ExcludeHiddenComments)
+                comments = comments.Where(x => !x.IsHidden).ToArray();
+
             if (comments.Count == 0)
                 return;
 
@@ -320,7 +322,9 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             _options = options;
 
-            QuestionPrintHelper.InitProperties(data.Questions, options.OrganizationID);
+            var questions = QuestionPrintHelper.FilterQuestions(data.Questions, options.QuestionFilter);
+
+            QuestionPrintHelper.InitProperties(questions, options.OrganizationID);
 
             PageTitle.InnerText = data.Title.IfNullOrEmpty("Untitled");
             ExcludeImagesStyle.Visible = !options.IncludeImages;
@@ -332,7 +336,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             QuestionRepeater.ItemDataBound += QuestionRepeater_ItemDataBound;
 
             QuestionRepeater.Visible = hasData;
-            QuestionRepeater.DataSource = data.Questions;
+            QuestionRepeater.DataSource = questions;
             QuestionRepeater.DataBind();
         }
 
@@ -419,7 +423,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             return html.ToString();
         }
 
-        private static void RenderOptionRepeaterCell(StringBuilder html, string tagName, QuestionTable.CellData cell)
+        private static void RenderOptionRepeaterCell(StringBuilder html, string tagName, BankQuestionTable.CellData cell)
         {
             html.Append("<").Append(tagName)
                 .Append(" style='text-align:").Append(cell.Alignment.ToString().ToLower()).Append(";'")

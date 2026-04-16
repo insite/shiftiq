@@ -4,8 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Admin.Events.Classes.Controls;
 using InSite.Application.Events.Write;
 using InSite.Application.Gradebooks.Write;
@@ -16,6 +14,7 @@ using InSite.UI.Admin.Events.Classes.Controls;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -202,8 +201,13 @@ namespace InSite.Admin.Events.Classes.Forms
 
             DownloadJsonLink.NavigateUrl = $"/ui/admin/events/classes/download?event={EventID}";
 
+            var registrationsPage = (int?)null;
+
             if (Panel == "registrations")
+            {
                 RegistrationTab.IsSelected = true;
+                registrationsPage = ValueConverter.ToInt32Nullable(Request.QueryString["grid-page"]);
+            }
             else if (Panel == "comment")
                 CommentTab.IsSelected = true;
 
@@ -239,7 +243,8 @@ namespace InSite.Admin.Events.Classes.Forms
 
             MandatorySurveyFormIdentifier.Value = ev.MandatorySurveyFormIdentifier;
 
-            LoadRegistrations(showForms);
+
+            LoadRegistrations(showForms, registrationsPage);
 
             SeatsGrid.LoadData(ev.EventIdentifier, CanEdit);
             GradebookGrid.LoadData(ev.EventIdentifier);
@@ -300,9 +305,9 @@ namespace InSite.Admin.Events.Classes.Forms
             Separator2.Visible = CanEdit;
         }
 
-        private void LoadRegistrations(bool showForms)
+        private void LoadRegistrations(bool showForms, int? page = null)
         {
-            Registrations.LoadData(EventID.Value, CanEdit, showForms, "event&panel=registrations");
+            Registrations.LoadData(EventID.Value, CanEdit, showForms, "event&panel=registrations", page);
         }
     }
 }

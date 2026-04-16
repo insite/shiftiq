@@ -53,7 +53,7 @@ namespace InSite.Domain.Banks
             if (attachment.Asset == 0)
                 throw new MissingAssetNumberException();
 
-            if (attachment.Identifier == Guid.Empty || attachment.Upload == Guid.Empty || Data.FindAttachment(attachment.Identifier) != null)
+            if (attachment.Identifier == Guid.Empty || attachment.FileIdentifier == null && attachment.Upload == Guid.Empty || Data.FindAttachment(attachment.Identifier) != null)
                 return;
 
             if (string.IsNullOrEmpty(attachment.Content.Title?.Default))
@@ -61,7 +61,7 @@ namespace InSite.Domain.Banks
 
             var e = new AttachmentAdded(attachment.Identifier, attachment.Asset,
                 attachment.Author, attachment.Content.Clone(), attachment.Condition,
-                attachment.Type, attachment.Upload, attachment.Image?.Clone());
+                attachment.Type, attachment.FileIdentifier, attachment.Upload, attachment.Image?.Clone());
 
             Apply(e);
         }
@@ -468,13 +468,13 @@ namespace InSite.Domain.Banks
             Apply(e);
         }
 
-        public void ChangeAttachmentImage(Guid attachment, Guid upload, Guid author, ImageDimension actualDimension)
+        public void ChangeAttachmentImage(Guid attachment, Guid? fileIdentifier, Guid upload, Guid author, ImageDimension actualDimension)
         {
             var a = Data.FindAttachment(attachment);
-            if (a == null || a.Type != AttachmentType.Image || upload == Guid.Empty || actualDimension == null || !actualDimension.HasValue)
+            if (a == null || a.Type != AttachmentType.Image || (fileIdentifier == null && upload == Guid.Empty) || actualDimension == null || !actualDimension.HasValue)
                 return;
 
-            var e = new AttachmentImageChanged(attachment, upload, author, actualDimension.Clone());
+            var e = new AttachmentImageChanged(attachment, fileIdentifier, upload, author, actualDimension.Clone());
 
             Apply(e);
         }

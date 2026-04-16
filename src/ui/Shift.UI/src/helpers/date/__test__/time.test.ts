@@ -19,12 +19,20 @@ test("_dateTimeParser.parsers  - h:m tt z", () => {
     expect(_dateTimeParser.timeParsers["h:m tt z"](["3", "60"])).toEqual(null);
 });
 
+test("_dateTimeParser.parsers  - HH:mm:ss z", () => {
+    expect(_dateTimeParser.timeParsers["HH:mm:ss z"](["21", "40", "55"])).toEqual({ hour: 21, minute: 40, second: 55, timeZoneId: null });
+    expect(_dateTimeParser.timeParsers["HH:mm:ss z"](["21", "40", "55", "utc"])).toEqual({ hour: 21, minute: 40, second: 55, timeZoneId: "UTC" });
+    expect(_dateTimeParser.timeParsers["HH:mm:ss z"](["30", "40"])).toEqual(null);
+    expect(_dateTimeParser.timeParsers["HH:mm:ss z"](["3", "60"])).toEqual(null);
+});
+
 test("dateHelper.parseDateTime", () => {
     expect(dateTimeHelper.parseDateTime("Apr 15, 2025")).toEqual({ date: { day: 15, month: 4, year: 2025 }, time: { hour: 0, minute: 0, timeZoneId: "UTC" } });
     expect(dateTimeHelper.parseDateTime("Apr 15, 2025 12:14 AM MT")).toEqual({ date: { day: 15, month: 4, year: 2025 }, time: { hour: 0, minute: 14, timeZoneId: "America/Edmonton" } });
     expect(dateTimeHelper.parseDateTime("Apr 15, 2025 10:14 AM MDT")).toEqual({ date: { day: 15, month: 4, year: 2025 }, time: { hour: 10, minute: 14, timeZoneId: "America/Edmonton" } });
     expect(dateTimeHelper.parseDateTime("Apr 15, 2025 10:14 PM MST")).toEqual({ date: { day: 15, month: 4, year: 2025 }, time: { hour: 22, minute: 14, timeZoneId: "America/Edmonton" } });
     expect(dateTimeHelper.parseDateTime("Apr 15, 2025 10:14", "America/Halifax")).toEqual({ date: { day: 15, month: 4, year: 2025 }, time: { hour: 10, minute: 14, timeZoneId: "America/Halifax" } });
+    expect(dateTimeHelper.parseDateTime("Apr 15, 2025 15:14:37 UTC", "America/Halifax", "mmm d, yyyy", "HH:mm:ss z")).toEqual({ date: { day: 15, month: 4, year: 2025 }, time: { hour: 15, minute: 14, second: 37, timeZoneId: "UTC" } });
     expect(dateTimeHelper.parseDateTime("")).toEqual(null);
     expect(dateTimeHelper.parseDateTime(undefined)).toEqual(null);
     expect(dateTimeHelper.parseDateTime(null)).toEqual(null);

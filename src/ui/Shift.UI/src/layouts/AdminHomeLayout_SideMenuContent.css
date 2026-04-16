@@ -1,4 +1,18 @@
-.AdminHomeLayout_SideMenuContent .footer {
-    margin-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.13) !important;
+.AdminHomeLayout_SideMenuContent {
+    .footer {
+        margin-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.13) !important;
+    }
+
+    .compact-footer {
+        display: none;
+    }
+}
+
+aside.admin-sidebar-compact {
+    .AdminHomeLayout_SideMenuContent .compact-footer {
+        display: block;
+        margin-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.13) !important;
+    }
 }

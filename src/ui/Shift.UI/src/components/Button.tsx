@@ -9,20 +9,24 @@ type ButtonType = "button" | "submit" | "reset";
 
 type Variant =
     "add"
-    | "new"
-    | "delete"
-    | "delete-icon"
-    | "clear"
-    | "search"
-    | "save"
-    | "icon-save"
+    | "apply-filter"
     | "cancel"
     | "close"
-    | "request"
+    | "clear"
+    | "delete"
+    | "delete-icon"
     | "download"
-    | "reset"
     | "download-excel"
+    | "icon-save"
+    | "new"
+    | "next"
     | "lock"
+    | "previous"
+    | "reset"
+    | "request"
+    | "save"
+    | "search"
+    | "top"
     | "unlock";
 
 interface Props {
@@ -46,6 +50,7 @@ type ButtonVariantList = {
         variantLoadingMessage: string;
         variantClass: string;
         variantOnlyIcon?: boolean;
+        variantIsRightIcon?: boolean;
     }
 }
 
@@ -56,10 +61,28 @@ const variants: ButtonVariantList = {
         variantLoadingMessage: "Adding...",
         variantClass: "default"
     },
-    new: {
-        variantIcon: "file",
-        variantTitle: "New",
-        variantLoadingMessage: "Creating...",
+    "apply-filter": {
+        variantIcon: "filter",
+        variantTitle: "Apply",
+        variantLoadingMessage: "Applying...",
+        variantClass: "default"
+    },
+    clear: {
+        variantIcon: "times",
+        variantTitle: "Clear",
+        variantLoadingMessage: "Clearing...",
+        variantClass: "primary"
+    },
+    cancel: {
+        variantIcon: "ban",
+        variantTitle: "Cancel",
+        variantLoadingMessage: "Cancelling...",
+        variantClass: "default"
+    },
+    close: {
+        variantIcon: "ban",
+        variantTitle: "Close",
+        variantLoadingMessage: "Closing...",
         variantClass: "default"
     },
     delete: {
@@ -75,23 +98,17 @@ const variants: ButtonVariantList = {
         variantClass: "default",
         variantOnlyIcon: true,
     },
-    clear: {
-        variantIcon: "times",
-        variantTitle: "Clear",
-        variantLoadingMessage: "Clearing...",
-        variantClass: "primary"
+    download: {
+        variantIcon: "download",
+        variantTitle: "Download",
+        variantLoadingMessage: "Downloading...",
+        variantClass: "default"
     },
-    search: {
-        variantIcon: "search",
-        variantTitle: "Search",
-        variantLoadingMessage: "Searching...",
-        variantClass: "primary"
-    },
-    save: {
-        variantIcon: "save",
-        variantTitle: "Save",
-        variantLoadingMessage: "Saving...",
-        variantClass: "success"
+    "download-excel": {
+        variantIcon: "file-excel",
+        variantTitle: "Download",
+        variantLoadingMessage: "Downloading...",
+        variantClass: "default"
     },
     "icon-save": {
         variantIcon: "save",
@@ -99,28 +116,29 @@ const variants: ButtonVariantList = {
         variantLoadingMessage: "",
         variantClass: "default btn-icon"
     },
-    cancel: {
-        variantIcon: "ban",
-        variantTitle: "Cancel",
-        variantLoadingMessage: "Cancelling...",
+    lock: {
+        variantIcon: "lock",
+        variantTitle: "Lock",
+        variantLoadingMessage: "Locking...",
         variantClass: "default"
     },
-    close: {
-        variantIcon: "ban",
-        variantTitle: "Close",
-        variantLoadingMessage: "Closing...",
+    new: {
+        variantIcon: "file",
+        variantTitle: "New",
+        variantLoadingMessage: "Creating...",
         variantClass: "default"
     },
-    request: {
-        variantIcon: "globe-pointer",
-        variantTitle: "API Request",
-        variantLoadingMessage: "Requesting...",
-        variantClass: "default"
+    next: {
+        variantIcon: "arrow-alt-right",
+        variantTitle: "Next",
+        variantLoadingMessage: "Moving...",
+        variantClass: "primary",
+        variantIsRightIcon: true,
     },
-    download: {
-        variantIcon: "download",
-        variantTitle: "Download",
-        variantLoadingMessage: "Downloading...",
+    previous: {
+        variantIcon: "arrow-alt-left",
+        variantTitle: "Previous",
+        variantLoadingMessage: "Moving...",
         variantClass: "default"
     },
     reset: {
@@ -129,16 +147,28 @@ const variants: ButtonVariantList = {
         variantLoadingMessage: "Resetting...",
         variantClass: "primary"
     },
-    "download-excel": {
-        variantIcon: "file-excel",
-        variantTitle: "Download",
-        variantLoadingMessage: "Downloading...",
+    request: {
+        variantIcon: "globe-pointer",
+        variantTitle: "API Request",
+        variantLoadingMessage: "Requesting...",
         variantClass: "default"
     },
-    lock: {
-        variantIcon: "lock",
-        variantTitle: "Lock",
-        variantLoadingMessage: "Locking...",
+    save: {
+        variantIcon: "save",
+        variantTitle: "Save",
+        variantLoadingMessage: "Saving...",
+        variantClass: "success"
+    },
+    search: {
+        variantIcon: "search",
+        variantTitle: "Search",
+        variantLoadingMessage: "Searching...",
+        variantClass: "primary"
+    },
+    top: {
+        variantIcon: "arrow-up",
+        variantTitle: "Top",
+        variantLoadingMessage: "Moving...",
         variantClass: "default"
     },
     unlock: {
@@ -162,17 +192,17 @@ export default function Button({
     href,
     onClick
 }: Props) {
-    const { variantIcon, variantTitle, variantLoadingMessage, variantClass, variantOnlyIcon } = variants[variant];
+    const { variantIcon, variantTitle, variantLoadingMessage, variantClass, variantOnlyIcon, variantIsRightIcon } = variants[variant];
 
     let icon: ReactNode;
     let content: string;
 
     if (isLoading) {
         content = loadingMessage ?? translate(variantLoadingMessage) ?? translate("Loading...");
-        icon = <Spinner animation="border" role="status" size="sm" className={!variantOnlyIcon && content ? "me-2" : ""} />;
+        icon = <Spinner animation="border" role="status" size="sm" className={!variantOnlyIcon && content ? variantIsRightIcon ? "ms-2" : "me-2" : ""} />;
     } else {
         content = text || translate(variantTitle);
-        icon = <Icon style="Solid" name={variantIcon} className={!variantOnlyIcon && content ? "me-2" : ""} />;
+        icon = <Icon style="solid" name={variantIcon} className={!variantOnlyIcon && content ? variantIsRightIcon ? "ms-2" : "me-2" : ""} />;
     }
 
     const finalClassName = `btn btn-sm btn-${variantClass} ${variantOnlyIcon ? "btn-icon" : ""} ${className ?? ""}`;
@@ -185,8 +215,9 @@ export default function Button({
                 tabIndex={tabIndex}
                 href={href}
             >
-                {icon}
+                {!variantIsRightIcon && icon}
                 {!variantOnlyIcon ? content : null}
+                {variantIsRightIcon && icon}
             </ActionLink>
         )
     }
@@ -200,8 +231,9 @@ export default function Button({
             tabIndex={tabIndex}
             onClick={onClick}
         >
-            {icon}
+            {!variantIsRightIcon && icon}
             {!variantOnlyIcon ? content : null}
+            {variantIsRightIcon && icon}
         </button>
     );
 }

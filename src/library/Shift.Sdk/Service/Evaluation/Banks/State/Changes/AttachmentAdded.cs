@@ -21,12 +21,13 @@ namespace InSite.Domain.Banks
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
         public AttachmentType Type { get; set; }
 
+        public Guid? FileIdentifier { get; set; }
         public Guid Upload { get; set; }
         public AttachmentImage Image { get; set; }
 
         public AttachmentAdded(Guid attachment, int asset,
             Guid author, ContentTitle content, string condition,
-            AttachmentType type, Guid upload, AttachmentImage image)
+            AttachmentType type, Guid? fileIdentifier, Guid upload, AttachmentImage image)
         {
             Attachment = attachment;
             Asset = asset;
@@ -36,6 +37,7 @@ namespace InSite.Domain.Banks
             Condition = condition;
 
             Type = type;
+            FileIdentifier = fileIdentifier;
             Upload = upload;
             Image = image;
         }

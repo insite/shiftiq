@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using InSite.Admin.Assessments.Attachments.Controls;
 using InSite.Admin.Assessments.Questions.Controls;
 using InSite.Admin.Assessments.Questions.Utilities;
 using InSite.Common.Web;
+using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
+using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
 using Shift.Constant;
-using Shift.Sdk.UI;
 
 namespace InSite.Admin.Assessments.Banks.Forms
 {
@@ -20,6 +23,12 @@ namespace InSite.Admin.Assessments.Banks.Forms
         #region Properties
 
         private Guid BankID => Guid.TryParse(Request.QueryString["bank"], out var value) ? value : Guid.Empty;
+
+        private List<Guid> CompetencyData
+        {
+            get => (List<Guid>)ViewState[nameof(CompetencyData)];
+            set => ViewState[nameof(CompetencyData)] = value;
+        }
 
         #endregion
 
@@ -49,6 +58,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
             BuildImagesButton.Click += BuildImagesButton_Click;
             BuildQuestionsInternal.Click += BuildQuestionsInternal_Click;
             BuildQuestionsCompact.Click += BuildQuestionsCompact_Click;
+            BuildQuestionsExternal.Click += BuildQuestionsExternal_Click;
 
             DownloadButton.Click += DownloadButton_Click;
         }
@@ -105,7 +115,13 @@ namespace InSite.Admin.Assessments.Banks.Forms
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, BankID,
-                new QuestionPrintInternal.BankOptions(Organization, User, BankID, IncludeImages.Checked, IncludeAdminComments.Checked),
+                new QuestionPrintInternal.BankOptions(Organization.Identifier, User.TimeZone, BankID)
+                {
+                    IncludeImages = IncludeImages.Checked,
+                    IncludeAdminComments = IncludeAdminComments.Checked,
+                    ExcludeHiddenComments = ExcludeHiddenComments.Checked,
+                    QuestionFilter = CreateQuestionFilter()
+                },
                 (user, options) => QuestionPrintInternal.RenderPdf(options));
         }
 
@@ -114,8 +130,24 @@ namespace InSite.Admin.Assessments.Banks.Forms
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, BankID,
-                new QuestionPrintCompact.BankOptions(Organization, BankID),
+                new QuestionPrintCompact.BankOptions(Organization, BankID)
+                {
+                    QuestionFilter = CreateQuestionFilter()
+                },
                 (user, options) => QuestionPrintCompact.RenderPdf(options));
+        }
+
+        private void BuildQuestionsExternal_Click(object sender, EventArgs e)
+        {
+            PrintQueue.QueuePrint(
+                _queueStoragePath,
+                User.Identifier, BankID,
+                new QuestionPrintExternal.BankOptions(Organization, BankID)
+                {
+                    IncludeImages = IncludeImages.Checked,
+                    QuestionFilter = CreateQuestionFilter()
+                },
+                (user, options) => QuestionPrintExternal.RenderPdf(options));
         }
 
         private void DownloadButton_Click(object sender, EventArgs e)
@@ -193,7 +225,117 @@ namespace InSite.Admin.Assessments.Banks.Forms
                 };
             }
 
+            LoadCompetencies(bank.Standard);
+
             GoBackButton.NavigateUrl = GetReaderUrl();
+        }
+
+        #endregion
+
+        #region Data binding (Competency)
+
+        private void LoadCompetencies(Guid frameworkId)
+        {
+            CompetencyField.Visible = false;
+
+            if (frameworkId == Guid.Empty)
+                return;
+
+            var data = StandardSearch.Bind(
+                a => new
+                {
+                    AreaId = a.StandardIdentifier,
+                    Code = a.Code,
+                    Title = a.ContentTitle,
+                    Competencies = a.Children.OrderBy(c => c.Sequence).ThenBy(c => c.ContentTitle).Select(c => new
+                    {
+                        CompetencyId = c.StandardIdentifier,
+                        Code = c.Code,
+                        Title = c.ContentTitle,
+                    })
+                },
+                a => a.ParentStandardIdentifier == frameworkId && a.Children.Any(),
+                null, "Sequence,ContentTitle");
+
+            if (data.IsEmpty())
+                return;
+
+            CompetencyField.Visible = true;
+
+            AreaRepeater.DataBinding += AreaRepeater_DataBinding;
+            AreaRepeater.ItemDataBound += AreaRepeater_ItemDataBound;
+            AreaRepeater.DataSource = data;
+            AreaRepeater.DataBind();
+        }
+
+        private void AreaRepeater_DataBinding(object sender, EventArgs e)
+        {
+            CompetencyData = new List<Guid>();
+        }
+
+        private void AreaRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (!IsContentItem(e))
+                return;
+
+            var repeater = (Repeater)e.Item.FindControl("CompetencyRepeater");
+            repeater.ItemDataBound += CompetencyRepeater_ItemDataBound;
+            repeater.DataSource = DataBinder.Eval(e.Item.DataItem, "Competencies");
+            repeater.DataBind();
+        }
+
+        private void CompetencyRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (!IsContentItem(e))
+                return;
+
+            var competencyId = (Guid)DataBinder.Eval(e.Item.DataItem, "CompetencyId");
+            CompetencyData.Add(competencyId);
+        }
+
+        protected string GetStandardTitle()
+        {
+            var dataItem = Page.GetDataItem();
+            var code = (string)DataBinder.Eval(dataItem, "Code");
+            var title = (string)DataBinder.Eval(dataItem, "Title");
+
+            return (code.IsEmpty() ? string.Empty : code + ". ") + title;
+        }
+
+        private IEnumerable<Guid> GetSelectedCompetencies()
+        {
+            var index = 0;
+
+            foreach (RepeaterItem areaItem in AreaRepeater.Items)
+            {
+                var competencyRepeater = (Repeater)areaItem.FindControl("CompetencyRepeater");
+                foreach (RepeaterItem competencyItem in competencyRepeater.Items)
+                {
+                    var chk = (ICheckBox)competencyItem.FindControl("IsSelected");
+
+                    if (chk.Checked)
+                        yield return CompetencyData[index];
+
+                    index++;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Methods (QuestionFilter)
+
+        private QuestionPrintHelper.QuestionFilter CreateQuestionFilter()
+        {
+            return new QuestionPrintHelper.QuestionFilter
+            {
+                QuestionTaxonomy = QuestionTaxonomy.ValuesAsInt.ToHashSet(),
+                QuestionCondition = QuestionCondition.Values.ToHashSet(),
+                QuestionFlag = QuestionFlag.EnumValues.ToHashSet(),
+                QuestionCompetency = GetSelectedCompetencies().ToHashSet(),
+                IsQuestionHasLig = IsQuestionHasLig.ValueAsBoolean,
+                IsQuestionHasReference = IsQuestionHasReference.ValueAsBoolean,
+            };
         }
 
         #endregion

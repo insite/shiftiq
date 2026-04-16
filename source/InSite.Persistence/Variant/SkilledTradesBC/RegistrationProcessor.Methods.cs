@@ -77,7 +77,12 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                     x => x.Accommodations,
                     x => x.RegistrationInstructors
                 );
+
                 if (registration == null || registration.EventIdentifier == Guid.Empty)
+                    return;
+
+                var alert = Notifications.Select(notificationName);
+                if (alert.Type == NotificationType.ITA016 && registration.Attempt == null)
                     return;
 
                 QEvent @event = _events.GetEvent(
@@ -96,11 +101,13 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                 if (form == null)
                     return;
 
-                var venueAddress = @event.VenueLocationIdentifier.HasValue ? _groups.GetAddress(@event.VenueLocationIdentifier.Value, AddressType.Physical) : null;
+                var venueAddress = @event.VenueLocationIdentifier.HasValue 
+                    ? _groups.GetAddress(@event.VenueLocationIdentifier.Value, AddressType.Physical) 
+                    : null;
 
                 var builder = new MessageBuilder(_contacts, _groups, _filePaths, _domain);
-                var alert = Notifications.Select(notificationName);
                 var email = builder.BuildRegistrationEmail(alert, @event, venueAddress, registration, form);
+
                 if (email == null || email.IsDisabled)
                     return;
 

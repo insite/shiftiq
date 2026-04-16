@@ -125,12 +125,7 @@ const _timeParsers = {
 
         let timeZoneId: TimeZoneId | null;
         if (parts.length >= 4) {
-            const timeZoneCode = parts[3].toLowerCase();
-            timeZoneId = timeZones.find(x =>
-                x.abbrev.toLowerCase() === timeZoneCode
-                || x.standardCode?.toLowerCase() === timeZoneCode
-                || x.daylightCode?.toLowerCase() === timeZoneCode
-            )?.timeZoneId ?? null;
+            timeZoneId = getTimeZoneId(parts[3]);
             if (!timeZoneId) {
                 return null;
             }
@@ -144,6 +139,53 @@ const _timeParsers = {
             timeZoneId
         };
     },
+
+    "HH:mm:ss z": (parts: string[]): TimeParts | null => {
+        if (parts.length < 3) {
+            return null;
+        }
+
+        const hour = Number(parts[0]);
+        if (Number.isNaN(hour) || hour < 0 || hour > 23) {
+            return null;
+        }
+
+        const minute = Number(parts[1]);
+        if (Number.isNaN(minute) || minute < 0 || minute > 59) {
+            return null;
+        }
+
+        const second = Number(parts[2]);
+        if (Number.isNaN(second) || second < 0 || second > 59) {
+            return null;
+        }
+
+        let timeZoneId: TimeZoneId | null;
+        if (parts.length === 4) {
+            timeZoneId = getTimeZoneId(parts[3]);
+            if (!timeZoneId) {
+                return null;
+            }
+        } else {
+            timeZoneId = null;
+        }
+
+        return {
+            hour,
+            minute,
+            second,
+            timeZoneId
+        };
+    },
+}
+
+function getTimeZoneId(timeZoneCode: string): TimeZoneId | null {
+    timeZoneCode = timeZoneCode.toLowerCase();
+    return timeZones.find(x =>
+        x.abbrev.toLowerCase() === timeZoneCode
+        || x.standardCode?.toLowerCase() === timeZoneCode
+        || x.daylightCode?.toLowerCase() === timeZoneCode
+    )?.timeZoneId ?? null;
 }
 
 function getMonthByName(monthName: string) {

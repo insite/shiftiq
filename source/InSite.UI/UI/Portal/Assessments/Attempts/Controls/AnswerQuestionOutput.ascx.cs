@@ -111,7 +111,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
         {
             var options = Data.Attempt.GetQuestionOptions(Data.AttemptQuestion.QuestionIdentifier).ToArray();
             var tableData = Data.BankQuestion?.Layout.Type == OptionLayoutType.Table
-                ? QuestionTable.Build(Data.BankQuestion.Layout.Columns, options.Select(x => x.OptionText))
+                ? BankQuestionTable.Build(Data.BankQuestion.Layout.Columns, options.Select(x => x.OptionText))
                 : null;
 
             var tableHeader = tableData?.GetHeader();

@@ -392,7 +392,22 @@ namespace InSite.Persistence
                 predicate = predicate.And(x => !filter.ExcludeUserIdentifiers.Contains(x.UserIdentifier));
 
             if (filter.EmployerGroups.IsNotEmpty())
-                predicate = predicate.And(x => x.User.Memberships.Select(y => y.GroupIdentifier).Intersect(filter.EmployerGroups).Any());
+            {
+                if (filter.EmployerGroupsRequireReferrals == true)
+                {
+                    var now = DateTimeOffset.Now;
+
+                    predicate = predicate
+                        .And(x => x.User.Memberships.Select(y => y.GroupIdentifier).Intersect(filter.EmployerGroups).Any()
+                          && db.QMembershipReasons
+                                .Where(r => r.ReasonType == "Referral" && r.Membership.UserIdentifier == x.UserIdentifier && (!r.ReasonExpiry.HasValue || now < r.ReasonExpiry))
+                                .Any(r => filter.EmployerGroups.Contains(r.Membership.GroupIdentifier)));
+                }
+                else
+                {
+                    predicate = predicate.And(x => x.User.Memberships.Select(y => y.GroupIdentifier).Intersect(filter.EmployerGroups).Any());
+                }
+            }
 
             switch (filter.EmailStatus)
             {
@@ -724,8 +739,9 @@ namespace InSite.Persistence
             if (filter.MembershipReasonExpirySince.HasValue)
             {
                 if (filter.EmployerGroups.IsNotEmpty())
-                    predicate = predicate.And(x => !db.QMembershipReasons.Where(r => r.Membership.UserIdentifier == x.UserIdentifier).Any(r => filter.EmployerGroups.Contains(r.Membership.GroupIdentifier))
-                                          || db.QMembershipReasons.Where(r => r.Membership.UserIdentifier == x.UserIdentifier).Any(r => filter.EmployerGroups.Contains(r.Membership.GroupIdentifier) && filter.MembershipReasonExpirySince.Value < r.ReasonExpiry));
+                    predicate = predicate.And(
+                        x => !db.QMembershipReasons.Where(r => r.Membership.UserIdentifier == x.UserIdentifier).Any(r => filter.EmployerGroups.Contains(r.Membership.GroupIdentifier))
+                           || db.QMembershipReasons.Where(r => r.Membership.UserIdentifier == x.UserIdentifier).Any(r => filter.EmployerGroups.Contains(r.Membership.GroupIdentifier) && filter.MembershipReasonExpirySince.Value < r.ReasonExpiry));
                 else
                     predicate = predicate.And(x => false);
             }

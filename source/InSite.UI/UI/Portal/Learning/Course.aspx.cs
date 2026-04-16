@@ -205,6 +205,14 @@ namespace InSite.UI.Portal.Learning
                 SidebarWidth = (Progress.Course.OutlineWidth ?? 4) * 105;
             }
 
+            if (model.Course.Gradebook != null && ServiceLocator.RecordSearch.GetGradebook(model.Course.Gradebook.Identifier) == null)
+            {
+                ControlButtons.Visible = false;
+                OutlineList.Visible = false;
+                ErrorAlert.AddMessage(AlertType.Error, $"{Translate("This gradebook for this course was deleted. Please contact your Administrator")}.");
+                return;
+            }
+
             if (model.Course.Gradebook?.IsLocked == true)
             {
                 ControlButtons.Visible = false;

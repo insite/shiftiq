@@ -1,0 +1,50 @@
+.InlineEditor {
+    &:not([data-editor-visible="true"]) {
+        width: fit-content;
+    }
+
+    & > span {
+        display: block;
+
+        &:not([data-disabled="true"]):hover {
+            background-color: #FFFFE0FF;
+            cursor: pointer;
+        }
+
+        & > p {
+            margin: 0;
+        }
+    }
+
+    & > div {
+        display: flex;
+        flex: 1 1 0;
+        gap: 0.25rem;
+
+        & > .edit-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        & > .form-control {
+            padding: 0.25rem 0.75rem;
+        }
+
+        & > textarea.form-control {
+            height: 2rem;
+            padding-top: 0.375rem;
+        }
+
+        & > .insite-combobox {
+            .btn-combobox {
+                padding: 0 0.75rem;
+                min-height: 2.375rem;
+                border-radius: 0.5rem;
+            }
+
+            .combobox-text {
+                font-size: calc(var(--ar-body-font-size) * 0.875);
+            }
+        }
+    }
+}

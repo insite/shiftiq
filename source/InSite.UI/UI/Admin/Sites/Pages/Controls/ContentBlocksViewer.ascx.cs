@@ -152,7 +152,7 @@ namespace InSite.Admin.Sites.Pages.Controls
 
         #region Data binding
 
-        public void SetInputValues(QPage page, Shift.Common.ContentContainer content, string editUrl)
+        public void SetInputValues(QPage page, Shift.Common.ContentContainer content, string editUrl, string editUrl2)
         {
             var selectorVal = ControlPath.BlockControlTypes.FirstOrDefault(x => x.Name == page.ContentControl);
 
@@ -160,6 +160,7 @@ namespace InSite.Admin.Sites.Pages.Controls
             Title.Text = page.Title;
             Hook.Text = page.Hook;
             EditLink.NavigateUrl = editUrl;
+            EditLink2.NavigateUrl = editUrl2;
 
 
             if (content == null)

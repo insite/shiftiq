@@ -9,6 +9,7 @@ using AngleSharp.Text;
 using InSite.Application.Records.Read;
 using InSite.Persistence;
 
+using Shift.Common;
 using Shift.Constant;
 
 namespace InSite.Admin.Records.Logbooks.Controls
@@ -20,6 +21,7 @@ namespace InSite.Admin.Records.Logbooks.Controls
             public Guid Identifier { get; set; }
             public int Sequence { get; set; }
             public string Name { get; set; }
+            public string Summary { get; set; }
             public decimal? RequiredHours { get; set; }
             public decimal CompletedHours { get; set; }
             public decimal Hours { get; set; }
@@ -37,6 +39,13 @@ namespace InSite.Admin.Records.Logbooks.Controls
             public string Name { get; set; }
 
             public List<CompetencyProgressItem> Competencies { get; set; }
+        }
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            CommonStyle.ContentKey = typeof(CompetencyProgressGrid).FullName;
         }
 
         public bool LoadData(Guid journalSetupIdentifier, Guid frameworkIdentifier, Guid userIdentifier)
@@ -129,6 +138,7 @@ namespace InSite.Admin.Records.Logbooks.Controls
                             Identifier = y.Identifier,
                             Sequence = y.Sequence,
                             Name = y.Name,
+                            Summary = y.Summary,
                             RequiredHours = y.Hours,
                             CompletedHours = userCompetency?.Hours ?? 0,
                             RequiredJournalItems = y.JournalItems,
@@ -150,7 +160,7 @@ namespace InSite.Admin.Records.Logbooks.Controls
                 .Select(c => c.SatisfactionLevel.ToEnum(ExperienceCompetencySatisfactionLevel.None))
                 .FirstOrDefault(v => v != ExperienceCompetencySatisfactionLevel.None);
 
-            if (level == default) 
+            if (level == default)
                 level = ExperienceCompetencySatisfactionLevel.None;
 
             return new CompetencyProgressItem
@@ -160,6 +170,14 @@ namespace InSite.Admin.Records.Logbooks.Controls
                 Hours = g.Sum(y => y.CompetencyHours ?? 0),
                 SatisfactionLevel = level
             };
+        }
+
+        protected string EvalSummaryHtml(string expression)
+        {
+            var dataItem = Page.GetDataItem();
+            var markdown = (string)DataBinder.Eval(dataItem, expression);
+
+            return markdown.IsNotEmpty() ? $"<div class='mt-2 competency-summary'>{Markdown.ToHtml(markdown)}</div>" : null;
         }
     }
 }

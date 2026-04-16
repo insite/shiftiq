@@ -128,6 +128,7 @@
                         </div>
 
                         <insite:NextButton runat="server" ID="Step1NextButton" ValidationGroup="Assign" Visible="false" />
+                        <insite:CloseButton runat="server" ID="Step1CloseButton" Visible="false" />
 
                     </div>
                 </div>
@@ -141,11 +142,7 @@
 
                 <div class="d-flex justify-content-between mt-4 mb-3">
                     <h2 class="h4">Pending Changes</h2>
-                    <div>
-                        
-                    </div>
                 </div>
-                
 
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
@@ -230,6 +227,7 @@
 
                         <div class="mt-3">
                             <insite:Button runat="server" ID="ConfirmButton" ButtonStyle="Success" Icon="fas fa-cloud-upload" Text="Save" ValidationGroup="Assign" />
+                            <insite:CloseButton runat="server" ID="Step2CloseButton" Visible="false" />
                         </div>
 
                     </div>

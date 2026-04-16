@@ -15,6 +15,7 @@ namespace InSite.Domain.Organizations
         public bool ReadOnlyEmploymentDetails { get; set; }
         public bool EnableOperatorGroup { get; set; }
         public bool EnableTraineeDepartment { get; set; }
+        public bool PortalSearchRequiresReferral { get; set; }
 
         public bool IsEqual(ContactSettings other)
         {
@@ -25,7 +26,8 @@ namespace InSite.Domain.Organizations
                 ReadOnlyEmploymentDetails == other.ReadOnlyEmploymentDetails &&
                 DisableLeaderRelationshipCreation == other.DisableLeaderRelationshipCreation &&
                 EnableOperatorGroup == other.EnableOperatorGroup &&
-                EnableTraineeDepartment == other.EnableTraineeDepartment
+                EnableTraineeDepartment == other.EnableTraineeDepartment &&
+                PortalSearchRequiresReferral == other.PortalSearchRequiresReferral
                 ;
         }
     }

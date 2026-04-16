@@ -285,7 +285,7 @@ order by
             if (filter.ExpirySince.HasValue)
                 query = query.Where(x => x.MembershipExpiry >= filter.ExpirySince);
 
-            if (filter.EffectiveBefore.HasValue)
+            if (filter.ExpiryBefore.HasValue)
                 query = query.Where(x => x.MembershipExpiry < filter.ExpiryBefore);
 
             return query;

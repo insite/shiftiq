@@ -81,7 +81,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Assessment
                         ValidationDateMustBeNull = true
                     };
 
-                    _data = UserCompetencyRepository.SelectSearchResults(filter, null, null);
+                    _data = UserCompetencyRepository.SelectSearchResults(filter, null);
                 }
 
                 return _data;
@@ -122,7 +122,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Assessment
                 ValidationDateMustBeNull = true
             };
 
-            var table = UserCompetencyRepository.SelectSearchResults(filter, null, null);
+            var table = UserCompetencyRepository.SelectSearchResults(filter, null);
 
             lock (ThreadLock)
             {

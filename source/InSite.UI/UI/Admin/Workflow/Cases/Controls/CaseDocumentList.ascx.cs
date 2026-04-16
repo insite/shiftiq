@@ -38,6 +38,7 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
             public string ApprovedBy { get; set; }
             public string Source { get; set; }
             public string AccessList { get; set; }
+            public string ReceivedTime { get; set; }
         }
 
         protected Guid IssueIdentifier { get; private set; }
@@ -56,11 +57,11 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
                 AddResponseFiles(respondentUserId.Value, items);
 
             items = items
-            .OrderBy(item => item.DocumentType == null)
-            .ThenBy(item => item.DocumentType)
-            .ThenBy(item => item.FileStatus)
-            .ThenByDescending(item => item.FileUploaded)
-            .ToList();
+                .OrderBy(item => item.DocumentType == null)
+                .ThenBy(item => item.DocumentType)
+                .ThenBy(item => item.FileStatus)
+                .ThenByDescending(item => item.FileUploaded)
+                .ToList();
 
             BindItems(items);
         }
@@ -110,6 +111,7 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
             item.UploadedBy = attachment.InputterUserName;
             item.Source = "Case";
             item.AllowLearnerToView = fileModel.Properties.AllowLearnerToView;
+            item.ReceivedTime = FormatDate(fileModel.Properties.Received);
 
             return item;
         }
@@ -151,11 +153,12 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
 
             var item = GetFileItemFromModel(model);
             item.FileName = HttpUtility.HtmlEncode(model.Properties.DocumentName);
-            item.UploadedTime = (response.ResponseSessionStarted ?? model.Uploaded).FormatDateOnly(User.TimeZone);
+            item.UploadedTime = FormatDate(response.ResponseSessionStarted ?? model.Uploaded);
             item.FileUploaded = response.ResponseSessionStarted ?? model.Uploaded;
             item.UploadedBy = GetUserName(response.RespondentUserIdentifier);
             item.Source = "Response";
             item.AllowLearnerToView = model.Properties.AllowLearnerToView;
+            item.ReceivedTime = FormatDate(model.Properties.Received);
 
             return item;
         }

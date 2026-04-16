@@ -111,8 +111,9 @@
                                 </div>
 
                                 <insite:Container runat="server" ID="AccessField">
-                                    <h3>Access
-                                            <sup class="text-danger"><i class="far fa-asterisk fa-xs"></i></sup>
+                                    <h3>
+                                        Access
+                                        <sup class="text-danger"><i class="far fa-asterisk fa-xs"></i></sup>
                                         <insite:CustomValidator runat="server" ID="AccessFieldValidator" ClientValidationFunction="publish.validateAccess" ValidationGroup="Assessment" ErrorMessage="Access: Please select one." Display="None" />
                                     </h3>
 
@@ -129,7 +130,11 @@
                                 </insite:Container>
 
                                 <div class="form-group mb-3" runat="server" id="PermissionListPanel" visible="false">
-                                    <label class="form-label">Permission Lists</label>
+                                    <label class="form-label">
+                                        Permission Lists
+                                        <sup class="text-danger"><i class="far fa-asterisk fa-xs"></i></sup>
+                                        <insite:CustomValidator runat="server" ID="PermissionListValidator" ClientValidationFunction="publish.validatePermissionLists" ValidationGroup="Assessment" ErrorMessage="Permission Lists: Please select one." Display="None" />
+                                    </label>
                                     <div>
                                         <asp:CheckBoxList runat="server" ID="PermissionList" DataValueField="GroupIdentifier" DataTextField="GroupName" />
                                     </div>
@@ -268,6 +273,12 @@
 
                     if (portalAccessModule && portalAccessStandalone)
                         e.IsValid = portalAccessModule.checked || portalAccessStandalone.checked;
+                };
+
+                instance.validatePermissionLists = function (s, e) {
+                    const list = document.getElementById('<%= PermissionList.ClientID %>');
+                    if (list)
+                        e.IsValid = list.querySelectorAll('input[type="checkbox"]:checked').length > 0;
                 };
             })();
         </script>

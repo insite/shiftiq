@@ -5,8 +5,8 @@
 <div class="float-end text-end mb-3">
     <insite:DropDownButton runat="server" ID="SendEmail" ButtonStyle="Default" DefaultAction="None" IconName="paper-plane" Text="Send Email" CssClass="d-inline-block">
         <Items>
-            <sdk:DropDownButtonLinkItem Name="Correspondence" Text="Correspondence" />
-            <sdk:DropDownButtonLinkItem Name="Welcome" Text="Welcome Email" />
+            <insite:DropDownButtonLinkItem Name="Correspondence" Text="Correspondence" />
+            <insite:DropDownButtonLinkItem Name="Welcome" Text="Welcome Email" />
         </Items>
     </insite:DropDownButton>
     <insite:DropDownButton runat="server" ID="MoreInfoButton" ButtonStyle="Default" DefaultAction="None" IconType="Regular" IconName="circle-info" Text="More Info" CssClass="d-inline-block" />

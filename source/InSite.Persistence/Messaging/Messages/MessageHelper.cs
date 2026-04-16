@@ -7,16 +7,16 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Hosting;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Messages.Read;
 using InSite.Application.Messages.Write;
 using InSite.Application.Surveys.Write;
+using InSite.Domain.Messages;
 using InSite.Domain.Surveys.Forms;
 
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Toolbox;
 
@@ -691,6 +691,57 @@ namespace InSite.Persistence
             return input.Substring(0, beginTagStart)
                    + content
                    + input.Substring(endTagStart + endTag.Length, input.Length - endTagStart - endTag.Length);
+        }
+
+        private static readonly object _lockCreateDefaultNotification = new object();
+
+        public static Guid? GetOrCreateDefaultNotificationId(Guid organizationId, Action<ICommand> sendCommand)
+        {
+            const string name = "Default System Notification";
+
+            var filter = new MessageFilter
+            {
+                OrganizationIdentifier = organizationId,
+                NameExact = name
+            };
+
+            var message = MessageSearch.Instance.GetMessage(filter);
+            if (message != null)
+                return message.MessageIdentifier;
+
+            lock (_lockCreateDefaultNotification)
+            {
+                message = MessageSearch.Instance.GetMessage(filter);
+                if (message != null)
+                    return message.MessageIdentifier;
+
+                var sender = TSenderSearch.Select("Mailgun", organizationId, true);
+                if (sender.IsEmpty())
+                    throw ApplicationError.Create("Can't find enabled sender");
+
+                message = new VMessage
+                {
+                    MessageType = "Notification",
+                    MessageName = name,
+                    SenderIdentifier = sender[0].SenderIdentifier,
+                    OrganizationIdentifier = organizationId
+                };
+
+                var content = new ContentContainer();
+                content.Title.Text.Default = name;
+                content.Body.Text.Default = "This is a system entity. Content is not needed.";
+
+                var commands = MessageHelper.CreateMessage(message, content, false);
+                foreach(var cmd in commands)
+                {
+                    if (cmd is CreateMessage create)
+                        message.MessageIdentifier = create.AggregateIdentifier;
+
+                    sendCommand(cmd);
+                }
+            }
+
+            return message.MessageIdentifier;
         }
 
         #endregion

@@ -23,23 +23,23 @@ namespace InSite.Admin.Records.Programs
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
-            {
-                var program = ProgramIdentifier.HasValue ? ProgramSearch.GetProgram(ProgramIdentifier.Value) : null;
-                if (program == null)
-                    Search.Redirect();
+            if (IsPostBack)
+                return;
 
-                PageHelper.AutoBindHeader(this, null, program.ProgramName);
+            var program = ProgramIdentifier.HasValue ? ProgramSearch.GetProgram(ProgramIdentifier.Value) : null;
+            if (program == null || program.OrganizationIdentifier != Organization.Identifier)
+                Search.Redirect();
 
-                ProgramCode.Text = program.ProgramCode;
-                ProgramName.Text = program.ProgramName;
-                ProgramTag.Text = program.ProgramTag;
-                DepartmentIdentifier.Value = program.GroupIdentifier;
-                IsHidden.Checked = program.IsHidden;
-                ProgramDescription.Text = program.ProgramDescription;
+            PageHelper.AutoBindHeader(this, null, program.ProgramName);
 
-                CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramIdentifier.Value);
-            }
+            ProgramCode.Text = program.ProgramCode;
+            ProgramName.Text = program.ProgramName;
+            ProgramTag.Text = program.ProgramTag;
+            DepartmentIdentifier.Value = program.GroupIdentifier;
+            IsHidden.Checked = program.IsHidden;
+            ProgramDescription.Text = program.ProgramDescription;
+
+            CancelButton.NavigateUrl = Outline.GetNavigateUrl(ProgramIdentifier.Value);
         }
 
         private void SaveButton_Click(object sender, EventArgs e)

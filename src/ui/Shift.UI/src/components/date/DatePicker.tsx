@@ -107,7 +107,7 @@ export default function DatePicker({
                     title={translate("Select Time Zone")}
                     onClick={handleTimeZoneButtonClicked}
                 >
-                    <Icon style="Regular" name="globe-americas" />
+                    <Icon style="regular" name="globe-americas" />
                     <span>{timeZone.timeZoneAbbrev}</span>
                 </button>
             )}
@@ -120,7 +120,7 @@ export default function DatePicker({
                 title={showTime ? translate("Select Date/Time") : translate("Select Date")}
                 onClick={handleCalendarButtonClicked}
             >
-                <Icon style="Regular" name="calendar-alt" />
+                <Icon style="regular" name="calendar-alt" />
             </button>
             {calendarState.opened && inputRef.current && (
                 <DatePicker_Calendar

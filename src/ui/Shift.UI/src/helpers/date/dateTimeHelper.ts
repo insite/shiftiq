@@ -43,6 +43,17 @@ const _timeFormatters = {
     },
 }
 
+interface NativeDateTimeParts {
+    day: number;
+    month: number;
+    year: number;
+    hour: number;
+    minute: number;
+    second: number;
+}
+
+const _dateTimePartFormatters: Partial<Record<TimeZoneId, Intl.DateTimeFormat>> = {};
+
 function isValidDate({ day, month, year }: DateParts) {
     return year && year >= _dateTimeParser.minYear && year <= _dateTimeParser.maxYear &&
         month && month >= 1 && month <= 12 &&
@@ -79,6 +90,118 @@ function formatTimeOffset(dateTime: DateTimeParts): string {
     const formattedMinute = !minute ? "00" : minute.length === 1 ? "0" + minute : minute;
 
     return `${sign}${formattedHour}:${formattedMinute}`;
+}
+
+function assertValidDate(date: DateParts): asserts date is {
+    day: number;
+    month: number;
+    year: number;
+} {
+    if (!isValidDate(date)) {
+        throw new Error(`Invalid date: ${JSON.stringify(date)}`);
+    }
+}
+
+function toNativeDate(date: DateParts): Date {
+    assertValidDate(date);
+
+    return new Date(date.year, date.month - 1, date.day);
+}
+
+function fromNativeDate(date: Date): DateParts {
+    return {
+        day: date.getDate(),
+        month: date.getMonth() + 1,
+        year: date.getFullYear(),
+    };
+}
+
+function getDateTimePartFormatter(timeZoneId: TimeZoneId): Intl.DateTimeFormat {
+    if (!_dateTimePartFormatters[timeZoneId]) {
+        _dateTimePartFormatters[timeZoneId] = new Intl.DateTimeFormat("en-CA", {
+            timeZone: timeZoneId,
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+            hour12: false,
+        });
+    }
+
+    return _dateTimePartFormatters[timeZoneId]!;
+}
+
+function getNumericDateTimePart(parts: Intl.DateTimeFormatPart[], type: "day" | "month" | "year" | "hour" | "minute" | "second"): number {
+    return Number(parts.find(x => x.type === type)!.value);
+}
+
+function getDateTimePartsInTimeZone(dateTime: Date, timeZoneId: TimeZoneId): NativeDateTimeParts {
+    const parts = getDateTimePartFormatter(timeZoneId).formatToParts(dateTime);
+
+    return {
+        day: getNumericDateTimePart(parts, "day"),
+        month: getNumericDateTimePart(parts, "month"),
+        year: getNumericDateTimePart(parts, "year"),
+        hour: getNumericDateTimePart(parts, "hour"),
+        minute: getNumericDateTimePart(parts, "minute"),
+        second: getNumericDateTimePart(parts, "second"),
+    };
+}
+
+function changeTimeZone(dateTime: Date, destTimeZoneId: TimeZoneId): DateTimeParts;
+function changeTimeZone(dateTime: null | undefined, destTimeZoneId: TimeZoneId): null;
+function changeTimeZone(dateTime: Date | null | undefined, destTimeZoneId: TimeZoneId): DateTimeParts | null {
+    if (!dateTime) {
+        return null;
+    }
+
+    const parts = getDateTimePartsInTimeZone(dateTime, destTimeZoneId);
+
+    return {
+        date: {
+            day: parts.day,
+            month: parts.month,
+            year: parts.year,
+        },
+        time: {
+            hour: parts.hour,
+            minute: parts.minute,
+            second: parts.second,
+            timeZoneId: destTimeZoneId,
+        }
+    }
+}
+
+function toDate(dateTime: DateTimeParts | undefined | null): Date | null {
+    if (!dateTime) {
+        return null;
+    }
+
+    assertValidDate(dateTime.date);
+
+    const timeZoneId = dateTime.time.timeZoneId;
+    if (!timeZoneId || !timeZones.find(x => x.timeZoneId === timeZoneId)) {
+        throw new Error(`Invalid time zone: ${timeZoneId}`);
+    }
+
+    const targetUtcMs = Date.UTC(
+        dateTime.date.year,
+        dateTime.date.month - 1,
+        dateTime.date.day,
+        dateTime.time.hour ?? 0,
+        dateTime.time.minute ?? 0,
+        dateTime.time.second ?? 0,
+    );
+
+    const targetUtc = new Date(targetUtcMs);
+    const parts = getDateTimePartsInTimeZone(targetUtc, timeZoneId);
+    const resultUtcMs = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+    const timeZoneOffsetInMs = resultUtcMs - targetUtcMs;
+    const adjustedUtcMs = targetUtcMs - timeZoneOffsetInMs;
+
+    return new Date(adjustedUtcMs);
 }
 
 export const dateTimeHelper = {
@@ -151,53 +274,73 @@ export const dateTimeHelper = {
 
     today(): DateParts {
         const n = new Date();
+        return fromNativeDate(n);
+    },
+
+    addDays(date: DateParts, days: number): DateParts {
+        const result = toNativeDate(date);
+        result.setDate(result.getDate() + days);
+
+        return fromNativeDate(result);
+    },
+
+    firstWeekDay(): DateParts {
+        const result = new Date();
+        result.setDate(result.getDate() - result.getDay());
+
+        return fromNativeDate(result);
+    },
+
+    firstMonthDay() : DateParts {
+        const date = new Date();
         return {
-            day: n.getDate(),
-            month: n.getMonth() + 1,
-            year: n.getFullYear(),
+            day: 1,
+            month: date.getMonth() + 1,
+            year: date.getFullYear(),
         }
+    },
+
+    firstYearDay() : DateParts {
+        const date = new Date();
+        return {
+            day: 1,
+            month: 1,
+            year: date.getFullYear(),
+        }
+    },
+
+    addMonths(date: DateParts, months: number): DateParts {
+        assertValidDate(date);
+
+        const targetMonthIndex = (date.year * 12) + (date.month - 1) + months;
+        const targetYear = Math.floor(targetMonthIndex / 12);
+        const normalizedMonthIndex = ((targetMonthIndex % 12) + 12) % 12;
+        const targetMonth = normalizedMonthIndex + 1;
+        const targetDay = Math.min(date.day, _dateTimeParser.getDaysInMonth(targetYear, targetMonth));
+
+        return {
+            day: targetDay,
+            month: targetMonth,
+            year: targetYear,
+        };
     },
 
     now(timeZoneId: TimeZoneId = "UTC"): DateTimeParts {
         return changeTimeZone(new Date(), timeZoneId);
     },
-}
 
-function changeTimeZone(dateTime: Date, destTimeZoneId: TimeZoneId): DateTimeParts;
-function changeTimeZone(dateTime: null | undefined, destTimeZoneId: TimeZoneId): null;
-function changeTimeZone(dateTime: Date | null | undefined, destTimeZoneId: TimeZoneId): DateTimeParts | null {
-    if (!dateTime) {
-        return null;
-    }
+    toDate,
 
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-        timeZone: destTimeZoneId,
-        day: "numeric",
-        month: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: false,
-    });
-    
-    const parts = formatter.formatToParts(dateTime);
+    toUtcDate(date: DateParts, timeZoneId: TimeZoneId): Date {
+        const dateTime: DateTimeParts = {
+            date,
+            time: {
+                hour: 0,
+                minute: 0,
+                timeZoneId
+            }
+        };
 
-    const day = Number(parts.find(x => x.type === "day")!.value);
-    const month = Number(parts.find(x => x.type === "month")!.value);
-    const year = Number(parts.find(x => x.type === "year")!.value);
-    const hour = Number(parts.find(x => x.type === "hour")!.value);
-    const minute = Number(parts.find(x => x.type === "minute")!.value);
-
-    return {
-        date: {
-            day,
-            month,
-            year,
-        },
-        time: {
-            hour,
-            minute,
-            timeZoneId: destTimeZoneId,
-        }
+        return toDate(dateTime)!;
     }
 }

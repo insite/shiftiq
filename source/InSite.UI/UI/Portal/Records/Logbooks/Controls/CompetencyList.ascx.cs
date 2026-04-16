@@ -13,6 +13,7 @@ using InSite.Common.Web.UI;
 using InSite.UI.Portal.Records.Logbooks.Models;
 
 using Shift.Sdk.UI;
+using Shift.Common;
 
 namespace InSite.UI.Portal.Records.Logbooks.Controls
 {
@@ -42,6 +43,8 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
             Repeater.ItemCreated += AreaRepeater_ItemCreated;
 
             RefreshButton.Click += RefreshButton_Click;
+
+            CommonStyle.ContentKey = typeof(CompetencyList).FullName;
         }
 
         private void RefreshButton_Click(object sender, EventArgs e)
@@ -52,7 +55,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
 
         private void AreaRepeater_ItemCreated(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            if (!IsContentItem(e))
                 return;
 
             var competencyRepeater = (Repeater)e.Item.FindControl("CompetencyRepeater");
@@ -61,7 +64,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
 
         private void CompetencyRepeater_ItemCreated(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            if (!IsContentItem(e))
                 return;
 
             var hoursValidator = (Common.Web.UI.CustomValidator)e.Item.FindControl("HoursValidator");
@@ -123,18 +126,19 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
 
         private static void BindJournalItems(Guid journalSetupIdentifier, List<CompetencyHelper.AreaItem> areas)
         {
-            var userCompetencies = ServiceLocator.JournalSearch.GetExperienceCompetencies(new QExperienceCompetencyFilter
-            {
-                JournalSetupIdentifier = journalSetupIdentifier,
-                UserIdentifier = CurrentSessionState.Identity.User.Identifier
-            })
-            .GroupBy(x => x.CompetencyStandardIdentifier)
-            .Select(x => new
-            {
-                Identifier = x.Key,
-                JournalItems = x.Count(),
-            })
-            .ToDictionary(x => x.Identifier);
+            var userCompetencies = ServiceLocator.JournalSearch
+                .GetExperienceCompetencies(new QExperienceCompetencyFilter
+                {
+                    JournalSetupIdentifier = journalSetupIdentifier,
+                    UserIdentifier = CurrentSessionState.Identity.User.Identifier
+                })
+                .GroupBy(x => x.CompetencyStandardIdentifier)
+                .Select(x => new
+                {
+                    Identifier = x.Key,
+                    JournalItems = x.Count(),
+                })
+                .ToDictionary(x => x.Identifier);
 
             if (userCompetencies != null && userCompetencies.Count > 0)
             {
@@ -199,7 +203,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
 
         private void Repeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            if (!IsContentItem(e))
                 return;
 
             var area = (CompetencyHelper.AreaItem)e.Item.DataItem;
@@ -212,7 +216,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
 
         private void CompetencyRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            if (!IsContentItem(e))
                 return;
 
             var competencyItem = (CompetencyHelper.CompetencyItem)e.Item.DataItem;
@@ -252,7 +256,12 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
             return result;
         }
 
-        protected string EscapeText(object obj) => HttpUtility.HtmlEncode(obj);
+        protected string EvalSummaryHtml(string expression)
+        {
+            var dataItem = Page.GetDataItem();
+            var markdown = (string)DataBinder.Eval(dataItem, expression);
 
+            return markdown.IsNotEmpty() ? $"<div class='mt-2 ps-4 fs-sm competency-summary'>{Markdown.ToHtml(markdown)}</div>" : null;
+        }
     }
 }

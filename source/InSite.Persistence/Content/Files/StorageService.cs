@@ -21,6 +21,9 @@ namespace InSite.Persistence
         private readonly IFileManagerService _fileManagerService;
         private readonly int _tempFileExpirationInMinutes;
 
+        private static readonly Regex FileUrlRegex = new Regex("^/api/(content|assets)/files/(?<fileIdentifier>[^/]+)/(?<fileName>[^/]+)$");
+        private static readonly Regex FileUrlRegex2 = new Regex("/(content|assets)/files/(?<fileId>[0-9a-fA-F-]+)/(?<fileName>[0-9a-zA-Z-.]+)");
+
         private readonly ConcurrentDictionary<Guid, FileStorageModel> _files;
 
         public StorageService(
@@ -49,8 +52,6 @@ namespace InSite.Persistence
 
             return url;
         }
-
-        static readonly Regex FileUrlRegex = new Regex("^/api/assets/files/(?<fileIdentifier>[^/]+)/(?<fileName>[^/]+)$");
 
         public (Guid? FileIdentifier, string FileName) ParseFileUrl(string fileUrl)
         {
@@ -298,6 +299,29 @@ namespace InSite.Persistence
             {
                 if (Authorize(identity, model) == FileGrantStatus.Granted)
                     result.Add(model);
+            }
+
+            return result;
+        }
+
+        public List<(Guid FileIdentifier, string FileName)> ExtractAndParseFileUrls(string text)
+        {
+            var result = new List<(Guid FileIdentifier, string FileName)>();
+
+            if (string.IsNullOrEmpty(text))
+                return result;
+
+            var matches = FileUrlRegex2.Matches(text);
+            foreach (Match match in matches)
+            {
+                if (!Guid.TryParse(match.Groups["fileId"].Value, out var fileId))
+                    continue;
+
+                var fileName = match.Groups["fileName"].Value;
+                if (string.IsNullOrEmpty(fileName))
+                    continue;
+
+                result.Add((fileId, fileName));
             }
 
             return result;

@@ -8,7 +8,7 @@ import { FieldError } from "react-hook-form";
 import Icon from "../icon/Icon";
 import { filePickerHelper } from "@/helpers/filePickerHelper";
 import { shiftClient } from "@/api/shiftClient";
-import { useStatusProvider } from "@/contexts/StatusProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
 import { urlHelper } from "@/helpers/urlHelper";
 
@@ -27,6 +27,7 @@ interface Props {
     error?: FieldError;
     onBlur?: (value: string) => void;
     onChange?: (value: string) => void;
+    onFileUploaded?: (value: string) => void;
 }
 
 export default function FileTextBox({
@@ -43,7 +44,8 @@ export default function FileTextBox({
     supportedFileTypes,
     error,
     onBlur,
-    onChange
+    onChange,
+    onFileUploaded
 }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [storedValue, setStoredValue] = useState(value !== undefined ? value : defaultValue ?? null);
@@ -96,6 +98,8 @@ export default function FileTextBox({
 
         const url = urlHelper.getFileUrl(result[0].FileId, result[0].FileName);
         setCurrentValue(url);
+
+        onFileUploaded?.(url);
     }
 
     return (
@@ -122,7 +126,7 @@ export default function FileTextBox({
                 tabIndex={-1}
                 onClick={handleClick}
             >
-                {isLoading ? <Spinner animation="border" role="status" size="sm" /> : <Icon style="Regular" name="search" />}
+                {isLoading ? <Spinner animation="border" role="status" size="sm" /> : <Icon style="regular" name="search" />}
             </button>
         </div>
     );

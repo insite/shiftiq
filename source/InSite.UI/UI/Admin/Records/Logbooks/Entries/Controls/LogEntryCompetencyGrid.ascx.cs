@@ -20,6 +20,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
             public Guid Identifier { get; set; }
             public int Sequence { get; set; }
             public string Name { get; set; }
+            public string Summary { get; set; }
             public decimal? Hours { get; set; }
             public ExperienceCompetencySatisfactionLevel SatisfactionLevel { get; set; }
             public int? SkillRating { get; set; }
@@ -40,6 +41,13 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
         private ReturnUrl _returnUrl;
 
         protected Guid ExperienceIdentifier { get; set; }
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            CommonStyle.ContentKey = typeof(LogEntryCompetencyGrid).FullName;
+        }
 
         private void AreaRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
@@ -129,17 +137,25 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
                 .GetRedirectUrl(string.Format(deleteUrlTemplate, experienceCompetency.ExperienceIdentifier, competency.CompetencyIdentifier),
                 "panel=competencies");
 
+            var content = ServiceLocator.ContentSearch.GetBlock(
+                competency.CompetencyIdentifier,
+                ContentContainer.DefaultLanguage,
+                new[] { ContentLabel.Title, ContentLabel.Summary }
+            );
+
             var competencyItem = new CompetencyItem
             {
                 Identifier = competency.CompetencyIdentifier,
                 Sequence = competency.CompetencySequence,
                 Name = CompetencyHelper.GetStandardName(
                     competency.CompetencyIdentifier,
+                    content,
                     competency.CompetencyAsset,
                     competency.CompetencyLabel,
                     competency.CompetencyCode,
                     classification
                 ),
+                Summary = content.Summary.Text.Get(ContentContainer.DefaultLanguage),
                 Hours = experienceCompetency.CompetencyHours,
                 SatisfactionLevel = experienceCompetency.SatisfactionLevel.ToEnum(ExperienceCompetencySatisfactionLevel.None),
                 SkillRating = experienceCompetency.SkillRating,
@@ -149,5 +165,12 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
             area.Competencies.Add(competencyItem);
         }
 
+        protected string EvalSummaryHtml(string expression)
+        {
+            var dataItem = Page.GetDataItem();
+            var markdown = (string)DataBinder.Eval(dataItem, expression);
+
+            return markdown.IsNotEmpty() ? $"<div class='mt-2 competency-summary'>{Markdown.ToHtml(markdown)}</div>" : null;
+        }
     }
 }

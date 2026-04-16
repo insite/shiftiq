@@ -7,9 +7,9 @@ import { Param, requestHelper } from "./requestHelper";
 import { shiftConfig } from "@/helpers/shiftConfig";
 
 
-async function afterRequest(response: Response, asBlob: true, returnNullOn404: boolean): Promise<Blob>;
-async function afterRequest<T>(response: Response, asBlob: false, returnNullOn404: boolean): Promise<T>;
-async function afterRequest<T>(response: Response, asBlob: boolean, returnNullOn404: boolean): Promise<T> {
+async function afterRequest(response: Response, asBlob: true, returnNullOn404: boolean, throwAuthError: boolean): Promise<Blob>;
+async function afterRequest<T>(response: Response, asBlob: false, returnNullOn404: boolean, throwAuthError: boolean): Promise<T>;
+async function afterRequest<T>(response: Response, asBlob: boolean, returnNullOn404: boolean, throwAuthError: boolean): Promise<T> {
     let json: unknown;
     try {
         json = asBlob
@@ -31,7 +31,7 @@ async function afterRequest<T>(response: Response, asBlob: boolean, returnNullOn
         return null as T;
     }
 
-    return requestHelper.afterRequest(response.ok, response.status, json) as T;
+    return requestHelper.afterRequest(response.ok, response.status, response.headers.get("X-Session-Refreshed"), json, throwAuthError) as T;
 }
 
 function getPagination(response: Response) {
@@ -93,7 +93,7 @@ export const fetchHelper = {
             credentials: "include"
         });
 
-        const rows = await afterRequest<Row[]>(response, false, false);
+        const rows = await afterRequest<Row[]>(response, false, false, false);
         if (!rows) {
             return null;
         }
@@ -135,7 +135,7 @@ export const fetchHelper = {
             credentials: "include"
         });
 
-        const data = await afterRequest(response, true, false);
+        const data = await afterRequest(response, true, false, false);
         if (!data) {
             return null;
         }
@@ -163,10 +163,10 @@ export const fetchHelper = {
             credentials: "include"
         });
 
-        return await afterRequest(response, false, returnNullOn404 === true);
+        return await afterRequest(response, false, returnNullOn404 === true, false);
     },
 
-    async post<T>(relativeUrl: string, body: unknown, params?: Param[] | null): Promise<T> {
+    async post<T>(relativeUrl: string, body: unknown, params?: Param[] | null, returnNullOn404: boolean = false, throwAuthError: boolean = false): Promise<T> {
         const url = requestHelper.beforeRequest(relativeUrl, params);
         if (!url) {
             return null as T;
@@ -182,7 +182,7 @@ export const fetchHelper = {
             credentials: "include"
         });
 
-        return await afterRequest(response, false, false);
+        return await afterRequest(response, false, returnNullOn404, throwAuthError);
     },
 
     async postForm<T>(relativeUrl: string, body: FormData, params?: Param[] | null): Promise<T> {
@@ -200,10 +200,10 @@ export const fetchHelper = {
             credentials: "include"
         });
 
-        return await afterRequest(response, false, false);
+        return await afterRequest(response, false, false, false);
     },
 
-    async put<T>(relativeUrl: string, body: unknown, params?: Param[] | null): Promise<T> {
+    async put<T>(relativeUrl: string, body: unknown, params?: Param[] | null, returnNullOn404?: boolean): Promise<T> {
         const url = requestHelper.beforeRequest(relativeUrl, params);
         if (!url) {
             return null as T;
@@ -219,7 +219,7 @@ export const fetchHelper = {
             credentials: "include"
         });
 
-        return await afterRequest(response, false, false);
+        return await afterRequest(response, false, returnNullOn404 === true, false);
     },
 
     async delete<T>(relativeUrl: string, body: unknown, params?: Param[] | null): Promise<T> {
@@ -238,7 +238,7 @@ export const fetchHelper = {
             credentials: "include"
         });
 
-        return await afterRequest(response, false, false);
+        return await afterRequest(response, false, false, false);
     },
 
     toParams(obj: object | undefined | null): Param[] | null {

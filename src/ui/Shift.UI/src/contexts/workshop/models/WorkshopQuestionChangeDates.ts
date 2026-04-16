@@ -1,0 +1,1 @@
+export type WorkshopQuestionChangeDates = Record<string, Date>;

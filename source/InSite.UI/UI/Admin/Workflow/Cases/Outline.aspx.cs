@@ -56,7 +56,7 @@ namespace InSite.Admin.Issues.Outlines.Forms
             {
                 _issueQuery = ServiceLocator.IssueSearch.GetIssue(CaseIdentifier.Value);
 
-                if (_issueQuery == null || !CaseVisibilityHelper.IsCaseVisible(_issueQuery.OrganizationIdentifier, _issueQuery.TopicUserIdentifier))
+                if (_issueQuery == null || !CaseVisibilityHelper.IsCaseVisible(_issueQuery))
                     return false;
 
                 _isLoaded = true;

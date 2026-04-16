@@ -89,22 +89,13 @@
 
                         <div class="clearfix"></div>
 
-                        <div class="d-lg-block collapse rounded-bottom-3 overflow-hidden" id="nav-menu">
+                        <div class="d-lg-block collapse rounded-top-3 rounded-bottom-3 overflow-hidden" id="nav-menu">
 
                             <asp:ContentPlaceHolder runat="server" ID="SideContent" />
 
-                            <asp:Panel ID="HelpPanel" runat="server" CssClass="hide-height">
+                            <asp:Panel ID="HelpPanel" runat="server" CssClass="">
                                 <div>
-                                    <h3 runat="server" id="HelpHeading" class="d-block bg-secondary fs-sm fw-semibold text-body-secondary mb-0 px-4 py-3"><%= Translate("Help") %></h3>
-
-                                    <div class="d-block p-0">
-                                        <h3 runat="server" id="CoreAboutHeading" class="h5"></h3>
-                                        <div runat="server" id="CoreAboutBody"></div>
-                                        <p class="fs-xs text-body-secondary mt-2">
-                                            <asp:HyperLink runat="server" ID="CoreAboutEdit"></asp:HyperLink>
-                                        </p>
-                                    </div>
-
+                                    <h3 runat="server" id="HelpHeading" class="d-block bg-secondary fs-sm fw-semibold text-body-secondary mb-0 px-4 py-3"><%= Translate("Instructions") %></h3>
                                     <div class="d-block p-4">
                                         <h3 runat="server" id="CustomAboutHeading" class="h5"></h3>
                                         <div runat="server" id="CustomAboutBody"></div>

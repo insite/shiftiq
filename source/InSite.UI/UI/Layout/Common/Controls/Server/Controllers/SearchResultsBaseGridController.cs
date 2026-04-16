@@ -196,7 +196,7 @@ namespace InSite.Common.Web.UI
                 maxPageIndex = 0;
 
             GridTotalItemCount = count;
-            GridPageIndex = pageIndex > maxPageIndex ? maxPageIndex : pageIndex;
+            GridPageIndex = Number.CheckRange(pageIndex, 0, maxPageIndex);
 
             var hasData = count > 0;
 

@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, ForwardedRef } from "react";
+import { ForwardedRef } from "react";
 import { FieldError } from "react-hook-form";
 import { errorHelper } from "@/helpers/errorHelper";
 
@@ -13,9 +13,12 @@ interface Props {
     placeholder?: string;
     disabled?: boolean;
     readOnly?: boolean;
+    value?: string;
+    defaultValue?: string;
     error?: FieldError;
-    onBlur?: (e: FocusEvent<HTMLTextAreaElement>) => void;
-    onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+    onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement>;
 }
 
 export default function TextArea({
@@ -29,9 +32,12 @@ export default function TextArea({
     placeholder,
     disabled,
     readOnly,
+    value,
+    defaultValue,
     error,
     onBlur,
-    onChange
+    onChange,
+    onKeyDown
 }: Props) {
     const errorTooltip = errorHelper.getErrorTooltip(error);
 
@@ -45,11 +51,14 @@ export default function TextArea({
             rows={rows}
             maxLength={maxLength}
             placeholder={placeholder}
+            value={value}
+            defaultValue={defaultValue}
             disabled={disabled}
             readOnly={readOnly}
             title={errorTooltip ?? undefined}
             onBlur={onBlur}
             onChange={onChange}
+            onKeyDown={onKeyDown}
         />
     );
 };

@@ -328,6 +328,10 @@ namespace InSite.Admin.Sites.Utilities
             if (folder == null)
                 return null;
 
+            var queryIndex = actionUrl.IndexOf('?');
+            if (queryIndex >= 0)
+                actionUrl = actionUrl.Substring(0, queryIndex);
+
             if (actionUrl.StartsWith("/"))
                 actionUrl = actionUrl.Substring(1, actionUrl.Length - 1);
 

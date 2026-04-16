@@ -107,6 +107,22 @@ const endpoints = {
         url: "POST api/security/users/search",
         permission: "Policies.Security.Users.User.Search"
     },
+    "shiftClient.pageContent.modify": {
+        url: "GET api/workspace/pages-contents/{page}",
+        permission: "workspace/pages"
+    },
+    "shiftClient.pageContent.retrieve": {
+        url: "PUT api/workspace/pages-contents/{page}",
+        permission: "workspace/pages"
+    },
+    "shiftClient.file.uploadTempFile": {
+        url: "POST api/content/files/temp",
+        permission: "none"
+    },
+    "shiftClient.translation.translate": {
+        url: "POST api/content/translations/translate",
+        permission: "none"
+    },
 };
 
 function processFolder(folderPath) {

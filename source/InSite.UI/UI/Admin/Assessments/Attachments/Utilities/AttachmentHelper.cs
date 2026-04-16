@@ -23,34 +23,10 @@ namespace InSite.Admin.Assessments.Attachments.Utilities
 {
     public static class AttachmentHelper
     {
-        #region Constants
-
-        private static readonly HashSet<string> AttachmentChangeTypeFilter;
-
-        #endregion
-
         #region Fields
 
         private static readonly object _syncRoot = new object();
         private static DateTime _nextClearTime = DateTime.MinValue;
-
-        #endregion
-
-        #region Construction
-
-        static AttachmentHelper()
-        {
-            var changeType = typeof(Change);
-            var targetType = typeof(AttachmentAdded);
-
-            AttachmentChangeTypeFilter = System.Reflection.Assembly.GetAssembly(targetType).GetTypes()
-                .Where(t => t.IsPublic && t.IsClass
-                         && t.IsSubclassOf(changeType)
-                         && t.Namespace == targetType.Namespace
-                         && t.Name.StartsWith("Attachment"))
-                .Select(x => x.Name)
-                .ToHashSet();
-        }
 
         #endregion
 
@@ -239,10 +215,10 @@ namespace InSite.Admin.Assessments.Attachments.Utilities
         #region Methods (question attachments)
 
         public static bool IsAttachmentChange(IChange e) =>
-            AttachmentChangeTypeFilter.Contains(e.GetType().Name);
+            BankHelper.AttachmentChangeTypes.Contains(e.GetType().Name);
 
         public static IEnumerable<IChange> GetChanges(Guid bankId) =>
-            ServiceLocator.ChangeStore.GetChanges("Bank", bankId, AttachmentChangeTypeFilter);
+            ServiceLocator.ChangeStore.GetChanges("Bank", bankId, BankHelper.AttachmentChangeTypes);
 
         public static IEnumerable<IChange> GetChanges(Guid bankId, Guid attachmentId) =>
             GetChanges(bankId).Where(e => GetAttachmentIdentifier(e).Contains(attachmentId));

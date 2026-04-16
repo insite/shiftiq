@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -98,10 +99,15 @@ namespace InSite.UI.Layout.Admin
             BindSidebar(sidebar);
         }
 
+        protected string GetRecentLinksKey()
+        {
+            var key = $"{ServiceLocator.AppSettings.Environment.Name}-{Organization.Identifier}-{User.Identifier}";
+            var bytes = EncryptionHelper.ComputeHashMd5(key);
+            return Convert.ToBase64String(bytes).Substring(0, 22);
+        }
+
         private void BindUser()
         {
-            RecentMenu.Visible = RecentLinkCache.IsVisible(Page.Session);
-
             MyDashboardLink.HRef = RelativeUrl.PortalHomeUrl;
             MyDashboardLink.InnerText = GetDisplayText("My Dashboard");
             MyDashboardLink.Visible = Organization.Toolkits.Portal.ShowMyDashboard;

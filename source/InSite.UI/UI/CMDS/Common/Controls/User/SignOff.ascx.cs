@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 
 using Humanizer;
 
+using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.Custom.CMDS.User.Achievements.Controls
 {
@@ -22,10 +23,10 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
             set => ViewState[nameof(CanBeSigned)] = value;
         }
 
-        private Guid? CredentialIdentifier
+        private Guid? CredentialId
         {
-            get { return (Guid?)ViewState[nameof(CredentialIdentifier)]; }
-            set { ViewState[nameof(CredentialIdentifier)] = value; }
+            get { return (Guid?)ViewState[nameof(CredentialId)]; }
+            set { ViewState[nameof(CredentialId)] = value; }
         }
 
         protected override void OnInit(EventArgs e)
@@ -39,28 +40,37 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
             SignedOff?.Invoke(this, new EventArgs());
         }
 
-        public void LoadData(Guid userId, Guid? credentialIdentifier)
+        public void LoadData(Guid userId, Guid? credentialId, bool isProgram)
         {
-            CredentialIdentifier = credentialIdentifier;
+            CredentialId = credentialId;
 
-            SelectedAchievement.Visible = credentialIdentifier.HasValue;
+            SelectedAchievement.Visible = credentialId.HasValue;
 
-            if (credentialIdentifier.HasValue)
-                LoadAchievementInfo(userId);
+            if (credentialId.HasValue)
+                LoadAchievementInfo(userId, isProgram);
 
             if (CurrentSessionState.Identity.IsImpersonating)
                 AchievementSummary.DisableSignOffButton();
         }
 
-        public void LoadAchievementInfo(VCmdsCredentialAndExperience credential)
+        public void LoadAchievementInfo(VCmdsCredentialAndExperience credential, bool isProgram)
         {
             var lifetime = credential.LifetimeMonths ?? 0;
 
             SelectedAchievement.Visible = true;
             AchievementTitle.Text = credential.AchievementTitle;
 
-            if (credential.AchievementDescription.HasValue())
-                AchievementDescription.Text = Markdown.ToHtml(credential.AchievementDescription);
+            var achievementDescription = credential.AchievementDescription?.Trim().NullIfEmpty();
+
+            if (isProgram && credential.AchievementLabel == "Certification")
+            {
+                var programDescription = TryGetProgramDescription(credential, CurrentLanguage);
+                if (programDescription != null)
+                    achievementDescription = programDescription;
+            }
+
+            if (achievementDescription != null)
+                AchievementDescription.Text = Markdown.ToHtml(achievementDescription);
 
             TimeSensitivePanel.Visible = lifetime > 0;
 
@@ -98,39 +108,35 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
             AchievementSummary.LoadData(credential.UserIdentifier, credential.AchievementIdentifier, CanBeSigned);
         }
 
-        private bool LoadAchievementInfo(Guid userId)
+        private bool LoadAchievementInfo(Guid userId, bool isProgram)
         {
             var organization = Organization.Identifier;
-            var credential = VCmdsCredentialSearch.SelectForTrainingPlan(CredentialIdentifier.Value, organization);
+            var credential = VCmdsCredentialSearch.SelectForTrainingPlan(CredentialId.Value, organization);
 
             if (credential == null || credential.UserIdentifier != userId)
                 return false;
 
-            LoadAchievementInfo(credential);
-            LoadProgramOnlyAchievementSummary(organization, credential.AchievementIdentifier);
+            LoadAchievementInfo(credential, isProgram);
 
             return false;
         }
 
-        private void LoadProgramOnlyAchievementSummary(Guid organizationId, Guid achievementId)
+        private static string TryGetProgramDescription(VCmdsCredentialAndExperience credential, string language)
         {
-            var tasks = TaskSearch.Select(x => x.ObjectIdentifier == achievementId && x.OrganizationIdentifier == organizationId, y => y.Program).ToList();
-
-            if (tasks == null || tasks.Count == 0)
-                return;
-
-            var summary = new StringBuilder();
-
-            foreach (var task in tasks)
+            var programs = ProgramSearch.GetPrograms(new TProgramFilter
             {
-                if (task.Program.ProgramType != "Achievements Only")
-                    continue;
+                OrganizationIdentifier = Organization.Identifier,
+                AchievementIdentifiers = new[] { credential.AchievementIdentifier }
+            });
 
-                var content = ServiceLocator.ContentSearch.GetBlock(task.ProgramIdentifier, CurrentLanguage);
-                summary.Append(content.Summary.GetHtml(CurrentLanguage));
-            }
+            if (programs.IsEmpty())
+                return null;
 
-            ProgramOnlyAchievementSummary.Text = summary.ToString();
+            var program = programs.First();
+            var content = ServiceLocator.ContentSearch.GetBlock(program.ProgramIdentifier, language, new[] { ContentLabel.Summary });
+            var summary = content.Summary.Text[language];
+
+            return summary.NullIfEmpty();
         }
     }
 }

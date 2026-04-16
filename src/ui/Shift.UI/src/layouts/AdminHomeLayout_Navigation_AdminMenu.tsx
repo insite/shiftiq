@@ -1,7 +1,7 @@
 import ActionLink from "@/components/ActionLink";
 import Icon from "@/components/icon/Icon";
 import { IconName } from "@/components/icon/IconName";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 
 export default function AdminHomeLayout_Navigation_AdminMenu() {
     const { siteSetting } = useSiteProvider();
@@ -19,7 +19,7 @@ export default function AdminHomeLayout_Navigation_AdminMenu() {
                 data-bs-auto-close="outside"
                 aria-expanded="false"
             >
-                <Icon style="Regular" name="grid-round" className="me-1 fa-width-auto" />
+                <Icon style="regular" name="grid-round" className="me-1 fa-width-auto" />
                 Admin
             </a>
 
@@ -33,7 +33,7 @@ export default function AdminHomeLayout_Navigation_AdminMenu() {
                                 {MenuItems.map(item => (
                                     <li key={item.Url}>
                                         <ActionLink className="dropdown-item" href={item.Url}>
-                                            <Icon style="Regular" name={item.Icon as IconName} className="me-1" />
+                                            <Icon style="regular" name={item.Icon as IconName} className="me-1" />
                                             {item.Text}
                                         </ActionLink>
                                     </li>

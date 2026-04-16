@@ -5,7 +5,7 @@ import { translate } from "@/helpers/translate";
 import { ListItem } from "@/models/listItem";
 import { blockList } from "./blockList";
 import ComboBox from "@/components/combobox/ComboBox";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePageContent_Provider } from "./PageContent_Provider";
 import { BlockType } from "./models/BlockType";
 import { blockTypeNameList } from "./blockTypeNameList";
@@ -18,19 +18,30 @@ const blockTypeItems: ListItem[] = [{
     text: blockTypeNameList[blockType]
 })));
 
-export default function PageContent_Blocks_New() {
+interface Props {
+    selected: boolean;
+}
+
+export default function PageContent_Blocks_New({ selected }: Props) {
     const [blockType, setBlockType] = useState("");
     const [blockTitle, setBlockTitle] = useState("");
 
     const { readOnly, addBlock } = usePageContent_Provider();
 
-    const titleRef = useRef<HTMLInputElement>(null);
+    const blockTypeRef = useRef<HTMLButtonElement>(null);
+    const blockTitleRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (selected && blockTypeRef.current) {
+            blockTypeRef.current.focus();
+        }
+    }, [selected]);
 
     function handleChangeBlockType(blockType: string | null) {
         setBlockType(blockType ?? "");
 
-        if (blockType && titleRef.current) {
-            titleRef.current.focus();
+        if (blockType && blockTitleRef.current) {
+            blockTitleRef.current.focus();
         }
     }
 
@@ -51,6 +62,7 @@ export default function PageContent_Blocks_New() {
                 <div className="col-md-4">
                     <FormField label={translate("Block Type")} required>
                         <ComboBox
+                            buttonRef={blockTypeRef}
                             value={blockType}
                             items={blockTypeItems}
                             onChange={handleChangeBlockType}
@@ -60,7 +72,7 @@ export default function PageContent_Blocks_New() {
                 <div className="col-md-4">
                     <FormField label={translate("Block Title")}>
                         <TextBox
-                            ref={titleRef}
+                            ref={blockTitleRef}
                             value={blockTitle}
                             maxLength={128}
                             onChange={e => setBlockTitle(e.target.value)}

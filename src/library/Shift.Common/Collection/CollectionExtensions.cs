@@ -161,6 +161,16 @@ namespace Shift.Common
             return dict == null || dict.Count == 0;
         }
 
+        public static bool IsNotEmpty<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dict)
+        {
+            return dict != null && dict.Count > 0;
+        }
+
+        public static bool IsEmpty<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dict)
+        {
+            return dict == null || dict.Count == 0;
+        }
+
         #endregion
 
         #region NullIfEmpty / EmptyIfNull

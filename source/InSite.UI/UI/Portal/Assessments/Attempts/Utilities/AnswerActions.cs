@@ -1005,9 +1005,6 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                 return null;
             }
 
-            var questionIndex = int.Parse(request.Form["index"]);
-            ServiceLocator.SendCommand(new SwitchAttemptQuestion(attemptId, questionIndex));
-
             var attempt = ServiceLocator.AttemptSearch.GetAttempt(attemptId);
             if (attempt == null || !attempt.ActiveSectionIndex.HasValue || !attempt.ActiveQuestionIndex.HasValue)
             {
@@ -1015,14 +1012,44 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                 return null;
             }
 
-            var section = sections.Get(attempt.ActiveSectionIndex.Value, attempt.ActiveQuestionIndex.Value);
+            var questionIndex = int.Parse(request.Form["index"]);
+            var isForced = false;
+
+            if (attempt.IsTimeLimitEnabled && attempt.SectionsAsTabsEnabled && !attempt.TabNavigationEnabled)
+            {
+                var tabTimeLimit = attempt.TabTimeLimit.ToEnum(SpecificationTabTimeLimit.Disabled);
+                if (tabTimeLimit != SpecificationTabTimeLimit.Disabled)
+                {
+                    var (_, timeLeft) = GetTimestamp(attempt);
+                    if (timeLeft <= 0)
+                    {
+                        var section = attempt.ActiveSectionIndex.Value;
+                        var state = ServiceLocator.AttemptSearch.GetAttemptState(attemptId);
+                        questionIndex = state.Questions.FirstOrDefault(x => x.SectionIndex > section)?.QuestionIndex
+                            ?? state.Questions.Last().QuestionIndex + 1;
+                        isForced = true;
+                    }
+                }
+            }
+
+            ServiceLocator.SendCommand(new SwitchAttemptQuestion(attemptId, questionIndex, isForced));
+
+            attempt = ServiceLocator.AttemptSearch.GetAttempt(attemptId);
+            if (attempt == null || !attempt.ActiveSectionIndex.HasValue || !attempt.ActiveQuestionIndex.HasValue)
+            {
+                HttpResponseHelper.SendHttp404(false);
+                return null;
+            }
+
+            var sectionData = sections.Get(attempt.ActiveSectionIndex.Value, attempt.ActiveQuestionIndex.Value);
             var (timestamp, _) = GetTimestamp(attempt);
 
             return timestamp + "|"
-                + section.NavItemIndex.ToString() + "|"
+                + sectionData.NavItemIndex.ToString() + "|"
                 + attempt.ActiveQuestionIndex.Value.ToString() + "|"
-                + section.Html;
+                + sectionData.Html;
         }
+
         #endregion
     }
 }

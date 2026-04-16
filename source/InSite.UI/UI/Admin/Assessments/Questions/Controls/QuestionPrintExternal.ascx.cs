@@ -13,7 +13,6 @@ using InSite.Common.Web.UI;
 using InSite.Domain.Attempts;
 using InSite.Domain.Banks;
 using InSite.Domain.Organizations;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 using InSite.Web.Helpers;
 
 using Shift.Common;
@@ -60,8 +59,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid BankID { get; }
 
-            public BankOptions(OrganizationState organization, Guid bankId, bool includeImages)
-                : base(organization, includeImages)
+            public BankOptions(OrganizationState organization, Guid bankId)
+                : base(organization)
             {
                 BankID = bankId;
             }
@@ -71,8 +70,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid FormID { get; }
 
-            public FormOptions(OrganizationState organization, Guid formId, bool includeImages)
-                : base(organization, includeImages)
+            public FormOptions(OrganizationState organization, Guid formId)
+                : base(organization)
             {
                 FormID = formId;
             }
@@ -86,9 +85,11 @@ namespace InSite.Admin.Assessments.Questions.Controls
             public string HeaderUrl { get; }
             public string FooterUrl { get; }
 
-            public bool IncludeImages { get; }
+            public bool IncludeImages { get; set; }
 
-            public Options(OrganizationState organization, bool includeImages)
+            public QuestionPrintHelper.QuestionFilter QuestionFilter { get; set; }
+
+            public Options(OrganizationState organization)
             {
                 OrganizationID = organization.Identifier;
 
@@ -97,8 +98,6 @@ namespace InSite.Admin.Assessments.Questions.Controls
                 CurrentUrl = request.Url.Scheme + "://" + request.Url.Host + request.RawUrl;
                 HeaderUrl = HttpRequestHelper.GetAbsoluteUrl("~/UI/Admin/Assessments/Questions/Html/PrintExternalHeader.html");
                 FooterUrl = HttpRequestHelper.GetAbsoluteUrl("~/UI/Admin/Assessments/Questions/Html/PrintExternalFooter.html");
-
-                IncludeImages = includeImages;
             }
         }
 
@@ -107,7 +106,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
         #region Fields
 
         private Guid? _prevSectionId = null;
-        private QuestionTable _questionTable = null;
+        private BankQuestionTable _questionTable = null;
 
         #endregion
 
@@ -127,7 +126,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             var aQuestionDefault = info.AttemptQuestion as AttemptQuestionDefault;
 
             _questionTable = aQuestionDefault != null && bQuestion.Layout.Type == OptionLayoutType.Table
-                ? QuestionTable.Build(bQuestion.Layout.Columns, aQuestionDefault.Options.Select(x => x.Text))
+                ? BankQuestionTable.Build(bQuestion.Layout.Columns, aQuestionDefault.Options.Select(x => x.Text))
                 : null;
 
             if (aQuestion.Type == QuestionItemType.SingleCorrect)
@@ -313,22 +312,25 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         #endregion
 
-        private void LoadData(ControlData data, bool includeImages)
+        private void LoadData(ControlData data, Options options, bool isForm)
         {
-            ExcludeImagesStyle.Visible = !includeImages;
+            ExcludeImagesStyle.Visible = !options.IncludeImages;
 
             PageTitle.InnerText = data.Title.IfNullOrEmpty("Untitled");
             FormTitle.InnerText = data.Title.IfNullOrEmpty("Untitled");
             FormDescription.Visible = data.Description.IsNotEmpty();
             FormDescription.InnerHtml = Markdown.ToHtml(data.Description);
+            FooterScript.Visible = isForm;
 
-            var hasData = data.Questions.Length > 0;
+            var questions = QuestionPrintHelper.FilterQuestions(data.Questions, options.QuestionFilter);
+            var hasData = questions.Any();
 
             NoDataMessage.Visible = !hasData;
+            NoDataMessage.InnerText = isForm ? "There are no questions in this form." : "There are no questions in this bank.";
             FormContainer.Visible = hasData;
 
             QuestionRepeater.ItemDataBound += QuestionRepeater_ItemDataBound;
-            QuestionRepeater.DataSource = data.Questions;
+            QuestionRepeater.DataSource = questions;
             QuestionRepeater.DataBind();
         }
 
@@ -340,7 +342,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             if (bank == null || bank.Tenant != options.OrganizationID)
                 return null;
 
-            return RenderPdf(new ControlData(bank), options);
+            return RenderPdf(new ControlData(bank), options, false);
         }
 
         public static PrintOutputFile RenderPdf(FormOptions options)
@@ -349,10 +351,10 @@ namespace InSite.Admin.Assessments.Questions.Controls
             if (form == null || form.Specification.Bank.Tenant != options.OrganizationID)
                 return null;
 
-            return RenderPdf(new ControlData(form), options);
+            return RenderPdf(new ControlData(form), options, true);
         }
 
-        private static PrintOutputFile RenderPdf(ControlData data, Options options)
+        private static PrintOutputFile RenderPdf(ControlData data, Options options, bool showFooter)
         {
             using (var page = new Page())
             {
@@ -361,7 +363,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
                 var report = (QuestionPrintExternal)page.LoadControl("~/UI/Admin/Assessments/Questions/Controls/QuestionPrintExternal.ascx");
 
-                report.LoadData(data, options.IncludeImages);
+                report.LoadData(data, options, showFooter);
 
                 var htmlBuilder = new StringBuilder();
 
@@ -421,7 +423,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             return html.ToString();
         }
 
-        private static void RenderOptionRepeaterCell(StringBuilder html, string tagName, QuestionTable.CellData cell)
+        private static void RenderOptionRepeaterCell(StringBuilder html, string tagName, BankQuestionTable.CellData cell)
         {
             html.Append("<").Append(tagName)
                 .Append(" style='text-align:").Append(cell.Alignment.ToString().ToLower()).Append(";'")

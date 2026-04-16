@@ -626,6 +626,12 @@ namespace InSite.Persistence
             if (filter.EventScheduledBefore.HasValue)
                 query = query.Where(x => x.EventScheduledStart < filter.EventScheduledBefore.Value);
 
+            if (filter.EventScheduledPeriodSince.HasValue)
+                query = query.Where(x => x.EventScheduledEnd >= filter.EventScheduledPeriodSince.Value);
+
+            if (filter.EventScheduledPeriodBefore.HasValue)
+                query = query.Where(x => x.EventScheduledStart < filter.EventScheduledPeriodBefore.Value);
+
             if (filter.EventScheduleEndSince.HasValue)
                 query = query.Where(x => x.EventScheduledEnd >= filter.EventScheduleEndSince.Value);
 

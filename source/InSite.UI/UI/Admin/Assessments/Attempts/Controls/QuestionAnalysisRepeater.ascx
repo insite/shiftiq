@@ -35,8 +35,8 @@
 <div class="mb-3">
     <insite:DropDownButton runat="server" ID="DownloadButton" ButtonStyle="OutlinePrimary" DefaultAction="None" IconName="download" Text="Download" CssClass="d-inline-block">
         <Items>
-            <sdk:DropDownButtonItem Name="Csv" IconName="file-csv" Text="Text (*.csv)" />
-            <sdk:DropDownButtonItem Name="Xlsx" IconName="file-excel" Text="Excel (*.xlsx)" />
+            <insite:DropDownButtonItem Name="Csv" IconName="file-csv" Text="Text (*.csv)" />
+            <insite:DropDownButtonItem Name="Xlsx" IconName="file-excel" Text="Excel (*.xlsx)" />
         </Items>
     </insite:DropDownButton>
     <insite:Button runat="server" ID="ToggleQuestionAnalysisImagesVisibility" ButtonStyle="Default" Text="<span>Hide Images</span>" Icon="fas fa-image" />

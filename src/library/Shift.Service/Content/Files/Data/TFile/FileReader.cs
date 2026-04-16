@@ -85,7 +85,7 @@ public class FileReader : IEntityReader
             var query = BuildQueryable(db, criteria);
 
             query = query
-                .OrderBy(criteria.Filter.Sort ?? DefaultSort)
+                .OrderBy(!string.IsNullOrEmpty(criteria.Filter.Sort) ? criteria.Filter.Sort : DefaultSort)
                 .ApplyPaging(criteria.Filter);
 
             return ToMatchesAsync(query, cancellation);

@@ -6,10 +6,10 @@ type IconStyleInfo = {
 }
 
 const _styles: IconStyleInfo = {
-    "Brands": "fa-brands",
-    "Regular": "fa-regular",
-    "Solid": "fa-solid",
-    "Light": "fa-light",
+    "brands": "fa-brands",
+    "regular": "fa-regular",
+    "solid": "fa-solid",
+    "light": "fa-light",
 }
 
 interface Props {

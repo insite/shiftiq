@@ -14,8 +14,6 @@
 
             <div runat="server" id="StatusPanel" class="mb-3"></div>
 
-            <asp:Literal ID="ProgramOnlyAchievementSummary" runat="server" />
-
             <div runat="server" id="TimeSensitivePanel" class="mb-3"></div>
 
             <div runat="server" id="ExpiryPanel" class="mb-3"></div>

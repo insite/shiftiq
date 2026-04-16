@@ -54,7 +54,7 @@ export default function FormField<T extends object>({
             {editHref && (
                 <div className="float-end">
                     <ActionLink href={editDisabled ? undefined : editHref}>
-                        <Icon style={editIconStyle ?? "Solid"} name={editIcon ?? "pencil"} className="icon" title={editTitle ?? ""} />
+                        <Icon style={editIconStyle ?? "solid"} name={editIcon ?? "pencil"} className="icon" title={editTitle ?? ""} />
                     </ActionLink>
                 </div>
             )}
@@ -67,7 +67,7 @@ export default function FormField<T extends object>({
                         className="btn btn-link m-0 p-0"
                         onClick={onEditClick}
                     >
-                        <Icon style="Solid" name={editIcon ?? "pencil"} />
+                        <Icon style="solid" name={editIcon ?? "pencil"} />
                     </button>
                 </div>
             )}
@@ -76,12 +76,12 @@ export default function FormField<T extends object>({
                     {label}
                     {(required || error) && (
                         <sup className="text-danger ms-1">
-                            <Icon style="Regular" name="asterisk" className="fa-xs" />
+                            <Icon style="regular" name="asterisk" className="fa-xs" />
                         </sup>
                     )}
                     {error && (
                         <sup className="text-danger">
-                            <Icon style="Regular" name="exclamation" className="ms-1" />
+                            <Icon style="regular" name="exclamation" className="ms-1" />
                         </sup>
                     )}
                 </label>

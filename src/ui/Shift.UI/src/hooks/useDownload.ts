@@ -1,4 +1,4 @@
-import { useStatusProvider } from "@/contexts/StatusProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { downloadHelper } from "@/helpers/downloadHelper";
 import { useState } from "react";
 

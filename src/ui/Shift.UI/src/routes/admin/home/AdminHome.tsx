@@ -1,4 +1,4 @@
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import AdminHome_PanelTile from "./AdminHome_PanelTile";
 
 export default function AdminHome() {

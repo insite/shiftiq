@@ -42,6 +42,7 @@
                     </td>
                     <td>
                         <%# Eval("Name") %>
+                        <%# EvalSummaryHtml("Summary") %>
                     </td>
                     <td style="text-align:center;">
                         <%# Eval("Hours", "{0:n2}") %>
@@ -60,3 +61,13 @@
         </asp:Repeater>
     </ItemTemplate>
 </asp:Repeater>
+
+<insite:PageHeadContent runat="server" ID="CommonStyle">
+    <style type="text/css">
+        
+        .competency-summary p {
+            margin-bottom: 0.5rem;
+        }
+
+    </style>
+</insite:PageHeadContent>

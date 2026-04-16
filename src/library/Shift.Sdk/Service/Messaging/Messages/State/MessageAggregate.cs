@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Domain.Messages
 {
@@ -90,6 +89,38 @@ namespace InSite.Domain.Messages
                 throw ApplicationError.Create("The value of ContentText for default language is undefined");
 
             Apply(new ContentChanged(text, MessageLinkExtractor.ExtractLinks(text)));
+        }
+
+        public void HandleMailoutCallback(Guid mailout, Guid callbackId, string recipient, DateTime timestamp,
+            string status, Dictionary<string, string> data)
+        {
+            if (status.IsEmpty())
+                return;
+
+            var mailoutState = Data.FindMailout(mailout);
+            if (mailoutState == null)
+                return;
+
+            if (callbackId == Guid.Empty || mailoutState.CallbackIds.Contains(callbackId))
+                return;
+
+            Apply(new MailoutCallbackHandled(mailout, callbackId, recipient, timestamp, status, data));
+        }
+
+        public void QueueMailout(Guid mailoutId, string recipient, Dictionary<string, string> data)
+        {
+            if (!Data.MailoutExists(mailoutId))
+                return;
+
+            Apply(new MailoutQueued(mailoutId, recipient, data));
+        }
+
+        public void RejectMailout(Guid mailoutId, string recipient, string description, Dictionary<string, string> data)
+        {
+            if (!Data.MailoutExists(mailoutId))
+                return;
+
+            Apply(new MailoutRejected(mailoutId, recipient, description, data));
         }
 
         public void Rename(string name)
@@ -202,13 +233,31 @@ namespace InSite.Domain.Messages
             Apply(new MailoutCompleted(mailout));
         }
 
+        public void DraftMailout(
+            Guid mailoutId, DateTimeOffset scheduledOn,
+            Guid senderId, string senderType,
+            IDictionary<Guid, string> to, IDictionary<Guid, string> cc, IDictionary<Guid, string> bcc,
+            MultilingualString subject, MultilingualString bodyText, MultilingualString bodyHtml, IList<string> attachments,
+            Guid? eventId)
+        {
+            if (Data.MailoutExists(mailoutId))
+                return;
+
+            Apply(new MailoutDrafted(
+                mailoutId, scheduledOn,
+                senderId, senderType,
+                to, cc, bcc,
+                subject, bodyText, bodyHtml, attachments,
+                eventId));
+        }
+
         public void StartDelivery(Guid mailout, Guid recipient)
         {
             if (!Data.MailoutExists(mailout))
                 return;
 
             var state = Data.FindMailout(mailout);
-            if (!state.Recipients.Any(x => x.Identifier == recipient))
+            if (!state.Recipients.Any(x => x.Email.Identifier == recipient))
                 return;
 
             var e = new DeliveryStarted2(mailout, recipient);
@@ -222,7 +271,7 @@ namespace InSite.Domain.Messages
                 return;
 
             var state = Data.FindMailout(mailout);
-            if (!state.Recipients.Any(x => x.Identifier == recipient))
+            if (!state.Recipients.Any(x => x.Email.Identifier == recipient))
                 return;
 
             var e = new CarbonCopyStarted2(mailout, recipient, ccType, cc);
@@ -236,7 +285,7 @@ namespace InSite.Domain.Messages
                 return;
 
             var state = Data.FindMailout(mailout);
-            if (!state.Recipients.Any(x => x.Identifier == recipient))
+            if (!state.Recipients.Any(x => x.Email.Identifier == recipient))
                 return;
 
             var e = new CarbonCopyCompleted2(mailout, recipient, ccType, cc, error);
@@ -250,7 +299,7 @@ namespace InSite.Domain.Messages
                 return;
 
             var state = Data.FindMailout(mailout);
-            if (!state.Recipients.Any(x => x.Identifier == recipient))
+            if (!state.Recipients.Any(x => x.Email.Identifier == recipient))
                 return;
 
             var e = new DeliveryCompleted2(mailout, recipient, error);

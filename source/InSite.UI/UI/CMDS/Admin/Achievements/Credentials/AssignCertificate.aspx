@@ -10,10 +10,6 @@
     <asp:CustomValidator ID="EmployeeRequired" runat="server" Display="None" ValidationGroup="Education" ErrorMessage="There are no selected people." />
 
     <section class="mb-3">
-        <h2 class="h4 mb-3">
-            <i class="far fa-trophy me-1"></i>
-            Achievement Assignment
-        </h2>
 
         <div class="row mb-3">
             <div class="col-md-6">
@@ -27,7 +23,7 @@
                                 Type
                             </label>
                             <div>
-                                <insite:ComboBox ID="SubType" runat="server" AllowBlank="false" />
+                                <insite:ComboBox ID="AchievementType" runat="server" AllowBlank="false" />
                             </div>
                             <div class="form-text"></div>
                         </div>

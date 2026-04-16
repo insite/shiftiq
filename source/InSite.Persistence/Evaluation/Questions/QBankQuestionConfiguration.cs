@@ -35,6 +35,10 @@ namespace InSite.Persistence
             Property(x => x.LastChangeUser).IsUnicode(false).HasMaxLength(100);
             Property(x => x.QuestionType).IsOptional().IsUnicode(false).HasMaxLength(21);
             Property(x => x.QuestionPublicationStatus).IsUnicode(false).HasMaxLength(12);
+            Property(x => x.QuestionPoints).HasPrecision(7, 2);
+            Property(x => x.QuestionCutScore).HasPrecision(7, 2);
+            Property(x => x.QuestionCalculationMethod).IsUnicode(false).HasMaxLength(23);
+            Property(x => x.SetName).IsUnicode(false).HasMaxLength(64);
 
             HasRequired(a => a.Bank).WithMany(b => b.Questions).HasForeignKey(c => c.BankIdentifier).WillCascadeOnDelete(false);
             HasOptional(a => a.Competency).WithMany(b => b.Questions).HasForeignKey(c => c.CompetencyIdentifier).WillCascadeOnDelete(false);

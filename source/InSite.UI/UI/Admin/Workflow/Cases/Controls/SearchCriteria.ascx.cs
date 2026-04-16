@@ -101,7 +101,7 @@ namespace InSite.Admin.Issues.Controls
                     AssigneeName = AssigneeName.Text,
                     LawyerIdentifier = LawyerID.ValueAsGuid,
                     IssueDescription = IssueDescription.Text,
-                    AssigneeEmployer = AssigneeEmployerIdentifiers.Values?.Select(x => (Guid?)x).ToList(),
+                    AssigneeEmployer = AssigneeEmployerIdentifiers.Values,
                     PersonCode = PersonCode.Text,
                     AssigneeOrganization = AssigneeOrganization.Text,
                     TopicDepartmentIdentifier = TopicDepartmentIdentifier.Value,
@@ -141,9 +141,10 @@ namespace InSite.Admin.Issues.Controls
 
                     OnlyRequestedFiles = AttachmentFileStatus.Value == OutstandingOption,
 
-                    TopicUserConnectedFromUserIdentifier = Organization.Toolkits.Issues?.DisplayOnlyConnectedCases == true && HasConnections
-                        ? User.Identifier
-                        : (Guid?)null
+                    TopicUserConnectedFromUserIdentifier = 
+                        !Identity.IsAdministrator && Organization.Toolkits.Issues?.DisplayOnlyConnectedCases == true && HasConnections
+                            ? User.Identifier
+                            : (Guid?)null
                 };
 
                 if (int.TryParse(IssueNumber.Text, out int number))
@@ -170,7 +171,7 @@ namespace InSite.Admin.Issues.Controls
                 LawyerID.ValueAsGuid = value.LawyerIdentifier;
                 MembershipStatus.Values = value.MembershipStatuses;
                 IssueDescription.Text = value.IssueDescription;
-                AssigneeEmployerIdentifiers.Values = value.AssigneeEmployer?.Where(x => x.HasValue).Select(x => x.Value).ToArray();
+                AssigneeEmployerIdentifiers.Values = value.AssigneeEmployer;
                 PersonCode.Text = value.PersonCode;
                 AssigneeOrganization.Text = value.AssigneeOrganization;
                 TopicDepartmentIdentifier.Value = value.TopicDepartmentIdentifier;

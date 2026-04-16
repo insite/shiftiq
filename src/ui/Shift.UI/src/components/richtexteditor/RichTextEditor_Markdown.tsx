@@ -3,6 +3,7 @@ import { ForwardedRef, useEffect, useImperativeHandle, useRef, useState } from "
 import {
     BlockTypeSelect,
     BoldItalicUnderlineToggles,
+    ButtonWithTooltip,
     CreateLink,
     DiffSourceToggleWrapper,
     InsertImage,
@@ -28,6 +29,8 @@ import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
 import { urlHelper } from "@/helpers/urlHelper";
 
 import "@mdxeditor/editor/style.css";
+import Icon from "../icon/Icon";
+import { translate } from "@/helpers/translate";
 
 export interface RichTextEditor_MarkdownRef {
     focus: () => void;
@@ -39,7 +42,9 @@ interface Props {
     disabled: boolean;
     markdown: string;
     disableUploadFile: boolean;
+    enableSelectFile: boolean;
     onUploadFile(file: File): Promise<ApiUploadFileInfo | null>;
+    onSelectFile?(): void,
     onChange: (markdown: string) => void;
     onBlur?: () => void;
 }
@@ -49,7 +54,9 @@ export default function RichTextEditor_Markdown({
     disabled,
     markdown,
     disableUploadFile,
+    enableSelectFile,
     onUploadFile,
+    onSelectFile,
     onChange,
     onBlur
 }: Props) {
@@ -147,6 +154,7 @@ export default function RichTextEditor_Markdown({
         <div ref={wrapperRef} className="markdown">
             <MDXEditor
                 ref={markdownRef}
+                className="light-theme"
                 readOnly={disabled}
                 markdown={markdown}
                 plugins={[
@@ -173,6 +181,16 @@ export default function RichTextEditor_Markdown({
                                 <Separator />
                                 <CreateLink />
                                 {!disableUploadFile && <InsertImage />}
+                                {enableSelectFile && (
+                                    <ButtonWithTooltip
+                                        title={translate("Select Uploaded Image")}
+                                        className="px-1"
+                                        disabled={disabled}
+                                        onClick={onSelectFile}
+                                    >
+                                        <Icon style="regular" name="images" className="text-dark" />
+                                    </ButtonWithTooltip>
+                                )}
                                 <InsertTable />
                             </DiffSourceToggleWrapper>
                         )

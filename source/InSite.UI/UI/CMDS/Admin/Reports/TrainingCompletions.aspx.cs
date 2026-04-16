@@ -159,6 +159,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     AchievementType = x.AchievementLabel,
                     Completed = x.DateCompleted.HasValue ? x.DateCompleted.Value.UtcDateTime : (DateTime?)null,
                     Status = x.CredentialStatus,
+                    Assigned = x.DateAssigned.HasValue ? x.DateAssigned.Value.UtcDateTime : (DateTime?)null,
                     Expired = x.ExpirationDate.HasValue ? x.ExpirationDate.Value.UtcDateTime : (DateTime?)null,
                     Score = x.GradePercent,
                 })
@@ -172,6 +173,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             helper.Map("AchievementType", "Achievement Type", 35, HorizontalAlignment.Left);
             helper.Map("Completed", "Completed", "MMM d, yyyy", 20, HorizontalAlignment.Center);
             helper.Map("Status", "Status", 20, HorizontalAlignment.Left);
+            helper.Map("Assigned", "Assigned", "MMM d, yyyy", 20, HorizontalAlignment.Center);
             helper.Map("Expired", "Expired", "MMM d, yyyy", 20, HorizontalAlignment.Center);
             helper.Map("Score", "Score", "0%", 20, HorizontalAlignment.Center);
 

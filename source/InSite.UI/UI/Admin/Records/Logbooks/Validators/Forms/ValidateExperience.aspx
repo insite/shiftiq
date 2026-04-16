@@ -62,7 +62,7 @@
                                                 <insite:ComboBox runat="server" ID="SkillRating" Width="100px" />
                                             </div>
                                             <div class="form-text">
-                                                This selection applies a skill rating to the entire log entry <i>(optional)</i>.
+                                                <insite:Literal runat="server" Text="[Records.Logbooks.ValidateExperience].[SkillRating].[HelpText]" Mode="Markdown" />
                                             </div>
                                         </div>
 

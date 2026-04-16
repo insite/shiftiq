@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 
 using InSite.Api.Settings;
 using InSite.Application.Groups.Write;
+using InSite.Domain.Banks;
 
 using Shift.Common;
 using Shift.Common.Kernel;
+using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
 using Shift.Common.Timeline.Exceptions;
 using Shift.Sdk.UI;
@@ -40,7 +44,7 @@ namespace InSite.Api
 
     [DisplayName("Timeline")]
     [ApiAuthenticationRequirement(ApiAuthenticationType.Jwt)]
-    public class TimelineController : ApiController
+    public class TimelineController : ApiBaseController
     {
         static readonly string[] _excludeNamespaces = new[]
         {
@@ -51,26 +55,32 @@ namespace InSite.Api
 
         static readonly CommandTypeCollection _types = new CommandTypeCollection(typeof(RenameGroup).Assembly, typeof(Command), _excludeNamespaces);
 
-        static readonly CommandBuilder _commandBuilder = new CommandBuilder(_types, new JsonSerializer2());
+        static readonly JsonSerializer2 _serializer = new JsonSerializer2();
+
+        static readonly CommandBuilder _commandBuilder = new CommandBuilder(_types, _serializer);
 
         [HttpPost]
         [Route("api/timeline/commands")]
-        public HttpResponseMessage ExecuteCommand(string command)
+        public HttpResponseMessage ExecuteCommands()
         {
-            var root = Global.GetRootSentinel();
-            var identity = HttpContext.Current.GetIdentity();
-            if (identity.User.Identifier != root.Identifier)
-                throw new ArgumentException("Only the root account is permitted to invoke this API method.");
-
-            var commandType = _commandBuilder.GetCommandType(command);
+            EnsureRootAccount();
 
             var requestBody = HttpHelper.ReadRequestBody(Request);
-            var commandObject = (Command)_commandBuilder.BuildCommand(commandType, requestBody);
-            var principal = HttpContext.Current.User as IPrincipal;
+            var apiCommands = _serializer.Deserialize<List<ApiCommand>>(requestBody);
+            var commands = new List<ICommand>();
+
+            foreach (var apiCommand in apiCommands)
+            {
+                var commandType = _commandBuilder.GetCommandType(apiCommand.CommandName);
+                var commandObject = (Command)_commandBuilder.BuildCommand(commandType, apiCommand.CommandData);
+
+                commands.Add(commandObject);
+            }
 
             try
             {
-                ServiceLocator.ExecuteCommand(commandObject);
+                foreach (var command in commands)
+                    ServiceLocator.ExecuteCommand(command);
 
                 return HttpHelper.Ok(Request);
             }
@@ -85,6 +95,34 @@ namespace InSite.Api
             {
                 return HttpHelper.ServerError(Request, ex);
             }
+        }
+
+        [HttpGet]
+        [Route("api/timeline/aggregates/{aggregateId}")]
+        public HttpResponseMessage GetAggregateState(Guid aggregateId, string aggregateType)
+        {
+            EnsureRootAccount();
+
+            AggregateState state;
+
+            switch (aggregateType)
+            {
+                case "BankAggregate":
+                    state = ServiceLocator.AggregateSearch.GetState<BankAggregate>(aggregateId);
+                    break;
+                default:
+                    throw new ArgumentException($"aggregateType: {aggregateType}");
+            }
+
+            return state != null ? JsonSuccess(state) : JsonError(new { }, HttpStatusCode.NotFound);
+        }
+
+        private void EnsureRootAccount()
+        {
+            var root = Global.GetRootSentinel();
+            var identity = HttpContext.Current.GetIdentity();
+            if (identity.User.Identifier != root.Identifier)
+                throw new ArgumentException("Only the root account is permitted to invoke this API method.");
         }
     }
 }

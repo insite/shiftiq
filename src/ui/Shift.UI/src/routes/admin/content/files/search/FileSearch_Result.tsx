@@ -1,7 +1,7 @@
 import { translate } from "@/helpers/translate";
 import SearchResult from "@/components/search/SearchResult";
 import { FileRow } from "./FileRow";
-import DateTimeField from "@/routes/_shared/fields/DateTimeField";
+import DateTimeField from "@/components/DateTimeField";
 import { numberHelper } from "@/helpers/numberHelper";
 import { urlHelper } from "@/helpers/urlHelper";
 import Icon from "@/components/icon/Icon";
@@ -29,7 +29,7 @@ export default function FileSearch_Result() {
                 title: translate("File"),
                 item: row => (
                     <>
-                        <Icon style="Regular" name="download" className="me-1" />
+                        <Icon style="regular" name="download" className="me-1" />
                         <a target="_blank" href={urlHelper.getFileUrl(row.fileId, row.fileName)}>{row.documentName}</a>
                         <span className="ms-2 badge bg-info float-end">{row.fileLocation}</span>
                         <div className="form-text text-body-secondary">

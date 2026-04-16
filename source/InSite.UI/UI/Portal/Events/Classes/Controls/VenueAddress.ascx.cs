@@ -41,7 +41,7 @@ namespace InSite.UI.Portal.Events.Classes.Controls
                     : addressText
                 : $"<span class='text-danger'>{Common.LabelHelper.GetTranslation("None")}</span>";
 
-            VenueAddressLabel.InnerText = venueAddressLabel;
+            VenueAddressLabel.Text = venueAddressLabel;
         }
 
         public static string GetAddress(Guid? venueIdentifier, AddressType type)

@@ -3,6 +3,7 @@
 namespace Shift.Api.Workspace;
 
 [ApiController]
+[HybridAuthorize()]
 [ApiExplorerSettings(GroupName = "Workspace API: Pages' Content")]
 public class PageContentController(
     IPageService pageService,
@@ -32,9 +33,9 @@ public class PageContentController(
         return Ok(pageContent);
     }
 
-    [HttpPost("api/workspace/pages-contents/{page:guid}")]
+    [HttpPut("api/workspace/pages-contents/{page:guid}")]
     [HybridPermission("workspace/pages", DataAccess.Read | DataAccess.Update)]
-    [ProducesResponseType<PageContentModel>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Dictionary<int, Guid>>(StatusCodes.Status200OK)]
     [EndpointName("modifyPageContent")]
     public async Task<IActionResult> ModifyAsync([FromRoute] Guid page, [FromBody] PageContentModifyModel modifyModel, CancellationToken cancellation = default)
     {
@@ -48,8 +49,8 @@ public class PageContentController(
             return NotFound();
         }
 
-        await contentModifyService.ModifyPageContentAsync(model, modifyModel, principal.User.Name);
+        var result = await contentModifyService.ModifyPageContentAsync(model, modifyModel, principal.User.Name);
 
-        return Ok();
+        return Ok(result);
     }
 }

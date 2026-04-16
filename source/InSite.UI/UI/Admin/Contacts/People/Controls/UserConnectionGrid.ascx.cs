@@ -44,12 +44,16 @@ namespace InSite.Admin.Contacts.People.Controls
             public string ToUserFullName { get; set; }
             public string ToUserEmail { get; set; }
 
+            public bool IsLeader { get; set; }
             public bool IsManager { get; set; }
             public bool IsSupervisor { get; set; }
             public bool IsValidator { get; set; }
 
             public IEnumerable<LabelInfo> GetAttributes()
             {
+                if (IsLeader)
+                    yield return new LabelInfo("custom-default", "Leader");
+
                 if (IsManager)
                     yield return new LabelInfo("custom-default", "Manager");
 
@@ -246,6 +250,7 @@ namespace InSite.Admin.Contacts.People.Controls
                     ToUserFullName = x.ToUser.FullName,
                     ToUserEmail = x.ToUser.Email,
 
+                    IsLeader = x.IsLeader,
                     IsManager = x.IsManager,
                     IsSupervisor = x.IsSupervisor,
                     IsValidator = x.IsValidator,

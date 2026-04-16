@@ -34,7 +34,7 @@ function onLoad<T>(
     }
 
     try {
-        const result = requestHelper.afterRequest(xhr.status === 200, xhr.status, json);
+        const result = requestHelper.afterRequest(xhr.status === 200, xhr.status, xhr.getResponseHeader("X-Session-Refreshed"), json, false);
         resolve(result as (T | null));
     } catch (err) {
         reject(err);

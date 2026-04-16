@@ -16,6 +16,12 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <Compile Remove="Service\Messaging\Messages\Process\Read\Handlers\EmailProcessor.cs" />
+    <Compile Remove="Service\Messaging\Messages\Process\Read\Interfaces\IEmailStore.cs" />
+    <Compile Remove="Service\Messaging\Messages\State\Changes\EmailScheduled.cs" />
+  </ItemGroup>
+	
+  <ItemGroup>
     <EmbeddedResource Include="UI\Navigation\sidebar-cmds.json" />
     <EmbeddedResource Include="UI\Navigation\sidebar.json" />
   </ItemGroup>
@@ -43,6 +49,7 @@
 
   <ItemGroup>
     <Folder Include="Service\Security\Partitions\State\" />
+    <Folder Include="UI\Layout\Common\Controls\Server\Buttons\" />
   </ItemGroup>
 
 </Project>

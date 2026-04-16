@@ -96,7 +96,7 @@ namespace Shift.Common
         ///     Returns true if the text ends with any one of the values in the
         ///     array. This function is not case-sensitive.
         /// </summary>
-        public static bool EndsWithAny(string text, string[] values)
+        public static bool EndsWithAny(string text, IEnumerable<string> values)
         {
             if (text == null)
                 throw new ArgumentNullException(nameof(text));
@@ -148,12 +148,12 @@ namespace Shift.Common
         ///     Returns true if the text equals any one of the values in the
         ///     array. This function is not case-sensitive.
         /// </summary>
-        public static bool EqualsAny(string text, string[] values)
+        public static bool EqualsAny(string text, IList<string> values)
         {
             if (values == null)
                 throw new ArgumentNullException(nameof(values));
 
-            for (var i = 0; i < values.Length; i++)
+            for (var i = 0; i < values.Count; i++)
             {
                 if (Equals(text, values[i]))
                     return true;

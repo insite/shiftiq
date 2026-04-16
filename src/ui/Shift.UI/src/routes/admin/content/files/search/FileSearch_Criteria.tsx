@@ -5,7 +5,7 @@ import { useSearch } from "@/components/search/Search";
 import SearchCriteria from "@/components/search/SearchCriteria";
 import { FileCriteria } from "./FileCriteria";
 import ControlledDatePicker from "@/components/date/ControlledDatePicker";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import OrganizationFinder from "@/routes/_shared/finders/OrganizationFinder";
 import FileObjectTypeComboBox from "@/routes/_shared/comboboxes/FileObjectTypeComboBox";
 import FileVisibilityComboBox from "@/routes/_shared/comboboxes/FileVisibilityComboBox";

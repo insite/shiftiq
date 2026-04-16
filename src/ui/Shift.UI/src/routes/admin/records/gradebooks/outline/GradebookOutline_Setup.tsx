@@ -84,9 +84,9 @@ export default function GradebookOutline_Setup({ model, isSaving, onLock }: Prop
                     <FormField label="Current Status" description="Changes to a locked gradebook are not permitted.">
                         {model ? (
                             model.isLocked ? (
-                                <span className='badge bg-danger'><Icon style="Regular" name="lock" /> Locked</span>
+                                <span className='badge bg-danger'><Icon style="regular" name="lock" /> Locked</span>
                             ) : (
-                                <span className='badge bg-success'><Icon style="Regular" name="lock-open" /> Unlocked</span>
+                                <span className='badge bg-success'><Icon style="regular" name="lock-open" /> Unlocked</span>
                             )
                         ) : (
                             textHelper.none()

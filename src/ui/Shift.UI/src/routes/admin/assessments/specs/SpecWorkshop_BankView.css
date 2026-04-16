@@ -1,0 +1,20 @@
+.table.table-bankview {
+    > thead > tr > th {
+        background-color: white;
+    }
+
+    > tbody > tr[data-competency] > td.cell-t1-actual,
+    > tbody > tr[data-competency] > td.cell-t2-actual,
+    > tbody > tr[data-competency] > td.cell-t3-actual {
+        background-color: #f9f9f9;
+    }
+}
+
+.table-danger {
+    background-color: #ecdede !important;
+}
+
+.table-success {
+    background-color: #92cf77 !important;
+    color: #fff !important;
+}

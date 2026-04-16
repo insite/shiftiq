@@ -11,6 +11,8 @@ namespace InSite.Application.Banks.Read
 {
     public class QBankQuestion
     {
+        public QBankQuestion() { }
+
         public Guid BankIdentifier { get; set; }
         public Guid? CompetencyIdentifier { get; set; }
         public Guid OrganizationIdentifier { get; set; }
@@ -34,14 +36,22 @@ namespace InSite.Application.Banks.Read
         public string QuestionText { get; set; }
         public string QuestionType { get; set; }
         public string QuestionPublicationStatus { get; set; }
+        public string QuestionCalculationMethod { get; set; }
+        public string SetName { get; set; }
+        public string SubStandardIdentifiers { get; set; }
+        public string CreateUser { get; set; }
 
         public int BankIndex { get; set; }
         public int? BankSubIndex { get; set; }
         public int? QuestionDifficulty { get; set; }
         public int? QuestionTaxonomy { get; set; }
 
+        public decimal? QuestionPoints { get; set; }
+        public decimal? QuestionCutScore { get; set; }
+
         public DateTimeOffset? LastChangeTime { get; set; }
         public DateTimeOffset? QuestionFirstPublished { get; set; }
+        public DateTimeOffset? CreateTime { get; set; }
 
         public virtual QBank Bank { get; set; }
         public virtual VCompetency Competency { get; set; }

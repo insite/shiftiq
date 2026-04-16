@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -8,6 +9,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using Shift.Common;
+using Shift.Common.Json;
+using Shift.Common.Kernel;
+using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
 
 namespace Shift.Toolbox
@@ -18,7 +22,7 @@ namespace Shift.Toolbox
         private readonly SecuritySettings _security;
         private readonly int _lifetimeLimitInSecond;
         private readonly HttpClient _http;
-        private readonly JsonSerializer2 _serializer = new JsonSerializer2();
+        private readonly Serializer _serializer = new Serializer();
 
         public TimelineClient(string apiBaseUrl, SecuritySettings security, int lifetimeLimitInSeconds = JwtRequest.DefaultLifetime)
         {
@@ -31,19 +35,66 @@ namespace Shift.Toolbox
             };
         }
 
-        public async Task<ApiResult> QueueCommandAsync(ICommand command, string token)
+        public async Task<ApiResult<StateType>> GetAggregateStateAsync<AggregateType, StateType>(Guid aggregateId, string token)
+            where AggregateType : AggregateRoot
+            where StateType : AggregateState
         {
-            var commandName = command.GetType().Name.ToKebabCase();
-            var serialized = _serializer.Serialize(command);
+            var aggregateType = typeof(AggregateType).Name;
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/timeline/aggregates/{aggregateId}?aggregateType={aggregateType}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            return await QueueCommandAsync(commandName, serialized, token);
+            var response = await _http.SendAsync(request);
+            var result = new ApiResult<StateType>(response.StatusCode, response.Headers);
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (result.IsOK())
+                result.Data = _serializer.Deserialize<StateType>(responseContent);
+            else
+                result.Problem = Problem.Deserialize(responseContent);
+
+            return result;
         }
 
-        public async Task<ApiResult> QueueCommandAsync(string name, string data, string token)
+        public async Task<ApiResult> QueueCommandsAsync(IEnumerable<ICommand> commands, string token)
         {
-            var content = new StringContent(data, Encoding.UTF8, "application/json");
+            var apiCommands = commands.Select(x =>
+            {
+                var type = x.GetType();
+                string name = null;
 
-            var request = new HttpRequestMessage(HttpMethod.Post, $"api/timeline/commands?command={name}");
+                if (type.Namespace == "InSite.Application.Banks.Write")
+                {
+                    switch (type.Name)
+                    {
+                        case "PostComment":
+                            name = "post-bank-comment";
+                            break;
+                        case "AddAttachment":
+                            name = "add-bank-attachment";
+                            break;
+                    }
+                }
+
+                if (name == null)
+                    name = type.Name.ToKebabCase();;
+
+                return new ApiCommand
+                {
+                    CommandName = name,
+                    CommandData = _serializer.SerializeCommandForApi(x)
+                };
+            });
+
+            return await QueueCommandsAsync(apiCommands, token);
+        }
+
+        public async Task<ApiResult> QueueCommandsAsync(IEnumerable<ApiCommand> commands, string token)
+        {
+            var serialized = _serializer.Serialize(commands);
+            var content = new StringContent(serialized, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/timeline/commands");
             request.Content = content;
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

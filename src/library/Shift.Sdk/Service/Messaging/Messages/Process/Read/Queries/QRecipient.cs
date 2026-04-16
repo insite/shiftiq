@@ -23,6 +23,7 @@ namespace InSite.Application.Messages.Read
 
         public DateTimeOffset? DeliveryCompleted { get; set; }
         public DateTimeOffset? DeliveryStarted { get; set; }
+        public DateTime? DeliveryCallbackTimestamp { get; set; }
     }
 
     public class QCarbonCopy

@@ -76,6 +76,18 @@ namespace Shift.Service.Content
             return EntitiesToModels(files, includeClaims);
         }
 
+        public async Task<List<FileStorageModel>> GetModelsAsync(Guid[] fileIdentifiers, bool includeClaims)
+        {
+            using var db = _tables.CreateDbContext();
+
+            var files = await db.TFile
+                .AsNoTracking()
+                .Where(x => fileIdentifiers.Any(id => id == x.FileIdentifier))
+                .ToListAsync();
+
+            return EntitiesToModels(files, includeClaims);
+        }
+
         public async Task<List<FileStorageModel>> GetExpiredModelsAsync(DateTimeOffset expiredAt)
         {
             using var db = _tables.CreateDbContext();

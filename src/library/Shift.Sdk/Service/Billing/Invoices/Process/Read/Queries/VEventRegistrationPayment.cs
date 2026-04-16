@@ -10,6 +10,7 @@ namespace InSite.Application.Invoices.Read
         public Guid PaymentIdentifier { get; set; }
 
         public string EmployerName { get; set; }
+        public string EmployerStatus { get; set; }
         public string EventName { get; set; }
         public string LearnerAttendee { get; set; }
         public string LearnerCode { get; set; }

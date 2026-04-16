@@ -1,1 +1,1 @@
-export type IconStyle = "Brands" | "Regular" | "Solid" | "Light";
+export type IconStyle = "brands" | "regular" | "solid" | "light";

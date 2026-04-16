@@ -51,6 +51,78 @@ namespace InSite.Admin.Assessments.Banks.Forms
         protected global::InSite.Common.Web.UI.CheckBox IncludeAdminComments;
 
         /// <summary>
+        /// ExcludeHiddenComments control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox ExcludeHiddenComments;
+
+        /// <summary>
+        /// QuestionTaxonomy control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TaxonomyMultiComboBox QuestionTaxonomy;
+
+        /// <summary>
+        /// QuestionCondition control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.QuestionConditionMultiComboBox QuestionCondition;
+
+        /// <summary>
+        /// IsQuestionHasLig control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.BooleanComboBox IsQuestionHasLig;
+
+        /// <summary>
+        /// IsQuestionHasReference control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.BooleanComboBox IsQuestionHasReference;
+
+        /// <summary>
+        /// QuestionFlag control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FlagMultiComboBox QuestionFlag;
+
+        /// <summary>
+        /// CompetencyField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CompetencyField;
+
+        /// <summary>
+        /// AreaRepeater control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater AreaRepeater;
+
+        /// <summary>
         /// BuildImagesButton control.
         /// </summary>
         /// <remarks>
@@ -76,6 +148,15 @@ namespace InSite.Admin.Assessments.Banks.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Button BuildQuestionsCompact;
+
+        /// <summary>
+        /// BuildQuestionsExternal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button BuildQuestionsExternal;
 
         /// <summary>
         /// GoBackButton control.

@@ -483,7 +483,7 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
                 ? "Select an achievement to enable sign-off"
                 : !typeSupportsSignOff
                     ? "Sign-off is not available for this achievement"
-                    : "Learners can sign off on this achievement themselves";
+                    : "Learner can sign off on this achievement themself";
         }
 
         #endregion

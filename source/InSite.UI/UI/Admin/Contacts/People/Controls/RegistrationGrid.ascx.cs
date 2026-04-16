@@ -29,6 +29,8 @@ namespace InSite.Admin.Contacts.People.Controls
             set => ViewState[nameof(UserIdentifier)] = value;
         }
 
+        private ReturnUrl _returnUrl = null;
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -36,6 +38,7 @@ namespace InSite.Admin.Contacts.People.Controls
             FilterButton.Click += FilterButton_Click;
 
             Grid.EnablePaging = false;
+            Grid.DataBinding += Grid_DataBinding;
             Grid.RowDataBound += Grid_ItemDataBound;
         }
 
@@ -65,6 +68,11 @@ namespace InSite.Admin.Contacts.People.Controls
             Clear(new NullFilter());
         }
 
+        private void Grid_DataBinding(object sender, EventArgs e)
+        {
+            _returnUrl = new ReturnUrl($"contact={UserIdentifier}&panel=registrations");
+        }
+
         private void Grid_ItemDataBound(object sender, GridViewRowEventArgs e)
         {
             if (!IsContentItem(e))
@@ -86,14 +94,14 @@ namespace InSite.Admin.Contacts.People.Controls
             var registrtaionLink = (IconLink)e.Row.FindControl("RegistrtaionLink");
             registrtaionLink.Visible = isClass || isExam;
             registrtaionLink.NavigateUrl = isClass
-                ? new ReturnUrl($"contact={UserIdentifier}&panel=registrations").GetRedirectUrl($"/ui/admin/registrations/classes/edit?id={registrationIdentifier}&user=1")
-                : new ReturnUrl($"contact={UserIdentifier}&panel=registrations").GetRedirectUrl($"/ui/admin/registrations/exams/edit?registration={registrationIdentifier}");
+                ? _returnUrl.GetRedirectUrl($"/ui/admin/registrations/classes/edit?id={registrationIdentifier}&user=1")
+                : _returnUrl.GetRedirectUrl($"/ui/admin/registrations/exams/edit?registration={registrationIdentifier}");
 
             var deleteLink = (IconLink)e.Row.FindControl("DeleteLink");
             deleteLink.Visible = isClass || isExam;
             deleteLink.NavigateUrl = isClass
-                ? new ReturnUrl($"contact={UserIdentifier}&panel=registrations").GetRedirectUrl($"/ui/admin/registrations/classes/delete?id={registrationIdentifier}")
-                : new ReturnUrl($"contact={UserIdentifier}&panel=registrations").GetRedirectUrl($"/ui/admin/registrations/exams/delete?id={registrationIdentifier}");
+                ? _returnUrl.GetRedirectUrl($"/ui/admin/registrations/classes/delete?id={registrationIdentifier}")
+                : _returnUrl.GetRedirectUrl($"/ui/admin/registrations/exams/delete?id={registrationIdentifier}");
         }
 
         private void FilterButton_Click(object sender, EventArgs e)

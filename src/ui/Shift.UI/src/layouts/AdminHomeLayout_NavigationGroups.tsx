@@ -1,6 +1,6 @@
 import { Fragment } from "react/jsx-runtime";
 import ActionLink from "@/components/ActionLink";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 
 export default function AdminHomeLayout_NavigationGroups() {
     const { siteSetting } = useSiteProvider();

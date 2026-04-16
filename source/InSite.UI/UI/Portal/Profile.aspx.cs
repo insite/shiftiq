@@ -254,7 +254,7 @@ namespace InSite.UI.Portal
         {
             FeatureFlagCard.Visible = Identity.IsAdministrator && ServiceLocator.AppSettings.Environment.IsPreProduction();
 
-            FeatureFlagHeading.InnerText = ServiceLocator.Partition.Name + " Feature Flags";
+            FeatureFlagHeading.InnerText = ServiceLocator.Partition.Brand + " Feature Flags";
 
             var (user, person) = GetUserAndPerson();
 

@@ -123,7 +123,10 @@ namespace Shift.Common
         ProxyAgent,
 
         [EnumMember(Value = "proxy_subject")]
-        ProxySubject
+        ProxySubject,
+
+        [EnumMember(Value = "proxy_agent_email")]
+        ProxyAgentEmail,
     }
 
     public static class ClaimNameExtensions

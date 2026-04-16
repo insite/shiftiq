@@ -40,6 +40,14 @@
                     </div>
 
                     <div class="mb-2">
+                        <insite:TextBox runat="server" ID="CandidateCode" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:TextBox runat="server" ID="CandidateEmail" EmptyMessage="Email" />
+                    </div>
+
+                    <div class="mb-2">
                         <insite:TextBox runat="server" ID="AssessorName" EmptyMessage="Assessor Name" />
                     </div>
 

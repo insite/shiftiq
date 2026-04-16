@@ -42,6 +42,7 @@ namespace InSite.Application.Attempts.Read
         public string LearnerCompany { get; set; }
         public string LearnerEmail { get; set; }
         public string LearnerName { get; set; }
+        public string LearnerCode { get; set; }
         public string Event { get; set; }
         public string EventFormat { get; set; }
         public string BankLevel { get; set; }

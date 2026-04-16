@@ -35,6 +35,8 @@ namespace Shift.Common
         /// </summary>
         string SerializeCommand(ICommand command);
 
+        string SerializeCommandForApi(ICommand command);
+
         /// <summary>
         /// Returns the serialized string value for a change.
         /// </summary>

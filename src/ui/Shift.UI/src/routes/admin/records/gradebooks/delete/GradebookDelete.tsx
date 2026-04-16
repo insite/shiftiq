@@ -1,6 +1,6 @@
 import { shiftClient } from "@/api/shiftClient";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { TimeZoneId } from "@/helpers/date/timeZones";
 import { GradebookDeleteModel } from "./GradebookDeleteModel";
 import DeleteForm from "@/routes/_shared/forms/DeleteForm";

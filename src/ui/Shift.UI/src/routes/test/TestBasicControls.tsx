@@ -4,7 +4,7 @@ import TestFinder from "@/routes/test/TestFinder";
 import FormField from "@/components/form/FormField";
 import DatePicker from "@/components/date/DatePicker";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import MultiSelect from "@/components/multiselect/MultiSelect";
 import FileUpload from "@/components/fileupload/FileUpload";
 

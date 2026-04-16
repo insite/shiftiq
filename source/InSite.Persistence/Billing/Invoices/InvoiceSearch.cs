@@ -70,11 +70,20 @@ namespace InSite.Persistence
         {
             using (var db = CreateContext())
             {
-                return CreateInvoiceQuery(filter, db, includes)
-                    .OrderByDescending(x => x.InvoiceSubmitted)
-                    .ThenBy(x => x.CustomerFullName)
-                    .ApplyPaging(filter)
-                    .ToList();
+                var query = CreateInvoiceQuery(filter, db, includes);
+
+                if (filter.OrderBy.IsEmpty())
+                {
+                    query = query
+                        .OrderByDescending(x => x.InvoiceSubmitted)
+                        .ThenBy(x => x.CustomerFullName);
+                }
+                else
+                {
+                    query = query.OrderBy(filter.OrderBy);
+                }
+
+                return query.ApplyPaging(filter).ToList();
             }
         }
 

@@ -27,13 +27,22 @@ namespace InSite.Admin.Assessments.Attachments.Controls
         public void LoadData(Question question)
         {
             var attachments = question.Set.Bank.EnumerateAllAttachments().Where(x => question.AttachmentIdentifiers.Contains(x.Identifier));
-            var uploads = UploadSearch
-                .Bind(x => new { x.UploadIdentifier, x.Name, x.NavigateUrl, x.ContentSize, x.Uploaded }, attachments)
-                .ToDictionary(x => x.UploadIdentifier);
 
-            var data = attachments.Where(x => uploads.ContainsKey(x.Upload)).Select(x =>
+            var uploads = UploadSearch
+                .Bind(x => new { Identifier = x.UploadIdentifier, NavigateUrl = "/files" + x.NavigateUrl }, attachments);
+
+            var files = ServiceLocator.FileSearch
+                .GetModels(attachments.Where(x => x.FileIdentifier.HasValue).Select(x => x.FileIdentifier.Value).ToArray(), false)
+                .Select(x => new { Identifier = x.FileIdentifier, NavigateUrl = ServiceLocator.StorageService.GetFileUrl(x) })
+                .ToList();
+
+            files.AddRange(uploads);
+
+            var dictionary = files.ToDictionary(x => x.Identifier);
+
+            var data = attachments.Where(x => dictionary.ContainsKey(x.FileIdentifier ?? x.Upload)).Select(x =>
             {
-                var upload = uploads[x.Upload];
+                var upload = dictionary[x.FileIdentifier ?? x.Upload];
 
                 return new
                 {
@@ -41,7 +50,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                     AssetNumber = x.Asset,
                     AssetVersion = x.AssetVersion,
                     Title = (x.Content?.Title.Default).IfNullOrEmpty("(Untitled)"),
-                    Url = "/files" + upload.NavigateUrl,
+                    Url = upload.NavigateUrl,
                     PublicationStatus = x.PublicationStatus.GetDescription(),
                 };
             }).OrderBy(x => x.Title).ThenBy(x => x.AssetNumber).ToArray();

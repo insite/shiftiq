@@ -1,5 +1,5 @@
 import { Params, RouteObject } from "react-router";
-import { CustomBreadcrumbItem, FormRoute, formRoutes } from "./formRoutes";
+import { CustomBreadcrumbItem, FormRoute, formRoutes } from "./_formroutes/formRoutes";
 
 const _list: FormRoute[] = [];
 

@@ -18,8 +18,9 @@ namespace InSite.Application.Contacts.Read
 
         public string UserEmail { get; set; }
         public string UserEmailAlternate { get; set; }
-        public string UserFirstName { get; set; }
         public string UserFullName { get; set; }
+        public string UserFirstName { get; set; }
+        public string UserMiddleName { get; set; }
         public string UserLastName { get; set; }
         public string UserPhoneMobile { get; set; }
         public string UserTimeZone { get; set; }

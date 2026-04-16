@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
 using Shift.Contract.Presentation;
+using Shift.Sdk.Service.Security.Cookies;
 
 namespace Shift.Api;
 
@@ -21,6 +22,7 @@ public class MeController : ControllerBase
     private readonly IPrincipalProvider _principalProvider;
     private readonly PermissionCache _permissionCache;
     private readonly IReactService _reactService;
+    private readonly ICookieService _cookieService;
 
     /// <summary>
     /// Initializes a new instance
@@ -28,12 +30,14 @@ public class MeController : ControllerBase
     /// <param name="principalProvider">Service for retrieving user identity and principal information.</param>
     /// <param name="permissionCache">Cached permissions for all organization accounts.</param>
     /// <param name="reactService">Service for building React-specific site settings and configuration.</param>
+    /// <param name="cookieService">Service for managing cookies.</param>
     /// <exception cref="ArgumentNullException">Thrown when any required service is null.</exception>
-    public MeController(IPrincipalProvider principalProvider, PermissionCache permissionCache, IReactService reactService)
+    public MeController(IPrincipalProvider principalProvider, PermissionCache permissionCache, IReactService reactService, ICookieService cookieService)
     {
         _principalProvider = principalProvider ?? throw new ArgumentNullException(nameof(principalProvider));
         _permissionCache = permissionCache;
         _reactService = reactService ?? throw new ArgumentNullException(nameof(reactService));
+        _cookieService = cookieService ?? throw new ArgumentNullException(nameof(cookieService));
     }
 
     /// <summary>
@@ -65,6 +69,14 @@ public class MeController : ControllerBase
         var principal = _principalProvider.GetPrincipal();
 
         var settings = await _reactService.RetrieveSiteSettingsAsync(principal, refresh);
+
+        // Refresh session
+        if (principal?.Identity?.IsAuthenticated == true)
+        {
+            var token = _cookieService.GetCookieToken();
+            if (token != null)
+                _cookieService.AppendSecurityCookie(token);
+        }
 
         return Ok(settings);
     }

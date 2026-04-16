@@ -477,23 +477,25 @@
         </asp:Repeater>
     </insite:Container>
 
-    <script type="text/javascript">
-        (function () {
-            var questions = document.querySelectorAll('table.question');
-            if (questions.length > 0) {
-                var lastTable = questions[questions.length - 1];
-                lastTable.style.marginBottom = '0 !important';
+    <insite:Container runat="server" ID="FooterScript">
+        <script type="text/javascript">
+            (function () {
+                var questions = document.querySelectorAll('table.question');
+                if (questions.length > 0) {
+                    var lastTable = questions[questions.length - 1];
+                    lastTable.style.marginBottom = '0 !important';
 
-                var tBody = lastTable.querySelector('tbody');
-                if (!tBody)
-                    tBody = lastTable;
+                    var tBody = lastTable.querySelector('tbody');
+                    if (!tBody)
+                        tBody = lastTable;
 
-                var lastTr = document.createElement('tr');
-                lastTr.innerHTML = '<td colspan="2" style="padding-top:2.23em; text-align:center; font-weight:bold;">THIS IS THE FINAL PAGE OF QUESTIONS IN THIS EXAM</td>';
-                tBody.appendChild(lastTr);
-            }
-        })();
-    </script>
+                    var lastTr = document.createElement('tr');
+                    lastTr.innerHTML = '<td colspan="2" style="padding-top:2.23em; text-align:center; font-weight:bold;">THIS IS THE FINAL PAGE OF QUESTIONS IN THIS EXAM</td>';
+                    tBody.appendChild(lastTr);
+                }
+            })();
+        </script>
+    </insite:Container>
 
     <script type="text/javascript">
         (function () {

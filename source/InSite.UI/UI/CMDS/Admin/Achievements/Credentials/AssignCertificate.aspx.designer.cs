@@ -33,13 +33,13 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         protected global::System.Web.UI.WebControls.CustomValidator EmployeeRequired;
 
         /// <summary>
-        /// SubType control.
+        /// AchievementType control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.ComboBox SubType;
+        protected global::InSite.Common.Web.UI.ComboBox AchievementType;
 
         /// <summary>
         /// Category control.

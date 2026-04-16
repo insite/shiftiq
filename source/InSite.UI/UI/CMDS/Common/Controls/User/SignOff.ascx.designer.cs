@@ -51,15 +51,6 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl StatusPanel;
 
         /// <summary>
-        /// ProgramOnlyAchievementSummary control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ProgramOnlyAchievementSummary;
-
-        /// <summary>
         /// TimeSensitivePanel control.
         /// </summary>
         /// <remarks>

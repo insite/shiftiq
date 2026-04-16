@@ -58,7 +58,7 @@ namespace InSite.UI.Layout.Portal.Controls
                 if (portalPage is IHasTitle p)
                     title = p.GetTitle();
 
-                PageTitle = (qualifier ?? title) + spacer + ServiceLocator.Partition.Name;
+                PageTitle = (qualifier ?? title) + spacer + ServiceLocator.Partition.Brand;
 
                 ActionTitle.Text = qualifier ?? title;
 
@@ -82,7 +82,7 @@ namespace InSite.UI.Layout.Portal.Controls
         public void BindTitleAndSubtitleNoTranslate(string pageTitle, string screenTitle, string screenSubtitle, string spacer = " - ")
         {
             if (Page is PortalBasePage)
-                PageTitle = pageTitle + spacer + ServiceLocator.Partition.Name;
+                PageTitle = pageTitle + spacer + ServiceLocator.Partition.Brand;
 
             ActionTitle.Text = screenTitle;
             ActionSubtitle.InnerHtml = screenSubtitle;
@@ -95,7 +95,7 @@ namespace InSite.UI.Layout.Portal.Controls
         public void BindTitleAndSubtitle(string pageTitle, string screenTitle, string screenSubtitle, string spacer = " - ")
         {
             if (Page is PortalBasePage)
-                PageTitle = pageTitle + spacer + ServiceLocator.Partition.Name;
+                PageTitle = pageTitle + spacer + ServiceLocator.Partition.Brand;
 
             ActionTitle.Text = GetDisplayText(screenTitle);
             ActionSubtitle.InnerHtml = GetDisplayText(screenSubtitle);

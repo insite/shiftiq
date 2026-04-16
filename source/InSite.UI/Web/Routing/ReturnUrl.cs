@@ -322,6 +322,42 @@ namespace InSite
             }
         }
 
+        private class ReturnParameter : BaseParameter
+        {
+            public ReturnParameter()
+                : base("return")
+            {
+
+            }
+
+            public override string Read(BinaryReader reader)
+            {
+                var type = reader.ReadChar();
+                if (type == '.')
+                    return reader.ReadString();
+
+                var length = reader.ReadUInt16();
+                var value = reader.ReadBytes(length);
+
+                return HttpServerUtility.UrlTokenEncode(value);
+            }
+
+            public override void Write(BinaryWriter writer, string value)
+            {
+                if (!string.IsNullOrEmpty(value) && value.StartsWith("."))
+                {
+                    writer.Write('.');
+                    writer.Write(value);
+                    return;
+                }
+
+                var data = HttpServerUtility.UrlTokenDecode(value);
+
+                writer.Write((ushort)data.Length);
+                writer.Write(data);
+            }
+        }
+
         #endregion
 
         #region  Classes (other)
@@ -531,7 +567,7 @@ namespace InSite
             _parameters.AddDefined(new GuidParameter("attachment"));
             _parameters.AddDefined(new GuidParameter("comment"));
             _parameters.AddDefined(new EnumParameter("panel", new[] { "attachments", "comments", "questions", "content", "candidates", "permission", "referral" }));
-            _parameters.AddDefined(new EnumParameter("tab", new[] { "fields", "title", "summary", "materials", "section", "body" }));
+            _parameters.AddDefined(new EnumParameter("tab", new[] { "fields", "title", "summary", "materials", "section", "body", "enrollments" }));
             _parameters.AddDefined(new GuidParameter("course"));
             _parameters.AddDefined(new GuidParameter("task"));
             _parameters.AddDefined(new GuidParameter("resource"));
@@ -541,12 +577,13 @@ namespace InSite
             _parameters.AddDefined(new GuidParameter("user"));
             _parameters.AddDefined(new GuidParameter("group"));
             _parameters.AddDefined(new Base64Parameter("filter"));
-            _parameters.AddDefined(new Base64Parameter("return"));
+            _parameters.AddDefined(new ReturnParameter());
             _parameters.AddDefined(new GuidParameter("journal"));
             _parameters.AddDefined(new GuidParameter("journalsetup"));
             _parameters.AddDefined(new GuidParameter("experience"));
             _parameters.AddDefined(new GuidParameter("event"));
             _parameters.AddDefined(new GuidParameter("id"));
+            _parameters.AddDefined(new GuidParameter("program"));
         }
 
         #endregion
@@ -556,12 +593,19 @@ namespace InSite
         private WebUrl _currentUrl;
         private WebUrl _returnUrl;
         private ReturnState _returnState;
+        private string _explicitReturnUrl;
 
         public ReturnUrl()
         {
             _currentUrl = HttpRequestHelper.GetCurrentWebUrl();
             _returnUrl = _currentUrl.Copy();
-            _returnState = ReturnState.FromToken(_currentUrl.QueryString["return"]);
+
+            var r = _currentUrl.QueryString["return"];
+
+            if (!string.IsNullOrEmpty(r) && r.Length > 1 && r[0] == '.')
+                _explicitReturnUrl = r.Substring(1);
+            else
+                _returnState = ReturnState.FromToken(r);
         }
 
         private ReturnUrl(ReturnUrl url)
@@ -659,6 +703,9 @@ namespace InSite
 
         public string GetReturnUrl(string required = null, string @override = null, string append = null)
         {
+            if (!string.IsNullOrEmpty(_explicitReturnUrl))
+                return _explicitReturnUrl;
+
             var requiredData = ParseDataQuery(required);
             var overrideData = ParseDataQuery(@override);
             var appendData = ParseDataQuery(append);

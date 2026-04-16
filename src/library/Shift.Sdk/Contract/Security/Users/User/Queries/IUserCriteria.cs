@@ -8,6 +8,7 @@ namespace Shift.Contract
     {
         QueryFilter Filter { get; set; }
 
+        Guid[] UserIds { get; set; }
         string UserEmailExact { get; set; }
         string UserFullNameContains { get; set; }
     }

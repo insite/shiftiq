@@ -106,6 +106,11 @@ public class CookieAuthenticationHandler : AuthenticationHandler<CookieAuthentic
             list.Add(_converter.ToClaim(ClaimName.UserId, claims.UserIdentifier.Value.ToString()));
         }
 
+        if (!string.IsNullOrEmpty(claims.ImpersonatorUser))
+        {
+            list.Add(_converter.ToClaim(ClaimName.ProxyAgentEmail, claims.ImpersonatorUser));
+        }
+
         foreach (var role in claims.UserRoles)
         {
             list.Add(_converter.ToClaim(ClaimName.Role, role.ToString()));

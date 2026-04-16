@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 
 using InSite.Admin.Assessments.Attempts.Utilities;
 using InSite.Application.Attempts.Read;
+using InSite.Common;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
@@ -37,6 +38,8 @@ namespace InSite.Admin.Attempts.Reports.Controls
                     LearnerUserIdentifier = ExamCandidateID.Value,
                     BankLevel = ExamBankLevel.Value,
                     LearnerName = CandidateName.Text,
+                    LearnerCode = CandidateCode.Text,
+                    LearnerEmail = CandidateEmail.Text,
                     AssessorName = AssessorName.Text,
                     EventIdentifier = ExamEventID.Value,
                     EventFormat = EventFormat.Value,
@@ -85,6 +88,8 @@ namespace InSite.Admin.Attempts.Reports.Controls
                 ExamBankLevel.Value = value.BankLevel;
 
                 CandidateName.Text = value.LearnerName;
+                CandidateCode.Text = value.LearnerCode;
+                CandidateEmail.Text = value.LearnerEmail;
                 AssessorName.Text = value.AssessorName;
                 ExamCandidateID.Value = value.LearnerUserIdentifier;
 
@@ -169,6 +174,10 @@ namespace InSite.Admin.Attempts.Reports.Controls
                     GradingAssessor.EmptyOnLoad = false;
                 }
             }
+
+            var personCodeLabel = LabelHelper.GetLabelContentText("Person Code");
+            CandidateCode.EmptyMessage = personCodeLabel;
+            CustomValidator.ErrorMessage = $"Please select 'Exam Bank' or 'Exam Candidate Name' or 'Exam Candidate {personCodeLabel}' or 'Exam Candidate Email'";
         }
 
         private void ExamBankFrameworkID_ValueChanged(object sender, EventArgs e) => OnExamBankFrameworkSelected();
@@ -188,7 +197,7 @@ namespace InSite.Admin.Attempts.Reports.Controls
 
         protected void CustomValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
-            args.IsValid = ExamBankID.HasValue || CandidateName.Text.HasValue();
+            args.IsValid = ExamBankID.HasValue || CandidateName.Text.HasValue() || CandidateCode.Text.HasValue() || CandidateEmail.Text.HasValue();
         }
 
         private void ExamBankID_ValueChanged(object sender, EventArgs e) => OnExamBankSelected();
@@ -235,6 +244,8 @@ namespace InSite.Admin.Attempts.Reports.Controls
             ExamBankLevel.Value = null;
 
             CandidateName.Text = null;
+            CandidateCode.Text = null;
+            CandidateEmail.Text = null;
             AssessorName.Text = null;
 
             ExamEventID.Value = null;

@@ -137,7 +137,6 @@
                                     <div class="form-group mb-3">
                                         <label class="form-label">
                                             Department
-                                            <insite:RequiredValidator runat="server" ControlToValidate="FindDepartment" FieldName="Department" ValidationGroup="Report" />
                                         </label>
                                         <cmds:FindDepartment runat="server" ID="FindDepartment" MaxSelectionCount="0" CausesValidation="true" ValidationGroup="Other" EmptyMessage="All departments" />
                                     </div>

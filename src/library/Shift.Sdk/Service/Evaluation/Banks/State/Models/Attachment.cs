@@ -38,6 +38,11 @@ namespace InSite.Domain.Banks
         public Guid Upload { get; set; }
 
         /// <summary>
+        /// The reference to the new file implementation
+        /// </summary>
+        public Guid? FileIdentifier { get; set; }
+
+        /// <summary>
         /// Every attachment is assigned a unique asset number in the organization's inventory.
         /// </summary>
         public int Asset { get; set; }

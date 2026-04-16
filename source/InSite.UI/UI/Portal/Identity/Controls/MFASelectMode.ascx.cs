@@ -36,6 +36,14 @@ namespace InSite.UI.Portal.Accounts.Users.Controls
             }
         }
 
+        private bool IsModeDefined()
+        {
+            return ModeNone.Checked
+                || ModeAuthenticatorApp.Checked
+                || ModeText.Checked
+                || ModeEmail.Checked;
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -58,15 +66,23 @@ namespace InSite.UI.Portal.Accounts.Users.Controls
 
         private void ContinueButton_Click(object sender, EventArgs e)
         {
-            Selected?.Invoke(this, new EventArgs());
+            OnSelected();
         }
 
         private void Mode_CheckedChanged(object sender, EventArgs e)
         {
             SetButtonVisibility();
 
-            if (!ModeNone.Checked)
-                Selected?.Invoke(this, new EventArgs());
+            if (!ModeNone.Checked && IsModeDefined())
+                OnSelected();
+        }
+
+        private void OnSelected()
+        {
+            if (!IsModeDefined())
+                ModeNone.Checked = true;
+
+            Selected?.Invoke(this, new EventArgs());
         }
 
         public void BindControls(OtpModes mode, bool allowSaveNone)

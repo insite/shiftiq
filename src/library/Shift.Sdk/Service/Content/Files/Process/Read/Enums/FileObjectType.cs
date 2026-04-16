@@ -15,6 +15,7 @@
         Program,
         ProgramTask,
         Standard,
-        Page
+        Page,
+        Bank
     }
 }

@@ -11,6 +11,7 @@ interface Props {
         name: IconName;
     };
     title: ReactNode;
+    subtitle?: string;
     children?: ReactNode;
 }
 
@@ -18,6 +19,7 @@ export default function FormTab({
     tab,
     icon,
     title,
+    subtitle,
     children
 }: Props) {
     return (
@@ -27,6 +29,11 @@ export default function FormTab({
                 <>
                     {icon && <Icon style={icon.style} name={icon.name} className="me-2" />}
                     {title}
+                    {subtitle && (
+                        <small className="text-body-secondary ms-1">
+                            {subtitle}
+                        </small>
+                    )}
                 </>
             )}
         >

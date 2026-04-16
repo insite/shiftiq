@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -11,6 +10,7 @@ using Newtonsoft.Json;
 
 using Shift.Common;
 using Shift.Common.Timeline.Changes;
+using Shift.Constant;
 
 namespace InSite.Persistence
 {
@@ -320,6 +320,49 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
             });
         }
 
+        public void UpdateMessage(MailoutCallbackHandled e)
+        {
+            if (e.Recipient.IsEmpty())
+                return;
+
+            var messageState = (MessageState)e.AggregateState;
+            var mailoutState = messageState.FindMailout(e.Mailout);
+            var recipientState = mailoutState.GetRecipient(e.Recipient);
+
+            UpdateMailout(e.Mailout, mailout =>
+            {
+                mailout.MailoutStatus = mailoutState.Status;
+                mailout.MailoutStatusDescription = mailoutState.StatusDescription.MaxLength(128);
+
+                if (!mailout.MailoutCompleted.HasValue && mailoutState.IsCompleted())
+                    mailout.MailoutCompleted = e.ChangeTime;
+
+                var allowHandle = e.Status == MailoutCallbackStatus.Accepted
+                    || e.Status == MailoutCallbackStatus.Delivered
+                    || e.Status == MailoutCallbackStatus.Failed
+                    || e.Status == MailoutCallbackStatus.Rejected;
+                if (!allowHandle)
+                    return;
+
+                var recipient = mailout.Recipients.FirstOrDefault(x => x.UserEmail == e.Recipient);
+                if (recipient == null)
+                    return;
+
+                if (recipient.DeliveryCallbackTimestamp.HasValue && recipient.DeliveryCallbackTimestamp.Value > e.Timestamp)
+                    return;
+
+                recipient.DeliveryStatus = recipientState.CallbackStatus;
+                recipient.DeliveryError = null;
+
+                var data = e.Data;
+                if (data.IsEmpty())
+                    return;
+
+                if (e.Status == MailoutCallbackStatus.Failed)
+                    recipient.DeliveryError = $"[{data.GetOrDefault("code")}] {data.GetOrDefault("message")}";
+            });
+        }
+
         public void UpdateMessage(MailoutCancelled e)
         {
             UpdateMailout(e.MailoutIdentifier, mailout => { });
@@ -341,6 +384,176 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
                 mailout.MailoutCompleted = e.ChangeTime;
                 mailout.MailoutStatus = "Completed";
             });
+        }
+
+        private static readonly int? MaxContentSubject = InternalDbContext.GetMaxLength<QMailout>(x => x.ContentSubject);
+        private static readonly int? MaxMailoutStatusCode = InternalDbContext.GetMaxLength<QMailout>(x => x.MailoutStatusCode);
+        private static readonly int? MaxSenderStatus = InternalDbContext.GetMaxLength<QMailout>(x => x.SenderStatus);
+
+        public void UpdateMessage(MailoutDrafted e)
+        {
+            using (var db = CreateContext())
+            {
+                db.Configuration.ValidateOnSaveEnabled = false;
+
+                var message = db.Messages.FirstOrDefault(x => x.MessageIdentifier == e.AggregateIdentifier)
+                    ?? throw new ArgumentException($"Message {e.AggregateIdentifier} does not exist");
+
+                var mailout = new QMailout
+                {
+                    MessageIdentifier = e.AggregateIdentifier,
+                    MessageType = message.MessageType,
+                    MessageName = message.MessageName,
+                    SurveyIdentifier = message.SurveyFormIdentifier,
+                    OrganizationIdentifier = message.OrganizationIdentifier,
+
+                    SenderType = e.SenderType,
+                    SenderIdentifier = e.SenderId,
+
+                    MailoutIdentifier = e.MailoutId,
+                    MailoutStatus = "Drafted",
+                    MailoutScheduled = e.ScheduledOn,
+
+                    EventIdentifier = e.EventId,
+
+                    ContentSubject = MaxContentSubject.HasValue ? e.Subject.Default.MaxLength(MaxContentSubject.Value) : e.Subject.Default,
+                    ContentBodyText = e.BodyText?.Default,
+                    ContentBodyHtml = e.BodyHtml?.Default,
+                    ContentAttachments = e.Attachments.IsNotEmpty() ? JsonConvert.SerializeObject(e.Attachments) : null,
+                };
+
+                var to = new Dictionary<Guid, string>();
+                var cc = new Dictionary<Guid, string>();
+
+                if (e.To.IsNotEmpty())
+                {
+                    foreach (var item in e.To)
+                        if (!to.ContainsKey(item.Key))
+                            to.Add(item.Key, item.Value);
+                }
+
+                if (e.Cc.IsNotEmpty())
+                {
+                    foreach (var item in e.Cc)
+                        if (!cc.ContainsKey(item.Key))
+                            cc.Add(item.Key, item.Value);
+                }
+
+                if (e.Bcc.IsNotEmpty())
+                {
+                    foreach (var item in e.Bcc)
+                        if (!cc.ContainsKey(item.Key))
+                            cc.Add(item.Key, item.Value);
+                }
+
+                var users = db.Persons.Where(x => x.OrganizationIdentifier == message.OrganizationIdentifier)
+                    .Select(x => new { x.UserIdentifier, x.User.Email, x.FullName, x.Language, x.PersonCode })
+                    .Distinct()
+                    .ToDictionary(x => x.UserIdentifier, x => x);
+
+                foreach (var itemTo in to)
+                {
+                    if (!users.TryGetValue(itemTo.Key, out var user))
+                        continue;
+
+                    var recipient = new QRecipient
+                    {
+                        RecipientIdentifier = UniqueIdentifier.Create(),
+                        OrganizationIdentifier = mailout.OrganizationIdentifier,
+                        MailoutIdentifier = mailout.MailoutIdentifier,
+                        DeliveryStatus = "Drafted",
+
+                        UserEmail = itemTo.Value,
+                        UserIdentifier = itemTo.Key,
+                        PersonName = user.FullName,
+                        PersonCode = user.PersonCode,
+                        PersonLanguage = user.Language,
+                    };
+
+                    foreach (var itemCc in cc)
+                    {
+                        if (users.ContainsKey(itemCc.Key))
+                            recipient.CarbonCopies.Add(new QCarbonCopy
+                            {
+                                CarbonCopyIdentifier = UniqueIdentifier.Create(),
+                                OrganizationIdentifier = mailout.OrganizationIdentifier,
+                                RecipientIdentifier = recipient.RecipientIdentifier,
+                                UserIdentifier = itemCc.Key
+                            });
+                    }
+
+                    db.Recipients.Add(recipient);
+                }
+
+                db.Mailouts.Add(mailout);
+
+                db.SaveChanges();
+            }
+        }
+
+        public void UpdateMessage(MailoutQueued e)
+        {
+            if (e.Recipient.IsEmpty())
+                return;
+
+            var messageState = (MessageState)e.AggregateState;
+            var mailoutState = messageState.FindMailout(e.MailoutId);
+            var recipientState = mailoutState.GetRecipient(e.Recipient);
+
+            UpdateMailout(e.MailoutId, mailout =>
+            {
+                mailout.MailoutStatus = mailoutState.Status;
+                mailout.MailoutStatusDescription = mailoutState.StatusDescription.MaxLength(128);
+
+                var recipient = mailout.Recipients.FirstOrDefault(x => x.UserEmail == e.Recipient);
+                if (recipient == null || recipient.DeliveryStatus != MailoutCallbackStatus.Drafted)
+                    return;
+
+                recipient.DeliveryStatus = recipientState.CallbackStatus;
+                recipient.DeliveryError = null;
+            });
+        }
+
+        public void UpdateMessage(MailoutRejected e)
+        {
+            if (e.Recipient.IsEmpty())
+                return;
+
+            var messageState = (MessageState)e.AggregateState;
+            var mailoutState = messageState.FindMailout(e.MailoutId);
+
+            UpdateMailout(e.MailoutId, mailout =>
+            {
+                mailout.MailoutStatus = mailoutState.Status;
+                mailout.MailoutStatusDescription = mailoutState.StatusDescription.MaxLength(128);
+
+                if (!mailout.MailoutCompleted.HasValue && mailoutState.IsCompleted())
+                    mailout.MailoutCompleted = e.ChangeTime;
+
+                if (e.Recipient != null)
+                {
+                    var recipient = mailout.Recipients.FirstOrDefault(x => x.UserEmail == e.Recipient);
+                    UpdateRecipient(recipient);
+                }
+                else
+                {
+                    foreach (var recipient in mailout.Recipients)
+                        UpdateRecipient(recipient);
+                }
+            });
+
+            void UpdateRecipient(QRecipient r)
+            {
+                if (r == null || r.DeliveryStatus != MailoutCallbackStatus.Drafted && r.DeliveryStatus != MailoutCallbackStatus.Queued)
+                    return;
+
+                var recipientState = mailoutState.GetRecipient(r.UserEmail);
+                if (recipientState == null)
+                    return;
+
+                r.DeliveryStatus = recipientState.CallbackStatus;
+                r.DeliveryError = e.Description;
+            }
         }
 
         public void UpdateMessage(MailoutScheduled2 e)
@@ -459,109 +672,6 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
             }
         }
 
-        public static void UpdateMailout(QMailout mailout)
-        {
-            using (var db = new InternalDbContext())
-            {
-                if (!db.Mailouts.Any(x => x.MailoutIdentifier == mailout.MailoutIdentifier))
-                    return;
-
-                SnipStrings(mailout);
-
-                db.Entry(mailout).State = EntityState.Modified;
-                db.SaveChanges();
-            }
-        }
-
-        public static void InsertMailout(QMailout email)
-        {
-            using (var db = new InternalDbContext())
-            {
-                var personQuery = db.Persons.AsQueryable();
-
-                if (email.OrganizationIdentifier != ServiceLocator.Partition.Identifier)
-                    personQuery = personQuery.Where(x => x.OrganizationIdentifier == email.OrganizationIdentifier);
-
-                var users = personQuery
-                    .Select(x => new { x.UserIdentifier, x.User.Email })
-                    .Distinct()
-                    .ToDictionary(x => x.UserIdentifier, x => x.Email);
-
-                SnipStrings(email);
-
-                var exists = db.Mailouts.Any(x => x.MailoutIdentifier == email.MailoutIdentifier);
-                if (exists)
-                    db.Entry(email).State = EntityState.Modified;
-                else
-                    db.Mailouts.Add(email);
-
-                var to = new Dictionary<Guid, string>();
-                var cc = new Dictionary<Guid, string>();
-
-                if (email.RecipientListTo != null)
-                {
-                    var list = JsonConvert.DeserializeObject<Dictionary<Guid, string>>(email.RecipientListTo);
-                    foreach (var item in list)
-                        if (!to.ContainsKey(item.Key))
-                            to.Add(item.Key, item.Value);
-                }
-
-                if (email.RecipientListCc != null)
-                {
-                    var list = JsonConvert.DeserializeObject<Dictionary<Guid, string>>(email.RecipientListCc);
-                    foreach (var item in list)
-                        if (!cc.ContainsKey(item.Key))
-                            cc.Add(item.Key, item.Value);
-                }
-
-                foreach (var i in to)
-                {
-                    if (!users.ContainsKey(i.Key))
-                        continue;
-
-                    var recipient = new QRecipient
-                    {
-                        RecipientIdentifier = UniqueIdentifier.Create(),
-                        OrganizationIdentifier = email.OrganizationIdentifier,
-                        MailoutIdentifier = email.MailoutIdentifier,
-                        UserEmail = i.Value,
-                        UserIdentifier = i.Key
-                    };
-
-                    foreach (var j in cc)
-                    {
-                        if (users.ContainsKey(j.Key))
-                            recipient.CarbonCopies.Add(new QCarbonCopy
-                            {
-                                CarbonCopyIdentifier = UniqueIdentifier.Create(),
-                                OrganizationIdentifier = email.OrganizationIdentifier,
-                                RecipientIdentifier = recipient.RecipientIdentifier,
-                                UserIdentifier = j.Key
-                            });
-                    }
-
-                    db.Recipients.Add(recipient);
-                }
-
-                db.SaveChanges();
-            }
-        }
-
-        private static void SnipStrings(QMailout email)
-        {
-            var max = InternalDbContext.GetMaxLength<QMailout>(x => x.ContentSubject);
-            if (max.HasValue)
-                email.ContentSubject = StringHelper.Snip(email.ContentSubject, max.Value);
-
-            max = InternalDbContext.GetMaxLength<QMailout>(x => x.MailoutStatusCode);
-            if (max.HasValue)
-                email.MailoutStatusCode = StringHelper.Snip(email.MailoutStatusCode, max.Value);
-
-            max = InternalDbContext.GetMaxLength<QMailout>(x => x.SenderStatus);
-            if (max.HasValue)
-                email.SenderStatus = StringHelper.Snip(email.SenderStatus, max.Value);
-        }
-
         #endregion
 
         #region Methods (deliveries)
@@ -618,18 +728,6 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
                 delivery.DeliveryStatus = "Started";
                 delivery.DeliveryStarted = e.ChangeTime;
 
-                db.SaveChanges();
-            }
-        }
-
-        public static void UpdateRecipient(QRecipient recipient)
-        {
-            using (var db = new InternalDbContext(true))
-            {
-                if (!db.Recipients.Any(x => x.MailoutIdentifier == recipient.MailoutIdentifier && x.RecipientIdentifier == recipient.RecipientIdentifier))
-                    return;
-
-                db.Entry(recipient).State = EntityState.Modified;
                 db.SaveChanges();
             }
         }

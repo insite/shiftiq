@@ -11,7 +11,6 @@ using InSite.Application.Banks.Write;
 using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
 using InSite.Persistence;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
 using Shift.Constant;
@@ -80,7 +79,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         #region Fields
 
-        private QuestionTable _currentQuestionTable;
+        private BankQuestionTable _currentQuestionTable;
         private DataItem _currentDataItem;
         protected ReturnUrl _returnUrl;
 
@@ -194,7 +193,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             var isTable = question.Layout.Type == OptionLayoutType.Table;
 
             _currentQuestionTable = isTable
-                ? QuestionTable.Build(question.Layout.Columns, question.Options.Select(x => x.Content.Title.Default))
+                ? BankQuestionTable.Build(question.Layout.Columns, question.Options.Select(x => x.Content.Title.Default))
                 : null;
 
             var multiView = (MultiView)e.Item.FindControl("QuestionItemsMultiView");
@@ -457,7 +456,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             return html.ToString();
         }
 
-        private static void RenderOptionRepeaterCell(Guid bankID, Guid questionID, int optionNumber, int colNumber, StringBuilder html, string tagName, QuestionTable.CellData cell)
+        private static void RenderOptionRepeaterCell(Guid bankID, Guid questionID, int optionNumber, int colNumber, StringBuilder html, string tagName, BankQuestionTable.CellData cell)
         {
             html.Append("<")
                 .Append(tagName)

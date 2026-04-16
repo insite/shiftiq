@@ -52,6 +52,8 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
 
                 filter.ShowValidationHistory = ShowValidationHistory.ValueAsBoolean ?? false;
 
+                filter.ValidatorUserIdentifier = ValidatorUserIdentifier;
+
                 return filter;
             }
             set
@@ -98,6 +100,12 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
 
                 ShowValidationHistory.ValueAsBoolean = filter.ShowValidationHistory;
             }
+        }
+
+        public Guid? ValidatorUserIdentifier
+        {
+            get { return ViewState[nameof(ValidatorUserIdentifier)] as Guid?; }
+            set { ViewState[nameof(ValidatorUserIdentifier)] = value; }
         }
 
         private bool CanSeeGroupCompetencies

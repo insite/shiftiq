@@ -14,7 +14,7 @@
 
 <div runat="server" id="ButtonPanel" class="mb-4">
     <insite:Button runat="server" ID="PreviousButton" ButtonStyle="Default" Text="Previous" Icon="fas fa-arrow-alt-left" />
-    <insite:Button runat="server" ID="SubmitButton" ButtonStyle="Success" Icon="fas fa-check" Text="Submit My Submission" DisableAfterClick="true" />
+    <insite:Button runat="server" ID="SubmitButton" ButtonStyle="Success" Icon="fas fa-check" Text="Submit" DisableAfterClick="true" />
 </div>
 
 <asp:Panel runat="server" ID="DebugPanel" Visible="false">

@@ -214,11 +214,35 @@ namespace InSite.Admin.Achievements.Achievements.Controls
             var warning = string.Empty;
             if (!credential.Equals(achievement))
             {
-                var icon = "<i class='fas fa-exclamation-triangle text-warning' style='padding-right:5px;'></i>";
-                warning = $"<span class='pull-left' title='Default expiration is {achievement}'>{icon}</span>";
+                var icon = "<i class='fa-solid fa-exclamation-triangle text-warning me-1'></i>";
+                warning = $"<div class=\"text-body-secondary fs-xs\"><span class='text-warning'>{icon}Default expiration is {achievement}</span></div>";
             }
 
-            return warning + credential;
+            return credential + warning;
+        }
+
+        public string GetSelfDeclarationHtml(object item)
+        {
+            var html = string.Empty;
+
+            var i = (VCredential)item;
+
+            if (i.AchievementAllowSelfDeclared != i.CredentialAllowSelfDeclared)
+            {
+                var icon = "<i class='fa-solid fa-exclamation-triangle text-warning me-1'></i>";
+
+                var text = string.Empty;
+
+                if (i.AchievementAllowSelfDeclared)
+                    text = $"Disallow self-declaration";
+
+                else if (i.CredentialAllowSelfDeclared)
+                    text = $"Allow self-declaration";
+
+                html = $"<span class='text-warning'>{icon}{text}</span>";
+            }
+
+            return html;
         }
     }
 }

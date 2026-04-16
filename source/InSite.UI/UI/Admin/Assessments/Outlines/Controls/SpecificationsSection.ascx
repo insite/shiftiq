@@ -13,9 +13,9 @@
             <div runat="server" id="CommandColumn" class="col-lg-6 text-end">
                 <insite:DropDownButton runat="server" ID="CommandsDropDown" IconName="plus-circle" Text="Add" CssClass="d-inline-block">
                     <Items>
-                        <sdk:DropDownButtonItem Name="AddSpecification" ToolTip="Add a new specification to the bank" IconType="Regular" IconName="clipboard-list" Text="Specification" />
-                        <sdk:DropDownButtonItem Name="AddCriterion" ToolTip="Add new criteria to the selected specification" IconType="Regular" IconName="filter" Text="Criteria" />
-                        <sdk:DropDownButtonItem Name="AddForm" ToolTip="Add a new form to the selected specification" IconType="Regular" IconName="align-left" Text="Form" />
+                        <insite:DropDownButtonItem Name="AddSpecification" ToolTip="Add a new specification to the bank" IconType="Regular" IconName="clipboard-list" Text="Specification" />
+                        <insite:DropDownButtonItem Name="AddCriterion" ToolTip="Add new criteria to the selected specification" IconType="Regular" IconName="filter" Text="Criteria" />
+                        <insite:DropDownButtonItem Name="AddForm" ToolTip="Add a new form to the selected specification" IconType="Regular" IconName="align-left" Text="Form" />
                     </Items>
                 </insite:DropDownButton>
 

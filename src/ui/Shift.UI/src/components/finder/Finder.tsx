@@ -1,8 +1,8 @@
 import { ForwardedRef, KeyboardEvent, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { ListItem } from "@/models/listItem";
-import { useStatusProvider } from "@/contexts/StatusProvider";
-import { useLoadingProvider } from "@/contexts/LoadingProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
+import { useLoadingProvider } from "@/contexts/loading/LoadingProviderContext";
 import { FieldError } from "react-hook-form";
 import { errorHelper } from "@/helpers/errorHelper";
 import { cache } from "@/cache/cache";

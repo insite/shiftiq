@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Shift.Common;
 
 namespace Shift.Common
 {
@@ -138,6 +139,15 @@ namespace Shift.Common
             return _subroutesByRoute.TryGetValue(route, out var subroutes)
                 ? subroutes
                 : new List<string>();
+        }
+
+        public List<(string route, List<string> subroutes)> GetRoutesAndSubroutes()
+        {
+            var result = new List<(string route, List<string> subroutes)>();
+            foreach (var pair in _subroutesByRoute)
+                result.Add((pair.Key, pair.Value));
+
+            return result;
         }
 
         /// <summary>

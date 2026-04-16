@@ -3,7 +3,7 @@ import AdminHomeLayout_DesktopMenu from "./AdminHomeLayout_DesktopMenu";
 import AdminHomeLayout_MobileMenu from "./AdminHomeLayout_MobileMenu";
 import { useState } from "react";
 import ActionLink from "@/components/ActionLink";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { shiftConfig } from "@/helpers/shiftConfig";
 import { SidebarState } from "../models/SidebarState";
 import Icon from "@/components/icon/Icon";
@@ -40,7 +40,7 @@ export default function AdminHomeLayout_Navigation({ onStateChange }: Props) {
                                 <>
                                     <li className="nav-item fs-sm">
                                         <ActionLink className="nav-link text-info" href="/client/react/home">
-                                            <Icon style="Brands" name="react" className="fa-width-auto me-2" />
+                                            <Icon style="brands" name="react" className="fa-width-auto me-2" />
                                             React {siteSetting.OrganizationCode ? `(${siteSetting.OrganizationCode})` : ""}
                                         </ActionLink>
                                     </li>
@@ -52,7 +52,7 @@ export default function AdminHomeLayout_Navigation({ onStateChange }: Props) {
 
                             <li className="nav-item fs-sm">
                                 <ActionLink className="nav-link" href="/ui/portal/home">
-                                    <Icon style="Regular" name="chalkboard-user" className="fa-width-auto me-2" />
+                                    <Icon style="regular" name="chalkboard-user" className="fa-width-auto me-2" />
                                     Portal
                                 </ActionLink>
                             </li>
@@ -64,8 +64,8 @@ export default function AdminHomeLayout_Navigation({ onStateChange }: Props) {
                             {siteSetting.ImpersonatorName && (
                                 <>
                                     <li className="nav-item fs-sm">
-                                        <ActionLink className="nav-link text-danger" href="/ui/portal/identity/impersonate">
-                                            <Icon style="Regular" name="user-secret" className="fa-width-auto me-2" />
+                                        <ActionLink className="nav-link text-danger" href="/ui/portal/security/impersonation/stop">
+                                            <Icon style="regular" name="user-secret" className="fa-width-auto me-2" />
                                             {siteSetting.ImpersonatorName}
                                         </ActionLink>
                                     </li>

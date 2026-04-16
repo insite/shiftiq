@@ -377,7 +377,7 @@ namespace InSite.Application.Banks.Write
         public void Handle(ChangeAttachmentImage c)
         {
             var aggregate = _repository.Get<BankAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
-            aggregate.ChangeAttachmentImage(c.Attachment, c.Upload, c.Author, c.ActualDimension);
+            aggregate.ChangeAttachmentImage(c.Attachment, c.FileIdentifier, c.Upload, c.Author, c.ActualDimension);
 
             Commit(aggregate, c);
         }

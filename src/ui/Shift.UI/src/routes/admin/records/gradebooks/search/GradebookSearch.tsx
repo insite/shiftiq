@@ -1,6 +1,6 @@
 import Search from "@/components/search/Search";
 import { GradebookRow, toGradebookRow } from "./GradebookRow";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { TimeZoneId } from "@/helpers/date/timeZones";
 import { shiftClient } from "@/api/shiftClient";
 import { mapQueryResult } from "@/models/QueryResult";

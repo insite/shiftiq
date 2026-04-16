@@ -23,8 +23,18 @@ using Shift.Sdk.UI;
 
 namespace InSite.Cmds.Admin.Records.Programs
 {
-    public partial class Assign : AdminBasePage, ICmdsUserControl
+    public partial class Assign : AdminBasePage, ICmdsUserControl, IOverrideWebRouteParent, IHasParentLinkParameters
     {
+        #region Properties
+
+        private bool HasDefaultProgram
+        {
+            get => (bool)(ViewState[nameof(HasDefaultProgram)] ?? false);
+            set => ViewState[nameof(HasDefaultProgram)] = value;
+        }
+
+        #endregion
+
         #region Initialization
 
         protected override void OnInit(EventArgs e)
@@ -32,9 +42,9 @@ namespace InSite.Cmds.Admin.Records.Programs
             base.OnInit(e);
 
             DepartmentIdentifier.AutoPostBack = true;
-            DepartmentIdentifier.ValueChanged += DepartmentIdentifier_ValueChanged;
+            DepartmentIdentifier.ValueChanged += (s, a) => OnDepartmentChanged();
 
-            SearchButton.Click += SearchButton_Click;
+            SearchButton.Click += (s, a) => OnSearchClick();
 
             Step1NextButton.Click += Step1NextButton_Click;
 
@@ -75,6 +85,42 @@ namespace InSite.Cmds.Admin.Records.Programs
             DepartmentIdentifier.Value = null;
 
             ProgramIdentifier.DepartmentIdentifier = Guid.Empty;
+
+            var returnUrl = GetReturnUrl();
+            var hasReturnUrl = returnUrl.IsNotEmpty();
+
+            Step1CloseButton.Visible = hasReturnUrl;
+            Step1CloseButton.NavigateUrl = returnUrl;
+
+            Step2CloseButton.Visible = hasReturnUrl;
+            Step2CloseButton.NavigateUrl = returnUrl;
+
+            SetDefaultProgram();
+        }
+
+        private void SetDefaultProgram()
+        {
+            HasDefaultProgram = false;
+
+            if (!Guid.TryParse(Request.QueryString["program"], out var programId))
+                return;
+
+            var program = ProgramSearch.GetProgram(programId);
+            if (program == null || program.OrganizationIdentifier != Organization.Identifier)
+                return;
+
+            ProgramIdentifier.Value = programId;
+            ProgramIdentifier.Enabled = false;
+
+            HasDefaultProgram = true;
+
+            if (!program.GroupIdentifier.HasValue)
+                return;
+
+            DepartmentIdentifier.Value = program.GroupIdentifier;
+            DepartmentIdentifier.Enabled = false;
+
+            OnSearchClick();
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -89,13 +135,16 @@ namespace InSite.Cmds.Admin.Records.Programs
 
         #region Event handlers
 
-        private void DepartmentIdentifier_ValueChanged(object sender, EventArgs e)
+        private void OnDepartmentChanged()
         {
-            var departmentId = DepartmentIdentifier.Value;
+            if (!HasDefaultProgram)
+            {
+                var departmentId = DepartmentIdentifier.Value;
 
-            ProgramIdentifier.DepartmentIdentifier = departmentId ?? Guid.Empty;
-            ProgramIdentifier.Value = null;
-            ProgramIdentifier.Enabled = departmentId.HasValue;
+                ProgramIdentifier.DepartmentIdentifier = departmentId ?? Guid.Empty;
+                ProgramIdentifier.Value = null;
+                ProgramIdentifier.Enabled = departmentId.HasValue;
+            }
 
             LearnersRepeater.DataSource = null;
             LearnersRepeater.DataBind();
@@ -104,7 +153,7 @@ namespace InSite.Cmds.Admin.Records.Programs
             Step1NextButton.Visible = false;
         }
 
-        private void SearchButton_Click(object sender, EventArgs e)
+        private void OnSearchClick()
         {
             var departmentId = DepartmentIdentifier.Value;
             var hasValue = departmentId.HasValue;
@@ -270,15 +319,21 @@ namespace InSite.Cmds.Admin.Records.Programs
 
             EditorStatus.AddMessage(AlertType.Success, "This training plan has been successfully assigned to the users you selected.");
 
+            var returnUrl = GetReturnUrl();
+            if (returnUrl.IsNotEmpty())
+            {
+                var url = new WebUrl(returnUrl);
+                url.QueryString["status"] = "learners_assigned";
+
+                HttpResponseHelper.Redirect(url);
+            }
+
             Step2.Visible = false;
             Step1.IsSelected = true;
 
             DepartmentIdentifier.Value = null;
 
-            ProgramIdentifier.Value = null;
-            ProgramIdentifier.Enabled = false;
-
-            LearnersPanel.Visible = false;
+            OnDepartmentChanged();
         }
 
         private void EmployeeRequired_ServerValidate(object source, ServerValidateEventArgs args)
@@ -525,6 +580,15 @@ namespace InSite.Cmds.Admin.Records.Programs
             }
 
             return list;
+        }
+
+        IWebRoute IOverrideWebRouteParent.GetParent() => GetParent();
+
+        string IHasParentLinkParameters.GetParentLinkParameters(IWebRoute parent)
+        {
+            return parent.Name == "ui/admin/learning/programs/outline"
+                ? $"id={Request.QueryString["program"]}"
+                : null;
         }
 
         #endregion

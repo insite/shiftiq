@@ -1,5 +1,5 @@
-import { useStatusProvider } from "@/contexts/StatusProvider";
-import { useLoadingProvider } from "@/contexts/LoadingProvider";
+import { useLoadingProvider } from "@/contexts/loading/LoadingProviderContext";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { ListItem } from "@/models/listItem";
 import { useEffect, useState } from "react";
 

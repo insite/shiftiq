@@ -268,12 +268,12 @@ namespace Shift.Common
             return Filter(StringHelper.Split(emails), StringHelper.Split(whitelistDomains), StringHelper.Split(whitelistTesters));
         }
 
-        public static List<string> Filter(IEnumerable<string> emails, string[] whitelistDomains, string[] whitelistTesters)
+        public static List<string> Filter(IEnumerable<string> emails, IList<string> whitelistDomains, IList<string> whitelistTesters)
         {
             return Filter(new EmailAddressList(emails), whitelistDomains, whitelistTesters);
         }
 
-        public static List<string> Filter(EmailAddressList emails, string[] whitelistDomains, string[] whitelistTesters)
+        public static List<string> Filter(EmailAddressList emails, IList<string> whitelistDomains, IList<string> whitelistTesters)
         {
             var list = emails.Select(x => x.Address).ToList();
 
@@ -300,7 +300,7 @@ namespace Shift.Common
             return list;
         }
 
-        public static Dictionary<Guid, string> Filter(Dictionary<Guid, string> emails, string[] whitelistDomains, string[] whitelistTesters)
+        public static Dictionary<Guid, string> Filter(Dictionary<Guid, string> emails, IList<string> whitelistDomains, IList<string> whitelistTesters)
         {
             if (whitelistDomains.IsNotEmpty() && whitelistTesters.IsNotEmpty())
             {

@@ -1,5 +1,5 @@
 import ActionLink from "@/components/ActionLink";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 
 export default function AdminHomeLayout_HomeLink() {
     const { siteSetting: { Home: home } } = useSiteProvider();

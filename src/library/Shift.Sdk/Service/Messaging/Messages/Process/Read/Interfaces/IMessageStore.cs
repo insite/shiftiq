@@ -21,8 +21,12 @@ namespace InSite.Application.Messages.Read
         void UpdateMessage(DeliveryStarted2 message);
         void UpdateMessage(LinkCounterReset message);
         void UpdateMessage(MailoutAborted message);
+        void UpdateMessage(MailoutCallbackHandled message);
         void UpdateMessage(MailoutCancelled message);
         void UpdateMessage(MailoutCompleted message);
+        void UpdateMessage(MailoutDrafted message);
+        void UpdateMessage(MailoutQueued message);
+        void UpdateMessage(MailoutRejected message);
         void UpdateMessage(MailoutScheduled2 message);
         void UpdateMessage(MailoutStarted message);
         void UpdateMessage(MessageArchived message);

@@ -1,6 +1,10 @@
-import { expect, test } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import { _dateTimeParser } from "../_dateTimeParser";
 import { dateTimeHelper } from "../dateTimeHelper";
+
+afterEach(() => {
+    vi.useRealTimers();
+});
 
 test("_dateTimeParser.splitText", () => {
     expect(_dateTimeParser.splitText(null)).toEqual(null);
@@ -121,4 +125,50 @@ test("dateHelper.formatDate", () => {
     expect(dateTimeHelper.formatDate({ day: 25, month: 11, year: 2023 }, "yyyy-mm-dd")).toEqual("2023-11-25");
     expect(dateTimeHelper.formatDate({ day: 29, month: 2, year: 2025 }, "yyyy-mm-dd")).toEqual(null);
     expect(dateTimeHelper.formatDate(null, "yyyy-mm-dd")).toEqual(null);
+});
+
+test("dateHelper.addDays", () => {
+    expect(dateTimeHelper.addDays({ day: 15, month: 4, year: 2025 }, 5)).toEqual({ day: 20, month: 4, year: 2025 });
+    expect(dateTimeHelper.addDays({ day: 30, month: 4, year: 2025 }, 2)).toEqual({ day: 2, month: 5, year: 2025 });
+    expect(dateTimeHelper.addDays({ day: 31, month: 12, year: 2025 }, 1)).toEqual({ day: 1, month: 1, year: 2026 });
+    expect(dateTimeHelper.addDays({ day: 28, month: 2, year: 2024 }, 1)).toEqual({ day: 29, month: 2, year: 2024 });
+    expect(dateTimeHelper.addDays({ day: 1, month: 3, year: 2024 }, -1)).toEqual({ day: 29, month: 2, year: 2024 });
+    expect(() => dateTimeHelper.addDays({ day: null, month: 2, year: 2025 }, 1)).toThrowError("Invalid date");
+});
+
+test("dateHelper.firstWeekDay", () => {
+    vi.useFakeTimers();
+
+    vi.setSystemTime(new Date(2025, 3, 16, 12, 0, 0));
+    expect(dateTimeHelper.firstWeekDay()).toEqual({ day: 13, month: 4, year: 2025 });
+
+    vi.setSystemTime(new Date(2025, 3, 13, 12, 0, 0));
+    expect(dateTimeHelper.firstWeekDay()).toEqual({ day: 13, month: 4, year: 2025 });
+});
+
+test("dateHelper.addMonths", () => {
+    expect(dateTimeHelper.addMonths({ day: 15, month: 4, year: 2025 }, 2)).toEqual({ day: 15, month: 6, year: 2025 });
+    expect(dateTimeHelper.addMonths({ day: 15, month: 11, year: 2025 }, 3)).toEqual({ day: 15, month: 2, year: 2026 });
+    expect(dateTimeHelper.addMonths({ day: 15, month: 1, year: 2025 }, -2)).toEqual({ day: 15, month: 11, year: 2024 });
+    expect(dateTimeHelper.addMonths({ day: 31, month: 1, year: 2025 }, 1)).toEqual({ day: 28, month: 2, year: 2025 });
+    expect(dateTimeHelper.addMonths({ day: 31, month: 1, year: 2024 }, 1)).toEqual({ day: 29, month: 2, year: 2024 });
+    expect(() => dateTimeHelper.addMonths({ day: 31, month: 2, year: 2025 }, 1)).toThrowError("Invalid date");
+});
+
+test("dateHelper.toDate", () => {
+    expect(dateTimeHelper.toDate(null)).toEqual(null);
+    expect(dateTimeHelper.toDate({date: { day: 25, month: 9, year: 2023 }, time: { hour: null, minute: null, timeZoneId: "UTC" }})).toEqual(new Date(Date.UTC(2023, 8, 25)));
+    expect(dateTimeHelper.toDate({date: { day: 25, month: 9, year: 2023 }, time: { hour: 15, minute: 25, second: 39, timeZoneId: "UTC" }})).toEqual(new Date(Date.UTC(2023, 8, 25, 15, 25, 39)));
+    expect(dateTimeHelper.toDate({date: { day: 27, month: 3, year: 2025 }, time: { hour: 12, minute: 15, second: 30, timeZoneId: "America/Edmonton" }})).toEqual(new Date(Date.UTC(2025, 2, 27, 18, 15, 30)));
+    expect(dateTimeHelper.toDate({date: { day: 27, month: 3, year: 2025 }, time: { hour: 9, minute: 30, second: 0, timeZoneId: "America/St_Johns" }})).toEqual(new Date(Date.UTC(2025, 2, 27, 12, 0, 0)));
+    expect(dateTimeHelper.toDate({date: { day: 15, month: 1, year: 2025 }, time: { hour: null, minute: null, timeZoneId: "America/Edmonton" }})).toEqual(new Date(Date.UTC(2025, 0, 15, 7, 0, 0)));
+    expect(dateTimeHelper.toDate({date: { day: 2, month: 11, year: 2025 }, time: { hour: 1, minute: 30, timeZoneId: "America/Edmonton" }})).toEqual(new Date(Date.UTC(2025, 10, 2, 7, 30, 0)));
+});
+
+test("dateHelper.toDate roundtrips parsed server datetime", () => {
+    const serverDateTime = "2025-03-27T18:15:30Z";
+    const parsedDateTime = dateTimeHelper.parseServerDateTime(serverDateTime, "America/Edmonton");
+
+    expect(parsedDateTime).not.toEqual(null);
+    expect(dateTimeHelper.toDate(parsedDateTime)).toEqual(new Date(serverDateTime));
 });

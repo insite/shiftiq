@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using Shift.Common;
-
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Domain.Attempts
@@ -350,7 +348,7 @@ namespace InSite.Domain.Attempts
             Apply(e);
         }
 
-        public void SwitchAttemptQuestion(int questionIndex)
+        public void SwitchAttemptQuestion(int questionIndex, bool isForced)
         {
             if (Data.Submitted.HasValue || !Data.Started.HasValue)
                 return;
@@ -364,28 +362,38 @@ namespace InSite.Domain.Attempts
             if (Data.Sections.IsEmpty() || !Data.ActiveSectionIndex.HasValue || !Data.ActiveQuestionIndex.HasValue)
                 return;
 
-            if (questionIndex != Data.ActiveQuestionIndex.Value + 1)
+            if (!isForced && questionIndex != Data.ActiveQuestionIndex.Value + 1)
                 return;
 
             var question = Data.Questions.FirstOrDefault(x => x.QuestionIndex >= questionIndex);
-            if (question == null)
-                return;
+            var sectionIndex = question?.SectionIndex;
 
-            var section = question.SectionIndex;
-            if (!section.HasValue || section.Value < Data.ActiveSectionIndex.Value)
-                return;
-
-            if (section.Value > Data.ActiveSectionIndex.Value + 1)
+            if (question != null)
             {
-                section = Data.ActiveSectionIndex.Value + 1;
-                questionIndex = Data.ActiveQuestionIndex.Value;
+                if (!sectionIndex.HasValue || sectionIndex.Value < Data.ActiveSectionIndex.Value)
+                    return;
+
+                if (sectionIndex.Value > Data.ActiveSectionIndex.Value + 1)
+                {
+                    sectionIndex = Data.ActiveSectionIndex.Value + 1;
+                    questionIndex = question.QuestionIndex - 1;
+                }
+                else
+                {
+                    questionIndex = question.QuestionIndex;
+                }
+            }
+            else if (Data.ActiveSectionIndex.Value < Data.Sections.Length)
+            {
+                sectionIndex = Data.ActiveSectionIndex.Value + 1;
+                questionIndex = Data.Questions.Length - 1;
             }
             else
             {
-                questionIndex = question.QuestionIndex;
+                return;
             }
 
-            var e = new AttemptQuestionSwitched(section.Value, questionIndex);
+            var e = new AttemptQuestionSwitched(sectionIndex.Value, questionIndex, isForced);
 
             Apply(e);
         }

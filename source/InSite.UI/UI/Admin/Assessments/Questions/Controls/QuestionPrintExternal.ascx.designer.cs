@@ -76,5 +76,14 @@ namespace InSite.Admin.Assessments.Questions.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater QuestionRepeater;
+
+        /// <summary>
+        /// FooterScript control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Container FooterScript;
     }
 }

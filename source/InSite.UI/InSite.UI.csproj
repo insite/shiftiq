@@ -308,6 +308,7 @@
     <Compile Include="Api\Attributes\CookieAuthorizeAttribute.cs" />
     <Compile Include="Api\Attributes\JwtAuthorizeAttribute.cs" />
     <Compile Include="Api\Controllers\IntegrationScoopController.cs" />
+    <Compile Include="Api\Controllers\MessageController.cs" />
     <Compile Include="Api\Controllers\ProgressCredentialController1.cs" />
     <Compile Include="Api\Controllers\SecurityCookieController.cs" />
     <Compile Include="Api\Controllers\TimelineCommandController2.cs" />
@@ -325,6 +326,28 @@
     <Compile Include="Api\Controllers\ProgressAchievementController.cs" />
     <Compile Include="Api\Controllers\LearningProgramController.cs" />
     <Compile Include="Api\Controllers\ContentFileController2.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\AccountData.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\ClientInfo.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\DeliveryStatusData.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EnvelopeData.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataClicked.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataFlags.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataOpened.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataUnsubscribed.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventLogLevel.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\GeolocationData.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\StorageData.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\JsonEventDataConverter.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\MessageData.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\MessageDataAttachment.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\MessageDataHeaders.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\Payload.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataBase.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataAccepted.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataDelivered.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataFailed.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\EventDataComplained.cs" />
+    <Compile Include="Api\Models\MailgunWebhook\PayloadSignature.cs" />
     <Compile Include="Api\Models\OpenBadgeFactory.cs" />
     <Compile Include="Api\Models\Template.cs" />
     <Compile Include="Api\Controllers\BookingEventsController.cs" />
@@ -625,9 +648,11 @@
     <Compile Include="UI\Admin\Assessments\Attempts\TakerReport.aspx.designer.cs">
       <DependentUpon>TakerReport.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportBySetExport.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportFilter.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AssessmentAuditReport.cs" />
-    <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportExport.cs" />
+    <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportDefaultExport.cs" />
+    <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportHelper.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\PerformanceReportHelper.cs" />
     <Compile Include="UI\Admin\Assessments\Fields\Forms\Pin.aspx.cs">
       <DependentUpon>Pin.aspx</DependentUpon>
@@ -1066,6 +1091,13 @@
     <Compile Include="UI\Admin\Assessments\Attempts\Controls\TakerReportControl.ascx.designer.cs">
       <DependentUpon>TakerReportControl.ascx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Events\Registrations\Classes\Reports\ExamLoginCredentialsReport.ascx.cs">
+      <DependentUpon>ExamLoginCredentialsReport.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Events\Registrations\Classes\Reports\ExamLoginCredentialsReport.ascx.designer.cs">
+      <DependentUpon>ExamLoginCredentialsReport.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Foundations\Colors.aspx.cs">
       <DependentUpon>Colors.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1330,6 +1362,27 @@
     </Compile>
     <Compile Include="UI\Admin\Learning\Programs\ModifySettings.aspx.designer.cs">
       <DependentUpon>ModifySettings.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Messages\Mailouts\Failures\Controls\SearchCriteria.ascx.cs">
+      <DependentUpon>SearchCriteria.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Messages\Mailouts\Failures\Controls\SearchCriteria.ascx.designer.cs">
+      <DependentUpon>SearchCriteria.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Messages\Mailouts\Failures\Controls\SearchResults.ascx.cs">
+      <DependentUpon>SearchResults.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Messages\Mailouts\Failures\Controls\SearchResults.ascx.designer.cs">
+      <DependentUpon>SearchResults.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Messages\Mailouts\Failures\Search.aspx.cs">
+      <DependentUpon>Search.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Messages\Mailouts\Failures\Search.aspx.designer.cs">
+      <DependentUpon>Search.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Messages\Messages\Controls\SendEmail.ascx.cs">
       <DependentUpon>SendEmail.ascx</DependentUpon>
@@ -1902,6 +1955,12 @@
     <Compile Include="UI\Layout\Common\Controls\Server\Controls\ControlVisibilityHelper.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Controls\UserEmailVerificationCheck.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Controls\VisibilityException.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\DropDownButtons\DropDownButtonBaseItem.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\DropDownButtons\DropDownButtonItem.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\DropDownButtons\DropDownButtonItemCollection.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\DropDownButtons\DropDownButtonItemTypeMapper.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\DropDownButtons\DropDownButtonLinkItem.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\DropDownButtons\DropDownButtonSeparatorItem.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Icons\Icon.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Media\InputMedia.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Media\InputVideo.cs" />
@@ -2297,6 +2356,9 @@
     <Compile Include="UI\Portal\Contacts\Referral\Controls\PortalDocumentList.ascx.designer.cs">
       <DependentUpon>PortalDocumentList.ascx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Portal\Learning\BasePlanPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="UI\Portal\Learning\Controls\CommentInfo.ascx.cs">
       <DependentUpon>CommentInfo.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2317,6 +2379,13 @@
     </Compile>
     <Compile Include="UI\Portal\Learning\Controls\CommentTextEditor.ascx.designer.cs">
       <DependentUpon>CommentTextEditor.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Portal\Learning\Controls\PlanAchievementTypeRepeater.ascx.cs">
+      <DependentUpon>PlanAchievementTypeRepeater.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Portal\Learning\Controls\PlanAchievementTypeRepeater.ascx.designer.cs">
+      <DependentUpon>PlanAchievementTypeRepeater.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Portal\Learning\Course.aspx.cs">
       <DependentUpon>Course.aspx</DependentUpon>
@@ -2382,6 +2451,13 @@
       <DependentUpon>ProgramSearchControl.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Portal\Learning\Programs\Models\ProgramRequestHelper.cs" />
+    <Compile Include="UI\Portal\Learning\Programs\Plan.aspx.cs">
+      <DependentUpon>Plan.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Portal\Learning\Programs\Plan.aspx.designer.cs">
+      <DependentUpon>Plan.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Portal\Learning\Progress.aspx.cs">
       <DependentUpon>Progress.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2389,6 +2465,7 @@
     <Compile Include="UI\Portal\Learning\Progress.aspx.designer.cs">
       <DependentUpon>Progress.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Portal\Learning\Utilities\LearningHelper.cs" />
     <Compile Include="UI\Portal\Records\Certificates\Badge.ashx.cs">
       <DependentUpon>Badge.ashx</DependentUpon>
     </Compile>
@@ -6460,6 +6537,8 @@
     <Content Include="UI\Admin\Events\Classes\Controls\PrivacyTab.ascx" />
     <Content Include="UI\Admin\Assessments\Attempts\Controls\TakerReportControl.ascx" />
     <Content Include="UI\Admin\Events\Classes\ModifyNotification.aspx" />
+    <Content Include="UI\Admin\Events\Registrations\Classes\Reports\ExamLoginCredentialsReport.ascx" />
+    <Content Include="UI\Admin\Events\Registrations\Classes\Reports\ExamLoginCredentialsReportHeader.html" />
     <Content Include="UI\Admin\Foundations\AudioSample.mp3" />
     <Content Include="UI\Admin\Foundations\Colors.aspx" />
     <Content Include="UI\Admin\Foundations\Controls\HomeCounterRepeater.ascx" />
@@ -6498,6 +6577,9 @@
     <Content Include="UI\Admin\Learning\Programs\ModifyNotification.aspx" />
     <Content Include="UI\Admin\Learning\Programs\ModifyPublication.aspx" />
     <Content Include="UI\Admin\Learning\Programs\ModifySettings.aspx" />
+    <Content Include="UI\Admin\Messages\Mailouts\Failures\Controls\SearchCriteria.ascx" />
+    <Content Include="UI\Admin\Messages\Mailouts\Failures\Controls\SearchResults.ascx" />
+    <Content Include="UI\Admin\Messages\Mailouts\Failures\Search.aspx" />
     <Content Include="UI\Admin\Messages\Messages\Controls\SendEmail.ascx" />
     <Content Include="UI\Admin\Messages\Subscribers\Controls\AddControl.ascx" />
     <Content Include="UI\Admin\Prototype\DashboardAuditor.aspx" />
@@ -7284,6 +7366,7 @@
     <Content Include="UI\Layout\Common\Parts\js\common.outputMedia.js" />
     <Content Include="UI\Layout\Common\Parts\js\common.outputVideo.js" />
     <Content Include="UI\Layout\Common\Parts\js\common.portalSidebar.js" />
+    <Content Include="UI\Layout\Common\Parts\js\common.recentLinks.js" />
     <Content Include="UI\Layout\Common\Parts\js\common.treeView.js" />
     <Content Include="UI\Layout\Common\Parts\plugins\chartjs\chartjs-adapter-moment.js" />
     <Content Include="UI\Layout\Common\Parts\around\js\theme-switcher.js" />
@@ -7333,6 +7416,7 @@
     <None Include="packages.config" />
     <Content Include="UI\Layout\Common\Styles\Components\_circular-progress.scss" />
     <Content Include="UI\Layout\Common\Parts\custom\rtl-styles.scss" />
+    <Content Include="UI\Layout\Common\Parts\custom\themes.dark.scss" />
     <None Include="UI\Layout\Common\Styles\Components\_header.scss" />
     <EmbeddedResource Include="UI\Layout\Common\Styles\Swagger.css" />
     <Content Include="UI\Layout\Common\Styles\shift.css">
@@ -7906,6 +7990,7 @@
     <Content Include="UI\Portal\Learning\Controls\CommentInfo.ascx" />
     <Content Include="UI\Portal\Learning\Controls\CommentRepeater.ascx" />
     <Content Include="UI\Portal\Learning\Controls\CommentTextEditor.ascx" />
+    <Content Include="UI\Portal\Learning\Controls\PlanAchievementTypeRepeater.ascx" />
     <Content Include="UI\Portal\Learning\Course.aspx" />
     <Content Include="UI\Portal\Home\Learning\Badges.aspx" />
     <Content Include="UI\Portal\Home\Learning\Catalog.aspx" />
@@ -7915,6 +8000,7 @@
     <Content Include="UI\Portal\Learning\Programs\Catalog.aspx" />
     <Content Include="UI\Portal\Learning\Programs\Controls\ProgramCardRepeater.ascx" />
     <Content Include="UI\Portal\Learning\Programs\Controls\ProgramSearchControl.ascx" />
+    <Content Include="UI\Portal\Learning\Programs\Plan.aspx" />
     <Content Include="UI\Portal\Learning\Progress.aspx" />
     <Content Include="UI\Portal\Records\Certificates\Certificate.ashx" />
     <Content Include="UI\Portal\Records\Credentials\Learners\Controls\AddCertificate.ascx" />
@@ -11872,7 +11958,6 @@
     <Compile Include="UI\Portal\Assessments\Attempts\Utilities\AttemptUrlBase.cs" />
     <Compile Include="UI\Portal\Assessments\Attempts\Utilities\AttemptUrlForm.cs" />
     <Compile Include="UI\Portal\Assessments\Attempts\Utilities\AttemptUrlResource.cs" />
-    <Compile Include="UI\Portal\Assessments\Attempts\Utilities\QuestionTable.cs" />
     <Compile Include="UI\Portal\Events\Classes\Controls\CardDetail.ascx.cs">
       <DependentUpon>CardDetail.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -17226,7 +17311,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Api\Helpers\ApiUserIdentity.cs" />
-    <Compile Include="UI\Layout\Common\Controls\Server\Buttons\DropDownButton.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\DropDownButtons\DropDownButton.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Content\MarkdownHtmlEditor.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Controllers\SearchResultsBaseGridController.cs">
       <SubType>ASPXCodeBehind</SubType>

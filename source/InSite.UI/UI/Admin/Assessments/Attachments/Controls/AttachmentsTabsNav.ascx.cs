@@ -31,7 +31,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
 
         private class AttachmentUploadModel
         {
-            public Guid UploadIdentifier { get; set; }
+            public Guid FileOrUploadId{ get; set; }
             public string Name { get; set; }
             public string NavigateUrl { get; set; }
             public int? ContentSize { get; set; }
@@ -42,7 +42,6 @@ namespace InSite.Admin.Assessments.Attachments.Controls
             #region Properties
 
             public Guid Identifier => _attachment.Identifier;
-            public Guid Upload => _attachment.Upload;
             public int AssetNumber => _attachment.Asset;
             public int AssetVersion => _attachment.AssetVersion;
             public string Title => (_attachment.Content?.Title.Default).IfNullOrEmpty("(Untitled)");
@@ -78,7 +77,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                 if (UploadExists)
                 {
                     FileName = upload.Name;
-                    FileUrl = "/files" + upload.NavigateUrl;
+                    FileUrl = upload.NavigateUrl;
                     FileSize = (upload.ContentSize ?? 0).Bytes().Humanize("0.##");
                 }
                 else
@@ -200,15 +199,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
             CanWrite = canWrite;
             _returnUrl = returnUrl;
 
-            var allUploads = UploadSearch
-                .Bind(x => new AttachmentUploadModel
-                {
-                    UploadIdentifier = x.UploadIdentifier,
-                    Name = x.Name,
-                    NavigateUrl = x.NavigateUrl,
-                    ContentSize = x.ContentSize,
-                }, attachments)
-                .ToDictionary(x => x.UploadIdentifier);
+            var bankFiles = ReadFiles(bankId, attachments);
 
             var allUsers = UserSearch
                 .Bind(
@@ -237,7 +228,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                 var isImage = attachment.Type == AttachmentType.Image;
                 var isDoc = attachment.Type == AttachmentType.Document;
 
-                var upload = allUploads.GetOrDefault(attachment.Upload);
+                var upload = bankFiles.GetOrDefault(attachment.FileIdentifier ?? attachment.Upload);
                 var user = allUsers.GetOrDefault(attachment.Author);
                 var changes = attachment.EnumerateAllVersions().Select(v => events.GetOrDefault(v.Identifier, 0)).Sum();
                 var model = isImage
@@ -269,6 +260,33 @@ namespace InSite.Admin.Assessments.Attachments.Controls
             OtherTab.Visible = others.Count > 0;
             OtherRepeater.DataSource = others.OrderBy(x => x.UploadExists).ThenBy(x => x.Title);
             OtherRepeater.DataBind();
+        }
+
+        private static Dictionary<Guid, AttachmentUploadModel> ReadFiles(Guid bankId, IEnumerable<Attachment> attachments)
+        {
+            var allUploads = UploadSearch
+                .Bind(x => new AttachmentUploadModel
+                {
+                    FileOrUploadId = x.UploadIdentifier,
+                    Name = x.Name,
+                    NavigateUrl = "/files" + x.NavigateUrl,
+                    ContentSize = x.ContentSize,
+                }, attachments);
+
+            var allFiles = ServiceLocator.FileSearch
+                .GetModels(null, bankId, null, false)
+                .Select(x => new AttachmentUploadModel
+                {
+                    FileOrUploadId = x.FileIdentifier,
+                    Name = x.Properties.DocumentName,
+                    NavigateUrl = ServiceLocator.StorageService.GetFileUrl(x),
+                    ContentSize = x.FileSize
+                })
+                .ToList();
+
+            allFiles.AddRange(allUploads);
+
+            return allFiles.ToDictionary(x => x.FileOrUploadId);
         }
 
         public bool SelectTab(TabType tab)

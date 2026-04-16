@@ -1,8 +1,8 @@
 using System;
 
+using Shift.Common;
 using Shift.Common.Timeline.Commands;
 
-using Shift.Common;
 namespace InSite.Application.Messages.Write
 {
     public class ChangeContent : Command

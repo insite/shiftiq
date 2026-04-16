@@ -19,13 +19,13 @@ export const requestHelper = {
         return requestHelper.appendParams(shiftConfig.shiftApiHostUrl + relativeUrl, params);
     },
 
-    afterRequest(isOk: boolean, status: number, json: unknown): unknown {
+    afterRequest(isOk: boolean, status: number, sessionRefreshed: string | null | undefined, json: unknown, throwAuthError: boolean): unknown {
         if (isOk) {
-            timerHelper.resetTimer();
+            timerHelper.resetTimer(sessionRefreshed);
             return json;
         }
 
-        if ((status === 403 || status === 401) && !_throwAuthError) {
+        if ((status === 403 || status === 401) && !_throwAuthError && !throwAuthError) {
             window.location.href = urlHelper.getLoginPageUrl();
             return null;
         }

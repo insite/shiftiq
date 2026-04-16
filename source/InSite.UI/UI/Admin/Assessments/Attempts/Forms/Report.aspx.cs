@@ -184,7 +184,9 @@ namespace InSite.Admin.Assessments.Attempts.Forms
         {
             try
             {
-                var data = AttemptReportExport.GetXlsx(Filter, IncludeAdditionalSheets.Checked);
+                var data = SeparateSheetPerSet.Checked
+                    ? AttemptReportBySetExport.GetXlsx(Filter)
+                    : AttemptReportDefaultExport.GetXlsx(Filter, IncludeAdditionalSheets.Checked);
 
                 Response.SendFile("attempt_report", "xlsx", data);
             }

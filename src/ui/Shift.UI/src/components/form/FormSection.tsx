@@ -20,7 +20,7 @@ export default function FormSection({
         <section className={className}>
             {title && (
                 <h2>
-                    {icon && <Icon style="Solid" name={icon} className="me-3" />}
+                    {icon && <Icon style="solid" name={icon} className="me-3" />}
                     {title}
                 </h2>
             )}

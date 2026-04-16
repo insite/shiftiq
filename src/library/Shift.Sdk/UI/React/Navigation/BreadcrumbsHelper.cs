@@ -46,7 +46,7 @@ namespace Shift.Contract
             )
         {
             var parentRoute = overrideWebRouteParent?.GetParent() ?? route.GetParent();
-            var parentParams = hasParentLinkParameters?.GetParentLinkParameters(parentRoute);
+            var parentParams = parentRoute != null ? hasParentLinkParameters?.GetParentLinkParameters(parentRoute) : null;
 
             var links = new Stack<BreadcrumbItem>();
 

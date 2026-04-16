@@ -74,7 +74,7 @@ function FinderSearchInput({ ref, disabled, keyword, onFilter }: Props) {
                     tabIndex={-1}
                     disabled={disabled}
                 >
-                    <Icon style="Solid" name="times" />
+                    <Icon style="solid" name="times" />
                 </button>
             )}
             <button
@@ -84,7 +84,7 @@ function FinderSearchInput({ ref, disabled, keyword, onFilter }: Props) {
                 disabled={disabled}
                 onClick={handleFilter}
             >
-                <Icon style="Solid" name="filter" />
+                <Icon style="solid" name="filter" />
             </button>
         </div>
     );

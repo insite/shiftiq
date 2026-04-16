@@ -361,6 +361,8 @@ namespace InSite.Admin.Sites.Pages
             foreach (var name in ContentFields)
             {
                 var item = content[name];
+                var editUrl = $"/client/admin/sites/pages/content/{page.PageIdentifier}?tab={HttpUtility.UrlEncode(name.ToLower())}";
+                var editUrl2 = $"/ui/admin/sites/pages/content?id={page.PageIdentifier}&tab={HttpUtility.UrlEncode(name.ToLower())}";
 
                 if (name == "HtmlHead")
                 {
@@ -369,7 +371,8 @@ namespace InSite.Admin.Sites.Pages
                         Title = "&lt;HEAD&gt;",
                         Value = item.Html,
                         IsRequired = false,
-                        EditUrl = $"/ui/admin/sites/pages/content?id={page.PageIdentifier}&tab={HttpUtility.UrlEncode(name.ToLower())}"
+                        EditUrl = editUrl,
+                        EditUrl2 = editUrl2
                     });
                 }
                 else
@@ -379,7 +382,8 @@ namespace InSite.Admin.Sites.Pages
                     {
                         ParentPage = page,
                         Title = "Blocks",
-                        EditUrl = $"/ui/admin/sites/pages/content?id={page.PageIdentifier}&tab={HttpUtility.UrlEncode(name.ToLower())}",
+                        EditUrl = editUrl,
+                        EditUrl2 = editUrl2
                     });
                 }
                 else if (name == "Body")
@@ -390,7 +394,8 @@ namespace InSite.Admin.Sites.Pages
                         Title = name,
                         Value = string.IsNullOrEmpty(item.Text.Default) ? item.Html : item.Text,
                         IsRequired = false,
-                        EditUrl = $"/ui/admin/sites/pages/content?id={page.PageIdentifier}&tab={HttpUtility.UrlEncode(name.ToLower())}"
+                        EditUrl = editUrl,
+                        EditUrl2 = editUrl2
                     });
                 }
                 else
@@ -400,7 +405,8 @@ namespace InSite.Admin.Sites.Pages
                         Title = name,
                         Value = item.Text,
                         IsRequired = false,
-                        EditUrl = $"/ui/admin/sites/pages/content?id={page.PageIdentifier}&tab={HttpUtility.UrlEncode(name.ToLower())}"
+                        EditUrl = editUrl,
+                        EditUrl2 = editUrl2
                     });
                 }
                 if (name == "HtmlHead")

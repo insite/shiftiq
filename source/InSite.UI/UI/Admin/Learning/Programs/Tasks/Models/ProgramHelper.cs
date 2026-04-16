@@ -157,14 +157,12 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
         public static void EnsureProgramAchievementEnrollement(Guid? programId, Guid objectIdentifier, Guid taskId, VProgramEnrollment programUser)
         {
             var program = programId.HasValue ? ProgramSearch.GetProgram(programId.Value) : null;
+            if (program == null || objectIdentifier != program.AchievementIdentifier)
+                return;
 
-            if (program != null && objectIdentifier == program.AchievementIdentifier)
-            {
-                var credential = ServiceLocator.AchievementSearch.GetCredential(objectIdentifier, programUser.UserIdentifier);
-
-                if (credential != null)
-                    TaskStore.CompleteTaskEnrollementFoLearner(programId.Value, taskId, objectIdentifier, programUser.UserIdentifier);
-            }
+            var credential = ServiceLocator.AchievementSearch.GetCredential(objectIdentifier, programUser.UserIdentifier);
+            if (credential != null)
+                TaskStore.CompleteTaskEnrollementFoLearner(programId.Value, taskId, objectIdentifier, programUser.UserIdentifier);
         }
 
         public static IEnumerable<Shift.Common.ListItem> GetTaskObjects(string objectType, Guid organizationId, bool includePartitionItems = false)
@@ -185,16 +183,17 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
                 filter.OrganizationIdentifiers.Add(ServiceLocator.Partition.Identifier);
 
             var programTasks = ProgramSearch1.GetProgramTasks(filter);
-
             var items = new List<ProgramTaskItem>();
 
             if (!programId.HasValue)
                 return (programTasks, items);
 
+            var tasksIndex = programTasks.ToDictionary(x => x.ObjectIdentifier, x => x);
+
             foreach (var o in objects)
             {
                 var objectId = Guid.Parse(o.Value);
-                var task = programTasks.FirstOrDefault(x => x.ObjectIdentifier == objectId);
+                var task = tasksIndex.GetOrDefault(objectId);
                 if (task == null)
                     continue;
 

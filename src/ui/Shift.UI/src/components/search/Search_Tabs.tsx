@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import { Tab, Tabs } from "react-bootstrap";
 import Search_DownloadTitle from "./Search_DownloadTitle";
-import LoadingContext from "@/contexts/LoadingProvider";
+import LoadingProvider from "@/contexts/loading/LoadingProvider";
 import Search_ResultTitle from "./Search_ResultTitle";
 import Search_CriteriaTitle from "./Search_CriteriaTitle";
 import { SelectedTab } from "@/models/enums";
@@ -26,22 +26,22 @@ export default function Search_Tabs({
     return (
         <Tabs activeKey={selectedTab} transition={false} onSelect={tab => onSelectTab(tab as SelectedTab)}>
             <Tab eventKey="result" title={<Search_ResultTitle count={totalRowCount} />}>
-                <LoadingContext>
+                <LoadingProvider>
                     {resultElement}
-                </LoadingContext>
+                </LoadingProvider>
             </Tab>
             {criteriaElement && (
                 <Tab eventKey="criteria" title={<Search_CriteriaTitle />}>
-                    <LoadingContext>
+                    <LoadingProvider>
                         {criteriaElement}
-                    </LoadingContext>
+                    </LoadingProvider>
                 </Tab>
             )}
             {downloadElement && (
                 <Tab eventKey="download" title={<Search_DownloadTitle />}>
-                    <LoadingContext>
+                    <LoadingProvider>
                         {downloadElement}
-                    </LoadingContext>
+                    </LoadingProvider>
                 </Tab>
             )}
         </Tabs>

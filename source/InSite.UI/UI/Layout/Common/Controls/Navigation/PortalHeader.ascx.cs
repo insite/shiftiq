@@ -52,7 +52,7 @@ namespace InSite.UI.Layout.Portal.Controls
             var maxheight = "style='max-height:60px'";
 
             var p = (logoImageUrl == null)
-                ? $"<i class='fas fa-share-alt-square me-2'></i> {ServiceLocator.Partition.Name}"
+                ? $"<i class='fas fa-share-alt-square me-2'></i> {ServiceLocator.Partition.Brand}"
                 : $"<img src='{logoImageUrl}' {maxheight} />";
 
             HomeLink.InnerHtml = p;

@@ -7,7 +7,7 @@ export const _pageContentController = {
         return await fetchHelper.get<ApiPageContentModel | null>(`/api/workspace/pages-contents/${pageId}`, null, true);
     },
 
-    async modify(pageId: string, model: ApiPageContentModifyModel): Promise<void> {
-        await fetchHelper.post(`/api/workspace/pages-contents/${pageId}`, model);
+    async modify(pageId: string, model: ApiPageContentModifyModel): Promise<Record<number, string> | null> {
+        return await fetchHelper.put<Record<number, string> | null>(`/api/workspace/pages-contents/${pageId}`, model);
     },
 }

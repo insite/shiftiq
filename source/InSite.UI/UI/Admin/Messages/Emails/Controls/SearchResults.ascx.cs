@@ -92,6 +92,9 @@ namespace InSite.Admin.Messages.Emails.Controls
                         OnError?.Invoke($"The email cannot be resent through {email.SenderType}");
                         return;
                     }
+                    if (!email.MessageIdentifier.HasValue)
+                        email.MessageIdentifier = MessageHelper.GetOrCreateDefaultNotificationId(
+                            Organization.OrganizationIdentifier, ServiceLocator.SendCommand);
 
                     ServiceLocator.AlertMailer.Send(email);
                     

@@ -1,0 +1,19 @@
+.WorkshopQuestions_Options_SingleCorrect {
+    display: inline;
+
+    .option-points {
+        .InlineEditor {
+            display: inline;
+
+            input {
+                display: inline;
+                max-width: 5rem;
+            }
+
+            .edit-buttons {
+                display: inline-flex;
+                margin-left: 0.25rem;
+            }
+        }
+    }
+}

@@ -158,8 +158,8 @@
                         <div class="col-lg-4 text-end">
                             <insite:DropDownButton runat="server" ID="ResultDownloadButton" ButtonStyle="Primary" IconType="Solid" IconName="download" Text="Download" DefaultAction="PostBack">
                                 <Items>
-                                    <sdk:DropDownButtonItem Name="Excel" IconType="Solid" IconName="file-excel" Text="Excel (.xlsx)" />
-                                    <sdk:DropDownButtonItem Name="Csv" IconType="Solid" IconName="file-csv" Text="Text (.csv)" />
+                                    <insite:DropDownButtonItem Name="Excel" IconType="Solid" IconName="file-excel" Text="Excel (.xlsx)" />
+                                    <insite:DropDownButtonItem Name="Csv" IconType="Solid" IconName="file-csv" Text="Text (.csv)" />
                                 </Items>
                             </insite:DropDownButton>
                         </div>

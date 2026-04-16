@@ -87,6 +87,9 @@ namespace InSite.Persistence
             if (filter.CatalogIdentifier.HasValue)
                 query = query.Where(x => x.CatalogIdentifier == filter.CatalogIdentifier);
 
+            if (filter.GroupIdentifier.HasValue)
+                query = query.Where(x => x.GroupIdentifier == filter.GroupIdentifier);
+
             if (filter.ProgramCode.HasValue())
                 query = query.Where(x => x.ProgramCode.Contains(filter.ProgramCode));
 
@@ -98,6 +101,22 @@ namespace InSite.Persistence
 
             if (filter.ProgramTag.IsNotEmpty())
                 query = query.Where(x => x.ProgramTag.Contains(filter.ProgramTag));
+
+            if (filter.EnrollmentUserIdentifier.HasValue)
+                query = query.Where(
+                    x => x.Enrollments.Any(y => y.LearnerUserIdentifier == filter.EnrollmentUserIdentifier.Value
+                                             && y.OrganizationIdentifier == filter.OrganizationIdentifier));
+
+            if (filter.AchievementIdentifiers.IsNotEmpty())
+                query = query.Where(x => filter.AchievementIdentifiers.Contains(x.AchievementIdentifier.Value));
+
+            if (filter.TaskObjectIdentifiers.IsNotEmpty())
+            {
+                query = query.Where(
+                    x => db.TTasks.Any(
+                        t => t.ProgramIdentifier == x.ProgramIdentifier
+                          && filter.TaskObjectIdentifiers.Contains(t.ObjectIdentifier)));
+            }
 
             return query;
         }

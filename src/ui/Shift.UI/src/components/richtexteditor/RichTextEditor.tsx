@@ -1,4 +1,4 @@
-import { ForwardedRef, useImperativeHandle, useRef, useState } from "react";
+import { ForwardedRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { FieldError } from "react-hook-form";
 import { Language } from "../../helpers/language";
 import RichTextEditor_Translate from "./RichTextEditor_Translate";
@@ -24,11 +24,15 @@ export interface RichTextEditorProps {
     defaultValue?: RichTextEditorValue | null;
     defaultLanguage?: Language;
     disableUploadFile?: boolean;
+    enableSelectFile?: boolean;
     enableModeSwitch?: boolean;
     htmlTitle?: string;
     markdownTitle?: string;
+    autoFocus?: boolean;
     disabled?: boolean;
     error?: FieldError;
+    onTranslate?: (value: RichTextEditorValue) => void;
+    onSelectFile?(insertFile: (fileUrl: string, documentName: string, isImage: boolean) => void): void;
     onChange?: (value: RichTextEditorValue) => void;
     onBlur?: (value: RichTextEditorValue) => void;
 }
@@ -40,11 +44,15 @@ export default function RichTextEditor ({
     defaultValue,
     defaultLanguage = "en",
     disableUploadFile = false,
+    enableSelectFile = false,
     enableModeSwitch = false,
     htmlTitle = "Body HTML",
     markdownTitle = "Body Text (Markdown)",
+    autoFocus = false,
     disabled = false,
     error,
+    onTranslate,
+    onSelectFile,
     onChange,
     onBlur
 }: RichTextEditorProps) {
@@ -69,6 +77,7 @@ export default function RichTextEditor ({
         handleHtmlChange,
         handleTranslate,
         handleUploadFileAndInsert,
+        handleInsertFileUrl,
         handleSelectLanguage,
     } = useRichTextEditor(
         markdownRef,
@@ -78,8 +87,20 @@ export default function RichTextEditor ({
         defaultValue,
         defaultLanguage,
         _supportedFileTypes,
+        onTranslate,
         onChange,
     );
+
+    useEffect(() => {
+        if (autoFocus) {
+            markdownRef.current?.focus();
+            htmlRef.current?.focus();
+        }
+    }, [autoFocus]);
+
+    function handleSelectFile() {
+        onSelectFile?.(handleInsertFileUrl);
+    }
 
     return (
         <div className={`richtexteditor ${error ? "is-invalid" : ""}`}>
@@ -98,7 +119,9 @@ export default function RichTextEditor ({
                     disabled={isTranslating || disabled}
                     markdown={currentValue?.markdown?.[currentLanguage] ?? ""}
                     disableUploadFile={disableUploadFile}
+                    enableSelectFile={enableSelectFile}
                     onUploadFile={handleUploadFile}
+                    onSelectFile={handleSelectFile}
                     onChange={handleMarkdownChange}
                     onBlur={() => onBlur?.(currentValue ?? {})}
                 />

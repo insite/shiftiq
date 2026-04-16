@@ -80,7 +80,7 @@ export default function ListManagerExistingItems({
                 title={deleteTooltip ?? undefined}
                 onClick={handleDelete}
             >
-                <Icon style="Solid" name="trash-alt" />
+                <Icon style="solid" name="trash-alt" />
             </button>
         </div>
     );

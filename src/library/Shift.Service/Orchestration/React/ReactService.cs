@@ -70,7 +70,7 @@ public class ReactService : IReactService
             return cachedValue.Settings;
         }
 
-        bool isCmds = StringHelper.EqualsAny(principal.Partition.Slug, new[] { "e03", "cmds" });
+        bool isCmds = StringHelper.EqualsAny(principal.Partition.Slug, ["e03", "cmds"]);
 
         var settings = new SiteSettings();
 
@@ -101,7 +101,7 @@ public class ReactService : IReactService
         settings.IsAdministrator = principal.Authority >= AuthorityAccess.Administrator;
         settings.IsOperator = principal.Authority >= AuthorityAccess.Operator;
         settings.IsMultiOrganization = await IsMultiOrganization(principal.User.Identifier);
-        settings.ImpersonatorName = principal.Proxy?.Agent != null ? principal.Proxy.Agent.Name : null;
+        settings.ImpersonatorName = await GetImpersonatorNameAsync(principal);
 
         if (organizationData != null && organizationData.Toolkits.Portal.ShowMyDashboard)
         {
@@ -145,6 +145,17 @@ public class ReactService : IReactService
         SiteSettingsCache.Add(identityKey, (principal.CookieId, settings));
 
         return settings;
+    }
+
+    private async Task<string?> GetImpersonatorNameAsync(IPrincipal principal)
+    {
+        var email = principal.Proxy?.Agent != null ? principal.Proxy.Agent.Email : null;
+        if (string.IsNullOrEmpty(email))
+            return null;
+
+        var users = await _userService.SearchAsync(new SearchUsers { UserEmailExact = email });
+
+        return users.FirstOrDefault()?.FullName;
     }
 
     private async Task<bool> IsMultiOrganization(Guid userId)

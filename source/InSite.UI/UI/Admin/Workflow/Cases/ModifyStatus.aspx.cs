@@ -30,7 +30,7 @@ namespace InSite.Admin.Issues.Forms
 
             _issue = ServiceLocator.IssueSearch.GetIssue(CaseIdentifier);
 
-            if (_issue == null || !CaseVisibilityHelper.IsCaseVisible(_issue.OrganizationIdentifier, _issue.TopicUserIdentifier))
+            if (_issue == null || !CaseVisibilityHelper.IsCaseVisible(_issue))
                 RedirectToSearch();
 
             IssueStatus.IssueType = _issue.IssueType;

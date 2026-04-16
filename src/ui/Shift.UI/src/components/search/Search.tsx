@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { CacheKey } from "@/cache/cacheKey";
-import { useStatusProvider } from "@/contexts/StatusProvider";
-import { useLoadingProvider } from "@/contexts/LoadingProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
+import { useLoadingProvider } from "@/contexts/loading/LoadingProviderContext";
 import { translate } from "@/helpers/translate";
 import { GridColumn } from "./Grid";
 import { BaseCriteria } from "./BaseCriteria";

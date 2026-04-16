@@ -122,6 +122,7 @@ namespace InSite.Persistence
         public bool? IsCandidate { get; set; }
         public Guid[] EmployerGroups { get; set; }
         public Guid[] Groups { get; set; }
+        public bool? EmployerGroupsRequireReferrals { get; set; }
 
         public int[] CommentsFlag { get; set; }
 

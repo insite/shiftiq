@@ -3,6 +3,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
+using Shift.Common.Kernel;
+
 namespace Shift.Api;
 
 [ApiController]
@@ -82,7 +84,14 @@ public class CommandController : ControllerBase
 
             // Relay the request to the Timeline command server.
 
-            var result = await client.QueueCommandAsync(command, commandData, token);
+            var result = await client.QueueCommandsAsync(new List<ApiCommand>()
+                {
+                    new ApiCommand
+                    {
+                        CommandName = command,
+                        CommandData = commandData
+                    }
+                }, token);
 
             if (!result.IsOK())
                 return result.Problem.ToActionResult(this);

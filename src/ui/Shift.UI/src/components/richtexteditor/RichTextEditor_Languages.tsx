@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import showdown from "showdown";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { Language, MultiLanguageText } from "../../helpers/language";
 import { RichTextEditorMode } from "./RichTextEditorMode";
 

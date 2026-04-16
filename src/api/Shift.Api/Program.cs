@@ -16,13 +16,17 @@ using Shift.Common.Integration.Google;
 using Shift.Constant;
 using Shift.Contract.Presentation;
 using Shift.Sdk.Service;
+using Shift.Sdk.Service.Security.Cookies;
 using Shift.Service.Content;
 using Shift.Service.Content.PageContents;
 using Shift.Service.Directory;
+using Shift.Service.Evaluation.Workshops;
 using Shift.Service.Feedback;
+using Shift.Service.Metadata.Sequences.Data;
 using Shift.Service.Orchestration;
 using Shift.Service.Presentation;
 using Shift.Service.Workspace;
+using Shift.Toolbox;
 
 // Step 1. Load configuration settings (from appsettings.json) before doing anything else.
 
@@ -154,11 +158,7 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
 
     services.AddSingleton<ResponseService>();
 
-    services.AddScoped<ICommanderAsync, CommanderAsync>();
-    services.AddScoped<ITranslatorService, TranslatorService>();
-    services.AddScoped<IGroupLookupService, GroupLookupService>();
-    services.AddScoped<IContentRetrieveService, ContentRetrieveService>();
-    services.AddScoped<IContentModifyService, ContentModifyService>();
+    services.AddSingleton<ICookieService, CookieService>();
 
     services.AddSingleton<IFileChangeFactory>(x => new FileChangeFactory(x => string.Empty));
     services.AddSingleton<IFileSearchAsync, FileSearch>();
@@ -169,6 +169,20 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
         return new FileManagerService(paths);
     });
     services.AddSingleton<IStorageServiceAsync, StorageService>();
+
+    services.AddScoped<ISequence, Sequence>();
+    services.AddScoped<ICommanderAsync, TimelineService>();
+    services.AddScoped<ITimelineQuery, TimelineService>();
+    services.AddScoped<ITranslatorService, TranslatorService>();
+    services.AddScoped<IGroupLookupService, GroupLookupService>();
+    services.AddScoped<IContentRetrieveService, ContentRetrieveService>();
+    services.AddScoped<IContentModifyService, ContentModifyService>();
+    services.AddScoped<IFormWorkshopRetrieveService, FormWorkshopRetrieveService>();
+    services.AddScoped<ISpecWorkshopRetrieveService, SpecWorkshopRetrieveService>();
+    services.AddScoped<ISpecWorkshopModifyService, SpecWorkshopModifyService>();
+    services.AddScoped<IWorkshopModifyQuestionService, WorkshopModifyQuestionService>();
+    services.AddScoped<IWorkshopModifyOptionService, WorkshopModifyOptionService>();
+    services.AddScoped<IWorkshopImageListService, WorkshopImageListService>();
 
     services.AddLogging(builder =>
     {
@@ -262,6 +276,8 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
         }
     });
 
+    ImageHelper.Initialize(settings.Engine.Api.ImageMagick);
+
     return BuildApplication(builder, settings, settings.Shift.Api, telemetry);
 }
 
@@ -290,7 +306,7 @@ WebApplication BuildApplication(WebApplicationBuilder builder, AppSettings setti
             .AllowAnyMethod()
             .AllowCredentials()
             .SetIsOriginAllowedToAllowWildcardSubdomains()
-            .WithExposedHeaders("X-Query-Pagination", "Content-Disposition")
+            .WithExposedHeaders("X-Query-Pagination", "Content-Disposition", "X-Session-Refreshed")
             .WithOrigins(api.Origins);
     });
 

@@ -19,21 +19,18 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
         public void Handle(ApprovalChanged e)
         {
             var packet = GetRegistrationPacket(e.AggregateIdentifier);
-            bool statusChanged = packet.Registration.ApprovalStatus != e.PreviousStatus;
-            bool forceExecution = e.Process?.Description == "Force Execution";
-
-            if (statusChanged || forceExecution)
-            {
-                if (!IsNotificationDisabled(packet))
-                {
-                    SetNotificationTimers(e, packet);
-                    _broker.Send(e, new ChangeSynchronization(e.AggregateIdentifier, "Push to Direct Access", null));
-                }
-            }
+            var statusChanged = packet.Registration.ApprovalStatus != e.PreviousStatus;
+            var forceExecution = e.Process?.Description == "Force Execution";
 
             if (statusChanged && e.PreviousStatus != null && e.Status != null)
             {
                 CancelRegistrationNotificationTimer(e, e.AggregateIdentifier, NotificationType.ITA021);
+            }
+
+            if ((statusChanged || forceExecution) && !IsNotificationDisabled(packet))
+            {
+                SetNotificationTimers(e, packet);
+                _broker.Send(e, new ChangeSynchronization(e.AggregateIdentifier, "Push to Direct Access", null));
             }
         }
 

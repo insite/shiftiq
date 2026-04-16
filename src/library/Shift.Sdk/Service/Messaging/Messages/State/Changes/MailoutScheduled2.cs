@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Shift.Common.Timeline.Changes;
-
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Domain.Messages
 {

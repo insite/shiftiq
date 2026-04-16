@@ -255,7 +255,12 @@ namespace InSite.Persistence.Plugin.CMDS
             return SelectForTrainingPlan(employeeId, organizationIdentifier, achievementType, null);
         }
 
-        private static List<VCmdsCredentialAndExperience> SelectForTrainingPlan(Guid employeeId, Guid organizationIdentifier, string achievementType, Guid? achievement)
+        public static List<VCmdsCredentialAndExperience> SelectForTrainingPlan(Guid employeeId, Guid organizationIdentifier, Guid[] achievementIds)
+        {
+            return SelectForTrainingPlan(employeeId, organizationIdentifier, null, achievementIds);
+        }
+
+        private static List<VCmdsCredentialAndExperience> SelectForTrainingPlan(Guid employeeId, Guid organizationIdentifier, string achievementType, Guid[] achievementIds)
         {
             using (var db = new InternalDbContext())
             {
@@ -271,8 +276,8 @@ namespace InSite.Persistence.Plugin.CMDS
                         && x.AchievementDescription != "Hidden"
                     );
 
-                if (achievement.HasValue)
-                    query = query.Where(x => x.AchievementIdentifier == achievement);
+                if (achievementIds.IsNotEmpty())
+                    query = query.Where(x => achievementIds.Contains(x.AchievementIdentifier));
 
                 if (!string.IsNullOrEmpty(achievementType))
                     query = query.Where(x => x.AchievementLabel == achievementType);

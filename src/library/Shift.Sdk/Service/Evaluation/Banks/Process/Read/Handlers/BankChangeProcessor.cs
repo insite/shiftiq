@@ -16,6 +16,7 @@ using InSite.Application.Sites.Read;
 using InSite.Domain.Banks;
 
 using Shift.Common;
+using InSite.Application.Files.Read;
 
 namespace InSite.Application.Banks.Read
 {
@@ -39,8 +40,18 @@ namespace InSite.Application.Banks.Read
         private readonly IPageSearch _pages;
         private readonly IRecordSearch _records;
         private readonly IUploadSearch _uploads;
+        private readonly IStorageService _storageService;
 
-        public BankChangeProcessor(ICommander commander, IChangeQueue publisher, IBankSearch banks, IPageSearch pages, IRecordSearch records, IUploadSearch uploads, string domain)
+        public BankChangeProcessor(
+            ICommander commander,
+            IChangeQueue publisher,
+            IBankSearch banks,
+            IPageSearch pages,
+            IRecordSearch records,
+            IUploadSearch uploads,
+            IStorageService storageService,
+            string domain
+            )
         {
             _commander = commander;
 
@@ -48,6 +59,7 @@ namespace InSite.Application.Banks.Read
             _pages = pages;
             _records = records;
             _uploads = uploads;
+            _storageService = storageService;
 
             _questionAttachmentPattern = new Regex(
                 $"!?\\[[^[]+]\\((?<Url>(?<Host>https?://[a-z-]+\\.{domain.Replace(".", "\\.")})?/files(?<UploadUrl>/[^(\"]+?))(?: \"[^(\"]+\")?\\)",
@@ -145,8 +157,8 @@ namespace InSite.Application.Banks.Read
 
             foreach (var attachment in bank.EnumerateAllAttachments())
             {
-                attachmentMapping.Add(attachment.Identifier, attachment.Upload);
-                uploadMapping[attachment.Upload] = attachment.Identifier;
+                attachmentMapping.Add(attachment.Identifier, attachment.FileIdentifier ?? attachment.Upload);
+                uploadMapping[attachment.FileIdentifier ?? attachment.Upload] = attachment.Identifier;
             }
 
             var uploads = GetQuestionUploads(question, uploadMapping);
@@ -190,9 +202,19 @@ namespace InSite.Application.Banks.Read
             if (text.IsEmpty())
                 return new Guid[0];
 
+            var ids = new HashSet<Guid>();
+
+            AddQuestionUploadsFromUploads(uploadMapping, text, ids);
+            AddQuestionUploadsFromFiles(uploadMapping, text, ids);
+
+            return ids;
+        }
+
+        private void AddQuestionUploadsFromUploads(Dictionary<Guid, Guid> uploadMapping, string text, HashSet<Guid> ids)
+        {
             var matches = _questionAttachmentPattern.Matches(text);
             if (matches.Count == 0)
-                return new Guid[0];
+                return;
 
             var urlFilter = matches.Cast<Match>().Select(m => m.Groups["UploadUrl"].Value)
                 .Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
@@ -200,7 +222,19 @@ namespace InSite.Application.Banks.Read
             var values = _uploads
                 .Bind(x => x.UploadIdentifier, x => uploadMapping.Keys.Contains(x.UploadIdentifier) && urlFilter.Contains(x.NavigateUrl));
 
-            return new HashSet<Guid>(values);
+            foreach (var value in values)
+                ids.Add(value);
+        }
+
+        private void AddQuestionUploadsFromFiles(Dictionary<Guid, Guid> uploadMapping, string text, HashSet<Guid> ids)
+        {
+            var files = _storageService.ExtractAndParseFileUrls(text);
+
+            foreach (var (fileId, _) in files)
+            {
+                if (uploadMapping.ContainsKey(fileId))
+                    ids.Add(fileId);
+            }
         }
 
         private static string ToSingleString(IEnumerable<MultilingualString> input)

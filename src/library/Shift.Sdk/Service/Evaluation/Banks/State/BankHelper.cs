@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 namespace InSite.Domain.Banks
 {
     public static class BankHelper
@@ -31,6 +32,35 @@ namespace InSite.Domain.Banks
             typeof(Randomization),
             typeof(ScoreCalculation)
         };
+
+        #endregion
+
+        #region Properties
+
+        private static HashSet<string> _attachmentChangeTypes;
+        public static HashSet<string> AttachmentChangeTypes
+        {
+            get
+            {
+                if (_attachmentChangeTypes == null)
+                {
+                    var changeType = typeof(Change);
+                    var targetType = typeof(AttachmentAdded);
+
+                    var list = System.Reflection.Assembly.GetAssembly(targetType).GetTypes()
+                        .Where(t => t.IsPublic && t.IsClass
+                                && t.IsSubclassOf(changeType)
+                                && t.Namespace == targetType.Namespace
+                                && t.Name.StartsWith("Attachment"))
+                        .Select(x => x.Name)
+                        .ToList();
+
+                    _attachmentChangeTypes = new HashSet<string>(list);
+                }
+                
+                return _attachmentChangeTypes;
+            }
+        }
 
         #endregion
 
@@ -104,7 +134,7 @@ namespace InSite.Domain.Banks
                 t.IsClass && t != typeof(string);
 
             bool IsValidObjType(Type t) =>
-                objType.IsGenericType ? !typeof(List<>).IsAssignableFrom(objType.GetGenericTypeDefinition()) : !_excludeObjTypes.Contains(t) && !t.IsSubclassOf(typeof(MultilingualDictionary));
+                t.IsGenericType ? !typeof(List<>).IsAssignableFrom(t.GetGenericTypeDefinition()) : !_excludeObjTypes.Contains(t) && !t.IsSubclassOf(typeof(MultilingualDictionary));
         }
 
         #endregion
@@ -185,79 +215,85 @@ namespace InSite.Domain.Banks
 
         }
 
-        private static void ResetGuidIdentifiers(object obj, ResetGuidState state)
+        private static void ResetGuidIdentifiers(object root, ResetGuidState state)
         {
-            if (state.VisitedObjects.Contains(obj))
-                return;
+            var stack = new Stack<object>();
+            stack.Push(root);
 
-            var objType = obj.GetType();
-
-            if (IsValidObjType(objType))
+            while (stack.Count > 0)
             {
-                state.VisitedObjects.Add(obj);
+                var obj = stack.Pop();
+                if (state.VisitedObjects.Contains(obj))
+                    continue;
 
-                var props = objType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
-                foreach (var p in props)
+                var objType = obj.GetType();
+
+                if (IsValidObjType(objType))
                 {
-                    if (p.GetIndexParameters().Length > 0)
-                        continue;
+                    state.VisitedObjects.Add(obj);
 
-                    var pType = p.PropertyType;
+                    var props = objType.GetProperties(
+                        BindingFlags.Instance | BindingFlags.Public |
+                        BindingFlags.GetProperty | BindingFlags.SetProperty);
 
-                    if (pType == typeof(Guid) && p.Name == "Identifier")
+                    foreach (var p in props)
                     {
-                        var oldId = (Guid)p.GetValue(obj);
-                        var newId = UuidFactory.Create();
+                        if (p.GetIndexParameters().Length > 0)
+                            continue;
 
-                        p.SetValue(obj, newId);
+                        var pType = p.PropertyType;
 
-                        if (oldId != Guid.Empty)
+                        if (pType == typeof(Guid) && p.Name == "Identifier")
                         {
-                            if (state.IdMapping.ContainsKey(oldId))
-                                throw ApplicationError.Create($"Duplicate identifier found: {oldId}");
+                            var oldId = (Guid)p.GetValue(obj);
+                            var newId = UuidFactory.Create();
+                            p.SetValue(obj, newId);
 
-                            state.IdMapping.Add(oldId, newId);
+                            if (oldId != Guid.Empty)
+                            {
+                                if (state.IdMapping.ContainsKey(oldId))
+                                    throw ApplicationError.Create($"Duplicate identifier found: {oldId}");
+
+                                state.IdMapping.Add(oldId, newId);
+                            }
+                        }
+                        else if (IsGuidType(pType))
+                        {
+                            state.Properties.Add(new Tuple<object, PropertyInfo>(obj, p));
+                        }
+
+                        if (!IsValidPropType(pType))
+                            continue;
+
+                        var value = p.GetValue(obj);
+                        if (value != null)
+                            stack.Push(value);
+                    }
+                }
+
+                if (objType.IsGenericType)
+                {
+                    var isHandled = false;
+                    var genTypeDef = objType.GetGenericTypeDefinition();
+
+                    if (typeof(IEnumerable).IsAssignableFrom(genTypeDef))
+                    {
+                        var genArgs = objType.GetGenericArguments();
+                        if (genArgs.Length == 1 && IsValidPropType(genArgs[0]))
+                        {
+                            foreach (var item in (IEnumerable)obj)
+                                stack.Push(item);
+
+                            isHandled = true;
                         }
                     }
-                    else if (IsGuidType(pType))
+
+                    if (!isHandled && typeof(IEnumerable).IsAssignableFrom(genTypeDef))
                     {
-                        state.Properties.Add(new Tuple<object, PropertyInfo>(obj, p));
+                        var genArgs = objType.GetGenericArguments();
+                        if (genArgs.Length == 1 && IsGuidType(genArgs[0]))
+                            state.Enumerables.Add((IEnumerable)obj);
                     }
-
-                    if (!IsValidPropType(pType))
-                        continue;
-
-                    var value = p.GetValue(obj);
-                    if (value == null)
-                        continue;
-
-                    ResetGuidIdentifiers(value, state);
-                }
-            }
-
-            if (objType.IsGenericType)
-            {
-                var isHandled = false;
-                var genTypeDef = objType.GetGenericTypeDefinition();
-
-                if (typeof(IEnumerable).IsAssignableFrom(genTypeDef))
-                {
-                    var genArgs = objType.GetGenericArguments();
-                    if (genArgs.Length == 1 && IsValidPropType(genArgs[0]))
-                    {
-                        var enumerable = (IEnumerable)obj;
-                        foreach (var item in enumerable)
-                            ResetGuidIdentifiers(item, state);
-
-                        isHandled = true;
-                    }
-                }
-
-                if (!isHandled && typeof(IEnumerable).IsAssignableFrom(genTypeDef))
-                {
-                    var genArgs = objType.GetGenericArguments();
-                    if (genArgs.Length == 1 && IsGuidType(genArgs[0]))
-                        state.Enumerables.Add((IEnumerable)obj);
                 }
             }
 
@@ -265,12 +301,11 @@ namespace InSite.Domain.Banks
                 t.IsClass && t != typeof(string);
 
             bool IsValidObjType(Type t) =>
-                objType.IsGenericType ? !typeof(List<>).IsAssignableFrom(objType.GetGenericTypeDefinition()) : !_excludeObjTypes.Contains(t);
+                t.IsGenericType ? !typeof(List<>).IsAssignableFrom(t.GetGenericTypeDefinition()) : !_excludeObjTypes.Contains(t);
 
             bool IsGuidType(Type t) =>
                 t == typeof(Guid) || t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>) && Nullable.GetUnderlyingType(t) == typeof(Guid);
         }
-
 
         #endregion
     }

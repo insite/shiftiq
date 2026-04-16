@@ -20,6 +20,10 @@ namespace Shift.Common.Json
             nameof(ICommand.OriginUser),
             nameof(ICommand.CommandIdentifier)
         });
+        static readonly CommandContractResolver CommandForApiResolver = new CommandContractResolver(typeof(ICommand), new[] {
+            nameof(ICommand.ExpectedVersion),
+            nameof(ICommand.CommandIdentifier)
+        });
         static readonly CommandContractResolver ChangeResolver = new CommandContractResolver(typeof(IChange), new[] {
             nameof(IChange.AggregateIdentifier),
             nameof(IChange.AggregateState),
@@ -28,6 +32,47 @@ namespace Shift.Common.Json
             nameof(IChange.OriginOrganization),
             nameof(IChange.OriginUser)
         });
+
+        static readonly JsonSerializerSettings CommandSettings = new JsonSerializerSettings
+        {
+            ContractResolver = CommandResolver,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            Formatting = Formatting.None,
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.None,
+            Converters =
+            {
+                new StringEnumConverter()
+            }
+        };
+
+        static readonly JsonSerializerSettings CommandForApiSettings = new JsonSerializerSettings
+        {
+            ContractResolver = CommandForApiResolver,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            Formatting = Formatting.None,
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.None,
+            Converters =
+            {
+                new StringEnumConverter()
+            }
+        };
+
+        static readonly JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
+        {
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            Formatting = Formatting.None,
+            NullValueHandling = NullValueHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.None,
+            Converters =
+            {
+                new StringEnumConverter()
+            }
+        };
 
         static readonly Dictionary<string, Resolver> ContractResolvers = new Dictionary<string, Resolver>();
         static readonly Dictionary<string, Resolver> IgnoreAttrContractResolvers = new Dictionary<string, Resolver>();
@@ -73,21 +118,7 @@ namespace Shift.Common.Json
 
         public string Serialize<T>(T value)
         {
-            if (value == null)
-                return null;
-
-            var settings = new JsonSerializerSettings
-            {
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                Formatting = Formatting.None,
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.None
-            };
-
-            settings.Converters.Add(new StringEnumConverter());
-
-            return JsonConvert.SerializeObject(value, settings);
+            return value != null ? JsonConvert.SerializeObject(value, DefaultSettings) : null;
         }
 
         /// <summary>
@@ -119,19 +150,12 @@ namespace Shift.Common.Json
         /// </summary>
         public string SerializeCommand(ICommand command)
         {
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = CommandResolver,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                Formatting = Formatting.None,
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.None
-            };
+            return JsonConvert.SerializeObject(command, CommandSettings);
+        }
 
-            settings.Converters.Add(new StringEnumConverter());
-
-            return JsonConvert.SerializeObject(command, settings);
+        public string SerializeCommandForApi(ICommand command)
+        {
+            return JsonConvert.SerializeObject(command, CommandForApiSettings);
         }
 
         /// <summary>

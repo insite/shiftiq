@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 
 using InSite.Application.Contents.Read;
+using InSite.Domain.Attempts;
 
 using Shift.Common;
 
@@ -56,6 +57,8 @@ namespace InSite.Application.Attempts.Read
         T[] BindAttemptMatches<T>(Expression<Func<QAttemptMatch, T>> binder, QAttemptFilter filter);
 
         // Attempts
+
+        AttemptState GetAttemptState(Guid attempt);
 
         QAttempt GetAttempt(Guid attempt, params Expression<Func<QAttempt, object>>[] includes);
         List<QAttempt> GetAttempts(QAttemptFilter filter, params Expression<Func<QAttempt, object>>[] includes);

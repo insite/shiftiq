@@ -33,6 +33,7 @@
                     <td style="padding-left:45px;">
                         <%# Eval("Name") %>
                         <%# EvalSatisfactionLevelHtml("SatisfactionLevel") %>
+                        <%# EvalSummaryHtml("Summary") %>
                     </td>
                     <td style="text-align:center;">
                         <asp:Literal runat="server" ID="Hours" />
@@ -46,3 +47,13 @@
         </asp:Repeater>
     </ItemTemplate>
 </asp:Repeater>
+
+<insite:PageHeadContent runat="server" ID="CommonStyle">
+    <style type="text/css">
+        
+        .competency-summary p {
+            margin-bottom: 0.5rem;
+        }
+
+    </style>
+</insite:PageHeadContent>

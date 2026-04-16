@@ -405,7 +405,7 @@ namespace InSite
             EventSearch = new EventSearch(SnapshotRepository);
             EventStore = new EventStore(Serializer, BankSearch);
 
-            AttemptSearch = new AttemptSearch();
+            AttemptSearch = new AttemptSearch(AggregateSearch);
             InstructorAttemptStore = new InstructorAttemptStore();
             LearnerAttemptSummarySearch = new LearnerAttemptSummarySearch();
             TakerReportSearch = new TakerReportSearch();
@@ -611,6 +611,9 @@ namespace InSite
             OrganizationChangeSubscriber = new OrganizationChangeSubscriber(ChangeQueue, OrganizationStore);
 
             InitializeCustomProjectManagers();
+
+            if (EmailOutbox is EmailOutbox eo)
+                eo.Init(MessageSearch);
         }
 
         public static void InitializeCustomProjectManagers()
@@ -639,7 +642,7 @@ namespace InSite
             _ = new AchievementChangeProcessor(commander, ChangeQueue, AlertMailer, AchievementSearch, CourseObjectSearch, AttemptSearch, JournalSearch, ProgramSearch, ProgramStore, ProgramService, MessageSearch, ContentSearch, ContactSearch, Partition.IsE03());
             _ = new EventChangeProcessor(commander, ChangeQueue, AlertMailer, ContactSearch, EventSearch, RegistrationSearch, RecordSearch);
             AttemptChangeProcessor = new AttemptChangeProcessor(commander, ChangeQueue, AlertMailer, AttemptSearch, BankSearch, ContactSearch, CourseObjectSearch, RecordSearch, OrganizationSearch);
-            _ = new BankChangeProcessor(commander, ChangeQueue, BankSearch, PageSearch, RecordSearch, UploadSearch, AppSettings.Partition.Domain);
+            _ = new BankChangeProcessor(commander, ChangeQueue, BankSearch, PageSearch, RecordSearch, UploadSearch, StorageService, AppSettings.Partition.Domain);
             ProgressRestarter = new ProgressRestarter(SendCommand, RecordSearch);
             _ = new CourseObjectChangeProcessor(commander, ChangeQueue, ProgressRestarter);
             _ = new IssueChangeProcessor(ChangeQueue, AlertMailer, IssueSearch);
@@ -655,6 +658,7 @@ namespace InSite
             _ = new JournalChangeProcessor(Urls, commander, ChangeQueue, JournalSearch, ContactSearch, AlertMailer, OrganizationSearch);
             _ = new GroupChangeProcessor(commander, ChangeQueue, AlertMailer);
             _ = new RubricChangeProcessor(commander, ChangeQueue, BankSearch);
+            _ = new MessageChangeProcessor(commander, ChangeQueue, MessageSearch, ContactSearch);
 
             // Custom process managers
 
@@ -665,19 +669,16 @@ namespace InSite
             _ = new RcabcRegistrationChangeProcessor(commander, ChangeQueue, SnapshotRepository, EventSearch, RecordSearch);
         }
 
-        public static void InitializeInfrastructure(IIdentityService identityService, IApiRequestLogger apiRequestLogger, Action<string> error)
+        public static void InitializeInfrastructure(ICommander commander, IIdentityService identityService, IApiRequestLogger apiRequestLogger, Action<string> error)
         {
             var domain = AppSettings.Partition.Domain;
 
             MailgunServer = new MailgunServer(
                 AppSettings.Integration.Mailgun,
-                AppSettings.Application.EmailOutboxDisabled,
-                AppSettings.Application.EmailOutboxFiltered,
-                StringHelper.Split(Partition.WhitelistDomains),
-                StringHelper.Split(Partition.WhitelistEmails),
-                AppSettings.Application.AlertsToForceSendList
+                new MailgunServerSettings(Partition, AppSettings.Environment, AppSettings.Application)
             );
-            EmailOutbox = new EmailOutbox(MailgunServer, AppSettings.Environment.Name, Partition);
+            
+            EmailOutbox = new EmailOutbox(MailgunServer, AppSettings.Environment.Name, Partition, commander);
             FFmpeg = new FFmpeg(AppSettings.Application.FFmpegFolderPath);
             CountrySearch = new CountrySearch(AppSettings.Engine.Api.Google.BaseUrl);
             ProvinceSearch = new ProvinceSearch(AppSettings.Engine.Api.Google.BaseUrl, CountrySearch);

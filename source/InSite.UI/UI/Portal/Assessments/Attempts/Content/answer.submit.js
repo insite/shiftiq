@@ -105,6 +105,7 @@
     const $form = $('form');
     const $cmds = $('.attempt-commands');
     const $timer = $('#timer');
+    const $timerTitle = $('<div class="title d-none"></div>');
     const $timerHours = $('<div class="timer-hours">00</div>');
     const $timerSeparator = $('<div class="timer-separator"> : </div>');
     const $timerMinutes = $('<div class="timer-minutes">00</div>');
@@ -118,7 +119,7 @@
             $('#attempt-commands').detach().appendTo($menuContainer);
     }
 
-    $timer.append($timerHours, $timerSeparator, $timerMinutes, $timerSeconds);
+    $timer.append($timerTitle, $timerHours, $timerSeparator, $timerMinutes, $timerSeconds);
 
     $(window).on('attempts:init', function () {
         $form.find(':input[data-submit="true"]').each(function () {
@@ -902,6 +903,19 @@
 
                 if (isLastItem)
                     $completeButton.show();
+            }
+
+            if (section.isBreakTime && _answerStrings.timer.breakLabel) {
+                $timerTitle.removeClass('d-none');
+                $timerTitle.text(_answerStrings.timer.breakLabel);
+            } else if ((section.isBreakTime || section.isTabInnerTimer) && _answerStrings.timer.tabLabel) {
+                $timerTitle.removeClass('d-none');
+                $timerTitle.text(_answerStrings.timer.tabLabel);
+            } else if (!section.isTabInnerTimer && !section.isBreakTime && _answerStrings.timer.examLabel) {
+                $timerTitle.removeClass('d-none');
+                $timerTitle.text(_answerStrings.timer.examLabel);
+            } else {
+                $timerTitle.addClass('d-none');
             }
 
             if (settings.examShowTimer && timer.direction != timerDirection.none)

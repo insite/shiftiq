@@ -9,6 +9,7 @@ namespace Shift.Contract
     {
         public Guid? OrganizationId { get; set; }
 
+        public Guid[] UserIds { get; set; }
         public string UserEmailExact { get; set; }
         public string UserFullNameContains { get; set; }
     }

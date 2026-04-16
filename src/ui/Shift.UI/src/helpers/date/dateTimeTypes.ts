@@ -10,6 +10,7 @@ export interface DateParts {
 export interface TimeParts {
     hour: number | null;
     minute: number | null;
+    second?: number | null;
     timeZoneId: TimeZoneId | null;
 }
 
@@ -27,7 +28,7 @@ export type DateTime = DateTimeParts | DateTimeInvalid | null;
 export type DateOrDateTime = DateParts | DateTimeParts | DateTimeInvalid | null;
 
 export type DateFormatType = "mm/dd/yyyy" | "mmm d, yyyy" | "yyyy-mm-dd";
-export type TimeFormatType = "h:m tt z";
+export type TimeFormatType = "h:m tt z" | "HH:mm:ss z";
 
 export const defaultFormatType: DateFormatType = "mmm d, yyyy";
 
@@ -52,4 +53,8 @@ export function isDateTimeInvalid(value: DateOrDateTime | undefined): value is D
 
 export function isDateTime(value: DateOrDateTime | undefined): value is DateTimeParts {
     return !!value && "date" in value && "time" in value;
+}
+
+export function isDate(value: DateOrDateTime | undefined): value is DateParts {
+    return !!value && "day" in value && "month" in value && "year" in value;
 }

@@ -48,17 +48,15 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
             if (@event.EventFormat == EventExamFormat.Online.Value)
                 StartEventAlertTimer(e, id, NotificationType.ITA003, twoBusinessDaysPrior, $"Two (2) business days prior, send ITA003", twoBusinessDaysPrior > now);
 
-            if (@event.ExamType != EventExamType.Arc.Value)
+            var isArcVenue = _helper.IsVenueARC(@event.VenueLocationIdentifier);
+            var isArcExam = @event.ExamType == EventExamType.Arc.Value;
+
+            foreach (var registration in registrations)
             {
-                var isARC = _helper.IsVenueARC(@event.VenueLocationIdentifier);
+                _broker.Send(e, new ChangeApproval(registration.RegistrationIdentifier, registration.ApprovalStatus, registration.ApprovalReason, CommandBroker.CreateProcess("Force Execution"), registration.ApprovalStatus));
 
-                foreach (var registration in registrations)
-                {
-                    _broker.Send(e, new ChangeApproval(registration.RegistrationIdentifier, registration.ApprovalStatus, registration.ApprovalReason, CommandBroker.CreateProcess("Force Execution"), registration.ApprovalStatus));
-
-                    if (isARC)
-                        _broker.Send(e, new TriggerNotification(registration.RegistrationIdentifier, NotificationType.ITA025.ToString()));
-                }
+                if (isArcVenue && !isArcExam)
+                    _broker.Send(e, new TriggerNotification(registration.RegistrationIdentifier, NotificationType.ITA025.ToString()));
             }
         }
 
@@ -182,6 +180,17 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                                 .OrderBy(x => x.Candidate.UserFullName)
                                 .ToArray()
                             : registrations;
+
+                        if (alert.Type == NotificationType.ITA016)
+                        {
+                            var hasAttempts = formRegistrations
+                                .Where(r => r.AttemptIdentifier.HasValue
+                                         && attempts.Any(a => a.AttemptIdentifier == r.AttemptIdentifier.Value))
+                                .Any();
+
+                            if (!hasAttempts)
+                                continue;
+                        }
 
                         var agent = new MessageBuilder(_contacts, _groups, _filePaths, _domain);
                         var email = agent.BuildEventEmail(alert, @event, venueAddress, form, formRegistrations, attempts, null);

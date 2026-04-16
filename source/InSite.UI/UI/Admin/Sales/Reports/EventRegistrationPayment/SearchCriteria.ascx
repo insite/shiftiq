@@ -34,6 +34,10 @@
                     </div>
 
                     <div class="mb-2">
+                        <insite:ItemNameComboBox runat="server" ID="EmployerStatus" EmptyMessage="Employer Group Status" />
+                    </div>
+
+                    <div class="mb-2">
                         <insite:TextBox ID="RegistrantName" runat="server" EmptyMessage="Registered By" MaxLength="100" />
                     </div>
 

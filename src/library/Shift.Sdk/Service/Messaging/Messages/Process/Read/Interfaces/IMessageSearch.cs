@@ -30,6 +30,10 @@ namespace InSite.Application.Messages.Read
         int CountMailouts(MailoutFilter filter);
         VMailout FindMailout(Guid mailout);
         List<VMailout> GetMailouts(MailoutFilter filter);
+        bool MailoutExists(Guid id);
+
+        List<VMailoutFailure> GetMailoutFailures(MailoutFailureFilter filter);
+        int CountMailoutFailures(MailoutFailureFilter filter);
 
         int CountDeliveries(DeliveryFilter filter);
         QRecipient GetDelivery(Guid mailout, Guid recipientId);
@@ -45,7 +49,7 @@ namespace InSite.Application.Messages.Read
         VSubscriberGroup GetSubscriberGroup(Guid message, Guid contact);
         List<VSubscriberGroup> GetSubscriberGroups(Guid message);
         List<VSubscriberGroup> GetSubscriberGroups(QSubscriberGroupFilter filter);
-        
+
         int CountSubscriberUsers(Guid message);
         int CountSubscriberUsers(QSubscriberUserFilter filter);
         ISubscriberPerson GetSubscriberUser(Guid message, Guid contact);
@@ -62,10 +66,10 @@ namespace InSite.Application.Messages.Read
 
         int CountClicks(VClickFilter filter);
         List<VClick> GetClicks(VClickFilter filter);
-        
+
         Guid[] GetOrphanMessages();
         Dictionary<Guid, string> GetOneRecipientForEachMailout(Guid[] mailouts);
-        
+
         string GetCarbonCopyEmails(ICollection<QCarbonCopy> carbonCopies);
     }
 }

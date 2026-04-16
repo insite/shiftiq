@@ -5,10 +5,9 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
-using Shift.Common.Timeline.Commands;
 
 using InSite.Admin.Events.Classes.Reports;
 using InSite.Admin.Events.Registrations.Reports;
@@ -25,6 +24,7 @@ using InSite.Web.Helpers;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -119,6 +119,7 @@ namespace InSite.Admin.Events.Classes.Controls
             AttendanceStatusComboBox.AutoPostBack = true;
             AttendanceStatusComboBox.ValueChanged += (a, b) => Search();
 
+            Grid.DataBinding += Grid_DataBinding;
             Grid.RowCreated += Grid_RowCreated;
             Grid.RowDataBound += Grid_RowDataBound;
             Grid.RowCommand += Grid_RowCommand;
@@ -146,6 +147,11 @@ namespace InSite.Admin.Events.Classes.Controls
                 "filter_focus",
                 $"inSite.common.baseInput.focus('{FilterTextBox.ClientID}', true);",
                 true);
+        }
+
+        private void Grid_DataBinding(object sender, EventArgs e)
+        {
+            _returnUrl = null;
         }
 
         private void Grid_RowCreated(object sender, GridViewRowEventArgs e)
@@ -366,7 +372,7 @@ namespace InSite.Admin.Events.Classes.Controls
 
         #region Methods (public)
 
-        public void LoadData(Guid eventId, bool canWrite, bool showForms, string returnParams)
+        public void LoadData(Guid eventId, bool canWrite, bool showForms, string returnParams, int? page)
         {
             CanWrite = canWrite;
             ShowForms = showForms;
@@ -384,7 +390,7 @@ namespace InSite.Admin.Events.Classes.Controls
 
             LoadCachedFilter(eventId);
 
-            Search(eventId);
+            Search(eventId, page);
         }
 
         private void LoadCachedFilter(Guid eventId)
@@ -409,10 +415,10 @@ namespace InSite.Admin.Events.Classes.Controls
 
         private void Search()
         {
-            Search(Filter.EventIdentifier.Value);
+            Search(Filter.EventIdentifier.Value, 1);
         }
 
-        private void Search(Guid eventId)
+        private void Search(Guid eventId, int? page)
         {
             SaveCachedFilter(eventId);
 
@@ -425,7 +431,7 @@ namespace InSite.Admin.Events.Classes.Controls
                 AttendanceStatuses = AttendanceStatusComboBox.Values.Select(x => x == EmptyKey ? null : x).ToArray()
             };
 
-            Search(filter);
+            Search(filter, (page ?? 1) - 1);
         }
 
         private void BindStatuses()
@@ -507,7 +513,7 @@ namespace InSite.Admin.Events.Classes.Controls
                     };
                 })
                 .ToList();
-            
+
             return _data.ToSearchResult();
         }
 
@@ -534,6 +540,7 @@ namespace InSite.Admin.Events.Classes.Controls
                     {
                         u.UserIdentifier,
                         u.FullName,
+                        u.Email,
                         Person = u.Persons
                             .Where(x => x.OrganizationIdentifier == Organization.Identifier)
                             .Select(x => new
@@ -555,7 +562,7 @@ namespace InSite.Admin.Events.Classes.Controls
                     PersonCode = x.Person?.PersonCode,
                     OccupationInterest = x.Person?.OccupationStandard?.ContentName
                 });
-
+            
             return users;
         }
 
@@ -641,6 +648,20 @@ namespace InSite.Admin.Events.Classes.Controls
                 Name = "APPRENTICESCORES",
                 IconName = "file-excel",
                 Text = "Most Improved Report (*.xlsx)"
+            });
+
+            button.Items.Add(new DropDownButtonItem
+            {
+                Name = "EXAMLOGINCREDENTIALS",
+                IconName = "file-pdf",
+                Text = "Exam Login Credentials (*.pdf)"
+            });
+
+            button.Items.Add(new DropDownButtonItem
+            {
+                Name = "EXAMLOGINCREDENTIALSXLSX",
+                IconName = "file-excel",
+                Text = "Exam Login Credentials (*.xlsx)"
             });
         }
 
@@ -823,6 +844,16 @@ namespace InSite.Admin.Events.Classes.Controls
                 var data = ApprenticeScoresReport.GetXlsx(Filter);
                 Response.SendFile("MostImprovedReport", "xlsx", data);
             }
+            else if (commandName == "EXAMLOGINCREDENTIALS")
+            {
+                var @event = ExamLoginCredentialsReport.GetEventInfo(Filter.EventIdentifier.Value);
+                Response.SendFile($"ExamLoginCredentials-{@event.EventTitle}", "pdf", ExamLoginCredentialsReport.GetPdf(@event));
+            }
+            else if (commandName == "EXAMLOGINCREDENTIALSXLSX")
+            {
+                var @event = ExamLoginCredentialsReport.GetEventInfo(Filter.EventIdentifier.Value);
+                Response.SendFile($"ExamLoginCredentials-{@event.EventTitle}", "xlsx", ExamLoginCredentialsReport.GetXlsx(@event));
+            }
             else
             {
                 base.OnExportButtonClick(commandName);
@@ -841,7 +872,12 @@ namespace InSite.Admin.Events.Classes.Controls
                 return url;
 
             if (_returnUrl == null)
-                _returnUrl = new ReturnUrl(ReturnParams);
+            {
+                var @params = HttpUtility.ParseQueryString(ReturnParams);
+                @params["grid-page"] = (GridPageIndex + 1).ToString();
+
+                _returnUrl = new ReturnUrl(@params.ToString());
+            }
 
             return _returnUrl.GetRedirectUrl(url);
         }

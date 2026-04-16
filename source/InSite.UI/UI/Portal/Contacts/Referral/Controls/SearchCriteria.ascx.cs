@@ -33,6 +33,9 @@ namespace InSite.UI.Portal.Contacts.Referral.Controls
                 if (Organization.Toolkits.Contacts.PortalSearchActiveMembershipReasons)
                     filter.MembershipReasonExpirySince = DateTimeOffset.Now;
 
+                if (Organization.Toolkits.Contacts.PortalSearchRequiresReferral)
+                    filter.EmployerGroupsRequireReferrals = true;
+
                 return filter;
             }
             set

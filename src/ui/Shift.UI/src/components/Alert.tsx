@@ -9,15 +9,23 @@ interface Props {
     children?: ReactNode;
     className?: string;
     messages?: ReactNode[];
+    hideIcon?: boolean;
 }
 
-export default function Alert({ alertType, children, className, messages }: Props) {
+export default function Alert({
+    alertType,
+    children,
+    className,
+    messages,
+    hideIcon = false
+}: Props)
+{
     const alertInfo = getAlertInfo(alertType ?? "none");
     
     return (
         <div role="alert" className={`alert alert-${alertInfo.variant} d-flex alert-custom-padding ${className ?? ""}`}>
-            {alertInfo.icon && (
-                <Icon style="Regular" name={alertInfo.icon} className="fs-xl me-2" />
+            {alertInfo.icon && !hideIcon && (
+                <Icon style="regular" name={alertInfo.icon} className="fs-xl me-2" />
             )}
             {messages ? (
                 <>

@@ -5,11 +5,10 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.StandardValidations.Write;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Constant.CMDS;
 
@@ -370,12 +369,12 @@ ORDER BY
 
             const string subqueryValidatorCompetencies = @"
     AND UserCompetency.CompetencyStandardIdentifier IN (
-            SELECT CompetencyStandardIdentifier
-                FROM custom_cmds.UserCompetency x
+            SELECT x.StandardIdentifier
+                FROM standard.QStandardValidation as x
                 WHERE x.UserIdentifier = @ValidatorUserIdentifier
                 AND ( (x.ValidationStatus IN ('Validated', 'Expired'))
-                        OR
-                        (x.ValidationStatus = 'Not Applicable' and UserCompetency.SelfAssessmentStatus = 'Not Applicable')
+                       OR
+                      (x.ValidationStatus = 'Not Applicable' and UserCompetency.SelfAssessmentStatus = 'Not Applicable')
                     )
                 AND ValidationDate IS NOT NULL
             )
@@ -660,7 +659,7 @@ GROUP BY ec.ValidationStatus
         {
             var filter = new EmployeeCompetencyFilter { UserIdentifier = userKey, OrganizationIdentifier = organizationId };
             var join = CreateJoinForSelectSearchResults(filter);
-            var where = CreateWhereForSelectSearchResults(filter, null, null);
+            var where = CreateWhereForSelectSearchResults(filter, null);
             var query = $@"
 SELECT
     COUNT(*) AS [Count],
@@ -675,7 +674,7 @@ FROM
 GROUP BY
     ec.ValidationStatus";
 
-            return DatabaseHelper.CreateDataTable(query, 2 * 60, GetParametersForSelectSearchResults(filter, null, null).ToArray());
+            return DatabaseHelper.CreateDataTable(query, 2 * 60, GetParametersForSelectSearchResults(filter, null).ToArray());
         }
 
         public static DataTable SelectComplianceSummaryX(Guid userKey, int profileStandardIdentifier, int department)
@@ -789,10 +788,10 @@ GROUP BY
                 );
         }
 
-        public static DataTable SelectSearchResults(EmployeeCompetencyFilter filter, Guid? validatorUserIdentifier, Guid? parentUserId)
+        public static DataTable SelectSearchResults(EmployeeCompetencyFilter filter, Guid? parentUserId)
         {
             var join = CreateJoinForSelectSearchResults(filter);
-            var where = CreateWhereForSelectSearchResults(filter, validatorUserIdentifier, parentUserId);
+            var where = CreateWhereForSelectSearchResults(filter, parentUserId);
             var query = $@"
 SELECT
     ec.*,
@@ -805,16 +804,13 @@ INNER JOIN custom_cmds.Competency c
 {join}
 {where}";
 
-            return DatabaseHelper.CreateDataTable(query, 5 * 60, GetParametersForSelectSearchResults(filter, validatorUserIdentifier, parentUserId).ToArray());
+            return DatabaseHelper.CreateDataTable(query, 5 * 60, GetParametersForSelectSearchResults(filter, parentUserId).ToArray());
         }
 
-        public static DataTable SelectSearchResultsPaged(EmployeeCompetencyFilter filter,
-            Guid? validatorUserIdentifier,
-            Guid? parentUserId
-            )
+        public static DataTable SelectSearchResultsPaged(EmployeeCompetencyFilter filter, Guid? parentUserId)
         {
             var join = CreateJoinForSelectSearchResults(filter);
-            var where = CreateWhereForSelectSearchResults(filter, validatorUserIdentifier, parentUserId);
+            var where = CreateWhereForSelectSearchResults(filter, parentUserId);
 
             var sortExpression = "Number";
 
@@ -859,18 +855,19 @@ SELECT * FROM OrderedEmployeeCompetencies
 
             var (startRow, endRow) = filter.Paging != null ? filter.Paging.ToStartEnd() : (0, int.MaxValue);
 
-            var parameters = GetParametersForSelectSearchResults(filter, validatorUserIdentifier, parentUserId);
+            var parameters = GetParametersForSelectSearchResults(filter, parentUserId);
             parameters.Add(new SqlParameter("StartRow", startRow));
             parameters.Add(new SqlParameter("EndRow", endRow));
 
             return DatabaseHelper.CreateDataTable(query, 5 * 60, parameters.ToArray());
         }
 
-        public static int CountSearchResults(EmployeeCompetencyFilter filter, Guid? validatorUserIdentifier, Guid? parentUserId)
+        public static int CountSearchResults(EmployeeCompetencyFilter filter, Guid? parentUserId)
         {
-
             var join = CreateJoinForSelectSearchResults(filter);
-            var where = CreateWhereForSelectSearchResults(filter, validatorUserIdentifier, parentUserId);
+
+            var where = CreateWhereForSelectSearchResults(filter, parentUserId);
+
             var query = $@"
 SELECT COUNT(*)
 FROM custom_cmds.UserCompetency ec WITH(NOLOCK)
@@ -882,11 +879,11 @@ INNER JOIN custom_cmds.Competency c WITH(NOLOCK)
             using (var db = new InternalDbContext())
             {
                 db.Database.CommandTimeout = 60;
-                return db.Database.SqlQuery<int>(query, GetParametersForSelectSearchResults(filter, validatorUserIdentifier, parentUserId).ToArray()).FirstOrDefault();
+                return db.Database.SqlQuery<int>(query, GetParametersForSelectSearchResults(filter, parentUserId).ToArray()).FirstOrDefault();
             }
         }
 
-        private static List<SqlParameter> GetParametersForSelectSearchResults(EmployeeCompetencyFilter filter, Guid? validatorUserIdentifier, Guid? parentUserId)
+        private static List<SqlParameter> GetParametersForSelectSearchResults(EmployeeCompetencyFilter filter, Guid? parentUserId)
         {
             var parameters = new List<SqlParameter>();
 
@@ -920,11 +917,9 @@ INNER JOIN custom_cmds.Competency c WITH(NOLOCK)
             if (filter.NumberOld.IsNotEmpty())
                 parameters.Add(new SqlParameter("NumberOld", string.Format("%{0}%", filter.NumberOld)));
 
-            if (validatorUserIdentifier.HasValue)
-                parameters.Add(new SqlParameter("ValidatorUserIdentifier", validatorUserIdentifier));
-
             if (filter.ManagerUserIdentifier.HasValue)
                 parameters.Add(new SqlParameter("ManagerID", filter.ManagerUserIdentifier));
+
             else if (parentUserId.HasValue)
                 parameters.Add(new SqlParameter("ParentUserID", parentUserId));
 
@@ -933,6 +928,9 @@ INNER JOIN custom_cmds.Competency c WITH(NOLOCK)
 
             if (filter.OrganizationIdentifier == Guid.Empty)
                 throw new ArgumentOutOfRangeException("Invalid company: 0");
+
+            if (filter.ValidatorUserIdentifier.HasValue)
+                parameters.Add(new SqlParameter("ValidatorUserIdentifier", filter.ValidatorUserIdentifier));
 
             parameters.Add(new SqlParameter("OrganizationIdentifier", filter.OrganizationIdentifier));
 
@@ -989,8 +987,7 @@ CROSS APPLY (
             return join.ToString();
         }
 
-        private static string CreateWhereForSelectSearchResults(EmployeeCompetencyFilter filter,
-            Guid? validatorUserIdentifier, Guid? parentUserId)
+        private static string CreateWhereForSelectSearchResults(EmployeeCompetencyFilter filter, Guid? parentUserId)
         {
             var where = new StringBuilder("WHERE 1=1");
 
@@ -1060,12 +1057,11 @@ AND ec.UserIdentifier IN (
             if (filter.NumberOld.IsNotEmpty())
                 where.Append(" AND c.NumberOld LIKE @NumberOld");
 
-            if (validatorUserIdentifier.HasValue)
+            if (filter.ValidatorUserIdentifier.HasValue)
             {
-                // Work Orders 5463 and 5552: When the validator has a competency for which his validation 
-                // status is Not Applicable, he is permitted to validate another person for the same 
-                // competency with that same status. This is the reason I have added 'Not Applicable' to 
-                // the WHERE clause.
+                // When the validator has a competency for which his validation status is Not Applicable, he is
+                // permitted to validate another person for the same competency with that same status. This is the
+                // reason we include 'Not Applicable' in the WHERE clause.
 
                 where.Append(@"
 AND (

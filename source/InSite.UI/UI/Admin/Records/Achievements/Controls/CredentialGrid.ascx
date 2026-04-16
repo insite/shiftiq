@@ -96,6 +96,9 @@
                 <asp:TemplateField HeaderText="Granted">
                     <ItemTemplate>
                         <%# GetLocalDate(Eval("CredentialGranted")) %>
+                        <div class="text-body-secondary fs-xs">
+                            <%# GetSelfDeclarationHtml(Container.DataItem) %>
+                        </div>
                     </ItemTemplate>
                 </asp:TemplateField>
 

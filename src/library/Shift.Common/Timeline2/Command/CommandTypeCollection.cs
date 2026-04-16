@@ -26,17 +26,33 @@ namespace Shift.Common
             // FIXME: Throw an exception if duplicate command names exist.
 
             var duplicateCommandNames = commandTypes
-                .GroupBy(x => x.Name)
+                .GroupBy(x => GetUniqueName(x))
                 .Where(x => x.Count() > 1)
                 .Select(x => x.Key)
                 .Distinct()
                 .ToList();
 
-            commandTypes = commandTypes.Where(x => !duplicateCommandNames.Contains(x.Name)).ToList();
+            commandTypes = commandTypes.Where(x => !duplicateCommandNames.Contains(GetUniqueName(x))).ToList();
 
-            _commands = commandTypes.ToDictionary(t => t.Name.ToLower(), t => t);
+            _commands = commandTypes.ToDictionary(t => GetUniqueName(t).ToLower(), t => t);
 
             _resources = CreateResources(_commands);
+        }
+
+        private static string GetUniqueName(Type type)
+        {
+            if (type.Namespace == "InSite.Application.Banks.Write")
+            {
+                switch (type.Name)
+                {
+                    case "PostComment":
+                        return "postbankcomment";
+                    case "AddAttachment":
+                        return "addbankattachment";
+                }
+            }
+
+            return type.Name;
         }
 
         private List<Resource> CreateResources(Dictionary<string, Type> queries)

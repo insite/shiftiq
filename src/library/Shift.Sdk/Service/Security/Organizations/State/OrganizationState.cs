@@ -178,6 +178,7 @@ namespace InSite.Domain.Organizations
             contacts.DisableLeaderRelationshipCreation = e.Contacts.DisableLeaderRelationshipCreation;
             contacts.EnableOperatorGroup = e.Contacts.EnableOperatorGroup;
             contacts.EnableTraineeDepartment = e.Contacts.EnableTraineeDepartment;
+            contacts.PortalSearchRequiresReferral = e.Contacts.PortalSearchRequiresReferral;
         }
 
         public void When(OrganizationCreated e)
@@ -391,6 +392,8 @@ namespace InSite.Domain.Organizations
             surveys.EnableUserConfidentiality = e.Surveys.EnableUserConfidentiality;
             surveys.LockUserConfidentiality = e.Surveys.LockUserConfidentiality;
             surveys.ResponseUploadClaimGroups = e.Surveys.ResponseUploadClaimGroups.EmptyIfNull().Select(x => x).ToArray();
+            surveys.DefaultCaseOwnerToSupervisor = e.Surveys.DefaultCaseOwnerToSupervisor;
+            surveys.FirstQuestionCaseSummary = e.Surveys.FirstQuestionCaseSummary;
         }
 
         public void When(OrganizationTypeModified e)

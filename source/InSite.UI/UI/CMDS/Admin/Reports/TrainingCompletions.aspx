@@ -146,7 +146,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <td colspan="9" class="fw-bold text-white" style="background-color: #2c2d3f;">
+                                <td colspan="10" class="fw-bold text-white" style="background-color: #2c2d3f;">
                                     Training Completions for <asp:Literal runat="server" ID="CompanyName" /> :: <asp:Literal runat="server" ID="DepartmentsList" />
                                 </td>
                             </tr>
@@ -158,6 +158,7 @@
                                 <th class="align-middle">Achievement Type</th>
                                 <th class="text-center align-middle">Completed</th>
                                 <th class="align-middle">Status</th>
+                                <th class="text-center align-middle">Assigned</th>
                                 <th class="text-center align-middle">Expired</th>
                                 <th class="text-center align-middle">Score</th>
                             </tr>
@@ -173,6 +174,7 @@
                                         <td><%# Eval("AchievementLabel") %></td>
                                         <td class="text-center text-nowrap"><%# Eval("DateCompleted", "{0:MMM d, yyy}") %></td>
                                         <td><%# Eval("CredentialStatus") %></td>
+                                        <td class="text-center text-nowrap"><%# Eval("DateAssigned") == null ? "-" : Eval("DateAssigned", "{0:MMM d, yyy}") %></td>
                                         <td class="text-center text-nowrap"><%# Eval("ExpirationDate") == null ? "-" : Eval("ExpirationDate", "{0:MMM d, yyy}") %></td>
                                         <td class="text-center text-nowrap"><%# Eval("GradePercent") ==  null ? "-" : Eval("GradePercent", "{0:p0}") %></td>
                                     </tr>

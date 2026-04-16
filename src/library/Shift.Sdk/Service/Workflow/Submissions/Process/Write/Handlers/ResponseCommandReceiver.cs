@@ -1,8 +1,8 @@
-﻿using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-
-using InSite.Application.Responses.Write;
+﻿using InSite.Application.Responses.Write;
 using InSite.Domain.Surveys.Sessions;
+
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
 
 namespace InSite.Application.Surveys.Write.Handlers
 {
@@ -101,7 +101,7 @@ namespace InSite.Application.Surveys.Write.Handlers
         {
             _repository.LockAndRun<ResponseAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.CompleteResponse(c.Completed);
+                aggregate.CompleteResponse(c.Completed, c.RespondentSupervisor, c.FirstQuestionCaseSummary);
                 Commit(aggregate, c);
             });
         }

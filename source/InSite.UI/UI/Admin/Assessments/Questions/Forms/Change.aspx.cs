@@ -26,6 +26,7 @@ using Shift.Common;
 using Shift.Common.Linq;
 using Shift.Constant;
 using Shift.Sdk.UI;
+using System.Web;
 
 namespace InSite.Admin.Assessments.Questions.Forms
 {
@@ -525,7 +526,7 @@ namespace InSite.Admin.Assessments.Questions.Forms
 
             var returnData = Request.QueryString["return"];
             if (returnData.IsNotEmpty())
-                returnUrl += $"&return={returnData}";
+                returnUrl += $"&return={HttpUtility.UrlEncode(returnData)}";
 
             CommentsTab.SetTitle("Comments", question.Comments.Count);
             CommentRepeater.LoadData(BankID, question.Identifier, question.Comments, new ReturnUrl(returnUrl));

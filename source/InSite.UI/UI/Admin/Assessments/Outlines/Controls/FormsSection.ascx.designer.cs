@@ -78,6 +78,15 @@ namespace InSite.Admin.Assessments.Outlines.Controls
         protected global::InSite.Common.Web.UI.Button FormWorkshopButton;
 
         /// <summary>
+        /// FormWorkshopNewButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button FormWorkshopNewButton;
+
+        /// <summary>
         /// PinSection control.
         /// </summary>
         /// <remarks>

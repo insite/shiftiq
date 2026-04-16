@@ -311,8 +311,11 @@ namespace InSite.Admin.Sites.Pages.Controls
                     {
                         var viewer = (ContentBlocksViewer)AddSectionControl(title,
                             "ContentBlocksViewer", tab, nav);
-                        viewer.SetInputValues(e, content, $"/ui/admin/sites/pages/content?id=" +
-                            $"{ParentPage.PageId}&tab=pageblocks&nav={title.ToLower()}");
+
+                        var editUrl = $"/client/admin/sites/pages/content/{ParentPage.PageId}?tab=pageblocks&block={e.PageIdentifier}";
+                        var editUrl2 = $"/ui/admin/sites/pages/content?id={ParentPage.PageId}&tab=pageblocks&nav={title.ToLower()}";
+
+                        viewer.SetInputValues(e, content, editUrl, editUrl2);
 
                     }
                     else

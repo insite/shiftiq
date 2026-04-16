@@ -167,12 +167,14 @@ namespace InSite.Cmds.Actions.BulkTool.Validate
                 canValidate = _validatorCompetencies.Select(filter).Length > 0;
             }
 
-            var isSelectedCheckBox = (ICheckBox)e.Item.FindControl("IsSelected");
+            var isSelectedCheckBox = (InSite.Common.Web.UI.CheckBox)e.Item.FindControl("IsSelected");
             isSelectedCheckBox.Enabled = canValidate;
+            isSelectedCheckBox.Visible = canValidate;
             isSelectedCheckBox.Text = $"{row["Number"]} - {row["Summary"]}";
 
-            var cannotValidateLabel = e.Item.FindControl("CannotValidate");
+            var cannotValidateLabel = (System.Web.UI.HtmlControls.HtmlGenericControl)e.Item.FindControl("CannotValidate");
             cannotValidateLabel.Visible = !canValidate;
+            cannotValidateLabel.InnerText = $"* {row["Number"]} - {row["Summary"]}";
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
@@ -237,7 +239,7 @@ namespace InSite.Cmds.Actions.BulkTool.Validate
             if (!ValidationPanel.Visible)
                 return;
 
-            var table = UserCompetencyRepository.SelectSearchResults(EmployeeFilter, null, null);
+            var table = UserCompetencyRepository.SelectSearchResults(EmployeeFilter, null);
 
             if (table.Rows.Count == 0)
             {
@@ -246,7 +248,7 @@ namespace InSite.Cmds.Actions.BulkTool.Validate
                 return;
             }
 
-            _validatorCompetencies = UserCompetencyRepository.SelectSearchResults(ValidatorFilter, null, null);
+            _validatorCompetencies = UserCompetencyRepository.SelectSearchResults(ValidatorFilter, null);
 
             var view = table.DefaultView;
             view.Sort = "Number";

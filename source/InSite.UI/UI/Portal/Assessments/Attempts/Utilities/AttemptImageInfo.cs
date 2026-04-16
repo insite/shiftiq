@@ -18,7 +18,13 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class AttemptImageInfo
     {
-        public static readonly Regex ImageUrlPattern = new Regex("^(https?://)(dev-|local-|sandbox-)?([^\\.]+)\\.([^/]+)/files(/.+)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex ImageUrlPattern = new Regex("^(https?://)(dev-|local-|sandbox-)?([^\\.]+)\\.(.*)/files(/.+)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private class UploadInfo
+        {
+            public Guid Identifier { get; set; }
+            public string NavigateUrl { get; set; }
+        }
 
         [JsonProperty(PropertyName = "width")]
         public int Width { get; set; }
@@ -27,25 +33,39 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 
         public static Dictionary<string, AttemptImageInfo> CreateDictionary(IEnumerable<Attachment> attachments)
         {
-            var uploads = UploadSearch.Bind(
-                x => new { x.UploadIdentifier, x.NavigateUrl, },
-                attachments.Where(x => x.Type == AttachmentType.Image && x.Image.TargetOnline?.HasValue == true));
+            var imageAttachments = attachments.Where(x => x.Type == AttachmentType.Image && x.Image.TargetOnline?.HasValue == true);
+
+            var uploads = UploadSearch.Bind(x => new UploadInfo { Identifier = x.UploadIdentifier, NavigateUrl = x.NavigateUrl }, imageAttachments);
+
+            foreach (var u in uploads)
+                u.NavigateUrl = FileHelper.GetUrl(u.NavigateUrl);
+
+            var fileIds = imageAttachments.Where(x => x.FileIdentifier.HasValue).Select(x => x.FileIdentifier.Value).ToArray();
+            var files = ServiceLocator.FileSearch
+                .GetModels(fileIds, false)
+                .Select(x => new UploadInfo
+                {
+                    Identifier = x.FileIdentifier,
+                    NavigateUrl = ServiceLocator.StorageService.GetFileUrl(x),
+                })
+                .ToList();
+
+            files.AddRange(uploads);
 
             var attachmentMapping = attachments
-                .GroupBy(x => x.Upload)
+                .GroupBy(x => x.FileIdentifier ?? x.Upload)
                 .ToDictionary(x => x.Key, x => x.FirstOrDefault(y => y.IsLastVersion()));
 
             var images = new Dictionary<string, AttemptImageInfo>();
 
-            foreach (var upload in uploads)
+            foreach (var upload in files)
             {
-                var url = FileHelper.GetUrl(upload.NavigateUrl);
-
+                var url = upload.NavigateUrl;
                 var urlMatch = ImageUrlPattern.Match(url);
                 if (urlMatch.Success)
                     url = urlMatch.Groups[3].Value + urlMatch.Groups[5].Value;
 
-                var attachment = attachmentMapping[upload.UploadIdentifier];
+                var attachment = attachmentMapping[upload.Identifier];
                 if (attachment?.Image != null)
                 {
                     var targetOnline = attachment.Image.TargetOnline;

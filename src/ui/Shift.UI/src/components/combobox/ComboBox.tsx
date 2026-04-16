@@ -1,6 +1,6 @@
 import { ButtonGroup, Dropdown } from "react-bootstrap";
 import { detectOverflow } from "@popperjs/core/lib/popper";
-import { ForwardedRef, MouseEvent, ReactNode, useRef, useState } from "react";
+import { ForwardedRef, ReactNode, useRef, useState } from "react";
 import { ListItem } from "@/models/listItem";
 import { translate } from "@/helpers/translate";
 import { useComboBox } from "./useComboBox";
@@ -59,19 +59,11 @@ export default function ComboBox({
         onChange?.(eventKey ?? null);
     }
 
-    function handleToggle() {
-        if (!opened) {
+    function handleToggle(nextShow: boolean) {
+        if (nextShow) {
             focusActiveItem();
         }
-        setOpened(!opened);
-    }
-
-    function handleClick(e: MouseEvent) {
-        e.preventDefault();
-
-        if (loadedItems && !(e.target as HTMLButtonElement).disabled) {
-            handleToggle();
-        }
+        setOpened(nextShow);
     }
 
     function focusActiveItem() {
@@ -81,8 +73,20 @@ export default function ComboBox({
             }
             const item = menuRef.current.querySelector("a.active.dropdown-item") as HTMLElement;
             if (item) {
-                item.scrollIntoView();
-                item.focus();
+                const menuRect = menuRef.current.getBoundingClientRect();
+                const itemRect = item.getBoundingClientRect();
+
+                if (itemRect.top < menuRect.top) {
+                    menuRef.current.scrollTop -= menuRect.top - itemRect.top;
+                } else if (itemRect.bottom > menuRect.bottom) {
+                    menuRef.current.scrollTop += itemRect.bottom - menuRect.bottom;
+                }
+
+                try {
+                    item.focus({ preventScroll: true });
+                } catch {
+                    item.focus();
+                }
             }
         }, 0);
     }
@@ -113,7 +117,6 @@ export default function ComboBox({
                     variant="combobox"
                     className={`w-100 ${errorTooltip ? "is-invalid" : ""}`}
                     disabled={disabled || !loadedItems}
-                    onClick={handleClick}
                 >
                     <span
                         className="combobox-text overflow-hidden w-100 text-start"

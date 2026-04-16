@@ -16,8 +16,7 @@
             <ul class="navbar-nav ms-auto">
 
                 <li runat="server" id="RecentMenu" class="nav-item dropdown fs-sm">
-                    <a runat="server" id="RecentAnchor" href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fa-regular fa-circle-bookmark me-2 fa-width-auto"></i>Recent</a>
-                    <insite:RecentLinkCache runat="server" ID="RecentLinks" />
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fa-regular fa-circle-bookmark me-2 fa-width-auto"></i>Recent</a>
                 </li>
 
                 <li class="nav-item fs-sm">
@@ -128,6 +127,12 @@
                 </li>
 
             </ul>
+
+            <script type="text/javascript">
+                (function () {
+                    inSite.common.recentLinks.init('<%= GetRecentLinksKey() %>', '<%= RecentMenu.ClientID %>');
+                })();
+            </script>
 
         </nav>
     </div>

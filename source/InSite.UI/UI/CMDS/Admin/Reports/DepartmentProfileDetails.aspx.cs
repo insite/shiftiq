@@ -564,7 +564,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 UserIdentifier = userKey
             };
 
-            var table = UserCompetencyRepository.SelectSearchResults(filter, null, null);
+            var table = UserCompetencyRepository.SelectSearchResults(filter, null);
 
             foreach (DataRow row in table.Rows)
             {

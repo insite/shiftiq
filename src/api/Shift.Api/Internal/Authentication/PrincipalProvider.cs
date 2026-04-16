@@ -52,9 +52,12 @@ namespace Shift.Api
                 ? (Guid.Empty, Guid.Empty)
                 : (orgId, userId);
 
-            if (PrincipalCache.TryGet(principalKey, out var cachedValue) && cachedValue.CookieId == cookieId)
+            if (cookieId != Guid.Empty && orgId != Guid.Empty && userId != Guid.Empty)
             {
-                return cachedValue.Principal;
+                if (PrincipalCache.TryGet(principalKey, out var cachedValue) && cachedValue.CookieId == cookieId)
+                {
+                    return cachedValue.Principal;
+                }
             }
 
             // Convert from claims (most expensive operation)

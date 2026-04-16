@@ -96,6 +96,11 @@ namespace Shift.Contract
         public bool IsExpired()
             => _modified.Add(Lifetime) <= DateTimeOffset.UtcNow;
 
+        public DateTimeOffset GetModified()
+        {
+            return _modified;
+        }
+
         public bool TargetsEnvironment(string environment)
             => StringHelper.Equals(environment, Environment);
 
@@ -105,6 +110,7 @@ namespace Shift.Contract
         public void ResetCreated()
         {
             Created = DateTimeOffset.UtcNow.ToString("O");
+            Modified = Created;
         }
 
         public void ResetID()

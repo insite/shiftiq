@@ -114,6 +114,10 @@ namespace InSite.Admin.Records.Programs
             if (IsPostBack)
                 return;
 
+            var status = Request.QueryString["status"];
+            if (status == "learners_assigned")
+                StatusAlert.AddMessage(AlertType.Success, "This training plan has been successfully assigned to the users you selected.");
+
             ValidateQueryString();
             BindModelToControls(InitModel());
         }
@@ -192,7 +196,7 @@ namespace InSite.Admin.Records.Programs
             DuplicateLink.NavigateUrl = $"/ui/admin/learning/programs/duplicate?id={model.ProgramIdentifier}";
             EditAchievementLink.NavigateUrl = ModifyAchievement.GetNavigateUrl(model.ProgramIdentifier);
 
-            ContactTabControl.LoadData(model.ProgramIdentifier, model.AchievementIdentifier);
+            ContactTabControl.LoadData(model);
 
             if (model.ProgramType == "Achievements Only")
             {
@@ -237,8 +241,9 @@ namespace InSite.Admin.Records.Programs
         private TProgram InitModel()
         {
             var model = ProgramSearch.GetProgram(ProgramID.Value);
-            if (model == null)
+            if (model == null || model.OrganizationIdentifier != Organization.Identifier)
                 Search.Redirect();
+
             return model;
         }
 

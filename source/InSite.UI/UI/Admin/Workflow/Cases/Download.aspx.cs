@@ -28,7 +28,7 @@ namespace InSite.UI.Admin.Issues.Issues.Forms
                 return;
 
             var issue = CaseIdentifier.HasValue ? ServiceLocator.IssueSearch.GetIssue(CaseIdentifier.Value) : null;
-            if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue.OrganizationIdentifier, issue.TopicUserIdentifier))
+            if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue))
             {
                 HttpResponseHelper.Redirect("/ui/admin/workflow/cases/search");
                 return;

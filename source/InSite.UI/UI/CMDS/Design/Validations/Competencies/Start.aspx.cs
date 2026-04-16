@@ -25,9 +25,10 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Validation
 
             PageHelper.AutoBindHeader(this);
 
-            int rowCount = UserCompetencyRepository.SelectItemCountForValidator(User.UserIdentifier, Organization.Identifier, null, null).Rows.Count;
+            var rowCount = UserCompetencyRepository.SelectItemCountForValidator(User.UserIdentifier, Organization.Identifier, null, null).Rows.Count;
 
             SummaryGrid.Visible = rowCount > 0;
+
             NoItems.Visible = rowCount == 0;
 
             SummaryGrid.VirtualItemCount = rowCount;

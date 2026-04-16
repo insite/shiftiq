@@ -1,0 +1,52 @@
+.WorkshopQuestions_SelectFile {
+    &.modal-dialog {
+        max-width: 980px;
+    }
+
+    .file-thumbnail {
+        > .file-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            margin-bottom: 0.75rem;
+            padding: 0.25rem;
+            background: #fff;
+
+            img {
+                opacity: 0;
+                transition: opacity 0.2s ease-in-out;
+                position: unset;
+
+                &.is-loaded {
+                    opacity: 1;
+                }
+            }
+        }
+
+        & > .icon-wrapper {
+            position: absolute;
+            right: 10px;
+        }
+
+        & > label {
+            line-height: 1;
+            margin: 0;
+            font-size: 0.8em;
+        }
+
+        & > span {
+            color: #000;
+            line-height: 1.1;
+            margin-bottom: 0.2em;
+        }
+
+        .no-upload {
+            font-size: 60px;
+            margin: 10px 0;
+            text-align: center;
+            display: block;
+            color: #888888;
+        }
+    }
+}

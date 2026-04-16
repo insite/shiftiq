@@ -1,5 +1,9 @@
 import { ReactNode, useState } from "react";
 import { Tabs } from "react-bootstrap";
+import Icon from "../icon/Icon";
+import { ObjectIndexer } from "@/models/ObjectIndexer";
+import { IconStyle } from "../icon/IconStyle";
+import { IconName } from "../icon/IconName";
 
 interface Props {
     defaultTab: string;
@@ -21,7 +25,8 @@ export default function FormTabs({
                 ...element,
                 props: "props" in element && element.props !== null && typeof element.props === "object" ? {
                     ...element.props,
-                    eventKey: "tab" in element.props ? element.props.tab : undefined
+                    eventKey: "tab" in element.props ? element.props.tab : undefined,
+                    title: <Title props={element.props} />
                 } : undefined
             } : element))
         ) : (
@@ -29,7 +34,8 @@ export default function FormTabs({
                 ...children,
                 props: "props" in children && children.props !== null && typeof children.props === "object" ? {
                     ...children.props,
-                    eventKey: "tab" in children.props ? children.props.tab : undefined
+                    eventKey: "tab" in children.props ? children.props.tab : undefined,
+                    title: <Title props={children.props} />
                 } : undefined
             } : children
         );
@@ -44,4 +50,30 @@ export default function FormTabs({
             {newChildren}
         </Tabs>
     )
+}
+
+interface TitleProps {
+    props: unknown;
+}
+
+function Title({ props }: TitleProps) {
+    const title = (props as ObjectIndexer)["title"] as ReactNode;
+    const subtitle = (props as ObjectIndexer)["subtitle"] as string;
+
+    const icon = (props as ObjectIndexer)["icon"] as {
+        style: IconStyle;
+        name: IconName;
+    };
+
+    return (
+        <>
+            {icon && <Icon style={icon.style} name={icon.name} className="me-2" />}
+            {title}
+            {subtitle && (
+                <small className="text-body-secondary ms-1">
+                    {subtitle}
+                </small>
+            )}
+        </>
+    );
 }

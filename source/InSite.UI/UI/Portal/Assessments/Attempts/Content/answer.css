@@ -184,6 +184,14 @@ a.glossary-term {
         top: 4px;
     }
 
+        #attempt-commands #timer > div.title {
+            display: block;
+            position: absolute;
+            font-size: 0.75rem;
+            margin-top: -0.75rem;
+            margin-left: 0.25rem;
+        }
+
         #attempt-commands #timer > div {
             display: inline-block;
         }

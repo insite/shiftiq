@@ -307,8 +307,16 @@ namespace InSite.Domain.Banks
 
         private void OnFormPublished(Form form, Change change)
         {
+            var updates = new Dictionary<(int asset, int version), Attachment>();
+
+            OnFormPublishedPublishQuestions(form, change, updates);
+            OnFormPublishedPublishFormAddendum(form, change, updates);
+            OnFormPublishedSyncAddendum(form, change, updates);
+        }
+
+        private void OnFormPublishedPublishQuestions(Form form, Change change, Dictionary<(int asset, int version), Attachment> updates)
+        {
             var questions = form.GetQuestions();
-            var addendumItems = form.Addendum.EnumerateAllItems().ToList();
 
             foreach (var question in questions)
             {
@@ -326,44 +334,41 @@ namespace InSite.Domain.Banks
                     if (attachment.FirstPublished.HasValue)
                         continue;
 
-                    var attachmentAsset = attachment.Asset;
-                    var attachmentVersion = attachment.AssetVersion;
-                    var addendumIndex = addendumItems.FindIndex(x => x.Asset == attachmentAsset && x.Version == attachmentVersion);
+                    var key = (attachment.Asset, attachment.AssetVersion);
+                    if (!updates.ContainsKey(key))
+                        updates.Add(key, attachment);
 
                     attachment.FirstPublished = change.ChangeTime;
-
-                    if (addendumIndex == -1)
-                        continue;
-
-                    addendumItems[addendumIndex].Version = attachment.AssetVersion;
-                    addendumItems.RemoveAt(addendumIndex);
                 }
             }
+        }
 
-            if (addendumItems.Count > 0)
+        private void OnFormPublishedPublishFormAddendum(Form form, Change change, Dictionary<(int asset, int version), Attachment> updates)
+        {
+            var allAttachments = EnumerateAllAttachments().ToDictionary(x => (x.Asset, x.AssetVersion), x => x);
+
+            foreach (var addendum in form.Addendum.EnumerateAllItems())
             {
-                var allAttachments = EnumerateAllAttachments().ToDictionary(x => (x.Asset, x.AssetVersion), x => x);
-                var allAddendums = Specifications.SelectMany(x => x.Forms)
-                    .Where(x => x.Identifier != form.Identifier)
-                    .SelectMany(x => x.Addendum.EnumerateAllItems())
-                    .GroupBy(x => (x.Asset, x.Version))
-                    .ToDictionary(x => x.Key, x => x.ToArray());
+                var key = (addendum.Asset, addendum.Version);
 
-                foreach (var addendum in addendumItems)
-                {
-                    var key = (addendum.Asset, addendum.Version);
+                if (!allAttachments.TryGetValue(key, out var attachment) || attachment.FirstPublished.HasValue)
+                    continue;
 
-                    if (!allAttachments.TryGetValue(key, out var attachment) || attachment.FirstPublished.HasValue)
-                        continue;
+                if (!updates.ContainsKey(key))
+                    updates.Add(key, attachment);
 
-                    var otherAddendums = allAddendums.GetOrDefault(key, () => new FormAddendumItem[0]);
+                attachment.FirstPublished = change.ChangeTime;
+            }
+        }
 
-                    attachment.FirstPublished = change.ChangeTime;
+        private void OnFormPublishedSyncAddendum(Form form, Change change, Dictionary<(int asset, int version), Attachment> updates)
+        {
+            var allAddendums = Specifications.SelectMany(x => x.Forms).SelectMany(x => x.Addendum.EnumerateAllItems());
+            foreach (var addendum in allAddendums)
+            {
+                var key = (addendum.Asset, addendum.Version);
+                if (updates.TryGetValue(key, out var attachment))
                     addendum.Version = attachment.AssetVersion;
-
-                    foreach (var otherAddendum in otherAddendums)
-                        otherAddendum.Version = attachment.AssetVersion;
-                }
             }
         }
 
@@ -504,6 +509,7 @@ namespace InSite.Domain.Banks
                 Content = e.Content,
                 Condition = e.Condition,
                 Type = e.Type,
+                FileIdentifier = e.FileIdentifier,
                 Upload = e.Upload,
                 Image = e.Image,
                 Uploaded = e.ChangeTime
@@ -541,12 +547,13 @@ namespace InSite.Domain.Banks
         {
             var attachment = FindAttachment(e.Attachment);
 
-            if (e.Upload != Guid.Empty && attachment.Upload != e.Upload)
+            if (e.FileIdentifier.HasValue && attachment.FileIdentifier != e.FileIdentifier || e.Upload != Guid.Empty && attachment.Upload != e.Upload)
             {
                 attachment.Author = e.Author;
                 attachment.Uploaded = e.ChangeTime;
             }
 
+            attachment.FileIdentifier = e.FileIdentifier;
             attachment.Upload = e.Upload;
             attachment.Image.Actual = e.ActualDimension.Clone();
         }

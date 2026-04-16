@@ -9,7 +9,8 @@ namespace InSite.UI.Portal.Events.Classes.Controls
     {
         public void BindVenue(QEvent @event, string venueAddressLabel, string venueLabel)
         {
-            VenueLabel.InnerText = venueLabel;
+            VenueLabel.Text = venueLabel;
+
             if (@event.VenueLocation == null)
             {
                 VenueName.Text = Translate("None");

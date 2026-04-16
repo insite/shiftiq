@@ -13,18 +13,20 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Validation
         {
             base.OnLoad(e);
 
+            SearchCriteria.ValidatorUserIdentifier = User.Identifier;
+
             SearchCriteria.DisableCurrentStatus();
         }
 
         protected override EmployeeCompetencyFilter GetFilterFromRequestParameters(EmployeeCompetencyFilter filter)
         {
-            filter = base.GetFilterFromRequestParameters(filter);
+            filter = base.GetFilterFromRequestParameters(filter) ?? new EmployeeCompetencyFilter();
 
-            var newFilter = filter == null ? new EmployeeCompetencyFilter() : filter;
+            filter.Statuses = new string[] { ValidationStatuses.SubmittedForValidation };
 
-            newFilter.Statuses = new string[] { ValidationStatuses.SubmittedForValidation };
+            filter.ValidatorUserIdentifier = User.Identifier;
 
-            return newFilter;
+            return filter;
         }
     }
 }

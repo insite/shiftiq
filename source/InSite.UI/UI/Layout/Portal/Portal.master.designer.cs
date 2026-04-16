@@ -204,33 +204,6 @@ namespace InSite.UI.Layout.Portal
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl HelpHeading;
 
         /// <summary>
-        /// CoreAboutHeading control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CoreAboutHeading;
-
-        /// <summary>
-        /// CoreAboutBody control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CoreAboutBody;
-
-        /// <summary>
-        /// CoreAboutEdit control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink CoreAboutEdit;
-
-        /// <summary>
         /// CustomAboutHeading control.
         /// </summary>
         /// <remarks>

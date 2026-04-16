@@ -16,6 +16,7 @@ namespace InSite.Application.Contacts.Read
         public Guid? ShippingAddressIdentifier { get; set; }
         public Guid OrganizationIdentifier { get; set; }
         public Guid UserIdentifier { get; set; }
+        public Guid PersonIdentifier { get; set; }
         public Guid? WorkAddressIdentifier { get; set; }
         public Guid? EmployerGroupStatusItemIdentifier { get; set; }
 

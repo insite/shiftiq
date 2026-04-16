@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using InSite.Domain.Banks;
+
+using Microsoft.AspNetCore.Mvc;
+
+using Shift.Common.Timeline.Changes;
+using Shift.Sdk.Service;
 
 namespace Shift.Api;
 
@@ -6,112 +11,121 @@ namespace Shift.Api;
 [ApiExplorerSettings(GroupName = "Timeline API")]
 public class QueryController : ControllerBase
 {
-    private readonly PermissionMatrix _authorizationService;
-    private readonly Shift.Common.IClaimConverter _converter;
-    private readonly QueryDispatcher _dispatcher;
-    private readonly Shift.Common.Reflector _reflector;
-    private readonly IJsonSerializerBase _serializer;
-    private readonly QueryBuilder _builder;
+    private readonly ITimelineQuery _timelineQuery;
 
-    public QueryController(QueryTypeCollection queryTypes,
-         PermissionMatrix authorizationService, Shift.Common.IClaimConverter converter, QueryDispatcher dispatcher, IJsonSerializerBase serializer)
+    public QueryController(ITimelineQuery timelineQuery)
     {
-        _authorizationService = authorizationService;
-        _converter = converter;
-        _dispatcher = dispatcher;
-        _reflector = new Shift.Common.Reflector();
-        _serializer = serializer;
-        _builder = new QueryBuilder(queryTypes, serializer);
+        _timelineQuery = timelineQuery;
     }
 
-    [HttpPost("api/timeline/queries")]
+    [HttpGet("api/timeline/aggregates/{aggregateId}")]
     [HybridPermission("timeline/queries")]
-    public async Task<IActionResult> RunQueryAsync([FromQuery] string q, [FromQuery] QueryFilter filter)
+    public async Task<IActionResult> RetrieveAggregateStateAsync(Guid aggregateId, string aggregateType)
     {
-        try
+        AggregateState state;
+
+        switch (aggregateType)
         {
-            var queryType = _builder.GetQueryType(q);
-
-            ConfirmPermission(queryType);
-
-            var requestBody = await new StreamReader(Request.Body).ReadToEndAsync();
-
-            var resultType = _builder.GetResultType(queryType);
-
-            var queryObject = _builder.BuildQuery(queryType, resultType, requestBody, filter);
-
-            // TODO: Implement monitoring.
-
-            var resultObject = RunQuery(queryObject, resultType);
-
-            if (resultObject == null)
-                return NotFound();
-
-            return Ok(resultObject);
+            case "BankAggregate":
+                state = await _timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(aggregateId);
+                break;
+            default:
+                return BadRequest();
         }
-        catch (Common.AccessDeniedException ad)
-        {
-            return Problem(ad.Message, null, 403);
-        }
-        catch (Common.BadQueryException bq)
-        {
-            return Problem(bq.Message, null, 400);
-        }
-        catch (Exception ex)
-        {
-            return Problem(ex.Message, null, 500);
-        }
+
+        return state != null ? Ok(state) : NotFound();
     }
 
-    private void ConfirmPermission(Type queryType)
-    {
-        // Confirm the user's authorization token has permission to run this specific query.
+    // TODO: Requires services that do not exist, therefore needs to be fixed before uncommenting
 
-        var principal = _converter.ToPrincipal(User.Claims);
+    // [HttpPost("api/timeline/queries")]
+    // [HybridPermission("timeline/queries")]
+    // public async Task<IActionResult> RunQueryAsync([FromQuery] string q, [FromQuery] QueryFilter filter)
+    // {
+    //     try
+    //     {
+    //         var queryType = _builder.GetQueryType(q);
 
-        var roles = principal.Roles.Select(x => x.Name);
+    //         ConfirmPermission(queryType);
 
-        var resourceName = _reflector.GetResourceName(queryType);
+    //         var requestBody = await new StreamReader(Request.Body).ReadToEndAsync();
 
-        if (IsGranted(principal, resourceName, roles, Common.FeatureAccess.Use))
-            return;
+    //         var resultType = _builder.GetResultType(queryType);
 
-        var roleList = string.Join(", ", roles);
+    //         var queryObject = _builder.BuildQuery(queryType, resultType, requestBody, filter);
 
-        var message = "None of the roles assigned to this token are granted access to run this"
-            + $" query. Resource = {resourceName}. Roles = {roleList}.";
+    //         // TODO: Implement monitoring.
 
-        throw new Common.AccessDeniedException(message);
-    }
+    //         var resultObject = RunQuery(queryObject, resultType);
 
-    private bool IsGranted(IPrincipal principal, string resourceSlug, IEnumerable<string> roles, Common.FeatureAccess access)
-    {
-        var permissionList = _authorizationService.GetPermissions(principal.Organization.Slug);
+    //         if (resultObject == null)
+    //             return NotFound();
 
-        var relativeUrl = new RelativePath(resourceSlug);
+    //         return Ok(resultObject);
+    //     }
+    //     catch (Common.AccessDeniedException ad)
+    //     {
+    //         return Problem(ad.Message, null, 403);
+    //     }
+    //     catch (Common.BadQueryException bq)
+    //     {
+    //         return Problem(bq.Message, null, 400);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return Problem(ex.Message, null, 500);
+    //     }
+    // }
 
-        var granted =
-            permissionList.IsAllowed("*", roles, access) ||
-            permissionList.IsAllowed(relativeUrl.Value, roles, access);
+    // private void ConfirmPermission(Type queryType)
+    // {
+    //     // Confirm the user's authorization token has permission to run this specific query.
 
-        while (!granted && relativeUrl.HasSegments())
-        {
-            relativeUrl.RemoveLastSegment();
+    //     var principal = _converter.ToPrincipal(User.Claims);
 
-            granted = permissionList.IsAllowed(relativeUrl.Value, roles, access);
-        }
+    //     var roles = principal.Roles.Select(x => x.Name);
 
-        return granted;
-    }
+    //     var resourceName = _reflector.GetResourceName(queryType);
 
-    private object? RunQuery(object queryObject, Type resultType)
-    {
-        var dispatchMethod = typeof(QueryDispatcher).GetMethod(nameof(QueryDispatcher.Dispatch))!;
+    //     if (IsGranted(principal, resourceName, roles, Common.FeatureAccess.Use))
+    //         return;
 
-        var genericDispatchMethod = dispatchMethod.MakeGenericMethod(resultType);
+    //     var roleList = string.Join(", ", roles);
 
-        var resultObject = genericDispatchMethod.Invoke(_dispatcher, [queryObject]);
+    //     var message = "None of the roles assigned to this token are granted access to run this"
+    //         + $" query. Resource = {resourceName}. Roles = {roleList}.";
 
-        return resultObject;
-    }
+    //     throw new Common.AccessDeniedException(message);
+    // }
+
+    // private bool IsGranted(IPrincipal principal, string resourceSlug, IEnumerable<string> roles, Common.FeatureAccess access)
+    // {
+    //     var permissionList = _authorizationService.GetPermissions(principal.Organization.Slug);
+
+    //     var relativeUrl = new RelativePath(resourceSlug);
+
+    //     var granted =
+    //         permissionList.IsAllowed("*", roles, access) ||
+    //         permissionList.IsAllowed(relativeUrl.Value, roles, access);
+
+    //     while (!granted && relativeUrl.HasSegments())
+    //     {
+    //         relativeUrl.RemoveLastSegment();
+
+    //         granted = permissionList.IsAllowed(relativeUrl.Value, roles, access);
+    //     }
+
+    //     return granted;
+    // }
+
+    // private object? RunQuery(object queryObject, Type resultType)
+    // {
+    //     var dispatchMethod = typeof(QueryDispatcher).GetMethod(nameof(QueryDispatcher.Dispatch))!;
+
+    //     var genericDispatchMethod = dispatchMethod.MakeGenericMethod(resultType);
+
+    //     var resultObject = genericDispatchMethod.Invoke(_dispatcher, [queryObject]);
+
+    //     return resultObject;
+    // }
 }

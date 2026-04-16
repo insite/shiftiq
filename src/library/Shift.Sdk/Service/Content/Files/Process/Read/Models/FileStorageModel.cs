@@ -32,5 +32,11 @@ namespace InSite.Application.Files.Read
 
             return clone;
         }
+
+        public string GetExtension()
+        {
+            var index = FileName.LastIndexOf('.');
+            return index >= 0 ? FileName.Substring(index) : "";
+        }
     }
 }

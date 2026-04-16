@@ -15,6 +15,15 @@ namespace InSite.Admin.Sites.Pages.Controls
     {
 
         /// <summary>
+        /// EditLink2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button EditLink2;
+
+        /// <summary>
         /// EditLink control.
         /// </summary>
         /// <remarks>

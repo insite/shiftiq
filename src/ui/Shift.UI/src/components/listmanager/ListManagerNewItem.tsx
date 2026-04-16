@@ -54,7 +54,7 @@ export default function ListManagerNewItem({ titlePlaceholder, addTooltip, onAdd
                 tabIndex={hasTitle ? undefined : -1}
                 onClick={() => handleAddClick()}
             >
-                <Icon style="Solid" name="plus-circle" />
+                <Icon style="solid" name="plus-circle" />
             </button>
         </div>
     );

@@ -24,9 +24,8 @@
                 <div class="col-md-6">
                     <div class="card border-0 shadow-lg mb-3">
                         <div class="card-body">
-
-                                <h3>Learner</h3>
-                                <uc:PersonDetail runat="server" ID="PersonDetail" />
+                            <h3>Learner</h3>
+                            <uc:PersonDetail runat="server" ID="PersonDetail" />
                         </div>
                     </div>
 

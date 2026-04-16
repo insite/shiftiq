@@ -619,8 +619,11 @@ namespace InSite.Persistence
             if (inputFilter.BankIdentifier.HasValue)
                 query = query.Where(x => x.Form.BankIdentifier == inputFilter.BankIdentifier);
 
-            if (inputFilter.FormIdentifiers.IsNotEmpty())
-                query = query.Where(x => inputFilter.FormIdentifiers.Contains(x.Attempt.FormIdentifier));
+            if (inputFilter.ExamFormIdentifier.HasValue)
+                query = query.Where(x => x.ExamFormIdentifier == inputFilter.ExamFormIdentifier.Value);
+
+            if (inputFilter.AttemptFormIdentifiers.IsNotEmpty())
+                query = query.Where(x => inputFilter.AttemptFormIdentifiers.Contains(x.Attempt.FormIdentifier));
 
             if (inputFilter.ExamFormName.IsNotEmpty())
                 query = query.Where(x => x.Form.FormName.Contains(inputFilter.ExamFormName));

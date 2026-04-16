@@ -2,7 +2,7 @@
 <%@ Register Src="VenueAddress.ascx" TagName="VenueAddress" TagPrefix="uc" %>	
 
 <div>
-    <h5 id="VenueLabel" runat="server" class="mt-2 mb-1">Venue</h5>
+    <h5 class="mt-2 mb-1"><insite:Literal runat="server" id="VenueLabel" Text="Venue" /></h5>
     <div>
         <asp:Literal runat="server" ID="VenueName" />
     </div>

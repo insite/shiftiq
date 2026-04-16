@@ -20,11 +20,14 @@ internal class ContentImageProcessor(IStorageServiceAsync storageService, FileRe
         if (ids.Count == 0)
             return;
 
-        var files = await fileReader.CollectAsync(new SearchFiles
+        var criteria = new SearchFiles
         {
             FileIds = ids.ToArray(),
             ObjectId = ObjectIdentifiers.Temporary
-        });
+        };
+        criteria.Filter.Page = 0;
+
+        var files = await fileReader.CollectAsync(criteria);
 
         foreach (var file in files)
             await storageService.ChangeObjectAsync(file.FileIdentifier, pageId, FileObjectType.Page);
@@ -38,8 +41,8 @@ internal class ContentImageProcessor(IStorageServiceAsync storageService, FileRe
 
             foreach (var language in item.Languages)
             {
-                AddNewImages(item.GetHtml(label), ids);
-                AddNewImages(item.GetText(label), ids);
+                AddNewImages(item.Html[language], ids);
+                AddNewImages(item.Text[language], ids);
             }
         }
     }
@@ -49,16 +52,5 @@ internal class ContentImageProcessor(IStorageServiceAsync storageService, FileRe
         var subList = storageService.ExtractAndParseFileUrls(s);
         foreach (var (fileId, _) in subList)
             ids.Add(fileId);
-    }
-
-    private async Task<List<FileEntity>> CollectTempFiles(List<(Guid FileId, string FileName)> list)
-    {
-        var ids = list.Select(x => x.FileId).ToArray();
-
-        return await fileReader.CollectAsync(new SearchFiles
-        {
-            FileIds = ids,
-            ObjectId = ObjectIdentifiers.Temporary
-        });
     }
 }

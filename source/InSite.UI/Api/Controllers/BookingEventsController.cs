@@ -58,9 +58,8 @@ namespace InSite.Api.Controllers
             if (DateTime.TryParse(date, out var start))
             {
                 var firstDay = new DateTime(start.Year, start.Month, 1);
-
-                filter.EventScheduledSince = new DateTimeOffset(firstDay, CurrentUser.TimeZone.BaseUtcOffset);
-                filter.EventScheduledBefore = filter.EventScheduledSince.Value.AddMonths(1);
+                filter.EventScheduledPeriodSince = new DateTimeOffset(firstDay, CurrentUser.TimeZone.BaseUtcOffset);
+                filter.EventScheduledPeriodBefore = filter.EventScheduledPeriodSince.Value.AddMonths(1);
             }
 
             var events = GetEvents(filter);

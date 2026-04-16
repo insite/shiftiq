@@ -7,9 +7,9 @@ namespace Shift.Api;
 [Route("api/setup/actions")]
 public class ActionController : ControllerBase
 {
-    private readonly ActionService _actionService;
+    private readonly IActionService _actionService;
 
-    public ActionController(ActionService actionService)
+    public ActionController(IActionService actionService)
     {
         _actionService = actionService;
     }

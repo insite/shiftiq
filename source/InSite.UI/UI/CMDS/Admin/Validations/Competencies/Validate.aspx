@@ -65,7 +65,7 @@
                                 <td>
                                     <asp:Literal ID="CompetencyStandardIdentifier" runat="server" Text='<%# Eval("CompetencyStandardIdentifier") %>' Visible="false" />
                                     <insite:CheckBox ID="IsSelected" runat="server" Text='<%# Eval("Number") %>' />
-                                    <asp:Literal ID="CannotValidate" runat="server" Text="*" />
+                                    <div runat="server" id="CannotValidate" class="text-muted" style="padding-bottom: 5px; padding-left: 25px; font-size: 14px;"></div>
                                 </td>
                             </tr>
                         </ItemTemplate>
@@ -79,11 +79,17 @@
                         <insite:Button ID="UnselectAllButton" runat="server" Icon="far fa-square" Text="Deselect All" ButtonStyle="OutlinePrimary" />
                     </div>
 
-                    <div class="mt-3 text-muted fs-sm">
+                    <div class="mt-3 text-muted fs-sm d-none">
                         <i class="fas fa-info-circle"></i>
                         You can validate only those competencies for which you yourself have been validated.
                         Similarly, you cannot validate competencies for which you yourself have not been validated.
                     </div>
+
+                    <div class="mt-3 alert d-flex alert-warning">
+                        <i class="fa-solid fa-info-square fs-xl me-2"></i>
+                        <p><strong>System Notice:</strong> A known issue may allow validators to complete validations for competencies they are not validated in. Please ensure you are validated in each competency before proceeding. This issue is currently being addressed.</p>
+                    </div>
+
                 </div>
             </div>
         

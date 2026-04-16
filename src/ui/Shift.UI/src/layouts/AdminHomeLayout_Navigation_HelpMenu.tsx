@@ -1,5 +1,5 @@
 import Icon from "@/components/icon/Icon";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 
 export default function AdminHomeLayout_Navigation_HelpMenu() {
     const { siteSetting } = useSiteProvider();
@@ -8,7 +8,7 @@ export default function AdminHomeLayout_Navigation_HelpMenu() {
         <li className="nav-item dropdown fs-sm">
 
             <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                <Icon style="Regular" name="question-circle" className="me-2 fa-width-auto" />
+                <Icon style="regular" name="question-circle" className="me-2 fa-width-auto" />
                 Help
             </a>
 

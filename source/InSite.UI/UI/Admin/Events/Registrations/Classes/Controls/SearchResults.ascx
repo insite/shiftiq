@@ -95,6 +95,8 @@
             </ItemTemplate>
         </asp:TemplateField>
 
+        <asp:BoundField HeaderText="Assessment Form Name" DataField="ExamFormName" />
+
         <asp:BoundField HeaderText="Include in T2202" DataField="IncludeInT2202" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" />
 
         <asp:TemplateField HeaderText="Employer at Time of Registration">

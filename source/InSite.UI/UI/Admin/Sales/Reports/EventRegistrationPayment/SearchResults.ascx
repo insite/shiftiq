@@ -15,7 +15,16 @@
 
         <asp:BoundField HeaderText="Achievement" DataField="AchievementTitle" />
 
-        <asp:BoundField HeaderText="Employer at Time of Registration" DataField="EmployerName" />
+        <asp:TemplateField HeaderText="Employer at Time of Registration">
+            <ItemTemplate>
+                <%# Eval("EmployerName") %>
+
+                <div class="form-text">
+                    <%# Eval("EmployerStatus") %>
+                </div>
+            </ItemTemplate>
+        </asp:TemplateField>
+
         <asp:BoundField HeaderText="Registered By" DataField="RegistrantCardholder" />
 
         <asp:TemplateField HeaderText="Registrant">

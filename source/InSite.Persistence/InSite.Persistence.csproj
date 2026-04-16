@@ -125,6 +125,7 @@
     <Compile Include="Learning\Enrollments\TProgramGroupEnrollmentConfiguration.cs" />
     <Compile Include="Learning\Enrollments\VLearnerActivityFilter.cs" />
     <Compile Include="Messaging\Mailouts\SenderNotFoundException.cs" />
+    <Compile Include="Messaging\Mailouts\VMailoutFailureConfiguration.cs" />
     <Compile Include="Progress\Regulations\QAreaRequirementConfiguration.cs" />
     <Compile Include="Orchestration\ServiceLocator.cs" />
     <Compile Include="Progress\Rubrics\QRubricSearch.cs" />

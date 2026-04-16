@@ -60,6 +60,15 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
         protected global::InSite.Common.Web.UI.TextBox EmployerName;
 
         /// <summary>
+        /// EmployerStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ItemNameComboBox EmployerStatus;
+
+        /// <summary>
         /// RegistrantName control.
         /// </summary>
         /// <remarks>

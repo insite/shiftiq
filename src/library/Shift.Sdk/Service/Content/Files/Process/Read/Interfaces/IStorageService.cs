@@ -61,6 +61,8 @@ namespace InSite.Application.Files.Read
 
         List<FileStorageModel> GetGrantedFiles(ISimplePrincipal identity, Guid[] objectIdentifiers, string documentName = null);
 
+        List<(Guid FileIdentifier, string FileName)> ExtractAndParseFileUrls(string text);
+
         void ClearCache();
 
         string AdjustFileName(string fileName);
@@ -103,9 +105,9 @@ namespace InSite.Application.Files.Read
 
         Task<(FileGrantStatus, FileStorageModel, Stream)> GetFileStreamAndAuthorizeAsync(ISimplePrincipal identity, Guid fileIdentifier);
 
-        string GetFileUrl(FileStorageModel model, bool download = false);
+        string GetFileUrl(FileStorageModel model, bool download = false, bool legacyLink = false);
 
-        string GetFileUrl(Guid fileIdentifier, string fileName, bool download = false);
+        string GetFileUrl(Guid fileIdentifier, string fileName, bool download = false, bool legacyLink = false);
 
         Task<List<FileStorageModel>> GetGrantedFilesAsync(ISimplePrincipal identity, Guid objectIdentifier, string documentName = null);
 

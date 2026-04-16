@@ -10,6 +10,7 @@ using InSite.Application.Surveys.Read;
 using InSite.Common.Web;
 using InSite.Domain.Surveys.Forms;
 using InSite.UI.Admin.Records.Programs.Utilities;
+using InSite.UI.Lobby;
 using InSite.UI.Portal.Workflow.Forms.Models;
 
 using Shift.Common;
@@ -55,7 +56,13 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             // If the form requires identification and the user is not identified, then display an error.
             if (Current.Survey.RequireUserIdentification && (Current.Respondent == null || Current.Respondent.UserIdentifier == Shift.Constant.UserIdentifiers.Someone))
             {
-                ErrorAlert.AddMessage(AlertType.Error, $"<strong>{Translate("Access Denied")}:</strong> {Translate("This form requires identification and does not permit anonymous submissions")}.");
+                var message = "This form requires identification and does not permit anonymous submissions";
+
+                if (User == null)
+                    SignOut.Redirect(this, message, Request.RawUrl);
+
+                ErrorAlert.AddMessage(AlertType.Error, $"<strong>{Translate("Access Denied")}:</strong> {Translate(message)}.");
+
                 return;
             }
 
@@ -144,7 +151,9 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
         private void Continue()
         {
-            if (User == null) // Anonymous
+            var userId = User?.UserIdentifier ?? Current.RespondentUserIdentifier;
+
+            if (userId == UserIdentifiers.Someone) // Anonymous
             {
                 var sessionId = CreateNewSession(UserIdentifiers.Someone);
                 SubmissionSessionNavigator.RedirectToStart(sessionId);
@@ -154,11 +163,11 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
             try
             {
-                var mutex = _mutexes.GetOrAdd(User.Identifier, key => new object());
+                var mutex = _mutexes.GetOrAdd(userId, key => new object());
 
                 lock (mutex)
                 {
-                    var mostRecent = Current.Survey.ResponseLimitPerUser == 1 ? GetMostRecentSession() : null;
+                    var mostRecent = Current.Survey.ResponseLimitPerUser == 1 ? GetMostRecentSession(userId) : null;
 
                     if (mostRecent.HasValue)
                     {
@@ -180,7 +189,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             }
             finally
             {
-                _mutexes.TryRemove(User.Identifier, out _);
+                _mutexes.TryRemove(userId, out _);
             }
 
             if (info == default)
@@ -192,18 +201,18 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 SubmissionSessionNavigator.RedirectTo(info.action, info.sessionId);
         }
 
-        private Guid? GetMostRecentSession()
+        private Guid? GetMostRecentSession(Guid userId)
         {
             var sessions = ServiceLocator.SurveySearch.GetResponseSessions(new QResponseSessionFilter
             {
-                AssessorUserIdentifier = User.Identifier,
+                AssessorUserIdentifier = userId,
                 SurveyFormIdentifier = Current.FormIdentifier
             });
 
             if (sessions.Count == 0)
                 sessions = ServiceLocator.SurveySearch.GetResponseSessions(new QResponseSessionFilter
                 {
-                    RespondentUserIdentifier = User.Identifier,
+                    RespondentUserIdentifier = userId,
                     SurveyFormIdentifier = Current.FormIdentifier
                 });
 

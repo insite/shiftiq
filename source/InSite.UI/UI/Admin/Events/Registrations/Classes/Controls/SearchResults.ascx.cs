@@ -40,7 +40,8 @@ namespace InSite.Admin.Events.Registrations.Controls
                     x => x.Customer,
                     x => x.Payment,
                     x => x.RegistrationRequestedByPerson,
-                    x => x.Seat
+                    x => x.Seat,
+                    x => x.Form
                 )
                 .Select(x => new
                 {
@@ -79,7 +80,10 @@ namespace InSite.Admin.Events.Registrations.Controls
                     RegistrationRequestedByName = x.RegistrationRequestedByPerson?.UserFullName,
                     RegistrationRequestedByEmail = x.RegistrationRequestedByPerson?.UserEmail,
                     BillingCode = x.BillingCode,
-                    Department = GetDepartment(x)
+                    Department = GetDepartment(x),
+                    ExamFormTitle = x.Form?.FormTitle,
+                    ExamFormName = x.Form?.FormName,
+                    ExamFormCode = x.Form?.FormCode
                 })
                 .ToList()
                 .ToSearchResult();

@@ -159,6 +159,15 @@ namespace InSite.Admin.Events.Registrations.Controls
         protected global::InSite.Common.Web.UI.ItemNameComboBox RegistrationEmployerRegion;
 
         /// <summary>
+        /// DepartmentId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindGroup DepartmentId;
+
+        /// <summary>
         /// PaymentStatus control.
         /// </summary>
         /// <remarks>
@@ -213,13 +222,13 @@ namespace InSite.Admin.Events.Registrations.Controls
         protected global::InSite.Common.Web.UI.TextBox VenueName;
 
         /// <summary>
-        /// DepartmentId control.
+        /// ExamFormIdentifier control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.FindGroup DepartmentId;
+        protected global::InSite.Common.Web.UI.FindBankForm ExamFormIdentifier;
 
         /// <summary>
         /// ShowColumns control.

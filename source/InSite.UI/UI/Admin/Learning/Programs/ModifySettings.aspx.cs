@@ -41,7 +41,7 @@ namespace InSite.Admin.Records.Programs
         private void Open()
         {
             var program = ProgramId.HasValue ? ProgramSearch.GetProgram(ProgramId.Value) : null;
-            if (program == null)
+            if (program == null || program.OrganizationIdentifier != Organization.Identifier)
                 Search.Redirect();
 
             PageHelper.AutoBindHeader(this, null, program.ProgramName);

@@ -279,9 +279,7 @@ namespace InSite.Persistence
         {
             using (var db = CreateContext())
             {
-                return db.Mailouts
-                    .AsNoTracking()
-                    .Any(x => x.MailoutIdentifier == id);
+                return db.Mailouts.Any(x => x.MailoutIdentifier == id);
             }
         }
 
@@ -430,6 +428,77 @@ where MailoutIdentifier = @Mailout
 
                 return delivery?.DeliveryCompleted;
             }
+        }
+
+        #endregion
+
+        #region MailoutFailures
+
+        public List<VMailoutFailure> GetMailoutFailures(MailoutFailureFilter filter)
+        {
+            using (var db = CreateContext())
+            {
+                return CreateQueryable(db, filter)
+                    .OrderByDescending(x => x.MailoutFailed)
+                    .ApplyPaging(filter)
+                    .ToList();
+            }
+        }
+
+        public int CountMailoutFailures(MailoutFailureFilter filter)
+        {
+            using (var db = CreateContext())
+                return CreateQueryable(db, filter).Count();
+        }
+
+        private IQueryable<VMailoutFailure> CreateQueryable(InternalDbContext db, MailoutFailureFilter filter)
+        {
+            var q = db.VMailoutFailures.AsQueryable();
+
+            if (filter.OrganizationIdentifier.HasValue)
+                q = q.Where(x => x.OrganizationIdentifier == filter.OrganizationIdentifier);
+
+            if (filter.MessageIdentifier.IsNotEmpty())
+                q = q.Where(x => x.MessageIdentifier == filter.MessageIdentifier);
+
+            if (filter.Sender.IsNotEmpty())
+                q = q.Where(x => x.SenderEmail.Contains(filter.Sender) || x.SenderName.Contains(filter.Sender));
+
+            if (filter.Recipient.IsNotEmpty())
+            {
+                q = q.Where(x => x.UserEmail.Contains(filter.Recipient)
+                              || x.RecipientName.Contains(filter.Recipient)
+                              || x.PersonName.Contains(filter.Recipient));
+            }
+
+            if (filter.Subject.IsNotEmpty())
+                q = q.Where(x => x.MessageSubject.Contains(filter.Subject));
+
+            if (filter.Status.IsNotEmpty())
+                q = q.Where(x => x.DeliveryStatus == filter.Status);
+
+            if (filter.MessageType.IsNotEmpty())
+                q = q.Where(x => x.MessageType == filter.MessageType);
+
+            if (filter.Scheduled?.IsEmpty == false)
+            {
+                if (filter.Scheduled.Since.HasValue)
+                    q = q.Where(x => x.MailoutScheduled >= filter.Scheduled.Since.Value);
+
+                if (filter.Scheduled.Before.HasValue)
+                    q = q.Where(x => x.MailoutScheduled < filter.Scheduled.Before.Value);
+            }
+
+            if (filter.Failed?.IsEmpty == false)
+            {
+                if (filter.Failed.Since.HasValue)
+                    q = q.Where(x => x.MailoutFailed >= filter.Failed.Since.Value);
+
+                if (filter.Failed.Before.HasValue)
+                    q = q.Where(x => x.MailoutFailed < filter.Failed.Before.Value);
+            }
+
+            return q;
         }
 
         #endregion

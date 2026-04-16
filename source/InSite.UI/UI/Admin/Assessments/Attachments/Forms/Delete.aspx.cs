@@ -18,6 +18,13 @@ namespace InSite.Admin.Assessments.Attachments.Forms
 {
     public partial class Delete : AdminBasePage, IHasParentLinkParameters
     {
+        private class FileInfo
+        {
+            public string Name { get; set; }
+            public string NavigateUrl { get; set; }
+            public int? ContentSize { get; set; }
+        }
+
         private Guid BankID => Guid.TryParse(Request.QueryString["bank"], out var value) ? value : Guid.Empty;
 
         private Guid AttachmentID => Guid.TryParse(Request.QueryString["attachment"], out var value) ? value : Guid.Empty;
@@ -64,11 +71,11 @@ namespace InSite.Admin.Assessments.Attachments.Forms
                 Timestamp.Text = $"Posted by {authorName} on {attachment.Uploaded.Format(User.TimeZone)}";
                 AttachmentType = attachment.Type;
 
-                var upload = UploadSearch.Select(attachment.Upload);
-                if (upload != null)
+                var fileInfo = ReadFileInfo(attachment.FileIdentifier, attachment.Upload);
+                if (fileInfo != null)
                 {
-                    FileName.Text = $"<a href=\"/files{upload.NavigateUrl}?download=1\">{upload.Name}</a>";
-                    FileSize.Text = (upload.ContentSize ?? 0).Bytes().Humanize("0.##");
+                    FileName.Text = $"<a href=\"{fileInfo.NavigateUrl}\">{fileInfo.Name}</a>";
+                    FileSize.Text = (fileInfo.ContentSize ?? 0).Bytes().Humanize("0.##");
                 }
                 else
                 {
@@ -87,6 +94,32 @@ namespace InSite.Admin.Assessments.Attachments.Forms
 
                 CancelButton.NavigateUrl = GetReaderUrl(false);
             }
+        }
+
+        private static FileInfo ReadFileInfo(Guid? fileId, Guid uploadId)
+        {
+            if (fileId.HasValue)
+            {
+                var file = ServiceLocator.FileSearch.GetModel(fileId.Value);
+                return file != null
+                    ? new FileInfo
+                        {
+                            Name = file.Properties.DocumentName,
+                            NavigateUrl = ServiceLocator.StorageService.GetFileUrl(file, true),
+                            ContentSize = file.FileSize
+                        }
+                    : null;
+            }
+
+            var upload = UploadSearch.Select(uploadId);
+            return upload != null
+                ? new FileInfo
+                {
+                    Name = upload.Name,
+                    NavigateUrl = $"/files{upload.NavigateUrl}?download=1",
+                    ContentSize = upload.ContentSize
+                }
+                : null;
         }
 
         private void BindQuestions(BankState bank, Attachment attachment)
@@ -117,20 +150,27 @@ namespace InSite.Admin.Assessments.Attachments.Forms
 
         private void DeleteButton_Click(object sender, EventArgs e)
         {
+            var bank = ServiceLocator.BankSearch.GetBankState(BankID);
+            var attachment = bank?.FindAttachment(AttachmentID);
+
             if (VersionSelector.SelectedValue == "all")
             {
-                var bank = ServiceLocator.BankSearch.GetBankState(BankID);
-                var attachment = bank?.FindAttachment(AttachmentID);
-
                 if (bank != null)
                 {
                     foreach (var v in attachment.EnumerateAllVersions(SortOrder.Descending))
+                    {
                         ServiceLocator.SendCommand(new DeleteAttachment(BankID, v.Identifier));
+                        if (v.FileIdentifier.HasValue)
+                            ServiceLocator.StorageService.Delete(v.FileIdentifier.Value);
+                    }
                 }
             }
-            else
+            else if (attachment != null)
             {
                 ServiceLocator.SendCommand(new DeleteAttachment(BankID, AttachmentID));
+
+                if (attachment.FileIdentifier.HasValue)
+                    ServiceLocator.StorageService.Delete(attachment.FileIdentifier.Value);
             }
 
             RedirectToReader(true);

@@ -1,6 +1,6 @@
 import ActionLink from "@/components/ActionLink";
 import Icon from "@/components/icon/Icon";
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 
 export default function AdminHomeLayout_UserMenu() {
     const { siteSetting } = useSiteProvider();
@@ -13,7 +13,7 @@ export default function AdminHomeLayout_UserMenu() {
         <li className="nav-item dropdown fs-sm">
                     
             <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                <Icon style="Regular" name="user" className="fa-width-auto me-2" />
+                <Icon style="regular" name="user" className="fa-width-auto me-2" />
                 {siteSetting.UserName}
             </a>
 

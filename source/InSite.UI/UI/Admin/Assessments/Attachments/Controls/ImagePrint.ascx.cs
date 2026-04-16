@@ -171,7 +171,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
             {
                 var imageAttachments = bank.Attachments.Where(x => x.Type == AttachmentType.Image).ToArray();
 
-                images = ConvertToInfo(imageAttachments);
+                images = ConvertToInfo(bank.Identifier, imageAttachments);
             }
 
             return RenderPdf(new ControlData
@@ -211,7 +211,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                     .Where(x => x.Type == AttachmentType.Image && attachmentFilter.Contains(x.Identifier))
                     .ToArray();
 
-                images = ConvertToInfo(attachments);
+                images = ConvertToInfo(form.Specification.Bank.Identifier, attachments);
             }
 
             return RenderPdf(new ControlData
@@ -292,18 +292,26 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                 .Select(x => attachmentMapping[x])
                 .ToArray();
 
-            return ConvertToInfo(addendumAttachments);
+            return ConvertToInfo(bank.Identifier, addendumAttachments);
         }
 
-        private static ImageInfo[] ConvertToInfo(IEnumerable<Attachment> attachments)
+        private static ImageInfo[] ConvertToInfo(Guid bankId, IEnumerable<Attachment> attachments)
         {
             var uploads = UploadSearch
-                .Bind(x => new { x.UploadIdentifier, x.Name, x.NavigateUrl, x.ContentSize, x.Uploaded }, attachments)
-                .ToDictionary(x => x.UploadIdentifier);
+                .Bind(x => new { Identifier = x.UploadIdentifier, NavigateUrl = "/files" + x.NavigateUrl }, attachments);
+
+            var files = ServiceLocator.FileSearch
+                .GetModels(null, bankId, null, false)
+                .Select(x => new { Identifier = x.FileIdentifier, NavigateUrl = ServiceLocator.StorageService.GetFileUrl(x) })
+                .ToList();
+
+            files.AddRange(uploads);
+
+            var dictionary = files.ToDictionary(x => x.Identifier);
 
             return attachments
-                .Where(x => uploads.ContainsKey(x.Upload))
-                .Select(x => new ImageInfo(x, "/files" + uploads[x.Upload].NavigateUrl))
+                .Where(x => dictionary.ContainsKey(x.FileIdentifier ?? x.Upload))
+                .Select(x => new ImageInfo(x, dictionary[x.FileIdentifier ?? x.Upload].NavigateUrl))
                 .ToArray();
         }
 

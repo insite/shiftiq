@@ -28,8 +28,6 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
             if (Page.IsPostBack)
                 return;
 
-            RecentLinkCache.Add(Page);
-
             var environment = ServiceLocator.AppSettings.Environment;
 
             var name = environment.Name;
@@ -79,7 +77,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
             }
             else if (Page is Portal.PortalBasePage q)
             {
-                PageTitle = (qualifier ?? q.ActionModel.ActionName) + spacer + ServiceLocator.Partition.Name;
+                PageTitle = (qualifier ?? q.ActionModel.ActionName) + spacer + ServiceLocator.Partition.Brand;
 
                 ActionTitle.InnerHtml = qualifier ?? q.ActionModel.ActionName;
 

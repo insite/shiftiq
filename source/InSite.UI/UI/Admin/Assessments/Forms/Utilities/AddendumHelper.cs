@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using InSite.Domain.Banks;
@@ -20,18 +21,26 @@ namespace InSite.UI.Admin.Assessments.Forms.Utilities
             public string Url { get; set; }
         }
 
-        public static RepeaterDataItem[][] GetRepeaterDataSource(params IEnumerable<Attachment>[] groups)
+        public static RepeaterDataItem[][] GetRepeaterDataSource(Guid bankId, params IEnumerable<Attachment>[] groups)
         {
             var uploads = UploadSearch
-                .Bind(x => new { x.UploadIdentifier, x.Name, x.NavigateUrl, x.ContentSize, x.Uploaded }, groups.SelectMany(x => x))
-                .ToDictionary(x => x.UploadIdentifier);
+                .Bind(x => new { Identifier = x.UploadIdentifier, NavigateUrl = "/files" + x.NavigateUrl }, groups.SelectMany(x => x));
+
+            var files = ServiceLocator.FileSearch
+                .GetModels(null, bankId, null, false)
+                .Select(x => new { Identifier = x.FileIdentifier, NavigateUrl = ServiceLocator.StorageService.GetFileUrl(x) })
+                .ToList();
+
+            files.AddRange(uploads);
+
+            var dictionary = files.ToDictionary(x => x.Identifier);
 
             return groups
                 .Select(group => group
-                    .Where(x => uploads.ContainsKey(x.Upload))
+                    .Where(x => dictionary.ContainsKey(x.FileIdentifier ?? x.Upload))
                     .Select(x =>
                     {
-                        var upload = uploads[x.Upload];
+                        var upload = dictionary[x.FileIdentifier ?? x.Upload];
 
                         return new RepeaterDataItem
                         {

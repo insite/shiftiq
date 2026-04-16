@@ -36,7 +36,7 @@ public class ContentModifyService(
         "CourseSummary",  
     };
 
-    public async Task ModifyPageContentAsync(PageModel pageModel, PageContentModifyModel modifyModel, string userFullName)
+    public async Task<Dictionary<int, Guid>> ModifyPageContentAsync(PageModel pageModel, PageContentModifyModel modifyModel, string userFullName)
     {
         var contentFields = pageModel.ContentLabelsToArray();
 
@@ -45,12 +45,23 @@ public class ContentModifyService(
 
         AddPageContentCommands(pageModel, modifyModel, contentFields, commands, contents);
 
-        if (modifyModel.Blocks != null && contentFields.Any(x => x.Equals("PageBlocks", StringComparison.OrdinalIgnoreCase)))
-            await AddBlockCommands(pageModel, modifyModel, userFullName, commands, contents);
+        var replacedBlockIds = new Dictionary<int, Guid>();
+
+        if (contentFields.Any(x => x.Equals("PageBlocks", StringComparison.OrdinalIgnoreCase))
+            && (
+                modifyModel.Blocks != null
+                || modifyModel.DeletedBlockIds != null && modifyModel.DeletedBlockIds.Length > 0
+            )
+        )
+        {
+            await AddBlockCommands(pageModel, modifyModel, userFullName, commands, contents, replacedBlockIds);
+        }
 
         await new ContentImageProcessor(storageService, fileReader).SaveImages(pageModel.PageId, contents);
 
         await commander.SendCommandsAsync(commands);
+
+        return replacedBlockIds;
     }
 
     private static void AddPageContentCommands(
@@ -85,9 +96,15 @@ public class ContentModifyService(
 
         contents.Add(dst);
 
-        var newTitle = src.Title?.Text?.Default;
-        if (!string.Equals(pageModel.Title, newTitle))
-            commands.Add(new ChangePageTitle(pageModel.PageId, newTitle));
+        var newTitle = StringHelper.StripMarkdown(src.Title?.Text?.Default);
+        if (!string.IsNullOrEmpty(newTitle))
+        {
+            if (newTitle.Length > 128)
+                newTitle = newTitle.Substring(0, 128);
+
+            if (!string.Equals(pageModel.Title, newTitle))
+                commands.Add(new ChangePageTitle(pageModel.PageId, newTitle));
+        }
 
         commands.Add(new ChangePageContent(pageModel.PageId, dst));
     }
@@ -97,21 +114,24 @@ public class ContentModifyService(
         PageContentModifyModel modifyModel,
         string userFullName,
         List<ICommand> commands,
-        List<ContentContainer> contents
+        List<ContentContainer> contents,
+        Dictionary<int, Guid> replacedBlockIds
     )
     {
-        var blockPages = await pageReader.CollectAsync(new CollectPages { ParentPageId = pageModel.PageId });
+        var criteria = new CollectPages { ParentPageId = pageModel.PageId };
+        criteria.Filter.Page = 0;
 
-        await AddBlockDeleteCommands(modifyModel, blockPages, commands);
+        var blockPages = await pageReader.CollectAsync(criteria);
 
-        AddBlockModifyCommands(pageModel, modifyModel, userFullName, blockPages, commands, contents);
+        if (modifyModel.DeletedBlockIds != null && modifyModel.DeletedBlockIds.Length > 0)
+            await AddBlockDeleteCommands(modifyModel, blockPages, commands);
+
+        if (modifyModel.Blocks != null && modifyModel.Blocks.Length > 0)
+            AddBlockModifyCommands(pageModel, modifyModel, userFullName, blockPages, commands, contents, replacedBlockIds);
     }
 
     private async Task AddBlockDeleteCommands(PageContentModifyModel modifyModel, List<PageEntity> blockPages, List<ICommand> commands)
     {
-        if (modifyModel.DeletedBlockIds == null || modifyModel.DeletedBlockIds.Length == 0)
-            return;
-
         foreach (var blockId in modifyModel.DeletedBlockIds)
         {
             if (!blockPages.Any(x => x.PageIdentifier == blockId))
@@ -131,7 +151,8 @@ public class ContentModifyService(
         string userFullName,
         List<PageEntity> blockPages,
         List<ICommand> commands,
-        List<ContentContainer> contents
+        List<ContentContainer> contents,
+        Dictionary<int, Guid> replacedBlockIds
     )
     {
         foreach (var blockModel in modifyModel.Blocks)
@@ -141,12 +162,14 @@ public class ContentModifyService(
             if (blockPage == null && !isNew)
                 continue;
 
-                var blockId = isNew ? UniqueIdentifier.Create() : blockModel.BlockId;
+            var blockId = isNew ? UniqueIdentifier.Create() : blockModel.BlockId;
 
             if (isNew)
             {
                 if (!_blockTypes.Contains(blockModel.BlockType))
                     throw new ArgumentException($"Invalid block type: {blockModel.BlockType}");
+
+                replacedBlockIds.Add(blockModel.BlockIdNumber ?? throw new ArgumentNullException("blockModel.BlockIdNumber"), blockId);
 
                 var sequence = blockPages.Count > 0 ? blockPages.Max(x => x.Sequence) + 1 : 1;
 

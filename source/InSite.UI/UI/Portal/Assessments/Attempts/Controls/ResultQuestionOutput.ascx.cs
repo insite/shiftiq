@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 
 using InSite.Application.Attempts.Read;
 using InSite.Common.Web.UI;
+using InSite.Domain.Banks;
 using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Newtonsoft.Json;
@@ -86,7 +87,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
             var options = Attempt.GetQuestionOptions(Question.QuestionIdentifier).ToArray();
             var bankQuestion = Attempt.Bank.FindQuestion(Question.QuestionIdentifier);
             var tableData = bankQuestion?.Layout.Type == OptionLayoutType.Table
-                ? QuestionTable.Build(bankQuestion.Layout.Columns, options.Select(x => x.OptionText))
+                ? BankQuestionTable.Build(bankQuestion.Layout.Columns, options.Select(x => x.OptionText))
                 : null;
 
             var tableHeader = tableData?.GetHeader();

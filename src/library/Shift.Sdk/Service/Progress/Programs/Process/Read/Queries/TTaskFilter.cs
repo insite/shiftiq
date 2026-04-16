@@ -14,5 +14,6 @@ namespace InSite.Application.Records.Read
         public Guid? ExcludedTask { get; set; }
         public Guid? ExcludedObject { get; set; }
         public string[] ExcludeObjectTypes { get; set; }
+        public string[] IncludeObjectTypes { get; set; }
     }
 }

@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-
-using Shift.Common.Timeline.Commands;
 
 using InSite.Application.Responses.Write;
 using InSite.Domain.Surveys.Sessions;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 
 namespace InSite.Application.Surveys.Write
 {
@@ -15,7 +15,7 @@ namespace InSite.Application.Surveys.Write
         /// <summary>
         /// Returns the list of commands to create an existing survey response session.
         /// </summary>
-        public ICommand[] GetCommands(ResponseSession session)
+        public ICommand[] GetCommands(ResponseSession session, Guid? respondentSupervisor, bool firstQuestionCaseSummary)
         {
             var id = session.Identifier;
             var script = new List<ICommand>
@@ -45,7 +45,7 @@ namespace InSite.Application.Surveys.Write
             }
 
             if (session.Completed.HasValue)
-                script.Add(new CompleteResponseSession(id, session.Completed));
+                script.Add(new CompleteResponseSession(id, session.Completed, respondentSupervisor, firstQuestionCaseSummary));
 
             return script.ToArray();
         }

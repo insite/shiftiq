@@ -27,7 +27,7 @@ namespace InSite.Application.Issues.Read
         public Guid? TopicUserConnectedFromUserIdentifier { get; set; }
         public Guid? TopicDepartmentIdentifier { get; set; } 
         public int? IssueNumber { get; set; }
-        public List<Guid?> AssigneeEmployer { get; set; }
+        public Guid[] AssigneeEmployer { get; set; }
         public string PersonCode { get; set; }
         public string AssigneeName { get; set; }
         public string AssigneeOrganization { get; set; }

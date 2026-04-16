@@ -4,7 +4,9 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 
+using InSite.Application;
 using InSite.Application.Messages.Read;
+using InSite.Application.Messages.Write;
 using InSite.Domain.Messages;
 
 using Newtonsoft.Json;
@@ -17,17 +19,37 @@ namespace InSite.Persistence
     public class EmailOutbox : IEmailOutbox
     {
         private readonly MailgunServer _mailgun;
-
         private readonly EnvironmentName _environment;
-
         private readonly IPartitionModel _partition;
+        private readonly ICommander _commander;
+        private IMessageSearch _messages;
 
-        public EmailOutbox(MailgunServer mailgunSender, EnvironmentName environment, IPartitionModel partition)
+        private bool _isInited = false;
+
+        public EmailOutbox(MailgunServer mailgunSender, EnvironmentName environment, IPartitionModel partition, ICommander commander)
         {
             _mailgun = mailgunSender;
 
             _environment = environment;
             _partition = partition;
+
+            _commander = commander;
+        }
+
+        public EmailOutbox(MailgunServer mailgunSender, EnvironmentName environment, IPartitionModel partition, ICommander commander, IMessageSearch messages)
+            : this(mailgunSender, environment, partition, commander)
+        {
+            Init(messages);
+        }
+
+        internal void Init(IMessageSearch messages)
+        {
+            if (_isInited)
+                return;
+
+            _messages = messages;
+
+            _isInited = true;
         }
 
         private class RecipientList
@@ -403,31 +425,56 @@ namespace InSite.Persistence
 
         public void Send(EmailDraft email, string tag, bool isUnitTest = false, string type = null)
         {
-            if (!email.SenderEnabled || email.RecipientListTo.Count == 0)
-                return;
+            CreateMailout(email);
 
-            email.MailoutSucceeded = false;
-            email.MailoutStatusCode = null;
-            email.MailoutStatus = "Pending";
-
-            if (email.SenderType == "Mailgun")
+            if (!email.SenderEnabled)
             {
-                if (email.RecipientListTo != null && email.RecipientListTo.Count == 1)
+                _commander.Send(new RejectMailout(
+                    email.MessageIdentifier.Value,
+                    email.MailoutIdentifier,
+                    null,
+                    "The sender is disabled.",
+                    null));
+                return;
+            }
+
+            if (email.RecipientListTo.IsEmpty())
+            {
+                _commander.Send(new RejectMailout(
+                    email.MessageIdentifier.Value,
+                    email.MailoutIdentifier,
+                    null,
+                    "The email has no recipients.",
+                    null));
+                return;
+            }
+
+            if (email.SenderType != "Mailgun")
+            {
+                _commander.Send(new RejectMailout(
+                    email.MessageIdentifier.Value,
+                    email.MailoutIdentifier,
+                    null,
+                    "Only Mailgun sender type is allowed.",
+                    null));
+                return;
+            }
+
+            if (email.RecipientListTo.Count == 1)
+            {
+                var item = email.RecipientListTo.Single();
+                var envelope = CreateEmailVariables(email, item.Key, item.Value);
+
+                SendUsingMailgun(email, envelope, tag, type);
+            }
+            else
+            {
+                foreach (var item in email.RecipientListTo)
                 {
-                    var item = email.RecipientListTo.Single();
+                    var _email = CopyEmail(email, item.Key, item.Value);
                     var envelope = CreateEmailVariables(email, item.Key, item.Value);
 
-                    SendUsingMailgun(email, envelope, tag, type);
-                }
-                else
-                {
-                    foreach (var item in email.RecipientListTo)
-                    {
-                        var _email = CopyEmail(email, item.Key, item.Value);
-                        var envelope = CreateEmailVariables(email, item.Key, item.Value);
-
-                        SendUsingMailgun(_email, envelope, tag, type);
-                    }
+                    SendUsingMailgun(_email, envelope, tag, type);
                 }
             }
         }
@@ -467,19 +514,37 @@ namespace InSite.Persistence
 
         public void Send(EmailDraft email)
         {
+            CreateMailout(email);
+
             if (email.Recipients.Count == 0)
+            {
+                _commander.Send(new RejectMailout(
+                    email.MessageIdentifier.Value,
+                    email.MailoutIdentifier,
+                    null,
+                    "The email has no recipients.",
+                    null));
                 return;
+            }
 
             var sender = TSenderSearch.Select(email.SenderIdentifier);
 
-            if (sender.SenderType == "Mailgun")
-                ScheduleUsingMailgun(email, sender, "Post Office");
+            if (sender.SenderType != "Mailgun")
+            {
+                _commander.Send(new RejectMailout(
+                    email.MessageIdentifier.Value,
+                    email.MailoutIdentifier,
+                    null,
+                    "Only Mailgun sender type is allowed.",
+                    null));
+                return;
+            }
+
+            ScheduleUsingMailgun(email, sender, "Post Office");
         }
 
         private void ScheduleUsingMailgun(EmailDraft draft, TSender sender, string tag)
         {
-            PrepareToSendMailout(draft);
-
             foreach (var recipient in draft.Recipients)
             {
                 if (recipient.Identifier == null)
@@ -525,31 +590,6 @@ namespace InSite.Persistence
             }
         }
 
-        void PrepareToSendMailout(EmailDraft draft)
-        {
-            var mailout = ConvertDraftToMailout(draft);
-
-            if (mailout.MailoutStatus == null)
-                mailout.MailoutStatus = "Started";
-
-            if (draft.Recipients != null && string.IsNullOrEmpty(mailout.RecipientListTo))
-            {
-                var to = new Dictionary<Guid, string>();
-
-                foreach (var recipient in draft.Recipients)
-                {
-                    if (recipient.Identifier == null)
-                        throw new InvalidOperationException($"The identifier for this recipient ({recipient.Address}) cannot be null.");
-
-                    to.Add(recipient.Identifier.Value, recipient.Address);
-                }
-
-                mailout.RecipientListTo = JsonConvert.SerializeObject(to);
-            }
-
-            MessageStore.InsertMailout(mailout);
-        }
-
         private void SendUsingMailgun(EmailDraft email, EmailVariables envelope, string tag, string type = null)
         {
             var envPrefix = GetEnvironmentPrefix();
@@ -564,8 +604,21 @@ namespace InSite.Persistence
             email.ContentSubject.Default = subject;
             email.ContentBody.Default = body;
 
-            if (_mailgun.SendEmail(email, tag, type))
-                OnSendCompleted(email, envelope.RecipientIdentifier);
+            var status = _mailgun.SendEmail(email, tag, type);
+
+            email.MailoutStatus = status.Status;
+
+            if (status.Status == MailoutCallbackStatus.Queued)
+            {
+                _commander.Send(new QueueMailout(
+                    email.MessageIdentifier.Value, email.MailoutIdentifier, envelope.RecipientEmail, status.Data));
+            }
+            else
+            {
+                _commander.Send(new RejectMailout(
+                    email.MessageIdentifier.Value, email.MailoutIdentifier, envelope.RecipientEmail,
+                    status.Description, status.Data));
+            }
         }
 
         private Dictionary<Guid, string> GetEmailAddresses(Guid organization, List<Guid> users)
@@ -949,119 +1002,48 @@ namespace InSite.Persistence
             return ReplaceSmarterMailVariables(recipientData, 0, subject, body);
         }
 
-        private void OnSendCompleted(EmailDraft email, Guid? userId)
+        private void CreateMailout(EmailDraft draft)
         {
-            var mailout = TEmailSearch.Get(email.MailoutIdentifier);
+            if (draft.MailoutIdentifier.IsEmpty())
+                throw ApplicationError.Create("MailoutId is not defined");
 
-            if (mailout == null)
-            {
-                mailout = ConvertDraftToMailout(email);
-                if (string.IsNullOrWhiteSpace(mailout.RecipientListTo))
-                    return;
+            if (_messages.MailoutExists(draft.MailoutIdentifier))
+                return;
 
-                MessageStore.InsertMailout(mailout);
-            }
-            else
-            {
-                mailout.MailoutStatus = email.MailoutStatus;
-                mailout.MailoutStatusCode = email.MailoutStatusCode;
-                mailout.MailoutError = email.MailoutErrorReason;
-
-                if (mailout.MailoutCompleted == null)
-                {
-                    if (email.MailoutSucceeded || email.MailoutStatus == "Completed" || email.MailoutStatus == "Succeeded")
-                        mailout.MailoutCompleted = DateTimeOffset.UtcNow;
-                }
-
-                mailout.SenderStatus = email.SenderStatus;
-
-                MessageStore.UpdateMailout(mailout);
-            }
-
-            if (userId != null)
-            {
-                var recipient = MessageSearch.Instance.GetDeliveryToUser(mailout.MailoutIdentifier, userId.Value);
-
-                if (recipient != null)
-                {
-                    recipient.DeliveryStatus = mailout.MailoutStatus;
-
-                    if (recipient.DeliveryCompleted == null)
-                    {
-                        if (email.MailoutSucceeded || email.MailoutStatus == "Completed" || email.MailoutStatus == "Succeeded")
-                            recipient.DeliveryCompleted = DateTimeOffset.UtcNow;
-                    }
-
-                    MessageStore.UpdateRecipient(recipient);
-                }
-            }
-        }
-
-        public static QMailout ConvertDraftToMailout(EmailDraft draft)
-        {
             var sender = TSenderSearch.Select(draft.SenderIdentifier);
-
             if (sender == null)
                 throw new SenderNotFoundException(draft.SenderIdentifier);
 
-            var mailout = new QMailout
+            var message = draft.MessageIdentifier.IsNotEmpty()
+                ? MessageSearch.Instance.GetMessage(draft.MessageIdentifier.Value)
+                : null;
+            if (message == null)
+                throw ApplicationError.Create("Message not found");
+
+            var to = draft.RecipientListTo.EmptyIfNull();
+
+            if (to.IsEmpty() && draft.Recipients != null && draft.Recipients.Count > 0)
             {
-                ContentBodyHtml = draft.ContentBody.Default,
-                ContentSubject = draft.ContentSubject.Default,
-                EventIdentifier = draft.EventIdentifier,
-                MessageIdentifier = draft.MessageIdentifier,
-                MailoutIdentifier = draft.MailoutIdentifier,
-                MailoutScheduled = DateTimeOffset.UtcNow,
-                MailoutStatus = draft.MailoutStatus,
-                MailoutStatusCode = draft.MailoutStatusCode,
-                OrganizationIdentifier = draft.OrganizationIdentifier,
-                SenderIdentifier = draft.SenderIdentifier,
-                SenderStatus = draft.SenderStatus,
-                SenderType = sender.SenderType,
-                UserIdentifier = draft.UserIdentifier,
-                MailoutError = draft.MailoutErrorReason
-            };
+                foreach (var recipient in draft.Recipients)
+                {
+                    if (recipient.Identifier == null)
+                        throw new InvalidOperationException($"The identifier for this recipient ({recipient.Address}) cannot be null.");
 
-            if (draft.ContentAttachments.IsNotEmpty())
-                mailout.ContentAttachments = JsonConvert.SerializeObject(draft.ContentAttachments);
-
-            if (!Calendar.IsEmpty(draft.MailoutScheduled))
-                mailout.MailoutScheduled = draft.MailoutScheduled.Value;
-
-            if (mailout.MailoutIdentifier == Guid.Empty)
-                mailout.MailoutIdentifier = UniqueIdentifier.Create();
-
-            if (mailout.MessageIdentifier != null)
-            {
-                var message = MessageSearch.Instance.GetMessage(mailout.MessageIdentifier.Value);
-                mailout.MessageType = message?.MessageType;
-                mailout.MessageName = message?.MessageName;
+                    to.Add(recipient.Identifier.Value, recipient.Address);
+                }
             }
 
-            if (mailout.MessageType == null)
-                mailout.MessageType = "None";
+            var scheduledOn = Calendar.IsEmpty(draft.MailoutScheduled)
+                ? DateTimeOffset.UtcNow
+                : draft.MailoutScheduled.Value;
 
-            if (mailout.MessageName == null)
-                mailout.MessageName = mailout.ContentSubject;
-
-            if (mailout.MailoutStarted == null)
-                if (draft.MailoutStatus == "Pending" || draft.MailoutStatus == "Completed" || draft.MailoutStatus == "Succeeded")
-                    mailout.MailoutStarted = DateTimeOffset.UtcNow;
-
-            if (mailout.MailoutCompleted == null)
-                if (draft.MailoutStatus == "Completed" || draft.MailoutStatus == "Succeeded")
-                    mailout.MailoutCompleted = DateTimeOffset.UtcNow;
-
-            if (draft.RecipientListTo != null && draft.RecipientListTo.Any())
-                mailout.RecipientListTo = JsonConvert.SerializeObject(draft.RecipientListTo);
-
-            if (draft.RecipientListCc != null && draft.RecipientListCc.Any())
-                mailout.RecipientListCc = JsonConvert.SerializeObject(draft.RecipientListCc);
-
-            if (draft.RecipientListBcc != null && draft.RecipientListBcc.Any())
-                mailout.RecipientListBcc = JsonConvert.SerializeObject(draft.RecipientListBcc);
-
-            return mailout;
+            _commander.Send(new DraftMailout(
+                message.MessageIdentifier,
+                draft.MailoutIdentifier, scheduledOn,
+                draft.SenderIdentifier, sender.SenderType,
+                to, draft.RecipientListCc, draft.RecipientListBcc,
+                draft.ContentSubject, null, draft.ContentBody, draft.ContentAttachments.NullIfEmpty(),
+                draft.EventIdentifier));
         }
     }
 }

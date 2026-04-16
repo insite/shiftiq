@@ -3,7 +3,7 @@ import { FieldError } from "react-hook-form";
 import { Spinner } from "react-bootstrap";
 import { numberHelper } from "@/helpers/numberHelper";
 import { translate } from "@/helpers/translate";
-import { useStatusProvider } from "@/contexts/StatusProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { shiftClient } from "@/api/shiftClient";
 import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
 import { errorHelper } from "@/helpers/errorHelper";
@@ -184,7 +184,7 @@ export default function FileUpload({
                     tabIndex={-1}
                     onClick={handleButtonClick}
                 >
-                    {isBusy ? <Spinner animation="border" role="status" size="sm" /> : <Icon style="Regular" name="search" />}
+                    {isBusy ? <Spinner animation="border" role="status" size="sm" /> : <Icon style="regular" name="search" />}
                 </button>
             </div>
             {showProgress && (

@@ -11,11 +11,16 @@ namespace InSite.Domain.Organizations
         public bool EnableUserConfidentiality { get; set; }
         public bool LockUserConfidentiality { get; set; }
         public Guid[] ResponseUploadClaimGroups { get; set; }
+        public bool DefaultCaseOwnerToSupervisor { get; set; }
+        public bool FirstQuestionCaseSummary { get; set; }
 
         public bool IsEqual(SurveySettings other)
         {
             var isEqual = EnableUserConfidentiality == other.EnableUserConfidentiality
-                && LockUserConfidentiality == other.LockUserConfidentiality;
+                && LockUserConfidentiality == other.LockUserConfidentiality
+                && DefaultCaseOwnerToSupervisor == other.DefaultCaseOwnerToSupervisor
+                && FirstQuestionCaseSummary == other.FirstQuestionCaseSummary;
+
             if (!isEqual)
                 return false;
 

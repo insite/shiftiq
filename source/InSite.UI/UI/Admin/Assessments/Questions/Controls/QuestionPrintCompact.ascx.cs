@@ -80,6 +80,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
             public string CurrentUrl { get; }
             public string HeaderUrl { get; }
 
+            public QuestionPrintHelper.QuestionFilter QuestionFilter { get; set; }
+
             public Options(OrganizationState organization)
             {
                 OrganizationID = organization.Identifier;
@@ -120,6 +122,12 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
             foreach (var q in bank.Sets.SelectMany(x => x.Questions))
             {
+                if (QuestionPrintHelper.IsQuestionMatch(q, options.QuestionFilter))
+                {
+                    sequence++;
+                    continue;
+                }
+
                 IEnumerable<Option> bankOptions;
 
                 if (q.Type.IsRadioList())
@@ -158,6 +166,9 @@ namespace InSite.Admin.Assessments.Questions.Controls
             {
                 var question = q.AttemptQuestion as AttemptQuestionDefault;
                 if (question == null)
+                    continue;
+
+                if (QuestionPrintHelper.IsQuestionMatch(q.BankQuestion, options.QuestionFilter))
                     continue;
 
                 IEnumerable<string> optionLetters;

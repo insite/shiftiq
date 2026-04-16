@@ -1,4 +1,4 @@
-import { useSiteProvider } from "@/contexts/SiteProvider";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { Language, languageNames } from "../../helpers/language";
 import { Spinner } from "react-bootstrap";
 import Icon from "../icon/Icon";
@@ -64,7 +64,7 @@ export default function RichTextEditor_Translate({
 
                 ) : (
                     <>
-                    <Icon style="Solid" name="globe" className="me-2" />
+                    <Icon style="solid" name="globe" className="me-2" />
                         Translate
                     </>
                 )}

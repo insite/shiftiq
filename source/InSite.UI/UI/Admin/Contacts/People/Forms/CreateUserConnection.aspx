@@ -87,6 +87,7 @@
                                     Attributes
                                 </label>
                                 <div>
+                                    <insite:CheckBox runat="server" ID="IsLeader" Text="Leader" />
                                     <insite:CheckBox runat="server" ID="IsManager" Text="Manager" />
                                     <insite:CheckBox runat="server" ID="IsSupervisor" Text="Supervisor" />
                                     <insite:CheckBox runat="server" ID="IsValidator" Text="Validator" />

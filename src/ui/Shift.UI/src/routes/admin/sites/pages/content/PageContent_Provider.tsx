@@ -11,7 +11,8 @@ interface ContextData {
     deletedBlockIds: string[];
     selectedBlockId: BlockId | null;
     readOnly: boolean;
-    initBlocks: (blocks: BlockState[]) => void;
+    isDirty: boolean;
+    initBlocks: (blocks: BlockState[], defaultSelectedBlockId: BlockId | null) => void;
     addBlock: (blockType: BlockType, blockTitle: string) => void;
     deleteBlock: (blockId: BlockId) => void;
     modifyBlockField: (blockId: BlockId, fieldName: BlockFieldName, fieldValue: BlockFieldValue) => void;
@@ -19,6 +20,7 @@ interface ContextData {
     modifyBlockHook: (blockId: BlockId, hook: string) => void;
     selectBlock: (blockId: BlockId | null) => void;
     setReadOnly: (readOnly: boolean) => void;
+    clearDirty: (replacedBlockIds: Record<number, string>) => void;
 }
 
 const PageContent_ProviderContext = createContext<ContextData>({
@@ -26,19 +28,22 @@ const PageContent_ProviderContext = createContext<ContextData>({
     deletedBlockIds: [],
     selectedBlockId: null,
     readOnly: false,
-    initBlocks: () => {},
-    addBlock: () => {},
-    deleteBlock: () => {},
-    modifyBlockField: () => {},
-    modifyBlockTitle: () => {},
-    modifyBlockHook: () => {},
-    selectBlock: () => {},
-    setReadOnly: () => {},
+    isDirty: false,
+    initBlocks() {},
+    addBlock() {},
+    deleteBlock() {},
+    modifyBlockField() {},
+    modifyBlockTitle() {},
+    modifyBlockHook() {},
+    selectBlock() {},
+    setReadOnly() {},
+    clearDirty() {},
 });
 
 interface InitBlocksAction {
     type: "initBlocks";
     blocks: BlockState[];
+    defaultSelectedBlockId: BlockId | null;
 }
 
 interface AddBlockAction {
@@ -81,7 +86,21 @@ interface SetReadOnlyAction {
     readOnly: boolean;
 }
 
-type Action = InitBlocksAction | AddBlockAction | DeleteBlockAction | ModifyBlockFieldAction | ModifyBlockTitleAction | ModifyBlockHookAction | SelectBlockAction | SetReadOnlyAction;
+interface ClearDirtyAction {
+    type: "clearDirty";
+    replacedBlockIds: Record<number, string>;
+}
+
+type Action = InitBlocksAction
+    | AddBlockAction
+    | DeleteBlockAction
+    | ModifyBlockFieldAction
+    | ModifyBlockTitleAction
+    | ModifyBlockHookAction
+    | SelectBlockAction
+    | SetReadOnlyAction
+    | ClearDirtyAction
+    ;
 
 interface State {
     blocks: BlockState[];
@@ -114,10 +133,14 @@ function reducer(state: State, action: Action): State {
     switch (type) {
         case "initBlocks":
         {
+            const selectedBlockId = action.defaultSelectedBlockId && action.blocks.find(x => x.blockId === action.defaultSelectedBlockId)
+                ? action.defaultSelectedBlockId
+                : action.blocks.length > 0 ? action.blocks[0].blockId : null;
+
             return {
                 ...state,
                 blocks: action.blocks,
-                selectedBlockId: action.blocks.length > 0 ? action.blocks[0].blockId : null,
+                selectedBlockId,
             };
         }
 
@@ -224,11 +247,30 @@ function reducer(state: State, action: Action): State {
         }
 
         case "selectBlock": {
-            return {...state, selectedBlockId: action.blockId};
+            const selectedBlockId = typeof action.blockId === "string" && !isNaN(Number(action.blockId)) 
+                ? Number(action.blockId)
+                : action.blockId;
+
+            return {...state, selectedBlockId};
         }
 
         case "setReadOnly": {
             return {...state, readOnly: action.readOnly};
+        }
+
+        case "clearDirty": {
+            const blocks = state.blocks.map(block => ({
+                ...block,
+                blockId: typeof block.blockId === "number" ? action.replacedBlockIds[block.blockId] : block.blockId,
+                contentDirty: false,
+                otherDirty: false,
+            }));
+            return {
+                ...state,
+                blocks,
+                deletedBlockIds: [],
+                selectedBlockId: typeof state.selectedBlockId === "number" ? action.replacedBlockIds[state.selectedBlockId] : state.selectedBlockId,
+            };
         }
 
         default:
@@ -244,8 +286,8 @@ export default function PageContent_Context({ children }: Props) {
     const [{ blocks, deletedBlockIds, selectedBlockId, readOnly }, dispatch] = useReducer(reducer, _initialState);
 
     const methods = useMemo(() => ({
-        initBlocks(blocks: BlockState[]): void {
-            dispatch({ type: "initBlocks", blocks });
+        initBlocks(blocks: BlockState[], defaultSelectedBlockId: BlockId | null): void {
+            dispatch({ type: "initBlocks", blocks, defaultSelectedBlockId });
         },
 
         addBlock(blockType: BlockType, blockTitle: string): void {
@@ -275,6 +317,10 @@ export default function PageContent_Context({ children }: Props) {
         setReadOnly(readOnly: boolean): void {
             dispatch({ type: "setReadOnly", readOnly });
         },
+
+        clearDirty(replacedBlockIds: Record<number, string>): void {
+            dispatch({ type: "clearDirty", replacedBlockIds });
+        },
     }), [dispatch]);
 
     const providerValue = useMemo(() => ({
@@ -282,6 +328,7 @@ export default function PageContent_Context({ children }: Props) {
         deletedBlockIds,
         selectedBlockId,
         readOnly,
+        isDirty: !!blocks.find(x => x.contentDirty || x.otherDirty),
         ...methods,
     }), [methods, blocks, deletedBlockIds, selectedBlockId, readOnly]);
 

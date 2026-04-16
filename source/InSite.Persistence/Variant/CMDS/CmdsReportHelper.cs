@@ -324,6 +324,7 @@ namespace InSite.Persistence.Plugin.CMDS
             public string FullName { get; set; }
             public string AchievementTitle { get; set; }
             public string AchievementLabel { get; set; }
+            public DateTimeOffset? DateAssigned { get; set; }
             public DateTimeOffset? DateCompleted { get; set; }
             public DateTimeOffset? ExpirationDate { get; set; }
             public bool IsRequired { get; set; }

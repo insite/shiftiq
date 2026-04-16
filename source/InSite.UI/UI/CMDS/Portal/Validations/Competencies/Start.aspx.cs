@@ -42,7 +42,7 @@ namespace InSite.Cmds.Actions.Talent.Employee.Competency.Assessment
                 ? (Guid?)null
                 : User.UserIdentifier;
 
-            var table = UserCompetencyRepository.SelectSearchResults(filter, null, parentUserID);
+            var table = UserCompetencyRepository.SelectSearchResults(filter, parentUserID);
 
             if (table.Rows.Count == 0)
             {

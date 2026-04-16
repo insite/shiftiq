@@ -1,0 +1,39 @@
+.card-attachment {
+    & > .file-preview {
+        cursor: default;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+
+        img {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out 0s;
+        }
+
+        .no-upload {
+            font-size: 80px;
+            margin: 10px 0;
+            text-align: center;
+            display: block;
+            color: #888888;
+        }
+    }
+
+    & > table {
+        table-layout: fixed;
+        margin-bottom: 0;
+
+        & > tbody > tr {
+            & > td.info-label {
+                white-space: nowrap;
+                width: 110px;
+            }
+
+            & > td.info-value {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+}

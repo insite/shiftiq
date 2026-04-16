@@ -144,6 +144,7 @@ namespace InSite.Admin.Contacts.People.Forms
                 {
                     FromUserIdentifier = fromUserId,
                     ToUserIdentifier = toUserId,
+                    IsLeader = IsLeader.Checked,
                     IsManager = IsManager.Checked,
                     IsSupervisor = IsSupervisor.Checked,
                     IsValidator = IsValidator.Checked,

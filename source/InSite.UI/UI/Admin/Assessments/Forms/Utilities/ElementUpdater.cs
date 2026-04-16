@@ -6,7 +6,6 @@ using Shift.Common.Timeline.Commands;
 
 using InSite.Application.Banks.Write;
 using InSite.Domain.Banks;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
 using Shift.Constant;
@@ -177,7 +176,7 @@ namespace InSite.Admin.Assessments.Forms.Models
 
         private static string CreateOptionTitle(Question question, Option option, int columnNumber, string newValue)
         {
-            var optionTitleTable = QuestionTable.Build(question.Layout.Columns, new[] { option.Content.Title.Default });
+            var optionTitleTable = BankQuestionTable.Build(question.Layout.Columns, new[] { option.Content.Title.Default });
             var cells = optionTitleTable.GetBody()[0];
             var result = new StringBuilder();
             var currentColumnNumber = 0;

@@ -4,7 +4,7 @@ import FinderSearchGrid from "./FinderSearchGrid";
 import LoadingPanel from "../LoadingPanel";
 import FinderSearchInput, { FinderSearchInputType } from "./FinderSearchInput";
 import { ListItem } from "@/models/listItem";
-import { useStatusProvider } from "@/contexts/StatusProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { FinderSearchWindowData } from "./FinderSearchWindowData";
 import Icon from "../icon/Icon";
@@ -146,7 +146,7 @@ export default function FinderSearchWindow({
 function FinderCancelButton({ disabled, className, onClick }: ButtonProps) {
     return (
         <Button disabled={disabled} variant="default" size="sm" className={className} onClick={onClick}>
-            <Icon style="Solid" name="ban" className="me-1" />
+            <Icon style="solid" name="ban" className="me-1" />
             Cancel
         </Button>
     );
@@ -155,7 +155,7 @@ function FinderCancelButton({ disabled, className, onClick }: ButtonProps) {
 function FinderClearButton({ disabled, className, onClick }: ButtonProps) {
     return (
         <Button disabled={disabled} variant="default" size="sm" className={className} onClick={onClick}>
-            <Icon style="Solid" name="undo" className="me-1" />
+            <Icon style="solid" name="undo" className="me-1" />
             Clear
         </Button>
     );

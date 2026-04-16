@@ -151,6 +151,11 @@ namespace Shift.Common
             return _unixEpoch.AddSeconds(value);
         }
 
+        public static DateTime FromUnixTimestamp(double value)
+        {
+            return _unixEpoch.AddSeconds(value);
+        }
+
         #endregion
     }
 }

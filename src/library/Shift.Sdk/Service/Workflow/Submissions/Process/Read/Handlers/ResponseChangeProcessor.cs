@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Cases.Write;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Contents.Read;
@@ -21,6 +19,7 @@ using InSite.Domain.Surveys.Forms;
 using InSite.Domain.Surveys.Sessions;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Application.Surveys.Read
@@ -157,7 +156,7 @@ namespace InSite.Application.Surveys.Read
             }
 
             if (hasAnswer)
-                OpenIssue(survey.WorkflowConfiguration, session, e);
+                OpenIssue(survey, session, e);
         }
 
         private void ViewUserProgramTaskEnrollment(QResponseSession session)
@@ -238,8 +237,9 @@ namespace InSite.Application.Surveys.Read
             _commander.Send(new ModifyPersonFieldDateOffset(person.PersonIdentifier, PersonField.AccountReviewQueued, DateTimeOffset.UtcNow));
         }
 
-        private void OpenIssue(SurveyWorkflowConfiguration workflow, QResponseSession session, ResponseSessionCompleted e)
+        private void OpenIssue(SurveyState survey, QResponseSession session, ResponseSessionCompleted e)
         {
+            var workflow = survey.WorkflowConfiguration;
             if (workflow == null)
                 return;
 
@@ -252,18 +252,19 @@ namespace InSite.Application.Surveys.Read
             if (issues != null && issues.Count > 0)
                 return;
 
-            var survey = session.SurveyForm;
-
             var id = UuidFactory.Create();
             var type = workflow.IssueType;
             var number = _issues.GetNextIssueNumber(e.OriginOrganization);
             var person = _contacts.GetPerson(session.Respondent.UserIdentifier, e.OriginOrganization);
-            var personCode = person?.PersonCode;
-            var personEmployer = person?.EmployerGroupIdentifier;
-            var title = $"{survey.SurveyFormName} - {session.Respondent.UserFullName} {personCode}";
             var now = e.ChangeTime;
 
-            _commander.Send(new OpenIssue(id, e.OriginOrganization, number, title, null, now, "Survey Response", type, null)
+            var title = e.FirstQuestionCaseSummary == true ? TryGetCaseTitleFromFirstQuestion(survey.Form, session) : null;
+            if (title == null)
+                title = survey.Form.Name;
+
+            title += $" - {session.Respondent.UserFullName} {person?.PersonCode}";
+
+            _commander.Send(new OpenIssue(id, e.OriginOrganization, number, title.Trim(), null, now, "Survey Response", type, null)
             {
                 OriginOrganization = e.OriginOrganization
             });
@@ -282,7 +283,7 @@ namespace InSite.Application.Surveys.Read
                 });
             }
 
-            var owner = workflow.OwnerUserIdentifier;
+            var owner = workflow.OwnerUserIdentifier ?? e.RespondentSupervisor;
             if (owner.HasValue)
             {
                 _commander.Send(new AssignUser(id, owner.Value, "Owner")
@@ -305,6 +306,7 @@ namespace InSite.Application.Surveys.Read
                 });
             }
 
+            var personEmployer = person?.EmployerGroupIdentifier;
             if (personEmployer.HasValue)
             {
                 _commander.Send(new AssignGroup(id, personEmployer.Value, "Employer")
@@ -312,6 +314,40 @@ namespace InSite.Application.Surveys.Read
                     OriginOrganization = e.OriginOrganization
                 });
             }
+        }
+
+        private static string TryGetCaseTitleFromFirstQuestion(SurveyForm form, QResponseSession session)
+        {
+            var firstQuestion = form.Questions.FirstOrDefault();
+            if (firstQuestion == null)
+                return null;
+
+            if (firstQuestion.Type == SurveyQuestionType.Comment || firstQuestion.Type == SurveyQuestionType.Text)
+            {
+                return session.QResponseAnswers
+                    .Where(x => x.SurveyQuestionIdentifier == firstQuestion.Identifier && x.ResponseAnswerText.IsNotEmpty())
+                    .Select(x => x.ResponseAnswerText)
+                    .FirstOrDefault()
+                    .NullIfEmpty();
+            }
+
+            if (firstQuestion.Type == SurveyQuestionType.RadioList || firstQuestion.Type == SurveyQuestionType.Selection)
+            {
+                var selectedOption = session.QResponseOptions
+                    .Where(x => x.SurveyQuestionIdentifier == firstQuestion.Identifier && x.ResponseOptionIsSelected)
+                    .FirstOrDefault();
+
+                if (selectedOption == null)
+                    return null;
+
+                var formOption = form.FindOptionItem(selectedOption.SurveyOptionIdentifier);
+                if (formOption == null)
+                    return null;
+
+                return formOption?.Content.Title.GetText(Language.Default);
+            }
+
+            return null;
         }
 
         public void Handle(ResponseSessionDeleted e)

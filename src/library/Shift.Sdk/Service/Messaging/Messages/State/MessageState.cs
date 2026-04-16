@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Constant;
 
 namespace InSite.Domain.Messages
 {
@@ -15,12 +15,37 @@ namespace InSite.Domain.Messages
         public Guid Identifier { get; set; }
         public string Status { get; set; }
         public string StatusReason { get; set; }
-        public EmailAddress[] Recipients { get; set; }
+        public string StatusDescription { get; set; }
+        public MailoutRecipientState[] Recipients { get; set; }
+        public HashSet<Guid> CallbackIds { get; }
 
         public MailoutState()
         {
-            Recipients = new EmailAddress[0];
+            Recipients = new MailoutRecipientState[0];
+            CallbackIds = new HashSet<Guid>();
         }
+
+        public MailoutRecipientState GetRecipient(string address)
+        {
+            return address.IsEmpty()
+                ? null
+                : Recipients.FirstOrDefault(x => string.Equals(x.Email.Address, address, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public bool IsCompleted()
+        {
+            return Recipients.IsEmpty() || Recipients
+                .All(x => x.CallbackStatus == MailoutCallbackStatus.Rejected
+                       || x.CallbackStatus == MailoutCallbackStatus.Delivered
+                       || x.CallbackStatus == MailoutCallbackStatus.Failed);
+        }
+    }
+
+    public class MailoutRecipientState
+    {
+        public EmailAddress Email { get; set; }
+        public string CallbackStatus { get; set; }
+        public DateTime? CallbackTimestamp { get; set; }
     }
 
     public class UserSubscriberState
@@ -199,6 +224,31 @@ namespace InSite.Domain.Messages
             ChangeMailoutStatus(e.Mailout, "Aborted", e.Reason);
         }
 
+        public void When(MailoutCallbackHandled e)
+        {
+            var mailout = FindMailout(e.Mailout);
+            if (!mailout.CallbackIds.Add(e.CallbackId))
+                return;
+
+            var allowHandle = e.Status == MailoutCallbackStatus.Accepted
+                || e.Status == MailoutCallbackStatus.Delivered
+                || e.Status == MailoutCallbackStatus.Failed
+                || e.Status == MailoutCallbackStatus.Rejected;
+            if (!allowHandle)
+                return;
+
+            var recipient = mailout.GetRecipient(e.Recipient);
+            if (recipient == null)
+                return;
+
+            if (recipient.CallbackTimestamp.HasValue && recipient.CallbackTimestamp.Value > e.Timestamp)
+                return;
+
+            recipient.CallbackStatus = e.Status;
+            recipient.CallbackTimestamp = e.Timestamp;
+            (mailout.Status, mailout.StatusDescription) = CalculateMailoutStatus(mailout.Recipients);
+        }
+
         public void When(MailoutStarted e)
         {
             ChangeMailoutStatus(e.MailoutIdentifier, "Started");
@@ -207,6 +257,64 @@ namespace InSite.Domain.Messages
         public void When(MailoutCompleted e)
         {
             ChangeMailoutStatus(e.MailoutIdentifier, "Completed");
+        }
+
+        public void When(MailoutDrafted e)
+        {
+            Mailouts.Add(e.MailoutId, new MailoutState
+            {
+                Identifier = e.MailoutId,
+                Status = MailoutCallbackStatus.Drafted,
+                Recipients = e.To
+                    .Select(x => new MailoutRecipientState
+                    {
+                        Email = new EmailAddress(x.Key, x.Value, null, null, null),
+                        CallbackStatus = MailoutCallbackStatus.Drafted,
+                        CallbackTimestamp = null
+                    })
+                    .ToArray()
+            });
+        }
+
+        public void When(MailoutQueued e)
+        {
+            var mailout = FindMailout(e.MailoutId);
+            var recipient = mailout.GetRecipient(e.Recipient);
+
+            if (recipient == null || recipient.CallbackStatus != MailoutCallbackStatus.Drafted)
+                return;
+
+            recipient.CallbackStatus = MailoutCallbackStatus.Queued;
+            recipient.CallbackTimestamp = null;
+            (mailout.Status, mailout.StatusDescription) = CalculateMailoutStatus(mailout.Recipients);
+        }
+
+        public void When(MailoutRejected e)
+        {
+            var mailout = FindMailout(e.MailoutId);
+
+            if (e.Recipient.IsNotEmpty())
+            {
+                var recipient = mailout.GetRecipient(e.Recipient);
+                if (recipient != null)
+                    UpdateRecipient(recipient);
+            }
+            else
+            {
+                foreach (var recipient in mailout.Recipients)
+                    UpdateRecipient(recipient);
+            }
+
+            (mailout.Status, mailout.StatusDescription) = CalculateMailoutStatus(mailout.Recipients);
+
+            void UpdateRecipient(MailoutRecipientState r)
+            {
+                if (r.CallbackStatus != MailoutCallbackStatus.Drafted && r.CallbackStatus != MailoutCallbackStatus.Queued)
+                    return;
+
+                r.CallbackStatus = MailoutCallbackStatus.Rejected;
+                r.CallbackTimestamp = null;
+            }
         }
 
         public void When(DeliveryStarted2 e)
@@ -272,26 +380,33 @@ namespace InSite.Domain.Messages
 
         public void AddMailout(Guid mailout, string status, IEnumerable<EmailAddress> recipients)
         {
-            if (!MailoutExists(mailout))
+            if (MailoutExists(mailout))
+                return;
+
+            var state = new MailoutState
             {
-                var state = new MailoutState
-                {
-                    Identifier = mailout,
-                    Status = status,
-                    Recipients = recipients.Select(x => x.Clone()).ToArray()
-                };
-                Mailouts.Add(mailout, state);
-            }
+                Identifier = mailout,
+                Status = status,
+                Recipients = recipients
+                    .Select(x => new MailoutRecipientState
+                    {
+                        Email = x.Clone(),
+                        CallbackStatus = status,
+                        CallbackTimestamp = null
+                    })
+                    .ToArray()
+            };
+            Mailouts.Add(mailout, state);
         }
 
         public void ChangeMailoutStatus(Guid mailout, string status, string reason = null)
         {
-            if (MailoutExists(mailout))
-            {
-                var state = FindMailout(mailout);
-                state.Status = status;
-                state.StatusReason = reason;
-            }
+            if (!MailoutExists(mailout))
+                return;
+
+            var state = FindMailout(mailout);
+            state.Status = status;
+            state.StatusReason = reason;
         }
 
         public MailoutState FindMailout(Guid mailout)
@@ -333,6 +448,97 @@ namespace InSite.Domain.Messages
                 UserIdentifier = userId,
                 Subscribed = subscribedOn
             });
+        }
+
+        private (string status, string description) CalculateMailoutStatus(IEnumerable<MailoutRecipientState> recipients)
+        {
+            var statuses = recipients
+                .GroupBy(x => x.CallbackStatus, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.Count(), StringComparer.OrdinalIgnoreCase);
+
+            var queued = statuses.GetOrDefault(MailoutCallbackStatus.Queued);
+            var accepted = statuses.GetOrDefault(MailoutCallbackStatus.Accepted);
+            var rejected = statuses.GetOrDefault(MailoutCallbackStatus.Rejected);
+            var delivered = statuses.GetOrDefault(MailoutCallbackStatus.Delivered);
+            var failed = statuses.GetOrDefault(MailoutCallbackStatus.Failed);
+            var total = recipients.Count();
+
+            string status, description;
+
+            if (delivered == total)
+            {
+                status = "Delivered";
+                description = $"Delivered to all recipients";
+            }
+            else if (accepted == total)
+            {
+                status = "Accepted";
+                description = $"Accepted for all recipients";
+            }
+            else if (failed == total)
+            {
+                status = "Failed";
+                description = $"Failed for all recipients";
+            }
+            else if (rejected == total)
+            {
+                status = "Rejected";
+                description = $"Rejected for all recipients";
+            }
+            else if (delivered > 0)
+            {
+                status = "Partially Delivered";
+                description = $"Delivered to {delivered} of {total} recipients"
+                    + GetDescriptionAddition(MailoutCallbackStatus.Delivered);
+            }
+            else if (accepted > 0)
+            {
+                status = "Partially Accepted";
+                description = $"Accepted for {accepted} of {total} recipients"
+                    + GetDescriptionAddition(MailoutCallbackStatus.Accepted);
+            }
+            else if (failed > 0)
+            {
+                status = "Partially Failed";
+                description = $"Failed for {failed} of {total} recipients"
+                    + GetDescriptionAddition(MailoutCallbackStatus.Failed);
+            }
+            else if (rejected > 0)
+            {
+                status = "Partially Rejected";
+                description = $"Rejected for {rejected} of {total} recipients"
+                    + GetDescriptionAddition(MailoutCallbackStatus.Rejected);
+            }
+            else
+            {
+                status = "Queued";
+                description = $"Queued {queued} of {total} recipients"
+                    + GetDescriptionAddition(MailoutCallbackStatus.Queued);
+            }
+
+            return (status, description);
+
+            string GetDescriptionAddition(string excludeStatus)
+            {
+                var parts = new List<string>();
+
+                if (queued > 0 && excludeStatus != MailoutCallbackStatus.Queued)
+                    parts.Add($"{queued} queued");
+
+                if (accepted > 0 && excludeStatus != MailoutCallbackStatus.Accepted)
+                    parts.Add($"{accepted} accepted");
+
+                if (delivered > 0 && excludeStatus != MailoutCallbackStatus.Delivered)
+                    parts.Add($"{delivered} delivered");
+
+                if (rejected > 0 && excludeStatus != MailoutCallbackStatus.Rejected)
+                    parts.Add($"{rejected} rejected");
+
+                if (failed > 0 && excludeStatus != MailoutCallbackStatus.Failed)
+                    parts.Add($"{failed} failed");
+
+                return parts.Count > 0 ? ", " + string.Join(", ", parts) : string.Empty;
+            }
         }
     }
 }

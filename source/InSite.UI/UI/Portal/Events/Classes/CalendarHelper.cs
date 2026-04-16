@@ -12,8 +12,12 @@ namespace InSite.UI.Portal.Events.Classes
             DateTime endDateTime,
             string eventTitle,
             string location = null,
-            string description = null)
+            string description = null,
+            Func<string, string> translate = null)
         {
+            if (translate == null)
+                translate = DummyTranslate;
+
             // Format dates as Google Calendar expects (yyyyMMddTHHmmssZ)
             string startTime = startDateTime.ToUniversalTime().ToString("yyyyMMddTHHmmss") + "Z";
             string endTime = endDateTime.ToUniversalTime().ToString("yyyyMMddTHHmmss") + "Z";
@@ -29,7 +33,7 @@ namespace InSite.UI.Portal.Events.Classes
             if (!string.IsNullOrEmpty(description))
                 calendarUrl += $"&details={Uri.EscapeDataString(description)}";
 
-            return $"<a class='btn btn-sm btn-primary' target='_blank' href='{calendarUrl}'><i class='fa-solid fa-calendar-circle-plus me-1'></i>Add to Google Calendar</a>";
+            return $"<a class='btn btn-sm btn-primary' target='_blank' href='{calendarUrl}'><i class='fa-solid fa-calendar-circle-plus me-1'></i>{translate("Add to Google Calendar")}</a>";
         }
 
         public string GenerateOffice365CalendarLink(
@@ -37,8 +41,12 @@ namespace InSite.UI.Portal.Events.Classes
             DateTime endDateTime,
             string eventTitle,
             string location = null,
-            string description = null)
+            string description = null,
+            Func<string, string> translate = null)
         {
+            if (translate == null)
+                translate = DummyTranslate;
+
             // Convert to UTC and format as ISO 8601
             string startTime = startDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
             string endTime = endDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
@@ -61,7 +69,7 @@ namespace InSite.UI.Portal.Events.Classes
             if (!string.IsNullOrEmpty(description))
                 calendarUrl += $"&body={Uri.EscapeDataString(description)}";
 
-            return $"<a class='btn btn-sm btn-primary' target='_blank' href='{calendarUrl}'><i class='fa-solid fa-calendar-circle-plus me-1'></i>Add to Outlook Calendar</a>";
+            return $"<a class='btn btn-sm btn-primary' target='_blank' href='{calendarUrl}'><i class='fa-solid fa-calendar-circle-plus me-1'></i>{translate("Add to Outlook Calendar")}</a>";
         }
 
         public string GenerateIcsDownloadLink(
@@ -69,8 +77,12 @@ namespace InSite.UI.Portal.Events.Classes
             DateTime endDateTime,
             string eventTitle,
             string location = null,
-            string description = null)
+            string description = null,
+            Func<string, string> translate = null)
         {
+            if (translate == null)
+                translate = DummyTranslate;
+
             string icsContent = GenerateIcsContent(startDateTime, endDateTime, eventTitle, location, description);
 
             // Convert to base64 for data URI
@@ -81,7 +93,7 @@ namespace InSite.UI.Portal.Events.Classes
             string dataUri = $"data:text/calendar;base64,{base64}";
             string filename = GenerateIcsFileName(eventTitle, startDateTime);
 
-            return $"<a class='btn btn-sm btn-default' target='_blank' download='{filename}' href='{dataUri}'><i class='fa-solid fa-download me-1'></i>Download ICS</a>";
+            return $"<a class='btn btn-sm btn-default' target='_blank' download='{filename}' href='{dataUri}'><i class='fa-solid fa-download me-1'></i>{translate("Download ICS")}</a>";
         }
 
         public string GenerateIcsFileName(string eventTitle, DateTime startDateTime)
@@ -144,5 +156,7 @@ namespace InSite.UI.Portal.Events.Classes
                 .Replace("\n", "\\n")
                 .Replace("\r", "");
         }
+
+        private static string DummyTranslate(string text) => text;
     }
 }

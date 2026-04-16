@@ -251,7 +251,12 @@ namespace Shift.Common
                 var subject = GetClaimAsGuid(ClaimName.ProxySubject);
                 if (agent != Guid.Empty && subject != Guid.Empty)
                     return new Proxy(agent, subject);
-                return null;
+
+                var agentEmail = GetClaim(ClaimName.ProxyAgentEmail);
+
+                return !string.IsNullOrEmpty(agentEmail)
+                    ? new Proxy(new Actor { Email = agentEmail }, null)
+                    : null;
             }
         }
 

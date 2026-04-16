@@ -44,6 +44,11 @@ export default function PageContent_Editor_Image({ block, fieldName }: Props) {
                         url: value,
                         alt: fieldValue?.alt ?? null,
                     })}
+                    onFileUploaded={value => modifyBlockField(block.blockId, fieldName, {
+                        key: 0,
+                        url: value,
+                        alt: fieldValue?.alt ?? null,
+                    })}
                 />
             </div>
         </FormField>

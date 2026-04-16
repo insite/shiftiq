@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 using InSite.Common.Web;
 using InSite.Persistence;
@@ -43,7 +39,7 @@ namespace InSite.Admin.Records.Programs
         private void Open()
         {
             var program = ProgramId.HasValue ? ProgramSearch.GetProgram(ProgramId.Value) : null;
-            if (program == null)
+            if (program == null || program.OrganizationIdentifier != Organization.Identifier)
                 Search.Redirect();
 
             PageHelper.AutoBindHeader(this, null, program.ProgramName);

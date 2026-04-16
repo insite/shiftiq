@@ -128,11 +128,12 @@ namespace InSite.UI.Layout.Portal
 
         private void ShowSideContent(PortalMaster master)
         {
-            // Find the ContentPlaceholder control in the master page
-            ContentPlaceHolder placeholder = master.FindControl("SideContent") as ContentPlaceHolder;
+            var sideContent = master.FindControl("SideContent") as ContentPlaceHolder;
 
-            // Check if the Content control exists within the ContentPlaceholder
-            bool hasContent = (placeholder != null && placeholder.HasControls());
+            var helpPanel = master.FindControl("HelpPanel") as Panel;
+
+            var hasContent = (sideContent != null && sideContent.HasControls())
+                || (helpPanel != null && helpPanel.Visible);
 
             if (!hasContent)
             {

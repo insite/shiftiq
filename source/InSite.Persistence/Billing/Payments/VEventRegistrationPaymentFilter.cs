@@ -13,6 +13,7 @@ namespace InSite.Persistence
         public DateTimeOffset? EventDateBefore { get; set; }
         public string EventName { get; set; }
         public string EmployerName { get; set; }
+        public string EmployerStatus { get; set; }
         public string RegistrantName { get; set; }
         public string LearnerName { get; set; }
         public string LearnerCode { get; set; }

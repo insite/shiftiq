@@ -4,6 +4,8 @@ using InSite.Common;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
+using Shift.Constant;
+
 namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
 {
     public partial class SearchCriteria : SearchCriteriaController<VEventRegistrationPaymentFilter>
@@ -20,6 +22,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                     EventDateBefore = EventDateBefore.Value,
                     EventName = EventName.Text,
                     EmployerName = EmployerName.Text,
+                    EmployerStatus = EmployerStatus.Value,
                     RegistrantName = RegistrantName.Text,
                     LearnerName = LearnerName.Text,
                     LearnerCode = LearnerCode.Text,
@@ -31,8 +34,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                     PaymentApprovedBefore = PaymentApprovedBefore.Value,
                     PaymentTransactionId = PaymentTransactionId.Text,
                     AchievementTitle = AchievementName.Text,
-                    InvoiceStatus = InvoiceStatus.Value
-
+                    InvoiceStatus = InvoiceStatus.Value,
                 };
 
                 GetCheckedShowColumns(filter);
@@ -47,6 +49,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                 EventDateBefore.Value = value.EventDateBefore;
                 EventName.Text = value.EventName;
                 EmployerName.Text = value.EmployerName;
+                EmployerStatus.Value = value.EmployerStatus;
                 RegistrantName.Text = value.RegistrantName;
                 LearnerName.Text = value.LearnerName;
                 LearnerCode.Text = value.LearnerCode;
@@ -71,12 +74,24 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
             LearnerCode.EmptyMessage = GetEmptyMessage("Person Code");
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (IsPostBack)
+                return;
+
+            EmployerStatus.Settings.CollectionName = CollectionName.Contacts_Groups_Status_Name;
+            EmployerStatus.Settings.OrganizationIdentifier = Organization.Key;
+        }
+
         public override void Clear()
         {
             EventDateSince.Value = null;
             EventDateBefore.Value = null;
             EventName.Text = null;
             EmployerName.Text = null;
+            EmployerStatus.ClearSelection();
             RegistrantName.Text = null;
             LearnerName.Text = null;
             LearnerCode.Text = null;

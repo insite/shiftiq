@@ -12,6 +12,8 @@ namespace InSite.Application.Files.Read
 
         List<FileStorageModel> GetModels(Guid? organizationIdentifier, Guid[] objectIdentifiers, string documentName, bool includeClaims);
 
+        List<FileStorageModel> GetModels(Guid[] fileIds, bool includeClaims);
+
         List<FileStorageModel> GetExpiredModels(DateTimeOffset expiredAt);
 
         List<FileActivity> GetFileActivities(Guid fileIdentifier);
@@ -26,6 +28,8 @@ namespace InSite.Application.Files.Read
         Task<List<FileStorageModel>> GetModelsAsync(Guid? organizationIdentifier, Guid objectIdentifier, string documentName, bool includeClaims);
 
         Task<List<FileStorageModel>> GetModelsAsync(Guid? organizationIdentifier, Guid[] objectIdentifiers, string documentName, bool includeClaims);
+
+        Task<List<FileStorageModel>> GetModelsAsync(Guid[] fileIdentifiers, bool includeClaims);
 
         Task<List<FileStorageModel>> GetExpiredModelsAsync(DateTimeOffset expiredAt);
 

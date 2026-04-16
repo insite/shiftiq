@@ -8,7 +8,6 @@ using System.Web.UI.WebControls;
 using InSite.Admin.Assessments.Forms.Models;
 using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
 using Shift.Constant;
@@ -35,7 +34,7 @@ namespace InSite.Admin.Assessments.Options.Controls
 
         #region Fields
 
-        private QuestionTable _currentQuestionTable = null;
+        private BankQuestionTable _currentQuestionTable = null;
 
         #endregion
 
@@ -58,7 +57,7 @@ namespace InSite.Admin.Assessments.Options.Controls
             var isTable = question.Layout.Type == OptionLayoutType.Table;
 
             _currentQuestionTable = isTable
-                ? QuestionTable.Build(question.Layout.Columns, question.Options.Select(x => x.Content.Title.Default))
+                ? BankQuestionTable.Build(question.Layout.Columns, question.Options.Select(x => x.Content.Title.Default))
                 : null;
 
             if (question.Type == QuestionItemType.TrueOrFalse)
@@ -310,7 +309,7 @@ namespace InSite.Admin.Assessments.Options.Controls
             return html.ToString();
         }
 
-        private void RenderOptionRepeaterCell(StringBuilder html, string tagName, QuestionTable.CellData cell)
+        private void RenderOptionRepeaterCell(StringBuilder html, string tagName, BankQuestionTable.CellData cell)
         {
             html.Append("<")
                 .Append(tagName)

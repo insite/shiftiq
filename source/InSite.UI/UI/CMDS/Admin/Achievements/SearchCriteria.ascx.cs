@@ -16,12 +16,13 @@ namespace InSite.Cmds.Controls.Training.Achievements
                 var filter = new VCmdsAchievementFilter
                 {
                     Title = Title.Text,
-                    AchievementType = SubType.Value,
+                    AchievementType = AchievementType.Value,
                     AchievementVisibility = AccountScope.Value,
                     GlobalOrCompanySpecific = true,
                     AchievementOrganizationIdentifier = !Company.Enabled || CompanyPanel.Visible ? Company.Value : null,
                     CategoryIdentifier = CategoryPanel.Visible ? Category.ValueAsGuid : null,
                     IsTimeSensitive = IsTimeSensitive.ValueAsBoolean,
+                    AllowSelfDeclared = AllowSelfDeclaration.ValueAsBoolean,
                     Description = Description.Text
                 };
 
@@ -30,10 +31,11 @@ namespace InSite.Cmds.Controls.Training.Achievements
             set
             {
                 Title.Text = value.Title;
-                SubType.Value = value.AchievementType;
+                AchievementType.Value = value.AchievementType;
                 AccountScope.Value = value.AchievementVisibility;
                 Company.Value = Company.Enabled ? value.AchievementOrganizationIdentifier : Organization.Identifier;
                 IsTimeSensitive.ValueAsBoolean = value.IsTimeSensitive;
+                AllowSelfDeclaration.ValueAsBoolean = value.AllowSelfDeclared;
 
                 InitVisibility();
 
@@ -74,10 +76,11 @@ namespace InSite.Cmds.Controls.Training.Achievements
         public override void Clear()
         {
             Title.Text = null;
-            SubType.ClearSelection();
+            AchievementType.ClearSelection();
             AccountScope.ClearSelection();
             Company.Value = AccountScope.IsGlobalItemVisible ? (Guid?)null : Organization.Identifier;
             IsTimeSensitive.ClearSelection();
+            AllowSelfDeclaration.ClearSelection();
             Description.Text = null;
 
             InitVisibility();

@@ -76,7 +76,20 @@
     <div class="col-3">
         <div class="mb-2">
             <h4>Settings</h4>
-            <insite:MultiComboBox ID="ShowColumns" runat="server" />
+            <div class="mb-2">
+                <insite:MultiComboBox ID="ShowColumns" runat="server" />
+            </div>
+            <div class="mb-4">
+                <insite:ComboBox ID="SortColumns" runat="server">
+                    <Items>
+                        <insite:ComboBoxOption Text="Sort by Invoice Number" Value="InvoiceNumber DESC,CustomerFullName" />
+                        <insite:ComboBoxOption Text="Sort by Customer Employer" Value="CustomerEmployer,InvoiceNumber DESC,CustomerFullName" />
+                        <insite:ComboBoxOption Text="Sort by Employer Contact" Value="CustomerFullName,InvoiceNumber DESC,CustomerEmployer" />
+                        <insite:ComboBoxOption Text="Sort by Invoice Drafted" Value="InvoiceDrafted DESC,InvoiceNumber DESC,CustomerFullName" />
+                        <insite:ComboBoxOption Text="Sort by Invoice Submitted" Value="InvoiceSubmitted DESC,InvoiceNumber DESC,CustomerFullName" />
+                    </Items>
+                </insite:ComboBox>
+            </div>
         </div>
         <div>
             <h4>Saved Filters</h4>

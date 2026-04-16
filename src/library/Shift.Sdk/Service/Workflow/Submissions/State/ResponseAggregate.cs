@@ -73,9 +73,9 @@ namespace InSite.Domain.Surveys.Sessions
                 Apply(new ResponseOptionUnselected(option));
         }
 
-        public void CompleteResponse(DateTimeOffset? completed)
+        public void CompleteResponse(DateTimeOffset? completed, Guid? respondentSupervisor, bool? firstQuestionCaseSummary)
         {
-            Apply(new ResponseSessionCompleted(completed));
+            Apply(new ResponseSessionCompleted(completed, respondentSupervisor, firstQuestionCaseSummary));
         }
 
         public void ConfirmResponse()

@@ -40,7 +40,8 @@ namespace InSite.Admin.Events.Registrations.Controls
                     PaymentStatus = PaymentStatus.Value,
                     EventType = "Class",
                     BillingCode = BillingCode.Text,
-                    CandidateMembershipGroupIdentifier = DepartmentId.Value
+                    CandidateMembershipGroupIdentifier = DepartmentId.Value,
+                    ExamFormIdentifier = ExamFormIdentifier.Value
                 };
 
                 GetCheckedShowColumns(filter);
@@ -70,6 +71,7 @@ namespace InSite.Admin.Events.Registrations.Controls
                 PaymentStatus.Value = value.PaymentStatus;
                 BillingCode.Text = value.BillingCode;
                 DepartmentId.Value = value.CandidateMembershipGroupIdentifier;
+                ExamFormIdentifier.Value = value.ExamFormIdentifier;
             }
         }
 
@@ -90,6 +92,8 @@ namespace InSite.Admin.Events.Registrations.Controls
 
             DepartmentId.Filter.GroupType = GroupTypes.Department;
             DepartmentId.Filter.OrganizationIdentifier = Organization.Identifier;
+
+            ExamFormIdentifier.Filter.IncludeFormStatus = "Published";
         }
 
         public override void Clear()
@@ -115,6 +119,7 @@ namespace InSite.Admin.Events.Registrations.Controls
             PaymentStatus.ClearSelection();
             BillingCode.Text = null;
             DepartmentId.Value = null;
+            ExamFormIdentifier.Value = null;
         }
 
         protected static string GetEmptyMessage(string text) => LabelHelper.GetLabelContentText(text);

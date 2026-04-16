@@ -13,7 +13,7 @@ export default function PageContent_Blocks() {
         <Tab.Container
             transition={false}
             activeKey={selectedBlockId ?? "new"}
-            onSelect={key => selectBlock(key)}
+            onSelect={key => selectBlock(key === "new" ? null : key)}
         >
             <div className="row">
                 <div className="col-md-2">
@@ -42,11 +42,11 @@ export default function PageContent_Blocks() {
                         <Tab.Content>
                             {blocks.map(b => (
                                 <Tab.Pane key={b.blockId} eventKey={b.blockId}>
-                                    <PageContent_Blocks_Edit block={b} />
+                                    <PageContent_Blocks_Edit block={b} selected={selectedBlockId === b.blockId} />
                                 </Tab.Pane>
                             ))}
                             <Tab.Pane eventKey="new">
-                                <PageContent_Blocks_New />
+                                <PageContent_Blocks_New selected={selectedBlockId === null} />
                             </Tab.Pane>
                         </Tab.Content>
                     </FormCard>

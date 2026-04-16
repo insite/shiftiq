@@ -94,12 +94,12 @@ namespace InSite.Cmds.Controls.Talents.EmployeeCompetencies
 
         protected override int SelectCount(EmployeeCompetencyFilter filter)
         {
-            return UserCompetencyRepository.CountSearchResults(filter, GetValidator(), GetUser());
+            return UserCompetencyRepository.CountSearchResults(filter, GetUser());
         }
 
         protected override IListSource SelectData(EmployeeCompetencyFilter filter)
         {
-            return UserCompetencyRepository.SelectSearchResultsPaged(filter, GetValidator(), GetUser());
+            return UserCompetencyRepository.SelectSearchResultsPaged(filter, GetUser());
         }
 
         protected string GetCategories(Guid competencyId)

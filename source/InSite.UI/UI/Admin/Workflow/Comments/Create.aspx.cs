@@ -43,7 +43,7 @@ namespace InSite.Admin.Issues.Comments.Forms
         private void Open()
         {
             var issue = CaseIdentifier.HasValue ? ServiceLocator.IssueSearch.GetIssue(CaseIdentifier.Value) : null;
-            if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue.OrganizationIdentifier, issue.TopicUserIdentifier))
+            if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue))
                 CommentInfo.RedirectToSearch();
 
             CaseInfo.BindIssue(issue, User.TimeZone);

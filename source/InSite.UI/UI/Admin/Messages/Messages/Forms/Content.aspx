@@ -93,8 +93,8 @@
         <insite:CancelButton runat="server" ID="CancelButton" CausesValidation="false" />
         <insite:DropDownButton runat="server" ID="DownloadButton" IconName="download" Text="Download" CssClass="d-inline-block">
             <Items>
-                <sdk:DropDownButtonItem Name="html" IconName="file-code" Text="HTML (*.html)" />
-                <sdk:DropDownButtonItem Name="md" IconType="Brand" IconName="markdown" Text="Markdown (*.md)" />
+                <insite:DropDownButtonItem Name="html" IconName="file-code" Text="HTML (*.html)" />
+                <insite:DropDownButtonItem Name="md" IconType="Brand" IconName="markdown" Text="Markdown (*.md)" />
             </Items>
         </insite:DropDownButton>
     </div>

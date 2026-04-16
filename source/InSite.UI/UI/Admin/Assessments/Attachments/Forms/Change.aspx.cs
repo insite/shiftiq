@@ -5,6 +5,7 @@ using System.Web.UI;
 using InSite.Admin.Assessments.Attachments.Controls;
 using InSite.Admin.Assessments.Attachments.Utilities;
 using InSite.Application.Banks.Write;
+using InSite.Application.Files.Read;
 using InSite.Common.Web;
 using InSite.Common.Web.Infrastructure;
 using InSite.Common.Web.UI;
@@ -36,8 +37,9 @@ namespace InSite.Admin.Assessments.Attachments.Forms
         {
             public Guid OrganizationID { get; set; }
             public int BankAsset { get; set; }
-            public Guid UploadID { get; set; }
-            public Guid? FileID { get; set; }
+            public Guid? FileId { get; set; }
+            public Guid UploadId { get; set; }
+            public Guid? StorageId { get; set; }
             public AttachmentType Type { get; set; }
             public string FileName { get; set; }
             public string NavigateUrl { get; set; }
@@ -96,18 +98,18 @@ namespace InSite.Admin.Assessments.Attachments.Forms
             if (!Page.IsValid)
                 return;
 
-            if (CurrentData.FileID.HasValue)
-                AttachmentHelper.DeleteStorage(CurrentData.FileID.Value);
+            if (CurrentData.StorageId.HasValue)
+                AttachmentHelper.DeleteStorage(CurrentData.StorageId.Value);
 
             try
             {
                 var fileInfo = new FileInfo(FileInput.Metadata.FilePath);
 
-                CurrentData.FileID = AttachmentHelper.SaveTempFile(fileInfo);
+                CurrentData.StorageId = AttachmentHelper.SaveTempFile(fileInfo);
             }
             catch (ApplicationError appex)
             {
-                CurrentData.FileID = null;
+                CurrentData.StorageId = null;
                 ScreenStatus.AddMessage(AlertType.Error, appex.Message);
             }
 
@@ -116,8 +118,8 @@ namespace InSite.Admin.Assessments.Attachments.Forms
 
         private void RemoveImageReplacementButton_Click(object sender, EventArgs e)
         {
-            if (CurrentData.FileID.HasValue)
-                AttachmentHelper.DeleteStorage(CurrentData.FileID.Value);
+            if (CurrentData.StorageId.HasValue)
+                AttachmentHelper.DeleteStorage(CurrentData.StorageId.Value);
 
             SetupImageReplacement();
         }
@@ -161,48 +163,89 @@ namespace InSite.Admin.Assessments.Attachments.Forms
             if (attachment.File == null)
                 return;
 
-            if (CurrentData.Type == AttachmentType.Image && CurrentData.FileID.HasValue)
+            if (CurrentData.Type == AttachmentType.Image && CurrentData.StorageId.HasValue)
             {
-                var fileInfo = AttachmentHelper.LoadAttachmentInfo(CurrentData.FileID.Value);
+                var fileInfo = AttachmentHelper.LoadAttachmentInfo(CurrentData.StorageId.Value);
                 if (fileInfo != null)
                 {
-                    byte[] uploadData;
+                    var (fileId, uploadId) = SaveImage(attachment, fileInfo);
 
-                    if (attachment.Image.Actual.Width != fileInfo.Image.Actual.Width || attachment.Image.Actual.Height != fileInfo.Image.Actual.Height)
-                    {
-                        fileInfo.Image.Actual.Width = attachment.Image.Actual.Width;
-                        fileInfo.Image.Actual.Height = attachment.Image.Actual.Height;
-
-                        uploadData = AttachmentHelper.LoadAndResizeImageData(CurrentData.FileID.Value, fileInfo);
-                    }
-                    else
-                    {
-                        uploadData = AttachmentHelper.LoadAttachmentData(CurrentData.FileID.Value);
-                    }
-
-                    var name = Path.GetFileNameWithoutExtension(fileInfo.File.Name);
-                    var extension = Path.GetExtension(fileInfo.File.Name);
-                    var filename = StringHelper.ToIdentifier(name) + extension;
-
-                    var filePath = AttachmentHelper.GetUniqueFilePath(CurrentData.BankAsset, filename, fileInfo.File.Extension);
-                    var file = FileHelper.Provider.Save(Organization.OrganizationIdentifier, filePath, uploadData);
-
-                    ServiceLocator.SendCommand(new ChangeAttachmentImage(BankID, AttachmentID, file.Guid, User.UserIdentifier, attachment.Image.Actual));
+                    ServiceLocator.SendCommand(new ChangeAttachmentImage(BankID, AttachmentID, fileId, uploadId, User.UserIdentifier, attachment.Image.Actual));
                 }
             }
+            else
+                ModifyFileName(attachment);
 
             var content = new ContentTitle();
             content.Title.Default = attachment.Title;
 
             ServiceLocator.SendCommand(new ChangeAttachment(BankID, AttachmentID, attachment.Condition, content, attachment.Image));
+        }
 
-            FileHelper.Provider.Update(CurrentData.UploadID, file =>
+        private (Guid? fileId, Guid uploadId) SaveImage(AttachmentInfo attachment, AttachmentInfo fileInfo)
+        {
+            byte[] uploadData;
+
+            if (attachment.Image.Actual.Width != fileInfo.Image.Actual.Width || attachment.Image.Actual.Height != fileInfo.Image.Actual.Height)
+            {
+                fileInfo.Image.Actual.Width = attachment.Image.Actual.Width;
+                fileInfo.Image.Actual.Height = attachment.Image.Actual.Height;
+
+                uploadData = AttachmentHelper.LoadAndResizeImageData(CurrentData.StorageId.Value, fileInfo);
+            }
+            else
+            {
+                uploadData = AttachmentHelper.LoadAttachmentData(CurrentData.StorageId.Value);
+            }
+
+            var name = Path.GetFileNameWithoutExtension(fileInfo.File.Name);
+            var extension = Path.GetExtension(fileInfo.File.Name);
+            var filename = StringHelper.ToIdentifier(name) + extension;
+
+            if (CurrentData.FileId == null)
+            {
+                var filePath = AttachmentHelper.GetUniqueFilePath(CurrentData.BankAsset, filename, fileInfo.File.Extension);
+                return (null, FileHelper.Provider.Save(Organization.OrganizationIdentifier, filePath, uploadData).Guid);
+            }
+
+            FileStorageModel model;
+
+            using (var file = new MemoryStream(uploadData))
+            {
+                model = ServiceLocator.StorageService.Create(
+                    file,
+                    filename,
+                    Organization.OrganizationIdentifier,
+                    User.Identifier,
+                    BankID,
+                    FileObjectType.Bank,
+                    new FileProperties { DocumentName = filename },
+                    null
+                );
+            }
+
+            return (model.FileIdentifier, Guid.Empty);
+        }
+
+        private void ModifyFileName(AttachmentInfo attachment)
+        {
+            if (CurrentData.FileId.HasValue)
+            {
+                var model = ServiceLocator.StorageService.GetFile(CurrentData.FileId.Value);
+                var newFileName = ServiceLocator.StorageService.AdjustFileName(attachment.File.Name + model.GetExtension());
+                if (!string.Equals(model.FileName, newFileName))
+                    ServiceLocator.StorageService.RenameFile(CurrentData.FileId.Value, User.Identifier, newFileName);
+
+                return;
+            }
+
+            FileHelper.Provider.Update(CurrentData.UploadId, file =>
             {
                 file.Name = StringHelper.ToIdentifier(attachment.File.Name) + file.Type;
 
                 for (var j = 1; ; j++)
                 {
-                    if (!UploadSearch.ExistsByOrganizationIdentifier(file.OrganizationIdentifier, CurrentData.UploadID, file.Path))
+                    if (!UploadSearch.ExistsByOrganizationIdentifier(file.OrganizationIdentifier, CurrentData.UploadId, file.Path))
                         break;
 
                     file.Name = StringHelper.ToIdentifier($"{attachment.File.Name} ({j})") + file.Type;
@@ -219,7 +262,8 @@ namespace InSite.Admin.Assessments.Attachments.Forms
             CurrentData = new ControlData
             {
                 BankAsset = attachment.Asset,
-                UploadID = attachment.Upload,
+                FileId = attachment.FileIdentifier,
+                UploadId = attachment.Upload,
                 Type = attachment.Type,
                 OrganizationID = bank.Tenant
             };
@@ -241,24 +285,7 @@ namespace InSite.Admin.Assessments.Attachments.Forms
                 Uploaded = attachment.Uploaded,
             };
 
-            var file = UploadSearch.Select(CurrentData.UploadID);
-            if (file != null)
-            {
-                CurrentData.FileName = file.Name;
-                CurrentData.NavigateUrl = file.NavigateUrl;
-
-                info.File = new AttachmentFileInfo
-                {
-                    Name = Path.GetFileNameWithoutExtension(file.Name),
-                    Extension = file.ContentType,
-                    ContentLength = file.ContentSize ?? 0,
-                };
-            }
-            else
-            {
-                ScreenStatus.AddMessage(AlertType.Error, "File not found.");
-                SaveButton.Visible = false;
-            }
+            SetFileInfo(info);
 
             Details.SetInputValues(info);
             Details.SetupAsset(bank, attachment);
@@ -266,6 +293,48 @@ namespace InSite.Admin.Assessments.Attachments.Forms
             SetupImageReplacement();
 
             CancelButton.NavigateUrl = GetReaderUrl(AttachmentID);
+        }
+
+        private void SetFileInfo(AttachmentInfo attachment)
+        {
+            if (CurrentData.FileId.HasValue)
+            {
+                var model = ServiceLocator.StorageService.GetFile(CurrentData.FileId.Value);
+                if (model != null)
+                {
+                    CurrentData.FileName = model.FileName;
+                    CurrentData.NavigateUrl = ServiceLocator.StorageService.GetFileUrl(model);
+
+                    attachment.File = new AttachmentFileInfo
+                    {
+                        Name = Path.GetFileNameWithoutExtension(model.FileName),
+                        Extension = model.GetExtension(),
+                        ContentLength = model.FileSize,
+                    };
+                }
+            }
+            else
+            {
+                var file = UploadSearch.Select(CurrentData.UploadId);
+                if (file != null)
+                {
+                    CurrentData.FileName = file.Name;
+                    CurrentData.NavigateUrl = file.NavigateUrl;
+
+                    attachment.File = new AttachmentFileInfo
+                    {
+                        Name = Path.GetFileNameWithoutExtension(file.Name),
+                        Extension = file.ContentType,
+                        ContentLength = file.ContentSize ?? 0,
+                    };
+                }
+            }
+
+            if (attachment.File == null)
+            {
+                ScreenStatus.AddMessage(AlertType.Error, "File not found.");
+                SaveButton.Visible = false;
+            }
         }
 
         private void SetupImageReplacement()
@@ -280,9 +349,9 @@ namespace InSite.Admin.Assessments.Attachments.Forms
             AttachmentImageThumbnail.ThumbnailInfo thumbnailInfo = null;
             var hasFileReplacement = false;
 
-            if (CurrentData.FileID.HasValue)
+            if (CurrentData.StorageId.HasValue)
             {
-                var attachment = AttachmentHelper.LoadAttachmentInfo(CurrentData.FileID.Value);
+                var attachment = AttachmentHelper.LoadAttachmentInfo(CurrentData.StorageId.Value);
 
                 hasFileReplacement = attachment != null;
 
@@ -292,11 +361,11 @@ namespace InSite.Admin.Assessments.Attachments.Forms
                     {
                         FileName = attachment.File.Name + attachment.File.Extension,
                         ImageDimension = attachment.Image?.Actual,
-                        ReadFile = read => AttachmentHelper.ReadAttachmentData(CurrentData.FileID.Value, read),
+                        ReadFile = read => AttachmentHelper.ReadAttachmentData(CurrentData.StorageId.Value, read),
                         GetImageUrl = () =>
                         {
                             var type = MimeMapping.GetContentType(attachment.File.Name);
-                            var data = AttachmentHelper.LoadAttachmentData(CurrentData.FileID.Value);
+                            var data = AttachmentHelper.LoadAttachmentData(CurrentData.StorageId.Value);
 
                             return $"data:{type};base64,{Convert.ToBase64String(data)}";
                         }
@@ -314,23 +383,37 @@ namespace InSite.Admin.Assessments.Attachments.Forms
 
             if (thumbnailInfo == null)
             {
-                thumbnailInfo = new AttachmentImageThumbnail.ThumbnailInfo
-                {
-                    FileName = CurrentData.FileName,
-                    ImageDimension = CurrentData.ImageActualDimension,
-                    ReadFile = read =>
-                    {
-                        using (var stream = FileHelper.Provider.Read(CurrentData.OrganizationID, CurrentData.NavigateUrl))
-                            read(stream);
-                    },
-                    GetImageUrl = () => FileHelper.GetUrl(CurrentData.NavigateUrl)
-                };
+                thumbnailInfo = CreateThumbnailInfo();
 
                 Details.SetupResolution(CurrentData.ImageResolution, true);
                 Details.SetupActualDimension(CurrentData.ImageActualDimension, true);
             }
 
             Thumbnail.TryLoadData(thumbnailInfo);
+        }
+
+        private AttachmentImageThumbnail.ThumbnailInfo CreateThumbnailInfo()
+        {
+            return new AttachmentImageThumbnail.ThumbnailInfo
+            {
+                FileName = CurrentData.FileName,
+                ImageDimension = CurrentData.ImageActualDimension,
+                ReadFile = read =>
+                {
+                    if (CurrentData.FileId.HasValue)
+                    {
+                        var (_, stream) = ServiceLocator.StorageService.GetFileStream(CurrentData.FileId.Value);
+                        using (stream)
+                            read(stream);
+                    }
+                    else
+                    {
+                        using (var stream = FileHelper.Provider.Read(CurrentData.OrganizationID, CurrentData.NavigateUrl))
+                            read(stream);
+                    }
+                },
+                GetImageUrl = () => CurrentData.FileId == null ? FileHelper.GetUrl(CurrentData.NavigateUrl) : CurrentData.NavigateUrl
+            };
         }
 
         #endregion

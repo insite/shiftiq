@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using Humanizer;
 
 using InSite.Admin.Assets.Glossaries.Utilities;
+using InSite.Common;
 using InSite.Common.Web;
 using InSite.Domain.Attempts;
 using InSite.Domain.Banks;
@@ -26,7 +27,7 @@ namespace InSite.Portal.Assessments.Attempts
 
         private class UploadInfo
         {
-            public Guid UploadIdentifier { get; set; }
+            public Guid Identifier { get; set; }
             public string Name { get; set; }
             public string NavigateUrl { get; set; }
             public int? ContentSize { get; set; }
@@ -300,12 +301,24 @@ namespace InSite.Portal.Assessments.Attempts
         composedVoice: {{
             removeConfirm: {TranslateAndJsEncode("Are you sure you want to re-record your answer?")}
         }},
+        timer: {{
+            examLabel: {GetLabelAndJsEncode("[Assessments.Attempts.Answer.Timer].[Exam]")},
+            tabLabel: {GetLabelAndJsEncode("[Assessments.Attempts.Answer.Timer].[Tab]")},
+            breakLabel: {GetLabelAndJsEncode("[Assessments.Attempts.Answer.Timer].[Break]")}
+        }},
     }};
 </script>
 ";
             string TranslateAndJsEncode(string text)
             {
                 return HttpUtility.JavaScriptStringEncode(Translate(text), true);
+            }
+
+            string GetLabelAndJsEncode(string label)
+            {
+                var value = LabelHelper.GetTranslation(label);
+
+                return label == value ? "null" : HttpUtility.JavaScriptStringEncode(value, true);
             }
         }
 
@@ -383,20 +396,44 @@ namespace InSite.Portal.Assessments.Attempts
         private static Dictionary<Guid, UploadInfo> GetUploads(Attachment[] formAcronyms, Attachment[] formFormulas, Attachment[] formFigures)
         {
             var uploadsFilter = formAcronyms.Concat(formFormulas).Concat(formFigures)
-                            .Select(x => x.Upload).Distinct().ToArray();
+                .Where(x => x.FileIdentifier == null)
+                .Select(x => x.Upload)
+                .Distinct()
+                .ToArray();
+
             var uploads = UploadSearch
                 .Bind(
                     x => new UploadInfo
                     {
-                        UploadIdentifier = x.UploadIdentifier,
+                        Identifier = x.UploadIdentifier,
                         Name = x.Name,
-                        NavigateUrl = x.NavigateUrl,
+                        NavigateUrl = "/files" + x.NavigateUrl,
                         ContentSize = x.ContentSize,
                         ContentType = x.ContentType
                     },
-                    x => uploadsFilter.Contains(x.UploadIdentifier))
-                .ToDictionary(x => x.UploadIdentifier);
-            return uploads;
+                    x => uploadsFilter.Contains(x.UploadIdentifier));
+
+            var fileIds = formAcronyms.Concat(formFormulas).Concat(formFigures)
+                .Where(x => x.FileIdentifier.HasValue)
+                .Select(x => x.FileIdentifier.Value)
+                .Distinct()
+                .ToArray();
+
+            var files = ServiceLocator.FileSearch
+                .GetModels(fileIds, false)
+                .Select(x => new UploadInfo
+                {
+                    Identifier = x.FileIdentifier,
+                    Name = x.Properties.DocumentName,
+                    NavigateUrl = ServiceLocator.StorageService.GetFileUrl(x),
+                    ContentSize = x.FileSize,
+                    ContentType = x.GetExtension()
+                })
+                .ToList();
+
+            files.AddRange(uploads);
+
+            return files.ToDictionary(x => x.Identifier);
         }
 
         private static Attachment[] GetAttachments(Dictionary<(int Asset, int AssetVersion), Attachment> bankAttachments, IEnumerable<FormAddendumItem> items)
@@ -411,10 +448,10 @@ namespace InSite.Portal.Assessments.Attempts
         {
             foreach (var attachment in attachments)
             {
-                if (!uploads.ContainsKey(attachment.Upload))
+                if (!uploads.ContainsKey(attachment.FileIdentifier ?? attachment.Upload))
                     continue;
 
-                var upload = uploads[attachment.Upload];
+                var upload = uploads[attachment.FileIdentifier ?? attachment.Upload];
                 if (upload.ContentType.IsEmpty())
                     continue;
 
@@ -428,7 +465,7 @@ namespace InSite.Portal.Assessments.Attempts
             return new AttemptAttachmentInfo
             {
                 Title = (attachment.Content?.Title.Default).IfNullOrEmpty(upload.Name),
-                Url = "/files" + upload.NavigateUrl,
+                Url = upload.NavigateUrl,
                 Size = upload.ContentSize.HasValue ? upload.ContentSize.Value.Bytes().Humanize("0.##") : string.Empty,
                 Icon = icon
             };

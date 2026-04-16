@@ -56,6 +56,7 @@
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/modal-manager.js" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/around/js/vendor/flatpickr/dist/flatpickr.js" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/plugins/pivottable/pivot.js" />
+        <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/common.recentLinks.js" />
         <insite:ResourceBundleMethod Type="InSite.Common.Web.UI.InputAudio, InSite.UI" Name="SetupSettings" />
         <insite:ResourceBundleMethod Type="InSite.Common.Web.UI.InputVideo, InSite.UI" Name="SetupSettings" />
         <insite:ResourceBundleMethod Type="InSite.Common.Web.UI.OutputAudio, InSite.UI" Name="SetupSettings" />

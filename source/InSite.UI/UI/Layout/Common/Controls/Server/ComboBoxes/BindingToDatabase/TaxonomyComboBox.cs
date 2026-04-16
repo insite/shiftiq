@@ -1,4 +1,7 @@
-﻿using InSite.Persistence;
+﻿using System.ComponentModel;
+using System.Web.UI;
+
+using InSite.Persistence;
 
 using Shift.Common;
 using Shift.Constant;
@@ -7,7 +10,39 @@ namespace InSite.Common.Web.UI
 {
     public class TaxonomyComboBox : ComboBox
     {
-        protected override ListItemArray CreateDataSource()
+        [PersistenceMode(PersistenceMode.InnerProperty), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public TaxonomyComboBoxSettings Settings { get; }
+
+        public TaxonomyComboBox()
+        {
+            Settings = new TaxonomyComboBoxSettings(nameof(Settings), ViewState);
+        }
+
+        protected override ListItemArray CreateDataSource() => Settings.CreateDataSource();
+    }
+
+    public class TaxonomyMultiComboBox : MultiComboBox
+    {
+        [PersistenceMode(PersistenceMode.InnerProperty), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public TaxonomyComboBoxSettings Settings { get; }
+
+        public TaxonomyMultiComboBox()
+        {
+            Settings = new TaxonomyComboBoxSettings(nameof(Settings), ViewState);
+        }
+
+        protected override ListItemArray CreateDataSource() => Settings.CreateDataSource();
+    }
+
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class TaxonomyComboBoxSettings : StateBagProxy
+    {
+        public TaxonomyComboBoxSettings(string prefix, StateBag viewState)
+            : base(prefix, viewState)
+        {
+        }
+
+        public ListItemArray CreateDataSource()
         {
             var list = new ListItemArray();
 

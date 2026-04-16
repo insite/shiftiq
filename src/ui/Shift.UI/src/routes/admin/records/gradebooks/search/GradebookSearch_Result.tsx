@@ -2,8 +2,8 @@ import ActionLink from "@/components/ActionLink";
 import { translate } from "@/helpers/translate";
 import SearchResult from "@/components/search/SearchResult";
 import { GradebookRow } from "./GradebookRow";
-import DateRangeField from "@/routes/_shared/fields/DateRangeField";
-import DateTimeField from "@/routes/_shared/fields/DateTimeField";
+import DateRangeField from "@/components/DateRangeField";
+import DateTimeField from "@/components/DateTimeField";
 import Icon from "@/components/icon/Icon";
 
 export default function GradebookSearch_Result() {
@@ -18,7 +18,7 @@ export default function GradebookSearch_Result() {
                         <ActionLink href={`/client/admin/records/gradebooks/outline/${row.gradebookId}`}>
                             {row.gradebookTitle}
                         </ActionLink>
-                        {row.isLocked ? <Icon style="Solid" name="lock" className="text-danger ms-2" title="Locked" /> : null}
+                        {row.isLocked ? <Icon style="solid" name="lock" className="text-danger ms-2" title="Locked" /> : null}
                     </>
                 )
             },

@@ -101,7 +101,7 @@ public class StandardReader : IEntityReader
     /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
     /// ordering fully unique, otherwise the result set is non-deterministic.
     /// </remarks>
-    private IQueryable<StandardEntity> BuildQueryable(TableDbContext db)
+    private static IQueryable<StandardEntity> BuildQueryable(TableDbContext db)
     {
         var query = db.QStandard
             .AsNoTracking();
@@ -117,6 +117,15 @@ public class StandardReader : IEntityReader
 
         if (criteria.OrganizationId != null)
             query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
+
+        if (criteria.ParentStandardId != null)
+            query = query.Where(x => x.ParentStandardIdentifier == criteria.ParentStandardId);
+
+        if (criteria.ParentStandardIds != null && criteria.ParentStandardIds.Length > 0)
+            query = query.Where(x => criteria.ParentStandardIds.Contains(x.ParentStandardIdentifier!.Value));
+
+        if (criteria.StandardIds != null && criteria.StandardIds.Length > 0)
+            query = query.Where(x => criteria.StandardIds.Contains(x.StandardIdentifier));
 
         if (!string.IsNullOrEmpty(criteria.ContentTitle))
             query = query.Where(x => x.ContentTitle!.Contains(criteria.ContentTitle));
@@ -139,11 +148,15 @@ public class StandardReader : IEntityReader
         var matches = await queryable
             .Select(entity => new StandardMatch
             {
-                Code = entity.Code,
                 Id = entity.StandardIdentifier,
+                ParentId = entity.ParentStandardIdentifier,
+                Code = entity.Code,
                 Name = entity.ContentName,
                 Title = entity.ContentTitle,
-                Type = entity.StandardType
+                Type = entity.StandardType,
+                Label = entity.StandardLabel,
+                AssetNumber = entity.AssetNumber,
+                Sequence = entity.Sequence,
             })
             .ToListAsync(cancellation);
 

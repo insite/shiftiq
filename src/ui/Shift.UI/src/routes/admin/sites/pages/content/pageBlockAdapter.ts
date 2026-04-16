@@ -166,7 +166,7 @@ export const pageBlockAdapter = {
         for (const apiBlock of model.Blocks) {
             const contentFields = getContentFields(apiBlock.BlockType as BlockType, apiBlock.Content);
             blocks.push({
-                blockId: apiBlock.BlockId,
+                blockId: apiBlock.BlockId.toLowerCase(),
                 blockType: apiBlock.BlockType as BlockType,
                 contentDirty: false,
                 otherDirty: false,
@@ -189,6 +189,7 @@ export const pageBlockAdapter = {
             }
             model.Blocks.push({
                 BlockId: typeof block.blockId === "string" ? block.blockId : null,
+                BlockIdNumber: typeof block.blockId === "number" ? block.blockId : null,
                 BlockType: block.blockType,
                 Title: block.blockTitle || blockTypeNameList[block.blockType],
                 Hook: block.hook,

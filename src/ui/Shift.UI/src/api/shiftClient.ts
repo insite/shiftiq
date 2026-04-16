@@ -15,6 +15,8 @@ import { fetchHelper } from "./fetchHelper";
 import { ApiSiteSetting } from "./models/ApiSiteSetting";
 import { _translationController } from "./controllers/translation/_translationController";
 import { _pageContentController } from "./controllers/pageContent/_pageContentController";
+import { _timelineController } from "./controllers/timeline/_timelineController";
+import { _workshopController } from "./controllers/workshop/_workshopController";
 
 export const shiftClient = {
     me: {
@@ -42,6 +44,8 @@ export const shiftClient = {
     caseStatus: _caseStatusController,
     translation: _translationController,
     pageContent: _pageContentController,
+    workshop: _workshopController,
 
     command: _commandController,
+    timeline: _timelineController,
 }

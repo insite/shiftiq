@@ -65,10 +65,7 @@ namespace Shift.Common
                 return;
 
             foreach (var subroute in settings.Subroutes)
-            {
-                RegisterExplicitRoutes(registry, subroute.Parents);
                 RegisterExplicitRoutes(registry, subroute.Children);
-            }
         }
 
         private void RegisterExplicitRoutes(ResourceRegistry registry, List<string> patterns)
@@ -201,7 +198,7 @@ namespace Shift.Common
             AddSystemAccessRules(resourcePermissions);
 
             // Apply subroute inheritance: child routes inherit permissions from parent routes
-            ApplySubrouteInheritance(resourcePermissions, context);
+            ApplySubrouteInheritance(matrix.Resources, resourcePermissions, context);
 
             var grantedPermissions = context.PermissionListLoader.ExpandWildcards(resourcePermissions.ToArray());
             context.PermissionListLoader.Populate(grantedPermissions, list, AccessOperation.Grant);
@@ -328,93 +325,57 @@ namespace Shift.Common
         /// <summary>
         /// Applies subroute inheritance rules. Child routes inherit permissions from parent routes.
         /// </summary>
-        private void ApplySubrouteInheritance(List<ResourcePermissions> resourcePermissions, LoadContext context)
+        private void ApplySubrouteInheritance(ResourceRegistry registry, List<ResourcePermissions> resourcePermissions, LoadContext context)
         {
             if (context.RouteSettings?.Subroutes == null || context.RouteSettings.Subroutes.Count == 0)
                 return;
 
-            // Build a lookup of route URL to its permissions for efficient matching
-            var permissionsByRoute = new Dictionary<string, List<RoleAccessBundle>>(StringComparer.OrdinalIgnoreCase);
-            foreach (var rp in resourcePermissions)
+            var routesAndSubroutes = registry.GetRoutesAndSubroutes();
+
+            foreach (var (route, subroutes) in routesAndSubroutes)
             {
-                // Add permissions for the resource path itself
-                if (!permissionsByRoute.ContainsKey(rp.Resource))
-                    permissionsByRoute[rp.Resource] = new List<RoleAccessBundle>();
-                permissionsByRoute[rp.Resource].AddRange(rp.Permissions);
-
-                // Add permissions for each route
-                foreach (var route in rp.Routes)
-                {
-                    if (!permissionsByRoute.ContainsKey(route))
-                        permissionsByRoute[route] = new List<RoleAccessBundle>();
-                    permissionsByRoute[route].AddRange(rp.Permissions);
-                }
-            }
-
-            // Process each subroute rule
-            foreach (var subroute in context.RouteSettings.Subroutes)
-            {
-                if (subroute.Parents == null || subroute.Children == null)
-                    continue;
-
-                // Find all permissions that match the parent patterns
                 var parentPermissions = new List<RoleAccessBundle>();
 
-                foreach (var parentPattern in subroute.Parents)
+                var resources = registry.FindResourcesByRoute(route);
+                foreach (var resource in resources)
                 {
-                    foreach (var kvp in permissionsByRoute)
-                    {
-                        if (MatchesPattern(kvp.Key, parentPattern))
-                        {
-                            parentPermissions.AddRange(kvp.Value);
-                        }
-                    }
+                    var list = resourcePermissions.FindAll(x => string.Equals(x.Resource, resource.Path, StringComparison.OrdinalIgnoreCase));
+                    foreach (var p in list)
+                        parentPermissions.AddRange(p.Permissions);
                 }
 
-                if (parentPermissions.Count == 0)
-                    continue;
-
-                // Apply parent permissions to all matching child routes
-                foreach (var childPattern in subroute.Children)
+                foreach (var subroute in subroutes)
                 {
-                    // Find all known routes that match the child pattern
-                    var matchingChildRoutes = context.AllRouteUrls
-                        .Where(route => MatchesPattern(route, childPattern))
-                        .ToList();
+                    // Find or create a ResourcePermissions entry for this child route
+                    var childPermission = resourcePermissions
+                        .FirstOrDefault(rp => rp.Routes.Contains(subroute, StringComparer.OrdinalIgnoreCase)
+                            || string.Equals(rp.Resource, subroute, StringComparison.OrdinalIgnoreCase));
 
-                    foreach (var childRoute in matchingChildRoutes)
+                    if (childPermission == null)
                     {
-                        // Find or create a ResourcePermissions entry for this child route
-                        var childPermission = resourcePermissions
-                            .FirstOrDefault(rp => rp.Routes.Contains(childRoute, StringComparer.OrdinalIgnoreCase)
-                                || string.Equals(rp.Resource, childRoute, StringComparison.OrdinalIgnoreCase));
-
-                        if (childPermission == null)
+                        childPermission = new ResourcePermissions
                         {
-                            childPermission = new ResourcePermissions
-                            {
-                                Resource = childRoute,
-                                Routes = new List<string> { childRoute }
-                            };
-                            resourcePermissions.Add(childPermission);
-                        }
+                            Resource = subroute,
+                            Routes = new List<string> { subroute }
+                        };
+                        resourcePermissions.Add(childPermission);
+                    }
 
-                        // Add inherited permissions (clone to avoid shared references)
-                        foreach (var parentPerm in parentPermissions)
+                    // Add inherited permissions (clone to avoid shared references)
+                    foreach (var parentPerm in parentPermissions)
+                    {
+                        var inheritedBundle = new RoleAccessBundle
                         {
-                            var inheritedBundle = new RoleAccessBundle
+                            Roles = parentPerm.Roles.ToList(),
+                            Access = new AccessSet
                             {
-                                Roles = parentPerm.Roles.ToList(),
-                                Access = new AccessSet
-                                {
-                                    Feature = parentPerm.Access.Feature,
-                                    Data = parentPerm.Access.Data,
-                                    Authority = parentPerm.Access.Authority
-                                }
-                            };
+                                Feature = parentPerm.Access.Feature,
+                                Data = parentPerm.Access.Data,
+                                Authority = parentPerm.Access.Authority
+                            }
+                        };
 
-                            childPermission.Permissions.Add(inheritedBundle);
-                        }
+                        childPermission.Permissions.Add(inheritedBundle);
                     }
                 }
             }

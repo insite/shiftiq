@@ -39,5 +39,11 @@
             </ItemTemplate>
         </asp:TemplateField>
 
+        <asp:TemplateField HeaderText="Source">
+            <ItemTemplate>
+                <%# Eval("AuthenticationSource") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
     </Columns>
 </insite:Grid>

@@ -203,10 +203,16 @@
 
                             <div class="form-group mb-3">
                                 <label class="form-label">Download Options</label>
-                                <div class="mb-3">
-                                    <asp:CheckBox runat="server" ID="IncludeAdditionalSheets" Text="Include additional metadata sheets" Checked="True" />
+                                <div class="mb-1">
+                                    <insite:CheckBox runat="server" ID="IncludeAdditionalSheets" Text="Include additional metadata sheets" Checked="true" />
                                     <div class="form-text mt-0 ms-4">
                                         Check this box to include additional sheets.
+                                    </div>
+                                </div>
+                                <div>
+                                    <insite:CheckBox runat="server" ID="SeparateSheetPerSet" Text="Download each set in its own tab" />
+                                    <div class="form-text mt-0 ms-4">
+                                        Check this box to display each set in a separate tab in the download.
                                     </div>
                                 </div>
                             </div>
@@ -226,5 +232,23 @@
     <div class="mt-3">
         <insite:CloseButton runat="server" ID="CloseButton" />
     </div>
+
+    <insite:PageFooterContent runat="server">
+        <script type="text/javascript">
+            (function () {
+                const chkIncludeAdditionalSheets = document.getElementById('<%= IncludeAdditionalSheets.ClientID %>');
+                const chkSeparateSheetPerSet = document.getElementById('<%= SeparateSheetPerSet.ClientID %>');
+                if (!chkIncludeAdditionalSheets || !chkSeparateSheetPerSet)
+                    return;
+
+                document.addEventListener('DOMContentLoaded', onSeparateSheetPerSetChanged);
+                chkSeparateSheetPerSet.addEventListener('change', onSeparateSheetPerSetChanged);
+
+                function onSeparateSheetPerSetChanged() {
+                    chkIncludeAdditionalSheets.disabled = chkSeparateSheetPerSet.checked;
+                }
+            })();
+        </script>
+    </insite:PageFooterContent>
 
 </asp:Content>

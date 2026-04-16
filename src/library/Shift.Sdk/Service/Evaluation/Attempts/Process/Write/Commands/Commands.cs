@@ -344,11 +344,13 @@ namespace InSite.Application.Attempts.Write
     public class SwitchAttemptQuestion : Command
     {
         public int NextQuestionIndex { get; set; }
+        public bool IsForced { get; set; }
 
-        public SwitchAttemptQuestion(Guid aggregate, int questionIndex)
+        public SwitchAttemptQuestion(Guid aggregate, int questionIndex, bool isForced)
         {
             AggregateIdentifier = aggregate;
             NextQuestionIndex = questionIndex;
+            IsForced = isForced;
         }
     }
 

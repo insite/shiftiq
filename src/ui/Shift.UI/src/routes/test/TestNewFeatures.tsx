@@ -3,9 +3,10 @@ import DatePicker from "@/components/date/DatePicker";
 import FormField from "@/components/form/FormField";
 import MultiSelect from "@/components/multiselect/MultiSelect";
 import TextBox from "@/components/TextBox";
-import { useStatusProvider } from "@/contexts/StatusProvider";
-import { useLoadingProvider } from "@/contexts/LoadingProvider";
+import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { ListItem } from "@/models/listItem";
+import { shiftClient } from "@/api/shiftClient";
+import { useLoadingProvider } from "@/contexts/loading/LoadingProviderContext";
 
 const _items: ListItem[] = [];
 for (let i = 0; i < 20; i++) {
@@ -45,6 +46,21 @@ export default function TestNewFeatures() {
                             className="w-100"
                             text="Hide Custom Error"
                             onClick={() => removeError()}
+                        />
+                    </FormField>
+                    <FormField>
+                        <Button
+                            variant="request"
+                            className="w-100"
+                            text="Refresh Session"
+                            onClick={async () => {
+                                addLoading();
+                                try {
+                                    await shiftClient.cookie.refreshSession();
+                                } finally {
+                                    removeLoading();
+                                }
+                            }}
                         />
                     </FormField>
                 </div>

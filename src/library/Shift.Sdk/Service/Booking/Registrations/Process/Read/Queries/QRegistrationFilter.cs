@@ -17,6 +17,7 @@ namespace InSite.Application.Registrations.Read
         public Guid? OrganizationIdentifier { get; set; }
         public Guid? OccupationIdentifier { get; set; }
         public Guid? FrameworkIdentifier { get; set; }
+        public Guid? ExamFormIdentifier { get; set; }
 
         public string Event { get; set; }
         public Guid? EventIdentifier { get; set; }
@@ -36,13 +37,13 @@ namespace InSite.Application.Registrations.Read
         public string Form { get; set; }
         public string FormName { get; set; }
 
-        public Guid? FormIdentifier
+        public Guid? AttemptFormIdentifier
         {
-            get => FormIdentifiers != null && FormIdentifiers.Length == 1 ? FormIdentifiers[0] : (Guid?)null;
-            set => FormIdentifiers = value.HasValue ? new[] { value.Value } : null;
+            get => AttemptFormIdentifiers != null && AttemptFormIdentifiers.Length == 1 ? AttemptFormIdentifiers[0] : (Guid?)null;
+            set => AttemptFormIdentifiers = value.HasValue ? new[] { value.Value } : null;
         }
 
-        public Guid[] FormIdentifiers { get; set; }
+        public Guid[] AttemptFormIdentifiers { get; set; }
 
         public bool? HasExamForm { get; set; }
 
