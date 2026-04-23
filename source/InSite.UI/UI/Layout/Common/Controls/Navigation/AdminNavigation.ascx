@@ -96,8 +96,8 @@
 
                         <li><h6 class="dropdown-header pt-2 pb-1">Resources</h6></li>
                         <li><a runat="server" id="ActionHelpAnchor" class="dropdown-item ms-2" href="#" data-bs-toggle="modal" data-bs-target="#modal-help">Help</a></li>
-                        <li><a runat="server" id="HelpCenterAnchor" class="dropdown-item ms-2" href="https://docs.shiftiq.com/help">Help center</a></li>
-                        <li><a runat="server" id="DocumentationAnchor" class="dropdown-item ms-2" href="https://docs.shiftiq.com/">Documentation</a></li>
+                        <li><a runat="server" id="HelpCenterAnchor" class="dropdown-item ms-2" href="#">Help center</a></li>
+                        <li><a runat="server" id="DocumentationAnchor" class="dropdown-item ms-2" href="#">Documentation</a></li>
 
                         <insite:Container runat="server" ID="ShiftContainer">
                             <li><h6 class="dropdown-header pb-1">Get Help</h6></li>

@@ -20,6 +20,9 @@
                 <asp:TemplateField HeaderText="Scheduled" ItemStyle-Wrap="False" ItemStyle-Width="150px">
                     <ItemTemplate>
                         <%# LocalizeTime((DateTimeOffset?)Eval("MailoutScheduled")) %>
+                        <div>
+                            <label class="badge bg-info"><%# Eval("MailoutStatus") %></label>
+                        </div>
                     </ItemTemplate>
                 </asp:TemplateField>
 
@@ -29,7 +32,6 @@
                     </ItemTemplate>
                 </asp:TemplateField>
 
-                <asp:BoundField HeaderText="" DataField="ContentSubject" />
                 <asp:TemplateField HeaderText="Subject">
                     <ItemTemplate>
                         <%# Eval("ContentSubject") %>

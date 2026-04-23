@@ -613,6 +613,14 @@ namespace InSite.Persistence
                 _commander.Send(new QueueMailout(
                     email.MessageIdentifier.Value, email.MailoutIdentifier, envelope.RecipientEmail, status.Data));
             }
+            else if (status.Status == MailoutCallbackStatus.Delivered)
+            {
+                if (envelope.RecipientIdentifier.HasValue)
+                {
+                    _commander.Send(new CompleteDelivery(email.MessageIdentifier.Value, email.MailoutIdentifier, envelope.RecipientIdentifier.Value, null));
+                }
+                _commander.Send(new CompleteMailout(email.MessageIdentifier.Value, email.MailoutIdentifier));
+            }
             else
             {
                 _commander.Send(new RejectMailout(
@@ -1037,13 +1045,16 @@ namespace InSite.Persistence
                 ? DateTimeOffset.UtcNow
                 : draft.MailoutScheduled.Value;
 
-            _commander.Send(new DraftMailout(
-                message.MessageIdentifier,
-                draft.MailoutIdentifier, scheduledOn,
-                draft.SenderIdentifier, sender.SenderType,
-                to, draft.RecipientListCc, draft.RecipientListBcc,
-                draft.ContentSubject, null, draft.ContentBody, draft.ContentAttachments.NullIfEmpty(),
-                draft.EventIdentifier));
+            if (draft.Recipients.Count > 0)
+            {
+                _commander.Send(new DraftMailout(
+                    message.MessageIdentifier,
+                    draft.MailoutIdentifier, scheduledOn,
+                    draft.SenderIdentifier, sender.SenderType,
+                    to, draft.RecipientListCc, draft.RecipientListBcc,
+                    draft.ContentSubject, null, draft.ContentBody, draft.ContentAttachments.NullIfEmpty(),
+                    draft.EventIdentifier));
+            }
         }
     }
 }

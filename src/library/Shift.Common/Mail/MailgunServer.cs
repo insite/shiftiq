@@ -191,6 +191,17 @@ namespace Shift.Common
             if (response.IsSuccessStatusCode)
             {
                 result.Data["statusId"] = ExtractMailgunStatusId(responseContent);
+
+                // If the scheduled delivery time is in the past (or within the next few minutes) then there is not
+                // enough time for an admin to login to Mailgun and cancel it. Therefore, consider it a delivered email
+                // message - when callbacks from Mailgun are not yet supported.
+
+                var cutoff = DateTimeOffset.Now.AddMinutes(_settings.MinutesBeforeCancellationIsDisallowed);
+
+                if (email.MailoutScheduled <= cutoff && !_settings.MailgunCallbackEnabled)
+                {
+                    result = MailgunStatus.Deliver();
+                }
             }
             else
             {

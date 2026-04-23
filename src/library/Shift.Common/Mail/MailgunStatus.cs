@@ -28,5 +28,13 @@ namespace Shift.Common
                 Status = MailoutCallbackStatus.Queued
             };
         }
+
+        public static MailgunStatus Deliver()
+        {
+            return new MailgunStatus
+            {
+                Status = MailoutCallbackStatus.Delivered
+            };
+        }
     }
 }

@@ -4,12 +4,11 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Credentials.Write;
 using InSite.Domain.Messages;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Persistence.Plugin.CMDS
@@ -49,7 +48,7 @@ namespace InSite.Persistence.Plugin.CMDS
             var email = MessageRepository.GetEmail(OrganizationIdentifiers.CMDS, notice.Type);
 
             email.MailoutIdentifier = UniqueIdentifier.Create();
-            email.MailoutScheduled = DateTimeOffset.UtcNow.AddMinutes(1);
+            email.MailoutScheduled = DateTimeOffset.UtcNow;
             email.ContentVariables = BuildVariableList().ToDictionary();
             email.Recipients = BuildRecipientList();
 
@@ -208,7 +207,7 @@ namespace InSite.Persistence.Plugin.CMDS
             var email = MessageRepository.GetEmail(OrganizationIdentifiers.CMDS, notice.Type);
 
             email.MailoutIdentifier = UniqueIdentifier.Create();
-            email.MailoutScheduled = DateTimeOffset.UtcNow.AddMinutes(1);
+            email.MailoutScheduled = DateTimeOffset.UtcNow;
             email.ContentVariables = BuildVariableList().ToDictionary();
             email.ContentPriority = MessageRepository.GetEmailPriority(type);
             email.Recipients = BuildRecipientList();
@@ -326,7 +325,7 @@ namespace InSite.Persistence.Plugin.CMDS
             var email = MessageRepository.GetEmail(OrganizationIdentifiers.CMDS, notice.Type);
 
             email.MailoutIdentifier = UniqueIdentifier.Create();
-            email.MailoutScheduled = DateTimeOffset.UtcNow.AddMinutes(1);
+            email.MailoutScheduled = DateTimeOffset.UtcNow;
             email.ContentVariables = BuildVariableList().ToDictionary();
             email.ContentPriority = MessageRepository.GetEmailPriority(type);
             email.Recipients = BuildRecipientList(e.ReminderType);
@@ -450,7 +449,7 @@ namespace InSite.Persistence.Plugin.CMDS
             var email = MessageRepository.GetEmail(organization, notification.Type);
 
             email.MailoutIdentifier = UniqueIdentifier.Create();
-            email.MailoutScheduled = DateTimeOffset.UtcNow.AddMinutes(1);
+            email.MailoutScheduled = DateTimeOffset.UtcNow;
             email.ContentVariables = variables.ToDictionary();
             email.ContentAttachments = attachments != null ? attachments.Cast<string>().ToList() : new List<string>();
             email.Recipients = GetSubscribers();

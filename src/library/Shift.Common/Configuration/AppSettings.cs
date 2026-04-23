@@ -31,6 +31,8 @@ namespace Shift.Common
         public string CssFileUrl
             => Application.StylePath + Partition.Style + ".css";
 
+        public string HelpUrl => Partition.HelpUrl ?? Application.HelpUrl;
+
         public string v1ApiBaseUrl
             => UrlHelper.GetAbsoluteUrl(Partition.Domain, Release.GetEnvironment(), "/api", Partition.Tenant);
 
@@ -68,6 +70,8 @@ namespace Shift.Common
 
                 current.WhitelistDomains = partition.WhitelistDomains;
                 current.WhitelistEmails = partition.WhitelistEmails;
+
+                current.HelpUrl = partition.HelpUrl;
 
                 _partition = current;
 

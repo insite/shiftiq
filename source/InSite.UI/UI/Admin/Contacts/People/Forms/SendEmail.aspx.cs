@@ -484,6 +484,8 @@ namespace InSite.UI.Admin.Contacts.People.Forms
                     ScreenStatus.AddMessage(AlertType.Success, $"The email message has been submitted for delivery <strong>{Email.Recipient.Email}</strong>.");
                 else if (email.MailoutStatus == "Queued")
                     ScreenStatus.AddMessage(AlertType.Success, $"The email message has been queued for delivery to <strong>{Email.Recipient.Email}</strong>.");
+                else if (email.MailoutStatus == "Delivered" && !ServiceLocator.AppSettings.Application.MailgunCallbackEnabled)
+                    ScreenStatus.AddMessage(AlertType.Success, $"The email message has been delivered to <strong>{Email.Recipient.Email}</strong>.");
                 else
                     ScreenStatus.AddMessage(AlertType.Warning, $"No email message has been sent.");
             }

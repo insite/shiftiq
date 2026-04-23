@@ -14,6 +14,10 @@ namespace Shift.Common
         public ReadOnlyCollection<string> ForcedTypes { get; }
         public string Domain { get; }
 
+        public int MinutesBeforeCancellationIsDisallowed { get; set; } = 5;
+
+        public bool MailgunCallbackEnabled { get; }
+
         public MailgunServerSettings(IPartitionModel partition, EnvironmentModel environment, Application application)
         {
             EmailOutboxDisabled = application.EmailOutboxDisabled;
@@ -24,6 +28,8 @@ namespace Shift.Common
             WhitelistTesters = Array.AsReadOnly(StringHelper.Split(partition.WhitelistEmails));
 
             Domain = (environment.GetSubdomainPrefix() + partition.Slug + "." + partition.Domain).ToLowerInvariant();
+
+            MailgunCallbackEnabled = application.MailgunCallbackEnabled;
         }
 
         public MailgunServerSettings(

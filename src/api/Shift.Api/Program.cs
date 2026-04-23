@@ -219,7 +219,7 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
         settings.NullValueHandling = NullValueHandling.Ignore;
     });
 
-    var developerDocsUrl = settings.Application.HelpUrl.TrimEnd('/') + "/developers";
+    var developerDocsUrl = settings.HelpUrl.TrimEnd('/') + "/developers";
 
     services.AddDocumentation(settings.Partition.Brand, developerDocsUrl);
 

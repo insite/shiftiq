@@ -322,7 +322,7 @@ namespace InSite
 
             FilePaths = new FilePaths(settings.DataFolderShare, settings.DataFolderEnterprise);
             Maintenance = new Maintenance(FilePaths);
-            Urls = new Urls(settings.Environment, settings.Partition.Domain, app.HelpUrl);
+            Urls = new Urls(settings.Environment, settings.Partition.Domain, settings.HelpUrl);
 
             DbSettings.Init(AppSettings.Database.ConnectionStrings.Shift, settings.Partition.Domain, AppSettings.Database.IsReadOnly);
 
@@ -677,7 +677,7 @@ namespace InSite
                 AppSettings.Integration.Mailgun,
                 new MailgunServerSettings(Partition, AppSettings.Environment, AppSettings.Application)
             );
-            
+
             EmailOutbox = new EmailOutbox(MailgunServer, AppSettings.Environment.Name, Partition, commander);
             FFmpeg = new FFmpeg(AppSettings.Application.FFmpegFolderPath);
             CountrySearch = new CountrySearch(AppSettings.Engine.Api.Google.BaseUrl);

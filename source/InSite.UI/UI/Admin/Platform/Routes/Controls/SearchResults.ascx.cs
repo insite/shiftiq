@@ -58,7 +58,7 @@ namespace InSite.Admin.Utilities.Actions.Controls
             {
                 html += "<span class='badge bg-success'>Action Linked to Help</span>";
 
-                var helpUrl = ServiceLocator.AppSettings.Application.HelpUrl + item.HelpUrl;
+                var helpUrl = ServiceLocator.AppSettings.HelpUrl + item.HelpUrl;
 
                 var helpLink = $"<a title='View help topic' target='_blank' href='{helpUrl}'>{item.HelpUrl}</a>";
 

@@ -22,6 +22,7 @@
                     <ItemTemplate>
                         <%# LocalizeTime((DateTimeOffset?)Eval("MailoutScheduled")) %>
                         <div>
+                            <label class="badge bg-info me-1"><%# Eval("MailoutStatus") %></label>
                             <label class="badge bg-<%# (bool)Eval("IsOverdue") ? "danger" : "success" %>">
                                 <%# Eval("Age") %>
                             </label>

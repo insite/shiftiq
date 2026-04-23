@@ -41,6 +41,7 @@ namespace Shift.Common
         public bool AntiForgeryTokenValidationEnabled { get; set; }
 
         public string AlertsToForceSend { get; set; }
+        public bool MailgunCallbackEnabled { get; set; }
 
         public List<string> AlertsToForceSendList =>
             string.IsNullOrWhiteSpace(AlertsToForceSend)

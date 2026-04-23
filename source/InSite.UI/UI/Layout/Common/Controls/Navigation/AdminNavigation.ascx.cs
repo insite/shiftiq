@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -9,7 +8,6 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using InSite.Common.Web;
-using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Layout.Lobby;
 
@@ -72,6 +70,10 @@ namespace InSite.UI.Layout.Admin
                 return;
 
             ImpersonatorAnchor.HRef = Urls.StopImpersonation;
+
+            HelpCenterAnchor.HRef = ServiceLocator.AppSettings.HelpUrl + "/help";
+
+            DocumentationAnchor.HRef = ServiceLocator.AppSettings.HelpUrl;
 
             LoadPermissionMatrix();
 

@@ -62,6 +62,8 @@ namespace Shift.Common
         /// </summary>
         string WhitelistEmails { get; set; }
 
+        string HelpUrl { get; set; }
+
         bool IsE01();
         bool IsE02();
         bool IsE03();

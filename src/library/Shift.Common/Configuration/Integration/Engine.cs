@@ -49,6 +49,7 @@ namespace Shift.Common
         public string Domain { get; set; }
         public string Email { get; set; }
         public string Slug { get; set; }
+        public string HelpUrl { get; set; }
 
         public Guid Identifier { get; set; }
 
