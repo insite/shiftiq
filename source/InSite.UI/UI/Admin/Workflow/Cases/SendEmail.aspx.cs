@@ -376,9 +376,9 @@ namespace InSite.UI.Admin.Issues.Outlines.Forms
             draft.ContentBody.Default = ComposeEmailBody.Value;
 
             var message = MessageHelper.BuildMessage(draft, email.Recipient.Language);
-            var recipientData = DeliveryAdapter.ToDataTable(Organization.Identifier, draft.Recipients);
-            var (subject, body) = EmailOutbox.ReplaceSmarterMailVariables(recipientData, 0, message.Subject, message.Body);
-
+            var envelope = EmailOutbox.CreateEmailVariables(draft, email.Recipient.UserIdentifier, email.Recipient.Email);
+            var subject = MessageHelper.ReplacePlaceholdersForMailgun(draft.OrganizationIdentifier, draft.SenderIdentifier, draft.SurveyNumber, message.Subject, envelope);
+            var body = MessageHelper.ReplacePlaceholdersForMailgun(draft.OrganizationIdentifier, draft.SenderIdentifier, draft.SurveyNumber, message.Body, envelope);
 
             email.EmailSubject = subject;
             email.EmailBody = body;
@@ -406,7 +406,11 @@ namespace InSite.UI.Admin.Issues.Outlines.Forms
                 ServiceLocator.EmailOutbox.SendAndReplacePlaceholders(email, "Case");
 
                 if (email.MailoutSucceeded)
-                    ScreenStatus.AddMessage(AlertType.Success, $"The email message has been sent to <strong>{Email.Recipient.Email}</strong>.");
+                    ScreenStatus.AddMessage(AlertType.Success, $"The email message has been submitted for delivery <strong>{Email.Recipient.Email}</strong>.");
+                else if (email.MailoutStatus == "Queued")
+                    ScreenStatus.AddMessage(AlertType.Success, $"The email message has been queued for delivery to <strong>{Email.Recipient.Email}</strong>.");
+                else if (email.MailoutStatus == "Delivered" && !ServiceLocator.AppSettings.Application.MailgunCallbackEnabled)
+                    ScreenStatus.AddMessage(AlertType.Success, $"The email message has been delivered to <strong>{Email.Recipient.Email}</strong>.");
                 else
                     ScreenStatus.AddMessage(AlertType.Warning, $"No email message has been sent.");
             }

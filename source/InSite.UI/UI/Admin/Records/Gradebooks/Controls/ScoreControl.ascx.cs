@@ -5,8 +5,6 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Gradebooks.Write;
 using InSite.Application.Progresses.Write;
 using InSite.Application.Records;
@@ -17,6 +15,7 @@ using InSite.Common.Web.UI;
 using InSite.Domain.Records;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Admin.Records.Gradebooks.Controls
@@ -720,7 +719,7 @@ namespace InSite.Admin.Records.Gradebooks.Controls
         }
 
         private bool HasNonEmptyChanges(Guid userId)
-            => Categories.Values.Any(c => c.Scores[userId].Any(s => !string.IsNullOrWhiteSpace(s.Value) || !string.IsNullOrWhiteSpace(s.Comment)));
+            => Categories.Values.Any(c => c.Scores.IsNotEmpty() && c.Scores[userId].Any(s => !string.IsNullOrWhiteSpace(s.Value) || !string.IsNullOrWhiteSpace(s.Comment)));
 
         private void CreateChangeCommand(ScoreItem scoreItem, QProgress progress, Guid progressIdentifier, Score newScore, List<ICommand> commands)
         {

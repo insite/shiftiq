@@ -383,6 +383,11 @@ namespace InSite.Admin.Courses.Outlines.Controls
             {
                 CourseSetupAlert.AddMessage(AlertType.Error, $"Modifications are not permitted while the achievement is locked. Please unlock it before making any changes. {ex.Message}");
             }
+            catch(Exception ex)
+            {
+                if (ex.InnerException is Application.Records.LockedGradebookException)
+                    CourseSetupAlert.AddMessage(AlertType.Error, "Modifications are not permitted while the gradebook is locked. Please unlock it before making any changes.");
+            }
         }
 
         private void DeleteImage_Click(object sender, EventArgs e)

@@ -14,9 +14,11 @@
                             <div class="mb-2">
                                 <insite:FindBankOccupation runat="server" ID="ExamBankOccupationID" EmptyMessage="Exam Bank Occupation" />
                             </div>
-                            <div class="mb-2">
-                                <insite:FindBankFramework runat="server" ID="ExamBankFrameworkID" EmptyMessage="Exam Bank Framework" Width="95%" />
-                                <insite:RequiredValidator runat="server" ControlToValidate="ExamBankFrameworkID" Display="Dynamic" FieldName="Exam Bank Framework" ValidationGroup="SearchCriteria" />
+                            <div class="mb-2 d-flex">
+                                <insite:FindBankFramework runat="server" ID="ExamBankFrameworkID" EmptyMessage="Exam Bank Framework" />
+                                <div class="ms-2 text-nowrap align-self-center flex-shrink-1">
+                                    <insite:RequiredValidator runat="server" ControlToValidate="ExamBankFrameworkID" Display="Dynamic" FieldName="Exam Bank Framework" ValidationGroup="SearchCriteria" />
+                                </div>
                             </div>
                             <div class="mb-2">
                                 <insite:FindBank runat="server" ID="ExamBankID" EmptyMessage="Exam Bank" />

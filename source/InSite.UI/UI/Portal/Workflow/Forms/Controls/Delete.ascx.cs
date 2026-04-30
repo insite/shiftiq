@@ -20,6 +20,9 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
         {
             base.OnLoad(e);
 
+            if (User == null)
+                HttpResponseHelper.Redirect(RelativeUrl.PortalHomeUrl);
+
             if (IsPostBack)
                 return;
 

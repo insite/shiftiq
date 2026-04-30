@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Attempts.Read;
 using InSite.Application.Attempts.Write;
 using InSite.Common.Web;
@@ -15,6 +13,7 @@ using InSite.UI.Layout.Admin;
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -188,7 +187,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Forms
 
         private void SetPageTitle(QAttempt attempt, bool exists, bool isOnlyAssessor)
         {
-            var learnerName = !Organization.Toolkits.Assessments.ShowPersonNameToGradingAssessor && exists && isOnlyAssessor
+            var learnerName = !Organization.Toolkits.Assessments.ShowPersonNameToGradingAssessor || exists && isOnlyAssessor
                 ? attempt.LearnerPerson.PersonCode
                 : ViewForm.ShouldHideLearnerName()
                     ? "Learner"

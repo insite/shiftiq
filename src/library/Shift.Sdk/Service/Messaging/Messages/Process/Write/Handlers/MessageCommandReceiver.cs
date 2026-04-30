@@ -36,6 +36,7 @@ namespace InSite.Application.Messages.Write
             commander.Subscribe<HandleMailoutCallback>(Handle);
             commander.Subscribe<QueueMailout>(Handle);
             commander.Subscribe<RejectMailout>(Handle);
+            commander.Subscribe<RemoveMessageSubscriber>(Handle);
             commander.Subscribe<RemoveMessageSubscribers>(Handle);
             commander.Subscribe<RenameMessage>(Handle);
             commander.Subscribe<ResetLinkCounter>(Handle);

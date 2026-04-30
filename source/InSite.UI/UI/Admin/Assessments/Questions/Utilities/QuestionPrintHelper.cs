@@ -377,7 +377,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
         public static bool IsQuestionMatch(Question question, QuestionFilter filter) =>
             IsQuestionMatch(question, filter.QuestionTaxonomy, filter.QuestionCondition, filter.QuestionFlag, filter.QuestionCompetency, filter.IsQuestionHasLig, filter.IsQuestionHasReference);
 
-        public static bool IsQuestionMatch(
+        private static bool IsQuestionMatch(
             Question question,
             HashSet<int> taxonomy,
             HashSet<string> condition,

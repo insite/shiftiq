@@ -276,7 +276,7 @@ namespace InSite.Persistence.Integration.Prometric
 
                     return new SaveEligibilityAccommodationItem
                     {
-                        Name = "Exam " + name,
+                        Name = name,
                         Multiplier = multiplier
                     };
                 })

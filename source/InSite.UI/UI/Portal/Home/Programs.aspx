@@ -12,7 +12,7 @@
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 
     <div style="position:relative">
-        <insite:Button runat="server" NavigateUrl="/ui/portal/learning/plan" Text="My Training Plan" Icon="far fa-map-location-dot" />
+        <insite:Button runat="server" NavigateUrl="/ui/portal/learning/programs/plan" Text="My Training Plan" Icon="far fa-map-location-dot" />
 
         <div class="mt-4">
             <uc:ProgramSearchControl runat="server" ID="ProgramSearchControl" />

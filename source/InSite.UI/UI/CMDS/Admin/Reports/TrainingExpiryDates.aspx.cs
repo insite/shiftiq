@@ -214,9 +214,11 @@ namespace InSite.Cmds.Actions.Reporting.Report
             FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
             FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
             FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
+
             FindAchievement.Filter.AchievementLabels.Clear();
-            if (!string.IsNullOrEmpty(AchievementType.Value))
+            if (AchievementType.HasValue)
                 FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
+
             FindAchievement.Value = null;
         }
 

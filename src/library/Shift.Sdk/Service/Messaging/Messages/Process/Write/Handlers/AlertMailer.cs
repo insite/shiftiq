@@ -160,7 +160,7 @@ namespace InSite.Application.Messages.Write
 
                     email.ContentAttachments.AddRange(attachments.EmptyIfNull());
 
-                    _outbox.Send(email, $"Notification: {type}", false, type.ToString());
+                    _outbox.Send(email, $"Notification: {type}", type.ToString());
                 }
 
                 return emails.Select(x => x.MailoutIdentifier).ToArray();

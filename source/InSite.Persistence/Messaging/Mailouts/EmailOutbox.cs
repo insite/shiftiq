@@ -423,60 +423,58 @@ namespace InSite.Persistence
             #endregion
         }
 
-        public void Send(EmailDraft email, string tag, bool isUnitTest = false, string type = null)
+        public void Send(EmailDraft batchEmail, string tag, string type = null)
         {
-            CreateMailout(email);
+            if (!ValidateBatchEmail(batchEmail))
+                return;
 
-            if (!email.SenderEnabled)
+            if (batchEmail.RecipientListTo.Count == 1)
             {
-                _commander.Send(new RejectMailout(
-                    email.MessageIdentifier.Value,
-                    email.MailoutIdentifier,
-                    null,
-                    "The sender is disabled.",
-                    null));
+                var recipient = batchEmail.RecipientListTo.Single();
+                var envelope = CreateEmailVariables(batchEmail, recipient.Key, recipient.Value);
+
+                CreateMailout(batchEmail);
+
+                SendUsingMailgun(batchEmail, envelope, tag, type);
+
                 return;
             }
 
-            if (email.RecipientListTo.IsEmpty())
+            foreach (var recipient in batchEmail.RecipientListTo)
             {
-                _commander.Send(new RejectMailout(
-                    email.MessageIdentifier.Value,
-                    email.MailoutIdentifier,
-                    null,
-                    "The email has no recipients.",
-                    null));
-                return;
-            }
+                var recipientEmail = CopyEmail(batchEmail, recipient.Key, recipient.Value);
+                var envelope = CreateEmailVariables(batchEmail, recipient.Key, recipient.Value);
 
-            if (email.SenderType != "Mailgun")
-            {
-                _commander.Send(new RejectMailout(
-                    email.MessageIdentifier.Value,
-                    email.MailoutIdentifier,
-                    null,
-                    "Only Mailgun sender type is allowed.",
-                    null));
-                return;
-            }
+                CreateMailout(recipientEmail);
 
-            if (email.RecipientListTo.Count == 1)
-            {
-                var item = email.RecipientListTo.Single();
-                var envelope = CreateEmailVariables(email, item.Key, item.Value);
-
-                SendUsingMailgun(email, envelope, tag, type);
+                SendUsingMailgun(recipientEmail, envelope, tag, type);
             }
+        }
+
+        private bool ValidateBatchEmail(EmailDraft batchEmail)
+        {
+            string error;
+
+            if (!batchEmail.SenderEnabled)
+                error = "The sender is disabled.";
+            else if (batchEmail.RecipientListTo.IsEmpty())
+                error = "The email has no recipients.";
+            else if (batchEmail.SenderType != "Mailgun")
+                error = "Only Mailgun sender type is allowed.";
             else
-            {
-                foreach (var item in email.RecipientListTo)
-                {
-                    var _email = CopyEmail(email, item.Key, item.Value);
-                    var envelope = CreateEmailVariables(email, item.Key, item.Value);
+                return true;
 
-                    SendUsingMailgun(_email, envelope, tag, type);
-                }
-            }
+            CreateMailout(batchEmail);
+
+            _commander.Send(new RejectMailout(
+                batchEmail.MessageIdentifier.Value,
+                batchEmail.MailoutIdentifier,
+                null,
+                error,
+                null
+            ));
+
+            return false;
         }
 
         public static EmailVariables CreateEmailVariables(EmailDraft email, Guid userId, string address)
@@ -1010,13 +1008,13 @@ namespace InSite.Persistence
             return ReplaceSmarterMailVariables(recipientData, 0, subject, body);
         }
 
-        private void CreateMailout(EmailDraft draft)
+        private bool CreateMailout(EmailDraft draft)
         {
             if (draft.MailoutIdentifier.IsEmpty())
                 throw ApplicationError.Create("MailoutId is not defined");
 
             if (_messages.MailoutExists(draft.MailoutIdentifier))
-                return;
+                return true;
 
             var sender = TSenderSearch.Select(draft.SenderIdentifier);
             if (sender == null)
@@ -1039,22 +1037,34 @@ namespace InSite.Persistence
 
                     to.Add(recipient.Identifier.Value, recipient.Address);
                 }
+
+                draft.RecipientListTo = to;
             }
+
+            if (to.IsEmpty())
+                return false;
 
             var scheduledOn = Calendar.IsEmpty(draft.MailoutScheduled)
                 ? DateTimeOffset.UtcNow
                 : draft.MailoutScheduled.Value;
 
-            if (draft.Recipients.Count > 0)
-            {
-                _commander.Send(new DraftMailout(
-                    message.MessageIdentifier,
-                    draft.MailoutIdentifier, scheduledOn,
-                    draft.SenderIdentifier, sender.SenderType,
-                    to, draft.RecipientListCc, draft.RecipientListBcc,
-                    draft.ContentSubject, null, draft.ContentBody, draft.ContentAttachments.NullIfEmpty(),
-                    draft.EventIdentifier));
-            }
+            _commander.Send(new DraftMailout(
+                message.MessageIdentifier,
+                draft.MailoutIdentifier,
+                scheduledOn,
+                draft.SenderIdentifier,
+                sender.SenderType,
+                to,
+                draft.RecipientListCc,
+                draft.RecipientListBcc,
+                draft.ContentSubject,
+                null,
+                draft.ContentBody,
+                draft.ContentAttachments.NullIfEmpty(),
+                draft.EventIdentifier
+            ));
+
+            return true;
         }
     }
 }

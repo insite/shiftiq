@@ -20,7 +20,7 @@ namespace InSite.Application.Messages.Read
             Guid[] to = null, Guid[] cc = null, Guid[] bcc = null
         );
 
-        void Send(EmailDraft email, string tag, bool isUnitTest = false, string type = null);
+        void Send(EmailDraft email, string tag, string type = null);
 
         void SendAndReplacePlaceholders(EmailDraft email, string tag);
 

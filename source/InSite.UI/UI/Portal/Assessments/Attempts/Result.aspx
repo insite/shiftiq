@@ -101,7 +101,7 @@
                             </div>
                         </div>
 
-                        <div runat="server" id="FooterPanel" class="card-footer bg-custom-default border-top-0">
+                        <div runat="server" id="FooterPanel" class="card-footer border-top-0">
                         </div>
                     </div>
 

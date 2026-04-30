@@ -47,15 +47,16 @@ namespace InSite.Admin.Contacts.People.Forms
             if (membership == null || membership.Group.OrganizationIdentifier != CurrentSessionState.Identity.Organization.OrganizationIdentifier)
                 HttpResponseHelper.Redirect(SearchUrl);
 
-            var person = ServiceLocator.PersonSearch.GetPerson(UserIdentifier.Value, Organization.Key, x => x.User);
+            var user = ServiceLocator.UserSearch.GetUser(UserIdentifier.Value);
+            var person = ServiceLocator.PersonSearch.GetPerson(UserIdentifier.Value, Organization.Key);
 
-            PageHelper.AutoBindHeader(Page, qualifier: person.User.FullName);
+            PageHelper.AutoBindHeader(Page, qualifier: user.FullName);
 
             GroupDetail.BindGroup(membership.Group);
-            PersonInfo.BindPerson(person, User.TimeZone);
+            PersonInfo.BindPerson(person, user, User.TimeZone);
 
             GroupType.Text = membership.Group.GroupLabel ?? membership.Group.GroupType;
-            PersonName1.Text = PersonName2.Text = person.User.FirstName;
+            PersonName1.Text = PersonName2.Text = user.FirstName;
 
             AssignedOn.Value = membership.Assigned;
             MembershipFunction.Value = membership.MembershipType;
