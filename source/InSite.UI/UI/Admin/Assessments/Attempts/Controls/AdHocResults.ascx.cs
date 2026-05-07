@@ -5,6 +5,7 @@ using InSite.Admin.Assessments.Attempts.Models;
 using InSite.Application.Attempts.Read;
 using InSite.Common.Web.UI;
 
+using Shift.Common;
 using Shift.Common.Linq;
 
 namespace InSite.Admin.Assessments.Attempts.Controls
@@ -51,9 +52,9 @@ namespace InSite.Admin.Assessments.Attempts.Controls
             if (DataItems == null)
                 return null;
 
-            return DataItems
+            return DataItems.AsQueryable()
+                .OrderBy(filter.OrderBy)
                 .ApplyPaging(filter)
-                .AsQueryable()
                 .ToSearchResult();
         }
 

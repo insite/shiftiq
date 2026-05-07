@@ -16,6 +16,7 @@ using InSite.UI.Layout.Admin;
 using InSite.Web.Data;
 
 using Shift.Common;
+using Shift.Common.Timeline.Exceptions;
 using Shift.Constant;
 using Shift.Contract;
 using Shift.Sdk.UI;
@@ -318,7 +319,7 @@ namespace InSite.Cmds.Admin.Competencies.Forms
             var copy = StandardFactory.Create(StandardType.Competency);
 
             copy.StandardIdentifier = UniqueIdentifier.Create();
-            copy.AssetNumber = Sequence.Increment(Organization.OrganizationIdentifier, SequenceType.Asset);
+            copy.AssetNumber = Sequence.Increment(OrganizationIdentifiers.CMDS, SequenceType.Asset);
 
             copy.Code = info.Code + " - Copy";
             copy.ContentTitle = info.ContentTitle + " - Copy";
@@ -326,7 +327,15 @@ namespace InSite.Cmds.Admin.Competencies.Forms
             copy.ContentSummary = info.ContentSummary;
             copy.ContentDescription = info.ContentDescription;
 
-            StandardStore.Insert(copy);
+            try
+            {
+                StandardStore.Insert(copy);
+            }
+            catch (UnhandledCommandException ex) when (ex.InnerException?.Message?.StartsWith("AssetNumber is already assigned") == true)
+            {
+                ScreenStatus.AddMessage(AlertType.Error, $"Asset number {copy.AssetNumber} is already assigned to another competency. Please try again.");
+                return Guid.Empty;
+            }
 
             var categoryId = StandardClassificationSearch.SelectFirstCategoryIdentifier(info.StandardIdentifier);
             if (categoryId.HasValue)

@@ -24,7 +24,7 @@ namespace InSite.Admin.Records.Gradebooks.Controls
     {
         #region Constants
 
-        public const int MaxStudents = 50;
+        public const int MaxStudents = 75;
 
         private const int ItemsPerPage = 11;
         protected const int StudentColumnWidth = 210;

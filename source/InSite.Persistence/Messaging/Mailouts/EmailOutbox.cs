@@ -1060,6 +1060,7 @@ namespace InSite.Persistence
                 draft.ContentSubject,
                 null,
                 draft.ContentBody,
+                draft.ContentVariables.NullIfEmpty(),
                 draft.ContentAttachments.NullIfEmpty(),
                 draft.EventIdentifier
             ));

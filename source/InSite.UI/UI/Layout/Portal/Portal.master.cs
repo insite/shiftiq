@@ -156,7 +156,13 @@ namespace InSite.UI.Layout.Portal
             if (Guid.TryParse(Request.QueryString["learner"], out Guid id))
                 avatar = UserSearch.SelectWebContact(id, identity.Organization.Identifier);
 
+            if (avatar == null)
+                return;
+
             var person = PersonSearch.Select(identity.Organization.OrganizationIdentifier, avatar.UserIdentifier);
+
+            if (person == null)
+                return;
 
             var style = ServiceLocator.AppSettings.Partition.Style;
 

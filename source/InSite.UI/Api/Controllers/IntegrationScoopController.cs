@@ -75,22 +75,29 @@ namespace InSite.Api.Controllers
             if (gradeitem == null)
                 return false;
 
-            return Complete(gradeitem.GradebookIdentifier, gradeitem.GradeItemIdentifier, userId, completed, true);
+            return MarkProgressComplete(gradeitem.GradebookIdentifier, gradeitem.GradeItemIdentifier, userId, completed, true);
         }
 
-        private bool Complete(Guid gradebook, Guid gradeitem, Guid user, DateTimeOffset? when, bool requireEnrollment)
+        private bool MarkProgressComplete(Guid gradebook, Guid gradeitem, Guid user, DateTimeOffset? when, bool requireEnrollment)
         {
-            var progress = ServiceLocator.RecordSearch.GetProgress(gradebook, gradeitem, user);
-            var isEnrolled = ServiceLocator.RecordSearch.EnrollmentExists(gradebook, user);
+            if (requireEnrollment)
+            {
+                var isEnrolled = ServiceLocator.RecordSearch.EnrollmentExists(gradebook, user);
 
-            if (requireEnrollment && !isEnrolled)
-                return false;
+                if (!isEnrolled)
+                    return false;
+            }
+
+            var progress = ServiceLocator.RecordSearch.GetProgress(gradebook, gradeitem, user);
 
             Guid id;
 
             if (progress != null)
             {
                 id = progress.ProgressIdentifier;
+
+                if (progress.ProgressIsCompleted && progress.ProgressCompleted == when)
+                    return false;
             }
             else
             {
@@ -101,13 +108,9 @@ namespace InSite.Api.Controllers
                 id = command.AggregateIdentifier;
             }
 
-            if (!progress.ProgressIsCompleted || progress.ProgressCompleted != when)
-            {
-                ServiceLocator.SendCommand(new CompleteProgress(id, when, null, null, null));
-                return true;
-            }
+            ServiceLocator.SendCommand(new CompleteProgress(id, when, null, null, null));
 
-            return false;
+            return true;
         }
 
         private static T TryDeserialize<T>(string json) where T : class

@@ -88,6 +88,12 @@ namespace InSite.Admin.Records.Programs
             if (IsPostBack)
                 return;
 
+            if (!ProgramId.HasValue)
+            {
+                Search.Redirect();
+                return;
+            }
+
             var url = new WebUrl(Request.RawUrl);
             var tab = url.QueryString["tab"];
 

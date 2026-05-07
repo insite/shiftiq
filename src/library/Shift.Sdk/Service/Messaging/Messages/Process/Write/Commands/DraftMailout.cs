@@ -18,6 +18,7 @@ namespace InSite.Application.Messages.Write
         public MultilingualString Subject { get; set; }
         public MultilingualString BodyText { get; set; }
         public MultilingualString BodyHtml { get; set; }
+        public IDictionary<string, string> Variables { get; set; }
         public IList<string> Attachments { get; set; }
         public Guid? EventId { get; set; }
 
@@ -25,8 +26,14 @@ namespace InSite.Application.Messages.Write
             Guid messageId,
             Guid mailoutId, DateTimeOffset scheduledOn,
             Guid senderId, string senderType,
-            IDictionary<Guid, string> to, IDictionary<Guid, string> cc, IDictionary<Guid, string> bcc,
-            MultilingualString subject, MultilingualString bodyText, MultilingualString bodyHtml, IList<string> attachments,
+            IDictionary<Guid, string> to,
+            IDictionary<Guid, string> cc,
+            IDictionary<Guid, string> bcc,
+            MultilingualString subject,
+            MultilingualString bodyText,
+            MultilingualString bodyHtml,
+            IDictionary<string, string> variables,
+            IList<string> attachments,
             Guid? eventId)
         {
             AggregateIdentifier = messageId;
@@ -40,6 +47,7 @@ namespace InSite.Application.Messages.Write
             Subject = subject;
             BodyText = bodyText;
             BodyHtml = bodyHtml;
+            Variables = variables;
             Attachments = attachments;
             EventId = eventId;
         }

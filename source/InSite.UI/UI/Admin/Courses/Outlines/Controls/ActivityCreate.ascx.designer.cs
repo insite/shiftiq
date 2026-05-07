@@ -132,13 +132,22 @@ namespace InSite.Admin.Courses.Outlines.Controls
         protected global::System.Web.UI.HtmlControls.HtmlTableRow AssessmentFormField;
 
         /// <summary>
-        /// AssessmentFormValidator control.
+        /// AssessmentFormRequiredValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.RequiredValidator AssessmentFormValidator;
+        protected global::InSite.Common.Web.UI.RequiredValidator AssessmentFormRequiredValidator;
+
+        /// <summary>
+        /// AssessmentFormUniqueValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CustomValidator AssessmentFormUniqueValidator;
 
         /// <summary>
         /// AssessmentFormIdentifier control.

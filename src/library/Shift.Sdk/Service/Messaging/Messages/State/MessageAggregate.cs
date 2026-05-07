@@ -234,21 +234,38 @@ namespace InSite.Domain.Messages
         }
 
         public void DraftMailout(
-            Guid mailoutId, DateTimeOffset scheduledOn,
-            Guid senderId, string senderType,
-            IDictionary<Guid, string> to, IDictionary<Guid, string> cc, IDictionary<Guid, string> bcc,
-            MultilingualString subject, MultilingualString bodyText, MultilingualString bodyHtml, IList<string> attachments,
+            Guid mailoutId,
+            DateTimeOffset scheduledOn,
+            Guid senderId,
+            string senderType,
+            IDictionary<Guid, string> to,
+            IDictionary<Guid, string> cc,
+            IDictionary<Guid, string> bcc,
+            MultilingualString subject,
+            MultilingualString bodyText,
+            MultilingualString bodyHtml,
+            IDictionary<string, string> variables,
+            IList<string> attachments,
             Guid? eventId)
         {
             if (Data.MailoutExists(mailoutId))
                 return;
 
             Apply(new MailoutDrafted(
-                mailoutId, scheduledOn,
-                senderId, senderType,
-                to, cc, bcc,
-                subject, bodyText, bodyHtml, attachments,
-                eventId));
+                mailoutId,
+                scheduledOn,
+                senderId,
+                senderType,
+                to,
+                cc,
+                bcc,
+                subject,
+                bodyText,
+                bodyHtml,
+                variables,
+                attachments,
+                eventId
+            ));
         }
 
         public void StartDelivery(Guid mailout, Guid recipient)

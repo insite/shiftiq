@@ -63,6 +63,15 @@ namespace InSite.UI.Lobby.SignInPages
 
                 var person = ServiceLocator.PersonSearch.GetPerson(user.Identifier, organization.Identifier);
 
+                if (person == null || person.PersonIdentifier == Guid.Empty)
+                {
+                    error = person == null
+                        ? "Person not found for the authenticated user and organization."
+                        : "Person identifier is empty.";
+
+                    return false;
+                }
+
                 var personId = person.PersonIdentifier;
 
                 var tokenSettings = ServiceLocator.AppSettings.Security.Token;

@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 
 using InSite.Application.Responses.Write;
 using InSite.Application.Surveys.Read;
+using InSite.Common.Web;
 using InSite.Common.Web.UI;
 
 using Shift.Common;
@@ -105,10 +106,16 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             // Delete the existing submission session
             var id = Guid.Parse(((uxButton)sender).CommandArgument);
             var response = ServiceLocator.SurveySearch.GetResponseSession(id);
+            if (response == null)
+                HttpResponseHelper.Redirect(Context.Request.RawUrl);
+
             ServiceLocator.SendCommand(new DeleteResponseSession(id));
 
             // Create a new submission session.
-            var survey = ServiceLocator.SurveySearch.GetSurveyState(response.SurveyFormIdentifier).Form;
+            var survey = ServiceLocator.SurveySearch.GetSurveyState(response.SurveyFormIdentifier)?.Form;
+            if (survey == null)
+                HttpResponseHelper.Redirect(Context.Request.RawUrl);
+
             var session = UniqueIdentifier.Create();
             var commands = Launch.BuildCommandScript("Restarted", session, survey, user.UserIdentifier, user.UserIdentifier);
             foreach (var command in commands)

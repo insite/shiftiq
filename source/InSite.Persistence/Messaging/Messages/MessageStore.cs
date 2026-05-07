@@ -419,6 +419,7 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
                     ContentSubject = MaxContentSubject.HasValue ? e.Subject.Default.MaxLength(MaxContentSubject.Value) : e.Subject.Default,
                     ContentBodyText = e.BodyText?.Default,
                     ContentBodyHtml = e.BodyHtml?.Default,
+                    ContentVariables = e.Variables.IsNotEmpty() ? JsonConvert.SerializeObject(e.Variables) : null,
                     ContentAttachments = e.Attachments.IsNotEmpty() ? JsonConvert.SerializeObject(e.Attachments) : null,
                 };
 

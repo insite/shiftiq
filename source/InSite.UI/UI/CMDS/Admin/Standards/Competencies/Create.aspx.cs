@@ -10,6 +10,7 @@ using InSite.UI.Layout.Admin;
 using InSite.Web.Data;
 
 using Shift.Common;
+using Shift.Common.Timeline.Exceptions;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -75,10 +76,19 @@ namespace InSite.Cmds.Admin.Competencies.Forms
 
             GetInputValues(info);
 
-            info.AssetNumber = Sequence.Increment(Organization.OrganizationIdentifier, SequenceType.Asset);
+            info.AssetNumber = Sequence.Increment(OrganizationIdentifiers.CMDS, SequenceType.Asset);
             info.OrganizationIdentifier = OrganizationIdentifiers.CMDS;
 
-            StandardStore.Insert(info);
+            try
+            {
+                StandardStore.Insert(info);
+            }
+            catch (UnhandledCommandException ex) when (IsAssetNumberConflict(ex))
+            {
+                UniqueNumber.IsValid = false;
+                UniqueNumber.ErrorMessage = $"Asset number {info.AssetNumber} is already assigned to another competency. Please try again.";
+                return;
+            }
 
             StandardClassificationStore.ReplaceCategory(info.StandardIdentifier, CategoryIdentifier.ValueAsGuid);
 
@@ -90,6 +100,9 @@ namespace InSite.Cmds.Admin.Competencies.Forms
 
             HttpResponseHelper.Redirect($"{EditUrl}?id={info.StandardIdentifier}&status=saved");
         }
+
+        private static bool IsAssetNumberConflict(UnhandledCommandException ex) =>
+            ex.InnerException?.Message?.StartsWith("AssetNumber is already assigned") == true;
 
         private void GetInputValues(QStandard info)
         {

@@ -61,8 +61,10 @@
                             </td>
                         </tr>
                         <tr runat="server" id="AssessmentFormField">
-                            <td style="width: 250px">Assessment Form
-                                <insite:RequiredValidator runat="server" ID="AssessmentFormValidator" FieldName="Assessment Form" ControlToValidate="AssessmentFormIdentifier" ValidationGroup="ActivityCreate" />
+                            <td style="width: 250px">
+                                Assessment Form
+                                <insite:RequiredValidator runat="server" ID="AssessmentFormRequiredValidator" FieldName="Assessment Form" ControlToValidate="AssessmentFormIdentifier" ValidationGroup="ActivityCreate" />
+                                <insite:CustomValidator runat="server" ID="AssessmentFormUniqueValidator" Display="None" ValidationGroup="ActivityCreate" />
                             </td>
                             <td>
                                 <insite:FindBankForm runat="server" ID="AssessmentFormIdentifier" />

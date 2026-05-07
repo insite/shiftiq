@@ -30,7 +30,7 @@
     
         <asp:Panel runat="server" ID="ResponsePanel" CssClass="mb-4">
 
-            <hr />
+            <hr class="my-3" />
             <h2 class="mb-0"><%= Translate("Form Submissions") %></h2>
             <p class="text-body-secondary"><asp:Literal runat="server" ID="ResponseCount" /></p>
 

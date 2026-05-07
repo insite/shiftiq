@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using Shift.Common.Timeline.Commands;
+using System.Web.UI.WebControls;
 
 using InSite.Admin.Courses.Courses;
 using InSite.Application.Banks.Write;
@@ -13,6 +12,7 @@ using InSite.Persistence;
 
 using Shift.Common;
 using Shift.Common.Events;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -103,6 +103,8 @@ namespace InSite.Admin.Courses.Outlines.Controls
             SurveyFormIdentifier.AutoPostBack = true;
             SurveyFormIdentifier.ValueChanged += SurveyFormIdentifier_ValueChanged;
 
+            AssessmentFormUniqueValidator.ServerValidate += AssessmentFormUniqueValidator_ServerValidate;
+
             SaveButton.Click += SaveButton_Click;
             CancelButton.Click += CancelButton_Click;
         }
@@ -157,6 +159,20 @@ namespace InSite.Admin.Courses.Outlines.Controls
             SurveyFormIdentifier.Value = null;
         }
 
+        private void AssessmentFormUniqueValidator_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            if (AssessmentType.SelectedValue != "Existing" || !AssessmentFormIdentifier.HasValue)
+                return;
+
+            args.IsValid = !IsAssessmentFormAssignedToActivity(AssessmentFormIdentifier.Value.Value);
+
+            if (!args.IsValid)
+            {
+                AssessmentFormError.Visible = false;
+                ((Common.Web.UI.CustomValidator)source).ErrorMessage = AssessmentFormError.InnerHtml;
+            }
+        }
+
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
@@ -168,10 +184,10 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 $"var $selectorField = $('#{AssessmentFormField.ClientID}');" +
                 $"var $countField = $('#{QuestionCountField.ClientID}');" +
                 "var isNew = $(this).find(':checked').val() === 'New';" +
-                $"ValidatorEnable(document.getElementById('{AssessmentFormValidator.ClientID}'), !isNew);" +
+                $"ValidatorEnable(document.getElementById('{AssessmentFormRequiredValidator.ClientID}'), !isNew);" +
                 "if(isNew) {{ $selectorField.hide(); $countField.show(); }} else {{ $selectorField.show(); $countField.hide(); }}";
 
-            AssessmentFormValidator.Enabled = AssessmentType.SelectedValue == "Existing";
+            AssessmentFormRequiredValidator.Enabled = AssessmentType.SelectedValue == "Existing";
         }
 
         private void SaveButton_Click(object sender, EventArgs e) => OnSaveClicked();

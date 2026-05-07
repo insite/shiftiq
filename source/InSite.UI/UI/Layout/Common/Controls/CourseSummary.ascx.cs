@@ -1,4 +1,6 @@
-﻿using InSite.Common.Web.UI;
+﻿using System;
+
+using InSite.Common.Web.UI;
 
 using Shift.Common;
 using Shift.Sdk.UI;
@@ -7,12 +9,33 @@ namespace InSite.UI.Layout.Common.Controls
 {
     public partial class CourseSummary : BlockControl, IBlockControl
     {
+        private bool IsContentBound
+        {
+            get => (bool?)ViewState[nameof(IsContentBound)] == true;
+            set => ViewState[nameof(IsContentBound)] = value;
+        }
+
         private static readonly string[] _contentLabels = new[] { "Title", "Description", "Time Required", "Start URL" };
 
         public override string[] GetContentLabels() => _contentLabels;
 
+        protected override void OnPreRender(EventArgs e)
+        {
+            if (!IsContentBound)
+            {
+                IsContentBound = true;
+
+                BlockTitle.InnerText = Translate("Title");
+                BlockDescription.InnerText = Translate("Description");
+            }
+
+            base.OnPreRender(e);
+        }
+
         public override void BindContent(ContentContainer block, string hook = null)
         {
+            IsContentBound = true;
+
             BlockTitle.InnerText = GetText(block, "Title");
             BlockDescription.InnerHtml = GetHtml(block, "Description");
             BlockTimeRequired.Text = GetText(block, "Time Required");

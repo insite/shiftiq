@@ -43,7 +43,7 @@
                     
                     <div class="mb-2">
                         <insite:ExamAttemptTagMultiComboBox runat="server" ID="AttemptTag" Multiple-ActionsBox="true" EnableSearch="true" EmptyMessage="Attempt Tag" />
-                    </div>                                   
+                    </div>
 
                     <div class="mb-2">
                         <insite:FilterButton runat="server" ID="SearchButton" ValidationGroup="SearchCriteria" />
@@ -89,11 +89,11 @@
                     <div class="mb-2">
                         <insite:ItemNameMultiComboBox runat="server" ID="CandidateType" Settings-CollectionName="Registrations/Exams/Candidate/Type" EmptyMessage="Candidate Type" />
                     </div>
-                </div>               
+                </div>
             </div> 
         </div>
     </div>
-    <div class="col-3">       
+    <div class="col-3">
         <div class="mb-2">
             <h4>Settings</h4>
             <insite:MultiComboBox ID="ShowColumns" runat="server" />
@@ -102,10 +102,10 @@
         <div class="mb-2">
             <insite:ComboBox ID="SortColumns" runat="server">
                 <Items>
-                    <insite:ComboBoxOption Text="Sort by Attempt Start Time" Value="AttemptStarted" />
+                    <insite:ComboBoxOption Text="Sort by Attempt Start Time" Value="AttemptStartedValue" />
                     <insite:ComboBoxOption Text="Sort by Attempt Score" Value="AttemptScore" />
-                    <insite:ComboBoxOption Text="Sort by Exam Form Name" Value="Form.FormName" />
-                    <insite:ComboBoxOption Text="Sort by Exam Candidate Name" Value="LearnerPerson.UserFullName" />
+                    <insite:ComboBoxOption Text="Sort by Exam Form Name" Value="FormName" />
+                    <insite:ComboBoxOption Text="Sort by Exam Candidate Name" Value="CandidateName" />
                 </Items>
             </insite:ComboBox>
         </div>

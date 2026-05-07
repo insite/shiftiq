@@ -113,10 +113,18 @@ namespace InSite.Application.Messages.Write
         {
             var aggregate = _repository.Get<MessageAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
             aggregate.DraftMailout(
-                c.MailoutId, c.ScheduledOn,
-                c.SenderId, c.SenderType,
-                c.To, c.Cc, c.Bcc,
-                c.Subject, c.BodyText, c.BodyHtml, c.Attachments,
+                c.MailoutId,
+                c.ScheduledOn,
+                c.SenderId,
+                c.SenderType,
+                c.To,
+                c.Cc,
+                c.Bcc,
+                c.Subject,
+                c.BodyText,
+                c.BodyHtml,
+                c.Variables,
+                c.Attachments,
                 c.EventId);
             Commit(aggregate, c);
         }
