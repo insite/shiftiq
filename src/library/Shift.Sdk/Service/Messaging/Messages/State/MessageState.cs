@@ -41,9 +41,42 @@ namespace InSite.Domain.Messages
         }
     }
 
+    public class MailoutRecipientEmail
+    {
+        [JsonProperty]
+        public Guid Identifier { get; private set; }
+
+        [JsonProperty]
+        public string Address { get; private set; }
+
+        [JsonConstructor]
+        private MailoutRecipientEmail()
+        {
+
+        }
+
+        public MailoutRecipientEmail(EmailAddress address)
+            : this(address.Identifier.EmptyIfNull(), address.Address)
+        {
+
+        }
+
+        public MailoutRecipientEmail(MailoutRecipientEmail other)
+            : this(other.Identifier, other.Address)
+        {
+
+        }
+
+        public MailoutRecipientEmail(Guid id, string address)
+        {
+            Identifier = id;
+            Address = address;
+        }
+    }
+
     public class MailoutRecipientState
     {
-        public EmailAddress Email { get; set; }
+        public MailoutRecipientEmail Email { get; set; }
         public string CallbackStatus { get; set; }
         public DateTime? CallbackTimestamp { get; set; }
     }
@@ -268,7 +301,7 @@ namespace InSite.Domain.Messages
                 Recipients = e.To
                     .Select(x => new MailoutRecipientState
                     {
-                        Email = new EmailAddress(x.Key, x.Value, null, null, null),
+                        Email = new MailoutRecipientEmail(x.Key, x.Value),
                         CallbackStatus = MailoutCallbackStatus.Drafted,
                         CallbackTimestamp = null
                     })
@@ -390,7 +423,7 @@ namespace InSite.Domain.Messages
                 Recipients = recipients
                     .Select(x => new MailoutRecipientState
                     {
-                        Email = x.Clone(),
+                        Email = new MailoutRecipientEmail(x),
                         CallbackStatus = status,
                         CallbackTimestamp = null
                     })

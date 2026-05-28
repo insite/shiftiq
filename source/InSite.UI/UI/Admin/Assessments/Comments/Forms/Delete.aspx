@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <div class="alert alert-danger">
+            <div class="alert alert-danger mt-3">
                 <i class="fas fa-stop-circle"></i> <strong>Confirm:</strong>
                 Are you sure you want to delete this comment?
             </div>

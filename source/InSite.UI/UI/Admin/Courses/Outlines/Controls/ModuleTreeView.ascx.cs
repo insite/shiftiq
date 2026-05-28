@@ -160,24 +160,9 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
         private void ActionCommandsDropDown_Click(object sender, CommandEventArgs e)
         {
-            if (e.CommandName == "ActionPreview")
-            {
-                HttpResponseHelper.Redirect(ProgressState.GetPreviewUrl(CourseIdentifier));
-            }
-            else if (e.CommandName == "ActionReorder")
+            if (e.CommandName == "ActionReorder")
             {
                 StartReorder();
-            }
-            else if (e.CommandName == "ActionPublish")
-            {
-                HttpResponseHelper.Redirect($"/ui/admin/courses/manage?course={CourseIdentifier}&activity={ActivityIdentifier}&panel=course&tab=publication");
-            }
-            else if (e.CommandName == "ActionDownload")
-            {
-                var redirectUrl = new ReturnUrl("course")
-                    .GetRedirectUrl($"/ui/admin/courses/download?course={CourseIdentifier}");
-
-                HttpResponseHelper.Redirect(redirectUrl);
             }
             else
             {
@@ -434,7 +419,16 @@ namespace InSite.Admin.Courses.Outlines.Controls
                         $"{u.Content.Title.GetText()} (Unlocked by {Shift.Common.Humanizer.ToQuantity(u.Prerequisites.Count, "Prerequisite")})";
             }
 
+            ActionCommandsDropDown.GetItem<DropDownButtonLinkItem>("ActionPreview").NavigateUrl = 
+                isPublished && previewUrl.IsNotEmpty() ? previewUrl : ProgressState.GetPreviewUrl(courseId);
+
             ActionCommandsDropDown.Items["ActionReorder"].Visible = modules.Count > 0 || Model.AllowMultipleUnits && UnitComboBox.Items.Count > 0;
+
+            ActionCommandsDropDown.GetItem<DropDownButtonLinkItem>("ActionPublish").NavigateUrl =
+                $"/ui/admin/courses/manage?course={CourseIdentifier}&activity={ActivityIdentifier}&panel=course&tab=publication";
+
+            ActionCommandsDropDown.GetItem<DropDownButtonLinkItem>("ActionDownload").NavigateUrl =
+                new ReturnUrl("course").GetRedirectUrl($"/ui/admin/courses/download?course={courseId}");
         }
 
         #endregion

@@ -110,7 +110,7 @@
             <insite:ComboBox ID="SortColumns" runat="server">
                 <Items>
                     <insite:ComboBoxOption Text="Sort by Group Name" Value="GroupName,GroupIdentifier" />
-                    <insite:ComboBoxOption Text="Sort by Group Size" Value="GroupSize,GroupIdentifier" />
+                    <insite:ComboBoxOption Text="Sort by Group Size" Value="GroupSize DESC,GroupIdentifier" />
                 </Items>
             </insite:ComboBox>
         </div>

@@ -47,11 +47,7 @@
                                 </div>
 
                                 <div class="mail-body-html mb-3 d-none">
-                                    <%# HttpUtility.HtmlEncode((string)Eval("ContentBodyHtml")) %>
-                                </div>
-
-                                <div class="mail-body-text mb-3 d-none">
-                                    <%# Eval("ContentBody") %>
+                                    <%# GetBodyHtml() %>
                                 </div>
 
                                 <%# GetVariablesHtml() %>
@@ -86,19 +82,9 @@
                         setFrameContent($frame, value);
 
                         $frame.height(height).closest('.accordion-item').on('shown.bs.collapse', onCollapse);
-
-                        $this.parent().find('.mail-body-text').remove();
                     }
 
                     $this.remove();
-                });
-
-                $('#<%= MailItems.ClientID %> .mail-body-text').each(function () {
-                    const $this = $(this);
-                    if ($this.text().trim().length == 0)
-                        $this.remove();
-                    else
-                        $this.removeClass('d-none');
                 });
 
                 $dummyFrameWrapper.remove();

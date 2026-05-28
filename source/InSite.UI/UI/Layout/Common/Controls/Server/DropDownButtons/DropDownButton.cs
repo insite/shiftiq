@@ -450,6 +450,8 @@ namespace InSite.Common.Web.UI
 
         #region Helper methods
 
+        public T GetItem<T>(string name) where T : DropDownButtonBaseItem => (T)Items[name];
+
         internal void CopyFrom(DropDownButton other)
         {
             other.ShallowCopyTo(this, BindingFlags.DeclaredOnly);

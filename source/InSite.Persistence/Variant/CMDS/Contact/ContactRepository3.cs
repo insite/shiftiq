@@ -1458,7 +1458,7 @@ SELECT *
             parameters.Add(new SqlParameter("StartRow", startRow));
             parameters.Add(new SqlParameter("EndRow", endRow));
 
-            return DatabaseHelper.CreateDataTable(query, parameters.ToArray());
+            return DatabaseHelper.CreateDataTable(query, 120, parameters.ToArray());
         }
 
         public static int CountSearchResults(CmdsPersonFilter filter)
@@ -1470,10 +1470,11 @@ SELECT COUNT(*)
   FROM identities.QUser AS cmdsPerson WITH (NOLOCK)
   WHERE {0}", where);
 
-
-
             using (var db = new InternalDbContext())
+            {
+                db.Database.CommandTimeout = 120;
                 return db.Database.SqlQuery<int>(query, GetParametersForFilter(filter, null, null).ToArray()).FirstOrDefault();
+            }
         }
 
         #endregion

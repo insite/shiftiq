@@ -724,6 +724,8 @@ where not exists (
         {
             using (var db = CreateContext())
             {
+                db.Database.CommandTimeout = 5 * 60;
+
                 var query = CreateQuery(filter, db).SelectMany(x => x.Questions.Select(y => y));
 
                 query = query

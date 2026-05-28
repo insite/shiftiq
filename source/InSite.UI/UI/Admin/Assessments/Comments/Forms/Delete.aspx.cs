@@ -11,7 +11,7 @@ using Shift.Constant;
 
 namespace InSite.Admin.Assessments.Comments.Forms
 {
-    public partial class Delete : AdminBasePage, IHasParentLinkParameters
+    public partial class Delete : AdminBasePage, IHasParentLinkParameters, IOverrideWebRouteParent
     {
         #region Properties
 
@@ -111,20 +111,35 @@ namespace InSite.Admin.Assessments.Comments.Forms
 
         private string GetReaderUrl()
         {
-            return new ReturnUrl().GetReturnUrl()
-                ?? $"/ui/admin/assessments/banks/outline?bank={BankID}&panel=comments";
+            return GetReturnUrl()
+                .IfNullOrEmpty($"/ui/admin/assessments/banks/outline?bank={BankID}&panel=comments");
         }
 
         #endregion
 
-        #region IHasParentLinkParameters
+        #region Methods (navigation back)
 
         public string GetParentLinkParameters(IWebRoute parent)
         {
-            return parent.Name.EndsWith("/outline")
-                ? $"bank={BankID}"
-                : null;
+            if (parent.Name.EndsWith("/banks/outline"))
+                return $"bank={BankID}";
+
+            if (parent.Name.EndsWith("/comments/revise"))
+                return $"bank={BankID}&comment={CommentID}";
+
+            if (parent.Name.EndsWith("/questions/change"))
+            {
+                var returnUrl = GetReturnUrl();
+                var webUrl = new WebUrl(returnUrl);
+
+                return $"bank={BankID}&question={webUrl.QueryString["question"]}";
+            }
+
+            return null;
         }
+
+        IWebRoute IOverrideWebRouteParent.GetParent() =>
+            GetParent();
 
         #endregion
     }

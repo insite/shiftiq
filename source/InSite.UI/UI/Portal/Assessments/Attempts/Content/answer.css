@@ -132,13 +132,13 @@ a.glossary-term {
 }
 
     .navbar > .container #attempt-commands {
-        right: 45px;
+        right: 56px;
         bottom: 0;
         margin-bottom: -106px;
     }
 
 .navbar.navbar-stuck > .container #attempt-commands {
-    right: 45px;
+    right: 56px;
     bottom: 0;
     margin-bottom: -72px;
 }
@@ -265,7 +265,8 @@ a.glossary-term {
     }
 
     .navbar > .container #attempt-commands {
-        top: -20px;
+        top: -12px;
+        right: 62px;
     }
 
     .navbar > .container .navbar-brand img {

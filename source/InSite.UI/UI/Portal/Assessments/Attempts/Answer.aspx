@@ -40,26 +40,26 @@
     </script>
 </insite:Container>
 
-<section class="container mb-2 mb-sm-0 pb-sm-5">
+<section class="mb-2 mb-sm-0 pb-sm-5">
 
     <div class="position-relative">
         <div id="attempt-commands" class="mt-4 attempt-commands">
-            <asp:Panel runat="server" ID="CommandsPanel">
-                <a runat="server" id="ViewAttachmentsLink" title="View Attachments" data-action="view-addendum" class="btn btn-default">
+            <asp:Panel runat="server" ID="CommandsPanel" CssClass="d-flex justify-content-end">
+                <a runat="server" id="ViewAttachmentsLink" title="View Attachments" data-action="view-addendum" class="btn btn-sm btn-default fs-6">
                     <i class="fal fa-download"></i>
                 </a>
-                <a runat="server" id="ViewAcronymsLink" title="View Acronyms" class="btn btn-default">
+                <a runat="server" id="ViewAcronymsLink" title="View Acronyms" class="btn btn-sm btn-default ms-1 fs-6">
                     <i class="fal fa-th-list"></i>
                 </a>
-                <a runat="server" id="ViewFormulasLink" title="View Formulas" class="btn btn-default">
+                <a runat="server" id="ViewFormulasLink" title="View Formulas" class="btn btn-sm btn-default ms-1 fs-6">
                     <i class="fal fa-square-root-alt"></i>
                 </a>
-                <div id="timer" style="display:none;"></div>
-                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-tab" PostBackEnabled="false" />
-                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-section" PostBackEnabled="false" />
-                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-question" PostBackEnabled="false" />
-                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked" Icon="fas fas fa-arrow-alt-right" Text="End Break" data-action="end-break" PostBackEnabled="false" />
-                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked" Icon="fas fa-cloud-upload" Text="Complete" data-action="complete" PostBackEnabled="false" />
+                <div id="timer" class="mx-2" style="display:none;"></div>
+                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked ms-1" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-tab" PostBackEnabled="false" />
+                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked ms-1" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-section" PostBackEnabled="false" />
+                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked ms-1" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-question" PostBackEnabled="false" />
+                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked ms-1" Icon="fas fas fa-arrow-alt-right" Text="End Break" data-action="end-break" PostBackEnabled="false" />
+                <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked ms-1" Icon="fas fa-cloud-upload" Text="Complete" data-action="complete" PostBackEnabled="false" />
             </asp:Panel>
         </div>
         <div>

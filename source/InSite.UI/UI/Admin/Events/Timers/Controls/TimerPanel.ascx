@@ -50,10 +50,10 @@
         <div class="card border-0 shadow-lg h-100">
             <div class="card-body">
 
-                <div class="mb-3">
+                <div class="d-flex align-items-center mb-3">
                     <insite:ComboBox runat="server" ID="RegistrationNotificationCombo" Width="200px" DropDown-Width="400px" />
-                    <insite:ComboBox runat="server" ID="RegistrationCombo" Width="200px" />
-                    <insite:IconButton runat="server" ID="RegistrationNotificationButton" Name="bolt" />
+                    <insite:ComboBox runat="server" ID="RegistrationCombo" Width="200px" CssClass="ms-1" />
+                    <insite:IconButton runat="server" ID="RegistrationNotificationButton" Name="bolt" CssClass="ms-2" />
                 </div>
 
                 <h3>Candidate Timers</h3>

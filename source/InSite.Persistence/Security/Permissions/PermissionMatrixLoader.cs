@@ -22,6 +22,7 @@ namespace InSite.Persistence
         {
             using (var db = new InternalDbContext())
             {
+                db.Database.CommandTimeout = 5 * 60; // 5 minutes
                 return db.RouteEndpoints.ToList();
             }
         }

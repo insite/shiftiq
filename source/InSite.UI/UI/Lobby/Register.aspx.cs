@@ -242,6 +242,9 @@ namespace InSite.UI.Lobby
 
         private void RegisterSubmitButton_Click(object sender, EventArgs e)
         {
+            if (!Page.IsValid)
+                return;
+
             if (!ValidateSubmit())
                 return;
 

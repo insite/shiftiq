@@ -75,7 +75,7 @@
                                         Description
                                     </label>
                                     <div>
-                                        <insite:TextBox runat="server" ID="FileDescription" TextMode="MultiLine" Rows="4" />
+                                        <insite:TextBox runat="server" ID="FileDescription" TextMode="MultiLine" Rows="4" MaxLength="2400" />
                                     </div>
                                     <div class="form-text">
                                     </div>

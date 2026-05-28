@@ -23,10 +23,10 @@
 
             <insite:DropDownButton runat="server" ID="ActionCommandsDropDown" IconName="screwdriver-wrench" Text="Action" CssClass="d-inline-block">
                 <Items>
-                    <insite:DropDownButtonItem Name="ActionPreview" ToolTip="Preview" IconType="Regular" IconName="external-link" Text="Preview" />
+                    <insite:DropDownButtonLinkItem Name="ActionPreview" ToolTip="Preview" IconType="Regular" IconName="external-link" Text="Preview" Target="_blank" />
                     <insite:DropDownButtonItem Name="ActionReorder" ToolTip="Reorder" IconType="Regular" IconName="sort" Text="Reorder" />
-                    <insite:DropDownButtonItem Name="ActionPublish" ToolTip="Publish" IconType="Regular" IconName="upload" Text="Publish" />
-                    <insite:DropDownButtonItem Name="ActionDownload" ToolTip="Download" IconType="Regular" IconName="download" Text="Download" />
+                    <insite:DropDownButtonLinkItem Name="ActionPublish" ToolTip="Publish" IconType="Regular" IconName="upload" Text="Publish" />
+                    <insite:DropDownButtonLinkItem Name="ActionDownload" ToolTip="Download" IconType="Regular" IconName="download" Text="Download" />
                 </Items>
             </insite:DropDownButton>
 

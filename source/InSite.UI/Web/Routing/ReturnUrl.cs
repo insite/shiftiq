@@ -332,28 +332,30 @@ namespace InSite
 
             public override string Read(BinaryReader reader)
             {
-                var type = reader.ReadChar();
-                if (type == '.')
+                var length = reader.ReadUInt16();
+                if (length == UInt16.MaxValue)
                     return reader.ReadString();
 
-                var length = reader.ReadUInt16();
                 var value = reader.ReadBytes(length);
-
                 return HttpServerUtility.UrlTokenEncode(value);
             }
 
             public override void Write(BinaryWriter writer, string value)
             {
-                if (!string.IsNullOrEmpty(value) && value.StartsWith("."))
+                if (value[0] == '.')
                 {
-                    writer.Write('.');
+                    writer.Write(UInt16.MaxValue);
                     writer.Write(value);
                     return;
                 }
 
                 var data = HttpServerUtility.UrlTokenDecode(value);
+                var len = data.Length;
 
-                writer.Write((ushort)data.Length);
+                if (len > UInt16.MaxValue - 1)
+                    throw ApplicationError.Create("The maximum length has been exceeded: {0}", Name);
+
+                writer.Write((ushort)len);
                 writer.Write(data);
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -70,24 +71,15 @@ namespace InSite.Persistence
 
         public List<GroupSearchResult> SearchGroups(QGroupFilter filter)
         {
-            var orderBy = !string.IsNullOrEmpty(filter.OrderBy)
-                ? filter.OrderBy
-                : "GroupName";
+            var orderBy = filter.OrderBy.IfNullOrEmpty("GroupName");
 
             using (var db = CreateContext())
             {
                 var query = CreateQueryByQGroupFilter(filter, db);
 
-                if (orderBy.Equals("GroupSize"))
-                    query = query.OrderBy(x => x.VMemberships.Count);
-                else
-                    query = query.OrderBy(orderBy);
-
-                var list = query.ApplyPaging(filter);
-
                 var statuses = filter.Statuses.IsEmpty() ? new[] { Guid.Empty } : filter.Statuses;
 
-                return list
+                return query
                     .Select(g => new GroupSearchResult
                     {
                         GroupIdentifier = g.GroupIdentifier,
@@ -133,6 +125,8 @@ namespace InSite.Persistence
                             GroupName = y.ParentGroup.GroupName
                         }).OrderBy(y => y.GroupName)
                     })
+                    .OrderBy(orderBy)
+                    .ApplyPaging(filter)
                     .ToList();
             }
         }

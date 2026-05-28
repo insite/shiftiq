@@ -78,7 +78,9 @@ namespace InSite.Persistence
         public class MyMessage
         {
             public Guid MailoutIdentifier { get; set; }
+            public Guid SenderIdentifier { get; set; }
             public Guid UserIdentifier { get; set; }
+            public Guid? SurveyIdentifier { get; set; }
             public string ContentSubject { get; set; }
             public string ContentBodyHtml { get; set; }
             public string ContentBodyText { get; set; }

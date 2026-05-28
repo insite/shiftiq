@@ -32,7 +32,7 @@
                                 Short Name
                             </label>
                             <div>
-                                <insite:TextBox runat="server" ID="ShortName" MaxLength="100" />
+                                <insite:TextBox runat="server" ID="ShortName" MaxLength="50" />
                             </div>
                         </div>
                     </div>

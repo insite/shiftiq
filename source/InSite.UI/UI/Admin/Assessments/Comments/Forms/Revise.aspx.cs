@@ -12,7 +12,7 @@ using Shift.Constant;
 
 namespace InSite.Admin.Assessments.Comments.Forms
 {
-    public partial class Revise : AdminBasePage, IHasParentLinkParameters
+    public partial class Revise : AdminBasePage, IHasParentLinkParameters, IOverrideWebRouteParent
     {
         #region Properties
 
@@ -226,14 +226,25 @@ namespace InSite.Admin.Assessments.Comments.Forms
 
         #endregion
 
-        #region IHasParentLinkParameters
+        #region Methods (navigation back)
 
         public string GetParentLinkParameters(IWebRoute parent)
         {
-            return parent.Name.EndsWith("/outline")
-                ? $"bank={BankID}"
-                : null;
+            if (parent.Name.EndsWith("/banks/outline"))
+                return $"bank={BankID}";
+
+            if (parent.Name.EndsWith("/questions/change"))
+            {
+                var returnUrl = GetReturnUrl();
+                var webUrl = new WebUrl(returnUrl);
+
+                return $"bank={BankID}&question={webUrl.QueryString["question"]}";
+            }
+
+            return null;
         }
+
+        IWebRoute IOverrideWebRouteParent.GetParent() => GetParent();
 
         #endregion
     }

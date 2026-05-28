@@ -77,21 +77,21 @@
                             </li>
                             <li><a class="dropdown-item ms-2" href="/ui/portal/support">Submit a support request</a></li>
                             <li><a class="dropdown-item ms-2" target="_blank" href="https://www.keyeracmds.com/blog">Blog posts, news, and updates</a></li>
-                            <li><a class="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/terminology.pdf">Terminology</a></li>
+                            <li><a class="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/terminology.pdf">Terminology</a></li>
                             <li>
                                 <h6 class="dropdown-header pb-1">CMDS Guides</h6>
                             </li>
-                            <li><a class="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/learner.pdf">User guide</a></li>
-                            <li><a class="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/validator.pdf">Validator guide</a></li>
-                            <li><a class="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/administrator.pdf">Administrator guide</a></li>
+                            <li><a class="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/learning.pdf">User guide</a></li>
+                            <li><a class="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/validation.pdf">Validator guide</a></li>
+                            <li><a class="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/administration.pdf">Administrator guide</a></li>
                             <li>
                                 <h6 class="dropdown-header pb-1">Orientation Guides</h6>
                             </li>
-                            <li><a class="dropdown-item ms-2" href="https://hub.cmds.app/lobby/docs/guides/orientation.pdf">Orientations and certificates</a></li>
+                            <li><a class="dropdown-item ms-2" href="https://docs.cmds.app/guides/orientation.pdf">Orientations and certificates</a></li>
                             <li runat="server" id="KeyeraHeading">
                                 <h6 class="dropdown-header pb-1">Course Registration Guides</h6>
                             </li>
-                            <li runat="server" id="KeyeraLinks"><a class="dropdown-item ms-2" href="https://hub.cmds.app/lobby/docs/guides/learning-catalogue-and-registration.pdf">Keyera learning catalogue &amp; registration quick reference guide</a></li>
+                            <li runat="server" id="KeyeraLinks"><a class="dropdown-item ms-2" href="https://docs.cmds.app/guides/registration.pdf">Keyera learning catalogue &amp; registration quick reference guide</a></li>
                         </insite:Container>
 
                         <li><h6 class="dropdown-header pt-2 pb-1">Resources</h6></li>

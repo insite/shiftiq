@@ -13,7 +13,7 @@ namespace InSite.Persistence
             ToTable(schema + ".TFileActivity");
             HasKey(x => new { x.ActivityIdentifier });
 
-            Property(x => x.ActivityChanges).IsRequired().IsUnicode(false).HasMaxLength(1200);
+            Property(x => x.ActivityChanges).IsRequired().IsUnicode(false);
 
             HasRequired(a => a.File).WithMany(b => b.FileActivities).HasForeignKey(c => c.FileIdentifier).WillCascadeOnDelete(false);
         }

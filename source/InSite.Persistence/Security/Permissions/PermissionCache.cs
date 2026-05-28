@@ -61,26 +61,27 @@ namespace InSite.Persistence
         {
             var loader = new PermissionMatrixLoader(RouteSettings);
 
+            PermissionMatrix matrix;
+
             if (organizationId != null && organizationId != Guid.Empty)
             {
-                if (_matrix == null)
-                {
-                    _matrix = new PermissionMatrix();
-                }
+                matrix = _matrix ?? new PermissionMatrix();
 
-                loader.Load(_matrix, organizationId.Value);
+                loader.Load(matrix, organizationId.Value);
             }
             else
             {
-                _matrix = new PermissionMatrix();
+                matrix = new PermissionMatrix();
 
-                loader.Load(_matrix);
+                loader.Load(matrix);
             }
 
-            if (Partition.HasValue() && _matrix.ContainsOrganization(Partition))
+            if (Partition.HasValue() && matrix.ContainsOrganization(Partition))
             {
-                _matrix.MergePermissions(Partition);
+                matrix.MergePermissions(Partition);
             }
+
+            _matrix = matrix;
         }
 
         /// <summary>

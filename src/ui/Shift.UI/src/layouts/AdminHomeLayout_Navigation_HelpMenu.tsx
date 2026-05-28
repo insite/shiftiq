@@ -13,7 +13,7 @@ export default function AdminHomeLayout_Navigation_HelpMenu() {
             </a>
 
             <ul className="dropdown-menu dropdown-menu-end">
-                
+
                 {siteSetting.UserName && siteSetting.IsCmds && (
                     <>
                         <li>
@@ -21,21 +21,21 @@ export default function AdminHomeLayout_Navigation_HelpMenu() {
                         </li>
                         <li><a className="dropdown-item ms-2" href="/ui/portal/support">Submit a support request</a></li>
                         <li><a className="dropdown-item ms-2" target="_blank" href="https://www.keyeracmds.com/blog">Blog posts, news, and updates</a></li>
-                        <li><a className="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/terminology.pdf">Terminology</a></li>
+                        <li><a className="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/terminology.pdf">Terminology</a></li>
                         <li>
                             <h6 className="dropdown-header pb-1">CMDS Guides</h6>
                         </li>
-                        <li><a className="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/learner.pdf">User guide</a></li>
-                        <li><a className="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/validator.pdf">Validator guide</a></li>
-                        <li><a className="dropdown-item ms-2" target="_blank" href="https://hub.cmds.app/lobby/docs/guides/administrator.pdf">Administrator guide</a></li>
+                        <li><a className="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/learning.pdf">User guide</a></li>
+                        <li><a className="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/validation.pdf">Validator guide</a></li>
+                        <li><a className="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/administration.pdf">Administrator guide</a></li>
                         <li>
                             <h6 className="dropdown-header pb-1">Orientation Guides (Skills Passport)</h6>
                         </li>
-                        <li><a className="dropdown-item ms-2" href="https://hub.cmds.app/lobby/docs/guides/orientation.pdf">Orientations and certificates</a></li>
+                        <li><a className="dropdown-item ms-2" href="https://docs.cmds.app/guides/orientation.pdf">Orientations and certificates</a></li>
                         <li>
                             <h6 className="dropdown-header pb-1">Course Registration Guides</h6>
                         </li>
-                        <li><a className="dropdown-item ms-2" href="https://hub.cmds.app/lobby/docs/guides/learning-catalogue-and-registration.pdf">Keyera's learning catalogue &amp; registration guide</a></li>
+                        <li><a className="dropdown-item ms-2" href="https://docs.cmds.app/guides/registration.pdf">Keyera's learning catalogue &amp; registration guide</a></li>
                     </>
                 )}
 
@@ -49,7 +49,7 @@ export default function AdminHomeLayout_Navigation_HelpMenu() {
                         <li><a className="dropdown-item ms-2" href="/ui/portal/support">Contact Support</a></li>
                     </>
                 )}
-                
+
             </ul>
 
         </li>

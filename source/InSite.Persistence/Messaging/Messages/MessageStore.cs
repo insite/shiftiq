@@ -344,6 +344,9 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
                 if (!allowHandle)
                     return;
 
+                if (recipientState == null)
+                    return;
+
                 var recipient = mailout.Recipients.FirstOrDefault(x => x.UserEmail == e.Recipient);
                 if (recipient == null)
                     return;
@@ -505,6 +508,9 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
             {
                 mailout.MailoutStatus = mailoutState.Status;
                 mailout.MailoutStatusDescription = mailoutState.StatusDescription.MaxLength(128);
+
+                if (recipientState == null)
+                    return;
 
                 var recipient = mailout.Recipients.FirstOrDefault(x => x.UserEmail == e.Recipient);
                 if (recipient == null || recipient.DeliveryStatus != MailoutCallbackStatus.Drafted)

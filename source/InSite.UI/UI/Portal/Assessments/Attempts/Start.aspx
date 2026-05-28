@@ -57,7 +57,7 @@
             </div>
 
             <div class="mt-4">
-                <insite:NextButton runat="server" ID="ConfirmLearnerButton" />
+                <insite:NextButton runat="server" ID="ConfirmLearnerButton" DisableAfterClick="true" />
             </div>
         </asp:View>
 
@@ -147,7 +147,7 @@
             </div>
 
             <div class="mt-4">
-                <insite:Button runat="server" ID="StartButton" ButtonStyle="Success" Text="Start" Icon="far fa-rocket-launch" />
+                <insite:Button runat="server" ID="StartButton" ButtonStyle="Success" Text="Start" Icon="far fa-rocket-launch" DisableAfterClick="true" />
             </div>
         </asp:View>
 

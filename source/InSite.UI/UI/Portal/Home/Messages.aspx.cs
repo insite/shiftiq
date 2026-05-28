@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.UI.WebControls;
 
 using InSite.Common.Web;
@@ -21,6 +22,8 @@ namespace InSite.UI.Portal.Home
         {
             public int Sequence { get; set; }
             public Guid MailoutIdentifier { get; set; }
+            public Guid SenderIdentifier { get; set; }
+            public Guid? SurveyIdentifier { get; set; }
             public string ContentSubject { get; set; }
             public string ContentBodyHtml { get; set; }
             public string ContentBodyText { get; set; }
@@ -73,6 +76,8 @@ namespace InSite.UI.Portal.Home
                 .Select((x, i) => new DataItem
                 {
                     MailoutIdentifier = x.MailoutIdentifier,
+                    SenderIdentifier = x.SenderIdentifier,
+                    SurveyIdentifier = x.SurveyIdentifier,
                     ContentSubject = x.ContentSubject,
                     ContentBodyHtml = x.ContentBodyHtml,
                     ContentBodyText = x.ContentBodyText,
@@ -103,6 +108,15 @@ namespace InSite.UI.Portal.Home
             return $"<span class='badge bg-info'>" +
                 $"{TimeZones.FormatDateOnly(item.DeliveryCompleted.Value, CurrentSessionState.Identity.User.TimeZone)} " +
                 $"{TimeZones.FormatTimeOnly(item.DeliveryCompleted.Value, CurrentSessionState.Identity.User.TimeZone)}</span>";
+        }
+
+        protected string GetBodyHtml()
+        {
+            var item = (DataItem)Page.GetDataItem();
+            var body = item.ContentBodyText ?? item.ContentBodyHtml;
+            var html = MessageHelper.BuildPreviewHtml(Organization.OrganizationIdentifier, item.SenderIdentifier, InSite.Admin.Messages.Outlines.Forms.Outline.GetSurveyFormAsset(item.SurveyIdentifier), body);
+
+            return HttpUtility.HtmlEncode(html);
         }
 
         protected string GetVariablesHtml()

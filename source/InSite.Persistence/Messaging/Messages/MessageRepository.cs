@@ -112,7 +112,7 @@ namespace InSite.Persistence
                     return GetEmail(organization, notification.Subject, notification.Body);
             }
 
-            if (message == null)
+            if (message == null) 
                 throw new MessageNotFoundException(messageName);
 
             return GetEmail(organization, message);
