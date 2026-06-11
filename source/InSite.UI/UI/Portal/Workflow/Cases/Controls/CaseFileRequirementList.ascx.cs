@@ -6,7 +6,9 @@ using System.Web.UI.WebControls;
 
 using InSite.Application.Cases.Write;
 using InSite.Application.Files.Read;
+using InSite.Application.Messages.Write;
 using InSite.Common.Web.UI;
+using InSite.Domain.Messages;
 using InSite.Web.Helpers;
 
 namespace InSite.UI.Portal.Issues.Controls
@@ -100,6 +102,32 @@ namespace InSite.UI.Portal.Issues.Controls
 
             var command = new CompleteFileRequirement(issueIdentifier, documentType, fileName, fileType, model.FileIdentifier, posted, poster);
             ServiceLocator.SendCommand(command);
+
+            SendWorkflowAttachmentUploadAlert(issueIdentifier, documentType);
+        }
+
+        private static void SendWorkflowAttachmentUploadAlert(Guid caseId, string documentType)
+        {
+            var caseEntity = ServiceLocator.IssueSearch.GetIssue(caseId);
+            if (caseEntity == null)
+                return;
+
+            var alert = new AlertWorkflowAttachmentUpload
+            {
+                UserName = User.FullName,
+                PersonCode = User.PersonCode,
+                CaseNumber = caseEntity.IssueNumber.ToString(),
+                DocumentType = documentType
+            };
+
+            try
+            {
+                ServiceLocator.AlertMailer.Send(Organization.Identifier, User.Identifier, caseEntity.OwnerUserIdentifier, alert);
+            }
+            catch (MessageNotFoundException)
+            {
+                // If the message is not defined then just ignore it
+            }
         }
 
         private static string GetFileName(Guid issueIdentifier, string fileName)

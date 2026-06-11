@@ -312,13 +312,13 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
         protected global::System.Web.UI.WebControls.Literal DescriptionOutput;
 
         /// <summary>
-        /// ProfileOwnershipHeading control.
+        /// ProfileOwnerHeading control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfileOwnershipHeading;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfileOwnerHeading;
 
         /// <summary>
         /// ProfileOwnership control.
@@ -327,16 +327,16 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Cmds.Controls.Profiles.Profiles.ProfileHierarchy ProfileOwnership;
+        protected global::InSite.Cmds.Controls.Profiles.Profiles.ProfileOwner ProfileOwnership;
 
         /// <summary>
-        /// ProfileOwnershipConfirm control.
+        /// ProfileOwnerConfirm control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfileOwnershipConfirm;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfileOwnerConfirm;
 
         /// <summary>
         /// ConfirmMoveButton control.

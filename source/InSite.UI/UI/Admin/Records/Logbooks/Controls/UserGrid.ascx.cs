@@ -35,6 +35,8 @@ namespace InSite.Admin.Records.Logbooks.Controls
         {
             JournalSetupIdentifier = journalSetupIdentifier;
 
+            Grid.Columns.FindByName("HourSum").Visible = Organization.Toolkits.Logbooks.DisplayTotalLogbookHours;
+
             var filter = new VJournalSetupUserFilter
             {
                 JournalSetupIdentifier = JournalSetupIdentifier,
@@ -70,6 +72,7 @@ namespace InSite.Admin.Records.Logbooks.Controls
                     EmployerIdentifier = x.EmployerGroupIdentifier,
                     Employer = x.EmployerGroupName,
                     ExperienceCount = x.ExperienceCount,
+                    HourSum = x.HourSum,
                     HasAchievement = x.HasAchievement,
                     Validated = !x.HasAchievement && x.ExperienceCount > 0 && x.ValidatedExperienceCount == x.ExperienceCount,
                     NotValidated = !x.HasAchievement && x.ExperienceCount > 0 && x.ValidatedExperienceCount < x.ExperienceCount,

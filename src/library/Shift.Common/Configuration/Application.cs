@@ -50,5 +50,10 @@ namespace Shift.Common
                     .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(a => a.Trim())
                     .ToList();
+
+        /// <summary>
+        /// Subdomain naming convention: Shift (default) or Cmds.
+        /// </summary>
+        public string SubdomainConvention { get; set; }
     }
 }

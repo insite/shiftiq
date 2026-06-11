@@ -7,6 +7,7 @@ using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
 
 using Shift.Common.Linq;
+using Shift.Constant;
 
 namespace InSite.UI.Admin.Records.Logbooks.Controls
 {
@@ -31,6 +32,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Controls
             Search(new QJournalSetupGroupFilter
             {
                 JournalSetupIdentifier = journalSetupId,
+                GroupRole = JournalSetupUserRole.Learner,
                 GroupName = keyword
             });
 
@@ -42,7 +44,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Controls
             var grid = (Grid)sender;
             var groupId = grid.GetDataKey<Guid>(e);
 
-            ServiceLocator.SendCommand(new RemoveJournalSetupGroup(Filter.JournalSetupIdentifier, groupId));
+            ServiceLocator.SendCommand(new RemoveJournalSetupGroup(Filter.JournalSetupIdentifier, groupId, JournalSetupUserRole.Learner));
 
             OnRefreshed();
         }

@@ -60,11 +60,36 @@
                                             <label class="form-label">
                                                 Document Subtype
                                             </label>
-                                            <div>
-                                                <insite:DocumentSubTypeComboBox runat="server" ID="FileSubcategory" />
-                                            </div>
-                                            <div class="form-text">
-                                            </div>
+
+                                            <insite:MultiField runat="server">
+
+                                                <insite:MultiFieldView runat="server" ID="FileSubcategorySelectorView" Inputs="FileSubcategorySelector">
+                                                    <span class="multi-field-input">
+                                                        <insite:DocumentSubTypeComboBox runat="server" ID="FileSubcategorySelector" />
+                                                    </span>
+                                                    <insite:Button runat="server"
+                                                        ID="SwitchToManualButton"
+                                                        OnClientClick='inSite.common.multiField.nextView(this); return false;'
+                                                        ButtonStyle="Default"
+                                                        Icon="far fa-keyboard"
+                                                        ToolTip="Enter a value manually"
+                                                    />
+                                                </insite:MultiFieldView>
+
+                                                <insite:MultiFieldView runat="server" ID="FileSubcategoryTextView" Inputs="FileSubcategoryText">
+                                                    <span class="multi-field-input">
+                                                        <insite:TextBox runat="server" ID="FileSubcategoryText" MaxLength="120" />
+                                                    </span>
+                                                    <insite:Button runat="server"
+                                                        OnClientClick='inSite.common.multiField.nextView(this); return false;'
+                                                        ButtonStyle="Default"
+                                                        Icon="far fa-list-ul"
+                                                        ToolTip="Select an option from the list"
+                                                    />
+                                                </insite:MultiFieldView>
+
+                                            </insite:MultiField>
+
                                         </div>
 
                                     </ContentTemplate>
@@ -136,16 +161,6 @@
 
                                 <div class="form-group mb-3">
                                     <label class="form-label">
-                                        Allow User to Open File
-                                    </label>
-                                    <div class="d-flex gap-3">
-                                        <insite:RadioButton runat="server" ID="AllowLearnerToViewYes" GroupName="AllowLearnerToView" Text="Yes" />
-                                        <insite:RadioButton runat="server" ID="AllowLearnerToViewNo" GroupName="AllowLearnerToView" Text="No" />                                        
-                                    </div>
-                                </div>
-
-                                <div class="form-group mb-3">
-                                    <label class="form-label">
                                         Expiry Date
                                     </label>
                                     <div>
@@ -198,9 +213,26 @@
                     <insite:CheckBox runat="server" ID="IsApproved" Text="Approved" />
                 </div>
 
-                <h3>Permissions</h3>
+                <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="PermissionPanel" />
+                <insite:UpdatePanel runat="server" ID="PermissionPanel">
+                    <ContentTemplate>
 
-                <uc:FilePermissionList runat="server" ID="PermissionList" />
+                        <h3>Permissions</h3>
+
+                        <uc:FilePermissionList runat="server" ID="PermissionList" />
+
+                        <div runat="server" id="AllowLearnerToViewPanel" class="form-group">
+                            <label class="form-label">
+                                Enable File Link for Member/Topic
+                            </label>
+                            <div class="d-flex gap-3">
+                                <insite:RadioButton runat="server" ID="AllowLearnerToViewYes" GroupName="AllowLearnerToView" Text="Yes" />
+                                <insite:RadioButton runat="server" ID="AllowLearnerToViewNo" GroupName="AllowLearnerToView" Text="No" />                                        
+                            </div>
+                        </div>
+
+                    </ContentTemplate>
+                </insite:UpdatePanel>
 
             </div>
         </div>

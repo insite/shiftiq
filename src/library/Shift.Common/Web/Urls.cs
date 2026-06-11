@@ -19,10 +19,6 @@ namespace Shift.Common
             _helpUrl = helpUrl;
         }
 
-        public static string AdminHomeUrl => "/ui/admin/home";
-
-        public static string AdminReportsUrl => "/ui/admin/reporting";
-
         public string DeveloperHelpUrl => HelpUrl.TrimEnd('/') + "/developers";
 
         public string HelpUrl => _helpUrl;

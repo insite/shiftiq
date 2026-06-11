@@ -20,6 +20,13 @@
                     <div class="card-body">
                         <h3>Details</h3>
                         <uc:Details runat="server" ID="BankDetails" />
+
+                        <div class="form-group">
+                            <label class="form-label">Language</label>
+                            <div>
+                                <insite:LanguageComboBox runat="server" ID="ReportLanguage" AllowBlank="false" Value="en" CssClass="w-50" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -127,6 +134,7 @@
         <div class="col-lg-12">
             <insite:DropDownButton runat="server" ID="BuildImagesButton" ButtonStyle="Success" DefaultAction="None" IconName="download" Text="Print Images" CssClass="d-inline-block" disabled="disabled"></insite:DropDownButton>
             <insite:Button runat="server" ID="BuildQuestionsInternal" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Questions (internal)" />
+            <insite:Button runat="server" ID="BuildQuestionsDocx" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Questions (DOCX)" />
             <insite:Button runat="server" ID="BuildQuestionsCompact" ButtonStyle="Info" Icon="fas fa-download" Text="Print Questions (compact)" />
             <insite:Button runat="server" ID="BuildQuestionsExternal" ButtonStyle="Success" Icon="fas fa-download" Text="Print Questions (external)" />
             <insite:CloseButton runat="server" ID="GoBackButton" />
@@ -134,7 +142,7 @@
     </div>
 
     <insite:Container runat="server" ID="BuildingPdfPanel" Visible="false">
-        <insite:LoadingPanel runat="server" ID="BuildingPdfLoadingPanel" Text="Building PDF" VisibleOnLoad="true" />
+        <insite:LoadingPanel runat="server" ID="BuildingPdfLoadingPanel" Text="Building Document" VisibleOnLoad="true" />
         <asp:Button runat="server" ID="DownloadButton" CssClass="d-none" />
         <script type="text/javascript">
             (function () {

@@ -42,13 +42,13 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         protected global::InSite.Custom.CMDS.Common.Controls.Server.AchievementTypeSelector AchievementType;
 
         /// <summary>
-        /// AchievementVisibility control.
+        /// OrganizationScope control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.ComboBox AchievementVisibility;
+        protected global::InSite.Custom.CMDS.Common.Controls.Server.OrganizationScopeSelector OrganizationScope;
 
         /// <summary>
         /// Categories control.

@@ -59,7 +59,7 @@ namespace InSite.UI.Admin.Records.Validators.Forms
 
             if (experience == null
                 || experience.Journal.JournalSetup.OrganizationIdentifier != Organization.OrganizationIdentifier
-                || !ServiceLocator.JournalSearch.ExistsJournalSetupUser(experience.Journal.JournalSetupIdentifier, User.UserIdentifier, JournalSetupUserRole.Validator)
+                || !ServiceLocator.JournalSearch.IsLogbookValidator(experience.Journal.JournalSetupIdentifier, User.UserIdentifier)
                 )
             {
                 RedirectToSearch();

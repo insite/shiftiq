@@ -1,4 +1,4 @@
-import { ApiSearchGradebooks } from "@/api/controllers/gradebook/ApiSearchGradebooks";
+import { ApiSearchGradebooks } from "@/api/controllers/records/gradebooks/ApiSearchGradebooks";
 import { BaseCriteria } from "@/components/search/BaseCriteria";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 import { DateTime } from "@/helpers/date/dateTimeTypes";

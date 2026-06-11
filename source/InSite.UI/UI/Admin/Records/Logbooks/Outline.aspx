@@ -325,13 +325,19 @@
                                             <ItemTemplate>
                                                 <tr>
                                                     <td>
-                                                        <a href="/ui/admin/contacts/people/edit?contact=<%# Eval("UserIdentifier") %>">
-                                                            <%# Eval("UserFullName") %>
+                                                        <a href='<%# Eval("EditUrl") %>'>
+                                                            <%# Eval("Name") %>
                                                         </a>
                                                     </td>
+                                                    <td>
+                                                        <%# Eval("Type") %>
+                                                    </td>
                                                     <td style="width:40px;text-align:right;">
-                                                        <insite:IconLink runat="server" Name="trash-alt" ToolTip="Delete"
-                                                            NavigateUrl='<%# string.Format("/ui/admin/records/logbooks/validators/delete?journalsetup={0}&user={1}", JournalSetupIdentifier, Eval("UserIdentifier")) %>' />
+                                                        <insite:IconLink runat="server"
+                                                            Name="trash-alt"
+                                                            ToolTip="Delete"
+                                                            NavigateUrl='<%# Eval("DeleteUrl") %>'
+                                                        />
                                                     </td>
                                                 </tr>
                                             </ItemTemplate>

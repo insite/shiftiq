@@ -191,9 +191,12 @@ namespace InSite.Admin.Events.Classes.Forms
             var isPublished = string.Equals(ev.EventPublicationStatus, PublicationStatus.Published.GetDescription(), StringComparison.OrdinalIgnoreCase);
             var isCancelled = string.Equals(ev.EventSchedulingStatus, "Cancelled", StringComparison.OrdinalIgnoreCase);
 
+            var status = ev.GetClassStatus();
+            var statusHtml = $"<span class='badge bg-{status.GetContextualClass()}' style='font-size:0.75rem'>{status.GetDescription()}</span>";
+
             PageHelper.AutoBindHeader(
                 this,
-                qualifier: $"{ev.EventTitle} <span class='form-text'>scheduled {ev.EventScheduledStart.FormatDateOnly(User.TimeZone)}</span>");
+                qualifier: $"{ev.EventTitle} <span class='form-text'>scheduled {ev.EventScheduledStart.FormatDateOnly(User.TimeZone)}</span> {statusHtml}");
 
             AddSeat.NavigateUrl = $"/ui/admin/events/seats/add?event={EventID}";
             AddGradebook.NavigateUrl = $"/ui/admin/records/gradebooks/open?event={EventID}";

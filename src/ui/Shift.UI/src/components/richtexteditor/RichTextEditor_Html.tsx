@@ -2,7 +2,7 @@ import { ForwardedRef, useEffect, useImperativeHandle, useRef, useState } from "
 import { Editor } from "@tinymce/tinymce-react";
 import { Editor as TinyMCEEditor } from "tinymce";
 import { shiftConfig } from "@/helpers/shiftConfig";
-import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
+import { ApiUploadFileInfo } from "@/api/controllers/assets/files/ApiUploadFileInfo";
 import { urlHelper } from "@/helpers/urlHelper";
 
 export interface RichTextEditor_HtmlRef {

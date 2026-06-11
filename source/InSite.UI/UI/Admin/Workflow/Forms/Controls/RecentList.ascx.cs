@@ -55,7 +55,7 @@ namespace InSite.UI.Admin.Surveys.Controls
             link.Text = $"<a href='/ui/admin/workflow/forms/submissions/search?form={survey.SurveyFormIdentifier}'><i class='far fa-search me-1'></i>Submission Search ({countResponses:n0})</a>";
 
             var lastChange = (ITextControl)e.Item.FindControl("LastChange");
-            lastChange.Text = UserSearch.GetTimestampHtml(survey.LastChangeUser, survey.LastChangeType, null, survey.LastChangeTime);
+            lastChange.Text = UserSearch.GetTimestampHtml(survey.LastChangeUser.Value, survey.LastChangeType, null, survey.LastChangeTime);
         }
     }
 }

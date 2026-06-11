@@ -1,6 +1,7 @@
 <%@ Page Language="C#" CodeBehind="Delete.aspx.cs" Inherits="InSite.UI.Admin.Records.Logbooks.Validators.Delete" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register Src="../../../Contacts/People/Controls/PersonInfo.ascx" TagName="PersonDetail" TagPrefix="uc" %>
+<%@ Register Src="../../../Contacts/Groups/Controls/GroupInfo.ascx" TagName="GroupDetail" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 <div id="desktop">	
@@ -13,7 +14,8 @@
         <div class="col-lg-6">
             <h3>Validator</h3>
 
-            <uc:PersonDetail runat="server" ID="PersonDetail" />
+            <uc:PersonDetail runat="server" ID="PersonDetail" Visible="false" />
+            <uc:GroupDetail runat="server" ID="GroupDetail" Visible="false" />
 
             <dl class="row">
                 <dt class="col-sm-3">Logbook Name:</dt>

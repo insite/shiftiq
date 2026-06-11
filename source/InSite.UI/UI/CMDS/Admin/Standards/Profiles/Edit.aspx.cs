@@ -201,11 +201,9 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
 
         private void MoveButton_Click(object sender, EventArgs e)
         {
-            var help = "Select the organization you want to become the new owner of this profile, then click <strong>Confirm</strong>.";
-
-            ProfileOwnershipHeading.InnerText = "Move Profile";
-            ProfileOwnership.SwitchToMoveMode(help);
-            ProfileOwnershipConfirm.Visible = true;
+            ProfileOwnerHeading.InnerText = "Move Profile";
+            ProfileOwnership.SwitchToMoveMode();
+            ProfileOwnerConfirm.Visible = true;
         }
 
         private void ConfirmMoveButton_Click(object sender, EventArgs e)

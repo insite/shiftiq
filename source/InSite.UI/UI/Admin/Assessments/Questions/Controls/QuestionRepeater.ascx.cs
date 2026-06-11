@@ -260,6 +260,12 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         #region Methods (question repeater helpers)
 
+        protected string GetQuestionTitle()
+        {
+            var q = (Question)Page.GetDataItem();
+            return Markdown.ToHtml(q.Content.Title?.Get(CurrentLanguage));
+        }
+
         protected string GetEnumDescription(Enum value) => value.GetDescription();
 
         protected string GetFlagHtml(FlagType flag)
@@ -279,7 +285,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             return formIndex >= 0 ? $"<span class='badge rounded-pill bg-custom-default'>{1 + formIndex}</span>" : null;
         }
 
-        protected static string DisplayRationale(object item)
+        protected string DisplayRationale(object item)
         {
             Question q = (Question)item;
 
@@ -288,14 +294,17 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
             var sb = new StringBuilder();
 
-            if (!string.IsNullOrEmpty(q.Content.Rationale?.Default))
-                sb.Append($"<div class='alert alert-info'><i class='fas fa-info-square'></i> <strong>Feedback to all candidates:</strong> {Markdown.ToHtml(q.Content.Rationale.Default)}</div>");
+            var reationale = q.Content.Rationale?.Get(CurrentLanguage);
+            if (!string.IsNullOrEmpty(reationale))
+                sb.Append($"<div class='alert alert-info'><i class='fas fa-info-square'></i> <strong>Feedback to all candidates:</strong> {Markdown.ToHtml(reationale)}</div>");
 
-            if (!string.IsNullOrEmpty(q.Content.RationaleOnCorrectAnswer?.Default))
-                sb.Append($"<div class='alert alert-success'><i class='fas fa-check-square'></i> <strong>Feedback on correct answers:</strong> {Markdown.ToHtml(q.Content.RationaleOnCorrectAnswer.Default)}</div>");
+            var rationaleOnCorrectAnswer = q.Content.RationaleOnCorrectAnswer?.Get(CurrentLanguage);
+            if (!string.IsNullOrEmpty(rationaleOnCorrectAnswer))
+                sb.Append($"<div class='alert alert-success'><i class='fas fa-check-square'></i> <strong>Feedback on correct answers:</strong> {Markdown.ToHtml(rationaleOnCorrectAnswer)}</div>");
 
-            if (!string.IsNullOrEmpty(q.Content.RationaleOnIncorrectAnswer?.Default))
-                sb.Append($"<div class='alert alert-danger'><i class='fas fa-times-square'></i> <strong>Feedback on incorrect answers:</strong> {Markdown.ToHtml(q.Content.RationaleOnIncorrectAnswer.Default)}</div>");
+            var rationaleOnIncorrectAnswer = q.Content.RationaleOnIncorrectAnswer?.Get(CurrentLanguage);
+            if (!string.IsNullOrEmpty(rationaleOnIncorrectAnswer))
+                sb.Append($"<div class='alert alert-danger'><i class='fas fa-times-square'></i> <strong>Feedback on incorrect answers:</strong> {Markdown.ToHtml(rationaleOnIncorrectAnswer)}</div>");
 
             return sb.ToString();
         }

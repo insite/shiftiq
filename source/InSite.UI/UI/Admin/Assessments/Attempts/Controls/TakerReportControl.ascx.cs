@@ -10,9 +10,13 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 using InSite.Admin.Assessments.Attempts.Models;
+using InSite.Admin.Assets.Contents.Utilities;
 using InSite.Application.Attempts.Read;
 using InSite.Common;
+using InSite.Domain.Organizations;
 using InSite.Web.Helpers;
+
+using PdfSharp.Pdf;
 
 using Shift.Common;
 using Shift.Constant;
@@ -25,45 +29,40 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
     {
         public enum Language { English, French }
 
-        private class AttemptItem
+        public class AttemptItem
         {
             public string PersonCode { get; set; }
             public string FullName { get; set; }
             public string Birthdate { get; set; }
-            public string ExamTitle { get; set; }
             public string ExamDate { get; set; }
+            public Language Language { get; set; }
 
             public List<FrameworkItem> Frameworks { get; set; }
         }
 
-        private class FrameworkItem
+        public class FrameworkItem
         {
             public string FrameworkTitle { get; set; }
-            public string PassOrFail { get; set; }
-        }
-
-        private Language CurrentLanguage
-        {
-            get => (Language)ViewState[nameof(CurrentLanguage)];
-            set => ViewState[nameof(CurrentLanguage)] = value;
-        }
-
-        protected string CurrentLanguageName
-        {
-            get
-            {
-                return CurrentLanguage == Language.English
-                    ? Translate("English")
-                    : Translate("French");
-            }
+            public bool IsPass { get; set; }
         }
 
         protected static UserModel User => CurrentSessionState.Identity.User;
+        private static OrganizationState Organization => CurrentSessionState.Identity.Organization;
 
-        public static byte[] GetPdf(Page page, Guid userId, Guid organizationId, Guid[] attemptIds, Language language)
+        private InputTranslator _translator;
+
+        private Language _attemptLanguage;
+
+        public static byte[] GetPdf(Page page, Guid userId, Guid[] attemptIds, Language language)
+        {
+            var attempts = GetAttempts(userId, attemptIds, language);
+            return GetPdf(page, attempts);
+        }
+
+        public static byte[] GetPdf(Page page, List<AttemptItem> attempts)
         {
             var report = (TakerReportControl)page.LoadControl("~/UI/Admin/Assessments/Attempts/Controls/TakerReportControl.ascx");
-            report.LoadReport(userId, organizationId, attemptIds, language);
+            report.LoadReport(attempts);
 
             var siteContent = new StringBuilder();
             using (var stringWriter = new StringWriter(siteContent))
@@ -77,6 +76,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
             var settings = new HtmlConverterSettings(ServiceLocator.AppSettings.Application.WebKitHtmlToPdfExePath)
             {
                 PageOrientation = PageOrientationType.Portrait,
+                PageSize = PageSizeType.Letter,
                 Viewport = new HtmlConverterSettings.ViewportSize(980, 1400),
                 Dpi = 240,
                 MarginTop = 5,
@@ -85,52 +85,52 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
                 FooterTextLeft = "High Stakes Test Taker Report",
                 FooterTextCenter = date,
                 FooterTextRight = "Page [page] of [topage]",
-                FooterFontName = "Calibri",
+                FooterFontName = "Arial",
                 FooterFontSize = 10,
                 FooterSpacing = 8.1f,
             };
 
             var data = HtmlConverter.HtmlToPdf(siteContent.ToString(), settings);
 
-            return PdfHelper.Process(data, doc =>
-            {
-                var logoUrl = GetLogoUrl();
-
-                var watermark = PdfHelper.LoadImageByUrl(logoUrl, greyscale: true, opacity: 0.1);
-                try
-                {
-                    if (watermark != null)
-                        PdfHelper.AddWatermark(doc, watermark, PdfHelper.WatermarkPosition.Diagonal);
-                }
-                finally
-                {
-                    if (watermark != null)
-                        watermark.Dispose();
-                }
-
-                var organization = CurrentSessionState.Identity.Organization;
-                doc.Info.Title = LabelHelper.GetTranslation("TakerReport.Title", Shift.Common.Language.Default);
-                doc.Info.Author = organization.LegalName;
-                doc.Info.CreationDate = DateTime.Now;
-
-                var release = ServiceLocator.AppSettings.Release;
-                var partition = ServiceLocator.AppSettings.Partition;
-                if (partition != null && release != null)
-                    doc.Info.Creator = $"{partition.Brand} v{release.Version}";
-
-                PdfHelper.SetReadOnly(doc);
-
-                doc.SecuritySettings.OwnerPassword = "9v![EDs8U|o*Uw.o\"+ibK!~}\\V*ec-Y8COc/mg|W3X7?^@+)~7";
-            });
+            return PdfHelper.Process(data, ProcessPdf);
         }
 
-        protected string Translate(string text) => LabelHelper.GetTranslation(text, CurrentLanguage == Language.English ? "en" : "fr");
-
-        private void LoadReport(Guid userId, Guid organizationId, Guid[] attemptIds, Language language)
+        private static void ProcessPdf(PdfDocument doc)
         {
-            CurrentLanguage = language;
+            var logoUrl = GetLogoUrl();
 
-            var attempts = GetAttempts(userId, organizationId, attemptIds);
+            var watermark = PdfHelper.LoadImageByUrl(logoUrl, greyscale: true, opacity: 0.1);
+            try
+            {
+                if (watermark != null)
+                    PdfHelper.AddWatermark(doc, watermark, PdfHelper.WatermarkPosition.Diagonal);
+            }
+            finally
+            {
+                if (watermark != null)
+                    watermark.Dispose();
+            }
+
+            doc.Info.Title = LabelHelper.GetTranslation("TakerReport.Title", Shift.Common.Language.Default);
+            doc.Info.Author = Organization.LegalName;
+            doc.Info.CreationDate = DateTime.Now;
+
+            var release = ServiceLocator.AppSettings.Release;
+            var partition = ServiceLocator.AppSettings.Partition;
+            if (partition != null && release != null)
+                doc.Info.Creator = $"{partition.Brand} v{release.Version}";
+
+            PdfHelper.SetReadOnly(doc);
+
+            var hashBytes = EncryptionHelper.ComputeHashSha256(UniqueIdentifier.Create().ToString());
+            var hash = StringHelper.ByteArrayToHex(hashBytes);
+
+            doc.SecuritySettings.OwnerPassword = hash;
+        }
+
+        private void LoadReport(List<AttemptItem> attempts)
+        {
+            _translator = new InputTranslator("en", Organization.Identifier);
 
             AttemptRepeater.ItemDataBound += AttemptRepeater_ItemDataBound;
             AttemptRepeater.DataSource = attempts;
@@ -150,6 +150,8 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
             var noDataRow = e.Item.FindControl("NoDataRow");
             noDataRow.Visible = attempt.Frameworks.Count == 0;
 
+            _attemptLanguage = attempt.Language;
+
             var frameworkRepeater = (Repeater)e.Item.FindControl("FrameworkRepeater");
             frameworkRepeater.DataSource = attempt.Frameworks;
             frameworkRepeater.DataBind();
@@ -161,14 +163,17 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
             return $"{request.Url.Scheme}://{request.Url.Host}{CurrentSessionState.Identity.Organization.PlatformCustomization.PlatformUrl.Logo}";
         }
 
-        private List<AttemptItem> GetAttempts(Guid userId, Guid organizationId, Guid[] attemptIds)
+        private static List<AttemptItem> GetAttempts(Guid userId, Guid[] attemptIds, Language language)
         {
-            var person = ServiceLocator.PersonSearch.GetPerson(userId, organizationId, x => x.User);
+            var person = ServiceLocator.PersonSearch.GetPerson(userId, Organization.Identifier, x => x.User);
             var attempts = ServiceLocator.AttemptSearch.GetAttempts(new QAttemptFilter { AttemptIdentifiers = attemptIds }, x => x.Form);
             var result = new List<AttemptItem>();
 
-            var language = CurrentLanguage == Language.English ? "en" : "fr";
-            var culture = CultureInfo.GetCultureInfo(language);
+            var languageCode = language == Language.English ? "en" : "fr";
+            var culture = CultureInfo.GetCultureInfo(languageCode);
+
+            var translator = new InputTranslator(languageCode, Organization.Identifier);
+            var na = translator.Translate("N/A");
 
             foreach (var attempt in attempts)
             {
@@ -181,24 +186,20 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
                 if (form == null)
                     continue;
 
-                var examTitle = form.Content?.Title != null
-                    ? (form.Content.Title.Get(language) ?? form.Content.Title.Default)
-                    : attempt.Form.FormTitle;
-
                 var item = new AttemptItem
                 {
                     PersonCode = person.PersonCode,
                     FullName = person.User.FullName,
+                    Language = language,
                     Birthdate = person.Birthdate.HasValue
                         ? TimeZones.FormatDateOnly(person.Birthdate.Value, User.TimeZone, culture, "{0:MMMM d, yyyy}")
-                        : Translate("N/A"),
-                    ExamTitle = examTitle,
+                        : na,
                     ExamDate = attempt.AttemptStarted.HasValue
                         ? TimeZones.FormatDateOnly(attempt.AttemptStarted.Value, User.TimeZone, culture, "{0:MMMM d, yyyy}")
-                        : Translate("N/A"),
-                };
+                        : na,
 
-                item.Frameworks = GetFrameworks(attempt.AttemptIdentifier, language);
+                    Frameworks = GetFrameworks(attempt.AttemptIdentifier, languageCode)
+                };
 
                 result.Add(item);
             }
@@ -206,7 +207,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
             return result;
         }
 
-        private List<FrameworkItem> GetFrameworks(Guid attemptId, string language)
+        private static List<FrameworkItem> GetFrameworks(Guid attemptId, string language)
         {
             var result = new List<FrameworkItem>();
 
@@ -229,7 +230,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
                     var item = new FrameworkItem
                     {
                         FrameworkTitle = framework.FrameworkTitle,
-                        PassOrFail = framework.Score >= framework.PassingScore ? Translate("Pass") : Translate("Fail")
+                        IsPass = framework.Score >= framework.PassingScore
                     };
 
                     result.Add(item);
@@ -237,6 +238,27 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
             }
 
             return result;
+        }
+
+        protected string GetLanguageName()
+        {
+            var attempt = (AttemptItem)Page.GetDataItem();
+            return attempt.Language == Language.English
+                ? Translate("English")
+                : Translate("French");
+        }
+
+        protected string GetPassOrFail()
+        {
+            var framework = (FrameworkItem)Page.GetDataItem();
+            var text = framework.IsPass ? "Pass" : "Fail";
+            return _translator.Translate(text, _attemptLanguage == Language.English ? "en" : "fr", Organization.Identifier);
+        }
+
+        protected string Translate(string text)
+        {
+            var attempt = (AttemptItem)Page.GetDataItem();
+            return _translator.Translate(text, attempt.Language == Language.English ? "en" : "fr", Organization.Identifier);
         }
 
         protected string GetAddress()

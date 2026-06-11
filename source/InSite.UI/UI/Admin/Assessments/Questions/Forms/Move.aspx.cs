@@ -88,6 +88,10 @@ namespace InSite.Admin.Assessments.Questions.Forms
 
         private Guid SetID => Guid.TryParse(Request.QueryString["set"], out var value) ? value : Guid.Empty;
 
+        private string SerializedFilter => Request.QueryString["filter"];
+
+        private string SerializedReactFilter => Request.QueryString["return"];
+
         protected IEnumerable<DestinationSelectorItem> DestinationSelectorItems
         {
             get => (IEnumerable<DestinationSelectorItem>)ViewState[nameof(DestinationSelectorItems)];
@@ -520,7 +524,11 @@ namespace InSite.Admin.Assessments.Questions.Forms
         private static HashSet<Guid> GetHasAttemptsFilter(IEnumerable<Guid> input) =>
             ServiceLocator.AttemptSearch.GetExistsQuestionIdentifiers(input).ToHashSet();
 
-        private QuestionFilter GetQuestionFilter() => QuestionFilterSerializer.Deserialize(Request.QueryString["filter"]);
+        private QuestionFilter GetQuestionFilter()
+        {
+            return ReactQuestionFilterDeserializer.Deserialize(SerializedReactFilter)
+                ?? QuestionFilterSerializer.Deserialize(SerializedFilter);
+        }
 
         #endregion
 

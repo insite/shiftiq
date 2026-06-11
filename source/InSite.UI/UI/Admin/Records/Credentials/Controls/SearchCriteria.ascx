@@ -63,6 +63,14 @@
                         <insite:FindDepartment ID="DepartmentIdentifier" runat="server" EmptyMessage="Department" />
                     </div>
                     
+                    <div class="mb-2">
+                        <insite:FindGroup ID="DistrictGroupIdentifier" runat="server" EmptyMessage="District" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:FindGroup ID="TeamGroupIdentifier" runat="server" EmptyMessage="Team" />
+                    </div>
+
                 </div>
                 <div class="col-4">
                     <div class="mb-2">

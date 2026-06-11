@@ -6,7 +6,7 @@ using System.Web.Http;
 using InSite.Api.Settings;
 using InSite.Application.Progresses.Write;
 using InSite.Persistence;
-using InSite.Persistence.Integration.Moodle;
+using InSite.Persistence.Integration.Scorm;
 
 using Newtonsoft.Json;
 

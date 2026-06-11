@@ -176,7 +176,7 @@
 
                 <insite:IconButton runat="server" ID="SendInviteButton" CommandName="SendInvite"
                     Name="paper-plane" Type="Regular" ToolTip="Send Invitation"
-                    OnClientClick="return confirm('An invitation to complete this registration will be sent to the person who added the individual to the waitlist. Do you want to proceed?');" />
+                />
 
                 <insite:IconLink runat="server" ID="CompleteRegisterLink" Name="plus-circle" Type="Regular"
                     NavigateUrl='<%# string.Format("/ui/portal/events/classes/register?event={0}&candidate={1}&adminoutline=1", Eval("EventIdentifier"), Eval("CandidateIdentifier")) %>'

@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 
 using InSite.Admin.Events.Classes.Reports;
 using InSite.Admin.Events.Registrations.Reports;
+using InSite.Application.Contacts.Read;
 using InSite.Application.Events.Read;
 using InSite.Application.Registrations.Read;
 using InSite.Application.Registrations.Write;
@@ -222,8 +223,11 @@ namespace InSite.Admin.Events.Classes.Controls
             editLink.NavigateUrl = GetRedirectUrl($"/ui/admin/registrations/classes/edit?id={item.RegistrationIdentifier}");
             editLink.Visible = isPersonExist;
 
-            var sendInviteButton = e.Row.FindControl("SendInviteButton");
+            var sendInviteButton = (IconButton)e.Row.FindControl("SendInviteButton");
             sendInviteButton.Visible = isPersonExist && isWaitlisted;
+            sendInviteButton.ConfirmText = Organization.Toolkits.Events?.SendRegistrationInvitationToRequestedBy == true
+                ? "An invitation to complete this registration will be sent to the person who added the individual to the waitlist. Do you want to proceed?"
+                : "An invitation to complete this registration will be sent to the Registrant. Do you want to proceed?";
 
             var voidItemButton = e.Row.FindControl("VoidItemButton");
             voidItemButton.Visible = CanWrite;
@@ -252,43 +256,56 @@ namespace InSite.Admin.Events.Classes.Controls
                 ServiceLocator.RegistrationSearch
             );
 
-            if (registration != null)
-            {
-                var domain = ServiceLocator.AppSettings.Partition.Domain;
-                var registrationRelativeUrl = $"/ui/portal/events/classes/register?event={registration.EventIdentifier}&candidate={registration.CandidateIdentifier}";
-                var registrationAbsoluteUrl = UrlHelper.GetAbsoluteUrl(domain, ServiceLocator.AppSettings.Environment, registrationRelativeUrl, Organization.Code);
-                var recipientId = registration.RegistrationRequestedBy ?? registration.CandidateIdentifier;
-
-                ServiceLocator.AlertMailer.Send(
-                    Organization.OrganizationIdentifier,
-                    recipientId,
-                    new AlertRegistrationInvitation
-                    {
-                        CandidateFullName = registration.Candidate.UserFullName,
-                        ClassTitle = registration.Event.EventTitle,
-                        ClassRegistrationLink = registrationAbsoluteUrl,
-                        RegistrationEndTime = DateTimeOffset.UtcNow.AddHours(RegistrationInvitationHelper.InvitationExpiresInHours).
-                            Format(TimeZoneInfo.FindSystemTimeZoneById(registration.Candidate.UserTimeZone)),
-                        ClassStartTime = registration.Event.EventScheduledStart.Format(TimeZoneInfo.FindSystemTimeZoneById(registration.Candidate.UserTimeZone)),
-                        ClassAchievement = GetAchievementName(registration.Event)
-                    }
-                );
-
-                string GetAchievementName(QEvent _event)
-                {
-                    if (_event == null || !_event.AchievementIdentifier.HasValue)
-                        return null;
-
-                    return ServiceLocator.AchievementSearch.GetAchievement(registration.Event.AchievementIdentifier.Value)?.AchievementTitle;
-                }
-            }
+            if (registration == null)
+                return;
+                
+            var recipient = SendRegistrationInvitationMessage(registration);
 
             SearchWithCurrentPageIndex(Filter);
 
-            StatusAlert.AddMessage(AlertType.Success,
-                $"The invitation has been sent to {registration.RegistrationRequestedByPerson?.UserFullName} " +
-                $"at {registration.RegistrationRequestedByPerson?.UserEmail} " +
-                $"for {registration.Candidate?.UserFullName}.");
+            var message = $"The invitation has been sent to {recipient?.UserFullName} " +
+                $"at {recipient?.UserEmail}";
+
+            if (recipient != registration.Candidate)
+                message += $" for {registration.Candidate?.UserFullName}.";
+
+            StatusAlert.AddMessage(AlertType.Success, message);
+        }
+
+        private VPerson SendRegistrationInvitationMessage(QRegistration registration)
+        {
+            var domain = ServiceLocator.AppSettings.Partition.Domain;
+            var registrationRelativeUrl = $"/ui/portal/events/classes/register?event={registration.EventIdentifier}&candidate={registration.CandidateIdentifier}";
+            var registrationAbsoluteUrl = UrlHelper.GetAbsoluteUrl(domain, ServiceLocator.AppSettings.Environment, registrationRelativeUrl, Organization.Code);
+
+            var recipient = Organization.Toolkits.Events?.SendRegistrationInvitationToRequestedBy == true
+                ? registration.RegistrationRequestedByPerson ?? registration.Candidate
+                : registration.Candidate;
+
+            ServiceLocator.AlertMailer.Send(
+                Organization.OrganizationIdentifier,
+                recipient.UserIdentifier,
+                new AlertRegistrationInvitation
+                {
+                    CandidateFullName = registration.Candidate.UserFullName,
+                    ClassTitle = registration.Event.EventTitle,
+                    ClassRegistrationLink = registrationAbsoluteUrl,
+                    RegistrationEndTime = DateTimeOffset.UtcNow.AddHours(RegistrationInvitationHelper.InvitationExpiresInHours).
+                        Format(TimeZoneInfo.FindSystemTimeZoneById(registration.Candidate.UserTimeZone)),
+                    ClassStartTime = registration.Event.EventScheduledStart.Format(TimeZoneInfo.FindSystemTimeZoneById(registration.Candidate.UserTimeZone)),
+                    ClassAchievement = GetAchievementName(registration.Event)
+                }
+            );
+
+            return recipient;
+
+            string GetAchievementName(QEvent _event)
+            {
+                if (_event == null || !_event.AchievementIdentifier.HasValue)
+                    return null;
+
+                return ServiceLocator.AchievementSearch.GetAchievement(registration.Event.AchievementIdentifier.Value)?.AchievementTitle;
+            }
         }
 
         private void DeleteForm(Guid registrationIdentifier)

@@ -30,6 +30,7 @@
                         <insite:DropDownButtonItem Name="Duplicate" IconType="Regular" IconName="copy" Text="New Version" ToolTip="Duplicate the form with a new version number" />
                         <insite:DropDownButtonItem Name="Archive" IconType="Regular" IconName="archive" Text="Archive" ToolTip="Archive the form" />
                         <insite:DropDownButtonItem Name="Unarchive" IconType="Regular" IconName="box-open" Text="Unarchive" ToolTip="Unarchive the form" />
+                        <insite:DropDownButtonItem Name="Download" IconType="Regular" IconName="download" Text="Download JSON" ToolTip="Download JSON" />
                     </Items>
                 </insite:DropDownButton>
 

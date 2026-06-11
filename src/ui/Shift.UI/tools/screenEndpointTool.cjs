@@ -8,35 +8,35 @@ const screens = {};
 
 const endpoints = {
     "shiftClient.achievement.retrieve": {
-        url: "GET api/progress/achievements/{achievementId}",
+        url: "GET api/records/achievements/{achievementId}",
         permission: "Policies.Progress.Achievements.Achievement.Retrieve"
     },
     "shiftClient.achievement.search": {
-        url: "POST api/progress/achievements/search",
+        url: "POST api/records/achievements/search",
         permission: "Policies.Progress.Achievements.Achievement.Search",
     },
     "shiftClient.caseStatus.create": {
-        url: "POST api/workflow/cases-statuses",
+        url: "POST api/workflows/cases-statuses",
         permission: "Policies.Workflow.Cases.CaseStatus.Create"
     },
     "shiftClient.caseStatus.delete": {
-        url: "DELETE api/workflow/cases-statuses/{statusId}",
+        url: "DELETE api/workflows/cases-statuses/{statusId}",
         permission: "Policies.Workflow.Cases.CaseStatus.Delete"
     },
     "shiftClient.caseStatus.download": {
-        url: "GET api/workflow/cases-statuses/download",
+        url: "GET api/workflows/cases-statuses/download",
         permission: "Policies.Workflow.Cases.CaseStatus.Download"
     },
     "shiftClient.caseStatus.retrieve": {
-        url: "GET api/workflow/cases-statuses/{statusId}",
+        url: "GET api/workflows/cases-statuses/{statusId}",
         permission: "Policies.Workflow.Cases.CaseStatus.Retrieve"
     },
     "shiftClient.caseStatus.search": {
-        url: "POST api/workflow/cases-statuses/search",
+        url: "POST api/workflows/cases-statuses/search",
         permission: "Policies.Workflow.Cases.CaseStatus.Search"
     },
     "shiftClient.caseStatus.update": {
-        url: "PUT api/workflow/cases-statuses/{statusId}",
+        url: "PUT api/workflows/cases-statuses/{statusId}",
         permission: "Policies.Workflow.Cases.CaseStatus.Modify"
     },
     "shiftClient.command.send": {
@@ -44,27 +44,27 @@ const endpoints = {
         permission: "Policies.Timeline.Commands.Send",
     },
     "shiftClient.event.retrieve": {
-        url: "GET api/booking/events/{event}",
+        url: "GET api/events/{event}",
         permission: "Policies.Booking.Events.Event.Retrieve"
     },
     "shiftClient.file.download": {
-        url: "POST api/content/files/download",
+        url: "POST api/assets/files/download",
         permission: "Policies.Content.Files.File.Download"
     },
     "shiftClient.file.search": {
-        url: "POST api/content/files/search",
+        url: "POST api/assets/files/search",
         permission: "Policies.Content.Files.File.Search"
     },
     "shiftClient.gradebook.download": {
-        url: "POST api/progress/gradebooks/download",
+        url: "POST api/records/gradebooks/download",
         permission: "Policies.Progress.Gradebooks.Gradebook.Download"
     },
     "shiftClient.gradebook.retrieve": {
-        url: "GET api/progress/gradebooks/{gradebook}",
+        url: "GET api/records/gradebooks/{gradebook}",
         permission: "Policies.Progress.Gradebooks.Gradebook.Retrieve"
     },
     "shiftClient.gradebook.search": {
-        url: "POST api/progress/gradebooks/search",
+        url: "POST api/records/gradebooks/search",
         permission: "Policies.Progress.Gradebooks.Gradebook.Search"
     },
     "shiftClient.me.context": {
@@ -72,55 +72,55 @@ const endpoints = {
         permission: "Public"
     },
     "shiftClient.organization.retrieve": {
-        url: "GET api/security/organizations/{organization}",
+        url: "GET api/accounts/organizations/{organization}",
         permission: "Policies.Security.Organizations.Organization.Retrieve"
     },
     "shiftClient.organization.search": {
-        url: "POST api/security/organizations/search",
+        url: "POST api/accounts/organizations/search",
         permission: "Policies.Security.Organizations.Organization.Search"
     },
     "shiftClient.people.search": {
-        url: "POST api/directory/people/search",
+        url: "POST api/contacts/people/search",
         permission: "Policies.Directory.People.Person.Search"
     },
     "shiftClient.period.retrieve": {
-        url: "GET api/progress/periods/{period}",
+        url: "GET api/records/periods/{period}",
         permission: "Policies.Progress.Periods.Period.Retrieve"
     },
     "shiftClient.period.search": {
-        url: "POST api/progress/periods/search",
+        url: "POST api/records/periods/search",
         permission: "Policies.Progress.Periods.Period.Search"
     },
     "shiftClient.standard.retrieve": {
-        url: "POST api/competency/standards/{standard}",
+        url: "POST api/standards/{standard}",
         permission: "Policies.Competency.Standards.Standard.Retrieve"
     },
     "shiftClient.standard.search": {
-        url: "POST api/competency/standards/search",
+        url: "POST api/standards/search",
         permission: "Policies.Competency.Standards.Standard.Search"
     },
     "shiftClient.user.retrieve": {
-        url: "GET api/security/users/{user}",
+        url: "GET api/accounts/users/{user}",
         permission: "Policies.Security.Users.User.Retrieve"
     },
     "shiftClient.user.search": {
-        url: "POST api/security/users/search",
+        url: "POST api/accounts/users/search",
         permission: "Policies.Security.Users.User.Search"
     },
     "shiftClient.pageContent.modify": {
-        url: "GET api/workspace/pages-contents/{page}",
+        url: "GET api/sites/pages-contents/{page}",
         permission: "workspace/pages"
     },
     "shiftClient.pageContent.retrieve": {
-        url: "PUT api/workspace/pages-contents/{page}",
+        url: "PUT api/sites/pages-contents/{page}",
         permission: "workspace/pages"
     },
     "shiftClient.file.uploadTempFile": {
-        url: "POST api/content/files/temp",
+        url: "POST api/assets/files/temp",
         permission: "none"
     },
     "shiftClient.translation.translate": {
-        url: "POST api/content/translations/translate",
+        url: "POST api/assets/translations/translate",
         permission: "none"
     },
 };
@@ -148,7 +148,7 @@ function processScreenFiles(screenUrl, files, processedFiles) {
     const screen = screens[screenUrl] ?? (screens[screenUrl] = {});
 
     const importFiles = [];
-    for(const file of files) {
+    for (const file of files) {
         processedFiles.push(file);
     }
 
@@ -229,7 +229,7 @@ function readFilesRecursively(folderPath, files) {
 
     readFolder(folderPath, files, folders);
 
-    for(const folderPath of folders) {
+    for (const folderPath of folders) {
         readFilesRecursively(folderPath, files);
     }
 }

@@ -17,21 +17,28 @@ namespace InSite.Cmds.Admin.Achievements.Forms
     {
         private Guid? AchievementIdentifier => Guid.TryParse(Request["achievement"], out var key) ? key : (Guid?)null;
 
-        private string Return => Request["return"];
+        private string EditUrl => "/ui/cmds/admin/achievements/edit?id={0}";
+
+        private string SearchUrl => "/ui/cmds/admin/achievements/search";
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
-                BindModelToControls();
+            if (IsPostBack)
+                return;
+
+            BindModelToControls();
         }
 
         protected void BindModelToControls()
         {
-            var achievement = AchievementIdentifier.HasValue ? VCmdsAchievementSearch.Select(AchievementIdentifier.Value) : null;
+            var achievement = AchievementIdentifier.HasValue
+                ? VCmdsAchievementSearch.Select(AchievementIdentifier.Value)
+                : null;
+
             if (achievement == null)
-                HttpResponseHelper.Redirect("/ui/cmds/admin/achievements/search", true);
+                HttpResponseHelper.Redirect(SearchUrl, true);
 
             BindFormHeader(achievement.AchievementTitle);
             BindReferences();
@@ -40,41 +47,30 @@ namespace InSite.Cmds.Admin.Achievements.Forms
 
         private void BindFormHeader(string qualifier)
         {
-            var breadcrumbs = new List<BreadcrumbItem>();
-
-            if (Return == "design")
+            var breadcrumbs = new List<BreadcrumbItem>
             {
-                breadcrumbs.Add(new BreadcrumbItem("Field Achievements", $"/ui/cmds/design/achievements/search"));
-                breadcrumbs.Add(new BreadcrumbItem("Edit", $"/ui/cmds/design/achievements/edit?id={AchievementIdentifier}"));
-            }
-            else
-            {
-                breadcrumbs.Add(new BreadcrumbItem("Achievements", $"/ui/cmds/admin/achievements/search"));
-                breadcrumbs.Add(new BreadcrumbItem("Edit", $"/ui/cmds/admin/achievements/edit?id={AchievementIdentifier}"));
-            }
-
-            breadcrumbs.Add(new BreadcrumbItem("View References", null, null, "active"));
+                new BreadcrumbItem("Achievements", SearchUrl),
+                new BreadcrumbItem("Edit", string.Format(EditUrl, AchievementIdentifier)),
+                new BreadcrumbItem("View References", null, null, "active")
+            };
 
             PageHelper.BindHeader(this, breadcrumbs.ToArray(), null, qualifier);
         }
 
         private void BindReferences()
         {
-            var dependencies = VCmdsAchievementHelper.BuildReferencesText(AchievementIdentifier.Value);
+            var referenceList = VCmdsAchievementHelper.BuildReferencesText(AchievementIdentifier.Value);
 
-            ReferenceRepeater.DataSource = dependencies.Items;
+            ReferenceRepeater.DataSource = referenceList.Items;
+
             ReferenceRepeater.DataBind();
 
-            InstructionText.Text = dependencies.Count == 0
-                ? "No references to this achievement"
-                : "reference".ToQuantity(dependencies.Count) + " to this achievement";
+            InstructionText.Text = "Reference".ToQuantity(referenceList.Count) + " to this achievement";
         }
 
         private void BindNavigation()
         {
-            CloseButton.NavigateUrl = Return == "design"
-                ? $"/ui/cmds/design/achievements/edit?id={AchievementIdentifier}"
-                : $"/ui/cmds/admin/achievements/edit?id={AchievementIdentifier}";
+            CloseButton.NavigateUrl = string.Format(EditUrl, AchievementIdentifier);
         }
     }
 }

@@ -13,6 +13,7 @@ interface NavigationGroup {
 export interface ApiSiteSetting {
     TimeZoneId: TimeZoneId;
     OrganizationCode?: string | null;
+    DomainName: string;
     CompanyName: string;
     IsCmds: boolean;
     Home: {
@@ -55,4 +56,5 @@ export interface ApiSiteSetting {
     PartitionEmail: string;
     CurrentLanguage: Language;
     SupportedLanguages: Language[];
+    RecentLinksKey: string;
 }

@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 
 using InSite.Api.Settings;
-using InSite.Persistence.Integration.Moodle;
+using InSite.Persistence.Integration.Scorm;
 
 namespace InSite.Api.Controllers
 {

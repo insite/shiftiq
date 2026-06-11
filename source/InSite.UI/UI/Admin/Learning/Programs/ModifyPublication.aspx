@@ -67,6 +67,23 @@
                                             <insite:TextBox runat="server" ID="ProgramImageUrl" />
                                         </div>
 
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Custom Flag Color
+                                            </label>
+                                            <div>
+                                                <insite:ColorComboBox runat="server" ID="ProgramFlagColor" CssClass="w-25" />
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Custom Flag Text
+                                            </label>
+                                            <div>
+                                                <insite:TextBox runat="server" ID="ProgramFlagText" MaxLength="50" />
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
 

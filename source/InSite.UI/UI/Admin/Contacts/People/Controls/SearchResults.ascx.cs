@@ -294,7 +294,7 @@ namespace InSite.Admin.Contacts.People.Controls
                     .GroupBy(x => x.UserIdentifier)
                     .ToDictionary(
                         x => x.Key,
-                        x => string.Join(", ", x.OrderBy(y => y.GroupName).Select(y => y.GroupName)));
+                        x => string.Join("; ", x.OrderBy(y => y.GroupName).Select(y => y.GroupName)));
 
                 foreach (var item in result)
                     item.PermissionLists = memberships.GetOrDefault(item.UserIdentifier);
@@ -480,6 +480,7 @@ namespace InSite.Admin.Contacts.People.Controls
             public string PersonUserApproveReason { get; set; }
             public string PersonWebSiteUrl { get; set; }
             public string PersonMembershipStatus { get; set; }
+            public string Roles { get; set; }
 
             public DateTimeOffset? PersonAccessRevoked { get; set; }
             public DateTimeOffset? PersonJobsApproved { get; set; }
@@ -497,7 +498,7 @@ namespace InSite.Admin.Contacts.People.Controls
             filter.OrderBy = "User.FullName";
 
             var data = PersonCriteria.Select(filter,
-                    x => x.User,
+                    x => x.User.Memberships.Select(y => y.Group),
                     x => x.BillingAddress,
                     x => x.HomeAddress,
                     x => x.ShippingAddress,
@@ -512,6 +513,8 @@ namespace InSite.Admin.Contacts.People.Controls
                     x => new { x.UserIdentifier, x.FullName },
                     new UserFilter { IncludeUserIdentifiers = data.SelectMany(x => new[] { x.CreatedBy, x.ModifiedBy }).Distinct().ToArray() })
                 .ToDictionary(x => x.UserIdentifier, x => x.FullName);
+
+            var accessibleOrgs = Identity.Organizations.Select(x => x.Identifier).ToArray();
 
             var result = new List<ExportDataItem>(data.Count);
 
@@ -620,6 +623,13 @@ namespace InSite.Admin.Contacts.People.Controls
                 exportItem.PersonUserApproveReason = dataItem.UserApproveReason;
                 exportItem.PersonWebSiteUrl = dataItem.WebSiteUrl;
                 exportItem.PersonMembershipStatus = dataItem.MembershipStatus?.ItemName;
+
+                exportItem.Roles = string.Join("; ",
+                    dataItem.User.Memberships
+                        .Where(x => x.Group.GroupType == GroupTypes.Role && accessibleOrgs.Contains(x.Group.OrganizationIdentifier))
+                        .Select(x => x.Group.GroupName)
+                        .OrderBy(x => x)
+                );
 
                 result.Add(exportItem);
             }

@@ -123,6 +123,24 @@ namespace InSite.Admin.Achievements.Credentials.Controls
         protected global::InSite.Common.Web.UI.FindDepartment DepartmentIdentifier;
 
         /// <summary>
+        /// DistrictGroupIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindGroup DistrictGroupIdentifier;
+
+        /// <summary>
+        /// TeamGroupIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindGroup TeamGroupIdentifier;
+
+        /// <summary>
         /// CredentialGrantedSince control.
         /// </summary>
         /// <remarks>

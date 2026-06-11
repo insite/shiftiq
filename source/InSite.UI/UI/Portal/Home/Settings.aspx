@@ -66,16 +66,30 @@
             <div class="mb-3 pb-1">
                 <label class="form-label" for="<%# Email.ClientID %>">
                     <insite:Literal runat="server" Text="Email" />
-                    <insite:RequiredValidator runat="server" ID="EmailRequiredValidator" ControlToValidate="Email" Display="None" ValidationGroup="Change" />
-                    <insite:EmailValidator runat="server" ID="EmailPatternValidator" ControlToValidate="Email" Display="None" ValidationGroup="Change" />
                 </label>
                 <div>
                     <div>
-                        <insite:TextBox ID="Email" runat="server" MaxLength="128" />
+                        <insite:TextBox ID="Email" runat="server" MaxLength="128" Enabled="false" />
                     </div>
                 </div>
                 <div class="form-text">
                     <insite:Literal runat="server" Text="Preferred email address." />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="mb-3 pb-1">
+                <label class="form-label" for="<%# EmailAlternate.ClientID %>">
+                    <insite:Literal runat="server" Text="Email Alternate" />
+                    <insite:EmailValidator runat="server" ControlToValidate="EmailAlternate" Display="None" ValidationGroup="Change" />
+                </label>
+                <div>
+                    <div>
+                        <insite:TextBox ID="EmailAlternate" runat="server" MaxLength="128" />
+                    </div>
+                </div>
+                <div class="form-text">
+                    <insite:Literal runat="server" Text="Secondary email address." />
                 </div>
             </div>
         </div>
@@ -126,6 +140,36 @@
                 </label>
                 <div>
                     <insite:TextBox ID="PostalCode" runat="server" MaxLength="128" />
+                </div>
+            </div>
+        </div>
+        <div runat="server" id="DepartmentField" class="col-sm-6">
+            <div class="mb-3 pb-1">
+                <label class="form-label">
+                    <insite:Literal runat="server" Text="Department" />
+                </label>
+                <div>
+                    <insite:TextBox ID="Department" runat="server" ReadOnly="true" />
+                </div>
+            </div>
+        </div>
+        <div runat="server" id="DistrictField" class="col-sm-6">
+            <div class="mb-3 pb-1">
+                <label class="form-label">
+                    <insite:Literal runat="server" Text="District" />
+                </label>
+                <div>
+                    <insite:TextBox ID="District" runat="server" ReadOnly="true" />
+                </div>
+            </div>
+        </div>
+        <div runat="server" id="SupervisorField" class="col-sm-6">
+            <div class="mb-3 pb-1">
+                <label class="form-label">
+                    <insite:Literal runat="server" Text="Supervisor" />
+                </label>
+                <div>
+                    <insite:TextBox ID="Supervisor" runat="server" ReadOnly="true" />
                 </div>
             </div>
         </div>

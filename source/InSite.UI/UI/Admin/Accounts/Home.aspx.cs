@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
@@ -63,6 +65,29 @@ namespace InSite.UI.Admin.Accounts
 
             var divisionCount = DivisionSearch.Count(new DivisionFilter());
             LoadCounter(DivisionCounter, DivisionCount, insite, divisionCount, DivisionLink, "/ui/admin/accounts/divisions/search");
+
+            BindDownloadLink();
+        }
+
+        private void BindDownloadLink()
+        {
+            var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
+
+            var serialized = ServiceLocator.Serializer.Serialize(permissions);
+
+            using (var sha = SHA256.Create())
+            {
+                var hashed = sha.ComputeHash(Encoding.UTF8.GetBytes(serialized));
+
+                var checksum = BitConverter.ToString(hashed).Replace("-", "").Substring(0, 12);
+
+                var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(serialized));
+
+                var href = $"data:application/json;base64,{encoded}";
+
+                DownloadNewPermissionMatrix.Text =
+                    $"<a href=\"{href}\" download=\"permission-matrix.json\" title=\"Checksum {checksum}\"><i class=\"fas fa-download me-1\"></i>Download Matrix</a>";
+            }
         }
 
         public static void LoadCounter(HtmlGenericControl card, Literal counter, bool visible, int count, HtmlAnchor link, string action)

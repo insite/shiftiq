@@ -105,6 +105,24 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.TextBox ProgramImageUrl;
 
         /// <summary>
+        /// ProgramFlagColor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ColorComboBox ProgramFlagColor;
+
+        /// <summary>
+        /// ProgramFlagText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox ProgramFlagText;
+
+        /// <summary>
         /// WebSiteIdentifier control.
         /// </summary>
         /// <remarks>

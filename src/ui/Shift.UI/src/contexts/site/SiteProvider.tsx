@@ -63,7 +63,7 @@ export default function SiteProvider({ children }: Props) {
                     siteSetting: newSiteSetting,
                     ...methods
                 });
-                urlHelper.setOrg(newSiteSetting.OrganizationCode);
+                urlHelper.setOrgAndDomain(newSiteSetting.OrganizationCode, newSiteSetting.DomainName);
                 cssHelper.setShiftCssFile(newSiteSetting.StylePath);
             } catch (err) {
                 setState({

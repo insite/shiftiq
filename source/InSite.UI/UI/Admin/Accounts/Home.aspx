@@ -113,7 +113,8 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-lg-12">
-                        <a class="me-3" href="/ui/admin/accounts/permissions/matrix"><i class="fas fa-table me-1"></i>Matrix</a>                      
+                        <a class="me-3" href="/ui/admin/accounts/permissions/matrix"><i class="fas fa-table me-1"></i>Edit Matrix</a>
+                        <asp:Literal runat="server" ID="DownloadNewPermissionMatrix" />
                     </div>
                 </div>
             </div>

@@ -24,6 +24,15 @@ namespace InSite.UI.Portal.Contacts.Referral
         protected global::InSite.Common.Web.UI.Alert OutlineAlert;
 
         /// <summary>
+        /// CaseColumn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CaseColumn;
+
+        /// <summary>
         /// DocumentList control.
         /// </summary>
         /// <remarks>

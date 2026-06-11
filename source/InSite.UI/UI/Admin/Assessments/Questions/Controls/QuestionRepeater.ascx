@@ -43,7 +43,7 @@
 
             <td>
                 <div>
-                    <%# Shift.Common.Markdown.ToHtml(Eval("Content.Title") == null ? null : ((Shift.Common.MultilingualString)Eval("Content.Title")).Default) %>
+                    <%# GetQuestionTitle() %>
                 </div>
 
                 <div runat="server" id="OptionRepeaterSection" class="mb-3" visible="false">
@@ -64,7 +64,7 @@
                     <table class='property-grid'>
 
                         <tr>
-                            <td>Asset #</td>
+                            <td><%# Translate("Asset #") %></td>
                             <td>
                                 <%# Eval("Asset") %>.<%# Eval("AssetVersion") %>
                                 <asp:LinkButton runat="server" ID="PinLink" CssClass="pin-link" Visible="false" />
@@ -72,17 +72,17 @@
                         </tr>
 
                         <tr>
-                            <td>Publication</td>
+                            <td><%# Translate("Publication") %></td>
                             <td><%# GetEnumDescription((PublicationStatus)Eval("PublicationStatus")) %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# Eval("Condition") != null %>'>
-                            <td>Condition</td>
+                            <td><%# Translate("Condition") %></td>
                             <td><%# Eval("Condition") %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# Eval("Classification.Taxonomy") != null %>'>
-                            <td>Taxonomy</td>
+                            <td><%# Translate("Taxonomy") %></td>
                             <td><%# Eval("Classification.Taxonomy") %></td>
                         </tr>
 
@@ -92,22 +92,22 @@
                         </tr>
 
                         <tr runat="server" visible='<%# !string.IsNullOrEmpty((string)Eval("Classification.Reference")) %>'>
-                            <td>Reference</td>
+                            <td><%# Translate("Reference") %></td>
                             <td style="word-break:break-word;"><%# Eval("Classification.Reference") %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# !string.IsNullOrEmpty((string)Eval("Classification.Code")) %>'>
-                            <td>Code</td>
+                            <td><%# Translate("Code") %></td>
                             <td><%# Eval("Classification.Code") %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# !string.IsNullOrEmpty((string)Eval("Classification.Tag")) %>'>
-                            <td>Tag</td>
+                            <td><%# Translate("Tag") %></td>
                             <td><%# Eval("Classification.Tag") %></td>
                         </tr>
 
                         <tr runat="server" ID="TagsField" visible='<%# ((int?)Eval("Classification.Tags.Count") ?? 0) > 0 %>'>
-                            <td class="align-top">Tags</td>
+                            <td class="align-top"><%# Translate("Tags") %></td>
                             <td><%# Shift.Common.StringHelper.JoinFormat(
                                 "<div class='question-tag-collection'>{Text}</div>{Items}",
                                 ((IEnumerable)Eval("Classification.Tags") ?? new object[0]).Cast<Tuple<string, List<string>>>().Select(x1 => new
@@ -123,7 +123,7 @@
                         </tr>
 
                         <tr runat="server" visible='<%# (int)Eval("Fields.Count") > 0 %>'>
-                            <td class="align-top">Form</td>
+                            <td class="align-top"><%# Translate("Form") %></td>
                             <td><%# string.Join(
                                 "<div class='pb-2'></div>",
                                 ((IEnumerable<Field>)Eval("Fields")).OrderBy(x => x.Section.Form.Sequence).Select(x => string.Format(
@@ -140,49 +140,49 @@
                         </tr>
 
                         <tr runat="server" visible='<%# (OptionLayoutType)Eval("Layout.Type") != OptionLayoutType.None %>'>
-                            <td>Layout</td>
+                            <td><%# Translate("Layout") %></td>
                             <td><%# Eval("Layout.Type") %></td>
                         </tr>
 
                         <tr>
-                            <td>Type</td>
+                            <td><%# Translate("Type") %></td>
                             <td><%# GetEnumDescription((QuestionItemType)Eval("Type")) %></td>
                         </tr>
 
                         <tr runat="server" id="RubricRow">
-                            <td>Rubric</td>
+                            <td><%# Translate("Rubric") %></td>
                             <td>
                                 <asp:Literal runat="server" ID="RubricTitle" />
                             </td>
                         </tr>
 
                         <tr>
-                            <td>Points</td>
+                            <td><%# Translate("Points") %></td>
                             <td><%# GetPoints() %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# Eval("CutScore") != null %>'>
-                            <td>Cut-Score</td>
+                            <td><%# Translate("Cut-Score") %></td>
                             <td><%# Eval("CutScore") %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# (QuestionCalculationMethod)Eval("CalculationMethod") != QuestionCalculationMethod.Default %>'>
-                            <td>Calculation Method</td>
+                            <td><%# Translate("Calculation Method") %></td>
                             <td><%# GetEnumDescription((QuestionCalculationMethod)Eval("CalculationMethod")) %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# (int)Eval("Comments.Count") > 0 %>'>
-                            <td>Comments</td>
+                            <td><%# Translate("Comments") %></td>
                             <td><%# GetCommentsSummary(Eval("Comments")) %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# Eval("Classification.Difficulty") != null %>'>
-                            <td>Difficulty</td>
+                            <td><%# Translate("Difficulty") %></td>
                             <td><%# Eval("Classification.Difficulty") %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# (FlagType)Eval("Flag") != FlagType.None %>'>
-                            <td>Flag</td>
+                            <td><%# Translate("Flag") %></td>
                             <td>
                                 <%# GetFlagHtml((FlagType)Eval("Flag")) %>
                                 <span class="form-text"><%# Eval("Flag") %></span>
@@ -190,17 +190,17 @@
                         </tr>
 
                         <tr runat="server" visible='<%# Eval("Randomization.Enabled") %>'>
-                            <td>Randomize</td>
-                            <td>Options</td>
+                            <td><%# Translate("Randomize") %></td>
+                            <td><%# Translate("Options") %></td>
                         </tr>
 
                         <tr runat="server" visible='<%# Eval("Source") != null %>'>
-                            <td>Source</td>
+                            <td><%# Translate("Source") %></td>
                             <td><%# GetSourceLink() %></td>
                         </tr>
 
                         <tr runat="server" id="GradeItemsRow">
-                            <td class="align-top">Grade Item</td>
+                            <td class="align-top"><%# Translate("Grade Item") %></td>
                             <td>
                                 <asp:Literal runat="server" ID="GradeItemName" />
                                 <asp:Repeater runat="server" ID="GradeItemList">
@@ -218,7 +218,7 @@
                         </tr>
 
                         <tr>
-                            <td>Translate</td>
+                            <td><%# Translate("Translate") %></td>
                             <td><%# GetLanguages() %></td>
                         </tr>
 
@@ -231,12 +231,12 @@
                     <table class='property-grid'>
 
                         <tr>
-                            <td>Points</td>
+                            <td><%# Translate("Points") %></td>
                             <td><%# GetPoints() %></td>
                         </tr>
 
                         <tr>
-                            <td>Type</td>
+                            <td><%# Translate("Type") %></td>
                             <td><%# GetEnumDescription((QuestionItemType)Eval("Type")) %></td>
                         </tr>
 

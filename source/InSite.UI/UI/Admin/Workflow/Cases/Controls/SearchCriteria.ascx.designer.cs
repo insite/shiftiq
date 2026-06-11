@@ -57,7 +57,7 @@ namespace InSite.Admin.Issues.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.IssueStatusComboBox IssueStatus;
+        protected global::InSite.Common.Web.UI.IssueStatusMultiComboBox IssueStatus;
 
         /// <summary>
         /// IssueTitle control.

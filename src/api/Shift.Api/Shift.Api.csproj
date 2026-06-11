@@ -48,6 +48,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.7" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.1" />
     <PackageReference Include="Scrutor" Version="6.0.1" />
     <PackageReference Include="Sentry" Version="5.0.1" />
     <PackageReference Include="Sentry.AspNetCore" Version="5.0.1" />
@@ -56,6 +57,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="7.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.2.0" />
@@ -71,6 +73,10 @@
 
   <ItemGroup>
 	<Analyzer Include="..\..\..\build\references\EyeSpy.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Courses\" />
   </ItemGroup>
 	
 </Project>

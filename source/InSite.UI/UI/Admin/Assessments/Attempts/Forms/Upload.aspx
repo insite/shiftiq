@@ -356,7 +356,7 @@
                         </div>
 
                         <div class="mt-3">
-                            <insite:CheckBox runat="server" ID="ConfirmAllowDuplicates" Text="Allow duplicate upload" Checked="true" />
+                            <insite:CheckBox runat="server" ID="ConfirmAllowDuplicates" Text="Allow duplicate upload" Checked="false" />
                         </div>
                     </ContentTemplate>
                 </insite:UpdatePanel>

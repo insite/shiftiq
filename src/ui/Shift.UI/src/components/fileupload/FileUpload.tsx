@@ -5,7 +5,7 @@ import { numberHelper } from "@/helpers/numberHelper";
 import { translate } from "@/helpers/translate";
 import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { shiftClient } from "@/api/shiftClient";
-import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
+import { ApiUploadFileInfo } from "@/api/controllers/assets/files/ApiUploadFileInfo";
 import { errorHelper } from "@/helpers/errorHelper";
 import ProgressBar, { ProgressBarIndicator } from "../ProgressBar";
 

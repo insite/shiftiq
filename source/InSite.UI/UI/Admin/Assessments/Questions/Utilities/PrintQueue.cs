@@ -118,6 +118,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
                 using (var writer = new BinaryWriter(stream))
                 {
                     writer.Write(file.Name);
+                    writer.Write(file.Ext);
                     writer.Write(file.Data.Length);
                     writer.Write(file.Data);
                 }
@@ -135,10 +136,11 @@ namespace InSite.Admin.Assessments.Questions.Utilities
                     using (var reader = new BinaryReader(stream))
                     {
                         var fileName = reader.ReadString();
+                        var fileExt = reader.ReadString();
                         var dataLength = reader.ReadInt32();
                         var dataBytes = reader.ReadBytes(dataLength);
 
-                        return new PrintOutputFile(fileName, dataBytes);
+                        return new PrintOutputFile(fileName, fileExt, dataBytes);
                     }
                 }
             }

@@ -23,6 +23,14 @@
                         <insite:DateTimeOffsetSelector ID="LastModifiedBefore" runat="server" EmptyMessage="Last Modified Before" />
                     </div>
                     
+                    <div class="mb-2">
+                        <insite:DateTimeOffsetSelector ID="CreatedSince" runat="server" EmptyMessage="Created Since" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:DateTimeOffsetSelector ID="CreatedBefore" runat="server" EmptyMessage="Created Before" />
+                    </div>
+
                     <insite:FilterButton runat="server" ID="SearchButton" />
                     <insite:ClearButton runat="server" ID="ClearButton" />
                 </div>

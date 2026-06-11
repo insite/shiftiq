@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Core;
@@ -21,6 +21,15 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
     public partial class TrainingExpiryDates : AdminBasePage, ICmdsUserControl
     {
+        #region Constants
+
+        private const string CloseUrl = "/ui/admin/reporting";
+        private const string StatusValid = "Valid";
+        private const string ColorExpired = "#ff6347";
+        private const string ColorExpiringSoon = "#ffff99";
+
+        #endregion
+
         #region Classes
 
         [Serializable]
@@ -30,7 +39,11 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public Guid[] Achievements { get; set; }
             public Guid[] Learners { get; set; }
             public bool? IsRequired { get; set; }
-            public string AchievementType { get; set; }
+            public string[] MembershipFunctions { get; set; }
+            public string CredentialStatus { get; set; }
+            public DateTime? CompletedSince { get; set; }
+            public DateTime? CompletedBefore { get; set; }
+            public bool ExcludeSelfDeclared { get; set; }
         }
 
         internal class CompanyGroupNode : GroupNode<DefaultGroupLeaf>, IComparable<CompanyGroupNode>
@@ -63,7 +76,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 return true;
             }
 
-            public int CompareTo(CompanyGroupNode other) => Name.CompareTo(other.Name);
+            public int CompareTo(CompanyGroupNode other) => other == null ? 1 : Name.CompareTo(other.Name);
 
             #endregion
         }
@@ -92,42 +105,51 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             private static string GetText(CmdsReportHelper.TrainingExpiryDate row)
             {
-                var result = string.Empty;
+                if (row == null)
+                    return string.Empty;
 
-                if (row != null)
+                string result;
+                if (row.Status == StatusValid)
                 {
-                    if (row.Status == "Valid")
-                    {
-                        if (row.ExpirationDate.HasValue)
-                            result = $"{row.ExpirationDate.Value:MM'/'dd'/'yy}";
-                        else if (row.DateCompleted.HasValue)
-                            result = "Done";
-                    }
-                    else if (row.ExpirationDate.HasValue)
-                    {
+                    if (row.ExpirationDate.HasValue)
                         result = $"{row.ExpirationDate.Value:MM'/'dd'/'yy}";
-                    }
-
-                    if (row.IsRequired)
-                        result += (result.Length > 0 ? " " : string.Empty) + "*";
+                    else if (row.DateCompleted.HasValue)
+                        result = "Done";
+                    else
+                        result = string.Empty;
                 }
+                else if (row.ExpirationDate.HasValue)
+                {
+                    result = $"{row.ExpirationDate.Value:MM'/'dd'/'yy}";
+                }
+                else
+                {
+                    result = string.Empty;
+                }
+
+                if (row.IsRequired)
+                    result += (result.Length > 0 ? " " : string.Empty) + "*";
 
                 return result;
             }
 
             private static string GetColor(CmdsReportHelper.TrainingExpiryDate row)
             {
-                string result = null;
+                if (row == null)
+                    return null;
 
-                if (row != null)
-                {
-                    if (row.Status != "Valid")
-                        result = "#ff6347"; // Red
-                    else if (row.ExpirationDate.HasValue && row.ExpirationDate.Value >= DateTimeOffset.Now && row.ExpirationDate.Value <= DateTimeOffset.Now.AddMonths(3))
-                        result = "#ffff99"; // Yellow
-                }
+                if (row.Status != StatusValid)
+                    return ColorExpired;
 
-                return result;
+                if (!row.ExpirationDate.HasValue)
+                    return null;
+
+                var now = DateTimeOffset.Now;
+                var expires = row.ExpirationDate.Value;
+                if (expires >= now && expires <= now.AddMonths(3))
+                    return ColorExpiringSoon;
+
+                return null;
             }
 
             #endregion
@@ -151,20 +173,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             base.OnInit(e);
 
-            FindDepartment.AutoPostBack = true;
-            FindDepartment.ValueChanged += (s, a) => OnDepartmentChanged();
-
-            FindProgram.AutoPostBack = true;
-            FindProgram.ValueChanged += (s, a) => SetupFindAchievement();
-
-            AchievementType.AutoPostBack = true;
-            AchievementType.ValueChanged += (s, a) => SetupFindAchievement();
-
-            IsRequired.AutoPostBack = true;
-            IsRequired.SelectedIndexChanged += (s, a) => SetupFindAchievement();
+            Criteria.MessageRaised += (type, message) => ScreenStatus.AddMessage(type, message);
 
             DownloadXlsx.Click += DownloadXlsx_Click;
-
             ReportButton.Click += ReportButton_Click;
 
             EmployeeRepeater.ItemCreated += EmployeeRepeater_ItemCreated;
@@ -180,54 +191,23 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             PageHelper.AutoBindHeader(this);
 
-            FindDepartment.Filter.OrganizationIdentifier = Organization.Identifier;
-
-            if (!Identity.HasAccessToAllCompanies)
-                FindDepartment.Filter.UserIdentifier = User.UserIdentifier;
-
-            OnDepartmentChanged();
-
-            var closeUrl = "/ui/admin/reporting";
-            CloseButton1.NavigateUrl = closeUrl;
-            CloseButton2.NavigateUrl = closeUrl;
+            CloseButton1.NavigateUrl = CloseUrl;
+            CloseButton2.NavigateUrl = CloseUrl;
         }
 
         #endregion
 
         #region Event handlers
 
-        private void OnDepartmentChanged()
-        {
-            FindLearner.Enabled = FindDepartment.HasValue;
-            FindLearner.Filter.OrganizationIdentifier = Organization.Identifier;
-            FindLearner.Filter.GroupDepartmentIdentifiers = FindDepartment.Values;
-            if (ServiceLocator.Partition.IsE03())
-                FindLearner.Filter.GroupDepartmentFunctions = new[] { "Department" };
-            FindLearner.Value = null;
-
-            SetupFindAchievement();
-        }
-
-        private void SetupFindAchievement()
-        {
-            FindAchievement.Enabled = FindDepartment.HasValue;
-            FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
-            FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
-            FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
-
-            FindAchievement.Filter.AchievementLabels.Clear();
-            if (AchievementType.HasValue)
-                FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
-
-            FindAchievement.Value = null;
-        }
-
         private void ReportButton_Click(object sender, EventArgs e)
         {
-            ReportTab.Visible = false;
+            if (!Page.IsValid)
+            {
+                ReportTab.Visible = false;
+                return;
+            }
 
-            if (Page.IsValid)
-                LoadReport();
+            LoadReport();
         }
 
         private void DownloadXlsx_Click(object sender, EventArgs e)
@@ -240,107 +220,18 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 return;
 
             var xlsxSheet = new XlsxWorksheet(Route.Title);
-            var headerStyle1 = new XlsxCellStyle
-            {
-                BackgroundColor = Color.FromArgb(105, 105, 105),
-                FontColor = Color.White,
-                IsBold = true,
-            };
-            var headerStyle2 = new XlsxCellStyle
-            {
-                BackgroundColor = Color.FromArgb(61, 120, 216),
-                FontColor = Color.White,
-                Align = HorizontalAlignment.Center,
-                VAlign = XlsxCellVAlign.Center,
-                WrapText = true,
-                IsBold = true,
-            };
-            var dataCellStyle = new XlsxCellStyle
-            {
-                WrapText = false,
-                Align = HorizontalAlignment.Center,
-            };
+            var (companyHeaderStyle, achievementHeaderStyle, dataCellStyle) = BuildXlsxStyles();
 
-            var companyColIndex = 0;
-            var AchievementColIndex = 0;
-
-            xlsxSheet.Columns[0].Width = 25;
-            xlsxSheet.Columns[1].Width = 20;
-
-            xlsxSheet.Cells.Add(new XlsxCell(companyColIndex++, 0) { Style = headerStyle1 });
-            xlsxSheet.Cells.Add(new XlsxCell(companyColIndex++, 0) { Style = headerStyle1 });
-
-            xlsxSheet.Cells.Add(new XlsxCell(AchievementColIndex++, 1) { Style = headerStyle2, Value = "Employee" });
-            xlsxSheet.Cells.Add(new XlsxCell(AchievementColIndex++, 1) { Style = headerStyle2, Value = "Department" });
-
-            foreach (var companyGroup in dataSource.Columns)
-            {
-                xlsxSheet.Cells.Add(new XlsxCell(companyColIndex, 0, companyGroup.Children.Count)
-                {
-                    Style = headerStyle1,
-                    Value = $"Worker Training Expiry Dates for {companyGroup.Name} :: {string.Join(", ", companyGroup.Departments)}",
-                });
-
-                companyColIndex += companyGroup.Children.Count;
-
-                foreach (var achievement in companyGroup.Children)
-                {
-                    xlsxSheet.Columns[AchievementColIndex].Width = 13;
-                    xlsxSheet.Cells.Add(new XlsxCell(AchievementColIndex, 1)
-                    {
-                        Style = headerStyle2,
-                        Value = achievement.Text,
-                    });
-
-                    AchievementColIndex++;
-                }
-            }
-
-            var rowIndex = 2;
-            var columnLeaves = dataSource.Columns.SelectMany(x => x.Children).ToArray();
-
-            foreach (var employeeGroup in dataSource.Rows)
-            {
-                xlsxSheet.Cells.Add(new XlsxCell(0, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.Text });
-
-                foreach (var departmentLeaf in employeeGroup.Children)
-                {
-                    var colIndex = 1;
-
-                    xlsxSheet.Cells.Add(new XlsxCell(colIndex++, rowIndex) { Value = departmentLeaf.Text });
-
-                    foreach (var columnLeaf in columnLeaves)
-                    {
-                        var cellData = dataSource.GetCell(columnLeaf, departmentLeaf);
-
-                        if (cellData != null)
-                        {
-                            var style = dataCellStyle.Copy();
-
-                            style.BackgroundColor = cellData.Color != null
-                                ? ColorTranslator.FromHtml(cellData.Color)
-                                : Color.Transparent;
-
-                            xlsxSheet.Cells.Add(new XlsxCell(colIndex, rowIndex)
-                            {
-                                Style = style,
-                                Value = cellData.Text
-                            });
-                        }
-
-                        colIndex++;
-                    }
-
-                    rowIndex++;
-                }
-            }
+            WriteXlsxHeaders(xlsxSheet, dataSource, companyHeaderStyle, achievementHeaderStyle);
+            WriteXlsxRows(xlsxSheet, dataSource, dataCellStyle);
 
             ReportXlsxHelper.Export(xlsxSheet);
         }
 
         private void EmployeeRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (!IsContentItem(e))
+            var isContent = IsContentItem(e);
+            if (!isContent)
                 return;
 
             var employeeGroup = (DefaultGroupNode<DefaultGroupLeaf>)e.Item.DataItem;
@@ -351,7 +242,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void EmployeeRepeater_ItemCreated(object sender, RepeaterItemEventArgs e)
         {
-            if (!IsContentItem(e))
+            var isContent = IsContentItem(e);
+            if (!isContent)
                 return;
 
             var departmentRepeater = (Repeater)e.Item.FindControl("DepartmentRepeater");
@@ -360,13 +252,17 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void DepartmentRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (!IsContentItem(e))
+            var isContent = IsContentItem(e);
+            if (!isContent)
                 return;
 
             var departmentGroup = (DefaultGroupLeaf)e.Item.DataItem;
             var table = (ReportDataSource)departmentGroup.Root;
             var cellRepeater = (Repeater)e.Item.FindControl("CellRepeater");
-            cellRepeater.DataSource = table.Columns.SelectMany(x => x.Children).Select(x => table.GetCell(x, departmentGroup));
+            cellRepeater.DataSource = table.Columns
+                .SelectMany(x => x.Children)
+                .Select(x => table.GetCell(x, departmentGroup))
+                .ToArray();
             cellRepeater.DataBind();
         }
 
@@ -376,21 +272,24 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void LoadReport()
         {
+            ReportTab.Visible = false;
+
             CurrentParameters = new SearchParameters
             {
-                Departments = FindDepartment.Values,
-                Achievements = FindAchievement.Values,
-                Learners = FindLearner.Values,
-                IsRequired = GetIsRequired(),
-                AchievementType = AchievementType.Value
+                Departments = Criteria.DepartmentValues,
+                Achievements = Criteria.SelectedAchievements,
+                Learners = Criteria.LearnerValues,
+                IsRequired = Criteria.IsRequiredFilter,
+                MembershipFunctions = Criteria.MembershipFunctions,
+                CredentialStatus = Criteria.CredentialStatusFilter,
+                CompletedSince = Criteria.CompletedSinceFilter,
+                CompletedBefore = Criteria.CompletedBeforeFilter,
+                ExcludeSelfDeclared = Criteria.ExcludeSelfDeclared
             };
 
-            var hasSelectedAchievement = CurrentParameters.Achievements.Length > 0;
-            var hasSelectedAchievementType = !string.IsNullOrEmpty(CurrentParameters.AchievementType);
-
-            if (CurrentParameters.Departments.Length == 0 && !hasSelectedAchievement && !hasSelectedAchievementType)
+            if (!Criteria.ValidateNarrowSelection(out var error))
             {
-                ScreenStatus.AddMessage(AlertType.Error, "Select at least one department, achievement, or achievement type.");
+                ScreenStatus.AddMessage(AlertType.Error, error);
                 return;
             }
 
@@ -410,7 +309,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     return;
                 }
 
-                throw ecex;
+                throw;
             }
 
             if (!dataSource.HasData)
@@ -434,19 +333,20 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private ReportDataSource GetReportDataSource()
         {
+            var organizations = GetOrganizationIds();
+
             var rows = CmdsReportHelper.SelectTrainingExpiryDates(
+                organizations,
                 CurrentParameters.Departments,
                 CurrentParameters.Achievements,
                 CurrentParameters.Learners,
                 CurrentParameters.IsRequired,
-                CurrentParameters.AchievementType);
-
-            var organizations = new List<Guid> { Organization.Identifier };
-
-            if (ServiceLocator.Partition.IsE03())
-                organizations.Add(ServiceLocator.AppSettings.Application.Organizations.Global);
-
-            rows = rows.Where(x => organizations.Contains(x.OrganizationIdentifier)).ToList();
+                achievementType: null,
+                membershipFunctions: CurrentParameters.MembershipFunctions,
+                credentialStatus: CurrentParameters.CredentialStatus,
+                completedSince: CurrentParameters.CompletedSince,
+                completedBefore: CurrentParameters.CompletedBefore,
+                excludeSelfDeclared: CurrentParameters.ExcludeSelfDeclared);
 
             var result = new ReportDataSource();
 
@@ -482,11 +382,135 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         #endregion
 
+        #region Xlsx export
+
+        private static (XlsxCellStyle CompanyHeader, XlsxCellStyle AchievementHeader, XlsxCellStyle DataCell) BuildXlsxStyles()
+        {
+            var companyHeader = new XlsxCellStyle
+            {
+                BackgroundColor = Color.FromArgb(105, 105, 105),
+                FontColor = Color.White,
+                IsBold = true,
+            };
+            var achievementHeader = new XlsxCellStyle
+            {
+                BackgroundColor = Color.FromArgb(61, 120, 216),
+                FontColor = Color.White,
+                Align = HorizontalAlignment.Center,
+                VAlign = XlsxCellVAlign.Center,
+                WrapText = true,
+                IsBold = true,
+            };
+            var dataCell = new XlsxCellStyle
+            {
+                WrapText = false,
+                Align = HorizontalAlignment.Center,
+            };
+            return (companyHeader, achievementHeader, dataCell);
+        }
+
+        private static void WriteXlsxHeaders(
+            XlsxWorksheet sheet,
+            ReportDataSource dataSource,
+            XlsxCellStyle companyHeaderStyle,
+            XlsxCellStyle achievementHeaderStyle)
+        {
+            const int CompanyHeaderRow = 0;
+            const int AchievementHeaderRow = 1;
+
+            sheet.Columns[0].Width = 25;
+            sheet.Columns[1].Width = 20;
+
+            var companyColIndex = 0;
+            sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
+            sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
+
+            var achievementColIndex = 0;
+            sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Employee" });
+            sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Department" });
+
+            foreach (var companyGroup in dataSource.Columns)
+            {
+                sheet.Cells.Add(new XlsxCell(companyColIndex, CompanyHeaderRow, companyGroup.Children.Count)
+                {
+                    Style = companyHeaderStyle,
+                    Value = $"Worker Training Expiry Dates for {companyGroup.Name} :: {string.Join(", ", companyGroup.Departments)}",
+                });
+
+                companyColIndex += companyGroup.Children.Count;
+
+                foreach (var achievement in companyGroup.Children)
+                {
+                    sheet.Columns[achievementColIndex].Width = 13;
+                    sheet.Cells.Add(new XlsxCell(achievementColIndex, AchievementHeaderRow)
+                    {
+                        Style = achievementHeaderStyle,
+                        Value = achievement.Text,
+                    });
+
+                    achievementColIndex++;
+                }
+            }
+        }
+
+        private static void WriteXlsxRows(XlsxWorksheet sheet, ReportDataSource dataSource, XlsxCellStyle dataCellStyle)
+        {
+            const int FirstDataRow = 2;
+            const int EmployeeColumn = 0;
+            const int DepartmentColumn = 1;
+
+            var rowIndex = FirstDataRow;
+            var columnLeaves = dataSource.Columns.SelectMany(x => x.Children).ToArray();
+
+            foreach (var employeeGroup in dataSource.Rows)
+            {
+                sheet.Cells.Add(new XlsxCell(EmployeeColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.Text });
+
+                foreach (var departmentLeaf in employeeGroup.Children)
+                {
+                    var colIndex = DepartmentColumn;
+
+                    sheet.Cells.Add(new XlsxCell(colIndex++, rowIndex) { Value = departmentLeaf.Text });
+
+                    foreach (var columnLeaf in columnLeaves)
+                    {
+                        var cellData = dataSource.GetCell(columnLeaf, departmentLeaf);
+
+                        if (cellData != null)
+                        {
+                            var style = dataCellStyle.Copy();
+
+                            style.BackgroundColor = cellData.Color != null
+                                ? ColorTranslator.FromHtml(cellData.Color)
+                                : Color.Transparent;
+
+                            sheet.Cells.Add(new XlsxCell(colIndex, rowIndex)
+                            {
+                                Style = style,
+                                Value = cellData.Text
+                            });
+                        }
+
+                        colIndex++;
+                    }
+
+                    rowIndex++;
+                }
+            }
+        }
+
+        #endregion
+
         #region Helper methods
 
-        private bool? GetIsRequired()
+        private Guid[] GetOrganizationIds()
         {
-            return IsRequired.SelectedIndex > 0 ? bool.Parse(IsRequired.SelectedValue) : (bool?)null;
+            var organizations = new List<Guid> { Organization.Identifier };
+
+            if (ServiceLocator.Partition.IsE03())
+                organizations.Add(ServiceLocator.AppSettings.Application.Organizations.Global);
+
+            return organizations.ToArray();
         }
 
         #endregion

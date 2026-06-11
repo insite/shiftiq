@@ -36,40 +36,75 @@
                                 Search
                             </h4>
 
-                            <div class="form-group mb-3 criteria-field">
-                                <label class="form-label">
-                                    Contact Name
-                                </label>
-                                <insite:TextBox ID="CriteriaName" runat="server" MaxLength="200" />
-                            </div>
+                            <insite:UpdatePanel runat="server" ID="CriteriaUpdatePanel">
+                                <ContentTemplate>
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">
+                                            Contact Type
+                                        </label>
+                                        <insite:ComboBox runat="server" ID="CriteriaContactType">
+                                            <Items>
+                                                <insite:ComboBoxOption Value="Group" Text="Group" />
+                                                <insite:ComboBoxOption Value="Person" Text="Person" />
+                                            </Items>
+                                        </insite:ComboBox>
+                                    </div>
 
-                            <div class="form-group mb-3 criteria-field">
-                                <label class="form-label">
-                                    Email
-                                </label>
-                                <insite:TextBox ID="CriteriaEmail" runat="server" MaxLength="200" />
-                            </div>
+                                    <div runat="server" id="GroupCriteriaPanel" visible="false">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">
+                                                Group Type
+                                            </label>
+                                            <insite:GroupTypeComboBox runat="server" ID="Group_GroupType" />
+                                        </div>
 
-                            <div class="form-group mb-3">
-                                <label class="form-label">
-                                    Group Type
-                                </label>
-                                <insite:GroupTypeComboBox runat="server" ID="CriteriaGroupType" ClientEvents-OnChange="assign.onGroupTypeChanged" />
-                            </div>
+                                        <div class="form-group mb-3 criteria-field">
+                                            <label class="form-label">
+                                                Name
+                                            </label>
+                                            <insite:TextBox ID="Group_GroupName" runat="server" MaxLength="200" />
+                                        </div>
+                                    </div>
 
-                            <div class="form-group mb-3 criteria-field">
-                                <label class="form-label">
-                                    Group Tag
-                                </label>
-                                <insite:TextBox runat="server" ID="CriteriaGroupLabel" ClientEvents-OnChange="assign.onGroupLabelChanged();" />
-                            </div>
+                                    <div runat="server" id="PersonCriteriaPanel" visible="false">
+                                        <div class="form-group mb-3 criteria-field">
+                                            <label class="form-label">
+                                                Contact Name
+                                            </label>
+                                            <insite:TextBox ID="CriteriaName" runat="server" MaxLength="200" />
+                                        </div>
 
-                            <div runat="server" id="CriteriaGroupIdentifierField" class="form-group mb-3">
-                                <label class="form-label">
-                                    Group
-                                </label>
-                                <insite:FindGroup runat="server" ID="CriteriaGroupIdentifier" />
-                            </div>
+                                        <div class="form-group mb-3 criteria-field">
+                                            <label class="form-label">
+                                                Email
+                                            </label>
+                                            <insite:TextBox ID="CriteriaEmail" runat="server" MaxLength="200" />
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">
+                                                Group Type
+                                            </label>
+                                            <insite:GroupTypeComboBox runat="server" ID="CriteriaGroupType" ClientEvents-OnChange="assign.onGroupTypeChanged" />
+                                        </div>
+
+                                        <div class="form-group mb-3 criteria-field">
+                                            <label class="form-label">
+                                                Group Tag
+                                            </label>
+                                            <insite:TextBox runat="server" ID="CriteriaGroupLabel" ClientEvents-OnChange="assign.onGroupLabelChanged();" />
+                                        </div>
+
+                                        <div runat="server" id="CriteriaGroupIdentifierField" class="form-group mb-3">
+                                            <label class="form-label">
+                                                Group
+                                            </label>
+                                            <insite:FindGroup runat="server" ID="CriteriaGroupIdentifier" />
+                                        </div>
+                                    </div>
+
+                                </ContentTemplate>
+                            </insite:UpdatePanel>
 
                             <div>
                                 <insite:FilterButton runat="server" ID="CriteriaSearchButton" CausesValidation="false" ButtonStyle="OutlinePrimary" />
@@ -105,7 +140,7 @@
                             <div class="mb-3">
                                 <h4 class="card-title mb-3">
                                     <i class="far fa-database me-1"></i>
-                                    People
+                                    <asp:Literal runat="server" ID="EntityName" />
                                     <span runat="server" id="SearchResultCount" class="badge rounded-pill bg-info ms-1"></span>
                                     <span runat="server" id="SearchSelectCount" class="badge rounded-pill bg-success ms-1"></span>
                                 </h4>
@@ -118,9 +153,17 @@
                                                     <th>
                                                         <input type="checkbox" >
                                                     </th>
-                                                    <th>Person</th>
-                                                    <th>Email</th>
-                                                    <th>Employer</th>
+
+                                                    <insite:Container runat="server" ID="SearchResultHeaderGroup">
+                                                        <th>Group</th>
+                                                        <th>Size</th>
+                                                    </insite:Container>
+
+                                                    <insite:Container runat="server" ID="SearchResultHeaderPerson">
+                                                        <th>Person</th>
+                                                        <th>Email</th>
+                                                        <th>Employer</th>
+                                                    </insite:Container>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -130,17 +173,29 @@
                                                             <td class="cell-select">
                                                                 <asp:CheckBox runat="server" ID="Selected" />
                                                             </td>
-                                                            <td>
-                                                                <a href='<%# Eval("UserIdentifier", "/ui/admin/contacts/people/edit?contact={0}") %>'><%# Eval("FullName") %></a>
-                                                                <span class="form-text"><%# Eval("PersonCode") %></span>
-                                                            </td>
-                                                            <td>
-                                                                <%# Eval("Email", "<a href='mailto:{0}'>{0}</a>") %>
-                                                                <span class="form-text"><%# Eval("EmailAlternate", "<a href='mailto:{0}'>{0}</a>") %></span>
-                                                            </td>
-                                                            <td>
-                                                                <a href='<%# Eval("EmployerIdentifier", "/ui/admin/contacts/groups/edit?contact={0}") %>'><%# Eval("EmployerName") %></a>
-                                                            </td>
+
+                                                            <insite:Container runat="server" Visible='<%# IsGroup %>'>
+                                                                <td>
+                                                                    <a href='<%# Eval("Identifier", "/ui/admin/contacts/groups/edit?contact={0}") %>'><%# Eval("Name") %></a>
+                                                                </td>
+                                                                <td>
+                                                                    <%# GetContactSize(Container.DataItem) %>
+                                                                </td>
+                                                            </insite:Container>
+
+                                                            <insite:Container runat="server" Visible='<%# IsPerson %>'>
+                                                                <td>
+                                                                    <a href='<%# Eval("Identifier", "/ui/admin/contacts/people/edit?contact={0}") %>'><%# Eval("Name") %></a>
+                                                                    <span class="form-text"><%# Eval("Code") %></span>
+                                                                </td>
+                                                                <td>
+                                                                    <%# Eval("Email", "<a href='mailto:{0}'>{0}</a>") %>
+                                                                    <span class="form-text"><%# Eval("EmailAlternate", "<a href='mailto:{0}'>{0}</a>") %></span>
+                                                                </td>
+                                                                <td>
+                                                                    <a href='<%# Eval("EmployerIdentifier", "/ui/admin/contacts/groups/edit?contact={0}") %>'><%# Eval("EmployerName") %></a>
+                                                                </td>
+                                                            </insite:Container>
                                                         </tr>
                                                     </ItemTemplate>
                                                 </asp:Repeater>
@@ -198,13 +253,12 @@
                 };
 
                 function onGroupTypeChanged() {
-                    var value = $('#<%= CriteriaGroupType.ClientID %>').selectpicker('val');
-                    var groupIdField = document.getElementById('<%= CriteriaGroupIdentifierField.ClientID %>');
+                    const value = $('#<%= CriteriaGroupType.ClientID %>').selectpicker('val');
+                    const groupIdField = document.getElementById('<%= CriteriaGroupIdentifierField.ClientID %>');
 
-                    if (value)
-                        groupIdField.style.display = '';
-                    else
-                        groupIdField.style.display = 'none';
+                    if (groupIdField) {
+                        groupIdField.style.display = value ? '' : 'none';
+                    }
                 }
 
                 function onGroupIdentifierParametersChanged() {

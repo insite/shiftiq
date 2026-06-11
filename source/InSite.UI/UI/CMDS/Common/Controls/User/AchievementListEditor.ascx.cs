@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using InSite.Common.Web.UI;
+using InSite.Custom.CMDS.Common.Controls.Server;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
@@ -17,9 +18,9 @@ namespace InSite.UI.CMDS.Common.Controls.User
     {
         #region Delegates
 
-        public List<AchievementListGridItem> GetMatchingAchievements(Guid enterpriseId, Guid organizationId, string scope, string keyword, Guid? departmentId = null)
+        public List<AchievementListGridItem> GetMatchingAchievements(Guid[] ownerOrganizationIdentifiers, string keyword, Guid? departmentId = null)
         {
-            return VCmdsAchievementSearch.SelectOrganizationAchievements(enterpriseId, organizationId, scope, keyword, departmentId);
+            return VCmdsAchievementSearch.SelectOrganizationAchievements(ownerOrganizationIdentifiers, keyword, departmentId);
         }
 
         public delegate List<AchievementListGridItem> GetAssignedAchievements(List<AchievementListGridItem> list);
@@ -231,15 +232,11 @@ namespace InSite.UI.CMDS.Common.Controls.User
 
             NewAchievementTab.Visible = IsEditable;
 
-            var scope = SelectedAccountScope();
-
-            var enterpriseId = ServiceLocator.AppSettings.Application.Organizations.Global;
-
-            var organizationId = Organization.Identifier;
+            var owners = SelectedOwnerOrganizationIdentifiers();
 
             var keyword = SearchText.Text;
 
-            var matchingAchievements = GetMatchingAchievements(enterpriseId, organizationId, scope, keyword, DepartmentId);
+            var matchingAchievements = GetMatchingAchievements(owners, keyword, DepartmentId);
 
             var hasMatchingAchievements = matchingAchievements.Count > 0;
 
@@ -294,17 +291,27 @@ namespace InSite.UI.CMDS.Common.Controls.User
             return assignedAchievements.Count;
         }
 
-        private string SelectedAccountScope()
+        private Guid[] SelectedOwnerOrganizationIdentifiers()
         {
-            var scope = AccountScopes.Organization;
+            var organizationId = Organization.Identifier;
+            var partitionId = ServiceLocator.Partition.Identifier;
 
-            if (Visibility.IsHidden(AccountScope) || AccountScope.Value == AccountScopes.Partition)
-                scope = AccountScopes.Partition;
+            // When the scope selector is hidden, default to the broadest scope.
+            var scope = Visibility.IsHidden(AccountScope)
+                ? OrganizationScopeSelector.ScopeBoth
+                : AccountScope.Value;
 
-            else if (AccountScope.Value == AccountScopes.Enterprise)
-                scope = AccountScopes.Enterprise;
+            switch (scope)
+            {
+                case OrganizationScopeSelector.ScopePartition:
+                    return new[] { partitionId };
 
-            return scope;
+                case OrganizationScopeSelector.ScopeBoth:
+                    return new[] { organizationId, partitionId };
+
+                default: // ScopeOrganization
+                    return new[] { organizationId };
+            }
         }
 
         public void SetEditable(bool isEditable, bool allowSelect)

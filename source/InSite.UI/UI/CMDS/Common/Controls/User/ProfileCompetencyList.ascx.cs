@@ -15,7 +15,7 @@ using Shift.Constant;
 
 namespace InSite.Cmds.Controls.Profiles.Profiles
 {
-    public partial class ProfileCompetencyList : UserControl
+    public partial class ProfileCompetencyList : BaseUserControl
     {
         #region Events
 
@@ -117,6 +117,7 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
             ProfileStandardIdentifier = profile.StandardIdentifier;
 
             SearchProfile.Filter.ExcludeProfileStandardIdentifier = ProfileStandardIdentifier;
+            SearchProfile.Filter.OwnerOrganizationIdentifiers = new[] { Organization.Identifier, OrganizationIdentifiers.CMDS };
 
             CompetencyButtons.Visible = !profile.IsLocked;
             NewCompetencyTab.Visible = !profile.IsLocked;

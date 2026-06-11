@@ -76,9 +76,15 @@ namespace InSite.UI.Lobby.Integration.Lti
 
         private QUser Authenticate(OrganizationState organization, string email, List<string> errors)
         {
-            var organizationSecret = Request.Form["oauth_consumer_key"];
+            var submittedSecret = Request.Form["oauth_consumer_key"];
 
-            if (!StringHelper.Equals(organizationSecret, organization.OrganizationSecret))
+            var configuredSecret = organization.OrganizationSecret;
+
+            var hasSecret = !string.IsNullOrEmpty(configuredSecret);
+
+            var isValidOrganizationSecret = StringHelper.Equals(submittedSecret, configuredSecret);
+
+            if (hasSecret && isValidOrganizationSecret)
             {
                 errors.Add($"OAuth Validation Failed: Organization Secret Mismatch");
                 return null;

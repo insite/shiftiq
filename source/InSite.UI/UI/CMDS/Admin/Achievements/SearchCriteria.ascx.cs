@@ -1,119 +1,99 @@
 ﻿using System;
 
 using InSite.Common.Web.UI;
+using InSite.Custom.CMDS.Common.Controls.Server;
 using InSite.Persistence.Plugin.CMDS;
 
+using Shift.Constant;
 using Shift.Constant.CMDS;
 
 namespace InSite.Cmds.Controls.Training.Achievements
 {
     public partial class AchievementSearchCriteria : SearchCriteriaController<VCmdsAchievementFilter>
     {
+        private Guid PartitionId => ServiceLocator.Partition.Identifier;
+
         public override VCmdsAchievementFilter Filter
         {
             get
             {
                 var filter = new VCmdsAchievementFilter
                 {
-                    Title = Title.Text,
+                    AchievementVisibility = AccountScopes.Organization,
+                    OrganizationIdentifier = Organization.Identifier,
+
                     AchievementType = AchievementType.Value,
-                    AchievementVisibility = AccountScope.Value,
-                    GlobalOrCompanySpecific = true,
-                    AchievementOrganizationIdentifier = !Company.Enabled || CompanyPanel.Visible ? Company.Value : null,
-                    CategoryIdentifier = CategoryPanel.Visible ? Category.ValueAsGuid : null,
+                    Title = Title.Text,
+                    Description = Description.Text,
+
                     IsTimeSensitive = IsTimeSensitive.ValueAsBoolean,
                     AllowSelfDeclared = AllowSelfDeclaration.ValueAsBoolean,
-                    Description = Description.Text
+                    CategoryIdentifier = Category.ValueAsGuid,
+
+                    AchievementScope = AchievementScope.Value
                 };
+
+                ApplyScope(filter);
 
                 return filter;
             }
             set
             {
-                Title.Text = value.Title;
                 AchievementType.Value = value.AchievementType;
-                AccountScope.Value = value.AchievementVisibility;
-                Company.Value = Company.Enabled ? value.AchievementOrganizationIdentifier : Organization.Identifier;
+                Title.Text = value.Title;
+                Description.Text = value.Description;
+
                 IsTimeSensitive.ValueAsBoolean = value.IsTimeSensitive;
                 AllowSelfDeclaration.ValueAsBoolean = value.AllowSelfDeclared;
-
-                InitVisibility();
-
                 Category.ValueAsGuid = value.CategoryIdentifier;
-                Description.Text = value.Description;
+
+                AchievementScope.Value = string.IsNullOrEmpty(value.AchievementScope)
+                    ? OrganizationScopeSelector.ScopeOrganization
+                    : value.AchievementScope;
             }
         }
 
-        protected override void OnInit(EventArgs e)
+        private void ApplyScope(VCmdsAchievementFilter filter)
         {
-            base.OnInit(e);
+            var ownerIds = AchievementScope.ResolveOwnerOrganizationIdentifiers(Organization.Identifier, PartitionId);
 
-            AccountScope.AutoPostBack = true;
-            AccountScope.ValueChanged += Visibility_ValueChanged;
+            if (ownerIds == null)
+                return; // current organization (default): leave filter unchanged
 
-            Company.AutoPostBack = true;
-            Company.ValueChanged += Company_ValueChanged;
+            filter.AchievementVisibility = null;
+            filter.OrganizationIdentifier = null;
+            filter.OwnerOrganizationIdentifiers = ownerIds;
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
-                InitVisibility();
-        }
+            if (IsPostBack)
+                return;
 
-        private void Visibility_ValueChanged(object sender, EventArgs e)
-        {
-            InitVisibility();
-        }
+            AchievementScope.Visible = Identity.IsOperator ||
+                Identity.IsInRole(CmdsRole.SystemAdministrators);
 
-        private void Company_ValueChanged(object o, EventArgs e)
-        {
             LoadCategories();
         }
 
         public override void Clear()
         {
-            Title.Text = null;
             AchievementType.ClearSelection();
-            AccountScope.ClearSelection();
-            Company.Value = AccountScope.IsGlobalItemVisible ? (Guid?)null : Organization.Identifier;
-            IsTimeSensitive.ClearSelection();
-            AllowSelfDeclaration.ClearSelection();
+            Title.Text = null;
             Description.Text = null;
 
-            InitVisibility();
-        }
-
-        private void InitVisibility()
-        {
-            switch (AccountScope.Value)
-            {
-                case AccountScopes.Organization:
-                    CompanyPanel.Visible = true;
-                    CategoryPanel.Visible = true;
-                    break;
-                default:
-                    CompanyPanel.Visible = false;
-                    CategoryPanel.Visible = false;
-                    break;
-            }
-
+            IsTimeSensitive.ClearSelection();
+            AllowSelfDeclaration.ClearSelection();
+            AchievementScope.Value = OrganizationScopeSelector.ScopeOrganization;
             LoadCategories();
         }
 
         private void LoadCategories()
         {
-            if (AccountScope.Value == AccountScopes.Enterprise)
-                return;
-
-            var oldCategoryIdentifier = Category.Value;
-
-            Category.ListFilter.OrganizationIdentifier = Company.Value ?? Guid.Empty;
+            Category.ListFilter.OrganizationIdentifier = Organization.Identifier;
             Category.RefreshData();
-
-            Category.Value = oldCategoryIdentifier;
         }
     }
 }

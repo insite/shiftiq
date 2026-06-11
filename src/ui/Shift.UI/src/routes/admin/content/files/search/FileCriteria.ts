@@ -1,4 +1,4 @@
-import { ApiSearchFiles } from "@/api/controllers/file/ApiSearchFiles";
+import { ApiSearchFiles } from "@/api/controllers/assets/files/ApiSearchFiles";
 import { BaseCriteria } from "@/components/search/BaseCriteria";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 import { DateTimeInvalid, DateTimeParts } from "@/helpers/date/dateTimeTypes";

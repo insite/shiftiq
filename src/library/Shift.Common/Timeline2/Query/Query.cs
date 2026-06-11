@@ -55,6 +55,12 @@ namespace Shift.Common
         public QueryFilter Filter { get; set; } = new QueryFilter();
 
         public Dictionary<Guid, string> Texts { get; set; } = new Dictionary<Guid, string>();
+
+        public void DisablePaging()
+        {
+            if (Filter != null)
+                Filter.Page = 0;
+        }
     }
 
     public interface IQueryRunner

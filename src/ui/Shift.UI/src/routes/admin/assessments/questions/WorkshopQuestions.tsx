@@ -15,6 +15,11 @@ import { workshopQuestionFilter, WorkshopQuestionFilterState } from "./workshopQ
 import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { WorkshopQuestion } from "@/contexts/workshop/models/WorkshopQuestion";
 import { WorkshopAreaCompetencies } from "@/contexts/workshop/models/WorkshopAreaCompetencies";
+import { urlHelper } from "@/helpers/urlHelper";
+import WorkshopQuestions_AddButton from "./WorkshopQuestions_AddButton";
+import { WorkshopNewQuestionCommand } from "@/api/controllers/assessments/workshop/_workshopController";
+import { useSaveWithResultAction } from "@/hooks/useSaveWithResultAction";
+import { ApiSpecWorkshopSet } from "@/api/controllers/assessments/workshop/ApiSpecWorkshopSet";
 
 interface Props {
     selectedQuestionId: string | null;
@@ -44,6 +49,9 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
     const [draftFilter, setDraftFilter] = useState<WorkshopQuestionFilterState>(() => workshopQuestionFilter.createWorkshopQuestionsFilterState(null, null));
     const [appliedFilter, setAppliedFilter] = useState<WorkshopQuestionFilterState>(() => workshopQuestionFilter.createWorkshopQuestionsFilterState(null, null));
     const [isFilterLoading, setIsFilterLoading] = useState(false);
+    const [moveToQuestionId, setMoveToQuestionId] = useState<string | null>(null);
+
+    const { isSaving: isAddingNewQuestion, runSave } = useSaveWithResultAction<ApiSpecWorkshopSet | null>();
 
     const scrolledToQuestionRef = useRef<boolean>(false);
 
@@ -56,6 +64,8 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
     const serializedFilter = useMemo(() => {
         return workshopQuestionFilter.serializeFilter(appliedFilter);
     }, [appliedFilter]);
+
+    const returnUrl = urlHelper.getInSiteReturnUrl(`tab=questions&filter=${serializedFilter}`);
 
     useEffect(() => {
         const defaultCompetencyId = getDefaultCompetencyId(sectionCompetencies);
@@ -88,6 +98,15 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
 
         scrolledToQuestionRef.current = true;
     }, [selectedQuestionId, filteredQuestions]);
+
+    useEffect(() => {
+        if (!moveToQuestionId) {
+            return;
+        }
+        moveToQuestion(moveToQuestionId);
+        setMoveToQuestionId(null);
+    }, [moveToQuestionId]);
+
 
     async function handleSectionChange(nextSectionId: string | null) {
         if (!nextSectionId || nextSectionId === sectionId || !sections) {
@@ -165,6 +184,25 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
         setAppliedFilter(emptyAppliedFilter);
     }
 
+    async function handleAddNewQuestion(command: WorkshopNewQuestionCommand) {
+        if (!specificationId || !draftFilter.sectionId || !areaCompetencies || !window.confirm("Are you sure you want to add a new question?")) {
+            return;
+        }
+        const set =  await runSave(() => shiftClient.workshop.addQuestion(bankId, specificationId, draftFilter.sectionId!, draftFilter.competencyId, command));
+        if (!set) {
+            return;
+        }
+
+        const { competencies, questions } = workshopQuestionAdapter.getSetData(set, areaCompetencies);
+        setSectionData(competencies, questions, true);
+
+        const questionId = (set as ApiSpecWorkshopSet).QuestionId;
+
+        if (questionId) {
+            setMoveToQuestionId(questionId);
+        }
+    }
+
     if (!sections?.length) {
         return (
             <FormCard>
@@ -178,11 +216,14 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
             <WorkshopQuestions_Filter
                 filter={draftFilter}
                 isLoading={isFilterLoading}
+                isAddingNewQuestion={isAddingNewQuestion}
+                returnUrl={returnUrl}
                 onSectionChange={handleSectionChange}
                 onCompetencyChange={handleCompetencyChange}
                 onFilterChange={setDraftFilter}
                 onApply={handleApplyFilter}
                 onClear={handleClearFilter}
+                onAddNewQuestion={handleAddNewQuestion}
             />
 
             <hr className="mt-4 mb-3" />
@@ -207,6 +248,7 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
                                     <WorkshopQuestions_Row
                                         key={question.questionId}
                                         id={getQuestionRowId(question.questionId)}
+                                        setId={appliedFilter.sectionId}
                                         question={question}
                                         hasPrev={index > 0}
                                         hasNext={index < filteredQuestions.length - 1}
@@ -214,10 +256,22 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
                                         onMoveTop={() => handleMoveTop(tableRef)}
                                         onMovePrev={index > 0 ? () => moveToQuestion(filteredQuestions[index - 1].questionId) : undefined}
                                         onMoveNext={index < filteredQuestions.length - 1 ? () => moveToQuestion(filteredQuestions[index + 1].questionId) : undefined}
+                                        onMoveToQuestion={setMoveToQuestionId}
                                     />
                                 ))}
                             </tbody>
                         </table>
+                    )}
+
+                    {specificationId && draftFilter.sectionId && (
+                        <WorkshopQuestions_AddButton
+                            bankId={bankId}
+                            setId={draftFilter.sectionId}
+                            competencyId={draftFilter.competencyId}
+                            returnUrl={returnUrl}
+                            isAddingNewQuestion={isAddingNewQuestion}
+                            onClick={handleAddNewQuestion}
+                        />
                     )}
                 </>
             )}

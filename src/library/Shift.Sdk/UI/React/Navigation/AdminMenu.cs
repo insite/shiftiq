@@ -9,7 +9,7 @@
                 Title = "Communication",
                 MenuItems = new NavigationItem[]
                 {
-                    new NavigationItem { Url = "/ui/admin/home", Icon = "grid-round", Title = "Toolkits (Apps)" },
+                    new NavigationItem { Url = "/client/admin/home", Icon = "grid-round", Title = "Toolkits (Apps)" },
                     new NavigationItem { Url = "/ui/admin/contacts/home", Icon = "file-chart-line", Title = "Contacts" },
                     new NavigationItem { Url = "/ui/admin/workflow/forms/home", Icon = "check-square", Title = "Forms (Surveys)" },
                     new NavigationItem { Url = "/ui/admin/messages/home", Icon = "paper-plane", Title = "Messages" },

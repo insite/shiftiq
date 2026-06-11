@@ -1,6 +1,6 @@
 <%@ Page Language="C#" CodeBehind="TrainingHistoryByWorker.aspx.cs" Inherits="InSite.Cmds.Actions.Reporting.Report.TrainingHistoryByWorker" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
-<%@ Register Src="~/UI/CMDS/Common/Controls/User/AchievementCriteriaSelector.ascx" TagName="AchievementCriteriaSelector" TagPrefix="uc" %>
+<%@ Register Src="~/UI/CMDS/Common/Controls/User/TrainingReportCriteria.ascx" TagName="TrainingReportCriteria" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent">
 
@@ -19,7 +19,7 @@
         <insite:NavItem runat="server" ID="CriteriaTab" Title="Criteria" Icon="far fa-search" IconPosition="BeforeText">
 
             <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="ReportUpdatePanel" />
-                
+
             <insite:UpdatePanel runat="server" ID="ReportUpdatePanel">
                 <Triggers>
                     <asp:PostBackTrigger ControlID="ReportButton" />
@@ -27,63 +27,7 @@
                 <ContentTemplate>
                     <div class="card border-0 shadow-lg">
                         <div class="card-body">
-
-                            <div class="row">
-                                <div class="col-lg-6">
-
-                                    <div class="form-group mb-3">
-                                        <label class="form-label">
-                                            Department
-                                        </label>
-                                        <cmds:FindDepartment runat="server" ID="FindDepartment" MaxSelectionCount="0" EmptyMessage="All departments" />
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label class="form-label">
-                                            Learner
-                                        </label>
-                                        <insite:FindPerson runat="server" ID="FindLearner" MaxSelectionCount="0" Enabled="false" EmptyMessage="All learners" />
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label class="form-label">
-                                            Settings
-                                        </label>
-                                        <div>
-                                            <asp:RadioButtonList ID="IsRequired" runat="server" RepeatLayout="Flow">
-                                                <asp:ListItem Text="Required and Optional Achievements" Selected="True" />
-                                                <asp:ListItem Value="True" Text="Required Achievements Only" />
-                                            </asp:RadioButtonList>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-6">
-
-                                    <div class="form-group mb-3">
-                                        <label class="form-label">
-                                            Program
-                                        </label>
-                                        <insite:FindProgram runat="server" ID="FindProgram" MaxSelectionCount="0" CausesValidation="true" ValidationGroup="Other" EmptyMessage="All programs" />
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label class="form-label">
-                                            Achievement Type
-                                        </label>
-                                        <cmds:AchievementTypeSelector runat="server" ID="AchievementType" AllowBlank="true" NullText="" />
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label class="form-label">
-                                            Achievement
-                                        </label>
-                                        <insite:FindAchievement runat="server" ID="FindAchievement" MaxSelectionCount="0" EmptyMessage="All achievements" />
-                                    </div>
-
-                                </div>
-                            </div>
-
+                            <uc:TrainingReportCriteria runat="server" ID="Criteria" ValidationGroup="Report" />
                         </div>
                     </div>
 

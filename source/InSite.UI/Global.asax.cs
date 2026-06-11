@@ -100,6 +100,9 @@ namespace InSite
             // Configure JSON serialization.
             Shift.Common.Json.JsonSettings.Register();
 
+            // Register this partition and its organizations with the Hub.
+            RegisterPartition();
+
             // Initialize integrations to third-party API services.
             InitIntegrations();
 
@@ -144,7 +147,7 @@ namespace InSite
 
             PermissionContext.GetMatrix = () => PermissionCache.Matrix;
 
-            PermissionCache.Initialize(partition.Slug, routeSettings);
+            PermissionCache.Initialize(partition.Slug, routeSettings, ServiceLocator.FilePaths);
         }
 
         private void InitializeFileSystem()
@@ -185,6 +188,73 @@ namespace InSite
                 ServiceLocator.AppSettings.Environment.Name,
                 organizationIntegrations
             );
+        }
+
+        private static List<string> SplitCsv(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return new List<string>();
+
+            return value
+                .Split(',')
+                .Select(x => x.Trim())
+                .Where(x => x.Length > 0)
+                .ToList();
+        }
+
+        private static void RegisterPartition()
+        {
+            try
+            {
+                var partition = ServiceLocator.AppSettings.Partition;
+
+                var environment = ServiceLocator.AppSettings.Environment;
+
+                var organizations = OrganizationSearch.SelectProjections()
+                    .Select(x => new Shift.Common.Integration.Partitions.OrganizationRegistration
+                    {
+                        Slug = x.OrganizationCode,
+                        Name = x.CompanyName,
+                        Identifier = x.OrganizationIdentifier,
+                        WebsiteUrl = x.CompanyWebSiteUrl,
+                        LogoUrl = UrlHelper.GetAbsoluteUrl(partition.Domain, environment.Name, x.OrganizationLogoUrl, partition.Slug),
+                        Account = new Shift.Common.Integration.Partitions.AccountRegistration
+                        {
+                            Name = x.CompanyTitle,
+                            Status = x.AccountStatus,
+                            Code = x.CustomerCode,
+                            Number = x.CustomerNumber,
+                            OpenedAt = x.AccountOpened,
+                            ClosedAt = x.AccountClosed
+                        }
+                    })
+                    .ToList();
+
+                var registration = new Shift.Common.Integration.Partitions.PartitionRegistration
+                {
+                    Number = partition.Number,
+                    Name = partition.Name,
+                    Brand = partition.Brand,
+                    Theme = partition.Style,
+                    Domain = partition.Domain,
+                    Email = partition.Email,
+                    Slug = partition.Slug,
+                    Identifier = partition.Identifier,
+                    Whitelist = SplitCsv(partition.WhitelistDomains),
+                    HelpUrl = partition.HelpUrl,
+                    LogoUrl = UrlHelper.GetAbsoluteUrl(partition.Domain, environment.Name, partition.LogoUrl, partition.Slug),
+                    Organizations = organizations
+                };
+
+                var client = new Shift.Common.Integration.Partitions.PartitionClient(ServiceLocator.AppSettings.Engine);
+
+                client.Register(registration);
+            }
+            catch (Exception ex)
+            {
+                // Registration is best-effort; never block application startup.
+                AppSentry.SentryError(ex);
+            }
         }
 
         protected void Application_BeginRequest()

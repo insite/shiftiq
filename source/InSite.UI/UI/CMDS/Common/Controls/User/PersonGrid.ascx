@@ -35,6 +35,7 @@
 		<insite:BoundField HeaderText="Name" DataField="FullName" FieldName="NameWithoutLink" />
 		<insite:BoundField HeaderText="City" DataField="AddressCity" FieldName="City"/>
 		<insite:BoundField HeaderText="Province" DataField="AddressProvince" FieldName="Province"/>
+		<insite:BoundField HeaderText="Membership Org" DataField="MembershipOrganizationCode" FieldName="MembershipOrg"/>
 
 		<insite:TemplateField HeaderText="Organization" FieldName="Organization">
 			<ItemTemplate>

@@ -84,7 +84,7 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Cmds.Controls.Profiles.Profiles.ProfileHierarchy ProfileHierarchy;
+        protected global::InSite.Cmds.Controls.Profiles.Profiles.ProfileOwner ProfileHierarchy;
 
         /// <summary>
         /// CompetencyTab control.

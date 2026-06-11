@@ -1,4 +1,4 @@
-import { ApiSpecWorkshop } from "@/api/controllers/workshop/ApiSpecWorkshop";
+import { ApiSpecWorkshop } from "@/api/controllers/assessments/workshop/ApiSpecWorkshop";
 import { WorkshopStandard } from "@/contexts/workshop/models/WorkshopStandard";
 import { SpecWorkshopState } from "@/contexts/workshop/states/SpecWorkshopState";
 

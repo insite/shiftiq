@@ -42,13 +42,49 @@ namespace InSite.UI.Admin.Assets.Files.Controls
         protected global::InSite.Common.Web.UI.ItemNameComboBox FileCategory;
 
         /// <summary>
-        /// FileSubcategory control.
+        /// FileSubcategorySelectorView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.DocumentSubTypeComboBox FileSubcategory;
+        protected global::InSite.Common.Web.UI.MultiFieldView FileSubcategorySelectorView;
+
+        /// <summary>
+        /// FileSubcategorySelector control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DocumentSubTypeComboBox FileSubcategorySelector;
+
+        /// <summary>
+        /// SwitchToManualButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button SwitchToManualButton;
+
+        /// <summary>
+        /// FileSubcategoryTextView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.MultiFieldView FileSubcategoryTextView;
+
+        /// <summary>
+        /// FileSubcategoryText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox FileSubcategoryText;
 
         /// <summary>
         /// FileDescription control.
@@ -132,24 +168,6 @@ namespace InSite.UI.Admin.Assets.Files.Controls
         protected global::InSite.Common.Web.UI.TextBox DocumentName;
 
         /// <summary>
-        /// AllowLearnerToViewYes control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.RadioButton AllowLearnerToViewYes;
-
-        /// <summary>
-        /// AllowLearnerToViewNo control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.RadioButton AllowLearnerToViewNo;
-
-        /// <summary>
         /// FileExpiry control.
         /// </summary>
         /// <remarks>
@@ -195,6 +213,15 @@ namespace InSite.UI.Admin.Assets.Files.Controls
         protected global::InSite.Common.Web.UI.CheckBox IsApproved;
 
         /// <summary>
+        /// PermissionPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel PermissionPanel;
+
+        /// <summary>
         /// PermissionList control.
         /// </summary>
         /// <remarks>
@@ -202,5 +229,32 @@ namespace InSite.UI.Admin.Assets.Files.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Admin.Assets.Files.Controls.FilePermissionList PermissionList;
+
+        /// <summary>
+        /// AllowLearnerToViewPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AllowLearnerToViewPanel;
+
+        /// <summary>
+        /// AllowLearnerToViewYes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.RadioButton AllowLearnerToViewYes;
+
+        /// <summary>
+        /// AllowLearnerToViewNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.RadioButton AllowLearnerToViewNo;
     }
 }

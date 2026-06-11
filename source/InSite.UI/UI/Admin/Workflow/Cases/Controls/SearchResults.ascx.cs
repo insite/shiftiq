@@ -5,8 +5,6 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using DocumentFormat.OpenXml.Spreadsheet;
-
 using InSite.Application.Cases.Write;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Contents.Read;
@@ -18,37 +16,17 @@ using Shift.Common.Linq;
 using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
-using CheckBox = InSite.Common.Web.UI.CheckBox;
-
 namespace InSite.Admin.Issues.Controls
 {
     public partial class SearchResults : SearchResultsGridViewController<QIssueFilter>
     {
         #region Properties
 
-        private bool ManyValues
+        private HashSet<Guid> SelectedItems
         {
-            get { return (bool)ViewState[nameof(ManyValues)]; }
-            set { ViewState[nameof(ManyValues)] = value; }
-        }
-
-        private string IssueType
-        {
-            get { return (string)ViewState[nameof(IssueType)]; }
-            set { ViewState[nameof(IssueType)] = value; }
-        }
-
-        private Dictionary<Guid, bool> SelectedItems
-        {
-            get => (Dictionary<Guid, bool>)(ViewState[nameof(SelectedItems)]
-                ?? (ViewState[nameof(SelectedItems)] = new Dictionary<Guid, bool>()));
+            get => (HashSet<Guid>)(ViewState[nameof(SelectedItems)]
+                ?? (ViewState[nameof(SelectedItems)] = new HashSet<Guid>()));
             set => ViewState[nameof(SelectedItems)] = value;
-        }
-
-        public bool IsCheckboxColumnVisible
-        {
-            get => (bool)(ViewState[nameof(IsCheckboxColumnVisible)] ?? false);
-            set => ViewState[nameof(IsCheckboxColumnVisible)] = value;
         }
 
         #endregion
@@ -72,10 +50,10 @@ namespace InSite.Admin.Issues.Controls
             base.OnInit(e);
 
             Grid.RowDataBound += Grid_RowDataBound;
-            Grid.PageIndexChanging += Grid_PageIndexChanging;
 
             AssignButton.Click += AssignButton_Click;
             SaveBulkButton.Click += SaveBulkButton_Click;
+            SaveBulkCaseStatusButton.Click += SaveBulkCaseStatusButton_Click;
 
             IssueStatus.StatusCategory = "Closed";
         }
@@ -86,14 +64,7 @@ namespace InSite.Admin.Issues.Controls
 
             if (IsPostBack)
             {
-                var hiddenShowValue = hfShowCheckboxColumn.Value == "true";
-                ScriptManager.RegisterStartupScript(this, GetType(), "enableBulkSaveButton", "enableBulkSaveButton();", true);
-                SetSaveButtonVisibility();
-
-                if (hiddenShowValue == IsCheckboxColumnVisible)
-                    RestoreScrollPosition();
-                else
-                    RenderBulkCloseStatusFunctionality(hiddenShowValue);
+                SyncSelectedItems();
             }
             else
             {
@@ -102,27 +73,20 @@ namespace InSite.Admin.Issues.Controls
             }
         }
 
-        private void RenderBulkCloseStatusFunctionality(bool hiddenShowValue)
-        {
-            if (!hiddenShowValue)
-                SelectedItems = new Dictionary<Guid, bool>();
-
-            AssignButtonStart.Enabled = !hiddenShowValue;
-            IsCheckboxColumnVisible = hiddenShowValue;
-            Grid.Columns[0].Visible = IsCheckboxColumnVisible;
-            BulkUpdatePanel.Visible = IsCheckboxColumnVisible;
-            BulkCloseCasesButton.Enabled = !IsCheckboxColumnVisible;
-
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "scrollToBottom", "window.scrollTo(0, document.body.scrollHeight);", true);
-        }
-
         #endregion
 
         #region Search results
 
         protected override int SelectCount(QIssueFilter filter)
         {
-            return ServiceLocator.IssueSearch.CountIssues(filter);
+            var count = ServiceLocator.IssueSearch.CountIssues(filter);
+
+            var canUpdateStatus = !string.IsNullOrEmpty(filter.IssueType) && count > 0;
+
+            BulkUpdateCaseStatusPanel.Visible = canUpdateStatus;
+            BulkCloseCasePanel.Visible = canUpdateStatus;
+
+            return count;
         }
 
         protected override IListSource SelectData(QIssueFilter filter)
@@ -132,6 +96,11 @@ namespace InSite.Admin.Issues.Controls
             GetIssueComments(issues);
             CalcResponseAttachmentCount(issues);
             GetDepartments(issues);
+
+            BulkHasSelectionOnOtherPages.Value =
+                SelectedItems.Any(x => !issues.Any(y => y.IssueIdentifier == x))
+                    ? "true"
+                    : "false";
 
             return issues.ToSearchResult();
         }
@@ -184,11 +153,8 @@ namespace InSite.Admin.Issues.Controls
                 lastCommentDate.Text = LocalizeDate(lastComment.CommentPosted);
             }
 
-            var chkSelect = (CheckBox)e.Row.FindControl("SelectCase");
-            var itemId = (Guid)Grid.DataKeys[e.Row.RowIndex].Value;
-
-            if (chkSelect != null && SelectedItems.ContainsKey(itemId))
-                chkSelect.Checked = SelectedItems[itemId];
+            var chk = (ICheckBoxControl)e.Row.FindControl("SelectCheckBox");
+            chk.Checked = SelectedItems.Contains(issueIdentifier);
         }
 
         private void AssignButton_Click(object sender, EventArgs e)
@@ -196,14 +162,13 @@ namespace InSite.Admin.Issues.Controls
             if (!Page.IsValid)
                 return;
 
-            var issueIds = GetSelectedIssues();
-            if (issueIds.Count == 0)
+            if (SelectedItems.Count == 0)
                 return;
 
             var ownerUserId = NewOwnerID.Value ?? throw new ArgumentNullException("NewOwnerID");
             var commands = new List<Command>();
 
-            foreach (var issueId in issueIds)
+            foreach (var issueId in SelectedItems)
             {
                 var issue = ServiceLocator.IssueSearch.GetIssue(issueId);
                 if (issue.OwnerUserIdentifier == ownerUserId)
@@ -222,6 +187,8 @@ namespace InSite.Admin.Issues.Controls
 
             ServiceLocator.SendCommands(commands);
 
+            ClearSelectedItems();
+
             OwnerAssigned?.Invoke(this, new EventArgs());
         }
 
@@ -233,7 +200,7 @@ namespace InSite.Admin.Issues.Controls
             if (SelectedItems.Count == 0)
                 return;
 
-            var issueStatusId = GetIssueStatusId();
+            var issueStatusId = IssueStatus.ValueAsGuid;
 
             if (!issueStatusId.HasValue)
                 return;
@@ -241,81 +208,66 @@ namespace InSite.Admin.Issues.Controls
             var commands = new List<Command>();
 
             foreach (var item in SelectedItems)
-                commands.Add(new ChangeIssueStatus(item.Key, issueStatusId.Value, DateTimeOffset.UtcNow));
+                commands.Add(new ChangeIssueStatus(item, issueStatusId.Value, DateTimeOffset.UtcNow));
 
             if (commands.Count == 0)
                 return;
 
             ServiceLocator.SendCommands(commands);
 
-            RenderBulkCloseStatusFunctionality(false);
+            ClearSelectedItems();
 
             RefreshGrid();
         }
 
-        protected void SelectAllCases_CheckedChanged(object sender, EventArgs e)
+        private void SaveBulkCaseStatusButton_Click(object sender, EventArgs e)
         {
-            var chkSelectAll = (CheckBox)sender;
+            if (SelectedItems.Count == 0 || BulkUpdateCaseStatus.ValueAsGuid == null)
+                return;
 
-            foreach (GridViewRow row in Grid.Rows)
-            {
-                var chkSelect = (CheckBox)row.FindControl("SelectCase");
-                if (chkSelect == null)
-                    continue;
+            var statusId = BulkUpdateCaseStatus.ValueAsGuid.Value;
 
-                chkSelect.Checked = chkSelectAll.Checked;
-                Guid itemId = (Guid)Grid.DataKeys[row.RowIndex].Value;
-                SelectedItems[itemId] = chkSelectAll.Checked;
-            }
+            var commands = new List<Command>();
+            foreach (var caseId in SelectedItems)
+                commands.Add(new ChangeIssueStatus(caseId, statusId, DateTimeOffset.UtcNow));
+
+            ServiceLocator.SendCommands(commands);
+
+            ClearSelectedItems();
+
+            RefreshGrid();
         }
 
-        protected void Grid_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        #endregion
+
+        #region Public methods
+
+        public void ClearSelectedItems()
         {
-            foreach (GridViewRow row in Grid.Rows)
-            {
-                var chkSelect = (CheckBox)row.FindControl("SelectCase");
-                var itemId = (Guid)Grid.DataKeys[row.RowIndex].Value;
+            SelectedItems.Clear();
 
-                if (chkSelect != null)
-                    SelectedItems[itemId] = chkSelect.Checked;
-            }
-
-            Grid.PageIndex = e.NewPageIndex;
-        }
-
-        protected void SelectCase_CheckedChanged(object sender, EventArgs e)
-        {
-            var chkSelect = (CheckBox)sender;
-            var row = (GridViewRow)chkSelect.NamingContainer;
-            var itemId = (Guid)Grid.DataKeys[row.RowIndex].Value;
-
-            SelectedItems[itemId] = chkSelect.Checked;
-
-            SaveScrollPosition();
-            SetSaveButtonVisibility();
-        }
-
-        private void SetSaveButtonVisibility()
-        {
-            SaveBulkButton.Enabled = SelectedItems.Any() && SelectedItems.Any(item => item.Value);
+            BulkMode.Value = "";
         }
 
         #endregion
 
         #region Private Methods
 
-        private List<Guid> GetSelectedIssues()
+        private void SyncSelectedItems()
         {
-            var list = new List<Guid>();
-
             foreach (GridViewRow row in Grid.Rows)
             {
-                var assignCheckBox = (ICheckBoxControl)row.FindControl("AssignCheckBox");
-                if (assignCheckBox.Checked)
-                    list.Add(GetDataKeys(row)[0]);
+                var chk = (ICheckBoxControl)row.FindControl("SelectCheckBox");
+                var caseId = (Guid)Grid.DataKeys[row.RowIndex].Value;
+
+                if (chk.Checked)
+                    SelectedItems.Add(caseId);
+                else
+                    SelectedItems.Remove(caseId);
             }
 
-            return list;
+            StartBulkCaseStatusButton.Enabled = SelectedItems.Count > 0;
+            SaveBulkButton.Enabled = SelectedItems.Count > 0;
         }
 
         private void GetIssueComments(List<VIssue> issues)
@@ -362,74 +314,22 @@ namespace InSite.Admin.Issues.Controls
                 .ToDictionary(x => x.Key, x => string.Join(", ", x.Select(y => y.Group.GroupName).OrderBy(y => y)));
         }
 
-        private void SaveScrollPosition()
-        {
-            var script = @"
-var scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-document.getElementById('" + hfScrollPosition.ClientID + @"').value = scrollPosition;";
-            ScriptManager.RegisterStartupScript(this, GetType(), "SaveScrollPosition", script, true);
-        }
-
-        private void RestoreScrollPosition()
-        {
-            var scrollPosition = hfScrollPosition.Value;
-
-            if (!string.IsNullOrEmpty(scrollPosition))
-            {
-                var script = $@"
-window.onload = function() {{
-    window.scrollTo(0, {scrollPosition});
-}};";
-                ScriptManager.RegisterStartupScript(this, GetType(), "RestoreScrollPosition", script, true);
-            }
-        }
-
         internal void IssuTypeSet(bool hasValue, string issueType)
         {
+            StartBulkCaseStatusButton.Enabled = hasValue;
             BulkCloseCasesButton.Enabled = hasValue;
 
             if (!hasValue)
-                BulkUpdateStatusInfo.AddMessage(AlertType.Warning, "Bulk Close Case - Available only when filtering by same Case Type.");
+                BulkUpdateStatusInfo.AddMessage(AlertType.Warning, "Bulk Case Update - Available only when filtering by same Case Type.");
+
+            BulkUpdateCaseStatus.IssueType = issueType;
+            BulkUpdateCaseStatus.RefreshData();
 
             if (hasValue && issueType.HasValue())
             {
-                IssueType = issueType;
-                IssueStatus.IssueType = IssueType;
+                IssueStatus.IssueType = issueType;
                 IssueStatus.RefreshData();
-
-                SetIssueStatusTypeControlsVisibility(IssueStatus.Items);
             }
-        }
-
-        private void SetIssueStatusTypeControlsVisibility(ComboBoxItemCollection<ComboBoxItem> items)
-        {
-            NoCaseStatus.Visible = OneCaseStatus.Visible = ManyCaseStatus.Visible = false;
-
-            if (items.Count() == 0)
-            {
-                ManyValues = false;
-                NoCaseStatus.Visible = true;
-            }
-            else if (items.Count() == 1)
-            {
-                ManyValues = false;
-                OneCaseStatus.Visible = true;
-                OneCaseStatusLiteral.Text = items.FirstOrDefault().Text;
-            }
-            else
-            {
-                ManyValues = true;
-                ManyCaseStatus.Visible = true;
-            }
-        }
-
-        private Guid? GetIssueStatusId()
-        {
-            if (ManyValues)
-                return IssueStatus.ValueAsGuid;
-
-            var items = ServiceLocator.IssueSearch.GetStatuses(CurrentSessionState.Identity.Organization.Identifier, IssueType, "Closed");
-            return items.FirstOrDefault()?.StatusIdentifier ?? null;
         }
 
         #endregion

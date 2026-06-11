@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Web.UI;
 
 using InSite.Domain.Organizations;
@@ -27,6 +28,8 @@ namespace InSite.Cmds.Controls.Contacts.Companies
             set => ViewState[nameof(OrganizationIdentifier)] = value;
         }
 
+        private Guid PartitionId => ServiceLocator.AppSettings.Partition.Identifier;
+
         #endregion
 
         #region Initialization
@@ -38,6 +41,8 @@ namespace InSite.Cmds.Controls.Contacts.Companies
             LogoUpdatePanel.Request += LogoUpdatePanel_Request;
 
             RemoveLogoButton.Click += RemoveLogoButton_Click;
+
+            AddInvoicingUserToGroup.Click += AddInvoicingUserToGroup_Click;
         }
 
         #endregion
@@ -53,6 +58,8 @@ namespace InSite.Cmds.Controls.Contacts.Companies
             CompanyName.Text = organization.CompanyDescription.LegalName;
             Acronym.Text = organization.CompanyName;
             OrganizationCode.Text = organization.OrganizationCode;
+            CustomerNumber.Text = organization.CustomerNumber;
+            CustomerCode.Text = organization.CustomerCode;
 
             Description.Text = organization.CompanyDescription.CompanySummary;
 
@@ -64,6 +71,8 @@ namespace InSite.Cmds.Controls.Contacts.Companies
             EnableDivisions.Checked = OrganizationHelper.EnableDivisions(organization.CompanyDescription.CompanySize);
 
             SetupLogo(organization.PlatformCustomization.PlatformUrl.Logo);
+
+            BindInvoicing();
         }
 
         public void GetInputValues(OrganizationState organization)
@@ -71,14 +80,60 @@ namespace InSite.Cmds.Controls.Contacts.Companies
             organization.CompanyDescription.LegalName = CompanyName.Text;
             organization.CompanyName = Acronym.Text;
             organization.OrganizationCode = OrganizationCode.Text;
+            organization.CustomerNumber = CustomerNumber.Text;
+            organization.CustomerCode = CustomerCode.Text;
             organization.CompanyDescription.CompanySummary = Description.Text;
             organization.PlatformCustomization.TenantUrl.WebSite = WebSiteUrl.Text;
             organization.CompanyDescription.CompanySize = EnableDivisions.Checked ? CompanySize.Large : CompanySize.Medium;
         }
 
+        private void BindInvoicing()
+        {
+            var organizationId = OrganizationIdentifier;
+
+            var teams = ServiceLocator.GroupSearch
+                .BindGroups(
+                    x => new { x.GroupIdentifier, x.GroupName },
+                    x => x.OrganizationIdentifier == PartitionId
+                    && x.GroupType == "Team"
+                    && x.GroupCategory == "Invoicing"
+                    );
+
+            var groupIds = teams.Select(x => x.GroupIdentifier).ToArray();
+
+            InvoicingGroup.ListFilter.OrganizationIdentifier = PartitionId;
+            InvoicingGroup.ListFilter.GroupType = "Team";
+            InvoicingGroup.ListFilter.IncludeGroupIdentifiers = groupIds;
+            InvoicingGroup.RefreshData();
+
+            InvoicingUser.Filter.OrganizationIdentifiers = new[] { organizationId };
+
+            InvoicingContacts.LoadData(organizationId);
+        }
+
         #endregion
 
         #region Event handlers
+
+        private void AddInvoicingUserToGroup_Click(object sender, EventArgs e)
+        {
+            var groupId = InvoicingGroup.ValueAsGuid;
+
+            var userId = InvoicingUser.Value;
+
+            if (!groupId.HasValue || !userId.HasValue)
+                return;
+
+            var membership = MembershipFactory.Create(userId.Value, groupId.Value, OrganizationIdentifier);
+
+            MembershipStore.Save(membership, false, false, false, true);
+
+            InvoicingGroup.ValueAsGuid = null;
+
+            InvoicingUser.Value = null;
+
+            BindInvoicing();
+        }
 
         private void LogoUpdatePanel_Request(object sender, StringValueArgs e)
         {
@@ -144,12 +199,17 @@ namespace InSite.Cmds.Controls.Contacts.Companies
             var hasLogo = !string.IsNullOrEmpty(imageUrl);
 
             LogoImage.Visible = hasLogo;
+            LogoLink.Visible = hasLogo;
             UploadLogoButton.Visible = !hasLogo;
             ReplaceLogoButton.Visible = hasLogo;
             RemoveLogoButton.Visible = hasLogo;
 
             if (hasLogo)
-                LogoImage.ImageUrl = imageUrl + "?" + UniqueIdentifier.Create();
+            {
+                var cacheBustedUrl = imageUrl + "?" + UniqueIdentifier.Create();
+                LogoImage.ImageUrl = cacheBustedUrl;
+                LogoLink.HRef = cacheBustedUrl;
+            }
         }
 
         #endregion

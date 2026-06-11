@@ -32,6 +32,7 @@ export function useEditForm<FormValues extends object>(
     }
 
     return {
+        id,
         backUrl,
         isLoaded,
         isSaving,

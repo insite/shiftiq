@@ -119,7 +119,7 @@
                             <insite:RequiredValidator runat="server" FieldName="Uploaded JSON" ControlToValidate="JsonInput" Display="None" ValidationGroup="Report" />
                             <asp:CustomValidator runat="server" ID="JsonSchemaValidator" ValidateEmptyText="false" ValidationGroup="Report" Display="None"  />
                         </h3>
-                        <insite:TextBox runat="server" ID="JsonInput" TextMode="MultiLine" Rows="15" />
+                        <insite:TextBox runat="server" ID="JsonInput" TextMode="MultiLine" Rows="15" AllowHtml="true" />
                     </div>
                 </div>
             </div>

@@ -5,10 +5,11 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+using Humanizer;
+
 using InSite.Admin.Records.Logbooks;
 using InSite.Application.Contacts.Read;
 using InSite.Application.JournalSetups.Write;
-using InSite.Application.Records.Read;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
@@ -42,10 +43,10 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
             set => ViewState[nameof(SearchResultDataKeys)] = value;
         }
 
-        private HashSet<Guid> SearchSelectedUsers
+        private HashSet<Guid> SearchSelectedEntities
         {
-            get => (HashSet<Guid>)ViewState[nameof(SearchSelectedUsers)];
-            set => ViewState[nameof(SearchSelectedUsers)] = value;
+            get => (HashSet<Guid>)ViewState[nameof(SearchSelectedEntities)];
+            set => ViewState[nameof(SearchSelectedEntities)] = value;
         }
 
         private Guid[] SavedIdentifiers
@@ -54,26 +55,14 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
             set => ViewState[nameof(SavedIdentifiers)] = value;
         }
 
-        private Guid[] _registeredInstructors;
-        private Guid[] RegisteredInstructors
+        private string SelectedContactType
         {
-            get
-            {
-                if (_registeredInstructors == null)
-                {
-                    _registeredInstructors = ServiceLocator.JournalSearch
-                        .GetJournalSetupUsers(new VJournalSetupUserFilter
-                        {
-                            JournalSetupIdentifier = JournalSetupIdentifier,
-                            Role = JournalSetupUserRole.Validator
-                        })
-                        .Select(x => x.UserIdentifier)
-                        .ToArray();
-                }
-
-                return _registeredInstructors;
-            }
+            get => (string)ViewState[nameof(SelectedContactType)] ?? "Person";
+            set => ViewState[nameof(SelectedContactType)] = value;
         }
+
+        protected bool IsGroup => SelectedContactType == "Group";
+        protected bool IsPerson => SelectedContactType == "Person";
 
         #endregion
 
@@ -82,6 +71,9 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
+            CriteriaContactType.AutoPostBack = true;
+            CriteriaContactType.ValueChanged += (s, a) => OnCriteriaContactTypeChanged();
 
             CriteriaGroupIdentifier.AutoPostBack = true;
             CriteriaGroupIdentifier.ItemsRequested += CriteriaGroupIdentifier_ItemsRequested;
@@ -121,7 +113,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         {
             base.OnPreRender(e);
 
-            var selectedCount = SearchSelectedUsers != null ? SearchSelectedUsers.Count : 0;
+            var selectedCount = SearchSelectedEntities != null ? SearchSelectedEntities.Count : 0;
 
             ScriptManager.RegisterStartupScript(
                 Page,
@@ -134,6 +126,14 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         #endregion
 
         #region Event handlers
+
+        private void OnCriteriaContactTypeChanged()
+        {
+            var contactType = CriteriaContactType.Value;
+
+            GroupCriteriaPanel.Visible = contactType == "Group";
+            PersonCriteriaPanel.Visible = contactType == "Person";
+        }
 
         private void CriteriaGroupIdentifier_ItemsRequested(object sender, EventArgs e)
         {
@@ -158,32 +158,23 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
             if (!IsContentItem(e))
                 return;
 
-            var id = (Guid)DataBinder.Eval(e.Item.DataItem, "UserIdentifier");
+            var id = (Guid)DataBinder.Eval(e.Item.DataItem, "Identifier");
 
             var selectedCheckBox = (ICheckBoxControl)e.Item.FindControl("Selected");
-            selectedCheckBox.Checked = SearchSelectedUsers.Contains(id);
+            selectedCheckBox.Checked = SearchSelectedEntities.Contains(id);
 
             SearchResultDataKeys.Add(id);
         }
 
         private void SearchResultSaveButton_Click(object sender, EventArgs e)
         {
-            if (SearchSelectedUsers.Count == 0)
+            if (SearchSelectedEntities.Count == 0)
             {
                 ScreenStatus.AddMessage(AlertType.Error, "There are no selected contacts");
                 return;
             }
 
-            var addInstructors = SearchSelectedUsers.Except(RegisteredInstructors);
-
-            foreach (var id in addInstructors)
-            {
-                var validator = ServiceLocator.JournalSearch
-                    .GetJournalSetupUser(JournalSetupIdentifier, id, JournalSetupUserRole.Validator);
-
-                if (validator == null)
-                    ServiceLocator.SendCommand(new AddJournalSetupUser(JournalSetupIdentifier, id, JournalSetupUserRole.Validator));
-            }
+            Save();
 
             HttpResponseHelper.Redirect(OutlineUrl);
         }
@@ -203,9 +194,11 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
             if (Request.QueryString["userCreated"] == "1" && CreateControl.SavedIdentifiers.IsNotEmpty())
             {
                 SavedIdentifiers = CreateControl.SavedIdentifiers;
-                SearchSelectedUsers = SavedIdentifiers.ToHashSet();
+                SearchSelectedEntities = SavedIdentifiers.ToHashSet();
 
                 CreateControl.SavedIdentifiers = null;
+
+                CriteriaContactType.Enabled = false;
             }
             else
             {
@@ -224,6 +217,10 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
                 CriteriaClear();
             }
 
+            CriteriaContactType.Value = "Person";
+
+            OnCriteriaContactTypeChanged();
+
             Search();
 
             SearchResultCloseButton.NavigateUrl = OutlineUrl;
@@ -231,13 +228,49 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
 
         private void CriteriaClear()
         {
+            if (CriteriaContactType.Enabled)
+                CriteriaContactType.ClearSelection();
+
             CriteriaName.Text = null;
             CriteriaEmail.Text = null;
             CriteriaGroupType.Value = null;
             CriteriaGroupLabel.Text = null;
             CriteriaGroupIdentifier.Value = null;
 
-            SearchSelectedUsers = new HashSet<Guid>();
+            OnCriteriaContactTypeChanged();
+
+            SearchSelectedEntities = new HashSet<Guid>();
+        }
+
+        private void Save()
+        {
+            if (IsGroup)
+                SaveGroups();
+            else
+                SavePersons();
+        }
+
+        private void SaveGroups()
+        {
+            foreach (var groupId in SearchSelectedEntities)
+            {
+                if (ServiceLocator.JournalSearch.ExistsJournalSetupGroup(JournalSetupIdentifier, groupId, JournalSetupUserRole.Validator))
+                    continue;
+
+                ServiceLocator.SendCommand(new CreateJournalSetupGroup(JournalSetupIdentifier, groupId, JournalSetupUserRole.Validator));
+            }
+        }
+
+        private void SavePersons()
+        {
+            foreach (var userId in SearchSelectedEntities)
+            {
+                var validator = ServiceLocator.JournalSearch
+                    .GetJournalSetupUser(JournalSetupIdentifier, userId, JournalSetupUserRole.Validator);
+
+                if (validator == null)
+                    ServiceLocator.SendCommand(new AddJournalSetupUser(JournalSetupIdentifier, userId, JournalSetupUserRole.Validator));
+            }
         }
 
         #endregion
@@ -246,7 +279,29 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
 
         private void Search()
         {
-            var count = ServiceLocator.PersonSearch.CountPersons(CreateFilter());
+            if (SelectedContactType != CriteriaContactType.Value)
+            {
+                SelectedContactType = CriteriaContactType.Value;
+                SearchSelectedEntities = new HashSet<Guid>();
+            }
+
+            SearchResultHeaderGroup.Visible = IsGroup;
+            SearchResultHeaderPerson.Visible = IsPerson;
+
+            int count;
+            if (IsGroup)
+            {
+                EntityName.Text = "Groups";
+                count = ServiceLocator.GroupSearch.CountGroups(GetGroupFilter());
+            }
+            else if (IsPerson)
+            {
+                EntityName.Text = "People";
+                count = ServiceLocator.PersonSearch.CountPersons(GetPersonFilter());
+            }
+            else
+                throw ApplicationError.Create("Not expected contact type: " + SelectedContactType);
+
             var hasData = count > 0;
 
             SearchResultPagination.ItemsCount = count;
@@ -263,19 +318,48 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
 
         private object GetCriteriaResultData()
         {
-            var filter = CreateFilter();
+            return IsGroup ? GetGroupResultData() : GetPersonResultData();
+        }
+
+        private object GetGroupResultData()
+        {
+            var filter = GetGroupFilter();
+
+            filter.Paging = Paging.SetSkipTake(SearchResultPagination.ItemsSkip, SearchResultPagination.ItemsTake);
+
+            var groups = ServiceLocator.GroupSearch.SearchGroupDetails(filter);
+
+            return groups
+                .Select(x => new
+                {
+                    Identifier = x.GroupIdentifier,
+                    Code = x.GroupCode,
+                    Name = x.GroupName,
+                    Email = (string)null,
+                    EmailAlternate = (string)null,
+                    EmployerIdentifier = (Guid?)null,
+                    EmployerName = (string)null,
+                    Size = x.MembershipCount,
+                })
+                .ToArray();
+        }
+
+        private object GetPersonResultData()
+        {
+            var filter = GetPersonFilter();
             filter.OrderBy = "User.FullName,User.Email";
             filter.Paging = Paging.SetStartEnd(SearchResultPagination.StartItem, SearchResultPagination.EndItem);
 
             return ServiceLocator.PersonSearch.GetPersons(filter, x => x.User, x => x.EmployerGroup).Select(x => new
             {
-                x.UserIdentifier,
-                x.User.FullName,
-                x.User.Email,
-                x.User.EmailAlternate,
-                x.PersonCode,
+                Identifier = x.UserIdentifier,
+                Code = x.PersonCode,
+                Name = x.User.FullName,
+                Email = x.User.Email,
+                EmailAlternate = x.User.EmailAlternate,
                 EmployerIdentifier = x.EmployerGroup?.GroupIdentifier,
-                EmployerName = x.EmployerGroup?.GroupName
+                EmployerName = x.EmployerGroup?.GroupName,
+                Size = (int?)null
             });
         }
 
@@ -289,20 +373,31 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
                 var checkBox = (ICheckBoxControl)item.FindControl("Selected");
                 var userId = SearchResultDataKeys[item.ItemIndex];
 
-                if (!checkBox.Checked && SearchSelectedUsers.Contains(userId))
-                    SearchSelectedUsers.Remove(userId);
-                else if (checkBox.Checked && !SearchSelectedUsers.Contains(userId))
-                    SearchSelectedUsers.Add(userId);
+                if (!checkBox.Checked && SearchSelectedEntities.Contains(userId))
+                    SearchSelectedEntities.Remove(userId);
+                else if (checkBox.Checked && !SearchSelectedEntities.Contains(userId))
+                    SearchSelectedEntities.Add(userId);
             }
         }
 
-        private QPersonFilter CreateFilter()
+        private QGroupFilter GetGroupFilter()
+        {
+            return new QGroupFilter
+            {
+                OrganizationIdentifier = Organization.Identifier,
+                GroupNameLike = Group_GroupName.Text,
+                GroupType = Group_GroupType.Value,
+                ExcludeValidatorJournalSetupIdentifier = JournalSetupIdentifier,
+            };
+        }
+
+        private QPersonFilter GetPersonFilter()
         {
             var filter = new QPersonFilter
             {
                 OrganizationIdentifier = Organization.OrganizationIdentifier,
                 UserIdentifiers = SavedIdentifiers,
-                ExcludeUserIdentifiers = RegisteredInstructors,
+                ExcludeValidatorJournalSetupIdentifier = JournalSetupIdentifier,
                 UserNameContains = CriteriaName.Text,
                 UserEmailContains = CriteriaEmail.Text,
                 UserMembershipGroupLabelContains = CriteriaGroupLabel.Text
@@ -317,6 +412,13 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
             }
 
             return filter;
+        }
+
+        protected string GetContactSize(object dataItem)
+        {
+            return IsGroup
+                ? "Person".ToQuantity((int)DataBinder.Eval(dataItem, "Size"))
+                : null;
         }
 
         #endregion

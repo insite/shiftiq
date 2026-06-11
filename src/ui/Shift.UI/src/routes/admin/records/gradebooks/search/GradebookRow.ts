@@ -1,4 +1,4 @@
-import { ApiGradebookMatch } from "@/api/controllers/gradebook/ApiGradebookMatch";
+import { ApiGradebookMatch } from "@/api/controllers/records/gradebooks/ApiGradebookMatch";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 import { DateTimeParts } from "@/helpers/date/dateTimeTypes";
 import { TimeZoneId } from "@/helpers/date/timeZones";

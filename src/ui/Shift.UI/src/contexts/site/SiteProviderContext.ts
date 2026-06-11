@@ -10,6 +10,7 @@ export const defaultSiteProviderContextData: ContextData = {
     siteSetting: {
         TimeZoneId: "UTC",
         OrganizationCode: "NA",
+        DomainName: "NA",
         CompanyName: "NA",
         IsCmds: false,
         Home: {
@@ -45,6 +46,7 @@ export const defaultSiteProviderContextData: ContextData = {
         AdminNavigationGroups: [],
         CurrentLanguage: "en",
         SupportedLanguages: ["en"],
+        RecentLinksKey: "NA",
     },
     refreshSiteSetting() {},
 }

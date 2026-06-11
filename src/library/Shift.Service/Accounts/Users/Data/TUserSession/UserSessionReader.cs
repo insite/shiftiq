@@ -1,0 +1,161 @@
+using System.Runtime.CompilerServices;
+
+using Microsoft.EntityFrameworkCore;
+
+using Shift.Common;
+using Shift.Common.Linq;
+using Shift.Contract;
+
+namespace Shift.Service.Security;
+
+public class UserSessionReader : IEntityReader
+{
+    private readonly IDbContextFactory<TableDbContext> _context;
+
+    private string DefaultSort = "SessionIdentifier";
+
+    public UserSessionReader(IDbContextFactory<TableDbContext> context)
+    {
+        _context = context;
+    }
+
+    public Task<bool> AssertAsync(Guid session, Guid? organization, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db);
+
+            if (organization != null)
+                query = query.Where(x => x.OrganizationIdentifier == organization.Value);
+
+            var exists = query.AnyAsync(x => x.SessionIdentifier == session, cancellation);
+
+            return exists;
+
+        }, cancellation);
+    }
+
+    public Task<List<UserSessionEntity>> CollectAsync(IUserSessionCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query
+                .OrderBy(criteria.Filter.Sort ?? DefaultSort)
+                .ApplyPaging(criteria.Filter)
+                .ToListAsync(cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<int> CountAsync(IUserSessionCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query.CountAsync(cancellation);
+
+        }, cancellation);
+    }
+
+    public async IAsyncEnumerable<UserSessionEntity> DownloadAsync(IUserSessionCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation = default)
+    {
+        using var db = _context.CreateDbContext();
+
+        var query = BuildQueryable(db, criteria);
+
+        await foreach (var entity in query.AsAsyncEnumerable().WithCancellation(cancellation))
+        {
+            yield return entity;
+        }
+    }
+
+    public Task<UserSessionEntity?> RetrieveAsync(Guid session, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db);
+
+            return query.FirstOrDefaultAsync(x => x.SessionIdentifier == session, cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<List<UserSessionMatch>> SearchAsync(IUserSessionCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            query = query
+                .OrderBy(criteria.Filter.Sort ?? DefaultSort)
+                .ApplyPaging(criteria.Filter);
+
+            return ToMatchesAsync(query, cancellation);
+
+        }, cancellation);
+    }
+
+    /// <summary>
+    /// Creates a queryable for events
+    /// </summary>
+    /// <remarks>
+    /// If you call .Include() on the DbSet then remember to use .AsSplitQuery() so that cartesian explosion is avoided.
+    /// When using split queries with Skip/Take on EF versions prior to 10, pay special attention to make your query
+    /// ordering fully unique, otherwise the result set is non-deterministic.
+    /// </remarks>
+    private IQueryable<UserSessionEntity> BuildQueryable(TableDbContext db)
+    {
+        var query = db.TUserSession
+            .AsNoTracking();
+
+        return query;
+    }
+
+    private IQueryable<UserSessionEntity> BuildQueryable(TableDbContext db, IUserSessionCriteria criteria)
+    {
+        ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
+
+        var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
+
+        if (criteria.SessionStartedSince.HasValue)
+            query = query.Where(x => x.SessionStarted >= criteria.SessionStartedSince);
+
+        if (criteria.SessionStartedBefore.HasValue)
+            query = query.Where(x => x.SessionStarted < criteria.SessionStartedBefore);
+
+        if (criteria.SessionStoppedSince.HasValue)
+            query = query.Where(x => x.SessionStopped >= criteria.SessionStoppedSince);
+
+        if (criteria.SessionStoppedBefore.HasValue)
+            query = query.Where(x => x.SessionStopped < criteria.SessionStoppedBefore);
+
+        return query;
+    }
+
+    private async Task<T> ExecuteAsync<T>(Func<TableDbContext, Task<T>> query, CancellationToken cancellation = default)
+    {
+        using var db = _context.CreateDbContext();
+
+        return await query(db);
+    }
+
+    public static async Task<List<UserSessionMatch>> ToMatchesAsync(IQueryable<UserSessionEntity> queryable, CancellationToken cancellation = default)
+    {
+        var matches = await queryable
+            .Select(entity => new UserSessionMatch
+            {
+                SessionId = entity.SessionIdentifier
+
+            })
+            .ToListAsync(cancellation);
+
+        return matches;
+    }
+
+}

@@ -1,7 +1,11 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="CompanyDetail.ascx.cs" Inherits="InSite.Cmds.Controls.Contacts.Companies.CompanyDetails" %>
+<%@ Register Src="~/UI/CMDS/Common/Controls/User/InvoicingContacts.ascx" TagName="InvoicingContacts" TagPrefix="uc" %>
 
 <div class="row">
-    <div class="col-lg-6">
+
+    <div class="col-lg-4">
+
+        <h2 class="h4 card-title mb-3">Profile</h2>
 
         <div class="form-group mb-3">
             <label class="form-label">
@@ -64,7 +68,52 @@
         </div>
 
     </div>
-    <div class="col-lg-6">
+
+    <div class="col-lg-4">
+
+        <h2 class="h4 card-title mb-3">Invoicing</h2>
+
+        <div class="form-group mb-3">
+            <label class="form-label" for="<%= CustomerNumber.ClientID %>">Customer number</label>
+            <div>
+                <insite:TextBox runat="server" ID="CustomerNumber" MaxLength="30" />
+            </div>
+            <div class="form-text">External accounting system customer number</div>
+        </div>
+
+        <div class="form-group mb-3">
+            <label class="form-label" for="<%= CustomerCode.ClientID %>">Customer code</label>
+            <div>
+                <insite:TextBox runat="server" ID="CustomerCode" MaxLength="30" />
+            </div>
+            <div class="form-text">External accounting system customer code</div>
+        </div>
+
+        <uc:InvoicingContacts runat="server" ID="InvoicingContacts" AllowMembershipDeletion="true" />
+
+        <div class="card bg-light mt-3">
+            <div class="card-body">
+                <h3 class="h6 card-title mb-3">Add user to invoicing team</h3>
+
+                <div class="form-group mb-3">
+                    <insite:GroupComboBox runat="server" ID="InvoicingGroup" Width="100%" EmptyMessage="Select a team" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <insite:FindUser runat="server" ID="InvoicingUser" Width="100%" EmptyMessage="Search for a user" />
+                </div>
+
+                <div class="d-grid">
+                    <insite:AddButton runat="server" ID="AddInvoicingUserToGroup" Text="Add user to team" Icon="fas fa-user-plus" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <h2 class="h4 card-title mb-3">Branding</h2>
 
         <div runat="server" id="LogoField" visible="false" class="form-group mb-3">
             <label class="form-label">
@@ -89,7 +138,9 @@
                             Supported image file formats: *.gif, *.jpg, *.png
                         </div>
 
-                        <asp:Image ID="LogoImage" runat="server" Visible="false" CssClass="img-thumbnail rounded-0" />
+                        <a runat="server" id="LogoLink" data-fancybox="company-logo" visible="false">
+                            <asp:Image ID="LogoImage" runat="server" Visible="false" CssClass="img-thumbnail rounded-0" />
+                        </a>
 
                         <div class="d-none">
                             <insite:FileUploadV1 runat="server" ID="LogoUpload" 
@@ -114,6 +165,7 @@
         </div>
 
     </div>
+
 </div>
 
 <insite:PageFooterContent runat="server">

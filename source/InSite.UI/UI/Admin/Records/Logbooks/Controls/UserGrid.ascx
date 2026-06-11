@@ -32,7 +32,16 @@
             </ItemTemplate>
         </asp:TemplateField>
 
-        <asp:TemplateField HeaderText="Entries">
+        <insite:BoundField
+            FieldName="HourSum"
+            DataField="HourSum"
+            HeaderText="Hours"
+            DataFormatString="{0:n2}"
+            HeaderStyle-HorizontalAlign="Center"
+            ItemStyle-HorizontalAlign="Center"
+        />
+
+        <asp:TemplateField HeaderText="Entries" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center">
             <ItemTemplate>
                 <%# Eval("ExperienceCount") %>
             </ItemTemplate>

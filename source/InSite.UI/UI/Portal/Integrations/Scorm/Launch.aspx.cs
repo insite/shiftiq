@@ -2,7 +2,6 @@
 
 using InSite.Common.Web;
 using InSite.Persistence;
-using InSite.Persistence.Integration.Moodle;
 using InSite.UI.Layout.Portal;
 using InSite.Web.Integration;
 using InSite.Web.Routing;
@@ -68,11 +67,6 @@ namespace InSite.UI.Portal.Integrations.Scorm
 
         private string GetScormLaunchUrl(string platform, string package, Guid courseId, Guid activityId, Guid organizationId)
         {
-            if (StringHelper.Equals(platform, "Moodle"))
-            {
-                return GetMoodleLaunchUrl(package, activityId);
-            }
-
             if (StringHelper.Equals(platform, "Scoop"))
             {
                 HideNavigation(); // Scoop has its own navigation bar
@@ -99,47 +93,19 @@ namespace InSite.UI.Portal.Integrations.Scorm
 
             var encodedProgressUrl = StringHelper.EncodeBase64(progressUrl);
 
-            if (scoop.Relay.Enabled)
-            {
-                var linkGenerator = new ScoopLinkGenerator();
+            if (!scoop.Relay.Enabled)
+                throw new Exception("Token relay authentication must be enabled for integration between Shift iQ and Scoop.");
 
-                var scoopUrl = linkGenerator.GenerateCourseUrl(Identity, host, Organization.Code, package, encodedProgressUrl, encodedExitUrl);
+            var linkGenerator = new ScoopLinkGenerator();
 
-                return scoopUrl;
-            }
-            else // continue with legacy shared cookie authentication
-            {
-                // SCORM content hosted in Moodle does not always launch correctly on iOS devices. (Learners are sometimes
-                // prompted with the Moodle login page, so they are unable to access the content. This problem does not
-                // occur on Android, Linux, OSX, or Windows devices.) To solve the immediate problem, I have implemented
-                // basic support for the new open-source app Scoop.
+            var scoopUrl = linkGenerator.GenerateCourseUrl(Identity, host, Organization.Code, package, encodedProgressUrl, encodedExitUrl);
 
-                var baseUri = new Uri(scoop.BaseUrl);
-
-                var relativePath = $"{Organization.Code}/{package}";
-
-                var queryString = $"progressUrl={encodedProgressUrl}&exitUrl={encodedExitUrl}";
-
-                var launchUri = new Uri(baseUri, relativePath + "?" + queryString);
-
-                return launchUri.ToString();
-            }
+            return scoopUrl;
         }
 
         private void HideNavigation()
         {
             NavigationBar.Visible = false;
-        }
-
-        private string GetMoodleLaunchUrl(string package, Guid activityId)
-        {
-            var options = ServiceLocator.AppSettings.Integration.Moodle;
-
-            var callback = PathHelper.GetAbsoluteUrl(options.ProgressCallbackUrl);
-
-            var moodle = new MoodleCloud(options.SiteUrl, options.TokenSecret, callback);
-
-            return moodle.GetLaunchUrl(Identity.User.Identifier, Identity.User.FullName, package, activityId);
         }
 
         private string GetRusticiLaunchUrl(Guid organizationId, Guid activityId)

@@ -183,6 +183,9 @@ namespace InSite.Admin.Contacts.Groups.Controls
 
             var edit = (IconLink)e.Row.FindControl("EditButton");
             edit.NavigateUrl += "&returnURL=" + HttpUtility.UrlEncode(returnUrl);
+
+            var organization = (Label)e.Row.FindControl("OrganizationLabel");
+            organization.Visible = ServiceLocator.Partition.IsE03();
         }
 
         private void DownloadBtn_Click(object sender, CommandEventArgs e)
@@ -262,6 +265,9 @@ namespace InSite.Admin.Contacts.Groups.Controls
                         x.MembershipExpiry,
                         x.Modified,
                         x.ModifiedBy,
+                        MembershipOrganizationIdentifier = x.OrganizationIdentifier,
+                        GroupOrganizationIdentifier = x.Group.OrganizationIdentifier,
+                        MembershipOrganizationCode = x.OrganizationCode,
                         Person = x.User.Persons.FirstOrDefault(y => y.OrganizationIdentifier == Organization.OrganizationIdentifier)
                     },
                     FilterQuery(),
@@ -276,6 +282,7 @@ namespace InSite.Admin.Contacts.Groups.Controls
                     Email = x.Email,
                     AccountNumber = x.Person?.PersonCode,
                     EmailEnabled = x.Person?.EmailEnabled ?? false,
+                    OrganizationCode = x.MembershipOrganizationIdentifier != x.GroupOrganizationIdentifier ? x.MembershipOrganizationCode : null,
                     RoleType = x.MembershipType,
                     Assigned = x.Assigned,
                     MembershipExpiry = x.MembershipExpiry,

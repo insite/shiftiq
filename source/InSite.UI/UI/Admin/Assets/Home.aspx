@@ -80,6 +80,7 @@
                 <div class="row mt-4">
                     <div class="col-lg-12">
                         <a runat="server" id="FileBrowserLink" class="me-3" href="/ui/admin/assets/files/browse"><i class="far fa-folder-tree me-2"></i> Browse Shared Library Files</a>
+                        <a runat="server" id="SearchFilesLink" class="me-3" href="/client/admin/content/files/search"><i class="fa-solid fa-files me-2"></i>Search Files (V2)</a>
                     </div>
                 </div>
 

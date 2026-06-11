@@ -1,0 +1,124 @@
+.notification-grid {
+    .dashboard-notification {
+        display: grid;
+        align-items: center;
+        grid-template-columns: 60px 1fr 40px;
+        height: var(--dashboard-notification-height, auto);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--ar-border-color);
+        overflow: hidden;
+        opacity: 1;
+        transition:
+            height var(--dashboard-notification-transition-duration, 250ms) ease-in-out,
+            opacity var(--dashboard-notification-transition-duration, 250ms) ease-in-out,
+            margin-bottom var(--dashboard-notification-transition-duration, 250ms) ease-in-out,
+            padding-bottom var(--dashboard-notification-transition-duration, 250ms) ease-in-out,
+            border-color var(--dashboard-notification-transition-duration, 250ms) ease-in-out;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &.hiding {
+            height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-color: transparent;
+        }
+    }
+
+    .dashboard-notification-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 45px;
+        width: 45px;
+        font-size: x-large;
+        color: #fff;
+        border-radius: 8px;
+    }
+}
+
+.dashboard-cards {
+    & > div > div {
+        h3 {
+            width: 100%;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--ar-border-color);
+        }
+
+        & > div {
+            padding: 1.5rem;
+        }
+    }
+
+    .chart-status {
+        height: 35px;
+        text-align: center;
+    }
+
+    .card-description {
+        height: 40px;
+        margin-bottom: 0.5rem;
+
+        span {
+            color: var(--ar-info);
+        }
+    }
+
+    .card-radials {
+        width: 100%;
+        display: flex;
+        margin-bottom: 1.25rem;
+
+        & > div {
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: 0;
+
+            & > div:first-child {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        .skills-progress {
+            --ar-progress-thickness: 1rem;
+            --ar-progress-bar-bg-primary: var(--ar-info);
+        }
+
+        .skills-progress span {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+    }
+
+    .action-list {
+        align-self: start;
+        flex-grow: 1;
+        width: 100%;
+
+        & > div {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            margin-bottom: 0.5rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        &.with-icons > div > span {
+            display: grid;
+            grid-template-columns: 35px 1fr;
+            align-items: center;
+
+            i {
+                color: var(--ar-info);
+            }
+        }
+    }
+}

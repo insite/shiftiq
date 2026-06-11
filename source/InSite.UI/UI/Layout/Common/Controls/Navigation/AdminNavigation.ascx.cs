@@ -13,6 +13,7 @@ using InSite.UI.Layout.Lobby;
 
 using Shift.Common;
 using Shift.Constant;
+using Shift.Sdk.UI;
 using Shift.Sdk.UI.Navigation;
 
 using PortalNavigation = InSite.UI.Layout.Portal.Controls.PortalHeader;
@@ -103,9 +104,7 @@ namespace InSite.UI.Layout.Admin
 
         protected string GetRecentLinksKey()
         {
-            var key = $"{ServiceLocator.AppSettings.Environment.Name}-{Organization.Identifier}-{User.Identifier}";
-            var bytes = EncryptionHelper.ComputeHashMd5(key);
-            return Convert.ToBase64String(bytes).Substring(0, 22);
+            return RecentLinksHelper.CreateRecentLinksKey(ServiceLocator.AppSettings.Environment.Name, Organization.Identifier, User.Identifier);
         }
 
         private void BindUser()

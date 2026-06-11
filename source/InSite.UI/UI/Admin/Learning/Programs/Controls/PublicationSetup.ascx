@@ -52,6 +52,23 @@
                                             </div>
                                         </div>
 
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Custom Flag Color
+                                            </label>
+                                            <div>
+                                                <asp:Literal runat="server" ID="ProgramFlagColor" />
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Custom Flag Text
+                                            </label>
+                                            <div>
+                                                <asp:Literal runat="server" ID="ProgramFlagText" />
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
 

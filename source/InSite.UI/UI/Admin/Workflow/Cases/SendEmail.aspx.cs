@@ -305,13 +305,17 @@ namespace InSite.UI.Admin.Issues.Outlines.Forms
             email.Variables.Clear();
             email.Variables.Add("FirstName", recipient.FirstName);
             email.Variables.Add("RecipientNameFirst", recipient.FirstName);
+            email.Variables.Add("RecipientFirstName", email.Recipient.FirstName);
             email.Variables.Add("LastName", recipient.LastName);
             email.Variables.Add("RecipientNameLast", recipient.LastName);
+            email.Variables.Add("RecipientLastName", email.Recipient.LastName);
             email.Variables.Add("FullName", recipient.FullName);
             email.Variables.Add("RecipientName", recipient.FullName);
             email.Variables.Add("Email", recipient.Email);
             email.Variables.Add("RecipientEmail", recipient.Email);
             email.Variables.Add("RecipientCode", recipient.PersonCode);
+            email.Variables.Add("PersonCode", email.Recipient.PersonCode);
+            email.Variables.Add("RecipientPersonCode", email.Recipient.PersonCode);
             email.Variables.Add("CompanyTitle", Organization.CompanyName);
             email.Variables.Add("SignInUrl", HttpRequestHelper.CurrentRootUrl + "/ui/lobby/signin");
         }

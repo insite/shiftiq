@@ -16,7 +16,7 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
     {
         private Guid? ItemID => Guid.TryParse(Request["id"], out var value) ? value : (Guid?)null;
 
-        private const string SearchUrl = "/ui/cmds/design/standards/profiles/search";
+        private const string SearchUrl = "/ui/cmds/admin/standards/profiles/search";
 
         protected override void OnInit(EventArgs e)
         {

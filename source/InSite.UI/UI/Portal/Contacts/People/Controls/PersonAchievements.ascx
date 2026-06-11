@@ -14,6 +14,8 @@
                     </ItemTemplate>
                 </asp:TemplateField>
 
+                <asp:BoundField DataField="AchievementLabel" HeaderText="Tag" />
+
                 <asp:TemplateField HeaderText="Credential Status">
                     <ItemTemplate>
                         <%# Eval("CredentialStatus") %>
@@ -23,12 +25,6 @@
                 <asp:TemplateField HeaderText="Credential Granted">
                     <ItemTemplate>
                         <%# LocalizeDate(Eval("CredentialGranted")) %>
-                    </ItemTemplate>
-                </asp:TemplateField>
-
-                <asp:TemplateField HeaderText="Credential Revoked">
-                    <ItemTemplate>
-                        <%# LocalizeDate(Eval("CredentialRevoked")) %>
                     </ItemTemplate>
                 </asp:TemplateField>
 

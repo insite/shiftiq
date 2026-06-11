@@ -266,10 +266,10 @@ namespace InSite.UI.Admin.Records.Logbooks.Controls
         {
             foreach (var groupId in SearchSelectedEntities)
             {
-                if (ServiceLocator.JournalSearch.ExistsJournalSetupGroup(JournalSetupIdentifier, groupId))
+                if (ServiceLocator.JournalSearch.ExistsJournalSetupGroup(JournalSetupIdentifier, groupId, JournalSetupUserRole.Learner))
                     continue;
 
-                ServiceLocator.SendCommand(new CreateJournalSetupGroup(JournalSetupIdentifier, groupId));
+                ServiceLocator.SendCommand(new CreateJournalSetupGroup(JournalSetupIdentifier, groupId, JournalSetupUserRole.Learner));
             }
         }
 
@@ -408,7 +408,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Controls
                 OrganizationIdentifier = Organization.Identifier,
                 GroupNameLike = CriteriaName.Text,
                 GroupType = CriteriaGroupType.Value,
-                ExcludeJournalSetupIdentifier = JournalSetupIdentifier,
+                ExcludeLearnerJournalSetupIdentifier = JournalSetupIdentifier,
             };
         }
 

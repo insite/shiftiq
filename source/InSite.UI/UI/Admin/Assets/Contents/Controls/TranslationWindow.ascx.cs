@@ -17,6 +17,7 @@ namespace InSite.Admin.Assets.Contents.Controls
             public string Key { get; set; }
             public string Translation { get; set; }
             public string Language { get; set; }
+            public bool AllowHtml { get; set; }
         }
 
         public delegate void LoadHandler(object sender, LoadEventArgs e);
@@ -110,7 +111,7 @@ namespace InSite.Admin.Assets.Contents.Controls
         {
             var translation = OnLoadTranslation(e.Value);
 
-            TranslationControl.SetTranslation(translation.Translation, translation.Language);
+            TranslationControl.SetTranslation(translation.Translation, translation.Language, translation.AllowHtml);
         }
 
         private void SaveButton_Click(object sender, EventArgs e)

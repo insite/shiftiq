@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Web.UI;
 
 using InSite.Application.Contacts.Read;
@@ -138,7 +139,7 @@ namespace InSite.UI.Portal.Home
             ProfileImage.AlternateText = user.FirstName + " " + user.LastName;
             ProfileImage.ImageUrl = string.IsNullOrEmpty(user.ImageUrl) ? "/UI/Layout/Portal/Images/Default.png" : user.ImageUrl;
             Email.Text = string.IsNullOrEmpty(user.Email) ? string.Empty : user.Email.ToLower();
-            Email.Enabled = false;
+            EmailAlternate.Text = user.EmailAlternate;
             PhoneMobile.Text = user.PhoneMobile;
 
             if (homeAddress != null)
@@ -161,6 +162,39 @@ namespace InSite.UI.Portal.Home
                 ProfileToast.Text = toast.Body;
                 ProfileToast.Visible = true;
             }
+
+            BindGroups(user.UserIdentifier);
+            BindConnections(user.UserIdentifier);
+        }
+
+        private void BindGroups(Guid userId)
+        {
+            var groups = ServiceLocator.MembershipSearch.Select(new QMembershipFilter
+            {
+                GroupOrganizationIdentifier = Organization.Identifier,
+                UserIdentifier = userId
+            }, x => x.Group);
+
+            var departments = groups.FindAll(x => string.Equals(x.Group.GroupType, "Department", StringComparison.OrdinalIgnoreCase));
+            DepartmentField.Visible = departments.Count > 0;
+            Department.Text = string.Join(", ", departments.Select(x => x.Group.GroupName).OrderBy(x => x));
+
+            var districts = groups.FindAll(x => string.Equals(x.Group.GroupType, "District", StringComparison.OrdinalIgnoreCase));
+            DistrictField.Visible = districts.Count > 0;
+            District.Text = string.Join(", ", districts.Select(x => x.Group.GroupName).OrderBy(x => x));
+        }
+
+        private void BindConnections(Guid userId)
+        {
+            var connections = ServiceLocator.UserSearch.GetConnections(new QUserConnectionFilter
+            {
+                FromUserOrganizationId = Organization.Identifier,
+                ToUserId = userId
+            }, x => x.FromUser);
+
+            var supervisors = connections.FindAll(x => x.IsSupervisor);
+            SupervisorField.Visible = supervisors.Count > 0;
+            Supervisor.Text = string.Join(", ", supervisors.Select(x => x.FromUser.FullName).OrderBy(x => x));
         }
 
         private bool Save()
@@ -171,6 +205,7 @@ namespace InSite.UI.Portal.Home
 
             user.FirstName = FirstName.Text;
             user.LastName = LastName.Text;
+            user.EmailAlternate = EmailAlternate.Text;
             user.PhoneMobile = Phone.Format(PhoneMobile.Text);
 
             UserStore.Update(user, OrganizationSearch.GetPersonFullNamePolicy(Organization.Identifier));

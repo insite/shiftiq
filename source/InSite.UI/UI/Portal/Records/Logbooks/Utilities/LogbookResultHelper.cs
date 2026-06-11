@@ -14,10 +14,10 @@ using InSite.UI.Portal.Records.Logbooks.Models;
 using Shift.Common;
 using Shift.Constant;
 using Shift.Toolbox;
-using Shift.Toolbox.Progress;
+using Shift.Toolbox.Records;
 
-using Comment = Shift.Toolbox.Progress.Comment;
-using Experience = Shift.Toolbox.Progress.Experience;
+using Comment = Shift.Toolbox.Records.Comment;
+using Experience = Shift.Toolbox.Records.Experience;
 
 namespace InSite.UI.Portal.Records.Logbooks.Utilities
 {
@@ -33,7 +33,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Utilities
             string language)
         {
             var person = ServiceLocator.ContactSearch.GetPerson(userIdentifier, organizationIdentifier);
-            
+
             var logoImageUrl = QuestPDFImageHelper.GetOrganizationLogoUrl(CurrentSessionState.Identity.Organization.Code);
             if (logoImageUrl != null)
                 logoImageUrl = HttpContext.Current.Server.MapPath(logoImageUrl);

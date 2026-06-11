@@ -157,22 +157,22 @@ namespace Shift.Common
             var host = url.Host;
             var subdomain = host.Substring(0, host.IndexOf('.'));
 
-            if (subdomain.StartsWith("dev-"))
-                return subdomain.Substring("dev-".Length);
-
-            if (subdomain.StartsWith("local-"))
-                return subdomain.Substring("local-".Length);
-
-            if (subdomain.StartsWith("sandbox-"))
-                return subdomain.Substring("sandbox-".Length);
+            foreach (var prefix in SubdomainConvention.KnownPrefixes)
+            {
+                if (subdomain.StartsWith(prefix))
+                    return subdomain.Substring(prefix.Length);
+            }
 
             try
             {
-                if (subdomain == "dev" || subdomain == "local" || subdomain == "sandbox" || subdomain == "www")
+                foreach (var bare in SubdomainConvention.KnownBareSubdomains)
                 {
-                    int from = host.IndexOf(".") + ".".Length;
-                    int to = host.LastIndexOf(".");
-                    return host.Substring(from, to - from);
+                    if (subdomain == bare)
+                    {
+                        int from = host.IndexOf(".") + ".".Length;
+                        int to = host.LastIndexOf(".");
+                        return host.Substring(from, to - from);
+                    }
                 }
             }
             catch { }

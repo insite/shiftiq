@@ -10,12 +10,28 @@ namespace InSite.Common.Web.UI
             set
             {
                 ViewState[nameof(IsEmailList)] = value;
-
-                ValidationExpression = value
-                    ? string.Format("^({0})( *; *({0}))* *;? *$",
-                        Pattern.ValidEmail.Substring(1, Pattern.ValidEmail.Length - 2))
-                    : Pattern.ValidEmail;
+                UpdateValidationExpression();
             }
+        }
+
+        public bool AllowMissingTld
+        {
+            get { return (bool?)ViewState[nameof(AllowMissingTld)] ?? false; }
+            set
+            {
+                ViewState[nameof(AllowMissingTld)] = value;
+                UpdateValidationExpression();
+            }
+        }
+
+        private void UpdateValidationExpression()
+        {
+            var basePattern = AllowMissingTld ? Pattern.ValidEmailNoTld : Pattern.ValidEmail;
+
+            ValidationExpression = IsEmailList
+                ? string.Format("^({0})( *; *({0}))* *;? *$",
+                    basePattern.Substring(1, basePattern.Length - 2))
+                : basePattern;
         }
 
         public string Identifier { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
+using InSite.Admin.Assets.Contents.Utilities;
 using InSite.Domain.Attempts;
 using InSite.Domain.Banks;
 using InSite.Persistence;
@@ -33,6 +34,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
             string AuthorName { get; }
             DateTimeOffset PostedOn { get; }
             string IconHtml { get; }
+            string FlagName { get; }
             string Text { get; }
             bool HasFlag { get; }
             bool IsHidden { get; }
@@ -85,6 +87,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
                             AuthorName = authors.TryGetValue(y.Author, out var author) ? author : y.Author.ToString(),
                             PostedOn = y.Posted,
                             IconHtml = y.Flag.ToIconHtml(),
+                            FlagName = y.Flag.GetName(),
                             Text = Markdown.ToHtml(y.Text),
                             HasFlag = y.Flag != FlagType.None,
                             IsHidden = y.IsHidden
@@ -123,6 +126,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
             public string AuthorName { get; set; }
             public DateTimeOffset PostedOn { get; set; }
             public string IconHtml { get; set; }
+            public string FlagName { get; set; }
             public string Text { get; set; }
             public bool HasFlag { get; set; }
             public bool IsHidden { get; set; }
@@ -138,7 +142,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
             public bool? IsQuestionHasReference { get; set; }
         }
 
-        public static IQuestionInfo[] GetQuestions(BankState bank)
+        public static IQuestionInfo[] GetQuestions(BankState bank, string language)
         {
             var result = new QuestionCollection();
 
@@ -147,15 +151,15 @@ namespace InSite.Admin.Assessments.Questions.Utilities
                 {
                     PrimarySequence = question.BankIndex + 1,
                     BankQuestion = question,
-                    AttemptQuestion = AttemptStarter.CreateQuestion(question, false, Language.Default)
+                    AttemptQuestion = AttemptStarter.CreateQuestion(question, false, language)
                 });
 
             return result.ToArray();
         }
 
-        public static IQuestionInfo[] GetQuestions(Form form)
+        public static IQuestionInfo[] GetQuestions(Form form, string language)
         {
-            var questions = AttemptHelper.CreateAttemptQuestions(form, false, Language.Default);
+            var questions = AttemptHelper.CreateAttemptQuestions(form, false, language);
             if (questions.Length == 0)
                 return new IQuestionInfo[0];
 
@@ -284,32 +288,32 @@ namespace InSite.Admin.Assessments.Questions.Utilities
                 yield return new Tuple<string, string>("default", q.Classification.Tag);
         }
 
-        public static IEnumerable<Tuple<string, string>> EnumerateProperties(IQuestionInfo info)
+        public static IEnumerable<Tuple<string, string>> EnumerateProperties(IQuestionInfo info, Func<string, string> translate)
         {
             var q = info.BankQuestion;
 
-            yield return new Tuple<string, string>("Asset #", $"{q.Asset}.{q.AssetVersion}");
+            yield return new Tuple<string, string>(translate("Asset #"), $"{q.Asset}.{q.AssetVersion}");
 
             if (info.CompetencyName != null)
-                yield return new Tuple<string, string>("Competency", info.CompetencyName);
+                yield return new Tuple<string, string>(translate("Competency"), info.CompetencyName);
 
             if (info.TaxonomyName != null)
-                yield return new Tuple<string, string>("Taxonomy", info.TaxonomyName);
+                yield return new Tuple<string, string>(translate("Taxonomy"), info.TaxonomyName);
 
             if (q.Classification.LikeItemGroup != null)
-                yield return new Tuple<string, string>("LIG", WebUtility.HtmlDecode(q.Classification.LikeItemGroup));
+                yield return new Tuple<string, string>(translate("LIG"), WebUtility.HtmlDecode(q.Classification.LikeItemGroup));
 
             if (q.Classification.Code != null)
-                yield return new Tuple<string, string>("Code", WebUtility.HtmlDecode(q.Classification.Code));
+                yield return new Tuple<string, string>(translate("Code"), WebUtility.HtmlDecode(q.Classification.Code));
 
             if (q.Condition != null)
-                yield return new Tuple<string, string>("Status", WebUtility.HtmlDecode(q.Condition));
+                yield return new Tuple<string, string>(translate("Status"), WebUtility.HtmlDecode(q.Condition));
 
             if (q.Flag != FlagType.None)
-                yield return new Tuple<string, string>("Flag", q.Flag.ToIconHtml() + $"<span class='ms-1 form-text'>{q.Flag.GetName()}</span>");
+                yield return new Tuple<string, string>(translate("Flag"), q.Flag.ToIconHtml() + $"<span class='ms-1 form-text'>{q.Flag.GetName()}</span>");
 
             if (q.Classification.Reference != null)
-                yield return new Tuple<string, string>("Reference", WebUtility.HtmlDecode(q.Classification.Reference));
+                yield return new Tuple<string, string>(translate("Reference"), WebUtility.HtmlDecode(q.Classification.Reference));
         }
 
         public static IEnumerable<IQuestionInfo> FilterQuestions(IEnumerable<IQuestionInfo> questions, QuestionFilter filter) =>

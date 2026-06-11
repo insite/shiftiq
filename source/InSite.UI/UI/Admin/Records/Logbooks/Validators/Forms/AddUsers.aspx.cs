@@ -26,17 +26,12 @@ namespace InSite.UI.Admin.Records.Validators.Forms
             if (IsPostBack)
                 return;
 
-            if (!CanCreate)
+            if (!CanCreate
+                || !ServiceLocator.JournalSearch.IsLogbookValidator(AddUsersControl.JournalSetupIdentifier, User.UserIdentifier)
+                )
+            {
                 HttpResponseHelper.Redirect(AddUsersControl.SearchUrl);
-
-            var entity = ServiceLocator.JournalSearch
-                .GetJournalSetupUser(
-                    AddUsersControl.JournalSetupIdentifier,
-                    User.UserIdentifier,
-                    JournalSetupUserRole.Validator);
-
-            if (entity == null)
-                HttpResponseHelper.Redirect(AddUsersControl.SearchUrl);
+            }
 
             PageHelper.AutoBindHeader(Page);
         }

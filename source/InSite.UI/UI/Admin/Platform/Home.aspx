@@ -34,6 +34,10 @@
                     </div>
 
                 </div>
+
+                <div class="mt-4">
+                    <a class="me-3" href="/client/admin/platform/notifications/search"><i class="fas fa-message-exclamation me-1"></i>Dashboard Notifications</a>
+                </div>
             </div>
         </div>
 

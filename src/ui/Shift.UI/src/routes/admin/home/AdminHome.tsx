@@ -1,8 +1,40 @@
 import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import AdminHome_PanelTile from "./AdminHome_PanelTile";
+import AdminHome_Dashboard from "./AdminHome_Dashboard";
+import { usePageProvider } from "@/contexts/page/PageProviderContext";
+import { useEffect, useState } from "react";
+import { Dashboard } from "./Dashboard";
+import { useLoadAction } from "@/hooks/useLoadAction";
+import { shiftClient } from "@/api/shiftClient";
+import { dashboardAdapter } from "./dashboardAdapter";
+import MaintenanceToast from "@/routes/_shared/toasts/MaintenanceToast";
 
 export default function AdminHome() {
+    const [dashboard, setDashboard] = useState<Dashboard | null>(null);
+
     const { siteSetting } = useSiteProvider();
+    const { hideTitle } = usePageProvider();
+    const { isLoaded, runLoad } = useLoadAction(load);
+
+    useEffect(() => { runLoad() }, [runLoad]);
+
+    useEffect(() => {
+        if (siteSetting.UserName) {
+            hideTitle();
+        }
+    }, [siteSetting, hideTitle]);
+
+    async function load() {
+        const apiDashboard = await shiftClient.dashboard.retrieveDashboard();
+        if (apiDashboard) {
+            const dashboard = dashboardAdapter.getDashboard(apiDashboard, siteSetting.TimeZoneId);
+            setDashboard(dashboard);
+        }
+    }
+
+    if (!isLoaded) {
+        return null;
+    }
 
     const menuItems = siteSetting.NavigationGroups?.length
         ? siteSetting.NavigationGroups
@@ -13,6 +45,10 @@ export default function AdminHome() {
 
     return (
         <>
+            <MaintenanceToast />
+
+            {siteSetting.UserName && dashboard && <AdminHome_Dashboard dashboard={dashboard} />}
+
             {menuItems && (
                 <section className="pb-4 mb-md-2">
                     <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">

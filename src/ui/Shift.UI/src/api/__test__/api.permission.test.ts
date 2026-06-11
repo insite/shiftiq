@@ -22,13 +22,13 @@ test("/api/me/context for regular user1", async () => {
     expect(result.StylePath).toBeTypeOf("string");
 });
 
-test("/api/content/files/search for regular user1", async () => {
+test("/api/assets/files/search for regular user1", async () => {
     await global.loginUser1();
 
     await expect(shiftClient.file.search({}, 0, null)).rejects.toThrowError(new ApiError(403, ""));
 });
 
-// test("/api/progress/gradebooks/search for regular user2", async () => {
+// test("/api/records/gradebooks/search for regular user2", async () => {
 //     await global.loginUser2();
 
 //     const result = await shiftClient.gradebook.search({}, 0, null);

@@ -1,11 +1,11 @@
-import { ApiPageContentModel } from "@/api/controllers/pageContent/ApiPageContentModel";
+import { ApiPageContentModel } from "@/api/controllers/sites/pageContents/ApiPageContentModel";
 import { ApiContentModel } from "@/api/models/ApiContentModel";
 import { ContentEditorValues } from "@/components/contenteditor/ContentEditorValues";
 import { EditorOptions } from "@/components/contenteditor/EditorOptions";
 import { RichTextEditorValue } from "@/components/richtexteditor/RichTextEditorValue";
 import { ReactNode } from "react";
 import PageContent_Blocks from "./PageContent_Blocks";
-import { ApiPageContentModifyModel } from "@/api/controllers/pageContent/ApiPageContentModifyModel";
+import { ApiPageContentModifyModel } from "@/api/controllers/sites/pageContents/ApiPageContentModifyModel";
 import { ContentEditorResult } from "@/components/contenteditor/ContentEditorResult";
 
 function getEditor(fieldName: string, content: ApiContentModel): {

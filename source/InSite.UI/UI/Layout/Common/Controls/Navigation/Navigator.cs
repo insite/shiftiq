@@ -3,6 +3,7 @@
 using InSite.Domain.Foundations;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.UI.Layout.Common.Controls.Navigation
 {
@@ -20,7 +21,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
             return IsCmds && DefaultToCmds(identity)
                 ? Urls.HomeUrl
                 : DefaultToAdmin(identity)
-                ? Urls.AdminHomeUrl
+                ? RelativeUrl.AdminHomeUrl
                 : Urls.PortalHomeUrl;
         }
 

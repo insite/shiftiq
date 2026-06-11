@@ -50,5 +50,11 @@ namespace InSite.UI.Portal.Learning.Programs.Controls
 
             return HttpUtility.HtmlEncode(Markdown.ToHtml(summary));
         }
+
+        protected string GetFlagHtml()
+        {
+            var card = (LaunchCard)Page.GetDataItem();
+            return card.GetFlagHtml();
+        }
     }
 }

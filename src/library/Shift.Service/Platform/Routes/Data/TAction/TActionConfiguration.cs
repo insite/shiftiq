@@ -25,5 +25,10 @@ public class TActionConfiguration : IEntityTypeConfiguration<TActionEntity>
         builder.Property(x => x.ControllerPath).HasColumnName("ControllerPath").IsUnicode(false).HasMaxLength(100);
         builder.Property(x => x.ExtraBreadcrumb).HasColumnName("ExtraBreadcrumb").IsUnicode(false).HasMaxLength(40);
         builder.Property(x => x.HelpUrl).HasColumnName("HelpUrl").IsUnicode(false).HasMaxLength(500);
+
+        builder.HasMany(e => e.PermissionChildren)
+            .WithOne(e => e.PermissionParent)
+            .HasForeignKey(e => e.PermissionParentActionIdentifier)
+            .HasPrincipalKey(e => e.ActionIdentifier);
     }
 }

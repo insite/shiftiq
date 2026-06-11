@@ -8,16 +8,8 @@ import { useWorkshopQuestionProvider } from "@/contexts/workshop/WorkshopQuestio
 import FormField from "@/components/form/FormField";
 import { WorkshopQuestionFilterState, WorkshopQuestionRange } from "./workshopQuestionFilter";
 import { useRef, useState } from "react";
-
-interface Props {
-    filter: WorkshopQuestionFilterState;
-    isLoading: boolean;
-    onSectionChange: (sectionId: string | null) => void;
-    onCompetencyChange: (competencyId: string | null) => void;
-    onFilterChange: (filter: WorkshopQuestionFilterState) => void;
-    onApply: () => Promise<boolean>;
-    onClear: () => void;
-}
+import { WorkshopNewQuestionCommand } from "@/api/controllers/assessments/workshop/_workshopController";
+import WorkshopQuestions_AddButton from "./WorkshopQuestions_AddButton";
 
 const ligItems: ListItem[] = [
     { value: "", text: "" },
@@ -44,17 +36,36 @@ const questionChangedOnItems: ListItem[] = [
     { value: "Custom", text: "Custom Dates" },
 ];
 
+interface Props {
+    filter: WorkshopQuestionFilterState;
+    isLoading: boolean;
+    isAddingNewQuestion: boolean;
+    returnUrl: string;
+    onSectionChange: (sectionId: string | null) => void;
+    onCompetencyChange: (competencyId: string | null) => void;
+    onFilterChange: (filter: WorkshopQuestionFilterState) => void;
+    onApply: () => Promise<boolean>;
+    onClear: () => void;
+    onAddNewQuestion(command: WorkshopNewQuestionCommand): void;
+}
+
 export default function WorkshopQuestions_Filter({
     filter,
     isLoading,
+    isAddingNewQuestion,
+    returnUrl,
     onSectionChange,
     onCompetencyChange,
     onFilterChange,
     onApply,
     onClear,
+    onAddNewQuestion,
 }: Props)
 {
     const {
+        bankId,
+        formId,
+        specificationId,
         sectionItems,
         sectionCompetencyItems,
         taxonomyItems,
@@ -100,7 +111,7 @@ export default function WorkshopQuestions_Filter({
         <div className="WorkshopQuestions_Filter">
             <div className="row">
                 <div className="col-md-6">
-                    <FormField label="Section" className="question-filter-section">
+                    <FormField label={formId ? "Section" : "Set"} className="question-filter-section">
                         <ComboBox
                             value={sectionId}
                             items={sectionItems}
@@ -121,6 +132,26 @@ export default function WorkshopQuestions_Filter({
                     </FormField>
                 </div>
             </div>
+
+            {specificationId && filter.sectionId && (
+                <div className="mb-3">
+                    <Button
+                        variant="move"
+                        className="me-1"
+                        href={`/ui/admin/assessments/questions/move?bank=${bankId}&spec=${specificationId}&set=${filter.sectionId}&${returnUrl}`}
+                        title="Move questions to another bank"
+                    />
+
+                    <WorkshopQuestions_AddButton
+                        bankId={bankId}
+                        setId={filter.sectionId}
+                        competencyId={filter.competencyId}
+                        returnUrl={returnUrl}
+                        isAddingNewQuestion={isAddingNewQuestion}
+                        onClick={onAddNewQuestion}
+                    />
+                </div>
+            )}
 
             <div className="row">
                 <div className="col-sm-6">

@@ -40,7 +40,7 @@ namespace InSite.UI.Admin.Integrations.Tests
                 return;
 
             if (!CanEdit)
-                HttpResponseHelper.Redirect("/ui/admin/home");
+                HttpResponseHelper.Redirect(RelativeUrl.AdminHomeUrl);
 
             PageHelper.AutoBindHeader(this);
 

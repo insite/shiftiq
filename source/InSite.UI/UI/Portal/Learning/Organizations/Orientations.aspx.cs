@@ -87,7 +87,7 @@ namespace InSite.UI.Portal.Learning.Organizations
         {
             var model = new List<StartOrientationItem>();
 
-            var organizations = OrganizationSearch.SelectAllWithOrientations();
+            var organizations = OrganizationSearch.SelectProjectionsWithOrientations();
             foreach (var organization in organizations)
             {
                 var item = new StartOrientationItem

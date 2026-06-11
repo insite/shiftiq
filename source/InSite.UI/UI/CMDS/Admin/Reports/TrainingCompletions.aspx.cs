@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Text;
 using System.Web.UI.WebControls;
 
 using InSite.Persistence;
@@ -14,12 +12,16 @@ using Shift.Constant;
 using Shift.Sdk.UI;
 using Shift.Toolbox;
 
-using SystemListItem = System.Web.UI.WebControls.ListItem;
-
 namespace InSite.Cmds.Actions.Reporting.Report
 {
     public partial class TrainingCompletions : AdminBasePage, ICmdsUserControl
     {
+        #region Constants
+
+        private const string CloseUrl = "/ui/admin/reporting";
+
+        #endregion
+
         #region Classes
 
         [Serializable]
@@ -34,7 +36,6 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public string CredentialStatus { get; set; }
             public string MembershipFunction { get; set; }
             public bool ExcludeSelfDeclaredCredentials { get; set; }
-            public string AchievementType { get; set; }
         }
 
         #endregion
@@ -55,68 +56,25 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             base.OnInit(e);
 
-            FindDepartment.AutoPostBack = true;
-            FindDepartment.ValueChanged += (s, a) => OnDepartmentChanged();
-
-            FindProgram.AutoPostBack = true;
-            FindProgram.ValueChanged += (s, a) => SetupFindAchievement();
-
-            AchievementType.AutoPostBack = true;
-            AchievementType.ValueChanged += (s, a) => SetupFindAchievement();
-
-            IsRequired.AutoPostBack = true;
-            IsRequired.SelectedIndexChanged += (s, a) => SetupFindAchievement();
+            Criteria.MessageRaised += (type, message) => ScreenStatus.AddMessage(type, message);
 
             DownloadXlsx.Click += DownloadXlsx_Click;
-
             ReportButton.Click += ReportButton_Click;
-
-            BindMembershipFunctions(false, false);
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            Server.ScriptTimeout = 60 * 5; // 5 minutes
+            Server.ScriptTimeout = 60 * 5;
 
             if (IsPostBack)
                 return;
 
             PageHelper.AutoBindHeader(this);
 
-            FindDepartment.Filter.OrganizationIdentifier = Organization.Identifier;
-
-            if (!Identity.HasAccessToAllCompanies)
-                FindDepartment.Filter.UserIdentifier = User.UserIdentifier;
-
-            OnDepartmentChanged();
-
-            var closeUrl = "/ui/admin/reporting";
-            CloseButton1.NavigateUrl = closeUrl;
-            CloseButton2.NavigateUrl = closeUrl;
-        }
-
-        private void BindMembershipFunctions(bool showAdmin, bool isOrganizationChecked)
-        {
-            var org = new SystemListItem("Organization");
-
-            var dept = new SystemListItem("Department");
-
-            org.Selected = isOrganizationChecked;
-
-            dept.Selected = true;
-
-            if (showAdmin)
-            {
-                var admin = new SystemListItem("Administration");
-
-                MembershipFunction.Items.Add(admin);
-            }
-
-            MembershipFunction.Items.Add(org);
-
-            MembershipFunction.Items.Add(dept);
+            CloseButton1.NavigateUrl = CloseUrl;
+            CloseButton2.NavigateUrl = CloseUrl;
         }
 
         #endregion
@@ -125,6 +83,12 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void ReportButton_Click(object sender, EventArgs e)
         {
+            if (!Page.IsValid)
+            {
+                ReportTab.Visible = false;
+                return;
+            }
+
             LoadReport();
         }
 
@@ -133,17 +97,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             if (CurrentParameters == null)
                 return;
 
-            var dataSource = CmdsReportHelper
-                .SelectTrainingCompletionDates(
-                    CurrentParameters.Departments,
-                    CurrentParameters.Achievements,
-                    CurrentParameters.Learners,
-                    CurrentParameters.IsRequired,
-                    CurrentParameters.CredentialGranted,
-                    CurrentParameters.CredentialStatus,
-                    CurrentParameters.MembershipFunction,
-                    CurrentParameters.@ExcludeSelfDeclaredCredentials,
-                    CurrentParameters.AchievementType)
+            var dataSource = SelectCompletions()
                 .OrderBy(x => x.FullName)
                 .ThenBy(x => x.CompanyName)
                 .ThenBy(x => x.DepartmentName)
@@ -186,58 +140,26 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         #region Data binding
 
-        private void OnDepartmentChanged()
-        {
-            FindLearner.Enabled = FindDepartment.HasValue;
-            FindLearner.Filter.OrganizationIdentifier = Organization.Identifier;
-            FindLearner.Filter.GroupDepartmentIdentifiers = FindDepartment.Values;
-            if (ServiceLocator.Partition.IsE03())
-                FindLearner.Filter.GroupDepartmentFunctions = new[] { "Department" };
-            FindLearner.Value = null;
-
-            SetupFindAchievement();
-        }
-
-        private void SetupFindAchievement()
-        {
-            FindAchievement.Enabled = FindDepartment.HasValue;
-            FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
-            FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
-            FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
-
-            FindAchievement.Filter.AchievementLabels.Clear();
-            if (AchievementType.HasValue)
-                FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
-
-            FindAchievement.Value = null;
-        }
-
         private void LoadReport()
         {
             ReportTab.Visible = false;
 
-            if (!Page.IsValid)
+            if (!Criteria.ValidateNarrowSelection(out var error))
+            {
+                ScreenStatus.AddMessage(AlertType.Error, error);
                 return;
+            }
 
-            var departments = GetEffectiveDepartments();
+            var departments = Criteria.EffectiveDepartmentValues;
             if (departments.Length == 0)
+            {
+                ScreenStatus.AddMessage(AlertType.Error, "There is no data matching your criteria.");
                 return;
+            }
 
             CurrentParameters = BuildSearchParameters(departments);
 
-            var dataSource = CmdsReportHelper
-                .SelectTrainingCompletionDates(
-                    CurrentParameters.Departments,
-                    CurrentParameters.Achievements,
-                    CurrentParameters.Learners,
-                    CurrentParameters.IsRequired,
-                    CurrentParameters.CredentialGranted,
-                    CurrentParameters.CredentialStatus,
-                    CurrentParameters.MembershipFunction,
-                    CurrentParameters.@ExcludeSelfDeclaredCredentials,
-                    CurrentParameters.AchievementType
-                    )
-                .ToList();
+            var dataSource = SelectCompletions().ToList();
 
             if (dataSource.Count == 0)
             {
@@ -249,12 +171,18 @@ namespace InSite.Cmds.Actions.Reporting.Report
             BindReportData(dataSource);
         }
 
-        private Guid[] GetEffectiveDepartments()
+        private IEnumerable<CmdsReportHelper.TrainingCompletionDate> SelectCompletions()
         {
-            var selected = FindDepartment.Values;
-            return selected.Length > 0
-                ? selected
-                : FindDepartment.GetDataItems().Select(x => x.Value).ToArray();
+            return CmdsReportHelper.SelectTrainingCompletionDates(
+                CurrentParameters.Departments,
+                CurrentParameters.Achievements,
+                CurrentParameters.Learners,
+                CurrentParameters.IsRequired,
+                CurrentParameters.CredentialGranted,
+                CurrentParameters.CredentialStatus,
+                CurrentParameters.MembershipFunction,
+                CurrentParameters.ExcludeSelfDeclaredCredentials,
+                achievementType: null);
         }
 
         private SearchParameters BuildSearchParameters(Guid[] departments)
@@ -263,14 +191,13 @@ namespace InSite.Cmds.Actions.Reporting.Report
             {
                 OrganizationIdentifier = Organization.Identifier,
                 Departments = departments,
-                Achievements = FindAchievement.Values,
-                Learners = FindLearner.Values,
-                IsRequired = GetIsRequired(),
-                CredentialGranted = new DateTimeRange(CredentialGrantedSince.Value, CredentialGrantedBefore.Value),
-                CredentialStatus = CredentialStatus.Value,
-                MembershipFunction = GetMembershipFunction(),
-                ExcludeSelfDeclaredCredentials = ExcludeSelfDeclaredCredentials.Checked,
-                AchievementType = AchievementType.Value
+                Achievements = Criteria.SelectedAchievements,
+                Learners = Criteria.LearnerValues,
+                IsRequired = Criteria.IsRequiredFilter,
+                CredentialGranted = new DateTimeRange(Criteria.CompletedSinceFilter, Criteria.CompletedBeforeFilter),
+                CredentialStatus = Criteria.CredentialStatusFilter,
+                MembershipFunction = string.Join(",", Criteria.MembershipFunctions),
+                ExcludeSelfDeclaredCredentials = Criteria.ExcludeSelfDeclared
             };
         }
 
@@ -293,42 +220,6 @@ namespace InSite.Cmds.Actions.Reporting.Report
             ReportTab.IsSelected = true;
             DataRepeater.DataSource = dataSource;
             DataRepeater.DataBind();
-        }
-
-        #endregion
-
-        #region Helper methods
-
-        private bool? GetIsRequired()
-        {
-            return IsRequired.SelectedIndex > 0 ? bool.Parse(IsRequired.SelectedValue) : (bool?)null;
-        }
-
-        private string GetMembershipFunction()
-        {
-            var list = new StringBuilder();
-
-            foreach (SystemListItem item in MembershipFunction.Items)
-            {
-                if (!item.Selected)
-                    continue;
-
-                if (list.Length > 0)
-                    list.Append(",");
-
-                list.Append(item.Value);
-            }
-
-            if (list.Length == 0)
-                foreach (SystemListItem item in MembershipFunction.Items)
-                {
-                    if (list.Length > 0)
-                        list.Append(",");
-
-                    list.Append(item.Value);
-                }
-
-            return list.ToString();
         }
 
         #endregion

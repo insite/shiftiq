@@ -240,6 +240,15 @@ namespace InSite.UI
         protected global::System.Web.UI.WebControls.Repeater Roles;
 
         /// <summary>
+        /// InvoicingContacts control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Cmds.Controls.User.InvoicingContacts InvoicingContacts;
+
+        /// <summary>
         /// Authentications control.
         /// </summary>
         /// <remarks>

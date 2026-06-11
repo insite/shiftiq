@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using InSite.Domain.Organizations.PerformanceReport;
 using InSite.Persistence;
 
 using Shift.Constant;
 using Shift.Toolbox;
-using Shift.Toolbox.Reporting.AssessmentAudit.Models;
+using Shift.Toolbox.Reports.AssessmentAudit.Models;
 
 using ColorTranslator = System.Drawing.ColorTranslator;
-using DomainItemWeight = InSite.Domain.Organizations.PerformanceReport.ItemWeight;
 using DrawingColor = System.Drawing.Color;
-using ItemWeight = Shift.Toolbox.Reporting.PerformanceReport.Models.ItemWeight;
-using ReportConfig = Shift.Toolbox.Reporting.PerformanceReport.Models.ReportConfig;
-using ReportCreator = Shift.Toolbox.Reporting.AssessmentAudit.ReportCreator;
-using UserScore = Shift.Toolbox.Reporting.PerformanceReport.Models.UserScore;
+using ItemWeight = Shift.Toolbox.Reports.PerformanceReport.Models.ItemWeight;
+using ReportConfig = Shift.Toolbox.Reports.PerformanceReport.Models.ReportConfig;
+using ReportCreator = Shift.Toolbox.Reports.AssessmentAudit.ReportCreator;
+using UserScore = Shift.Toolbox.Reports.PerformanceReport.Models.UserScore;
 
 namespace InSite.UI.Admin.Assessments.Attempts.Utilities
 {

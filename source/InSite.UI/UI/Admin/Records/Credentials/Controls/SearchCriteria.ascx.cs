@@ -28,6 +28,8 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                     AchievementLabel = AchievementLabel.Value,
                     EmployerGroupStatus = EmployerGroupStatus.Value,
                     DepartmentIdentifier = DepartmentIdentifier.Value,
+                    DistrictGroupIdentifier = DistrictGroupIdentifier.Value,
+                    TeamGroupIdentifier = TeamGroupIdentifier.Value,
 
                     CredentialGrantedSince = CredentialGrantedSince.Value,
                     CredentialGrantedBefore = CredentialGrantedBefore.Value,
@@ -57,6 +59,8 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                 AchievementLabel.Value = value.AchievementLabel;
                 EmployerGroupStatus.Value = value.EmployerGroupStatus;
                 DepartmentIdentifier.Value = value.DepartmentIdentifier;
+                DistrictGroupIdentifier.Value = value.DistrictGroupIdentifier;
+                TeamGroupIdentifier.Value = value.TeamGroupIdentifier;
 
                 CredentialGrantedSince.Value = value.CredentialGrantedSince;
                 CredentialGrantedBefore.Value = value.CredentialGrantedBefore;
@@ -80,6 +84,12 @@ namespace InSite.Admin.Achievements.Credentials.Controls
             EmployerGroupStatus.Settings.OrganizationIdentifier = Organization.Key;
 
             DepartmentIdentifier.OrganizationIdentifier = Organization.OrganizationIdentifier;
+
+            DistrictGroupIdentifier.CurrentOrganizationOnly = true;
+            DistrictGroupIdentifier.Filter.GroupType = "District";
+
+            TeamGroupIdentifier.CurrentOrganizationOnly = true;
+            TeamGroupIdentifier.Filter.GroupType = "Team";
 
             PersonCode.EmptyMessage = GetEmptyMessage("Person Code");
         }
@@ -105,6 +115,8 @@ namespace InSite.Admin.Achievements.Credentials.Controls
             AchievementLabel.ClearSelection();
             EmployerGroupStatus.ClearSelection();
             DepartmentIdentifier.Value = null;
+            DistrictGroupIdentifier.Value = null;
+            TeamGroupIdentifier.Value = null;
 
             CredentialGrantedSince.Value = null;
             CredentialGrantedBefore.Value = null;

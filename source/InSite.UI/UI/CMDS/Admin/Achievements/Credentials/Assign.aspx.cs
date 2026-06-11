@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using InSite.Application.Credentials.Write;
 using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
+using InSite.Custom.CMDS.Common.Controls.Server;
 using InSite.Domain.Records;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
@@ -236,8 +237,8 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             AchievementType.AutoPostBack = true;
             AchievementType.ValueChanged += SubType_ValueChanged;
 
-            AchievementVisibility.AutoPostBack = true;
-            AchievementVisibility.ValueChanged += AchievementVisibility_ValueChanged;
+            OrganizationScope.AutoPostBack = true;
+            OrganizationScope.ValueChanged += OrganizationScope_ValueChanged;
 
             Category.AutoPostBack = true;
             Category.ValueChanged += Category_ValueChanged;
@@ -317,7 +318,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         private void SubType_ValueChanged(object sender, EventArgs e)
         {
             if (AchievementType.Value != AchievementTypes.Module)
-                AchievementVisibility.Value = "Organization-Specific Achievements";
+                OrganizationScope.Value = OrganizationScopeSelector.ScopeOrganization;
 
             SetCategoryVisibility();
 
@@ -327,11 +328,11 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             LoadAchievements();
         }
 
-        private void AchievementVisibility_ValueChanged(object sender, EventArgs e)
+        private void OrganizationScope_ValueChanged(object sender, EventArgs e)
         {
             SetCategoryVisibility();
 
-            AchievementCategory.OrganizationIdentifier = AchievementVisibility.Value == "Global Achievements"
+            AchievementCategory.OrganizationIdentifier = OrganizationScope.Value == OrganizationScopeSelector.ScopePartition
                 ? OrganizationIdentifiers.CMDS
                 : Organization.OrganizationIdentifier;
             AchievementCategory.RefreshData();
@@ -664,23 +665,24 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
         {
             var filter = new VCmdsAchievementFilter { AchievementType = AchievementType.Value };
 
-            if (AchievementVisibility.Value == "Organization-Specific Achievements")
+            var partitionId = ServiceLocator.Partition.Identifier;
+
+            if (OrganizationScope.Value == OrganizationScopeSelector.ScopeOrganization)
             {
                 filter.OrganizationIdentifier = Organization.Identifier;
                 filter.CategoryIdentifier = Category.ValueAsGuid;
                 filter.AchievementVisibility = AccountScopes.Organization;
             }
-            else if (AchievementVisibility.Value == "Global Achievements")
+            else if (OrganizationScope.Value == OrganizationScopeSelector.ScopePartition)
             {
-                filter.AchievementVisibility = AccountScopes.Enterprise;
+                filter.OwnerOrganizationIdentifiers = new[] { partitionId };
 
                 if (AchievementType.Value == AchievementTypes.Module && AchievementCategory.ValueAsGuid.HasValue)
                     filter.AchievementCategory = AchievementCategory.GetSelectedOption().Text;
             }
             else
             {
-                filter.OrganizationIdentifier = Organization.Identifier;
-                filter.GlobalOrCompanySpecific = true;
+                filter.OwnerOrganizationIdentifiers = new[] { Organization.Identifier, partitionId };
             }
 
             filter.OrganizationCode = Organization.Code;
@@ -751,13 +753,13 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
         private void SetCategoryVisibility()
         {
-            Categories.Visible = AchievementVisibility.Value == "Organization-Specific Achievements"
-                              || AchievementVisibility.Value == "Global Achievements"
+            Categories.Visible = OrganizationScope.Value == OrganizationScopeSelector.ScopeOrganization
+                              || OrganizationScope.Value == OrganizationScopeSelector.ScopePartition
                               && AchievementType.Value == AchievementTypes.Module;
 
-            Category.Visible = AchievementVisibility.Value == "Organization-Specific Achievements";
+            Category.Visible = OrganizationScope.Value == OrganizationScopeSelector.ScopeOrganization;
 
-            AchievementCategory.Visible = AchievementVisibility.Value != "Organization-Specific Achievements";
+            AchievementCategory.Visible = OrganizationScope.Value != OrganizationScopeSelector.ScopeOrganization;
         }
 
         #endregion

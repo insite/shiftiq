@@ -11,6 +11,7 @@ import { IconStyle } from "../icon/IconStyle";
 interface Props<T extends object> {
     children?: ReactNode;
     className?: string;
+    bodyClassName?: string;
     label?: string;
     description?: string;
     editHref?: string | null;
@@ -27,6 +28,7 @@ interface Props<T extends object> {
 export default function FormField<T extends object>({
     children,
     className,
+    bodyClassName,
     label,
     description,
     editHref,
@@ -86,7 +88,7 @@ export default function FormField<T extends object>({
                     )}
                 </label>
             )}
-            <div>
+            <div className={bodyClassName}>
                 {children}
             </div>
             {description && (

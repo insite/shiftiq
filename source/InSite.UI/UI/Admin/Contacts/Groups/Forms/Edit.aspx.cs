@@ -382,14 +382,17 @@ namespace InSite.Admin.Contacts.Groups.Forms
             var g = ServiceLocator.GroupSearch.GetGroup(Entity.Identifier);
             var commands = new List<Command>();
 
-            GetInputValues(g, commands);
+            var isPermissionRefreshNeeded = GetInputValues(g, commands);
 
             ServiceLocator.SendCommands(commands);
+
+            if (isPermissionRefreshNeeded)
+                PermissionCache.Refresh(g.OrganizationIdentifier);
 
             return true;
         }
 
-        private void GetInputValues(QGroup g, List<Command> commands)
+        private bool GetInputValues(QGroup g, List<Command> commands)
         {
             var id = Entity.Identifier;
             var isRole = GroupType.Value == GroupTypes.Role;
@@ -452,6 +455,8 @@ namespace InSite.Admin.Contacts.Groups.Forms
                 foreach (var entry in addresses)
                     commands.Add(new ChangeGroupAddress(id, entry.Key, entry.Value));
             }
+
+            return GroupType.Value != g.GroupType || GroupName.Text != g.GroupName;
         }
 
         private Guid? GetGroupStatusItemId()

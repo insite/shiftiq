@@ -13,6 +13,7 @@ using InSite.Common.Web.UI;
 using InSite.Domain.Organizations;
 using InSite.Persistence;
 using InSite.Web.Helpers;
+using InSite.Web.Optimization;
 
 using Shift.Common;
 
@@ -22,6 +23,17 @@ namespace InSite.UI.Layout.Lobby
 {
     public class LobbyBasePage : Page, IHasWebRoute, IHasTranslator, IAdminPage
     {
+        private PageStatePersister _pageStatePersister;
+
+        /// <summary>
+        /// Returns a <see cref="CachePageStatePersister"/> so ViewState is persisted server-side rather than inlined in 
+        /// the rendered page. Overriding the property on the page directly bypasses the ASP.NET control-adapter 
+        /// mechanism (previously wired up via App_Browsers\DefaultPageAdapter.browser), which proved fragile in 
+        /// deployments where stale precompiled artifacts in /bin could silently disable the adapter.
+        /// </summary>
+        protected override PageStatePersister PageStatePersister
+            => _pageStatePersister ?? (_pageStatePersister = new CachePageStatePersister(this));
+
         public Control ActionControl => this;
 
         protected CultureInfo LanguageCulture => CultureInfo.GetCultureInfo(Identity.Language);

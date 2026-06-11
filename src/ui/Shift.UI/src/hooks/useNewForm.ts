@@ -5,8 +5,8 @@ import { DefaultValues, useForm } from "react-hook-form";
 
 export function useNewForm<FormValues extends object>(
     defaultValues: FormValues,
-    outlineUrl: string,
-    onSave: (values: FormValues) => Promise<string>,
+    outlineUrl: string | null,
+    onSave: (values: FormValues) => Promise<string | null>,
 ) {
     const params = useParams();
     const navigate = useNavigate();
@@ -20,8 +20,11 @@ export function useNewForm<FormValues extends object>(
     });
 
     async function handleSave(values: FormValues) {
-        let id: string;
+        let id: string | null = null;
         if (await runSave(async () => id = await onSave(values))) {
+            if (!id) {
+                return;
+            }
             if (outlineUrl) {
                 navigate(`${outlineUrl}${id!}`);
             } else {

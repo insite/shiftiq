@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.UI;
 
 using InSite.Admin.Assessments.Questions.Utilities;
+using InSite.Admin.Assets.Contents.Utilities;
 using InSite.Common.Web;
 using InSite.Domain.Attempts;
 using InSite.Domain.Banks;
@@ -30,17 +31,17 @@ namespace InSite.Admin.Assessments.Questions.Controls
             public string Name { get; }
             public List<DataItem> Items { get; } = new List<DataItem>();
 
-            public ControlData(BankState bank)
+            public ControlData(BankState bank, string language)
             {
                 AssetNumber = bank.Asset.ToString();
-                Title = (bank.Content?.Title?.Default).IfNullOrEmpty(bank.Name);
+                Title = (bank.Content?.Title?.Get(language)).IfNullOrEmpty(bank.Name);
                 Name = bank.Name;
             }
 
-            public ControlData(Form form)
+            public ControlData(Form form, string language)
             {
                 AssetNumber = $"{form.Asset}.{form.AssetVersion}";
-                Title = (form.Content.Title?.Default).IfNullOrEmpty(form.Name);
+                Title = (form.Content.Title?.Get(language)).IfNullOrEmpty(form.Name);
                 Name = form.Name;
             }
         }
@@ -55,8 +56,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid BankID { get; }
 
-            public BankOptions(OrganizationState organization, Guid bankId)
-                : base(organization)
+            public BankOptions(OrganizationState organization, string language, Guid bankId)
+                : base(organization, language)
             {
                 BankID = bankId;
             }
@@ -66,8 +67,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid FormID { get; }
 
-            public FormOptions(OrganizationState organization, Guid formId)
-                : base(organization)
+            public FormOptions(OrganizationState organization, string language, Guid formId)
+                : base(organization, language)
             {
                 FormID = formId;
             }
@@ -76,15 +77,17 @@ namespace InSite.Admin.Assessments.Questions.Controls
         public class Options
         {
             public Guid OrganizationID { get; }
+            public string Language { get; set; }
 
             public string CurrentUrl { get; }
             public string HeaderUrl { get; }
 
             public QuestionPrintHelper.QuestionFilter QuestionFilter { get; set; }
 
-            public Options(OrganizationState organization)
+            public Options(OrganizationState organization, string language)
             {
                 OrganizationID = organization.Identifier;
+                Language = language;
 
                 var request = HttpContext.Current.Request;
 
@@ -95,8 +98,12 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         #endregion
 
-        private void LoadData(ControlData data)
+        private InputTranslator _translator;
+
+        private void LoadData(ControlData data, Options options)
         {
+            _translator = new InputTranslator(options.Language, options.OrganizationID);
+
             PageTitle.InnerText = data.Title.IfNullOrEmpty("Untitled");
 
             var hasData = data.Items.Count > 0;
@@ -116,7 +123,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             if (bank == null || bank.Tenant != options.OrganizationID)
                 return null;
 
-            var data = new ControlData(bank);
+            var data = new ControlData(bank, options.Language);
 
             var sequence = 1;
 
@@ -158,11 +165,11 @@ namespace InSite.Admin.Assessments.Questions.Controls
             if (form == null || form.Specification.Bank.Tenant != options.OrganizationID)
                 return null;
 
-            var data = new ControlData(form);
+            var data = new ControlData(form, options.Language);
 
             var sequence = 1;
 
-            foreach (var q in QuestionPrintHelper.GetQuestions(form))
+            foreach (var q in QuestionPrintHelper.GetQuestions(form, options.Language))
             {
                 var question = q.AttemptQuestion as AttemptQuestionDefault;
                 if (question == null)
@@ -210,7 +217,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
                 var report = (QuestionPrintCompact)page.LoadControl("~/UI/Admin/Assessments/Questions/Controls/QuestionPrintCompact.ascx");
 
-                report.LoadData(data);
+                report.LoadData(data, options);
 
                 var htmlBuilder = new StringBuilder();
 
@@ -235,12 +242,17 @@ namespace InSite.Admin.Assessments.Questions.Controls
                     {
                         new HtmlConverterSettings.Variable("title", data.Title),
                         new HtmlConverterSettings.Variable("name", data.Name),
-                        new HtmlConverterSettings.Variable("asset_number", data.AssetNumber),
+                        new HtmlConverterSettings.Variable("asset_number", $"{report.CustomTranslate("Asset #")}{data.AssetNumber}"),
                     },
                 });
 
                 return new PrintOutputFile(fileName, pdfData);
             }
+        }
+
+        protected string CustomTranslate(string text)
+        {
+            return _translator.Translate(text);
         }
 
         #endregion

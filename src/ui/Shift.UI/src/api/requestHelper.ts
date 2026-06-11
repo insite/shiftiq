@@ -26,7 +26,7 @@ export const requestHelper = {
         }
 
         if ((status === 403 || status === 401) && !_throwAuthError && !throwAuthError) {
-            window.location.href = urlHelper.getLoginPageUrl();
+            window.location.href = status === 403 ? urlHelper.get403PageUrl() : urlHelper.getLoginPageUrl();
             return null;
         }
 

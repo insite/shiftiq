@@ -269,7 +269,7 @@ translationControl.initEditor('{TranslatedText.ClientID}');",
 
         public void SetDefault() => SetTranslation(string.Empty, null);
 
-        public void SetTranslation(string translation, string language)
+        public void SetTranslation(string translation, string language, bool allowHtml = false)
         {
             Translations = MultilingualString.Deserialize(translation);
 
@@ -277,8 +277,11 @@ translationControl.initEditor('{TranslatedText.ClientID}');",
 
             BindTranslatedLanguage(SelectedOrganizationCode);
 
+            DefaultText.AllowHtml = allowHtml;
             DefaultText.Text = Translations[DefaultLanguage];
             DefaultLiteral.InnerHtml = Markdown.ToHtml(Translations[DefaultLanguage]);
+
+            TranslatedText.AllowHtml = allowHtml;
 
             LanguageSelected(null, null, language ?? SelectedLanguage, SelectedOrganizationCode);
 

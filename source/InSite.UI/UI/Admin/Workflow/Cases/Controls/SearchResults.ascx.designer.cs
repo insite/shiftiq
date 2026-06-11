@@ -42,6 +42,15 @@ namespace InSite.Admin.Issues.Controls
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ButtonPanel;
 
         /// <summary>
+        /// BulkButtons control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl BulkButtons;
+
+        /// <summary>
         /// AssignButtonStart control.
         /// </summary>
         /// <remarks>
@@ -58,6 +67,24 @@ namespace InSite.Admin.Issues.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Button BulkCloseCasesButton;
+
+        /// <summary>
+        /// StartBulkCaseStatusButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button StartBulkCaseStatusButton;
+
+        /// <summary>
+        /// AssignPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AssignPanel;
 
         /// <summary>
         /// NewOwnerID control.
@@ -87,76 +114,49 @@ namespace InSite.Admin.Issues.Controls
         protected global::InSite.Common.Web.UI.Button AssignButtonStop;
 
         /// <summary>
-        /// BulkUpdateStatus control.
+        /// BulkUpdateCaseStatusPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Alert BulkUpdateStatus;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl BulkUpdateCaseStatusPanel;
 
         /// <summary>
-        /// BulkUpdateStatusInfo control.
+        /// BulkUpdateCaseStatus control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Alert BulkUpdateStatusInfo;
+        protected global::InSite.Common.Web.UI.IssueStatusComboBox BulkUpdateCaseStatus;
 
         /// <summary>
-        /// BulkUpdatePanel control.
+        /// SaveBulkCaseStatusButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl BulkUpdatePanel;
+        protected global::InSite.Common.Web.UI.SaveButton SaveBulkCaseStatusButton;
 
         /// <summary>
-        /// ConfirmMessage control.
+        /// CancelBulkCaseStatusButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ConfirmMessage;
+        protected global::InSite.Common.Web.UI.CancelButton CancelBulkCaseStatusButton;
 
         /// <summary>
-        /// NoCaseStatus control.
+        /// BulkCloseCasePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl NoCaseStatus;
-
-        /// <summary>
-        /// OneCaseStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl OneCaseStatus;
-
-        /// <summary>
-        /// OneCaseStatusLiteral control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal OneCaseStatusLiteral;
-
-        /// <summary>
-        /// ManyCaseStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ManyCaseStatus;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl BulkCloseCasePanel;
 
         /// <summary>
         /// IssueStatus control.
@@ -186,21 +186,30 @@ namespace InSite.Admin.Issues.Controls
         protected global::InSite.Common.Web.UI.CancelButton CancelBulkButton;
 
         /// <summary>
-        /// hfShowCheckboxColumn control.
+        /// BulkUpdateStatusInfo control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfShowCheckboxColumn;
+        protected global::InSite.Common.Web.UI.Alert BulkUpdateStatusInfo;
 
         /// <summary>
-        /// hfScrollPosition control.
+        /// BulkMode control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfScrollPosition;
+        protected global::System.Web.UI.WebControls.HiddenField BulkMode;
+
+        /// <summary>
+        /// BulkHasSelectionOnOtherPages control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField BulkHasSelectionOnOtherPages;
     }
 }

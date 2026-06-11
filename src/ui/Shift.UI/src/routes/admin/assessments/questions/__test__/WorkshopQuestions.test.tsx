@@ -325,6 +325,7 @@ function QuestionWorkshopTestProvider({
                 type: "setSectionData",
                 competencies,
                 questions,
+                afterQuestionCreated: false,
             }));
         },
         selectSection(sectionId: string) {

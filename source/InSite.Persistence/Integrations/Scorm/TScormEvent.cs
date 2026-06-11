@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace InSite.Persistence.Integration.Scorm
+{
+    public class TScormEvent
+    {
+        public Guid EventIdentifier { get; set; }
+        public string EventData { get; set; }
+        public DateTimeOffset EventWhen { get; set; }
+        public string EventSource { get; set; }
+    }
+}

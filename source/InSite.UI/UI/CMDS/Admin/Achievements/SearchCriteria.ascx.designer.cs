@@ -15,6 +15,15 @@ namespace InSite.Cmds.Controls.Training.Achievements
     {
 
         /// <summary>
+        /// AchievementScope control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Custom.CMDS.Common.Controls.Server.OrganizationScopeSelector AchievementScope;
+
+        /// <summary>
         /// AchievementType control.
         /// </summary>
         /// <remarks>
@@ -58,42 +67,6 @@ namespace InSite.Cmds.Controls.Training.Achievements
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.ComboBox AllowSelfDeclaration;
-
-        /// <summary>
-        /// AccountScope control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Custom.CMDS.Common.Controls.Server.AchievementVisibilitySelector AccountScope;
-
-        /// <summary>
-        /// CompanyPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CompanyPanel;
-
-        /// <summary>
-        /// Company control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Custom.CMDS.Common.Controls.Server.FindCompany Company;
-
-        /// <summary>
-        /// CategoryPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl CategoryPanel;
 
         /// <summary>
         /// Category control.

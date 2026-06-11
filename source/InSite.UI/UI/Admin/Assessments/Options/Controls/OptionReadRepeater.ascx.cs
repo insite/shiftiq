@@ -57,7 +57,7 @@ namespace InSite.Admin.Assessments.Options.Controls
             var isTable = question.Layout.Type == OptionLayoutType.Table;
 
             _currentQuestionTable = isTable
-                ? BankQuestionTable.Build(question.Layout.Columns, question.Options.Select(x => x.Content.Title.Default))
+                ? BankQuestionTable.Build(question.Layout.Columns, question.Options.Select(x => x.Content.Title?.Get(CurrentLanguage)))
                 : null;
 
             if (question.Type == QuestionItemType.TrueOrFalse)
@@ -101,7 +101,7 @@ namespace InSite.Admin.Assessments.Options.Controls
             {
                 x.Points,
                 x.Letter,
-                Title = x.Content.Title?.Default,
+                Title = x.Content.Title?.Get(CurrentLanguage),
                 Option = x
             });
             TrueOrFalseOptionRepeater.DataBind();
@@ -115,7 +115,7 @@ namespace InSite.Admin.Assessments.Options.Controls
             {
                 x.Points,
                 x.Letter,
-                Title = x.Content.Title?.Default,
+                Title = x.Content.Title?.Get(CurrentLanguage),
                 Option = x
             });
             SingleCorrectOptionRepeater.DataBind();
@@ -128,7 +128,7 @@ namespace InSite.Admin.Assessments.Options.Controls
             MultipleCorrectOptionRepeater.DataSource = question.Options.Select(x => new
             {
                 x.Letter,
-                Title = x.Content.Title?.Default,
+                Title = x.Content.Title?.Get(CurrentLanguage),
                 x.Points,
                 x.IsTrue,
                 Option = x
@@ -143,7 +143,7 @@ namespace InSite.Admin.Assessments.Options.Controls
             ComposedRubricOptionRepeater.DataSource = question.Options.Select(x => new
             {
                 x.Letter,
-                Title = x.Content.Title?.Default,
+                Title = x.Content.Title?.Get(CurrentLanguage),
                 x.Points,
                 Option = x
             });
@@ -157,7 +157,7 @@ namespace InSite.Admin.Assessments.Options.Controls
             BooleanTableOptionRepeater.DataSource = question.Options.Select(x => new
             {
                 x.Letter,
-                Title = x.Content.Title?.Default,
+                Title = x.Content.Title?.Get(CurrentLanguage),
                 x.Points,
                 x.IsTrue,
                 Option = x
@@ -170,12 +170,12 @@ namespace InSite.Admin.Assessments.Options.Controls
             MultiView.SetActiveView(MatchingView);
 
             MatchingPairsRepeater.Visible = (question.Matches?.Pairs).IsNotEmpty();
-            MatchingPairsRepeater.DataSource = question.Matches.Pairs.Select(x => new { Left = x.Left.Title.Default, Right = x.Right.Title.Default, x.Points });
+            MatchingPairsRepeater.DataSource = question.Matches.Pairs.Select(x => new { Left = x.Left.Title.Get(CurrentLanguage), Right = x.Right.Title.Get(CurrentLanguage), x.Points });
             MatchingPairsRepeater.DataBind();
 
             var distractors = question.Matches.Distractors
-                .Where(x => !string.IsNullOrEmpty(x.Title.Default))
-                .Select(x => new { Value = x.Title.Default })
+                .Where(x => !string.IsNullOrEmpty(x.Title.Get(CurrentLanguage)))
+                .Select(x => new { Value = x.Title.Get(CurrentLanguage) })
                 .ToList();
 
             MatchingDistractorsRepeater.Visible = distractors.Count > 0;
@@ -239,8 +239,8 @@ namespace InSite.Admin.Assessments.Options.Controls
 
             var ordering = question.Ordering;
             var label = ordering.Label;
-            var topLabel = label.TopContent.Title.Default;
-            var bottomLabel = label.BottomContent.Title.Default;
+            var topLabel = label.TopContent.Title.Get(CurrentLanguage);
+            var bottomLabel = label.BottomContent.Title.Get(CurrentLanguage);
 
             OrderingTopLabel.InnerHtml = ConvertToHtml(topLabel);
             OrderingTopLabel.Visible = label.Show && topLabel.IsNotEmpty();
@@ -259,7 +259,7 @@ namespace InSite.Admin.Assessments.Options.Controls
                     return new
                     {
                         Sequence = ordering.GetOptionIndex(option) + 1,
-                        Html = ConvertToHtml(option.Content.Title.Default)
+                        Html = ConvertToHtml(option.Content.Title.Get(CurrentLanguage))
                     };
                 }),
             });
@@ -351,7 +351,7 @@ namespace InSite.Admin.Assessments.Options.Controls
     data-name='{ElementUpdater.ElementTypes.OptionTitle}'
     data-type='text'
     data-pk='{option.Question.Set.Bank.Identifier}:{option.Question.Identifier}:{option.Number}'
->{ConvertToHtml(option.Content.Title != null ? option.Content.Title.Default : null)}</a>
+>{ConvertToHtml(option.Content.Title?.Get(CurrentLanguage))}</a>
 ";
                 return $"<td class='option-title'>{text}</td>";
             }
@@ -385,9 +385,18 @@ namespace InSite.Admin.Assessments.Options.Controls
                     ? "<i class='far fa-dot-circle'></i>"
                     : "<i class='far fa-circle'></i>";
 
-        protected string GetOptionPoints(decimal value) => $"{value:n2} points";
+        protected string GetOptionPoints(decimal value) => $"{value:n2} {Translate("points")}";
 
-        protected string ConvertToHtml(string text)
+        protected string TranslateContentTitle()
+        {
+            var item = Page.GetDataItem();
+            var content = (ContentTitle)DataBinder.Eval(item, "Content");
+            var text = content.Title?.Get(CurrentLanguage);
+
+            return ConvertToHtml(text);
+        }
+
+        private string ConvertToHtml(string text)
         {
             return AllowHtml
                 ? Markdown.ToHtml(text)

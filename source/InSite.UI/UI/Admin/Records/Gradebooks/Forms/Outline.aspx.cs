@@ -27,6 +27,12 @@ namespace InSite.Admin.Records.Gradebooks.Forms
 
         private Guid? ScoreItem => Guid.TryParse(Request["scoreItem"], out var value) ? value : (Guid?)null;
 
+        private DateTimeOffset? GradebookLocked
+        {
+            get => (DateTimeOffset?)ViewState[nameof(GradebookLocked)];
+            set => ViewState[nameof(GradebookLocked)] = value;
+        }
+
         public static List<string> UploadWarnings
         {
             get => (List<string>)HttpContext.Current.Session["InSite.Admin.Grades.Gradebooks.Forms.Outline.UploadWarnings"];
@@ -97,6 +103,12 @@ namespace InSite.Admin.Records.Gradebooks.Forms
 
         private void UnlockButton_Click(object sender, EventArgs e)
         {
+            if (!AllowUnlockGradebook())
+            {
+                StatusAlert.AddMessage(AlertType.Success, "Gradebook can only be unlocked by Operator");
+                return;
+            }
+
             ServiceLocator.SendCommand(new UnlockGradebook(GradebookID.Value));
 
             DomainCache.Instance.RemoveCourses(x => x.Gradebook?.Identifier == GradebookID.Value);
@@ -156,6 +168,8 @@ namespace InSite.Admin.Records.Gradebooks.Forms
                 return;
             }
 
+            GradebookLocked = queryGradebook.GradebookLocked;
+
             DownloadLink.NavigateUrl = $"/ui/admin/records/gradebooks/download?gradebook={GradebookID}";
 
             var dataGradebook = ServiceLocator.RecordSearch.GetGradebookState(GradebookID.Value);
@@ -175,7 +189,7 @@ namespace InSite.Admin.Records.Gradebooks.Forms
                 "<span class='badge bg-success'><i class='far fa-lock-open'></i> Unlocked</span>";
 
             LockButton.Visible = !dataGradebook.IsLocked;
-            UnlockButton.Visible = dataGradebook.IsLocked;
+            UnlockButton.Visible = dataGradebook.IsLocked && AllowUnlockGradebook();
 
             GradebookTitle.Text = queryGradebook.GradebookTitle;
 
@@ -204,7 +218,6 @@ namespace InSite.Admin.Records.Gradebooks.Forms
             var credentialCounts = CredentialGrid.LoadData(GradebookID.Value);
             CredentialPanel.Visible = credentialCounts.CountInUsers > 0;
 
-            ScormEventGrid.LoadData(GradebookID.Value);
             ScormRegistrationGrid.LoadData(GradebookID.Value);
 
             var useScormCloud = Organization.Integrations?.ScormCloud?.UserName != null
@@ -282,6 +295,14 @@ namespace InSite.Admin.Records.Gradebooks.Forms
                 ClassRepeater.DataSource = dataSource;
                 ClassRepeater.DataBind();
             }
+        }
+
+        private bool AllowUnlockGradebook()
+        {
+            return !GradebookLocked.HasValue
+                || Organization.Toolkits.Gradebooks.OperatorOnlyUnlockAfterMonths < 0
+                || GradebookLocked.Value.AddMonths(Organization.Toolkits.Gradebooks.OperatorOnlyUnlockAfterMonths) > DateTimeOffset.Now
+                || Identity.IsOperator;
         }
 
         private static string GetLocalTime(DateTimeOffset? item)

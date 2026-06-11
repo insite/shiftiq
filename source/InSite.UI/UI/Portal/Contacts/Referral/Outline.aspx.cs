@@ -1,5 +1,6 @@
 using System;
 
+using InSite.Application.Issues.Read;
 using InSite.Common.Web;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
@@ -18,6 +19,25 @@ namespace InSite.UI.Portal.Contacts.Referral
         public string GetTitle()
             => Model.FullName;
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            Model = CreateModel();
+
+            if (Model == null)
+                HttpResponseHelper.Redirect("/ui/portal/contacts/referral/search");
+
+            if (IsPostBack)
+                return;
+
+            PageHelper.AutoBindHeader(this);
+
+            CaseColumn.Visible = Model.HasCase;
+
+            DocumentList.BindFiles(LearnerIdentifier);
+        }
+
         private PersonOutlineModel CreateModel()
         {
             var learner = PersonSearch.Select(Organization.Identifier, LearnerIdentifier, x => x.User, x => x.OccupationStandard);
@@ -25,35 +45,26 @@ namespace InSite.UI.Portal.Contacts.Referral
             if (learner == null)
                 return null;
 
+            var caseFilter = new QIssueFilter
+            {
+                OrganizationIdentifier = Organization.Identifier,
+                TopicUserIdentifier = LearnerIdentifier,
+            };
+
+            var cases = ServiceLocator.IssueSearch.GetIssues(caseFilter);
+            var @case = cases.Count == 1 ? cases[0] : null;
+
             return new PersonOutlineModel
             {
                 FullName = learner.User.FullName,
                 Email = learner.User.Email,
                 AccountCode = learner.PersonCode ?? "-",
                 Phone = learner.Phone ?? "-",
-                OccupationTitle = learner.OccupationStandard?.ContentTitle ?? "-"
+                OccupationTitle = learner.OccupationStandard?.ContentTitle ?? "-",
+                HasCase = @case != null,
+                CaseType = @case?.IssueType,
+                CaseStatus = @case?.IssueStatusName,
             };
-        }
-
-        protected override void OnInit(EventArgs e)
-        {
-            base.OnInit(e);
-            Model = CreateModel();
-
-            if (Model == null)
-                HttpResponseHelper.Redirect("/ui/portal/contacts/referral/search");
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-
-            if (IsPostBack)
-                return;
-
-            PageHelper.AutoBindHeader(this);
-
-            DocumentList.BindFiles(LearnerIdentifier);
         }
     }
 }

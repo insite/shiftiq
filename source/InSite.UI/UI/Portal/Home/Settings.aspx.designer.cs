@@ -123,24 +123,6 @@ namespace InSite.UI.Portal.Home
         protected global::InSite.Common.Web.UI.TextBox LastName;
 
         /// <summary>
-        /// EmailRequiredValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.RequiredValidator EmailRequiredValidator;
-
-        /// <summary>
-        /// EmailPatternValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.EmailValidator EmailPatternValidator;
-
-        /// <summary>
         /// Email control.
         /// </summary>
         /// <remarks>
@@ -148,6 +130,15 @@ namespace InSite.UI.Portal.Home
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.TextBox Email;
+
+        /// <summary>
+        /// EmailAlternate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox EmailAlternate;
 
         /// <summary>
         /// PhoneMobileRequiredValidator control.
@@ -211,6 +202,60 @@ namespace InSite.UI.Portal.Home
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.TextBox PostalCode;
+
+        /// <summary>
+        /// DepartmentField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DepartmentField;
+
+        /// <summary>
+        /// Department control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox Department;
+
+        /// <summary>
+        /// DistrictField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DistrictField;
+
+        /// <summary>
+        /// District control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox District;
+
+        /// <summary>
+        /// SupervisorField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SupervisorField;
+
+        /// <summary>
+        /// Supervisor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox Supervisor;
 
         /// <summary>
         /// SaveButton control.

@@ -39,7 +39,7 @@ namespace InSite.UI.Admin.Records.Validators.Forms
 
                 if (user == null
                     || user.JournalSetup.OrganizationIdentifier != Organization.Identifier
-                    || !ServiceLocator.JournalSearch.ExistsJournalSetupUser(JournalSetupIdentifier, User.Identifier, JournalSetupUserRole.Validator)
+                    || !ServiceLocator.JournalSearch.IsLogbookValidator(JournalSetupIdentifier, User.Identifier)
                     )
                 {
                     HttpResponseHelper.Redirect($"/ui/admin/records/logbooks/search");

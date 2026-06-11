@@ -60,6 +60,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             BuildForm.Click += BuildForm_Click;
             BuildAddendum.Click += BuildAddendum_Click;
             BuildFormInternal.Click += BuildFormInternal_Click;
+            BuildFormDocx.Click += BuildFormDocx_Click;
             BuildFormCompact.Click += BuildFormCompact_Click;
 
             DownloadButton.Click += DownloadButton_Click;
@@ -102,7 +103,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, FormID,
-                new QuestionPrintExternal.FormOptions(Organization, FormID)
+                new QuestionPrintExternal.FormOptions(Organization, ReportLanguage.Value, FormID)
                 {
                     IncludeImages = IncludeImages.Checked,
                     QuestionFilter = CreateQuestionFilter()
@@ -124,7 +125,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, FormID,
-                new QuestionPrintInternal.FormOptions(Organization.Identifier, User.TimeZone, FormID)
+                new QuestionPrintInternal.FormOptions(Organization.Identifier, User.TimeZone, ReportLanguage.Value, FormID)
                 {
                     IncludeImages = IncludeImages.Checked,
                     IncludeAdminComments = IncludeAdminComments.Checked,
@@ -134,12 +135,35 @@ namespace InSite.Admin.Assessments.Forms.Forms
                 (user, options) => QuestionPrintInternal.RenderPdf(options));
         }
 
+        private void BuildFormDocx_Click(object sender, EventArgs e)
+        {
+            PrintQueue.QueuePrint(
+                _queueStoragePath,
+                User.Identifier, FormID,
+                new QuestionDocxPrinter.PrinterOptions
+                {
+                    OrganizationId = Organization.Identifier,
+                    BankId = BankID,
+                    FormId = FormID,
+                    Language = ReportLanguage.Value,
+                    TimeZone = User.TimeZone,
+                    IncludeImages = IncludeImages.Checked,
+                    IncludeAdminComments = IncludeAdminComments.Checked,
+                    ExcludeHiddenComments = ExcludeHiddenComments.Checked,
+                    AuthorName = User.FullName,
+                    QuestionFilter = CreateQuestionFilter(),
+                    DefaultImagePath = MapPath("~/UI/Layout/Common/Images/None.png"),
+                    WebsiteUrl = $"{Request.Url.Scheme}://{Request.Url.Host}"
+                },
+                (_, options) => QuestionDocxPrinter.RenderFormQuestions(options));
+        }
+
         private void BuildFormCompact_Click(object sender, EventArgs e)
         {
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, FormID,
-                new QuestionPrintCompact.FormOptions(Organization, FormID)
+                new QuestionPrintCompact.FormOptions(Organization, ReportLanguage.Value, FormID)
                 {
                     QuestionFilter = CreateQuestionFilter()
                 },
@@ -150,7 +174,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
         {
             var file = PrintQueue.GetPrintFile(_queueStoragePath, User.Identifier, FormID);
             if (file != null)
-                Response.SendFile(file.Name, "pdf", file.Data);
+                Response.SendFile(file.Name, file.Ext, file.Data);
         }
 
         #endregion
@@ -187,6 +211,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             var hasQuestions = form.GetQuestions().Count > 0;
             BuildForm.Enabled = hasQuestions;
             BuildFormInternal.Enabled = hasQuestions;
+            BuildFormDocx.Enabled = hasQuestions;
 
             if (!form.Addendum.IsEmpty)
                 BuildAddendum.Enabled = true;

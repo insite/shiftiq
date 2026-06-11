@@ -81,6 +81,10 @@
 
         <asp:BoundField HeaderText="Department" DataField="Department" />
 
+        <asp:BoundField HeaderText="District" DataField="District" />
+
+        <asp:BoundField HeaderText="Team" DataField="Team" />
+
     </Columns>
 
 </insite:Grid>

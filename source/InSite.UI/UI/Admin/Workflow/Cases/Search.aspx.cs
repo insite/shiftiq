@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using InSite.Application.Issues.Read;
+using InSite.Common;
 using InSite.Common.Web.UI;
 using InSite.Domain.Reports;
 using InSite.UI.Layout.Admin;
@@ -62,6 +63,7 @@ namespace InSite.UI.Admin.Issues.Issues
                 new DownloadColumn("LastChangeType"),
                 new DownloadColumn("LastChangeUser"),
                 new DownloadColumn("LastChangeUserName"),
+                new DownloadColumn("TopicPersonCode", LabelHelper.GetLabelContentText("Person Code")),
             };
         }
 
@@ -102,6 +104,12 @@ namespace InSite.UI.Admin.Issues.Issues
         private void SearchCriteria_IssueTypeSet(object sender, FilterIssueTypeEventArgs e)
         {
             SearchResults.IssuTypeSet(e.HasValue, e.IssueType);
+        }
+
+        protected override void OnSearching(QIssueFilter filter)
+        {
+            base.OnSearching(filter);
+            SearchResults.ClearSelectedItems();
         }
     }
 }

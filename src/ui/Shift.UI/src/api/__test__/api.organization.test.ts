@@ -2,14 +2,14 @@ import { expect, test } from "vitest";
 import { shiftClient } from "../shiftClient";
 import { ApiError } from "../apiError";
 
-test("/api/security/organizations: non-authenticated", async () => {
+test("/api/accounts/organizations: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.organization.search({}, 0, 10, null)).rejects.toThrowError(new ApiError(401, ""));
     await expect(shiftClient.organization.retrieve("ed420b32-5535-4c4c-8ecc-2e995e40b046")).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("/api/security/organizations/search: authenticated", async () => {
+test("/api/accounts/organizations/search: authenticated", async () => {
     await global.login();
 
     const searchResult = await shiftClient.organization.search({}, 0, 10, null);
@@ -22,7 +22,7 @@ test("/api/security/organizations/search: authenticated", async () => {
     expect(searchResult!.rows[0].CompanyName).toBeTypeOf("string");
 });
 
-test("/api/security/organizations/retrieve: authenticated", async () => {
+test("/api/accounts/organizations/retrieve: authenticated", async () => {
     await global.login();
 
     const retrieveResult = await shiftClient.organization.retrieve("0c071b03-6fe1-400f-82f4-78ff6f751ae7");

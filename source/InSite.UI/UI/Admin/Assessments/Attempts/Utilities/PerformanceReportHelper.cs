@@ -11,12 +11,10 @@ using InSite.Application.Files.Read;
 using InSite.Persistence;
 using InSite.Web.Helpers;
 
-using Newtonsoft.Json;
-
 using Shift.Common;
 using Shift.Constant;
-using Shift.Toolbox.Reporting.PerformanceReport;
-using Shift.Toolbox.Reporting.PerformanceReport.Models;
+using Shift.Toolbox.Reports.PerformanceReport;
+using Shift.Toolbox.Reports.PerformanceReport.Models;
 
 namespace InSite.UI.Admin.Assessments.Attempts.Utilities
 {

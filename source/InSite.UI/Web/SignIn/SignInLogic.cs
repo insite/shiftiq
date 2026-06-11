@@ -126,7 +126,7 @@ namespace InSite.Web.SignIn
             }
             else if (isAdministrator)
             {
-                url = "/ui/admin/home";
+                url = RelativeUrl.AdminHomeUrl;
             }
             else
             {

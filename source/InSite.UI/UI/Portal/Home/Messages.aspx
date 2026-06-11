@@ -27,7 +27,7 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id='item-header-<%# Eval("Sequence") %>'>
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target='#item-collapse-<%# Eval("Sequence") %>' aria-expanded="false" aria-controls='item-collapse-<%# Eval("Sequence") %>'>
-                                <%# Eval("ContentSubject") %>
+                                <%# Eval("Data.ContentSubject") %>
 
                                 <div class="position-absolute end-0 pe-5">
                                     <%# GetDeliveryHtml() %>
@@ -37,12 +37,12 @@
                         <div class="accordion-collapse collapse" id='item-collapse-<%# Eval("Sequence") %>' aria-labelledby='item-header-<%# Eval("Sequence") %>' data-bs-parent="#orders-accordion" style="">
                             <div class="accordion-body pt-4 bg-secondary rounded-top-0 rounded-3">
                                 <div class="float-end pb-2">
-                                    <insite:Button runat="server" ID="PrintDeliveredEmail" ButtonStyle="OutlineSecondary" Size="ExtraSmall" Icon="fas fa-download" Text="Print" CommandName="Print"  CommandArgument='<%# Eval("MailoutIdentifier") %>' />
+                                    <insite:Button runat="server" ID="PrintDeliveredEmail" ButtonStyle="OutlineSecondary" Size="ExtraSmall" Icon="fas fa-download" Text="Print" CommandName="Print"  CommandArgument='<%# Eval("Data.MailoutIdentifier") %>' />
                                 </div>
 
                                 <div class="mb-3">
                                     <strong>
-                                        From: <%# Eval("SenderName") %> &lt;<%# Eval("SenderEmail") %>&gt;
+                                        From: <%# Eval("Data.SenderName") %> &lt;<%# Eval("Data.SenderEmail") %>&gt;
                                     </strong>
                                 </div>
 

@@ -128,6 +128,10 @@ namespace InSite.Admin.Records.Programs
             ProgramIconPreview.InnerHtml = $"<i class='{program.ProgramIcon}'></i>";
 
             SetProgramImage(program.ProgramImage);
+
+            ProgramFlagColor.Value = program.ProgramFlagColor;
+            ProgramFlagText.Text = program.ProgramFlagText;
+
             BindTaskRepeater(program.ProgramIdentifier);
 
             CancelButton.NavigateUrl = ReturnUrl;
@@ -155,6 +159,8 @@ namespace InSite.Admin.Records.Programs
 
             program.ProgramSlug = ProgramSlug.Text;
             program.ProgramIcon = ProgramIcon.Text;
+            program.ProgramFlagColor = ProgramFlagColor.Value;
+            program.ProgramFlagText = ProgramFlagText.Text;
 
             SaveV2Image(program);
 

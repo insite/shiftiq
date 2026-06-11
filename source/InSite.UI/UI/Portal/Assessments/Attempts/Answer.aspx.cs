@@ -311,8 +311,12 @@ namespace InSite.Portal.Assessments.Attempts
 ";
             string TranslateAndJsEncode(string text)
             {
-                return HttpUtility.JavaScriptStringEncode(Translate(text), true);
+                // Bypass AutoTranslateEnabled and Language != "en"
+                var translated = Translator.Translate(text);
+
+                return HttpUtility.JavaScriptStringEncode(translated, true);
             }
+
 
             string GetLabelAndJsEncode(string label)
             {

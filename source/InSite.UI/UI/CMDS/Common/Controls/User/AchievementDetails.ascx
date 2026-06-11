@@ -36,6 +36,11 @@
                     <div>
                         <insite:CheckBox ID="EnableSignOff" runat="server" Text="Learners can sign off on this achievement themselves" />
                     </div>
+                    <div runat="server" id="LearnerSelfDeclarationPanel" class="fs-sm p-3 mt-2 mb-2 bg-info text-white">
+                        <span runat="server" id="LearnerSelfDeclarationStatus" />
+                        <asp:LinkButton runat="server" ID="AllowSelfDeclarationOnCredentials" CssClass="fw-bold text-nowrap" Text="Fix it" Visible="false" />
+                        <asp:LinkButton runat="server" ID="DisallowSelfDeclarationOnCredentials" CssClass="fw-bold text-nowrap" Text="Fix it" Visible="false" />
+                    </div>
                     <div>
                         <insite:CheckBox ID="IsTimeSensitive" runat="server" Text="This achievement is time-sensitive" SubText="(it expires after a set period)" onclick="showHideDateExpired();" />
                     </div>

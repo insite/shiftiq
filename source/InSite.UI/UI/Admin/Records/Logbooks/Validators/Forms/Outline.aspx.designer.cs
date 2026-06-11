@@ -42,6 +42,15 @@ namespace InSite.UI.Admin.Records.Validators.Forms
         protected global::InSite.Common.Web.UI.Button AddUsers;
 
         /// <summary>
+        /// BulkAddEntriesButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button BulkAddEntriesButton;
+
+        /// <summary>
         /// Users control.
         /// </summary>
         /// <remarks>

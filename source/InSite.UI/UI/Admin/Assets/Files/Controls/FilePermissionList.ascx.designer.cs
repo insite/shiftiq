@@ -15,15 +15,6 @@ namespace InSite.UI.Admin.Assets.Files.Controls
     {
 
         /// <summary>
-        /// PermissionPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.UpdatePanel PermissionPanel;
-
-        /// <summary>
         /// PublicRadioButton control.
         /// </summary>
         /// <remarks>

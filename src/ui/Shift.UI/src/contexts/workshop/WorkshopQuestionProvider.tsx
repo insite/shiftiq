@@ -19,6 +19,7 @@ interface SetSectionDataAction {
     type: "setSectionData";
     competencies: WorkshopStandard[];
     questions: WorkshopQuestion[];
+    afterQuestionCreated: boolean;
 }
 
 interface SelectSectionAction {
@@ -132,11 +133,6 @@ interface SetQuestionChangeDatesAction {
     questionChangeDates: WorkshopQuestionChangeDates | null;
 }
 
-interface AddQuestionAction {
-    type: "addQuestion";
-    question: WorkshopQuestion;
-}
-
 type Action =
     InitStateAction
     | SetSectionDataAction
@@ -157,7 +153,6 @@ type Action =
     | ModifyQuestionOptionColumnTitleAction
     | ShowHideCommentAction
     | SetQuestionChangeDatesAction
-    | AddQuestionAction
     ;
 
 const _initialState: WorkshopQuestionState = {
@@ -264,17 +259,13 @@ function reducer(state: WorkshopQuestionState, action: Action): WorkshopQuestion
             }
             return {
                 ...state,
-                sections: state.sections.map(s => {
-                    if (s.sectionId !== state.sectionId) {
-                        return s;
-                    }
-                    return {
-                        sectionId: s.sectionId,
-                        sectionTitle: s.sectionTitle,
-                        competencies: action.competencies,
-                        questions: action.questions,
-                    };
-                }),
+                totalQuestionCount: action.afterQuestionCreated ? state.totalQuestionCount + 1 : state.totalQuestionCount,
+                sections: state.sections.map(s => ({
+                    sectionId: s.sectionId,
+                    sectionTitle: s.sectionTitle,
+                    competencies: s.sectionId === state.sectionId ? action.competencies : action.afterQuestionCreated ? null : s.competencies,
+                    questions: s.sectionId === state.sectionId ? action.questions : action.afterQuestionCreated ? null : s.questions,
+                })),
                 sectionCompetencies: action.competencies,
                 sectionCompetencyItems: competenciesToItems(action.competencies),
                 sectionQuestions: action.questions,
@@ -403,23 +394,6 @@ function reducer(state: WorkshopQuestionState, action: Action): WorkshopQuestion
                 questionChangeDates: action.questionChangeDates,
             };
 
-        case "addQuestion": {
-            const section = state.sections?.find(x => x.sectionId === state.sectionId);
-            if (!section) {
-                throw new Error(`Section ${state.sectionId} does not exist`);
-            }
-            const questions = [...section.questions!, action.question];
-            return {
-                ...state,
-                totalQuestionCount: state.totalQuestionCount + 1,
-                sections: state.sections!.map(s => ({
-                    ...s,
-                    questions: s === section ? questions : s.questions,
-                })),
-                sectionQuestions: questions,
-            };
-        }
-
         default:
             throw new Error(`Unknown action: ${type}`);
     }
@@ -436,8 +410,8 @@ export default function WorkshopQuestionProvider({ children }: Props) {
         initQuestionState(state: WorkshopQuestionState): void {
             dispatch({ type: "initState", state });
         },
-        setSectionData(competencies: WorkshopStandard[], questions: WorkshopQuestion[]): void {
-            dispatch({ type: "setSectionData", competencies, questions });
+        setSectionData(competencies: WorkshopStandard[], questions: WorkshopQuestion[], afterQuestionCreated: boolean = false): void {
+            dispatch({ type: "setSectionData", competencies, questions, afterQuestionCreated });
         },
         selectSection(sectionId: string): void {
             dispatch({ type: "selectSection", sectionId: sectionId.toLowerCase() });
@@ -489,9 +463,6 @@ export default function WorkshopQuestionProvider({ children }: Props) {
         },
         setQuestionChangeDates(questionChangeDates: WorkshopQuestionChangeDates | null): void {
             dispatch({ type: "setQuestionChangeDates", questionChangeDates });
-        },
-        addQuestion(question: WorkshopQuestion): void {
-            dispatch({ type: "addQuestion", question });
         },
     }), [dispatch]);
 

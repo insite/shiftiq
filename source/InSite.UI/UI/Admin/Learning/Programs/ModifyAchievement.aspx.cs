@@ -191,7 +191,7 @@ namespace InSite.Admin.Records.Programs
         {
             program.AchievementIdentifier = achievement;
             program.AchievementWhenChange = TriggerCauseChange.Changed.ToString();
-            program.AchievementWhenGrade = TriggerCauseGrade.Pass.ToString();
+            program.AchievementWhenGrade = "Pass";
             program.AchievementThenCommand = TriggerEffectCommand.Grant.ToString();
             program.AchievementElseCommand = TriggerEffectCommand.Void.ToString();
 

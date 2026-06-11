@@ -51,7 +51,10 @@ export default function WorkshopQuestions_NewComment({
         }
 
         await runSave(async () => {
-            const result = await shiftClient.workshop.postFieldComment(bankId, fieldId!, authorType, flag as WorkshopFlag, text);
+            const result = fieldId
+                ? await shiftClient.workshop.postFieldComment(bankId, fieldId, authorType, flag as WorkshopFlag, text)
+                : await shiftClient.workshop.postQuestionComment(bankId, questionId, authorType, flag as WorkshopFlag, text);
+
             if (result) {
                 const comments = workshopQuestionAdapter.getComments(result.Comments);
                 modifyQuestionComments(questionId, comments, result.CandidateCommentCount);

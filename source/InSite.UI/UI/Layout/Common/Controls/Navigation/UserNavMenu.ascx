@@ -42,6 +42,8 @@
         </a>
     </li>
     <li runat="server" id="SignOutItem">
-        <a class="dropdown-item" runat="server" id="SignOutLink">Sign Out</a>
+        <a class="dropdown-item" runat="server" id="SignOutLink">
+            <%= GetDisplayText("Sign Out") %>
+        </a>
     </li>
 </ul>

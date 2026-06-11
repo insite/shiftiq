@@ -19,16 +19,56 @@ namespace Shift.Common
 
     public class EngineApiSettings
     {
-        public ApiSettings Google { get; set; }
-        public ApiSettings Premailer { get; set; }
-        public ApiSettings Scorm { get; set; }
+        // Single root for all Engine (Hub) API libraries and third-party integrations.
+
+        // The per-integration base URLs below are derived by appending the integration's route
+        // segment, so configuration needs only one key.
+
+        public string BaseUrl { get; set; }
+
+        // Shared service key sent as X-Api-Key on Engine (Hub) calls that run server-side.
+
+        public string ApiKey { get; set; }
+
+        public ApiSettings Google => Segment("google/");
+        public ApiSettings Premailer => Segment("premailer/");
+        public ApiSettings ImageMagick => Segment("imagemagick/");
+
+        private ApiSettings _scorm;
+        public ApiSettings Scorm
+        {
+            get
+            {
+                // ScormCloud carries a configured CallbackPath; fill in the derived BaseUrl while
+                // preserving whatever was bound from configuration.
+
+                var settings = _scorm ?? new ApiSettings();
+
+                if (string.IsNullOrEmpty(settings.BaseUrl))
+                    settings.BaseUrl = Segment("scorm/")?.BaseUrl;
+
+                return settings;
+            }
+            set => _scorm = value;
+        }
+
         public ScoopSettings Scoop { get; set; }
-        public ApiSettings ImageMagick { get; set; }
+
+        private ApiSettings Segment(string segment)
+        {
+            if (string.IsNullOrEmpty(BaseUrl))
+                return null;
+
+            var root = BaseUrl.EndsWith("/") ? BaseUrl : BaseUrl + "/";
+
+            return new ApiSettings { BaseUrl = root + segment };
+        }
     }
 
     public class ShiftSettings
     {
         public ShiftSettingsApi Api { get; set; }
+        public ShiftSettingsMailgun Mailgun { get; set; }
         public string ConfigurationProviders { get; set; }
     }
 
@@ -36,6 +76,11 @@ namespace Shift.Common
     {
         public ApiSettings Hosting { get; set; }
         public string[] Origins { get; set; }
+        public TelemetrySettings Telemetry { get; set; }
+    }
+
+    public class ShiftSettingsMailgun
+    {
         public TelemetrySettings Telemetry { get; set; }
     }
 
@@ -50,6 +95,7 @@ namespace Shift.Common
         public string Email { get; set; }
         public string Slug { get; set; }
         public string HelpUrl { get; set; }
+        public string LogoUrl { get; set; }
 
         public Guid Identifier { get; set; }
 

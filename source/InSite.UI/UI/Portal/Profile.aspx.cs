@@ -76,7 +76,7 @@ namespace InSite.UI.Portal
 
             var client = new ApiClientSynchronous(new HttpClientFactory(baseAddress, secret), serializer);
 
-            var response = client.HttpPost<JwtResponse>("api/security/tokens/generate", request);
+            var response = client.HttpPost<JwtResponse>("api/accounts/tokens/generate", request);
 
             if (response.Status == System.Net.HttpStatusCode.OK)
                 return response.Data;

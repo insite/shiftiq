@@ -413,6 +413,9 @@ namespace InSite.Admin.Contacts.People.Forms
             SurveyResponseGrid.Visible = SurveyResponseGrid.HasData;
             NoSurveyResponses.Visible = !SurveyResponseGrid.HasData;
 
+            var programCount = ProgramGrid.LoadData(Organization.Identifier, person.UserIdentifier);
+            ProgramTab.SetTitle("Programs", programCount);
+
             OutcomeSubTab.Visible = false;
 
             // SystemAccessTab

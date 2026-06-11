@@ -51,6 +51,7 @@ test("/api/me/context: authenticated operator", async () => {
     expect(result.NavigationGroups[1].MenuItems.length).toBeGreaterThanOrEqual(1);
     expect(result.NavigationGroups[2].MenuItems.length).toBeGreaterThanOrEqual(1);
     expect(result.AdminNavigationGroups.length).toBeGreaterThanOrEqual(1);
+    expect(result.RecentLinksKey.length).toBeGreaterThanOrEqual(1);
     expect(result.StylePath).toBeTypeOf("string");
     expect(result.StylePath.substring(result.StylePath.lastIndexOf("/"))).toBe(result.StylePath.substring(result.StylePath.lastIndexOf("/")).toLowerCase());
 });

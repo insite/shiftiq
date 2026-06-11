@@ -2,14 +2,14 @@ import { expect, test } from "vitest";
 import { shiftClient } from "../shiftClient";
 import { ApiError } from "../apiError";
 
-test("/api/security/users: non-authenticated", async () => {
+test("/api/accounts/users: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.user.search({}, 0, 10, null)).rejects.toThrowError(new ApiError(401, ""));
     await expect(shiftClient.user.retrieve("0c071b03-6fe1-400f-82f4-78ff6f751ae7")).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("/api/security/users/search: authenticated", async () => {
+test("/api/accounts/users/search: authenticated", async () => {
     await global.login();
 
     const searchResult = await shiftClient.user.search({
@@ -24,7 +24,7 @@ test("/api/security/users/search: authenticated", async () => {
     expect(searchResult!.rows[0].FullName).toBe("Aleksey Terzi");
 });
 
-test("/api/security/users/retrieve: authenticated", async () => {
+test("/api/accounts/users/retrieve: authenticated", async () => {
     await global.login();
 
     const retrieveResult = await shiftClient.user.retrieve("3ab3b7bc-f17d-4d38-a555-0b58db206669");

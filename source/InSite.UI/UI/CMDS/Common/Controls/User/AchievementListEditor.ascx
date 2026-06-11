@@ -11,13 +11,7 @@
             <insite:TextBox runat="server" ID="SearchText" />
             <insite:ClearButton ID="ClearButton" runat="server" ButtonStyle="OutlineSecondary" Text="" Size="Default" />
             <insite:FilterButton ID="FilterButton" runat="server" ButtonStyle="OutlineSecondary" Text="" Size="Default" />
-            <insite:ComboBox runat="server" ID="AccountScope" Width="250px">
-                <Items>
-                    <insite:ComboBoxOption Value="Organization" Text="Organization-Specific" />
-                    <insite:ComboBoxOption Value="Enterprise" Text="Global" />
-                    <insite:ComboBoxOption Value="Partition" Text="All" />
-                </Items>
-            </insite:ComboBox>
+            <cmds:OrganizationScopeSelector runat="server" ID="AccountScope" Width="250px" />
             <insite:ComboBox runat="server" ID="GroupByComboBox" Width="220px" ButtonStyle="Primary">
                 <Items>
                     <insite:ComboBoxOption Value="Type" Text="Type" />

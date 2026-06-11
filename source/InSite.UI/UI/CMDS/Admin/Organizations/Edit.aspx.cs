@@ -39,7 +39,7 @@ namespace InSite.Cmds.Admin.Organizations.Forms
 
         private Guid OrganizationIdentifier
         {
-            get => (Guid)ViewState[nameof(OrganizationIdentifier)];
+            get => (Guid)(ViewState[nameof(OrganizationIdentifier)] ?? Guid.Empty);
             set => ViewState[nameof(OrganizationIdentifier)] = value;
         }
 
@@ -53,11 +53,8 @@ namespace InSite.Cmds.Admin.Organizations.Forms
         {
             base.OnInit(e);
 
-            _organization = Guid.TryParse(Request.QueryString["id"], out var organizationId)
-                ? OrganizationSearch.Select(organizationId)
-                : null;
-
-            OrganizationIdentifier = organizationId;
+            if (Guid.TryParse(Request.QueryString["id"], out var organizationId))
+                OrganizationIdentifier = organizationId;
 
             ProfileEditor.InitDelegates(SelectProfiles, SelectProfilesToAdd, DeleteProfiles, InsertProfiles, InitProfileCopy, EditorStatus, "organization");
 
@@ -84,6 +81,8 @@ namespace InSite.Cmds.Admin.Organizations.Forms
 
             if (IsPostBack)
                 return;
+
+            _organization = OrganizationSearch.Select(OrganizationIdentifier);
 
             Open();
 
@@ -176,7 +175,11 @@ namespace InSite.Cmds.Admin.Organizations.Forms
                 return;
 
             Save();
+
+            _organization = OrganizationSearch.Select(OrganizationIdentifier);
+
             Open();
+
             SetStatus(EditorStatus, StatusType.Saved);
         }
 
@@ -229,7 +232,7 @@ namespace InSite.Cmds.Admin.Organizations.Forms
                 RoleType = new[] { MembershipType.Organization }
             };
 
-            PersonGrid.SetVisibleColumns(new[] { "Name", "City", "Province", "EmailWork", "ToolTipWithLinks" });
+            PersonGrid.SetVisibleColumns(new[] { "Name", "City", "Province", "MembershipOrg", "EmailWork", "ToolTipWithLinks" });
             PersonGrid.LoadData(personFilter);
             PersonGrid.ShowFilterPanel();
 
@@ -274,12 +277,16 @@ namespace InSite.Cmds.Admin.Organizations.Forms
         {
             OrganizationStore.Close(OrganizationIdentifier);
 
+            _organization = OrganizationSearch.Select(OrganizationIdentifier);
+
             Open();
         }
 
         private void Unarchive()
         {
             OrganizationStore.Open(OrganizationIdentifier);
+
+            _organization = OrganizationSearch.Select(OrganizationIdentifier);
 
             Open();
         }

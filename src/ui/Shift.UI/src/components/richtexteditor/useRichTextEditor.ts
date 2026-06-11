@@ -1,7 +1,7 @@
 import { RefObject, useState } from "react";
 import { useSaveAction } from "@/hooks/useSaveAction";
 import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
-import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
+import { ApiUploadFileInfo } from "@/api/controllers/assets/files/ApiUploadFileInfo";
 import { shiftClient } from "@/api/shiftClient";
 import { urlHelper } from "@/helpers/urlHelper";
 import { Language, MultiLanguageText } from "../../helpers/language";

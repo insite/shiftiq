@@ -110,7 +110,7 @@
                         <label class="form-label">
                             <insite:Literal runat="server" Text="Email" />
                             <insite:RequiredValidator runat="server" ControlToValidate="SignInUserName" Display="None" ValidationGroup="SignIn" />
-                            <insite:EmailValidator runat="server" Display="None" ControlToValidate="SignInUserName" ValidationGroup="SignIn" FieldName="Email" />
+                            <insite:EmailValidator runat="server" Display="None" ControlToValidate="SignInUserName" ValidationGroup="SignIn" FieldName="Email" AllowMissingTld="true" />
                         </label>
                         <insite:TextBox runat="server" ID="SignInUserName" MaxLength="128" autocomplete="off" TabIndex="1" />
                     </div>

@@ -50,6 +50,8 @@ namespace InSite.UI.Admin.Assets
             LoadCounter(UploadCard, UploadCount, UploadLink, model.UploadCount, PermissionIdentifiers.Admin_Assets_Uploads, "/ui/admin/assets/uploads/browse");
 
             FileBrowserLink.Visible = Identity.IsOperator;
+            SearchFilesLink.Visible = Identity.IsOperator;
+
             FilesSection.Visible = Identity.IsOperator || UploadCard.Visible;
         }
 

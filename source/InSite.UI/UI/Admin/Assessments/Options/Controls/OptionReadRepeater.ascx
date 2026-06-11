@@ -169,7 +169,7 @@
                         <tr>
                     </HeaderTemplate>
                     <ItemTemplate>
-                        <td><%# ConvertToHtml((string)Eval("Content.Title.Default")) %></td>
+                        <td><%# TranslateContentTitle() %></td>
                     </ItemTemplate>
                     <FooterTemplate>
                         </tr>
@@ -181,7 +181,7 @@
                     <ItemTemplate>
                         <tr>
                             <td><%# (int)Eval("Index") + 1 %>.</td>
-                            <td><%# ConvertToHtml((string)Eval("Content.Title.Default")) %></td>
+                            <td><%# TranslateContentTitle() %></td>
                             <asp:Repeater runat="server" ID="LikertOptionRepeater">
                                 <ItemTemplate>
                                     <td class="likert-option"><%# Eval("Points") %></td>
@@ -207,7 +207,7 @@
                 <tr data-id='<%# Eval("Letter") %>'>
                     <td><%# GetSingleCorrectOptionIcon((decimal)Eval("Points")) %></td>
                     <td><%# Eval("Letter") %>.</td>
-                    <td><%# ConvertToHtml((string)Eval("Content.Title.Default")) %></td>
+                    <td><%# TranslateContentTitle() %></td>
                     <td class="form-text option-points">
                         &bull; <%# GetOptionPoints((decimal)Eval("Points")) %>
                     </td>

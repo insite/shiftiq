@@ -65,7 +65,7 @@
                                                 <td>
                                                     <%# Eval("Status") %>
                                                 </td>
-                                                <td class="text-end" style="width:90px;">
+                                                <td class="text-end" style="width:110px;">
                                                     <insite:IconLink runat="server" Name='<%# Eval("ValidateButtonIcon") %>' ToolTip='<%# Eval("ValidateButtonHint") %>'
                                                         NavigateUrl='<%# Eval("ExperienceIdentifier", "/ui/admin/records/logbooks/validators/validate-experience?experience={0}") %>'
                                                     />

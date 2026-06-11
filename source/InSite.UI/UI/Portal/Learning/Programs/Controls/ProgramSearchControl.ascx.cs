@@ -164,6 +164,7 @@ namespace InSite.UI.Portal.Learning.Programs.Controls
                 Image = card.ThumbnailImageUrl,
                 Title = card.ItemTitle,
                 Summary = card.ItemDescription,
+                Flag = card.ItemFlag,
             })
             .ToList();
 

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using InSite.Application.Records.Read;
@@ -22,14 +19,19 @@ namespace InSite.UI.Portal.Contacts.People.Controls
                 UserIdentifier = userId
             };
 
-            var credentials = ServiceLocator.AchievementSearch.GetCredentials(filter).Select(x => new
-            {
-                AchievementTitle = x.AchievementTitle,
-                CredentialStatus = x.CredentialStatus,
-                CredentialExpired = x.CredentialExpired,
-                CredentialGranted = x.CredentialGranted,
-                CredentialRevoked = x.CredentialRevoked
-            }).ToList();
+            var credentials = ServiceLocator.AchievementSearch.GetCredentials(filter)
+                .Select(x => new
+                {
+                    AchievementTitle = x.AchievementTitle,
+                    AchievementLabel = x.AchievementLabel,
+                    CredentialStatus = x.CredentialStatus,
+                    CredentialExpired = x.CredentialExpired,
+                    CredentialGranted = x.CredentialGranted,
+                    CredentialRevoked = x.CredentialRevoked
+                })
+                .OrderBy(x => x.AchievementLabel)
+                .ThenBy(x => x.AchievementTitle)
+                .ToList();
 
             AchievementGrid.DataSource = credentials;
             AchievementGrid.DataBind();

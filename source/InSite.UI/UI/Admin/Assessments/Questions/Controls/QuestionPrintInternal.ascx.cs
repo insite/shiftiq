@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +8,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 using InSite.Admin.Assessments.Questions.Utilities;
+using InSite.Admin.Assets.Contents.Utilities;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Attempts;
@@ -31,8 +31,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid BankID { get; }
 
-            public BankOptions(Guid organizationId, TimeZoneInfo timeZone, Guid bankId)
-                : base(organizationId, timeZone)
+            public BankOptions(Guid organizationId, TimeZoneInfo timeZone, string language, Guid bankId)
+                : base(organizationId, timeZone, language)
             {
                 BankID = bankId;
             }
@@ -42,8 +42,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid FormID { get; }
 
-            public FormOptions(Guid organizationId, TimeZoneInfo timeZone, Guid formId)
-                : base(organizationId, timeZone)
+            public FormOptions(Guid organizationId, TimeZoneInfo timeZone, string language, Guid formId)
+                : base(organizationId, timeZone, language)
             {
                 FormID = formId;
             }
@@ -53,6 +53,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid OrganizationID { get; }
             public TimeZoneInfo TimeZone { get; }
+            public string Language { get; }
 
             public string CurrentUrl { get; }
             public string HeaderUrl { get; }
@@ -63,10 +64,11 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
             public QuestionPrintHelper.QuestionFilter QuestionFilter { get; set; }
 
-            public Options(Guid organizationId, TimeZoneInfo timeZone)
+            public Options(Guid organizationId, TimeZoneInfo timeZone, string language)
             {
                 OrganizationID = organizationId;
                 TimeZone = timeZone;
+                Language = language;
 
                 var request = HttpContext.Current.Request;
 
@@ -82,20 +84,20 @@ namespace InSite.Admin.Assessments.Questions.Controls
             public string Name { get; }
             public IQuestionInfo[] Questions { get; }
 
-            public ControlData(BankState bank)
+            public ControlData(BankState bank, string language)
             {
                 AssetNumber = bank.Asset.ToString();
-                Title = (bank.Content?.Title?.Default).IfNullOrEmpty(bank.Name);
+                Title = (bank.Content?.Title?.Get(language)).IfNullOrEmpty(bank.Name);
                 Name = bank.Name;
-                Questions = QuestionPrintHelper.GetQuestions(bank);
+                Questions = QuestionPrintHelper.GetQuestions(bank, language);
             }
 
-            public ControlData(Form form)
+            public ControlData(Form form, string language)
             {
                 AssetNumber = $"{form.Asset}.{form.AssetVersion}";
-                Title = (form.Content.Title?.Default).IfNullOrEmpty(form.Name);
+                Title = (form.Content.Title?.Get(language)).IfNullOrEmpty(form.Name);
                 Name = form.Name;
-                Questions = QuestionPrintHelper.GetQuestions(form);
+                Questions = QuestionPrintHelper.GetQuestions(form, language);
             }
         }
 
@@ -103,6 +105,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         #region Fields
 
+        private InputTranslator _translator;
         private BankQuestionTable _questionTable = null;
         private Options _options;
 
@@ -156,7 +159,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
         private void BindProperties(RepeaterItem item, IQuestionInfo info)
         {
             var propertyRepeater = (Repeater)item.FindControl("PropertyRepeater");
-            propertyRepeater.DataSource = QuestionPrintHelper.EnumerateProperties(info);
+            propertyRepeater.DataSource = QuestionPrintHelper.EnumerateProperties(info, CustomTranslate);
             propertyRepeater.DataBind();
         }
 
@@ -308,7 +311,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
                     return;
 
                 var solution = (AttemptQuestionOrderingSolution)a.Item.DataItem;
-
+                    
                 var optionRepeater = (Repeater)a.Item.FindControl("OptionRepeater");
                 optionRepeater.DataSource = solution.OptionsOrder.Select(key => options.First(o => o.Option.Key == key));
                 optionRepeater.DataBind();
@@ -320,6 +323,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
         private void LoadData(ControlData data, Options options)
         {
+            _translator = new InputTranslator(options.Language, options.OrganizationID);
             _options = options;
 
             var questions = QuestionPrintHelper.FilterQuestions(data.Questions, options.QuestionFilter);
@@ -332,6 +336,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             var hasData = data.Questions.Length > 0;
 
             NoDataMessage.Visible = !hasData;
+            NoDataMessage.InnerText = CustomTranslate("No Questions.");
 
             QuestionRepeater.ItemDataBound += QuestionRepeater_ItemDataBound;
 
@@ -348,7 +353,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             if (bank == null || bank.Tenant != options.OrganizationID)
                 return null;
 
-            return RenderPdf(new ControlData(bank), options);
+            return RenderPdf(new ControlData(bank, options.Language), options);
         }
 
         public static PrintOutputFile RenderPdf(FormOptions options)
@@ -357,7 +362,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             if (form == null || form.Specification.Bank.Tenant != options.OrganizationID)
                 return null;
 
-            return RenderPdf(new ControlData(form), options);
+            return RenderPdf(new ControlData(form, options.Language), options);
         }
 
         private static PrintOutputFile RenderPdf(ControlData data, Options options)
@@ -394,7 +399,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
                     {
                         new HtmlConverterSettings.Variable("title", data.Title),
                         new HtmlConverterSettings.Variable("name", data.Name),
-                        new HtmlConverterSettings.Variable("asset_number", data.AssetNumber),
+                        new HtmlConverterSettings.Variable("asset_number", $"{report.CustomTranslate("Asset #")}{data.AssetNumber}"),
                     },
                 });
 
@@ -490,7 +495,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
                     ? "<i class='far fa-dot-circle'></i>"
                     : "<i class='far fa-circle'></i>";
 
-        protected string GetOptionPoints(decimal value) => $"{value:n2} points";
+        protected string GetOptionPoints(decimal value) => $"{value:n2} {CustomTranslate("points")}";
 
         protected string FormatDateTime(string name)
         {
@@ -500,6 +505,11 @@ namespace InSite.Admin.Assessments.Questions.Controls
             var tz = TimeZones.GetAbbreviation(_options.TimeZone)?.GetAbbreviation(value) ?? _options.TimeZone.Id;
 
             return string.Format("{0:MMM d, yyyy} at {0:h:mm tt} <span class='comment-timezone'>{1}</span>", value, tz);
+        }
+
+        protected string CustomTranslate(string text)
+        {
+            return _translator.Translate(text);
         }
 
         #endregion

@@ -18,6 +18,7 @@ import WorkshopQuestions_SelectFile from "./WorkshopQuestions_SelectFile";
 
 interface Props {
     id: string;
+    setId: string | null;
     question: WorkshopQuestion;
     hasPrev: boolean;
     hasNext: boolean;
@@ -25,10 +26,12 @@ interface Props {
     onMoveTop: () => void;
     onMovePrev: (() => void) | undefined;
     onMoveNext: (() => void) | undefined;
+    onMoveToQuestion: (questionId: string) => void;
 }
 
 export default function WorkshopQuestions_Row({
     id,
+    setId,
     question,
     hasPrev,
     hasNext,
@@ -36,10 +39,12 @@ export default function WorkshopQuestions_Row({
     onMoveTop,
     onMovePrev,
     onMoveNext,
+    onMoveToQuestion,
 }: Props) {
     const {
         bankId,
         formId,
+        specificationId,
         sectionCompetencies,
         sectionCompetencyItems,
         readOnly,
@@ -118,9 +123,12 @@ export default function WorkshopQuestions_Row({
                 <WorkshopQuestions_Actions
                     bankId={bankId}
                     formId={formId}
+                    specificationId={specificationId}
+                    setId={setId}
                     question={question}
                     isEditable={isEditable}
                     returnUrl={returnUrl}
+                    onMoveToQuestion={onMoveToQuestion}
                 />
             </td>
 

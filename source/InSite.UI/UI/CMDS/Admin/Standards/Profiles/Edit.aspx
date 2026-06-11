@@ -1,6 +1,6 @@
 <%@ Page Language="C#" CodeBehind="Edit.aspx.cs" Inherits="InSite.Custom.CMDS.Admin.Standards.Profiles.Edit" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
-<%@ Register Src="~/UI/CMDS/Common/Controls/User/ProfileHierarchy.ascx" TagName="ProfileHierarchy" TagPrefix="uc" %>
+<%@ Register Src="~/UI/CMDS/Common/Controls/User/ProfileOwner.ascx" TagName="ProfileOwner" TagPrefix="uc" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/PersonGrid.ascx" TagName="PersonGrid" TagPrefix="uc" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/ProfileCompetencyList.ascx" TagName="ProfileCompetencyList" TagPrefix="uc" %>
 
@@ -122,11 +122,11 @@
                             </div>
                             <div class="col-lg-6">
 
-                                <h3 runat="server" id="ProfileOwnershipHeading">Profile Visibility</h3>
+                                <h3 runat="server" id="ProfileOwnerHeading">Profile Owner</h3>
 
-                                <uc:ProfileHierarchy runat="server" ID="ProfileOwnership" />
+                                <uc:ProfileOwner runat="server" ID="ProfileOwnership" AllowThisOrganizationAndGlobal="true" />
 
-                                <div runat="server" id="ProfileOwnershipConfirm" visible="false" class="alert alert-danger" role="alert">
+                                <div runat="server" id="ProfileOwnerConfirm" visible="false" class="alert alert-danger" role="alert">
                                     <p>Are you sure you want to move this profile to a different organization?</p>
                                     <insite:Button runat="server" ID="ConfirmMoveButton" 
                                         Text="Confirm" ButtonStyle="Danger" />

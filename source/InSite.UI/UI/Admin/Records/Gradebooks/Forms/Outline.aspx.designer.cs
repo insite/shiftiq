@@ -114,15 +114,6 @@ namespace InSite.Admin.Records.Gradebooks.Forms
         protected global::InSite.Admin.Records.Gradebooks.Controls.ScormRegistrationGrid ScormRegistrationGrid;
 
         /// <summary>
-        /// ScormEventGrid control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Admin.Records.Gradebooks.Controls.ScormEventGrid ScormEventGrid;
-
-        /// <summary>
         /// ConfigurationSection control.
         /// </summary>
         /// <remarks>

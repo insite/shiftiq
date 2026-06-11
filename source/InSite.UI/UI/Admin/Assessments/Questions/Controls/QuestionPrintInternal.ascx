@@ -473,8 +473,8 @@
                                                 <tr>
                                                     <th></th>
                                                     <%# GetOptionRepeaterTableHeadTitleCols() %>
-                                                    <th class="oicon">True</th>
-                                                    <th class="oicon">False</th>
+                                                    <th class="oicon"><%# CustomTranslate("True") %></th>
+                                                    <th class="oicon"><%# CustomTranslate("False") %></th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -499,7 +499,7 @@
                                     <asp:Repeater runat="server" ID="MatchingPairsRepeater">
                                         <HeaderTemplate>
                                             <tr>
-                                                <th colspan="3">Matching Pairs</th>
+                                                <th colspan="3"><%# CustomTranslate("Matching Pairs") %></th>
                                             </tr>
                                         </HeaderTemplate>
                                         <ItemTemplate>
@@ -514,7 +514,7 @@
                                     <asp:Repeater runat="server" ID="MatchingDistractorsRepeater">
                                         <HeaderTemplate>
                                             <tr>
-                                                <th colspan="3">Matching Distractors</th>
+                                                <th colspan="3"><%# CustomTranslate("Matching Distractors") %></th>
                                             </tr>
                                         </HeaderTemplate>
                                         <FooterTemplate></tbody></table></FooterTemplate>
@@ -645,7 +645,7 @@
                         <tr class="row-comments">
                             <td></td>
                             <td>
-                                <h3>Administrator Comments</h3>
+                                <h3><%# CustomTranslate("Administrator Comments") %></h3>
                     </HeaderTemplate>
                     <FooterTemplate>
                             </td>

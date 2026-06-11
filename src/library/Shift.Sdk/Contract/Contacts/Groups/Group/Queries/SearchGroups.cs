@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+
+using Shift.Common;
+
+namespace Shift.Contract
+{
+    public class SearchGroups : Query<IEnumerable<GroupMatch>>, IGroupCriteria
+    {
+        public Guid? OrganizationId { get; set; }
+
+        public DateTimeOffset? GroupCreatedSince { get; set; }
+        public DateTimeOffset? GroupCreatedBefore { get; set; }
+        public DateTimeOffset? GroupExpirySince { get; set; }
+        public DateTimeOffset? GroupExpiryBefore { get; set; }
+        public DateTimeOffset? LastChangeTimeSince { get; set; }
+        public DateTimeOffset? LastChangeTimeBefore { get; set; }
+    }
+}

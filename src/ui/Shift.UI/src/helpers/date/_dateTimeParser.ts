@@ -11,7 +11,7 @@ const _timeSeparator = ":";
 const _minYear = 1900;
 const _maxYear = new Date().getFullYear() + 100;
 
-const _dateParsers = {
+const _dateParsers: Record<DateFormatType, (parts: string[]) => DateParts | null>  = {
     "mm/dd/yyyy": (parts: string[]): DateParts | null => {
         if (parts.length < 2 || parts.length > 3) {
             return null;
@@ -90,6 +90,8 @@ const _dateParsers = {
             year
         };
     },
+    "dddd, mmmm d, yyyy": () => { throw new Error("Not Implemented") },
+    "mmmm d, yyyy": () => { throw new Error("Not Implemented") },
 }
 
 const _timeParsers = {

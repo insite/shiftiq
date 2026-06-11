@@ -393,6 +393,33 @@ namespace InSite.Admin.Contacts.People.Forms
         protected global::InSite.Admin.Workflow.Forms.Submissions.Controls.SearchResults SurveyResponseGrid;
 
         /// <summary>
+        /// ProgramTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NavItem ProgramTab;
+
+        /// <summary>
+        /// ProgramUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel ProgramUpdatePanel;
+
+        /// <summary>
+        /// ProgramGrid control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.UI.Admin.Contacts.People.Controls.ProgramGrid ProgramGrid;
+
+        /// <summary>
         /// OutcomeSubTab control.
         /// </summary>
         /// <remarks>

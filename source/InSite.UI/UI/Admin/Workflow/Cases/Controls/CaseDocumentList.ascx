@@ -71,7 +71,7 @@
                     <%# Eval("AccessList") %>
                 </div>
                 <div class="form-text text-body-secondary">
-                    Allow Learner To Open File: <%# (bool?)Eval("AllowLearnerToView") == true ? "Yes" : "No" %>
+                    Enable File Link for Member/Topic: <%# (bool?)Eval("AllowLearnerToView") == true ? "Yes" : "No" %>
                 </div>
             </td>
             <td>

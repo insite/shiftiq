@@ -123,6 +123,15 @@ namespace InSite.Admin.Assessments.Forms.Forms
         protected global::InSite.Admin.Assessments.Forms.Controls.FormInfo FormDetails;
 
         /// <summary>
+        /// ReportLanguage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.LanguageComboBox ReportLanguage;
+
+        /// <summary>
         /// BuildForm control.
         /// </summary>
         /// <remarks>
@@ -148,6 +157,15 @@ namespace InSite.Admin.Assessments.Forms.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Button BuildFormInternal;
+
+        /// <summary>
+        /// BuildFormDocx control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button BuildFormDocx;
 
         /// <summary>
         /// BuildFormCompact control.

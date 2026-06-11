@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+using InSite.Application.Credentials.Write;
+using InSite.Common.Web;
 using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant.CMDS;
 using Shift.Sdk.UI;
 
@@ -36,6 +40,57 @@ namespace InSite.Cmds.Controls.Training.Achievements
 
             SubType.AutoPostBack = true;
             SubType.ValueChanged += SubType_ValueChanged;
+
+            AllowSelfDeclarationOnCredentials.Click += (x, y) => ModifySelfDeclarationOnCredentials(true);
+            DisallowSelfDeclarationOnCredentials.Click += (x, y) => ModifySelfDeclarationOnCredentials(false);
+        }
+
+        private void ModifySelfDeclarationOnCredentials(bool allowSelfDeclaration)
+        {
+            if (AchievementIdentifier == null)
+                return;
+
+            var commands = new List<Command>();
+
+            var achievement = VCmdsAchievementSearch.Select(AchievementIdentifier.Value);
+
+            var credentials = VCmdsCredentialSearch.Bind(x => new
+            {
+                x.CredentialIdentifier,
+                x.AuthorityIdentifier,
+                x.AuthorityName,
+                x.AuthorityType,
+                x.AuthorityLocation,
+                x.AuthorityReference,
+                x.CredentialHours
+            },
+                    x => x.AchievementIdentifier == AchievementIdentifier);
+
+            foreach (var credential in credentials)
+            {
+                var credentialAllowsSelfDeclaration = credential.AuthorityType == "Self";
+
+                if (allowSelfDeclaration == credentialAllowsSelfDeclaration)
+                    continue;
+
+                var disallowSelfDeclaration = new ChangeCredentialAuthority(
+                    credential.CredentialIdentifier,
+                    credential.AuthorityIdentifier,
+                    credential.AuthorityName,
+                    (allowSelfDeclaration ? "Self" : null),
+                    credential.AuthorityLocation,
+                    credential.AuthorityReference,
+                    credential.CredentialHours);
+
+                commands.Add(disallowSelfDeclaration);
+            }
+
+            foreach (var command in commands)
+                ServiceLocator.SendCommand(command);
+
+            var redirectUrl = $"/ui/cmds/admin/achievements/edit?id={AchievementIdentifier.Value}";
+
+            HttpResponseHelper.Redirect(redirectUrl);
         }
 
         private void SubType_ValueChanged(object sender, ComboBoxValueChangedEventArgs e)
@@ -56,12 +111,10 @@ namespace InSite.Cmds.Controls.Training.Achievements
             AchievementHierarchy.SetDefaultValues();
         }
 
-        public void SetInputValues(VCmdsAchievement info)
+        public void SetInputValues(VCmdsAchievement info, int credentialsThatAllowSelfDeclaration, int credentialsThatDisallowSelfDeclaration)
         {
             AchievementIdentifier = info.AchievementIdentifier;
-
             Title.Text = info.AchievementTitle;
-            EnableSignOff.Checked = info.AchievementAllowSelfDeclared;
             IsTimeSensitive.Checked = info.ValidForCount.HasValue;
             ValidForCount.ValueAsInt = info.ValidForCount;
             ValidForUnit.Value = ValidForUnits.Months;
@@ -78,6 +131,29 @@ namespace InSite.Cmds.Controls.Training.Achievements
 
             DownloadRow.Visible = true;
             DownloadPanel.Visible = DownloadList.LoadUploads(info.AchievementIdentifier);
+
+            BindSelfDeclarations(info.AchievementAllowSelfDeclared, credentialsThatAllowSelfDeclaration, credentialsThatDisallowSelfDeclaration);
+        }
+
+        private void BindSelfDeclarations(bool allow, int credentialsThatAllowSelfDeclaration, int credentialsThatDisallowSelfDeclaration)
+        {
+            EnableSignOff.Checked = allow;
+
+            LearnerSelfDeclarationPanel.Visible = false;
+
+            if (allow && credentialsThatDisallowSelfDeclaration > 0)
+            {
+                LearnerSelfDeclarationPanel.Visible = true;
+                LearnerSelfDeclarationStatus.InnerText = $"Self-declaration is disallowed for {credentialsThatDisallowSelfDeclaration:n0} learners.";
+                AllowSelfDeclarationOnCredentials.Visible = true;
+            }
+
+            else if (!allow && credentialsThatAllowSelfDeclaration > 0)
+            {
+                LearnerSelfDeclarationPanel.Visible = true;
+                LearnerSelfDeclarationStatus.InnerText = $"Self-declaration is allowed for {credentialsThatAllowSelfDeclaration:n0} learners.";
+                DisallowSelfDeclarationOnCredentials.Visible = true;
+            }
         }
 
         public AchievementInfo GetInputValues()

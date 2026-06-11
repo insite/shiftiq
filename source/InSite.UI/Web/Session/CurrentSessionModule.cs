@@ -119,7 +119,7 @@ namespace InSite
             var organization = GetValidatedOrganizationCode(context.Request.Url);
             var token = CookieTokenModule.Current;
 
-            if (forceRefresh || IsIdentityChanged(token, identity, organization))
+            if (forceRefresh || IsIdentityChanged(token, identity, organization) || IsPermissionCacheChanged(identity, organization))
             {
                 CookieTokenModule.ResetCreated();
 
@@ -155,6 +155,11 @@ namespace InSite
 
                 HttpContext.Current.User = identity;
             }
+        }
+
+        private static bool IsPermissionCacheChanged(ISecurityFramework identity, string organization)
+        {
+            return identity.LoadedAt < PermissionCache.LoadedAt;
         }
 
         private static bool IsTokenObsolete(CookieToken token)

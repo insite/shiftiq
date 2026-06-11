@@ -51,6 +51,24 @@ namespace InSite.Admin.Workflow.Forms.Controls
         protected global::InSite.Common.Web.UI.DateTimeOffsetSelector LastModifiedBefore;
 
         /// <summary>
+        /// CreatedSince control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DateTimeOffsetSelector CreatedSince;
+
+        /// <summary>
+        /// CreatedBefore control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DateTimeOffsetSelector CreatedBefore;
+
+        /// <summary>
         /// SearchButton control.
         /// </summary>
         /// <remarks>

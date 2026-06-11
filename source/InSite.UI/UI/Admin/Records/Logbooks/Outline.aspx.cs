@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using InSite.Application.JournalSetups.Write;
 using InSite.Application.Records.Read;
@@ -225,14 +226,38 @@ namespace InSite.Admin.Records.Logbooks
 
         private void BindValidators()
         {
-            var instructors = ServiceLocator.JournalSearch
-                .GetJournalSetupUsers(new VJournalSetupUserFilter
-                {
-                    JournalSetupIdentifier = JournalSetupIdentifier,
-                    Role = JournalSetupUserRole.Validator
-                });
+            var users = ServiceLocator.JournalSearch.GetJournalSetupUsers(new VJournalSetupUserFilter
+            {
+                JournalSetupIdentifier = JournalSetupIdentifier,
+                Role = JournalSetupUserRole.Validator
+            });
 
-            ValidatorRepeater.DataSource = instructors;
+            var groups = ServiceLocator.JournalSearch.GetJournalSetupGroupDetails(new QJournalSetupGroupFilter
+            {
+                JournalSetupIdentifier = JournalSetupIdentifier,
+                GroupRole = JournalSetupUserRole.Validator
+            });
+
+            var validators = users
+                .Select(x => new
+                {
+                    Name = x.UserFullName,
+                    Type = "User",
+                    EditUrl = $"/ui/admin/contacts/people/edit?contact={x.UserIdentifier}",
+                    DeleteUrl = $"/ui/admin/records/logbooks/validators/delete?journalsetup={JournalSetupIdentifier}&user={x.UserIdentifier}",
+                })
+                .Union(groups.Select(x => new
+                {
+                    Name = x.GroupName,
+                    Type = "Group",
+                    EditUrl = $"/ui/admin/contacts/groups/edit?contact={x.GroupIdentifier}",
+                    DeleteUrl = $"/ui/admin/records/logbooks/validators/delete?journalsetup={JournalSetupIdentifier}&group={x.GroupIdentifier}",
+                }))
+                .OrderBy(x => x.Type)
+                .ThenBy(x => x.Name)
+                .ToList();
+
+            ValidatorRepeater.DataSource = validators;
             ValidatorRepeater.DataBind();
 
             AssignValidators.NavigateUrl = $"/ui/admin/records/logbooks/validators/assign?journalsetup={JournalSetupIdentifier}";

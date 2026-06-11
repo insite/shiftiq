@@ -25,7 +25,7 @@ import {
     toolbarPlugin
 } from "@mdxeditor/editor";
 
-import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
+import { ApiUploadFileInfo } from "@/api/controllers/assets/files/ApiUploadFileInfo";
 import { urlHelper } from "@/helpers/urlHelper";
 
 import "@mdxeditor/editor/style.css";

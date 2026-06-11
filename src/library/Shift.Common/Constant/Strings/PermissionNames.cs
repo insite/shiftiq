@@ -9,6 +9,7 @@
         public const string Admin_Polaris = "Admin/Polaris";
         public const string Admin_Settings = "Admin/Settings";
         public const string Admin_Forms_Submissions_Change = "Admin/Forms/Submissions/Change";
+        public const string Admin_Home = "ui/admin/home";
 
         public const string Custom_CMDS_Administrators = "Custom/CMDS/Administrators";
         public const string Custom_CMDS_Colleges = "Custom/CMDS/Colleges";

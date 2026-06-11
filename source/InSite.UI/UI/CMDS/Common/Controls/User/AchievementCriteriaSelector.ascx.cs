@@ -154,5 +154,17 @@ namespace InSite.Cmds.Controls.Reporting.Report
                 .Select(x => (FindEntity)x.FindControl("AchievementSelector"))
                 .Any(x => x.HasValue);
         }
+
+        public bool IsAllSelected()
+        {
+            if (Achievements == null || Achievements.Length == 0)
+                return false;
+
+            var totalCount = Achievements.Sum(g => g.Items.Length);
+            if (totalCount == 0)
+                return false;
+
+            return GetSelectedAchievements().Length >= totalCount;
+        }
     }
 }

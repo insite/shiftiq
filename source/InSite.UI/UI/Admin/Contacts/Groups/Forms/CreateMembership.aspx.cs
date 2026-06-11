@@ -187,7 +187,7 @@ namespace InSite.Admin.Contacts.Groups.Forms
         {
             if (SearchSelectedUsers.Count > 0)
             {
-                Save(SearchSelectedUsers, RoleType.Value);
+                Save(SearchSelectedUsers);
 
                 HttpResponseHelper.Redirect(GetCloseUrl());
             }
@@ -216,7 +216,7 @@ namespace InSite.Admin.Contacts.Groups.Forms
                 });
 
             if (people.Length > 0)
-                Save(people, RoleType.Value);
+                Save(people);
 
             ScreenStatus.AddMessage(AlertType.Success, $"{people.Length:n0} contacts added to the group");
         }
@@ -279,10 +279,19 @@ namespace InSite.Admin.Contacts.Groups.Forms
             EmailListCloseButton.NavigateUrl = GetCloseUrl();
         }
 
-        private void Save(IEnumerable<Guid> userIds, string roleType)
+        private void Save(IEnumerable<Guid> userIds)
         {
             if (GroupIdentifier == null || !MembershipPermissionHelper.CanModifyMembership(GroupIdentifier.Value))
                 return;
+
+            var group = ServiceLocator.GroupSearch.GetGroup(GroupIdentifier.Value) ?? throw new ArgumentException($"Group {GroupIdentifier} does not exist");
+
+            var membershipType = RoleType.Value;
+            if (string.IsNullOrEmpty(membershipType))
+            {
+                if (string.Equals(group.GroupType, "Department", StringComparison.OrdinalIgnoreCase))
+                    membershipType = "Department";
+            }
 
             foreach (var userKey in userIds)
             {
@@ -291,7 +300,7 @@ namespace InSite.Admin.Contacts.Groups.Forms
                     GroupIdentifier = GroupIdentifier.Value,
                     UserIdentifier = userKey,
                     Assigned = DateTimeOffset.UtcNow,
-                    MembershipType = roleType
+                    MembershipType = membershipType
                 });
             }
         }

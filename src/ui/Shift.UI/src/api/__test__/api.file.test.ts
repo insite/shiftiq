@@ -2,12 +2,12 @@ import { expect, test } from "vitest";
 import { shiftClient } from "../shiftClient";
 import { ApiError } from "../apiError";
 import { fetchHelper } from "../fetchHelper";
-import { ApiUploadFileInfo } from "../controllers/file/ApiUploadFileInfo";
+import { ApiUploadFileInfo } from "../controllers/assets/files/ApiUploadFileInfo";
 
 const fileText = "My test text";
 const fileName = "test-text.txt";
 
-test("/api/content/files: non-authenticated", async () => {
+test("/api/assets/files: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.file.count({})).rejects.toThrowError(new ApiError(401, ""));
@@ -17,7 +17,7 @@ test("/api/content/files: non-authenticated", async () => {
     await expect(shiftClient.file.uploadTempFile(createFile())).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("/api/content/files: authenticated", async () => {
+test("/api/assets/files: authenticated", async () => {
     await global.login();
 
     // Happy Dom, XMLHttpRequest, and cookies seems are not friends, so am using workaround
@@ -25,7 +25,7 @@ test("/api/content/files: authenticated", async () => {
     const formData = new FormData();
     formData.append(file.name, file);
 
-    const uploadResult = (await fetchHelper.postForm("/api/content/files/temp", formData)) as ApiUploadFileInfo[];
+    const uploadResult = (await fetchHelper.postForm("/api/assets/files/temp", formData)) as ApiUploadFileInfo[];
 
     expect(uploadResult).not.toBe(null);
     expect(uploadResult!.length).toBe(1);

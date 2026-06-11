@@ -19,6 +19,7 @@ const _items = [
     { text: translate("Program Task"), value: "ProgramTask" },
     { text: translate("Standard"), value: "Standard" },
     { text: translate("Page"), value: "Page" },
+    { text: translate("Organization"), value: "Organization" },
 ];
 
 export default function FileObjectTypeComboBox<Criteria extends object>(props: Props<Criteria>) {

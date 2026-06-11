@@ -4,13 +4,13 @@ import { ApiError } from "../apiError";
 
 const pageId = "b1b1d7da-8d09-42cb-b25b-6d3a17637462";
 
-test("GET /api/workspace/pages-contents/<pageId>: non-authenticated", async () => {
+test("GET /api/sites/pages-contents/<pageId>: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.pageContent.retrieve(pageId)).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("GET /api/workspace/pages-contents/<pageId>: authenticated", async () => {
+test("GET /api/sites/pages-contents/<pageId>: authenticated", async () => {
     await global.login();
 
     const page = await shiftClient.pageContent.retrieve(pageId);
@@ -71,7 +71,7 @@ test("GET /api/workspace/pages-contents/<pageId>: authenticated", async () => {
     expect(page!.Blocks[8].BlockType).toBe("CourseSummary");
 });
 
-test("PUT /api/workspace/pages-contents/<pageId>: authenticated 1", async () => {
+test("PUT /api/sites/pages-contents/<pageId>: authenticated 1", async () => {
     await global.login();
 
     const result = await shiftClient.pageContent.modify(pageId, {
@@ -169,7 +169,7 @@ test("PUT /api/workspace/pages-contents/<pageId>: authenticated 1", async () => 
 
 });
 
-test("PUT /api/workspace/pages-contents/<pageId>: authenticated 2", async () => {
+test("PUT /api/sites/pages-contents/<pageId>: authenticated 2", async () => {
     await global.login();
 
     await shiftClient.pageContent.modify(pageId, {

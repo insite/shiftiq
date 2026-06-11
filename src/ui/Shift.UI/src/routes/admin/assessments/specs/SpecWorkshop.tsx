@@ -8,7 +8,7 @@ import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 import { usePageProvider } from "@/contexts/page/PageProviderContext";
 import { useWorkshopOtherProvider } from "@/contexts/workshop/WorkshopOtherProviderContext";
 import { useWorkshopQuestionProvider } from "@/contexts/workshop/WorkshopQuestionProviderContext";
-import { useSpecWorkshopProvider } from "@/contexts/workshop/SpecWorkshopProviderContext";
+import { criterionWeightToPercent, useSpecWorkshopProvider } from "@/contexts/workshop/SpecWorkshopProviderContext";
 import { useLoadAction } from "@/hooks/useLoadAction";
 import { shiftClient } from "@/api/shiftClient";
 import { workshopOtherAdapter } from "../other/workshopOtherAdapter";
@@ -30,26 +30,10 @@ import { useForm } from "react-hook-form";
 import { useSaveAction } from "@/hooks/useSaveAction";
 import { SpecWorkshopDetailsValues, toApiSpecWorkshopInput, toSpecWorkshopDetailsValues } from "./SpecWorkshopDetailsValues";
 import SpecWorkshop_BankView from "./SpecWorkshop_BankView";
+import Alert from "@/components/Alert";
+import { SpecWorkshopCriterion } from "@/contexts/workshop/models/SpecWorkshopCriterion";
 
 const outlinePageUrl = "/ui/admin/assessments/banks/outline";
-
-interface Counts {
-    questions: number;
-    comments: number;
-    attachments: number;
-    problems: number;
-}
-
-const defaultCounts: Counts = {
-    questions: 0,
-    comments: 0,
-    attachments: 0,
-    problems: 0,
-};
-
-function getSubtitle(count: number) {
-    return count ? `(${count})` : undefined;
-}
 
 export default function SpecWorkshop() {
     return (
@@ -72,17 +56,17 @@ function SpecWorkshopInternal() {
     const serializedFilter = searchParams.get("filter");
 
     const [backUrl, setBackUrl] = useState(outlinePageUrl);
-    const [counts, setCounts] = useState(defaultCounts);
     const [defaultFilter, setDefaultFilter] = useState<WorkshopQuestionFilterState | null>(null);
     const [status, setStatus] = useState<"saved" | "error" | "none">("none");
+    const [totalWeightPercent, setTotalWeightPercent] = useState(0);
 
     const timeoutRef = useRef<number>(null);
 
     const { siteSetting: { TimeZoneId: timeZoneId } } = useSiteProvider();
     const { setActionSubtitle, setBreadcrumbItemPath } = usePageProvider();
-    const { initOtherState } = useWorkshopOtherProvider();
-    const { initQuestionState } = useWorkshopQuestionProvider();
-    const { initState, details, readOnly, specificationId } = useSpecWorkshopProvider();
+    const { comments, attachments, problemQuestions, initOtherState } = useWorkshopOtherProvider();
+    const { totalQuestionCount, initQuestionState } = useWorkshopQuestionProvider();
+    const { details, readOnly, specificationId, initState } = useSpecWorkshopProvider();
     const { isSaving, runSave } = useSaveAction();
     const {
         control,
@@ -134,12 +118,7 @@ function SpecWorkshopInternal() {
             }
         }
 
-        setCounts({
-            questions: questionState.totalQuestionCount,
-            comments: otherState.comments!.length,
-            attachments: otherState.attachments!.length,
-            problems: otherState.problemQuestions!.length,
-        });
+        setTotalWeightPercent(calcTotalWeightPercent(specState.details?.criteria));
 
         const newBackUrl = `${outlinePageUrl}?bank=${specState.bankId}&spec=${id}`;
 
@@ -161,7 +140,7 @@ function SpecWorkshopInternal() {
 
         reset(toSpecWorkshopDetailsValues(details));
         initializedSpecificationIdRef.current = specificationId;
-    }, [details, reset, specificationId]);
+    }, [details, specificationId, reset]);
 
     async function handleValidSubmit(values: SpecWorkshopDetailsValues) {
         if (!details) {
@@ -176,9 +155,8 @@ function SpecWorkshopInternal() {
 
         const input = toApiSpecWorkshopInput(details, values);
 
-        if (await runSave(async () => {
-            await shiftClient.workshop.modifySpec(specificationId, input);
-        })) {
+        if (await runSave(() => shiftClient.workshop.modifySpec(specificationId, input))) {
+            setTotalWeightPercent(calcTotalWeightPercent(details.criteria));
             setStatus("saved");
         } else {
             setStatus("error");
@@ -194,6 +172,12 @@ function SpecWorkshopInternal() {
         <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
             <ValidationSummary errors={errors} />
 
+            {details && totalWeightPercent !== 100 && (
+                <Alert alertType="warning">                    
+                    Please ensure your question set weights sum to 100%.
+                </Alert>
+            )}
+
             <FormTabs defaultTab={tab == "bankview" || tab === "questions" || tab === "comments" || tab === "attachments" || tab === "problems" ? tab : "spec"}>
                 <FormTab tab="spec" title={translate("Specification")} icon={{ style: "regular", name: "clipboard-list" }}>
                     <SpecWorkshop_Details
@@ -204,19 +188,19 @@ function SpecWorkshopInternal() {
                 <FormTab tab="bankview" title={translate("Bank View")} icon={{ style: "regular", name: "balance-scale" }}>
                     <SpecWorkshop_BankView />
                 </FormTab>
-                <FormTab tab="questions" title={translate("Questions")} subtitle={getSubtitle(counts.questions)} icon={{ style: "regular", name: "question" }}>
+                <FormTab tab="questions" title={translate("Questions")} subtitle={getSubtitle(totalQuestionCount)} icon={{ style: "regular", name: "question" }}>
                     <WorkshopQuestions
                         selectedQuestionId={selectedQuestionId}
                         defaultFilter={defaultFilter}
                     />
                 </FormTab>
-                <FormTab tab="comments" title={translate("Comments")} subtitle={getSubtitle(counts.comments)} icon={{ style: "regular", name: "comments" }}>
+                <FormTab tab="comments" title={translate("Comments")} subtitle={getSubtitle(comments?.length ?? 0)} icon={{ style: "regular", name: "comments" }}>
                     <WorkshopComments />
                 </FormTab>
-                <FormTab tab="attachments" title={translate("Attachments")} subtitle={getSubtitle(counts.attachments)} icon={{ style: "regular", name: "paperclip" }}>
+                <FormTab tab="attachments" title={translate("Attachments")} subtitle={getSubtitle(attachments?.length ?? 0)} icon={{ style: "regular", name: "paperclip" }}>
                     <WorkshopAttachments />
                 </FormTab>
-                <FormTab tab="problems" title={translate("Problems")} subtitle={getSubtitle(counts.problems)} icon={{ style: "regular", name: "exclamation-triangle" }}>
+                <FormTab tab="problems" title={translate("Problems")} subtitle={getSubtitle(problemQuestions?.length ?? 0)} icon={{ style: "regular", name: "exclamation-triangle" }}>
                     <WorkshopProblems />
                 </FormTab>
             </FormTabs>
@@ -247,6 +231,12 @@ function SpecWorkshopInternal() {
     );
 }
 
+function calcTotalWeightPercent(criteria: SpecWorkshopCriterion[] | undefined): number {
+    return criteria
+        ? criterionWeightToPercent(criteria.reduce((prev, cur) => prev + cur.weight, 0))
+        : 0;
+}
+
 function createAreaCompetencies(competencies: WorkshopStandard[]): WorkshopAreaCompetencies {
     const result: WorkshopAreaCompetencies = competencies.reduce((prev, cur) => {
         const list = prev[cur.parent!.standardId] ?? (prev[cur.parent!.standardId] = []);
@@ -254,4 +244,8 @@ function createAreaCompetencies(competencies: WorkshopStandard[]): WorkshopAreaC
         return prev;
     }, {} as WorkshopAreaCompetencies);
     return result;
+}
+
+function getSubtitle(count: number) {
+    return count ? `(${count})` : undefined;
 }

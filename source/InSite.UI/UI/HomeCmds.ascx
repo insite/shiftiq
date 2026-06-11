@@ -2,6 +2,7 @@
 
 <%@ Register Src="~/UI/Admin/Foundations/Controls/MaintenanceToast.ascx" TagName="MaintenanceToast" TagPrefix="uc" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/RelatedPersons.ascx" TagName="RelatedPersons" TagPrefix="uc" %>
+<%@ Register Src="~/UI/CMDS/Common/Controls/User/InvoicingContacts.ascx" TagName="InvoicingContacts" TagPrefix="uc" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/ImpersonationGrid.ascx" TagName="ImpersonationGrid" TagPrefix="uc" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/UpcomingSessionList.ascx" TagName="UpcomingSessionList" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Portal/Home/Controls/Authentications.ascx" TagName="Authentications" TagPrefix="uc" %>
@@ -161,7 +162,7 @@
 
                         <insite:NavItem runat="server" ID="NavContacts" Title="Contacts">
 
-                            <div class="row mb-5">
+                            <div class="row mb-4">
                                 <div runat="server" id="MyContactsPanel" class="col-lg-7 mb-3 mb-lg-0">
                                     <h3>My Contacts</h3>
                                     <uc:RelatedPersons ID="RelatedPersons" runat="server" />
@@ -175,6 +176,15 @@
                                             </ItemTemplate>
                                         </asp:Repeater>
                                     </ul>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-lg-12">
+
+                                    <h3 class="mt-0">Invoicing</h3>
+                                    <uc:InvoicingContacts runat="server" ID="InvoicingContacts" />
+
                                 </div>
                             </div>
 

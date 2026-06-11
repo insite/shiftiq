@@ -570,6 +570,7 @@ namespace InSite.Admin.Workflow.Forms
 
             e.Translation = content[CurrentField.Field].Text.Serialize();
             e.Language = ToLanguage.Value;
+            e.AllowHtml = true;
         }
 
         private void TranslationWindow_SaveTranslation(object sender, StringValueArgs e)

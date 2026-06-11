@@ -2,14 +2,14 @@ import { expect, test } from "vitest";
 import { shiftClient } from "../shiftClient";
 import { ApiError } from "../apiError";
 
-test("/api/progress/achievements/*: non-authenticated", async () => {
+test("/api/records/achievements/*: non-authenticated", async () => {
     await global.logout();
 
     await expect(shiftClient.achievement.search({}, 0, 0)).rejects.toThrowError(new ApiError(401, ""));
     await expect(shiftClient.achievement.retrieve("f3ad8690-76e0-4ede-afb0-a0c2a21ed947")).rejects.toThrowError(new ApiError(401, ""));
 });
 
-test("/api/progress/achievements/search: authenticated", async () => {
+test("/api/records/achievements/search: authenticated", async () => {
     await global.login();
 
     const result = await shiftClient.achievement.search({}, 0, 10);
@@ -23,7 +23,7 @@ test("/api/progress/achievements/search: authenticated", async () => {
     expect(result!.rows[0].AchievementTitle).toBeTypeOf("string");
 });
 
-test("/api/progress/achievements/<achievementId>: authenticated", async () => {
+test("/api/records/achievements/<achievementId>: authenticated", async () => {
     await global.login();
 
     const searchResult = await shiftClient.achievement.search({}, 0, 10);

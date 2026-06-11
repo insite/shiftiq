@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.UI.WebControls;
-
-using Shift.Common.Timeline.Commands;
 
 using Humanizer;
 
 using InSite.Application.Cases.Write;
+using InSite.Application.Contacts.Read;
 using InSite.Application.Files.Read;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Admin.Workflow.Cases.Utilities;
-using InSite.Web.Helpers;
 
 using Shift.Common;
 using Shift.Common.Events;
+using Shift.Common.Timeline.Commands;
+using Shift.Constant;
 using Shift.Sdk.UI;
 
 namespace InSite.UI.Admin.Assets.Files.Controls
@@ -42,6 +43,12 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             set => ViewState[nameof(OriginalDocumentName)] = value;
         }
 
+        private Guid? CaseId
+        {
+            get => (Guid?)ViewState[nameof(CaseId)];
+            set => ViewState[nameof(CaseId)] = value;
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -52,6 +59,8 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             IssueDocumentNameValidator.ServerValidate += IssueDocumentNameValidator_ServerValidate;
 
             File.FileUploaded += File_FileUploaded;
+
+            PermissionList.PermissionsChanged += PermissionList_PermissionsChanged;
         }
 
         private void IssueDocumentNameValidator_ServerValidate(object source, ServerValidateEventArgs args)
@@ -63,9 +72,15 @@ namespace InSite.UI.Admin.Assets.Files.Controls
 
         private void FileCategory_ValueChanged(object sender, ComboBoxValueChangedEventArgs e)
         {
-            FileSubcategory.ClearSelection();
-            FileSubcategory.DocumentType = FileCategory.Value;
-            FileSubcategory.RefreshData();
+            FileSubcategorySelectorView.IsActive = true;
+
+            SwitchToManualButton.Enabled = !string.IsNullOrEmpty(FileCategory.Value);
+
+            FileSubcategorySelector.ClearSelection();
+            FileSubcategorySelector.DocumentType = FileCategory.Value;
+            FileSubcategorySelector.RefreshData();
+
+            FileSubcategoryText.Text = null;
         }
 
         private void File_FileUploaded(object sender, EventArgs e)
@@ -82,6 +97,11 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             }
         }
 
+        private void PermissionList_PermissionsChanged(object sender, EventArgs e)
+        {
+            BindAllowLearnerSettings(ObjectIdentifier, ObjectType, PermissionList.GetFileClaims(), AllowLearnerToViewYes.Checked);
+        }
+
         public (bool IsValid, string Title) BindDefaultsToControls(FileObjectType objectType, Guid objectIdentifier)
         {
             var (isValid, title) = Validate(objectType, objectIdentifier);
@@ -96,15 +116,14 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             FileStatus.EnsureDataBound();
             FileStatus.Value = "Uploaded";
 
-            if (objectType != FileObjectType.Issue  || CaseAttachmentHelper.AllowLearnerToViewByIssue(ObjectIdentifier))
-                AllowLearnerToViewYes.Checked = true;
-            else
-                AllowLearnerToViewNo.Checked = true;
+            SwitchToManualButton.Enabled = !string.IsNullOrEmpty(FileCategory.Value);
+
+            BindAllowLearnerSettings(objectIdentifier, objectType, null, null);
 
             return (isValid, title);
         }
 
-        public (bool IsValid, string Title) BindModelToControls(FileStorageModel model)
+        public (bool IsValid, string Title) BindModelToControls(FileStorageModel model, Guid? caseId)
         {
             var (isValid, title) = Validate(model.ObjectType, model.ObjectIdentifier);
             if (!isValid)
@@ -113,6 +132,7 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             ObjectIdentifier = model.ObjectIdentifier;
             ObjectType = model.ObjectType;
             OriginalDocumentName = model.Properties.DocumentName;
+            CaseId = caseId;
 
             PermissionList.BindModelToControls(model);
 
@@ -131,9 +151,15 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             FileCategory.EnsureDataBound();
             FileCategory.Value = properties.Category;
 
-            FileSubcategory.DocumentType = properties.Category;
-            FileSubcategory.RefreshData();
-            FileSubcategory.Value = properties.Subcategory;
+            FileSubcategorySelectorView.IsActive = true;
+
+            FileSubcategorySelector.DocumentType = properties.Category;
+            FileSubcategorySelector.RefreshData();
+            FileSubcategorySelector.Value = properties.Subcategory;
+
+            FileSubcategoryText.Text = null;
+
+            SwitchToManualButton.Enabled = !string.IsNullOrEmpty(FileCategory.Value);
 
             FileDescription.Text = properties.Description;
             DocumentName.Text = properties.DocumentName;
@@ -143,12 +169,55 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             IsReviewed.Checked = properties.ReviewedTime.HasValue;
             IsApproved.Checked = properties.ApprovedTime.HasValue;
 
-            if (model.Properties.AllowLearnerToView)
-                AllowLearnerToViewYes.Checked = true;
-            else
-                AllowLearnerToViewNo.Checked = true;
+            BindAllowLearnerSettings(model.ObjectIdentifier, model.ObjectType, model.Claims, properties.AllowLearnerToView);
 
             return (isValid, title);
+        }
+
+        private void BindAllowLearnerSettings(Guid objectId, FileObjectType objectType, IEnumerable<FileClaim> fileClaims, bool? allowLearnerToView)
+        {
+            var caseEntity = CaseId != null
+                ? ServiceLocator.IssueSearch.GetIssue(CaseId.Value)
+                : objectType == FileObjectType.Issue
+                        ? ServiceLocator.IssueSearch.GetIssue(objectId)
+                        : null;
+
+            var visible = caseEntity != null;
+
+            AllowLearnerToViewPanel.Visible = visible;
+
+            if (!visible)
+            {
+                AllowLearnerToViewYes.Checked = true;
+                return;
+            }
+
+            if (IsPermissionDenied(caseEntity.TopicUserIdentifier, fileClaims))
+            {
+                AllowLearnerToViewPanel.Visible = false;
+                AllowLearnerToViewYes.Checked = false;
+                AllowLearnerToViewNo.Checked = true;
+                return;
+            }
+
+            AllowLearnerToViewYes.Checked = allowLearnerToView == true;
+            AllowLearnerToViewNo.Checked = allowLearnerToView != true;
+        }
+
+        private static bool IsPermissionDenied(Guid? topicUserId, IEnumerable<FileClaim> fileClaims)
+        {
+            if (topicUserId == null || fileClaims == null)
+                return false;
+
+            var groups = ServiceLocator.GroupSearch.GetGroups(new QGroupFilter
+            {
+                OrganizationIdentifier = Organization.Identifier,
+                UserIdentifier = topicUserId
+            });
+
+            var userRoleIds = groups.Select(x => x.GroupIdentifier).ToArray();
+
+            return ServiceLocator.StorageService.GetGrantStatus(topicUserId.Value, userRoleIds, fileClaims) != FileGrantStatus.Granted;
         }
 
         public FileStorageModel CreateFile(Guid objectIdentifier, FileObjectType objectType)
@@ -218,7 +287,7 @@ namespace InSite.UI.Admin.Assets.Files.Controls
                 DocumentName = DocumentName.Text,
                 Description = FileDescription.Text,
                 Category = FileCategory.Value,
-                Subcategory = FileSubcategory.Value,
+                Subcategory = GetOrCreateSubcategory(),
                 Status = FileStatus.Value,
                 Expiry = FileExpiry.Value,
                 Received = FileReceived.Value,
@@ -229,6 +298,50 @@ namespace InSite.UI.Admin.Assets.Files.Controls
                 ApprovedUserIdentifier = approvedUser,
                 AllowLearnerToView = AllowLearnerToViewYes.Checked
             };
+        }
+
+        private string GetOrCreateSubcategory()
+        {
+            if (FileSubcategorySelectorView.IsActive)
+                return FileSubcategorySelector.Value;
+
+            if (string.IsNullOrEmpty(FileCategory.Value))
+                return null;
+
+            var name = FileSubcategoryText.Text;
+            var itemName = $"{FileCategory.Value}: {name}";
+
+            var existItems = TCollectionItemSearch.Select(new TCollectionItemFilter
+            {
+                OrganizationIdentifier = Organization.Identifier,
+                CollectionName = CollectionName.Assets_Files_Document_SubType,
+                ItemName = itemName
+            });
+
+            if (existItems.Count > 0)
+                return name;
+
+            var collectionId = TCollectionSearch.BindFirst(
+                x => (Guid?)x.CollectionIdentifier,
+                new TCollectionFilter { CollectionName = CollectionName.Assets_Files_Document_SubType }
+            );
+            if (collectionId == null)
+                return null;
+
+            var nextSequence = TCollectionItemSearch.GetNextSequence(collectionId.Value, Organization.Identifier);
+            var entity = new TCollectionItem
+            {
+                ItemName = itemName,
+                ItemSequence = nextSequence,
+                OrganizationIdentifier = Organization.Identifier,
+                ItemIdentifier = UniqueIdentifier.Create(),
+                CollectionIdentifier = collectionId.Value
+            };
+
+            TCollectionItemStore.Insert(entity);
+            TCollectionItemCache.Refresh();
+
+            return name;
         }
 
         private static (DateTimeOffset? Time, Guid? User) GetTimeAndUser(DateTimeOffset? oldTime, Guid? oldUser, bool selected)

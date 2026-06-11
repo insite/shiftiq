@@ -376,7 +376,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions
         private string GetSurveyLastModifiedHtml()
         {
             var survey = ServiceLocator.SurveySearch.GetSurveyForm(Current.Survey.Identifier);
-            var subtitle = UserSearch.GetTimestampHtml(survey.LastChangeUser, survey.LastChangeType, null, survey.LastChangeTime);
+            var subtitle = UserSearch.GetTimestampHtml(survey.LastChangeUser.Value, survey.LastChangeType, null, survey.LastChangeTime);
 
             return $"<div class='last-modified'>{subtitle}</div>";
         }

@@ -10,6 +10,7 @@ using InSite.Persistence;
 using InSite.UI.Admin.Records.Programs.Utilities;
 
 using Shift.Common;
+using Shift.Constant;
 using Shift.Sdk.UI;
 
 namespace InSite.Admin.Records.Programs.Controls
@@ -70,6 +71,16 @@ namespace InSite.Admin.Records.Programs.Controls
 
             ProgramImage.ImageUrl = program.ProgramImage;
             ProgramImageField.Visible = program.ProgramImage.IsNotEmpty();
+
+            if (program.ProgramFlagColor.IsNotEmpty())
+            {
+                var indicator = program.ProgramFlagColor.ToEnum<Indicator>();
+                ProgramFlagColor.Text = $"<i class='fas fa-square text-{indicator.GetContextualClass()} me-2'></i>{indicator.GetDescription()}";
+            }
+            else
+                ProgramFlagColor.Text = "<i>None</i>";
+
+            ProgramFlagText.Text = GetHtmlText(program.ProgramFlagText);
 
             string GetHtmlText(string text) => text.IsEmpty() ? "<i>None</i>" : HttpUtility.HtmlEncode(text);
         }

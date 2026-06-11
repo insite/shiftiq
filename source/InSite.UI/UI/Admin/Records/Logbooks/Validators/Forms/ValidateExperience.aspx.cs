@@ -95,7 +95,7 @@ namespace InSite.UI.Admin.Records.Validators.Forms
             var experience = ServiceLocator.JournalSearch.GetExperience(ExperienceIdentifier, x => x.Journal.JournalSetup, x => x.Journal.JournalSetup.Event);
             if (experience == null
                 || experience.Journal.JournalSetup.OrganizationIdentifier != Organization.OrganizationIdentifier
-                || ServiceLocator.JournalSearch.GetJournalSetupUser(experience.Journal.JournalSetupIdentifier, User.UserIdentifier, JournalSetupUserRole.Validator) == null
+                || !ServiceLocator.JournalSearch.IsLogbookValidator(experience.Journal.JournalSetupIdentifier, User.UserIdentifier)
                 )
             {
                 HttpResponseHelper.Redirect("/ui/admin/records/logbooks/validators/search");

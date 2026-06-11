@@ -6,7 +6,7 @@ import { shiftClient } from "@/api/shiftClient";
 import { pageBlockAdapter } from "./pageBlockAdapter";
 import { pageContentAdapter } from "./pageContentAdapter";
 import { ContentEditorResult } from "@/components/contenteditor/ContentEditorResult";
-import { ApiPageContentModifyModel } from "@/api/controllers/pageContent/ApiPageContentModifyModel";
+import { ApiPageContentModifyModel } from "@/api/controllers/sites/pageContents/ApiPageContentModifyModel";
 import { useSearchParams } from "react-router";
 import { usePageProvider } from "@/contexts/page/PageProviderContext";
 import { blockTypeNameList } from "./blockTypeNameList";

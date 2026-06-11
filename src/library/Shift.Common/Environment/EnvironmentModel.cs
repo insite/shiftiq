@@ -33,18 +33,14 @@ namespace Shift.Common
             Initialize(environment);
         }
 
+        public string GetName(string convention)
+            => SubdomainConvention.GetName(convention, Name);
+
         public string GetSubdomainPrefix()
-        {
-            switch (Name)
-            {
-                case EnvironmentName.Development:
-                case EnvironmentName.Local:
-                case EnvironmentName.Sandbox:
-                    return Slug + "-";
-                default:
-                    return string.Empty;
-            }
-        }
+            => SubdomainConvention.GetPrefix(Name);
+
+        public string GetSubdomainPrefix(string convention)
+            => SubdomainConvention.GetPrefix(convention, Name);
 
         private void Initialize(EnvironmentName name)
         {

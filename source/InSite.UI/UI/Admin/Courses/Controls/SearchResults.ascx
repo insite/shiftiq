@@ -2,12 +2,12 @@
 
 <asp:Literal id="Instructions" runat="server" />
 
-<insite:Grid runat="server" ID="Grid" DataKeyNames="CourseIdentifier">
+<insite:Grid runat="server" ID="Grid" DataKeyNames="CourseId">
     <Columns>
 
         <asp:TemplateField HeaderText="Course Name">
             <ItemTemplate>
-                <a href='<%# Eval("CourseIdentifier", "/ui/admin/courses/manage?course={0}") %>'>
+                <a href='<%# Eval("CourseId", "/ui/admin/courses/manage?course={0}") %>'>
                     <%# Eval("CourseName") %>
                 </a>
             </ItemTemplate>
@@ -28,11 +28,11 @@
             <ItemTemplate>
                 <table class="table-enrollments"><tbody>
                     <tr>
-                        <td><%# Eval("EnrollmentStarted") %></td>
+                        <td><%# Eval("EnrollmentCountStarted", "{0:n0}") %></td>
                         <td>Started</td>
                     </tr>
                     <tr>
-                        <td><%# Eval("EnrollmentCompleted") %></td>
+                        <td><%# Eval("EnrollmentCountCompleted", "{0:n0}") %></td>
                         <td>Completed</td>
                     </tr>
                 </tbody></table>
@@ -59,7 +59,7 @@
 
         <asp:TemplateField HeaderText="Gradebook">
             <ItemTemplate>
-                <a href='<%# Eval("GradebookIdentifier", "/ui/admin/records/gradebooks/outline?id={0}") %>'>
+                <a href='<%# Eval("GradebookId", "/ui/admin/records/gradebooks/outline?id={0}") %>'>
                     <%# Eval("GradebookTitle") %>
                 </a>
             </ItemTemplate>

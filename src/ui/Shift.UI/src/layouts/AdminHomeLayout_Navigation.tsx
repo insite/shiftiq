@@ -10,6 +10,7 @@ import Icon from "@/components/icon/Icon";
 import AdminHomeLayout_Navigation_AdminMenu from "./AdminHomeLayout_Navigation_AdminMenu";
 import AdminHomeLayout_Navigation_HelpMenu from "./AdminHomeLayout_Navigation_HelpMenu";
 import AdminHomeLayout_Navigation_Lang from "./AdminHomeLayout_Navigation_Lang";
+import AdminHomeLayout_Navigation_RecentMenu from "./AdminHomeLayout_Navigation_RecentMenu";
 
 interface Props {
     onStateChange: (state: SidebarState) => void;
@@ -49,6 +50,8 @@ export default function AdminHomeLayout_Navigation({ onStateChange }: Props) {
                                     </li>
                                 </>
                             )}
+
+                            <AdminHomeLayout_Navigation_RecentMenu />
 
                             <li className="nav-item fs-sm">
                                 <ActionLink className="nav-link" href="/ui/portal/home">

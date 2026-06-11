@@ -361,7 +361,7 @@ namespace InSite.Admin.Assessments.Attempts.Forms
                 }
             }
 
-            ConfirmAllowDuplicates.Checked = true;
+            ConfirmAllowDuplicates.Checked = false;
 
             ConfirmData = new ConfirmUploadModel
             {

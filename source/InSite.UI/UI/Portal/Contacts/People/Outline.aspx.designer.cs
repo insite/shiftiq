@@ -123,6 +123,51 @@ namespace InSite.UI.Portal.Contacts.People
         protected global::InSite.UI.Portal.Contacts.People.Controls.PersonRecords Records;
 
         /// <summary>
+        /// ProgramSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NavItem ProgramSection;
+
+        /// <summary>
+        /// ProgramUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel ProgramUpdatePanel;
+
+        /// <summary>
+        /// PersonPrograms control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.UI.Portal.Contacts.People.Controls.PersonPrograms PersonPrograms;
+
+        /// <summary>
+        /// LogbookSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NavItem LogbookSection;
+
+        /// <summary>
+        /// PersonLogbooks control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.UI.Portal.Contacts.People.Controls.PersonLogbooks PersonLogbooks;
+
+        /// <summary>
         /// CloseButton control.
         /// </summary>
         /// <remarks>

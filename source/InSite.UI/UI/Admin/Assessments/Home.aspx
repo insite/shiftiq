@@ -159,6 +159,10 @@
                         <i class="fas fa-balance-scale me-1"></i>
                         High Stakes Test Taker Report
                     </a>
+                    <a href="/ui/admin/assessments/attempts/taker-report-upload">
+                        <i class="fas fa-upload me-1"></i>
+                        Bulk Upload Reports
+                    </a>
                 </div>
 
             </div>

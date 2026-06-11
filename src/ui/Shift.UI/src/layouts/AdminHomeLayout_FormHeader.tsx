@@ -9,20 +9,20 @@ import { usePageProvider } from "@/contexts/page/PageProviderContext";
 export default function AdminHomeLayout_FormHeader() {
     const params = useParams();
 
-    const { actionTitle, actionSubtitle, description, breadcrumbs, menu } = usePageProvider();
+    const { actionTitle, actionSubtitle, description, breadcrumbs, menu, isTitleVisible } = usePageProvider();
 
     useEffect(() => {
         document.title = `${actionTitle ?? "Unknown Form"} | Shift iQ`;
     }, [actionTitle]);
 
     return (
-        <div className="form-header border-bottom">
+        <div className={`form-header ${isTitleVisible ? "border-bottom" : ""}`}>
             <AdminHomeLayout_FormHeader_Env />
 
             <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
                     {breadcrumbs?.map(({ originalPath, title, path, category }, index) => (
-                        <Fragment key={originalPath}>
+                        <Fragment key={index !== breadcrumbs.length - 1 ? originalPath : "current"}>
                             {category && (
                                 <li
                                     className="breadcrumb-item"
@@ -52,22 +52,24 @@ export default function AdminHomeLayout_FormHeader() {
                     ))}
                 </ol>
             </nav>
-            <div className="row pb-2">
-                <div className="col-lg-12">
-                    <h1 className="mb-1">
-                        {actionTitle}
-                        {actionSubtitle && (
-                            <>
-                                &nbsp;-&nbsp;
-                                <span className="text-info">{actionSubtitle}</span>
-                                {description && (
-                                    <span className="form-text ms-2">{description}</span>
-                                )}
-                            </>
-                        )}
-                    </h1>
+            {isTitleVisible && (
+                <div className="row pb-2">
+                    <div className="col-lg-12">
+                        <h1 className="mb-1">
+                            {actionTitle}
+                            {actionSubtitle && (
+                                <>
+                                    &nbsp;-&nbsp;
+                                    <span className="text-info">{actionSubtitle}</span>
+                                    {description && (
+                                        <span className="form-text ms-2">{description}</span>
+                                    )}
+                                </>
+                            )}
+                        </h1>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

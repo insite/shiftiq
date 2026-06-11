@@ -48,7 +48,7 @@ namespace InSite.UI.CMDS.Common.Controls.User
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.ComboBox AccountScope;
+        protected global::InSite.Custom.CMDS.Common.Controls.Server.OrganizationScopeSelector AccountScope;
 
         /// <summary>
         /// GroupByComboBox control.

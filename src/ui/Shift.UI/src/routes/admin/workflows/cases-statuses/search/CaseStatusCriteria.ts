@@ -1,4 +1,4 @@
-import { ApiSearchCaseStatuses } from "@/api/controllers/caseStatus/ApiSearchCaseStatuses";
+import { ApiSearchCaseStatuses } from "@/api/controllers/workflows/caseStatuses/ApiSearchCaseStatuses";
 import { BaseCriteria } from "@/components/search/BaseCriteria";
 
 export interface CaseStatusCriteria extends BaseCriteria {

@@ -200,6 +200,9 @@ namespace InSite.Admin.Assessments.Outlines.Controls
                 case "Prepublish":
                     HttpResponseHelper.Redirect($"/ui/admin/assessments/forms/prepublish?bank={BankID}&form={form.Identifier}");
                     break;
+                case "Download":
+                    HttpResponseHelper.Redirect($"/ui/admin/assessments/banks/download?bank={BankID}&form={form.Identifier}");
+                    break;
             }
         }
 

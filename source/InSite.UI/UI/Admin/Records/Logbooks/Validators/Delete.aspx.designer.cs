@@ -42,6 +42,15 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         protected global::InSite.UI.Admin.Contacts.People.Controls.PersonInfo PersonDetail;
 
         /// <summary>
+        /// GroupDetail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Admin.Contacts.Groups.Controls.GroupInfo GroupDetail;
+
+        /// <summary>
         /// LogbookName control.
         /// </summary>
         /// <remarks>

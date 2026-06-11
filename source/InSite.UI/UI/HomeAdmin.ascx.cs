@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 
 using InSite.Application.Contacts.Read;
+using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.UI.Layout.Admin;
 
@@ -26,10 +27,9 @@ namespace InSite.UI
             if (IsPostBack)
                 return;
 
-            AdminDashboardPrototype.Visible = Organization.Toolkits?.Accounts?.DisplayDashboardPrototype == true;
+            // TODO: Make sure /client/admin/home satisfies all requirements for HomeAdmin and then delete HomeAdmin
 
-            if (Organization.Toolkits?.Accounts?.DisplayDashboardPrototype == true)
-                PageHelper.HideTitle(Page);
+            HttpResponseHelper.Redirect("/client/admin/home");
 
             WarningCheck();
         }

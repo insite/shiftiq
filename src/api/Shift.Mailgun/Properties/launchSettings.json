@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Shift.Mailgun": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:53061;http://localhost:53062"
+    }
+  }
+}

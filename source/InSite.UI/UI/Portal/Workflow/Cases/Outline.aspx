@@ -25,15 +25,17 @@
 
         <asp:Literal runat="server" ID="IssueDescriptionHtml" />
 
-        <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="AttachmentPanel" />
-        <insite:UpdatePanel runat="server" ID="AttachmentPanel">
+        <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="LoadingPanel" />
+        <insite:UpdatePanel runat="server" ID="LoadingPanel">
             <ContentTemplate>
 
                 <div runat="server" id="RequestPanel" class="card shadow mt-3">
 
                     <div class="card-body">
 
-                        <h3 class="card-title">Requests</h3>
+                        <h3 class="card-title">
+                            <insite:Literal runat="server" Text="Requests" />
+                        </h3>
 
                         <uc:CaseFileRequirementList runat="server" ID="CaseFileRequirementList" />
 
@@ -41,11 +43,13 @@
 
                 </div>
 
-                <div runat="server" id="NewAttachmentPanel" class="card shadow mt-3">
+                <div runat="server" id="AttachmentPanel" class="card shadow mt-3">
 
                     <div class="card-body">
 
-                        <h3 class="card-title">Attachments</h3>
+                        <h3 class="card-title">
+                            <insite:Literal runat="server" Text="Attachments" />
+                        </h3>
 
                         <uc:CaseDocumentList runat="server" ID="CaseDocumentList" />
 

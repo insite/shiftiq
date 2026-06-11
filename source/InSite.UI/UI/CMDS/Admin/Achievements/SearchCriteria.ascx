@@ -9,6 +9,10 @@
                 <div class="col-6">
 
                     <div class="mb-2">
+                        <cmds:OrganizationScopeSelector runat="server" ID="AchievementScope" EmptyMessage="Achievement Scope" />
+                    </div>
+
+                    <div class="mb-2">
                         <cmds:AchievementTypeSelector ID="AchievementType" runat="server" EmptyMessage="Achievement Type" NullText="" />
                     </div>
     
@@ -20,42 +24,36 @@
                         <insite:TextBox ID="Description" runat="server" EmptyMessage="Achievement Description" MaxLength="256" />
                     </div>
 
+                </div>
+                <div class="col-6">
+
                     <div class="mb-2">
-                        <insite:ComboBox ID="IsTimeSensitive" runat="server">
+                        <insite:ComboBox runat="server" ID="IsTimeSensitive" EmptyMessage="Time-Sensitivity">
                             <Items>
-                                <insite:ComboBoxOption Text="All" />
+                                <insite:ComboBoxOption Value="" />
                                 <insite:ComboBoxOption Value="True" Text="Time-Sensitive" />
-                                <insite:ComboBoxOption Value="False" Text="Not Time-Sensitive" />                    
+                                <insite:ComboBoxOption Value="False" Text="Not Time-Sensitive" />
                             </Items>
                         </insite:ComboBox>
                     </div>
 
                     <div class="mb-2">
-                        <insite:ComboBox ID="AllowSelfDeclaration" runat="server">
+                        <insite:ComboBox runat="server" ID="AllowSelfDeclaration" EmptyMessage="Self-Declaration">
                             <Items>
-                                <insite:ComboBoxOption Text="All" />
+                                <insite:ComboBoxOption Value="" />
                                 <insite:ComboBoxOption Value="True" Text="Allow self-declaration" />
                                 <insite:ComboBoxOption Value="False" Text="Disallow self-declaration" />
                             </Items>
                         </insite:ComboBox>
                     </div>
 
-                </div>
-                <div class="col-6">
-                    <div class="mb-2">
-                        <cmds:AchievementVisibilitySelector ID="AccountScope" runat="server" EmptyMessage="Visibility" />
-                    </div>
-                    <div id="CompanyPanel" runat="server" class="mb-2">
-                        <cmds:FindCompany runat="server" ID="Company" EmptyMessage="Organization" />
-                    </div>
-                    <div id="CategoryPanel" runat="server" class="mb-2">
-                        <cmds:TrainingCategorySelector ID="Category" runat="server" EmptyMessage="Category" />
-                    </div>
+                    <cmds:TrainingCategorySelector runat="server" ID="Category" EmptyMessage="Category" />
+
                 </div>
             </div>            
 
-	        <insite:FilterButton ID="SearchButton" runat="server" />
-	        <insite:ClearButton ID="ClearButton" runat="server" />
+	        <insite:FilterButton runat="server" ID="SearchButton" />
+	        <insite:ClearButton runat="server" ID="ClearButton" />
         </div>
     </div>
     <div class="col-6">       

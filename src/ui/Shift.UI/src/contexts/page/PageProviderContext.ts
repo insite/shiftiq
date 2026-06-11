@@ -14,8 +14,10 @@ interface ContextData {
     description: string | null;
     breadcrumbs: PageProviderContextBreadcrumbItem[];
     menu: MenuItem[] | null;
+    isTitleVisible: boolean;
     setActionSubtitle: (actionSubtitle: string | null, description?: string | null) => void;
     setBreadcrumbItemPath: (originalPath: string, path: string) => void;
+    hideTitle: () => void;
 }
 
 export const PageProviderContext = createContext<ContextData>({
@@ -24,8 +26,10 @@ export const PageProviderContext = createContext<ContextData>({
     description: null,
     breadcrumbs: [],
     menu: null,
+    isTitleVisible: false,
     setActionSubtitle() {},
     setBreadcrumbItemPath() {},
+    hideTitle() {},
 });
 
 export function usePageProvider() {

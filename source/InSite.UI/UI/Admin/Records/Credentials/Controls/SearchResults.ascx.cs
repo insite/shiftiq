@@ -42,6 +42,8 @@ namespace InSite.Admin.Achievements.Credentials.Controls
             public bool? HasBadgeImage { get; set; }
             public string BadgeImageUrl { get; set; }
             public string Department { get; set; }
+            public string District { get; set; }
+            public string Team { get; set; }
         }
 
         public class ExportDataItem
@@ -65,6 +67,8 @@ namespace InSite.Admin.Achievements.Credentials.Controls
             public string AchievementCertificateLayoutCode { get; set; }
             public bool? HasBadgeImage { get; set; }
             public string Department { get; set; }
+            public string District { get; set; }
+            public string Team { get; set; }
         }
 
         #endregion  
@@ -152,7 +156,9 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                         x.CredentialExpirationExpected, x.CredentialExpired, "yyyy-MM-dd"),
                     CredentialExpiryHtml = Achievements.Controls.CredentialGrid.GetCredentialExpiry(
                         x.CredentialExpirationExpected, x.CredentialExpired),
-                    Department = x.Department
+                    Department = x.Department,
+                    District = string.Join(", ", x.Groups.Where(y => string.Equals(y.GroupType, "District", StringComparison.OrdinalIgnoreCase)).Select(y => y.GroupName)),
+                    Team = string.Join(", ", x.Groups.Where(y => string.Equals(y.GroupType, "Team", StringComparison.OrdinalIgnoreCase)).Select(y => y.GroupName)),
                 })
                 .ToList()
                 .ToSearchResult();
@@ -190,7 +196,9 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                     EmployerGroupRegion = x.EmployerGroupRegion,
                     AchievementCertificateLayoutCode = x.AchievementCertificateLayoutCode,
                     HasBadgeImage = x.HasBadgeImage,
-                    Department = x.Department
+                    Department = x.Department,
+                    District = x.District,
+                    Team = x.Team,
                 })
                 .ToList()
                 .ToSearchResult();

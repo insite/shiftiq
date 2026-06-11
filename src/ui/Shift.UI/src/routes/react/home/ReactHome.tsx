@@ -13,6 +13,7 @@ export default function ReactHome() {
                 <li><ActionLink href="/client/admin/assessment/forms/workshop/7f959c01-ef9d-0a71-8241-238c97448d67">/client/admin/assessment/forms/workshop/7f959c01-ef9d-0a71-8241-238c97448d67</ActionLink></li>
                 <li><ActionLink href="/client/admin/assessment/specs/workshop/7f959c01-3d1e-7b76-be57-2fb8c82d5bfc">/client/admin/assessment/specs/workshop/7f959c01-3d1e-7b76-be57-2fb8c82d5bfc</ActionLink></li>
                 <li><ActionLink href="/client/admin/assessment/specs/workshop/6c160462-3041-4f65-b302-3a61e0ae977d">/client/admin/assessment/specs/workshop/6c160462-3041-4f65-b302-3a61e0ae977d</ActionLink></li>
+                <li><ActionLink href="/client/admin/platform/notifications/search">/client/admin/platform/notifications/search</ActionLink></li>
             </ul>
         </>
     );

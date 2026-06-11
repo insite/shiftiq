@@ -1,6 +1,7 @@
 import { shiftConfig } from "./shiftConfig";
 
 const _orgStorageKey = "currentOrganization";
+const _domainNameKey = "domainName";
 
 function getActionUrl(relativeUrl: string) {
     return getUrl(relativeUrl);
@@ -10,12 +11,16 @@ function getUrl(relativeUrl: string) {
     if (!shiftConfig.isLocal || relativeUrl.toLowerCase().startsWith(shiftConfig.clientPrefix)) {
         return relativeUrl;
     }
-    const origin = `https://local-${getOrg()}.${shiftConfig.insiteLocalDomain}`;
+    const origin = `https://local-${getOrg()}.${getDomainName()}`;
     return origin + relativeUrl;
 }
 
 function getOrg() {
     return localStorage.getItem(_orgStorageKey) || "insite";
+}
+
+function getDomainName() {
+    return localStorage.getItem(_domainNameKey) || "insite.com";
 }
 
 function replaceUrlParams(url: string, params: string): string {
@@ -58,6 +63,11 @@ export const urlHelper = {
             : getActionUrl(shiftConfig.loginPageUrl + `?returnUrl=${returnUrl}`);
     },
 
+    get403PageUrl() {
+        const path = encodeURIComponent(window.location.pathname);
+        return getActionUrl(`/403?path=${path}`);
+    },
+
     getActionUrl,
 
     getResourceUrl(relativeUrl: string) {
@@ -65,7 +75,7 @@ export const urlHelper = {
     },
 
     getFileUrl(fileId: string, fileName: string) {
-        return `${shiftConfig.shiftApiHostUrl}/api/content/files/${fileId}/${fileName}`;
+        return `${shiftConfig.shiftApiHostUrl}/api/assets/files/${fileId}/${fileName}`;
     },
 
     getFileUrlByNavigateUrl(navigateUrl: string) {
@@ -86,11 +96,12 @@ export const urlHelper = {
 
     getOrg,
 
-    setOrg(organizationCode: string | undefined | null) {
+    setOrgAndDomain(organizationCode: string | undefined | null, domainName: string) {
         if (organizationCode) {
             localStorage.setItem(_orgStorageKey, organizationCode);
         } else {
             localStorage.removeItem(_orgStorageKey);
         }
+        localStorage.setItem(_domainNameKey, domainName);
     },
 }

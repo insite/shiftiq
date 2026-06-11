@@ -9,17 +9,14 @@
     <div class="row">
         <div class="col-lg-12">
 
-            <insite:Alert runat="server" ID="NoIssuesAlert" Visible="false" Indicator="Success" Icon="fas fa-check">
-                You have no outstanding cases.
-            </insite:Alert>
+            <insite:Alert runat="server" ID="NoIssuesAlert" Visible="false" Indicator="Success" Icon="fas fa-check" />
 
             <asp:Repeater runat="server" ID="IssueRepeater">
                 <ItemTemplate>
                     <div class="card shadow card-hover mb-5">
-
                         <div class="card-body">
 
-                            <h5 class="card-title">Case #<%# Eval("IssueNumber") %>
+                            <h5 class="card-title"><insite:Literal runat="server" Text="Case" /> #<%# Eval("IssueNumber") %>
                                 <span class="ms-1 me-1">&raquo;</span>
                                 <%# Eval("IssueType") %>
                                 <span class="ms-1 me-1">&raquo;</span>
@@ -31,10 +28,10 @@
                             <%# Eval("IssueDescriptionHtml") %>
 
                             <div class="d-block">
-                                <asp:HyperLink runat="server" ID="ViewIssueLink" CssClass="btn btn-sm btn-primary"><i class="fas fa-folder-open me-2"></i>View Case</asp:HyperLink>
+                                <asp:HyperLink runat="server" ID="ViewIssueLink" CssClass="btn btn-sm btn-primary"><i class="fas fa-folder-open me-2"></i><insite:Literal ID="Test" runat="server" Text="View Case" /></asp:HyperLink>
                             </div>
-                    </div>
 
+                        </div>
                     </div>
                 </ItemTemplate>
             </asp:Repeater>

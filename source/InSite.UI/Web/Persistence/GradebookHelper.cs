@@ -41,8 +41,8 @@ namespace InSite.Common.Web
             public decimal? PassPercent { get; set; }
             public string Achievement { get; set; }
             public TriggerCauseChange? AchievementWhenChange { get; set; }
-            public TriggerCauseGrade? AchievementWhenGrade { get; set; }
-            public TriggerEffectCommand? AchievementThenCommand { get; set; }
+            public TriggerEffectCommand? AchievementWhenPassCommand { get; set; }
+            public TriggerEffectCommand? AchievementWhenFailCommand { get; set; }
             public TriggerEffectCommand? AchievementElseCommand { get; set; }
             public string AchievementFixedDate { get; set; }
             public string[] Standards { get; set; }
@@ -192,8 +192,8 @@ namespace InSite.Common.Web
                     PassPercent = src.PassPercent,
                     Achievement = achievementTitle,
                     AchievementWhenChange = src.Achievement?.WhenChange,
-                    AchievementWhenGrade = src.Achievement?.WhenGrade,
-                    AchievementThenCommand = src.Achievement?.ThenCommand,
+                    AchievementWhenPassCommand = src.Achievement?.WhenPassCommand,
+                    AchievementWhenFailCommand = src.Achievement?.WhenFailCommand,
                     AchievementElseCommand = src.Achievement?.ElseCommand,
                     AchievementFixedDate = src.Achievement?.AchievementFixedDate != null ? $"{src.Achievement.AchievementFixedDate:yyyy-MM-dd}" : null,
                     Children = src.Children.IsNotEmpty() ? new List<GradeItemModel>() : null,
@@ -324,8 +324,8 @@ namespace InSite.Common.Web
                     var achievement = new GradeItemAchievement
                     {
                         WhenChange = item.AchievementWhenChange.Value,
-                        WhenGrade = item.AchievementWhenGrade.Value,
-                        ThenCommand = item.AchievementThenCommand.Value,
+                        WhenPassCommand = item.AchievementWhenPassCommand.Value,
+                        WhenFailCommand = item.AchievementWhenFailCommand.Value,
                         ElseCommand = item.AchievementElseCommand.Value,
                         Achievement = achievementIdentifier.Value,
                         AchievementFixedDate = DateTimeOffset.Parse(item.AchievementFixedDate)

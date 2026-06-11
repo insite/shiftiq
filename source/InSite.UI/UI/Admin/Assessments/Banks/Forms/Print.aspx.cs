@@ -57,6 +57,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
 
             BuildImagesButton.Click += BuildImagesButton_Click;
             BuildQuestionsInternal.Click += BuildQuestionsInternal_Click;
+            BuildQuestionsDocx.Click += BuildQuestionsDocx_Click;
             BuildQuestionsCompact.Click += BuildQuestionsCompact_Click;
             BuildQuestionsExternal.Click += BuildQuestionsExternal_Click;
 
@@ -115,7 +116,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, BankID,
-                new QuestionPrintInternal.BankOptions(Organization.Identifier, User.TimeZone, BankID)
+                new QuestionPrintInternal.BankOptions(Organization.Identifier, User.TimeZone, ReportLanguage.Value, BankID)
                 {
                     IncludeImages = IncludeImages.Checked,
                     IncludeAdminComments = IncludeAdminComments.Checked,
@@ -125,12 +126,34 @@ namespace InSite.Admin.Assessments.Banks.Forms
                 (user, options) => QuestionPrintInternal.RenderPdf(options));
         }
 
+        private void BuildQuestionsDocx_Click(object sender, EventArgs e)
+        {
+            PrintQueue.QueuePrint(
+                _queueStoragePath,
+                User.Identifier, BankID,
+                new QuestionDocxPrinter.PrinterOptions
+                {
+                    OrganizationId = Organization.Identifier,
+                    BankId = BankID,
+                    Language = ReportLanguage.Value,
+                    TimeZone = User.TimeZone,
+                    IncludeImages = IncludeImages.Checked,
+                    IncludeAdminComments = IncludeAdminComments.Checked,
+                    ExcludeHiddenComments = ExcludeHiddenComments.Checked,
+                    AuthorName = User.FullName,
+                    QuestionFilter = CreateQuestionFilter(),
+                    DefaultImagePath = MapPath("~/UI/Layout/Common/Images/None.png"),
+                    WebsiteUrl = $"{Request.Url.Scheme}://{Request.Url.Host}"
+                },
+                (_, options) => QuestionDocxPrinter.RenderBankQuestions(options));
+        }
+
         private void BuildQuestionsCompact_Click(object sender, EventArgs e)
         {
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, BankID,
-                new QuestionPrintCompact.BankOptions(Organization, BankID)
+                new QuestionPrintCompact.BankOptions(Organization, ReportLanguage.Value, BankID)
                 {
                     QuestionFilter = CreateQuestionFilter()
                 },
@@ -142,7 +165,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, BankID,
-                new QuestionPrintExternal.BankOptions(Organization, BankID)
+                new QuestionPrintExternal.BankOptions(Organization, ReportLanguage.Value, BankID)
                 {
                     IncludeImages = IncludeImages.Checked,
                     QuestionFilter = CreateQuestionFilter()
@@ -154,7 +177,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
         {
             var file = PrintQueue.GetPrintFile(_queueStoragePath, User.Identifier, BankID);
             if (file != null)
-                Response.SendFile(file.Name, "pdf", file.Data);
+                Response.SendFile(file.Name, file.Ext, file.Data);
         }
 
         private void BuildImagesButton_Click(object sender, CommandEventArgs e)
@@ -196,11 +219,13 @@ namespace InSite.Admin.Assessments.Banks.Forms
             if (bank.Sets.Count > 0 && bank.Sets.Any(x => x.Questions.Count > 0))
             {
                 BuildQuestionsInternal.Attributes.Remove("disabled");
+                BuildQuestionsDocx.Attributes.Remove("disabled");
                 BuildQuestionsCompact.Attributes.Remove("disabled");
             }
             else
             {
                 BuildQuestionsInternal.Attributes["disabled"] = "disabled";
+                BuildQuestionsDocx.Attributes["disabled"] = "disabled";
                 BuildQuestionsCompact.Attributes["disabled"] = "disabled";
             }
 

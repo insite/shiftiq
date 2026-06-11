@@ -308,16 +308,15 @@
     <Compile Include="Api\Attributes\CookieAuthorizeAttribute.cs" />
     <Compile Include="Api\Attributes\JwtAuthorizeAttribute.cs" />
     <Compile Include="Api\Controllers\IntegrationScoopController.cs" />
-    <Compile Include="Api\Controllers\MessageController.cs" />
     <Compile Include="Api\Controllers\ProgressCredentialController1.cs" />
     <Compile Include="Api\Controllers\SecurityCookieController.cs" />
+    <Compile Include="Api\Controllers\SecuritySecretController.cs" />
     <Compile Include="Api\Controllers\TimelineCommandController2.cs" />
     <Compile Include="Api\Controllers\MaintenanceController.cs" />
-    <Compile Include="Api\Controllers\IntegrationMoodleController.cs" />
     <Compile Include="Api\Controllers\BillingController.cs" />
     <Compile Include="Api\Controllers\IntegrationScormController.cs" />
     <Compile Include="Api\Controllers\ExperimentReactController.cs" />
-    <Compile Include="Api\Controllers\PlatformController.cs" />
+    <Compile Include="Api\Controllers\DiagnosticController.cs" />
     <Compile Include="Api\Helpers\HttpHelper.cs" />
     <Compile Include="Api\Controllers\ProgressCredentialController2.cs" />
     <Compile Include="Api\Controllers\ContentFileController0.cs" />
@@ -326,28 +325,6 @@
     <Compile Include="Api\Controllers\ProgressAchievementController.cs" />
     <Compile Include="Api\Controllers\LearningProgramController.cs" />
     <Compile Include="Api\Controllers\ContentFileController2.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\AccountData.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\ClientInfo.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\DeliveryStatusData.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EnvelopeData.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataClicked.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataFlags.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataOpened.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataUnsubscribed.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventLogLevel.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\GeolocationData.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\StorageData.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\JsonEventDataConverter.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\MessageData.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\MessageDataAttachment.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\MessageDataHeaders.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\Payload.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataBase.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataAccepted.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataDelivered.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataFailed.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\EventDataComplained.cs" />
-    <Compile Include="Api\Models\MailgunWebhook\PayloadSignature.cs" />
     <Compile Include="Api\Models\OpenBadgeFactory.cs" />
     <Compile Include="Api\Models\Template.cs" />
     <Compile Include="Api\Controllers\BookingEventsController.cs" />
@@ -357,13 +334,6 @@
     <Compile Include="Api\Controllers\BookingRegistrationController.cs" />
     <Compile Include="Api\Helpers\SwaggerConfiguration.cs" />
     <Compile Include="AppSentry.cs" />
-    <Compile Include="UI\AdminDashboardPrototype.ascx.cs">
-      <DependentUpon>AdminDashboardPrototype.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\AdminDashboardPrototype.ascx.designer.cs">
-      <DependentUpon>AdminDashboardPrototype.ascx</DependentUpon>
-    </Compile>
     <Compile Include="UI\Admin\Accounts\Departments\Search.aspx.cs">
       <DependentUpon>Search.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -648,12 +618,23 @@
     <Compile Include="UI\Admin\Assessments\Attempts\TakerReport.aspx.designer.cs">
       <DependentUpon>TakerReport.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Assessments\Attempts\TakerReportUpload.aspx.cs">
+      <DependentUpon>TakerReportUpload.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Assessments\Attempts\TakerReportUpload.aspx.designer.cs">
+      <DependentUpon>TakerReportUpload.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportBySetExport.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportFilter.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AssessmentAuditReport.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportDefaultExport.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\AttemptReportHelper.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\PerformanceReportHelper.cs" />
+    <Compile Include="UI\Admin\Assessments\Attempts\Utilities\TakerReport\PersonFramework.cs" />
+    <Compile Include="UI\Admin\Assessments\Attempts\Utilities\TakerReport\PersonRow.cs" />
+    <Compile Include="UI\Admin\Assessments\Attempts\Utilities\TakerReport\TakerReportReader.cs" />
+    <Compile Include="UI\Admin\Assessments\Attempts\Utilities\TakerReport\TakerReportUploader.cs" />
     <Compile Include="UI\Admin\Assessments\Fields\Forms\Pin.aspx.cs">
       <DependentUpon>Pin.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -742,6 +723,8 @@
     <Compile Include="UI\Admin\Assessments\Questions\Controls\QuestionPreviewOrdering.ascx.designer.cs">
       <DependentUpon>QuestionPreviewOrdering.ascx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Assessments\Questions\Utilities\QuestionDocxPrinter.cs" />
+    <Compile Include="UI\Admin\Assessments\Questions\Utilities\ReactQuestionFilterDeserializer.cs" />
     <Compile Include="UI\Admin\Assessments\QuizAttempts\Controls\SearchCriteria.ascx.cs">
       <DependentUpon>SearchCriteria.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -931,6 +914,13 @@
     </Compile>
     <Compile Include="UI\Admin\Contacts\People\Controls\DocumentList.ascx.designer.cs">
       <DependentUpon>DocumentList.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Contacts\People\Controls\ProgramGrid.ascx.cs">
+      <DependentUpon>ProgramGrid.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Contacts\People\Controls\ProgramGrid.ascx.designer.cs">
+      <DependentUpon>ProgramGrid.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Contacts\People\Controls\ReferralGrid.ascx.cs">
       <DependentUpon>ReferralGrid.ascx</DependentUpon>
@@ -1456,13 +1446,6 @@
       <DependentUpon>OutlineNotifications.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Records\Credentials\Utilities\BadgeHelper.cs" />
-    <Compile Include="UI\Admin\Records\Gradebooks\Controls\ScormEventGrid.ascx.cs">
-      <DependentUpon>ScormEventGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Records\Gradebooks\Controls\ScormEventGrid.ascx.designer.cs">
-      <DependentUpon>ScormEventGrid.ascx</DependentUpon>
-    </Compile>
     <Compile Include="UI\Admin\Records\Logbooks\ChangeArea.aspx.cs">
       <DependentUpon>ChangeArea.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1490,6 +1473,13 @@
     </Compile>
     <Compile Include="UI\Admin\Records\Logbooks\ReorderFields.aspx.designer.cs">
       <DependentUpon>ReorderFields.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Records\Logbooks\Validators\BulkEntry.aspx.cs">
+      <DependentUpon>BulkEntry.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Records\Logbooks\Validators\BulkEntry.aspx.designer.cs">
+      <DependentUpon>BulkEntry.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Records\Reports\Controls\RecentCredentialList.ascx.cs">
       <DependentUpon>RecentCredentialList.ascx</DependentUpon>
@@ -1682,6 +1672,13 @@
     <Compile Include="UI\Admin\Standards\Standards\Forms\Troubleshoot.aspx.designer.cs">
       <DependentUpon>Troubleshoot.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Workflow\Cases\Controls\SearchDownload.ascx.cs">
+      <DependentUpon>SearchDownload.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Workflow\Cases\Controls\SearchDownload.ascx.designer.cs">
+      <DependentUpon>SearchDownload.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Workflow\Forms\Comments\Controls\CommentRepeater.ascx.cs">
       <DependentUpon>CommentRepeater.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1821,6 +1818,20 @@
       <DependentUpon>AchievementExpirations.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Contacts\People\Utilities\ArchiveHelper.cs" />
+    <Compile Include="UI\CMDS\Admin\Standards\Profiles\SearchCriteria.ascx.cs">
+      <DependentUpon>SearchCriteria.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\CMDS\Admin\Standards\Profiles\SearchCriteria.ascx.designer.cs">
+      <DependentUpon>SearchCriteria.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CMDS\Admin\Standards\Profiles\SearchResults.ascx.cs">
+      <DependentUpon>SearchResults.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\CMDS\Admin\Standards\Profiles\SearchResults.ascx.designer.cs">
+      <DependentUpon>SearchResults.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\CMDS\Admin\Users\Controls\NotificationsTab.ascx.cs">
       <DependentUpon>NotificationsTab.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1855,6 +1866,13 @@
     </Compile>
     <Compile Include="UI\CMDS\Common\Controls\User\PendingApprovalUserGrid.ascx.designer.cs">
       <DependentUpon>PendingApprovalUserGrid.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CMDS\Common\Controls\User\ProfileOwner.ascx.cs">
+      <DependentUpon>ProfileOwner.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\CMDS\Common\Controls\User\ProfileOwner.ascx.designer.cs">
+      <DependentUpon>ProfileOwner.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Common\Models\SummaryDataItem.cs" />
     <Compile Include="UI\HomeAdmin.ascx.cs">
@@ -1943,6 +1961,7 @@
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindCountry.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindPersonCodeUser.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\FindProduct.cs" />
+    <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\IssueStatusMultiComboBox.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\IssueStatusRadioList.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\JobDivisionComboBox.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\ComboBoxes\BindingToDatabase\ProductPriceSelectorComboBox.cs" />
@@ -2123,6 +2142,20 @@
     </Compile>
     <Compile Include="UI\Portal\Contacts\People\Controls\PersonDetail.ascx.designer.cs">
       <DependentUpon>PersonDetail.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Portal\Contacts\People\Controls\PersonLogbooks.ascx.cs">
+      <DependentUpon>PersonLogbooks.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Portal\Contacts\People\Controls\PersonLogbooks.ascx.designer.cs">
+      <DependentUpon>PersonLogbooks.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Portal\Contacts\People\Controls\PersonPrograms.ascx.cs">
+      <DependentUpon>PersonPrograms.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Portal\Contacts\People\Controls\PersonPrograms.ascx.designer.cs">
+      <DependentUpon>PersonPrograms.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Portal\Contacts\People\Controls\PersonRecords.ascx.cs">
       <DependentUpon>PersonRecords.ascx</DependentUpon>
@@ -6109,13 +6142,6 @@
     <Compile Include="UI\Portal\Integrations\Lti\Consumer.aspx.designer.cs">
       <DependentUpon>Consumer.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Portal\Integrations\Moodle\Consumer.aspx.cs">
-      <DependentUpon>Consumer.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Portal\Integrations\Moodle\Consumer.aspx.designer.cs">
-      <DependentUpon>Consumer.aspx</DependentUpon>
-    </Compile>
     <Compile Include="UI\Portal\Records\Logbooks\ChangeComment.aspx.cs">
       <DependentUpon>ChangeComment.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -6272,7 +6298,6 @@
     <Content Include="favicon-cmds.png" />
     <Content Include="favicon.ico" />
     <Content Include="favicon.png" />
-    <Content Include="UI\AdminDashboardPrototype.ascx" />
     <Content Include="UI\Admin\Accounts\Departments\Search.aspx" />
     <Content Include="UI\Admin\Accounts\Divisions\Search.aspx" />
     <Content Include="UI\Admin\Accounts\Home.aspx" />
@@ -6361,6 +6386,7 @@
     <Content Include="UI\Admin\Assessments\Attempts\SearchPerformanceReport.aspx" />
     <Content Include="UI\Admin\Assessments\Attempts\SkillsCheckReport.aspx" />
     <Content Include="UI\Admin\Assessments\Attempts\TakerReport.aspx" />
+    <Content Include="UI\Admin\Assessments\Attempts\TakerReportUpload.aspx" />
     <Content Include="UI\Admin\Assessments\BanksComments\Search.aspx" />
     <Content Include="UI\Admin\Assessments\Banks\Controls\BankDetail.ascx" />
     <Content Include="UI\Admin\Assessments\Banks\Search.aspx" />
@@ -6462,6 +6488,7 @@
     <Content Include="UI\Admin\Assets\Labels\Delete.aspx" />
     <Content Include="UI\Admin\Assets\Labels\Search.aspx" />
     <Content Include="UI\Admin\Contacts\People\Archive.aspx" />
+    <Content Include="UI\Admin\Contacts\People\Controls\ProgramGrid.ascx" />
     <Content Include="UI\Admin\Courses\Outlines\Controls\EnrollmentGroupGrid.ascx" />
     <Content Include="UI\Admin\Courses\Outlines\Controls\EnrollmentUserGrid.ascx" />
     <Content Include="UI\Admin\Courses\Scorm\Upload.aspx" />
@@ -6590,11 +6617,11 @@
     <Content Include="UI\Admin\Prototype\DashboardAdministrator.aspx" />
     <Content Include="UI\Admin\Prototype\MultidimensionalDataInput.aspx" />
     <Content Include="UI\Admin\Records\Achievements\Controls\OutlineNotifications.ascx" />
-    <Content Include="UI\Admin\Records\Gradebooks\Controls\ScormEventGrid.ascx" />
     <Content Include="UI\Admin\Records\Logbooks\ChangeArea.aspx" />
     <Content Include="UI\Admin\Records\Logbooks\Controls\ExperienceFields\DropDown.ascx" />
     <Content Include="UI\Admin\Records\Logbooks\Controls\GroupGrid.ascx" />
     <Content Include="UI\Admin\Records\Logbooks\ReorderFields.aspx" />
+    <Content Include="UI\Admin\Records\Logbooks\Validators\BulkEntry.aspx" />
     <Content Include="UI\Admin\Records\Reports\Controls\RecentCredentialList.ascx" />
     <Content Include="UI\Admin\Records\Rurbics\Controls\TranslateField.ascx" />
     <Content Include="UI\Admin\Records\Rurbics\Translate.aspx" />
@@ -6621,6 +6648,7 @@
     <Content Include="UI\Admin\Standards\Standards\Controls\ScenarioQuestions.ascx" />
     <Content Include="UI\Admin\Standards\Standards\Forms\Status.aspx" />
     <Content Include="UI\Admin\Standards\Standards\Forms\Troubleshoot.aspx" />
+    <Content Include="UI\Admin\Workflow\Cases\Controls\SearchDownload.ascx" />
     <Content Include="UI\Admin\Workflow\Forms\Comments\Controls\CommentRepeater.ascx" />
     <Content Include="UI\Admin\Workflow\Forms\Comments\Author.aspx" />
     <Content Include="UI\Admin\Workflow\Forms\Comments\Delete.aspx" />
@@ -6684,6 +6712,9 @@
     <Content Include="UI\Admin\Events\Reports\Controls\RecentClassesList.ascx" />
     <Content Include="UI\Admin\Events\Reports\Controls\RecentExamsList.ascx" />
     <Content Include="UI\Admin\Events\Seats\Search.aspx" />
+    <Content Include="UI\CMDS\Admin\Standards\Profiles\SearchCriteria.ascx" />
+    <Content Include="UI\CMDS\Admin\Standards\Profiles\SearchResults.ascx" />
+    <Content Include="UI\CMDS\Common\Controls\User\ProfileOwner.ascx" />
     <Content Include="UI\Guidelines.aspx" />
     <Content Include="UI\Admin\Foundations\Controls\AnnouncementToast.ascx" />
     <Content Include="UI\Admin\Home.aspx" />
@@ -7264,7 +7295,6 @@
     <Content Include="UI\HomeAdmin.ascx" />
     <Content Include="UI\HomeCmds.ascx" />
     <Content Include="UI\HomePortal.ascx" />
-    <Content Include="UI\Images\ce-performance.jpg" />
     <Content Include="UI\Layout\Common\Controls\BundleCss.ascx" />
     <Content Include="UI\Layout\Common\Controls\BundleJsFooter.ascx" />
     <Content Include="UI\Layout\Common\Controls\BundleJsHeader.ascx" />
@@ -7272,6 +7302,7 @@
     <Content Include="UI\Layout\Common\Controls\Navigation\ModeSwitch.ascx" />
     <Content Include="UI\Layout\Common\Controls\Navigation\SidebarSwitch.ascx" />
     <Content Include="UI\Layout\Common\Controls\ProfilePictureUpload.ascx" />
+    <Content Include="UI\Layout\Common\Images\None.png" />
     <Content Include="UI\Layout\Common\Images\registration.jpg" />
     <Content Include="UI\Layout\Common\Parts\around\js\vendor\chart.js\dist\chart.umd.js" />
     <Content Include="UI\Layout\Common\Parts\around\js\vendor\cleave.js\dist\addons\cleave-phone.ca.js" />
@@ -7440,6 +7471,8 @@
     <Content Include="UI\Lobby\Images\cmds-dark.png" />
     <Content Include="UI\Lobby\Images\cmds.png" />
     <Content Include="UI\Lobby\Images\development.jpg" />
+    <Content Include="UI\Lobby\Images\insite.png" />
+    <Content Include="UI\Lobby\Images\inspire.png" />
     <Content Include="UI\Lobby\Images\local.jpg" />
     <Content Include="UI\Lobby\Images\production.jpg" />
     <Content Include="UI\Lobby\Images\sandbox.jpg" />
@@ -7450,6 +7483,8 @@
     <Content Include="UI\Lobby\Images\signin-2.jpg" />
     <Content Include="UI\Lobby\Images\signin-3.jpg" />
     <Content Include="UI\Lobby\Images\signin-4.jpg" />
+    <Content Include="UI\Lobby\Images\skilledtradesbc.png" />
+    <Content Include="UI\Lobby\Images\skillscheck.png" />
     <Content Include="UI\Lobby\Logs\400.aspx" />
     <Content Include="UI\Lobby\Logs\404.aspx" />
     <Content Include="UI\Lobby\Logs\500.aspx" />
@@ -7467,6 +7502,8 @@
     <Content Include="UI\Portal\Billing\Controls\PriceSelector.ascx" />
     <Content Include="UI\Portal\Contacts\People\Controls\PersonAchievements.ascx" />
     <Content Include="UI\Portal\Contacts\People\Controls\PersonDetail.ascx" />
+    <Content Include="UI\Portal\Contacts\People\Controls\PersonLogbooks.ascx" />
+    <Content Include="UI\Portal\Contacts\People\Controls\PersonPrograms.ascx" />
     <Content Include="UI\Portal\Contacts\People\Controls\PersonRecords.ascx" />
     <Content Include="UI\Portal\Contacts\People\Controls\PersonRegistrations.ascx" />
     <Content Include="UI\Portal\Contacts\People\Controls\SearchCriteria.ascx" />
@@ -8117,7 +8154,6 @@
     <Content Include="UI\Portal\Records\Logbooks\Controls\ExperienceFields\Text.ascx" />
     <Content Include="UI\Portal\Records\Logbooks\Controls\ExperienceFields\TwoDates.ascx" />
     <Content Include="UI\Portal\Identity\Authenticate.aspx" />
-    <Content Include="UI\Portal\Integrations\Moodle\Consumer.aspx" />
     <Content Include="UI\Portal\Events\Classes\Registrations\Search.aspx" />
     <Content Include="UI\Portal\Content\Sites\Page.aspx" />
     <Content Include="UI\Portal\Standards\Controls\OutlineTree.ascx" />
@@ -9092,6 +9128,7 @@
     <Content Include="UI\CMDS\Common\Controls\User\CategoryGrid.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\CertificateCompetencyList.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\CompanyDetail.ascx" />
+    <Content Include="UI\CMDS\Common\Controls\User\InvoicingContacts.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\CompanyAchievementProblems.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\CompanySearchCriteria.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\CompanySearchResults.ascx" />
@@ -9117,10 +9154,6 @@
     <Content Include="UI\CMDS\Common\Controls\User\ExecutiveSummaryOnAchievementStatusCriteria.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\ExecutiveSummaryOnAchievementStatusResults.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\ExpiredCompetencies.ascx" />
-    <Content Include="UI\CMDS\Common\Controls\User\FieldProfileSearchCriteria.ascx" />
-    <Content Include="UI\CMDS\Common\Controls\User\FieldProfileSearchResults.ascx" />
-    <Content Include="UI\CMDS\Common\Controls\User\FieldAchievementSearchCriteria.ascx" />
-    <Content Include="UI\CMDS\Common\Controls\User\FieldAchievementSearchResults.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\GlobalAchievementExporter.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\HistorySnapshotGrid.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\MultipleDepartmentSelector.ascx" />
@@ -9129,11 +9162,9 @@
     <Content Include="UI\CMDS\Admin\Users\SearchCriteria.ascx" />
     <Content Include="UI\CMDS\Admin\Users\SearchResults.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\ProfileCompetencyList.ascx" />
-    <Content Include="UI\CMDS\Common\Controls\User\ProfileHierarchy.ascx" />
-    <Content Include="UI\CMDS\Common\Controls\User\ProfileSearchCriteria.ascx" />
-    <Content Include="UI\CMDS\Common\Controls\User\ProfileSearchResults.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\RelatedPersons.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\AchievementCriteriaSelector.ascx" />
+    <Content Include="UI\CMDS\Common\Controls\User\TrainingReportCriteria.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\AchievementDetails.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\AchievementDownloadList.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\AchievementHierarchy.ascx" />
@@ -9145,9 +9176,6 @@
     <Content Include="UI\CMDS\Common\Controls\User\UploadCompetencyChooser.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\UserConnections.ascx" />
     <Content Include="UI\CMDS\Common\Controls\User\UserDepartments.ascx" />
-    <Content Include="UI\CMDS\Design\Achievements\Edit.aspx" />
-    <Content Include="UI\CMDS\Design\Achievements\Search.aspx" />
-    <Content Include="UI\CMDS\Design\Standards\Profiles\Search.aspx" />
     <Content Include="UI\CMDS\Design\Uploads\Edit.aspx" />
     <Content Include="UI\CMDS\Design\Uploads\Search.aspx" />
     <Content Include="UI\CMDS\Design\Validations\Competencies\Search.aspx" />
@@ -9633,6 +9661,7 @@
     </Compile>
     <Compile Include="UI\Admin\Courses\Controls\SearchResults.ascx.cs">
       <DependentUpon>SearchResults.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UI\Admin\Courses\Controls\SearchResults.ascx.designer.cs">
       <DependentUpon>SearchResults.ascx</DependentUpon>
@@ -15582,9 +15611,6 @@
     <Compile Include="UI\CMDS\Common\Controls\Server\PersonStatusSelector.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\Server\ProfileVisibilitySelector.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="UI\CMDS\Common\Controls\Server\AchievementCategorySelector.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -15598,6 +15624,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UI\CMDS\Common\Controls\Server\AchievementVisibilitySelector.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\CMDS\Common\Controls\Server\OrganizationScopeSelector.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UI\CMDS\Common\Controls\Server\RoleSelector.cs">
@@ -15853,34 +15882,6 @@
     <Compile Include="UI\CMDS\Common\Controls\User\ExpiredCompetencies.ascx.designer.cs">
       <DependentUpon>ExpiredCompetencies.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\FieldProfileSearchCriteria.ascx.cs">
-      <DependentUpon>FieldProfileSearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\FieldProfileSearchCriteria.ascx.designer.cs">
-      <DependentUpon>FieldProfileSearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\FieldProfileSearchResults.ascx.cs">
-      <DependentUpon>FieldProfileSearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\FieldProfileSearchResults.ascx.designer.cs">
-      <DependentUpon>FieldProfileSearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\FieldAchievementSearchCriteria.ascx.cs">
-      <DependentUpon>FieldAchievementSearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\FieldAchievementSearchCriteria.ascx.designer.cs">
-      <DependentUpon>FieldAchievementSearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\FieldAchievementSearchResults.ascx.cs">
-      <DependentUpon>FieldAchievementSearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\FieldAchievementSearchResults.ascx.designer.cs">
-      <DependentUpon>FieldAchievementSearchResults.ascx</DependentUpon>
-    </Compile>
     <Compile Include="UI\CMDS\Common\Controls\User\GlobalAchievementExporter.ascx.cs">
       <DependentUpon>GlobalAchievementExporter.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -15937,27 +15938,6 @@
     <Compile Include="UI\CMDS\Common\Controls\User\ProfileCompetencyList.ascx.designer.cs">
       <DependentUpon>ProfileCompetencyList.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\ProfileHierarchy.ascx.cs">
-      <DependentUpon>ProfileHierarchy.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\ProfileHierarchy.ascx.designer.cs">
-      <DependentUpon>ProfileHierarchy.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\ProfileSearchCriteria.ascx.cs">
-      <DependentUpon>ProfileSearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\ProfileSearchCriteria.ascx.designer.cs">
-      <DependentUpon>ProfileSearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\ProfileSearchResults.ascx.cs">
-      <DependentUpon>ProfileSearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Common\Controls\User\ProfileSearchResults.ascx.designer.cs">
-      <DependentUpon>ProfileSearchResults.ascx</DependentUpon>
-    </Compile>
     <Compile Include="UI\CMDS\Common\Controls\User\RelatedPersons.ascx.cs">
       <DependentUpon>RelatedPersons.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -15965,12 +15945,26 @@
     <Compile Include="UI\CMDS\Common\Controls\User\RelatedPersons.ascx.designer.cs">
       <DependentUpon>RelatedPersons.ascx</DependentUpon>
     </Compile>
+    <Compile Include="UI\CMDS\Common\Controls\User\InvoicingContacts.ascx.cs">
+      <DependentUpon>InvoicingContacts.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\CMDS\Common\Controls\User\InvoicingContacts.ascx.designer.cs">
+      <DependentUpon>InvoicingContacts.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\CMDS\Common\Controls\User\AchievementCriteriaSelector.ascx.cs">
       <DependentUpon>AchievementCriteriaSelector.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UI\CMDS\Common\Controls\User\AchievementCriteriaSelector.ascx.designer.cs">
       <DependentUpon>AchievementCriteriaSelector.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CMDS\Common\Controls\User\TrainingReportCriteria.ascx.cs">
+      <DependentUpon>TrainingReportCriteria.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\CMDS\Common\Controls\User\TrainingReportCriteria.ascx.designer.cs">
+      <DependentUpon>TrainingReportCriteria.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\CMDS\Common\Controls\User\AchievementDetails.ascx.cs">
       <DependentUpon>AchievementDetails.ascx</DependentUpon>
@@ -16059,27 +16053,6 @@
     <Compile Include="UI\CMDS\Common\Settings\CompanyAchievementHelper.cs" />
     <Compile Include="UI\CMDS\Common\Settings\EmployeeAchievementHelper.cs" />
     <Compile Include="UI\CMDS\Common\Settings\TimeSensitivityHelper.cs" />
-    <Compile Include="UI\CMDS\Design\Achievements\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Design\Achievements\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CMDS\Design\Achievements\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Design\Achievements\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CMDS\Design\Standards\Profiles\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\CMDS\Design\Standards\Profiles\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
     <Compile Include="UI\CMDS\Design\Uploads\Edit.aspx.cs">
       <DependentUpon>Edit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

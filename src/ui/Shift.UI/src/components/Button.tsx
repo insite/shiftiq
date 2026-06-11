@@ -4,6 +4,7 @@ import { Spinner } from "react-bootstrap";
 import ActionLink from "./ActionLink";
 import { IconName } from "./icon/IconName";
 import Icon from "./icon/Icon";
+import { IconStyle } from "./icon/IconStyle";
 
 type ButtonType = "button" | "submit" | "reset";
 
@@ -18,6 +19,7 @@ type Variant =
     | "download"
     | "download-excel"
     | "icon-save"
+    | "move"
     | "new"
     | "next"
     | "lock"
@@ -29,23 +31,10 @@ type Variant =
     | "top"
     | "unlock";
 
-interface Props {
-    variant: Variant;
-    text?: string;
-    title?: string;
-    type?: ButtonType;
-    className?: string;
-    disabled?: boolean;
-    tabIndex?: number;
-    isLoading?: boolean;
-    loadingMessage?: string;
-    href?: string;
-    onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
-}
-
 type ButtonVariantList = {
     [variant in Variant]: {
         variantIcon: IconName;
+        variantIconStyle?: IconStyle;
         variantTitle: string;
         variantLoadingMessage: string;
         variantClass: string;
@@ -122,6 +111,13 @@ const variants: ButtonVariantList = {
         variantLoadingMessage: "Locking...",
         variantClass: "default"
     },
+    move: {
+        variantIcon: "file-export",
+        variantIconStyle: "regular",
+        variantTitle: "Move",
+        variantLoadingMessage: "Moving...",
+        variantClass: "default"
+    },
     new: {
         variantIcon: "file",
         variantTitle: "New",
@@ -179,6 +175,21 @@ const variants: ButtonVariantList = {
     },
 };
 
+interface Props {
+    variant: Variant;
+    text?: string;
+    title?: string;
+    type?: ButtonType;
+    className?: string;
+    disabled?: boolean;
+    tabIndex?: number;
+    isLoading?: boolean;
+    loadingMessage?: string;
+    href?: string;
+    iconStyle?: IconStyle;
+    onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+}
+
 export default function Button({
     variant,
     text,
@@ -190,9 +201,11 @@ export default function Button({
     isLoading,
     loadingMessage,
     href,
+    iconStyle,
     onClick
-}: Props) {
-    const { variantIcon, variantTitle, variantLoadingMessage, variantClass, variantOnlyIcon, variantIsRightIcon } = variants[variant];
+}: Props)
+{
+    const { variantIcon, variantIconStyle, variantTitle, variantLoadingMessage, variantClass, variantOnlyIcon, variantIsRightIcon } = variants[variant];
 
     let icon: ReactNode;
     let content: string;
@@ -202,7 +215,7 @@ export default function Button({
         icon = <Spinner animation="border" role="status" size="sm" className={!variantOnlyIcon && content ? variantIsRightIcon ? "ms-2" : "me-2" : ""} />;
     } else {
         content = text || translate(variantTitle);
-        icon = <Icon style="solid" name={variantIcon} className={!variantOnlyIcon && content ? variantIsRightIcon ? "ms-2" : "me-2" : ""} />;
+        icon = <Icon style={iconStyle ?? variantIconStyle ?? "solid"} name={variantIcon} className={!variantOnlyIcon && content ? variantIsRightIcon ? "ms-2" : "me-2" : ""} />;
     }
 
     const finalClassName = `btn btn-sm btn-${variantClass} ${variantOnlyIcon ? "btn-icon" : ""} ${className ?? ""}`;

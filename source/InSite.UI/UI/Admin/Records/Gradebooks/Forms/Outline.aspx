@@ -4,7 +4,6 @@
 <%@ Register Src="../Controls/GradeItemsGrid.ascx" TagName="GradeItemsGrid" TagPrefix="uc" %>
 <%@ Register Src="../Controls/LearningMasteryGrid.ascx" TagName="LearningMasteryGrid" TagPrefix="uc" %>
 <%@ Register Src="../Controls/OutlineProgressList.ascx" TagName="OutlineProgressList" TagPrefix="uc" %>
-<%@ Register Src="../Controls/ScormEventGrid.ascx" TagName="ScormEventGrid" TagPrefix="uc" %>
 <%@ Register Src="../Controls/ScormRegistrationGrid.ascx" TagName="ScormRegistrationGrid" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
@@ -61,17 +60,10 @@
         <insite:NavItem runat="server" ID="ScormPanel" Title="SCORM" Icon="far fa-id-card" IconPosition="BeforeText">
             <section>
                 
-                <h2 class="h4 mt-4 mb-3">SCORM Registrations</h2>
+                <h2 class="h4 mt-4 mb-3">SCORM Cloud Registrations</h2>
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <uc:ScormRegistrationGrid runat="server" ID="ScormRegistrationGrid" />
-                    </div>
-                </div>
-
-                <h2 class="h4 mt-4 mb-3">SCORM Events</h2>
-                <div class="card border-0 shadow-lg">
-                    <div class="card-body">
-                        <uc:ScormEventGrid runat="server" ID="ScormEventGrid" />
                     </div>
                 </div>
 

@@ -1,6 +1,6 @@
 <%@ Page Language="C#" CodeBehind="Create.aspx.cs" Inherits="InSite.Custom.CMDS.Admin.Standards.Profiles.Create" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
-<%@ Register Src="~/UI/CMDS/Common/Controls/User/ProfileHierarchy.ascx" TagName="ProfileHierarchy" TagPrefix="uc" %>
+<%@ Register Src="~/UI/CMDS/Common/Controls/User/ProfileOwner.ascx" TagName="ProfileOwner" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
@@ -60,9 +60,9 @@
                     </div>
                     <div class="col-lg-6">
 
-                        <h3>Profile Visibility</h3>
+                        <h3>Profile Owner</h3>
 
-                        <uc:ProfileHierarchy ID="ProfileHierarchy" runat="server" />
+                        <uc:ProfileOwner ID="ProfileHierarchy" runat="server" />
 
                     </div>
                 </div>

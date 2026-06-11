@@ -51,13 +51,13 @@ namespace InSite.UI.Portal.Issues
         protected global::System.Web.UI.WebControls.Literal IssueDescriptionHtml;
 
         /// <summary>
-        /// AttachmentPanel control.
+        /// LoadingPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.UpdatePanel AttachmentPanel;
+        protected global::InSite.Common.Web.UI.UpdatePanel LoadingPanel;
 
         /// <summary>
         /// RequestPanel control.
@@ -78,13 +78,13 @@ namespace InSite.UI.Portal.Issues
         protected global::InSite.UI.Portal.Issues.Controls.CaseFileRequirementList CaseFileRequirementList;
 
         /// <summary>
-        /// NewAttachmentPanel control.
+        /// AttachmentPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl NewAttachmentPanel;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AttachmentPanel;
 
         /// <summary>
         /// CaseDocumentList control.

@@ -44,22 +44,24 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>if <b>Percent</b> is a</td>
+                    <td>if <b>Pass</b></td>
                     <td>
-                        <asp:RadioButtonList runat="server" ID="WhenGrade" RepeatDirection="Horizontal" RepeatLayout="Flow">
-                            <asp:ListItem Value="Pass" Text="Pass" Selected="True" />
-                            <asp:ListItem Value="Fail" Text="Fail" />
-                        </asp:RadioButtonList>
-                    </td>
-                </tr>
-                <tr>
-                    <td><b>then</b></td>
-                    <td>
-                        <asp:RadioButtonList runat="server" ID="ThenCommand" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                        <asp:RadioButtonList runat="server" ID="WhenPassCommand" RepeatDirection="Horizontal" RepeatLayout="Flow">
                             <asp:ListItem Value="Ignore" Text="Ignore" />
                             <asp:ListItem Value="Grant" Text="Grant" Selected="True" />
                             <asp:ListItem Value="Revoke" Text="Revoke" />
                             <asp:ListItem Value="Void" Text="Delete" />
+                        </asp:RadioButtonList>
+                    </td>
+                </tr>
+                <tr>
+                    <td>if <b>Fail</b></td>
+                    <td>
+                        <asp:RadioButtonList runat="server" ID="WhenFailCommand" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                            <asp:ListItem Value="Ignore" Text="Ignore" />
+                            <asp:ListItem Value="Grant" Text="Grant" />
+                            <asp:ListItem Value="Revoke" Text="Revoke" />
+                            <asp:ListItem Value="Void" Text="Delete" Selected="True" />
                         </asp:RadioButtonList>
                     </td>
                 </tr>

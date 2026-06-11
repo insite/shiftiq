@@ -1,4 +1,7 @@
-﻿using System.Web.UI;
+﻿using System;
+using System.Drawing;
+using System.Linq;
+using System.Web.UI;
 
 using InSite.Persistence;
 
@@ -9,6 +12,20 @@ namespace InSite.UI.Admin.Records.AchievementLayouts
 {
     public partial class Details : UserControl
     {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (IsPostBack)
+                return;
+
+            string[] fontNames = FontFamily.Families
+                .Select(family => family.Name)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .OrderBy(name => name)
+                .ToArray();
+
+            AvailableFonts.Text = string.Join(Environment.NewLine, fontNames);
+        }
+
         public void SetInputValues(TCertificateLayout layout)
         {
             CertificateLayoutCode.Text = layout.CertificateLayoutCode;

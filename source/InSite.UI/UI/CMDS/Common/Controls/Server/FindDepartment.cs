@@ -8,6 +8,7 @@ using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.Custom.CMDS.Common.Controls.Server
 {
@@ -74,6 +75,12 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
 
         protected override DataFilter GetFilter(string keyword)
         {
+            var partitionSlug = ServiceLocator.Partition.Slug;
+
+            var identity = CurrentSessionState.Identity;
+
+            var roleNames = identity.GetRoleNames();
+
             var filter = new DataFilter
             {
                 Filter = Filter.Clone(),
@@ -84,9 +91,29 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
                 filter.Filter.OrganizationIdentifier = _companySelector.Value ?? Guid.Empty;
 
             if (filter.Filter.OrganizationIdentifier == Guid.Empty)
-                filter.Filter.OrganizationIdentifier = CurrentSessionState.Identity.Organization.Identifier;
+                filter.Filter.OrganizationIdentifier = identity.Organization.Identifier;
+
+            if (DenyAccessToAllDepartments(partitionSlug, roleNames))
+            {
+                var departments = identity.Groups
+                    .Where(x => x.Type == GroupType.Department)
+                    .Select(x => x.Identifier)
+                    .ToArray();
+
+                filter.Filter.DepartmentIdentifiers = departments;
+            }
 
             return filter;
+        }
+
+        private bool DenyAccessToAllDepartments(string organizationCode, string[] roleNames)
+        {
+            var permissions = PermissionCache.Matrix.GetPermissions(organizationCode);
+
+            if (permissions.IsDenied("contacts/groups/departments/all", roleNames))
+                return true;
+
+            return false;
         }
 
         protected override int Count(DataFilter filter)

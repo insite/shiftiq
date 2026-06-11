@@ -72,6 +72,7 @@ namespace Shift.Common
                 current.WhitelistEmails = partition.WhitelistEmails;
 
                 current.HelpUrl = partition.HelpUrl;
+                current.LogoUrl = partition.LogoUrl;
 
                 _partition = current;
 

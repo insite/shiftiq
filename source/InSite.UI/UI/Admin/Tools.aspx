@@ -110,40 +110,6 @@
 
     <section class="pb-5 mb-md-2">
 
-        <h2 class="h4 mb-3">Libraries (Field Admins)</h2>
-
-        <div class="card border-0 shadow-lg">
-            <div class="card-body">               
-                
-                <div class="row row-cols-1 row-cols-md-4 g-4">
-
-                    <div runat="server" id="FieldSearchAchievementsLink" class="col">
-                        <a class="card card-hover card-tile border-0 shadow" href='/ui/cmds/design/achievements/search'>
-                            <div class="card-body text-center">
-                                <i class='far fa-trophy fa-3x mb-3'></i>
-                                <h3 class='h5 nav-heading mb-2 text-break'>Achievements</h3>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div runat="server" id="FieldSearchProfilesLink" class="col">
-                        <a class="card card-hover card-tile border-0 shadow" href='/ui/cmds/design/standards/profiles/search'>
-                            <div class="card-body text-center">
-                                <i class='far fa-id-badge fa-3x mb-3'></i>
-                                <h3 class='h5 nav-heading mb-2 text-break'>Profiles</h3>
-                            </div>
-                        </a>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-
-    </section>
-
-    <section class="pb-5 mb-md-2">
-
         <h2 class="h4 mb-3">Tools</h2>
 
         <div class="card border-0 shadow-lg">

@@ -130,11 +130,18 @@ namespace InSite.Admin.Contacts.People.Utilities
         {
             string email;
 
-            do
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
             {
-                email = UniqueIdentifier.Create().ToString().Substring(0, 8) + "@keyeracmds.com";
+                var buffer = new byte[4];
+
+                do
+                {
+                    rng.GetBytes(buffer);
+
+                    email = StringHelper.ByteArrayToHex(buffer).ToLower() + "@keyeracmds.com";
+                }
+                while (ServiceLocator.UserSearch.IsUserExist(email));
             }
-            while (ServiceLocator.UserSearch.IsUserExist(email));
 
             return email;
         }

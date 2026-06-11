@@ -44,6 +44,14 @@
     </div>
 </div>
 
+<div class="form-group mb-3">
+    <label class="form-label">Available Fonts</label>
+    <div>
+        <asp:TextBox runat="server" ID="AvailableFonts" TextMode="MultiLine" Rows="12" Width="100%" ReadOnly="true" CssClass="form-control" />
+    </div>
+    <div class="form-text">Font family names available on the server. Select and copy as needed.</div>
+</div>
+
 <insite:PageFooterContent runat="server">
 
     <insite:ResourceLink runat="server" Type="JavaScript" Url="/UI/Layout/common/parts/plugins/ace.cloud9/ace.js" />

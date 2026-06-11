@@ -9,6 +9,7 @@ namespace Shift.Contract.Presentation
     {
         public string TimeZoneId { get; set; }
         public string OrganizationCode { get; set; }
+        public string DomainName { get; set; }
         public string CompanyName { get; set; }
         public bool IsCmds { get; set; } = false;
         public HomeSettings Home { get; set; }
@@ -31,6 +32,7 @@ namespace Shift.Contract.Presentation
         public string PartitionEmail { get; set; }
         public string CurrentLanguage { get; set; }
         public List<string> SupportedLanguages { get; set; }
+        public string RecentLinksKey { get; set; }
 
         public class HomeSettings
         {

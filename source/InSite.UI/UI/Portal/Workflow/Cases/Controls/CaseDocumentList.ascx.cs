@@ -7,6 +7,7 @@ using System.Web;
 using Humanizer;
 
 using InSite.Application.Cases.Write;
+using InSite.Application.Contacts.Read;
 using InSite.Application.Files.Read;
 using InSite.Application.Issues.Read;
 using InSite.Common.Web.UI;
@@ -34,6 +35,9 @@ namespace InSite.UI.Portal.Issues.Controls
             public DateTimeOffset? Reviewed { get; set; }
             public DateTimeOffset? Approved { get; set; }
             public bool AllowLearnerToView { get; set; }
+            public Guid UploadedBy { get; set; }
+            public bool IsAdministrator { get; set; }
+            public bool IsApplicant { get; set; }
         }
 
         private Guid IssueIdentifier
@@ -49,6 +53,16 @@ namespace InSite.UI.Portal.Issues.Controls
             AttachmentInput.FileUploaded += (x, y) => SaveFile();
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (IsPostBack)
+                return;
+
+            AttachmentInput.LabelText = Translate("New Attachment");
+        }
+
         public void BindFiles(Guid issueIdentifier, Guid? topicUserIdentifier)
         {
             IssueIdentifier = issueIdentifier;
@@ -60,9 +74,42 @@ namespace InSite.UI.Portal.Issues.Controls
             if (topicUserIdentifier.HasValue)
                 ReadResponseFiles(topicUserIdentifier.Value, items);
 
+            CheckPersonType(items);
+
             items.Sort((a, b) => b.Uploaded.CompareTo(a.Uploaded));
 
             BindItems(items);
+
+            NewAttachmentPanel.Visible = Organization.Toolkits.Issues.NewAttachmentUpload;
+        }
+
+        private void CheckPersonType(List<FileItem> fileItems)
+        {
+            var userIds = fileItems.Select(x => x.UploadedBy).Distinct().ToArray();
+
+            var filter = new QPersonFilter
+            {
+                OrganizationIdentifier = Organization.Identifier,
+                UserIdentifiers = userIds
+            };
+
+            var users = ServiceLocator.PersonSearch
+                .GetPersons(filter)
+                .Select(x => new
+                {
+                    UserId = x.UserIdentifier,
+                    x.IsAdministrator,
+                    x.IsLearner
+                })
+                .ToDictionary(x => x.UserId);
+
+            foreach (var fileItem in fileItems)
+            {
+                users.TryGetValue(fileItem.UploadedBy, out var uploadedBy);
+
+                fileItem.IsAdministrator = uploadedBy != null && uploadedBy.IsAdministrator;
+                fileItem.IsApplicant = uploadedBy != null && uploadedBy.IsLearner;
+            }
         }
 
         private void BindItems(List<FileItem> items)
@@ -190,7 +237,8 @@ namespace InSite.UI.Portal.Issues.Controls
                 Status = model.Properties.Status,
                 Reviewed = model.Properties.ReviewedTime,
                 Approved = model.Properties.ApprovedTime,
-                AllowLearnerToView = model.Properties.AllowLearnerToView
+                AllowLearnerToView = model.Properties.AllowLearnerToView,
+                UploadedBy = model.UserIdentifier
             };
         }
 

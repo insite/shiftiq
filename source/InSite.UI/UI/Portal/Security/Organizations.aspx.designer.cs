@@ -33,6 +33,33 @@ namespace InSite.UI.Portal.Security
         protected global::System.Web.UI.WebControls.Repeater SessionRepeater;
 
         /// <summary>
+        /// ApiOfflineAlert control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ApiOfflineAlert;
+
+        /// <summary>
+        /// NoPartitionsAlert control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl NoPartitionsAlert;
+
+        /// <summary>
+        /// OrganizationPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel OrganizationPanel;
+
+        /// <summary>
         /// OrganizationRepeater control.
         /// </summary>
         /// <remarks>
@@ -40,5 +67,23 @@ namespace InSite.UI.Portal.Security
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater OrganizationRepeater;
+
+        /// <summary>
+        /// PartitionsPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel PartitionsPanel;
+
+        /// <summary>
+        /// PartitionRepeater control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater PartitionRepeater;
     }
 }

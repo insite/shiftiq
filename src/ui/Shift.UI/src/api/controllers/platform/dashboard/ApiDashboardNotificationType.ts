@@ -1,0 +1,1 @@
+export type ApiDashboardNotificationType = "None" | "PlatformUpdate" | "ReleaseNotes" | "Other";

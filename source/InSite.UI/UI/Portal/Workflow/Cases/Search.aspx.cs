@@ -46,6 +46,8 @@ namespace InSite.UI.Portal.Issues
             IssueRepeater.Visible = !NoIssuesAlert.Visible;
             IssueRepeater.DataSource = issues;
             IssueRepeater.DataBind();
+
+            NoIssuesAlert.Text = Translate("You have no outstanding cases.");
         }
 
         private List<VIssue> GetIssues()

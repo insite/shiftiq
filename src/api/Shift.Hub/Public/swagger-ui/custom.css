@@ -1,0 +1,60 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Override the base font for all Swagger UI elements */
+.swagger-ui * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Specific overrides for key elements */
+.swagger-ui {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+    /* Title and description */
+    .swagger-ui .info .title,
+    .swagger-ui .info .description,
+    .swagger-ui .info .description p,
+    .swagger-ui .info .info__contact,
+    .swagger-ui .info .info__contact a {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        font-size: 16px !important;
+    }
+
+    .swagger-ui .info h2.title { font-size: 2rem !important; }
+
+    /* Operation blocks */
+    .swagger-ui .opblock-summary-description,
+    .swagger-ui .opblock-description-wrapper,
+    .swagger-ui .opblock-summary-path,
+    .swagger-ui .opblock-summary-method {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+
+    /* Parameters and responses */
+    .swagger-ui .parameter__name,
+    .swagger-ui .parameter__type,
+    .swagger-ui .response-col_description,
+    .swagger-ui .response-col_status,
+    .swagger-ui .model-title {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+
+    /* Buttons and interactive elements */
+    .swagger-ui .btn,
+    .swagger-ui .authorization__btn,
+    .swagger-ui .execute-wrapper .btn {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+
+    /* Code blocks and monospace - keep monospace but use a better one */
+    .swagger-ui .highlight-code,
+    .swagger-ui .microlight,
+    .swagger-ui .model-example,
+    .swagger-ui .response-content-type {
+        font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', Consolas, monospace !important;
+    }
+
+    /* Custom topbar styling */
+    .swagger-ui .topbar {
+        display: none !important;
+    }

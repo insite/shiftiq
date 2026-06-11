@@ -5,7 +5,6 @@ export const shiftConfig = {
     simplebarCssUrl:    import.meta.env.VITE_SIMPLEBAR_CSS_URL as string,
     simplebarJsUrl:     import.meta.env.VITE_SIMPLEBAR_JS_URL as string,
     loginPageUrl:       import.meta.env.VITE_LOGIN_PAGE_URL as string,
-    insiteLocalDomain:  import.meta.env.VITE_INSITE_LOCAL_DOMAIN as string,
     localUser:          (import.meta.env.VITE_LOCAL_USER ?? null) as (string | null),
     localOrganization:  (import.meta.env.VITE_LOCAL_ORGANIZATION ?? null) as (string | null),
     pagesPerView:       parseInt(import.meta.env.VITE_PAGES_PER_VIEW),

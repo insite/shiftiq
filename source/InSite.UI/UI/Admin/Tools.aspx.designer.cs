@@ -105,24 +105,6 @@ namespace InSite.UI.CMDS
         protected global::System.Web.UI.WebControls.HyperLink ScoopLibraryLink;
 
         /// <summary>
-        /// FieldSearchAchievementsLink control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl FieldSearchAchievementsLink;
-
-        /// <summary>
-        /// FieldSearchProfilesLink control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl FieldSearchProfilesLink;
-
-        /// <summary>
         /// AssignDepartmentsLink1 control.
         /// </summary>
         /// <remarks>

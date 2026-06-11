@@ -99,7 +99,7 @@
         </div>
 
         <div class="mb-2">
-            <insite:BooleanComboBox ID="IsCmdsAccessGranted" runat="server" />
+            <insite:BooleanComboBox ID="IsCmdsAccessGranted" runat="server" EmptyMessage="CMDS Access" TrueText="CMDS Access Granted" FalseText="CMDS Access Not Granted" />
         </div>
 
     </div>

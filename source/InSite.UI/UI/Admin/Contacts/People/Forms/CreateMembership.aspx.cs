@@ -158,11 +158,19 @@ namespace InSite.Admin.Contacts.People.Forms
                 if (!MembershipPermissionHelper.CanModifyMembership(groupId))
                     continue;
 
+                var membershipType = RoleType.Value;
+                if (string.IsNullOrEmpty(membershipType))
+                {
+                    var group = ServiceLocator.GroupSearch.GetGroup(groupId) ?? throw new ArgumentException($"Group {groupId} does not exist");
+                    if (string.Equals(group.GroupType, "Department", StringComparison.OrdinalIgnoreCase))
+                        membershipType = "Department";
+                }
+
                 var membershipId = MembershipHelper.Save(new Membership
                 {
                     GroupIdentifier = groupId,
                     UserIdentifier = userId,
-                    MembershipType = RoleType.Value,
+                    MembershipType = membershipType,
                     Assigned = DateTimeOffset.UtcNow
                 });
 

@@ -72,7 +72,7 @@ namespace InSite.UI.Admin.Records.Validators.Forms
             if (journal == null || journal.JournalSetup.OrganizationIdentifier != CurrentSessionState.Identity.Organization.OrganizationIdentifier)
                 RedirectToSearch();
 
-            if (ServiceLocator.JournalSearch.GetJournalSetupUser(journal.JournalSetupIdentifier, User.UserIdentifier, JournalSetupUserRole.Validator) == null)
+            if (!ServiceLocator.JournalSearch.IsLogbookValidator(journal.JournalSetupIdentifier, User.UserIdentifier))
                 RedirectToSearch();
 
             JournalIdentifier = journal.JournalIdentifier;

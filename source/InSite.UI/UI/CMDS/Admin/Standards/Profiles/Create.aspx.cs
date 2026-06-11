@@ -54,6 +54,12 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
 
             StandardStore.Insert(asset);
 
+            if (asset.ParentStandardIdentifier.HasValue)
+            {
+                StandardContainmentStore.CopyByFrom(asset.ParentStandardIdentifier.Value, asset.StandardIdentifier);
+                VCmdsCompetencyOrganizationRepository.InsertProfileCompetencies(asset.StandardIdentifier);
+            }
+
             HttpResponseHelper.Redirect($"{EditUrl}?id={asset.StandardIdentifier}&status=saved");
         }
     }

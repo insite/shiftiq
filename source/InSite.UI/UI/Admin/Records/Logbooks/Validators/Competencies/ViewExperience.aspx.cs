@@ -45,7 +45,7 @@ namespace InSite.UI.Admin.Records.Validators.Competencies
                 return;
             }
 
-            if (!ServiceLocator.JournalSearch.ExistsJournalSetupUser(experienceCompetency.Experience.Journal.JournalSetupIdentifier, User.UserIdentifier, JournalSetupUserRole.Validator))
+            if (!ServiceLocator.JournalSearch.IsLogbookValidator(experienceCompetency.Experience.Journal.JournalSetupIdentifier, User.UserIdentifier))
             {
                 HttpResponseHelper.Redirect("/ui/admin/records/logbooks/validators/competencies/search");
                 return;

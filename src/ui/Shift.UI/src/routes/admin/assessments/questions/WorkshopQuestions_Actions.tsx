@@ -7,21 +7,31 @@ import InlineEditor from "@/components/inlineeditor/InlineEditor";
 import WorkshopQuestions_NewComment from "./WorkshopQuestions_NewComment";
 import { workshopValidation } from "@/contexts/workshop/models/workshopValidation";
 import { useWorkshopQuestionProvider } from "@/contexts/workshop/WorkshopQuestionProviderContext";
+import IconButton from "@/components/iconbutton/IconButton";
+import { workshopQuestionAdapter } from "./workshopQuestionAdapter";
+import { ApiSpecWorkshopSet } from "@/api/controllers/assessments/workshop/ApiSpecWorkshopSet";
+import { useSaveWithResultAction } from "@/hooks/useSaveWithResultAction";
 
 interface Props {
     bankId: string;
     formId: string | null;
+    specificationId: string | null;
+    setId: string | null | undefined;
     question: WorkshopQuestion;
     isEditable: boolean;
     returnUrl: string;
+    onMoveToQuestion: (questionId: string) => void;
 }
 
 export default function WorkshopQuestions_Actions({
     bankId,
     formId,
+    specificationId,
+    setId,
     question,
     isEditable,
-    returnUrl
+    returnUrl,
+    onMoveToQuestion
 }: Props) {
     const formParam = formId ? `&form=${formId}` : "";
     const changeUrl = `/ui/admin/assessments/questions/change?bank=${bankId}${formParam}&question=${question.questionId}&${returnUrl}`;
@@ -31,12 +41,33 @@ export default function WorkshopQuestions_Actions({
         ? `/ui/admin/assessments/bankscomments/search?bank=${bankId}&form=${formId}&question=${question.questionId}&role=Candidate&showAuthor=0&panel=results`
         : `/ui/admin/assessments/bankscomments/search?bank=${bankId}&question=${question.questionId}&role=Candidate&showAuthor=0&panel=results`;
 
-    const { modifyQuestionFlag } = useWorkshopQuestionProvider();
+    const { areaCompetencies, modifyQuestionFlag, setSectionData } = useWorkshopQuestionProvider();
+
+    const { isSaving: isDuplicating, runSave } = useSaveWithResultAction<ApiSpecWorkshopSet | null>();
 
     async function handleSaveFlag(value: string) {
         const flag = workshopValidation.validateFlag(value);
         await shiftClient.workshop.modifyQuestion(bankId, question.questionId, "Flag", null, flag);
         modifyQuestionFlag(question.questionId, flag);
+    }
+
+    async function handleDuplicateQuestion() {
+        if (!specificationId || !setId || !areaCompetencies || !window.confirm("Are you sure you want to create a copy of this question?")) {
+            return;
+        }
+        const set =  await runSave(() => shiftClient.workshop.duplicateQuestion(bankId, specificationId, setId, question.questionId));
+        if (!set) {
+            return;
+        }
+
+        const { competencies, questions } = workshopQuestionAdapter.getSetData(set, areaCompetencies);
+        setSectionData(competencies, questions, true);
+
+        const questionId = (set as ApiSpecWorkshopSet).QuestionId;
+
+        if (questionId) {
+            onMoveToQuestion(questionId);
+        }
     }
 
     return (
@@ -63,12 +94,13 @@ export default function WorkshopQuestions_Actions({
 
             {question.canCopyField && (
                 <div className="mb-1">
-                    <a
-                        href="#duplicate"
+                    <IconButton
+                        iconStyle="solid"
+                        iconName="copy"
                         title="Duplicate"
-                    >
-                        <Icon style="solid" name="file" />
-                    </a>
+                        isLoading={isDuplicating}
+                        onClick={handleDuplicateQuestion}
+                    />
                 </div>
             )}
 
@@ -88,9 +120,11 @@ export default function WorkshopQuestions_Actions({
                 </div>
             )}
 
-            <div className="mb-1" title="Form Question Number">
-                <span className="badge rounded-pill bg-custom-default fs-5">{question.questionFormSequence ?? "?"}</span>
-            </div>
+            {question.questionFormSequence && (
+                <div className="mb-1" title="Form Question Number">
+                    <span className="badge rounded-pill bg-custom-default fs-5">{question.questionFormSequence}</span>
+                </div>
+            )}
 
             <div className="d-flex flex-column align-items-center">
                 {question.questionFlag !== "None" && (

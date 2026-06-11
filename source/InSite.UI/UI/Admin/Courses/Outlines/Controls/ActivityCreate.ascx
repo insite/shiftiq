@@ -123,8 +123,7 @@
                         <insite:ComboBox runat="server" ID="ActivityPlatform" Visible="false">
                             <Items>
                                 <insite:ComboBoxOption Value="SCORM Cloud" Text="SCORM Cloud" />
-                                <insite:ComboBoxOption Value="Moodle" Text="Moodle" />
-                                <insite:ComboBoxOption Value="Scoop" Text="Scoop" />
+                                <insite:ComboBoxOption Value="Scoop" Text="OpenSCORM (Scoop)" />
                             </Items>
                         </insite:ComboBox>
                     </div>

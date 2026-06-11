@@ -37,17 +37,11 @@
                             <div class="col-lg-3">
                                 <div class="form-group mb-3">
                                     <label class="form-label">
-                                        Visibility
-                                        <insite:RequiredValidator runat="server" ControlToValidate="AchievementVisibility" FieldName="Type" ValidationGroup="Education" />
+                                        Owner
+                                        <insite:RequiredValidator runat="server" ControlToValidate="OrganizationScope" FieldName="Type" ValidationGroup="Education" />
                                     </label>
                                     <div>
-                                        <insite:ComboBox ID="AchievementVisibility" runat="server">
-                                            <Items>
-                                                <insite:ComboBoxOption Value="Organization-Specific Achievements" Text="Organization-Specific Achievements" />
-                                                <insite:ComboBoxOption Value="Global Achievements" Text="Global Achievements" />
-                                                <insite:ComboBoxOption Value="All Achievements" Text="All Achievements" />
-                                            </Items>
-                                        </insite:ComboBox>
+                                        <cmds:OrganizationScopeSelector runat="server" ID="OrganizationScope" />
                                     </div>
                                 </div>
                             </div>

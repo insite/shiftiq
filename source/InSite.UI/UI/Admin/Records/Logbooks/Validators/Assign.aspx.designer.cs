@@ -24,6 +24,60 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         protected global::InSite.Common.Web.UI.Alert ScreenStatus;
 
         /// <summary>
+        /// CriteriaUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel CriteriaUpdatePanel;
+
+        /// <summary>
+        /// CriteriaContactType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox CriteriaContactType;
+
+        /// <summary>
+        /// GroupCriteriaPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl GroupCriteriaPanel;
+
+        /// <summary>
+        /// Group_GroupType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.GroupTypeComboBox Group_GroupType;
+
+        /// <summary>
+        /// Group_GroupName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox Group_GroupName;
+
+        /// <summary>
+        /// PersonCriteriaPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl PersonCriteriaPanel;
+
+        /// <summary>
         /// CriteriaName control.
         /// </summary>
         /// <remarks>
@@ -123,6 +177,15 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         protected global::InSite.Common.Web.UI.Button UploadContactLink;
 
         /// <summary>
+        /// EntityName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal EntityName;
+
+        /// <summary>
         /// SearchResultCount control.
         /// </summary>
         /// <remarks>
@@ -148,6 +211,24 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.UpdatePanel SearchResultUpdatePanel;
+
+        /// <summary>
+        /// SearchResultHeaderGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Container SearchResultHeaderGroup;
+
+        /// <summary>
+        /// SearchResultHeaderPerson control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Container SearchResultHeaderPerson;
 
         /// <summary>
         /// SearchResultRepeater control.

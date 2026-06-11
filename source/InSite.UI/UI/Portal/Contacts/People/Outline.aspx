@@ -4,7 +4,9 @@
 <%@ Register TagPrefix="uc" TagName="PersonDetail" Src="./Controls/PersonDetail.ascx" %> 
 <%@ Register TagPrefix="uc" TagName="PersonAchievements" Src="./Controls/PersonAchievements.ascx" %> 
 <%@ Register TagPrefix="uc" TagName="PersonRecords" Src="./Controls/PersonRecords.ascx" %>
-<%@ Register TagPrefix="uc" TagName="PersonRegistrations" Src="./Controls/PersonRegistrations.ascx" %> 
+<%@ Register TagPrefix="uc" TagName="PersonRegistrations" Src="./Controls/PersonRegistrations.ascx" %>
+<%@ Register TagPrefix="uc" TagName="PersonPrograms" Src="./Controls/PersonPrograms.ascx" %>
+<%@ Register TagPrefix="uc" TagName="PersonLogbooks" Src="./Controls/PersonLogbooks.ascx" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 
@@ -26,7 +28,7 @@
         <insite:NavItem runat="server" ID="RegistrationSection" Title="Registrations" Icon="far fa-id-card" IconPosition="BeforeText">
             <uc:PersonRegistrations runat="server" ID="Registrations" />
         </insite:NavItem>
-        <insite:NavItem runat="server" ID="RecordSection" Title="Records" Icon="far fa-pencil-ruler" IconPosition="BeforeText">
+        <insite:NavItem runat="server" ID="RecordSection" Title="Gradebooks" Icon="far fa-pencil-ruler" IconPosition="BeforeText">
             <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="GradebookUpdatePanel" />
 
             <insite:UpdatePanel runat="server" ID="GradebookUpdatePanel">
@@ -34,6 +36,18 @@
                     <uc:PersonRecords runat="server" ID="Records" />
                 </ContentTemplate>
             </insite:UpdatePanel>
+        </insite:NavItem>
+        <insite:NavItem runat="server" ID="ProgramSection" Title="Programs" Icon="far fa-graduation-cap" IconPosition="BeforeText">
+            <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="ProgramUpdatePanel" />
+
+            <insite:UpdatePanel runat="server" ID="ProgramUpdatePanel">
+                <ContentTemplate>
+                    <uc:PersonPrograms runat="server" ID="PersonPrograms" />
+                </ContentTemplate>
+            </insite:UpdatePanel>
+        </insite:NavItem>
+        <insite:NavItem runat="server" ID="LogbookSection" Title="Logbooks" Icon="far fa-book-open" IconPosition="BeforeText">
+            <uc:PersonLogbooks runat="server" ID="PersonLogbooks" />
         </insite:NavItem>
     </insite:Nav>
 

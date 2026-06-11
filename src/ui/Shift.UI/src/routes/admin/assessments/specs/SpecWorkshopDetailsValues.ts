@@ -1,4 +1,4 @@
-import { ApiSpecWorkshopInput } from "@/api/controllers/workshop/ApiSpecWorkshopInput";
+import { ApiSpecWorkshopInput } from "@/api/controllers/assessments/workshop/ApiSpecWorkshopInput";
 import { SpecWorkshopDetails } from "@/contexts/workshop/models/SpecWorkshopDetails";
 import { criterionPercentToWeight, criterionWeightToPercent } from "@/contexts/workshop/SpecWorkshopProviderContext";
 

@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="mb-2" runat="server" id="IssueStatusField" visible="false">
-                        <insite:IssueStatusComboBox runat="server" ID="IssueStatus" EmptyMessage="Case Status" />
+                        <insite:IssueStatusMultiComboBox runat="server" ID="IssueStatus" EmptyMessage="Case Status" />
                     </div>
 
                     <div class="mb-2">

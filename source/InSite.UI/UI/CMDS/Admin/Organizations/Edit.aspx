@@ -19,9 +19,6 @@
 
         <insite:NavItem runat="server" ID="OrganizationTab" Title="Organization" Icon="far fa-city" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    Organization Information
-                </h2>
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <uc:CompanyDetail ID="CompanyDetail" runat="server" />
@@ -32,10 +29,6 @@
 
         <insite:NavItem runat="server" ID="DepartmentTab" Title="Departments" Icon="far fa-building" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    Departments
-                </h2>
-
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <uc:DepartmentGrid ID="DepartmentGrid" runat="server" />
@@ -46,10 +39,6 @@
 
         <insite:NavItem runat="server" ID="DivisionTab" Title="Divisions" Icon="far fa-industry" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    Divisions
-                </h2>
-
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <uc:DistrictGrid ID="DivisionGrid" runat="server" />
@@ -60,10 +49,6 @@
 
         <insite:NavItem runat="server" ID="PeopleTab" Title="People" Icon="far fa-user" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    People
-                </h2>
-
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <uc:PersonGrid ID="PersonGrid" runat="server" />
@@ -74,10 +59,6 @@
 
         <insite:NavItem runat="server" ID="ProfileTab" Title="Profiles" Icon="far fa-ruler-triangle" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    Profiles
-                </h2>
-
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <uc:ContactProfileEditor ID="ProfileEditor" runat="server" />
@@ -88,10 +69,6 @@
 
         <insite:NavItem runat="server" ID="CompetencyTab" Title="Competencies" Icon="far fa-ruler-triangle" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    Competencies
-                </h2>
-
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
 
@@ -118,10 +95,6 @@
 
         <insite:NavItem runat="server" ID="CategoryTab" Title="Categories" Icon="far fa-tag" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    Categories
-                </h2>
-
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <uc:CategoryGrid ID="CategoryGrid" runat="server" />
@@ -132,10 +105,6 @@
 
         <insite:NavItem runat="server" ID="FileCleanupTab" Title="File Cleanup" Icon="far fa-bug" IconPosition="BeforeText">
             <section>
-                <h2 class="h4 mt-4 mb-3">
-                    File Cleanup
-                </h2>
-
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
                         <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="FileCleanupUpdatePanel" />

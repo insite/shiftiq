@@ -285,8 +285,8 @@ namespace InSite.Admin.Courses.Outlines.Controls
             {
                 Achievement = achievement,
                 WhenChange = TriggerCauseChange.Changed,
-                WhenGrade = TriggerCauseGrade.Pass,
-                ThenCommand = TriggerEffectCommand.Grant,
+                WhenPassCommand = TriggerEffectCommand.Grant,
+                WhenFailCommand = TriggerEffectCommand.Void,
                 ElseCommand = TriggerEffectCommand.Void
             };
 

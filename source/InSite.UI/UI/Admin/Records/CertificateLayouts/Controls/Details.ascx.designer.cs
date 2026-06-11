@@ -31,5 +31,14 @@ namespace InSite.UI.Admin.Records.AchievementLayouts
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.TextBox CertificateLayoutData;
+
+        /// <summary>
+        /// AvailableFonts control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox AvailableFonts;
     }
 }

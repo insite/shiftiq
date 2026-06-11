@@ -59,9 +59,6 @@ namespace InSite.UI.CMDS
 
             CompareProfilesLink.Visible = isGrantedAdministrators;
 
-            FieldSearchAchievementsLink.Visible = isGrantedFields;
-            FieldSearchProfilesLink.Visible = isGrantedFields;
-
             AssignDepartmentsLink1.Visible = isGrantedAdministrators;
             AssignDepartmentsLink2.Visible = isGrantedAdministrators;
             AssignDepartmentsLink3.Visible = isGrantedAdministrators;

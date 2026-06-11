@@ -1,4 +1,4 @@
-import { WorkshopReplaceQuestionCommand } from "@/api/controllers/workshop/_workshopController";
+import { WorkshopReplaceQuestionCommand } from "@/api/controllers/assessments/workshop/_workshopController";
 import { shiftClient } from "@/api/shiftClient";
 import Button from "@/components/Button";
 import Icon from "@/components/icon/Icon";
@@ -30,7 +30,7 @@ export default function WorkshopQuestions_NavButtons({
     const { addLoading, removeLoading } = useLoadingProvider();
     const { addError, removeError } = useStatusProvider();
 
-    async function handelReplaceQuestion(command: WorkshopReplaceQuestionCommand) {
+    async function handleReplaceQuestion(command: WorkshopReplaceQuestionCommand) {
         if (!question.fieldId) {
             return;
         }
@@ -66,25 +66,25 @@ export default function WorkshopQuestions_NavButtons({
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             {question.replaceButtons.newVersion && (
-                                <Dropdown.Item onClick={() => handelReplaceQuestion("NewVersion")}>
+                                <Dropdown.Item onClick={() => handleReplaceQuestion("NewVersion")}>
                                     <Icon style="regular" name="arrow-alt-up" className="me-1" />
                                     New version
                                 </Dropdown.Item>
                             )}
                             {question.replaceButtons.newQuestionAndSurplus && (
-                                <Dropdown.Item onClick={() => handelReplaceQuestion("NewQuestionAndSurplus")}>
+                                <Dropdown.Item onClick={() => handleReplaceQuestion("NewQuestionAndSurplus")}>
                                     <Icon style="regular" name="plus-circle" className="me-1" />
                                     New Question and Surplus
                                 </Dropdown.Item>
                             )}
                             {question.replaceButtons.newQuestionAndPurge && (
-                                <Dropdown.Item onClick={() => handelReplaceQuestion("NewQuestionAndPurge")}>
+                                <Dropdown.Item onClick={() => handleReplaceQuestion("NewQuestionAndPurge")}>
                                     <Icon style="regular" name="plus-hexagon" className="me-1" />
                                     New Question and Purge
                                 </Dropdown.Item>
                             )}
                             {question.replaceButtons.rollbackQuestion && (
-                                <Dropdown.Item onClick={() => handelReplaceQuestion("RollbackQuestion")}>
+                                <Dropdown.Item onClick={() => handleReplaceQuestion("RollbackQuestion")}>
                                     <Icon style="regular" name="undo-alt" className="me-1" />
                                     Revert/Rollback
                                 </Dropdown.Item>

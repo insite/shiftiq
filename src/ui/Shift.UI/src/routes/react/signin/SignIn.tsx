@@ -24,6 +24,10 @@ interface FormFields {
     impersonatorOrganizationCode: string;
 }
 
+interface ChangeOriginFields {
+    origin: string;
+}
+
 export default function SignIn() {
     const [isLogginIn, setIsLogginIn] = useState(false);
     const [isChangingTheme, setIsChangingTheme] = useState(false);
@@ -41,6 +45,12 @@ export default function SignIn() {
                 impersonatorUserEmail: account?.impersonatorEmail ?? shiftConfig.localUser ?? "",
                 impersonatorOrganizationCode: account?.impersonatorOrganization ?? shiftConfig.localOrganization ?? "",
             });
+        }
+    });
+
+    const { register: register2, handleSubmit: handleSubmit2, formState: { errors: errors2 } } = useForm<ChangeOriginFields>({
+        defaultValues: {
+            origin: "https://insite.insite.com",
         }
     });
 
@@ -121,116 +131,151 @@ export default function SignIn() {
         setImpersonate(Boolean(getValues("impersonate")));
     }
 
+    async function handleChangeOrigin(fields: ChangeOriginFields) {
+        localStorageHelper.setOverrideOrigin(fields.origin);
+        refreshSiteSetting();
+        cache.clear();
+    }
+
     return (
         <>
-            <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
-                <FormSection className="w-50">
-                    <FormField label="Organization" required>
-                        <TextBox
-                            autoFocus
-                            {...register("organizationCode", {
-                                required: true
-                            })}
-                            error={errors.organizationCode}
-                            disabled={isLogginIn}
-                        />
-                    </FormField>
-                    <FormField label="Email" required>
-                        <TextBox
-                            {...register("email", {
-                                required: true
-                            })}
-                            error={errors.email}
-                            disabled={isLogginIn}
-                        />
-                    </FormField>
-                    <FormField>
-                        <label>
-                            <input
-                                type="checkbox"
-                                {...register("impersonate", {
-                                    onChange: handleImpersonateChange,
-                                })}
-                                disabled={isLogginIn}
-                            /> Impersonate
-                        </label>
-                    </FormField>
-                    {impersonate && (
-                        <>
-                            <FormField label="Impersonator Organization" required>
+            <div className="row">
+                <div className="col-6">
+                    <form autoComplete="off" onSubmit={handleSubmit(handleValidSubmit)}>
+                        <FormSection>
+                            <FormField label="Organization" required>
                                 <TextBox
-                                    {...register("impersonatorOrganizationCode", {
+                                    autoFocus
+                                    {...register("organizationCode", {
                                         required: true
                                     })}
-                                    error={errors.impersonatorOrganizationCode}
+                                    error={errors.organizationCode}
                                     disabled={isLogginIn}
                                 />
                             </FormField>
-                            <FormField label="Impersonator Email" required>
+                            <FormField label="Email" required>
                                 <TextBox
-                                    {...register("impersonatorUserEmail", {
-                                        validate: value => {
-                                            if (!value) {
-                                                return "The field is required";
-                                            }
-                                            if (value.toLowerCase() === getValues("email").toLowerCase()) {
-                                                return "Impersonator Email and Email cannot be the same"
-                                            }
-                                            return undefined;
-                                        }
+                                    {...register("email", {
+                                        required: true
                                     })}
-                                    error={errors.impersonatorUserEmail}
+                                    error={errors.email}
                                     disabled={isLogginIn}
                                 />
                             </FormField>
-                        </>
-                    )}
-                    <FormField hasBottomMargin={false}>
-                        <Button
-                            variant="save"
-                            text="Login"
-                            loadingMessage="Logging In..."
-                            isLoading={isLogginIn}
-                        />
-                        {UserName && (
-                            <Button
-                                type="button"
-                                variant="delete"
-                                text="Logout"
-                                className="ms-2"
-                                onClick={handleLogout}
-                            />
-                        )}
-                    </FormField>
-                </FormSection>
-            </form>
+                            <FormField>
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        {...register("impersonate", {
+                                            onChange: handleImpersonateChange,
+                                        })}
+                                        disabled={isLogginIn}
+                                    /> Impersonate
+                                </label>
+                            </FormField>
+                            {impersonate && (
+                                <>
+                                    <FormField label="Impersonator Organization" required>
+                                        <TextBox
+                                            {...register("impersonatorOrganizationCode", {
+                                                required: true
+                                            })}
+                                            error={errors.impersonatorOrganizationCode}
+                                            disabled={isLogginIn}
+                                        />
+                                    </FormField>
+                                    <FormField label="Impersonator Email" required>
+                                        <TextBox
+                                            {...register("impersonatorUserEmail", {
+                                                validate: value => {
+                                                    if (!value) {
+                                                        return "The field is required";
+                                                    }
+                                                    if (value.toLowerCase() === getValues("email").toLowerCase()) {
+                                                        return "Impersonator Email and Email cannot be the same"
+                                                    }
+                                                    return undefined;
+                                                }
+                                            })}
+                                            error={errors.impersonatorUserEmail}
+                                            disabled={isLogginIn}
+                                        />
+                                    </FormField>
+                                </>
+                            )}
+                            <FormField hasBottomMargin={false}>
+                                <Button
+                                    variant="save"
+                                    text="Login"
+                                    loadingMessage="Logging In..."
+                                    isLoading={isLogginIn}
+                                />
+                                {UserName && (
+                                    <Button
+                                        type="button"
+                                        variant="delete"
+                                        text="Logout"
+                                        className="ms-2"
+                                        onClick={handleLogout}
+                                    />
+                                )}
+                            </FormField>
+                        </FormSection>
+                    </form>
 
-            <FormSection className="w-50">
-                <FormField label="Light/dark mode switch">
-                    <div className="d-flex align-items-center mt-2">
-                        <div className="form-check form-switch mode-switch" data-bs-toggle="mode" onClick={handleThemeClick}>
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                defaultChecked={theme === "dark"}
-                            />
-                            <label className="form-check-label">
-                                <Icon style="light" name="sun-bright" className="fs-lg" />
-                            </label>
-                            <label className="form-check-label">
-                                <Icon style="light" name="moon" className="fs-lg" />
-                            </label>
-                        </div>
+                    <FormSection>
+                        <FormField label="Light/dark mode switch">
+                            <div className="d-flex align-items-center mt-2">
+                                <div className="form-check form-switch mode-switch" data-bs-toggle="mode" onClick={handleThemeClick}>
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        defaultChecked={theme === "dark"}
+                                    />
+                                    <label className="form-check-label">
+                                        <Icon style="light" name="sun-bright" className="fs-lg" />
+                                    </label>
+                                    <label className="form-check-label">
+                                        <Icon style="light" name="moon" className="fs-lg" />
+                                    </label>
+                                </div>
 
-                        {isChangingTheme && (
-                            <>
-                                <Spinner animation="border" role="status" size="sm" className="ms-2 me-2" />
-                                Saving ...
-                            </>
-                        )}
+                                {isChangingTheme && (
+                                    <>
+                                        <Spinner animation="border" role="status" size="sm" className="ms-2 me-2" />
+                                        Saving ...
+                                    </>
+                                )}
+                            </div>
+                        </FormField>
+                    </FormSection>
+                </div>
+                {UserName && (
+                    <div className="col-6">
+                        <form autoComplete="off" onSubmit={handleSubmit2(handleChangeOrigin)}>
+                            <FormSection>
+                                <FormField label="Origin" required>
+                                    <TextBox
+                                        {...register2("origin", {
+                                            required: true
+                                        })}
+                                        error={errors2.origin}
+                                        disabled={isLogginIn}
+                                    />
+                                </FormField>
+                                <FormField hasBottomMargin={false}>
+                                    <Button
+                                        variant="save"
+                                        text="Change Origin"
+                                        loadingMessage="Changing origin..."
+                                        isLoading={isLogginIn}
+                                    />
+                                </FormField>
+                            </FormSection>
+                        </form>
                     </div>
-                </FormField>
-            </FormSection>
+                )}
+            </div>
         </>
     );
 }

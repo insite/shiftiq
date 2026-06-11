@@ -69,6 +69,15 @@ namespace InSite.Admin.Assessments.Outlines.Controls
         protected global::InSite.Common.Web.UI.Button SpecificationWorkshopButton;
 
         /// <summary>
+        /// SpecificationWorkshopNewButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button SpecificationWorkshopNewButton;
+
+        /// <summary>
         /// SpecificationCriteriaRow control.
         /// </summary>
         /// <remarks>

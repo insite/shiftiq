@@ -65,15 +65,18 @@
 
                         <li runat="server" id="HelpMenuItem" class="nav-item fs-sm dropdown">
     
-                            <a runat="server" id="HelpMenuAnchor" href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"><i class="fa-regular fa-question-circle me-1"></i>Help</a>
+                            <a runat="server" id="HelpMenuAnchor" href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <i class="fa-regular fa-question-circle me-1"></i>
+                                <%= Translate("Help") %>
+                            </a>
 
                             <ul class="dropdown-menu">
                                 <insite:Container runat="server" ID="ResourcesGroupContainer">
-                                    <li><h6 class="dropdown-header pt-2 pb-1">Resources</h6></li>
+                                    <li><h6 class="dropdown-header pt-2 pb-1"><%= Translate("Resources") %></h6></li>
                                     <li><a runat="server" id="HelpAnchor" class="dropdown-item ms-2" href="#" data-bs-toggle="modal" data-bs-target="#modal-help"><%= Translate("Help") %></a></li>
                                 </insite:Container>
                                 <insite:Container runat="server" ID="GetHelpGroupContainer">
-                                    <li><h6 class="dropdown-header pb-1">Get Help</h6></li>
+                                    <li><h6 class="dropdown-header pb-1"><%= Translate("Get Help") %></h6></li>
                                     <li><a runat="server" id="SupportAnchor" class="dropdown-item ms-2" href="/ui/portal/support"><%= Translate("Support") %></a></li>
                                 </insite:Container>
                             </ul>

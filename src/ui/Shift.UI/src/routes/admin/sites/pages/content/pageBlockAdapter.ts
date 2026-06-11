@@ -1,4 +1,4 @@
-import { ApiPageContentModel } from "@/api/controllers/pageContent/ApiPageContentModel";
+import { ApiPageContentModel } from "@/api/controllers/sites/pageContents/ApiPageContentModel";
 import { BlockType } from "./models/BlockType";
 import { ApiContentModel } from "@/api/models/ApiContentModel";
 import { blockFieldList } from "./blockFieldList";
@@ -7,7 +7,7 @@ import { BlockFieldValue } from "./models/BlockFieldValue";
 import { blockList } from "./blockList";
 import { BlockImageValue } from "./models/BlockImageValue";
 import { BlockState } from "./models/BlockState";
-import { ApiPageContentModifyModel } from "@/api/controllers/pageContent/ApiPageContentModifyModel";
+import { ApiPageContentModifyModel } from "@/api/controllers/sites/pageContents/ApiPageContentModifyModel";
 import { blockTypeNameList } from "./blockTypeNameList";
 import { RichTextEditorValue } from "@/components/richtexteditor/RichTextEditorValue";
 

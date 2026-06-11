@@ -19,6 +19,12 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             public string ObjectName { get; set; }
         }
 
+        public event EventHandler PermissionsChanged;
+        private void OnPermissionsChanged()
+        {
+            PermissionsChanged?.Invoke(this, new EventArgs());
+        }
+
         private List<PermissionObject> Objects
         {
             get => (List<PermissionObject>)ViewState[nameof(Objects)];
@@ -30,10 +36,10 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             base.OnInit(e);
 
             PublicRadioButton.AutoPostBack = true;
-            PublicRadioButton.CheckedChanged += (x, y) => ShowPermissionType();
+            PublicRadioButton.CheckedChanged += PermissionType_Changed;
 
             PrivateRadioButton.AutoPostBack = true;
-            PrivateRadioButton.CheckedChanged += (x, y) => ShowPermissionType();
+            PrivateRadioButton.CheckedChanged += PermissionType_Changed;
 
             ClaimObjectType.AutoPostBack = true;
             ClaimObjectType.ValueChanged += (x, y) => ShowClaimObject();
@@ -95,11 +101,17 @@ namespace InSite.UI.Admin.Assets.Files.Controls
                 return null;
 
             return Objects.Select(x => new FileClaim
-            {
-                ObjectIdentifier = x.ObjectIdentifier,
-                ObjectType = x.ObjectType == "Group" ? FileClaimObjectType.Group : FileClaimObjectType.Person
-            })
+                {
+                    ObjectIdentifier = x.ObjectIdentifier,
+                    ObjectType = x.ObjectType == "Group" ? FileClaimObjectType.Group : FileClaimObjectType.Person
+                })
                 .ToList();
+        }
+
+        private void PermissionType_Changed(object sender, EventArgs e)
+        {
+            ShowPermissionType();
+            OnPermissionsChanged();
         }
 
         private void PermissionList_ItemCommand(object source, RepeaterCommandEventArgs e)
@@ -113,6 +125,8 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             Objects.RemoveAt(index);
 
             BindPermissions();
+
+            OnPermissionsChanged();
         }
 
         private void ShowPermissionType()
@@ -160,6 +174,8 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             });
 
             BindPermissions();
+
+            OnPermissionsChanged();
         }
 
         private void BindPermissions()

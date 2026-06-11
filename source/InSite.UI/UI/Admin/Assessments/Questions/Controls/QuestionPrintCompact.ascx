@@ -46,7 +46,9 @@
 
 </head>
 <body>
-    <p runat="server" id="NoDataMessage" visible="false">No Questions.</p>
+    <p runat="server" id="NoDataMessage" visible="false">
+        <%= CustomTranslate("No Questions.") %>
+    </p>
 
     <asp:Repeater runat="server" ID="ItemRepeater" Visible="false">
         <ItemTemplate>

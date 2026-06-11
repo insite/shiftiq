@@ -1,51 +1,16 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchResults.ascx.cs" Inherits="InSite.Admin.Issues.Controls.SearchResults" %>
 
-<script type="text/javascript">
-    function saveScrollPosition() {
-        var scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-        $('#<%= hfScrollPosition.ClientID %>').val(scrollPosition);
-    }
-
-    function restoreScrollPosition() {
-        var scrollPosition = $('#<%= hfScrollPosition.ClientID %>').val();
-        if (scrollPosition && scrollPosition !== "0") {
-            window.scrollTo(0, scrollPosition);
-        }
-    }
-
-    $(document).ready(function () {
-        restoreScrollPosition();
-    });
-
-    function enableBulkSaveButton() {
-        var count = $('.checkbox-column input:checked').length;
-
-        var saveBulkButton = $('#<%= SaveBulkButton.ClientID %>');
-        if (count) {
-            saveBulkButton.removeClass('disabled');
-        } else {
-            saveBulkButton.addClass('disabled');
-        }
-    }
-</script>
-
 <asp:Literal id="Instructions" runat="server" />
 
 <insite:Grid runat="server" ID="Grid" DataKeyNames="IssueIdentifier">
     <Columns>
 
-        <asp:TemplateField ItemStyle-Wrap="false" Visible="false" HeaderStyle-CssClass="checkbox-column" ItemStyle-CssClass="checkbox-column">
+        <asp:TemplateField ItemStyle-Width="40" ItemStyle-HorizontalAlign="Center" HeaderStyle-CssClass="assign-checkbox hide" ItemStyle-CssClass="assign-checkbox hide">
             <HeaderTemplate>
-                <insite:CheckBox ID="SelectAllCases" runat="server" OnCheckedChanged="SelectAllCases_CheckedChanged" AutoPostBack="true" />
+                <asp:CheckBox runat="server" ID="AllCheckBox" />
             </HeaderTemplate>
             <ItemTemplate>
-                <insite:CheckBox ID="SelectCase" runat="server" OnCheckedChanged="SelectCase_CheckedChanged" CssClass="select-case-checkbox" AutoPostBack="true" OnClientChange="saveScrollPosition(); return true;" />
-            </ItemTemplate>
-        </asp:TemplateField>
-
-        <asp:TemplateField ItemStyle-Width="40" ItemStyle-HorizontalAlign="Center" HeaderStyle-CssClass="assign-checkbox hide" ItemStyle-CssClass="assign-checkbox hide">
-            <ItemTemplate>
-                <asp:CheckBox runat="server" ID="AssignCheckBox" onclick="" />
+                <asp:CheckBox runat="server" ID="SelectCheckBox" />
             </ItemTemplate>
         </asp:TemplateField>
 
@@ -186,10 +151,13 @@
 
 <div runat="server" id="ButtonPanel" class="row mt-4 mb-5">
     <div class="col-lg-12">
-        <insite:Button runat="server" ID="AssignButtonStart" ButtonStyle="Default" Text="Assign Cases" Icon="fas fa-stamp" />
-        <insite:Button runat="server" ID="BulkCloseCasesButton" ButtonStyle="Default" Text="Bulk Close Cases" Icon="fas fa-folder" />
+        <div id="BulkButtons" runat="server">
+            <insite:Button runat="server" ID="AssignButtonStart" ButtonStyle="Default" Text="Assign Cases" Icon="fas fa-stamp" />
+            <insite:Button runat="server" ID="BulkCloseCasesButton" ButtonStyle="Default" Text="Bulk Close Cases" Icon="fas fa-folder" />
+            <insite:Button runat="server" ID="StartBulkCaseStatusButton" ButtonStyle="Default" Text="Bulk Case Status" Icon="fas fa-folder" />
+        </div>
 
-        <div id="AssignPanel" class="d-none">
+        <div id="AssignPanel" runat="server" class="d-none">
             <div class="hstack">
                 <div class="hstack w-25 me-2">
                     <insite:FindPerson runat="server" ID="NewOwnerID" EmptyMessage="Select a New Owner" CssClass="me-1" />
@@ -197,63 +165,73 @@
                 </div>
 
                 <div>
-                    <insite:Button runat="server" ID="AssignButton" ButtonStyle="Success" Text="Assign Selected Cases" Icon="fas fa-stamp" ValidationGroup="Assign" />
+                    <insite:Button runat="server" ID="AssignButton" ButtonStyle="Success" Text="Assign Selected Cases" Icon="fas fa-stamp" ValidationGroup="Assign" DisableAfterClick="true" />
                     <insite:Button runat="server" ID="AssignButtonStop" ButtonStyle="Danger" Text="Stop Assigning Cases" Icon="fas fa-stop" />
                 </div>
             </div>
         </div>
 
-
-        <div class="row mt-3">
+        <div id="BulkUpdateCaseStatusPanel" runat="server" class="row d-none">
             <div class="col-4">
 
-                <insite:Alert runat="server" ID="BulkUpdateStatus" />
-                <insite:Alert runat="server" ID="BulkUpdateStatusInfo"/>
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-stop-circle pe-2"></i><strong>Confirm:</strong>
+                    Are you sure you want to bulk-update these cases?
+                </div>
 
-                <div id="BulkUpdatePanel" class="mt-3" runat="server" visible="false">
-                    <div runat="server" id="ConfirmMessage" class="alert alert-danger" role="alert">
-                        <i class="fas fa-stop-circle pe-2"></i><strong>Confirm:</strong>
-                        Are you sure you want to bulk-update these cases?
-                    </div>
+                <div class="card shadow-lg">
+                    <div class="card-body">
 
-                    <div class="card shadow-lg">
-                        <div class="card-body">
-
-                            <div class="row mb-3">
-                                <div runat="server" id="NoCaseStatus">
-                                    <p>No Case Status to select</p>
-                                </div>
-                                <div runat="server" id="OneCaseStatus">
-                                    <p><span class="fw-bold">Set Case status to: </span>
-                                        <asp:Literal ID="OneCaseStatusLiteral" runat="server"></asp:Literal></p>
-                                </div>
-                                <div runat="server" id="ManyCaseStatus">
-                                    <insite:IssueStatusComboBox runat="server" ID="IssueStatus" EmptyMessage="Select a Case Status" AllowBlank="false" />
-                                </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Case Status</label>
+                            <div>
+                                <insite:IssueStatusComboBox runat="server" ID="BulkUpdateCaseStatus" AllowBlank="false" />
                             </div>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mb-3">
-                                        <insite:SaveButton runat="server" ID="SaveBulkButton"/>
-                                        <insite:CancelButton runat="server" ID="CancelBulkButton" />
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
-                    </div>
 
+                        <insite:SaveButton runat="server" ID="SaveBulkCaseStatusButton" DisableAfterClick="true" />
+                        <insite:CancelButton runat="server" ID="CancelBulkCaseStatusButton" />
+
+                    </div>
                 </div>
 
             </div>
         </div>
 
+        <div id="BulkCloseCasePanel" runat="server" class="row d-none">
+            <div class="col-4">
+
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-stop-circle pe-2"></i><strong>Confirm:</strong>
+                    Are you sure you want to bulk-update these cases?
+                </div>
+
+                <div class="card shadow-lg">
+                    <div class="card-body">
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Case Status</label>
+                            <div>
+                                <insite:IssueStatusComboBox runat="server" ID="IssueStatus" AllowBlank="false" />
+                            </div>
+                        </div>
+
+                        <insite:SaveButton runat="server" ID="SaveBulkButton" DisableAfterClick="true" />
+                        <insite:CancelButton runat="server" ID="CancelBulkButton" />
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <insite:Alert runat="server" ID="BulkUpdateStatusInfo" CssClass="mt-4"/>
+
     </div>
 </div>
 
-<asp:HiddenField ID="hfShowCheckboxColumn" runat="server" Value="false" />
-<asp:HiddenField ID="hfScrollPosition" runat="server" />
+<asp:HiddenField ID="BulkMode" runat="server" />
+<asp:HiddenField ID="BulkHasSelectionOnOtherPages" runat="server" />
 
 <insite:PageHeadContent runat="server">
     <style type="text/css">
@@ -269,80 +247,141 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
+            const bulkButtons = document.getElementById("<%= BulkButtons.ClientID %>");
+            const bulkModeField = document.getElementById("<%= BulkMode.ClientID %>");
 
-            $('#<%= AssignButtonStart.ClientID %>').click(function (e) {
-                e.preventDefault();
+            if (bulkModeField.value) {
+                document.querySelectorAll(".assign-checkbox").forEach(e => e.classList.remove("hide"));
 
-                $(this).hide();
-                $('#<%= BulkCloseCasesButton.ClientID %>').hide();
-
-                $("#AssignPanel").removeClass("d-none");
-
-                enableAssignButton();
-
-                $('.assign-checkbox').removeClass('hide');
-            });
-
-            $('#<%= AssignButtonStop.ClientID %>').click(function (e) {
-                e.preventDefault();
-
-                $("#AssignPanel").addClass("d-none");
-
-                $('#<%= AssignButtonStart.ClientID %>').show();
-                $('#<%= BulkCloseCasesButton.ClientID %>').show();
-
-                $('.assign-checkbox').addClass('hide');
-            });
-
-            $('#<%= AssignButton.ClientID %>').click(function (e) {
-                if (typeof $(this).attr('disabled') !== 'undefined' && $(this).attr('disabled') !== false) {
-                    e.preventDefault();
+                switch (bulkModeField.value) {
+                    case "CaseStatus":
+                        showCaseStatus();
+                        break;
+                    case "CloseCase":
+                        showCloseCase();
+                        break;
+                    case "Assign":
+                        showAssign();
+                        break;
                 }
+
+                document.querySelector("#<%= Grid.ClientID %> tr th").scrollIntoView();
+
+                showOrHideSaveButton();
+            }
+
+            document.querySelectorAll("td.assign-checkbox > input").forEach(el => el.addEventListener("change", showOrHideSaveButton));
+
+            document.getElementById("<%= StartBulkCaseStatusButton.ClientID %>")?.addEventListener("click", e => {
+                e.preventDefault();
+                showCaseStatus();
             });
 
-            $('.assign-checkbox input').change(enableAssignButton);
+            document.getElementById("<%= CancelBulkCaseStatusButton.ClientID %>")?.addEventListener("click", e => {
+                e.preventDefault();
+                hideCaseStatus();
+            });
 
-            function enableAssignButton() {
-                var count = $('.assign-checkbox input:checked').length;
+            document.getElementById("<%= BulkCloseCasesButton.ClientID %>")?.addEventListener("click", e => {
+                e.preventDefault();
+                showCloseCase();
+            });
 
-                if (count) {
-                    $('#<%= AssignButton.ClientID %>').removeClass('disabled');
+            document.getElementById("<%= CancelBulkButton.ClientID %>")?.addEventListener("click", e => {
+                e.preventDefault();
+                hideCloseCase();
+            });
+
+            document.getElementById("<%= AssignButtonStart.ClientID %>")?.addEventListener("click", e => {
+                e.preventDefault();
+                showAssign();
+            });
+
+            document.getElementById("<%= AssignButtonStop.ClientID %>")?.addEventListener("click", e => {
+                e.preventDefault();
+                hideAssign();
+            });
+
+            document.querySelector("th.assign-checkbox > input").addEventListener("click", e => {
+                const isChecked = e.target.checked;
+                document.querySelectorAll("td.assign-checkbox > input").forEach(e => e.checked = isChecked);
+                showOrHideSaveButton();
+            });
+
+            function showOrHideSaveButton() {
+                const hasChecked = document.getElementById("<%=BulkHasSelectionOnOtherPages.ClientID %>").value === "true"
+                    || !!document.querySelector("td.assign-checkbox > input:checked");
+
+                if (hasChecked) {
+                    document.getElementById("<%= SaveBulkCaseStatusButton.ClientID %>")?.classList?.remove("disabled");
+                    document.getElementById("<%= SaveBulkButton.ClientID %>")?.classList?.remove("disabled");
+                    document.getElementById("<%= AssignButton.ClientID %>")?.classList?.remove("disabled");
                 } else {
-                    $('#<%= AssignButton.ClientID %>').addClass('disabled');
+                    document.getElementById("<%= SaveBulkCaseStatusButton.ClientID %>")?.classList?.add("disabled");
+                    document.getElementById("<%= SaveBulkButton.ClientID %>")?.classList?.add("disabled");
+                    document.getElementById("<%= AssignButton.ClientID %>")?.classList?.add("disabled");
                 }
             }
 
-            $('.checkbox-column input').change(enableBulkSaveButton);
+            function showCaseStatus() {
+                showOrHideSaveButton();
 
-            function enableBulkSaveButton() {
-                var count = $('.checkbox-column input:checked').length;
+                document.getElementById("<%= BulkUpdateCaseStatusPanel.ClientID %>").classList.remove("d-none");
+                document.querySelectorAll(".assign-checkbox").forEach(e => e.classList.remove("hide"));
+                bulkButtons.classList.add("d-none");
 
-                if (count) {
-                    $('#<%= SaveBulkButton.ClientID %>').removeClass('disabled');
-                } else {
-                    $('#<%= SaveBulkButton.ClientID %>').addClass('disabled');
-                }
+                document.getElementById("<%= CancelBulkCaseStatusButton.ClientID %>").scrollIntoView();
+
+                bulkModeField.value = "CaseStatus";
             }
 
-            $('#<%= BulkCloseCasesButton.ClientID %>').click(function (e) {
-                e.preventDefault();
+            function hideCaseStatus() {
+                document.getElementById("<%= BulkUpdateCaseStatusPanel.ClientID %>").classList.add("d-none");
+                document.querySelectorAll(".assign-checkbox").forEach(e => e.classList.add("hide"));
+                bulkButtons.classList.remove("d-none");
 
-                enableBulkSaveButton();
+                bulkModeField.value = "";
+            }
 
-                $('#<%= hfShowCheckboxColumn.ClientID %>').val("true");
+            function showCloseCase() {
+                showOrHideSaveButton();
 
-                __doPostBack('<%= Grid.ClientID %>', '');
-            });
+                document.getElementById("<%= BulkCloseCasePanel.ClientID %>").classList.remove("d-none");
+                document.querySelectorAll(".assign-checkbox").forEach(e => e.classList.remove("hide"));
+                bulkButtons.classList.add("d-none");
 
-            $('#<%= CancelBulkButton.ClientID %>').click(function (e) {
-                e.preventDefault();
+                document.getElementById("<%= CancelBulkButton.ClientID %>").scrollIntoView();
 
-                $('#<%= hfShowCheckboxColumn.ClientID %>').val("false");
+                bulkModeField.value = "CloseCase";
+            }
 
-                __doPostBack('<%= Grid.ClientID %>', '');
-            });
+            function hideCloseCase() {
+                document.getElementById("<%= BulkCloseCasePanel.ClientID %>").classList.add("d-none");
+                document.querySelectorAll(".assign-checkbox").forEach(e => e.classList.add("hide"));
+                bulkButtons.classList.remove("d-none");
 
+                bulkModeField.value = "";
+            }
 
+            function showAssign() {
+                showOrHideSaveButton();
+
+                document.getElementById("<%= AssignPanel.ClientID %>").classList.remove("d-none");
+                document.querySelectorAll(".assign-checkbox").forEach(e => e.classList.remove("hide"));
+                bulkButtons.classList.add("d-none");
+
+                document.getElementById("<%= AssignButtonStop.ClientID %>").scrollIntoView();
+
+                bulkModeField.value = "Assign";
+            }
+
+            function hideAssign() {
+                document.getElementById("<%= AssignPanel.ClientID %>").classList.add("d-none");
+                document.querySelectorAll(".assign-checkbox").forEach(e => e.classList.add("hide"));
+                bulkButtons.classList.remove("d-none");
+
+                bulkModeField.value = "";
+            }
         });
 
     </script>

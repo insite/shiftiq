@@ -44,10 +44,12 @@ namespace InSite.UI.Admin.Assessments.QuizAttempts
             if (attempt == null)
                 HttpResponseHelper.Redirect(Search.NavigateUrl, true);
 
-            var learner = ServiceLocator.PersonSearch.GetPerson(attempt.LearnerIdentifier, attempt.OrganizationIdentifier, x => x.User);
-            PersonDetail.BindPerson(learner, User.TimeZone);
+            var person = ServiceLocator.PersonSearch.GetPerson(attempt.LearnerIdentifier, attempt.OrganizationIdentifier);
+            var user = ServiceLocator.UserSearch.GetUser(attempt.LearnerIdentifier);
 
-            PageHelper.AutoBindHeader(this, null, learner.FullName);
+            PersonDetail.BindPerson(person, user, User.TimeZone);
+
+            PageHelper.AutoBindHeader(this, null, (user?.FullName).IfNullOrEmpty("N/A"));
 
             QuizType.Text = attempt.QuizType;
             QuizName.Text = attempt.QuizName;

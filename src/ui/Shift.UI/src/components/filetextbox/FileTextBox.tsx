@@ -9,7 +9,7 @@ import Icon from "../icon/Icon";
 import { filePickerHelper } from "@/helpers/filePickerHelper";
 import { shiftClient } from "@/api/shiftClient";
 import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
-import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
+import { ApiUploadFileInfo } from "@/api/controllers/assets/files/ApiUploadFileInfo";
 import { urlHelper } from "@/helpers/urlHelper";
 
 interface Props {

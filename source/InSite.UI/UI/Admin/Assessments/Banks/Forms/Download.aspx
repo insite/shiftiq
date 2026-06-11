@@ -1,6 +1,7 @@
 <%@ Page Language="C#" CodeBehind="Download.aspx.cs" Inherits="InSite.Admin.Assessments.Banks.Forms.Download" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
-<%@ Register Src="../Controls/BankInfo.ascx" TagName="Details" TagPrefix="uc" %>
+<%@ Register Src="../Controls/BankInfo.ascx" TagName="BankDetails" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormInfo.ascx" TagName="FormDetails" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
@@ -59,12 +60,19 @@
 
             <div class="col-lg-6">
 
-                <div class="card border-0 shadow-lg h-100">
+                <div runat="server" id="BankPanel" visible="false" class="card border-0 shadow-lg h-100">
                     <div class="card-body">
                         <h3>Bank</h3>
-                        <uc:Details runat="server" ID="BankDetails" />
+                        <uc:BankDetails runat="server" ID="BankDetails" />
                     </div>
                 </div>
+
+                <div runat="server" id="FormPanel" visible="false" class="card border-0 shadow-lg h-100">
+                    <div class="card-body">
+                        <uc:FormDetails runat="server" ID="FormDetails" />
+                    </div>
+                </div>
+
             </div>
         </div>
 

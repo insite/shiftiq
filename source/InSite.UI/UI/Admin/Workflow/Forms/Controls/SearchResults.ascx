@@ -49,9 +49,15 @@
             </ItemTemplate>
         </asp:TemplateField>
 
+        <asp:TemplateField HeaderText="Created">
+            <ItemTemplate>
+                <%# GetDataTimeHtml((DateTimeOffset?)Eval("Created"), (string)Eval("CreatedByUser.FullName")) %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
         <asp:TemplateField HeaderText="Last Modified">
             <ItemTemplate>
-                <%# GetDataTimeHtml((DateTimeOffset?)Eval("LastChangeTime"), (Guid)Eval("LastChangeUser")) %>
+                <%# GetDataTimeHtml((DateTimeOffset?)Eval("LastChangeTime"), (string)Eval("LastChangeUserEntity.FullName")) %>
             </ItemTemplate>
         </asp:TemplateField>
 

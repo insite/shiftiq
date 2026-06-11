@@ -104,7 +104,7 @@ namespace InSite.UI.Admin.Records.Validators.Forms
             var journalInfo = GetJournalInfo();
             if (journalInfo == null
                 || journalInfo.JournalSetup.OrganizationIdentifier != Organization.OrganizationIdentifier
-                || ServiceLocator.JournalSearch.GetJournalSetupUser(journalInfo.JournalSetup.JournalSetupIdentifier, User.UserIdentifier, JournalSetupUserRole.Validator) == null
+                || !ServiceLocator.JournalSearch.IsLogbookValidator(journalInfo.JournalSetup.JournalSetupIdentifier, User.UserIdentifier)
                 )
             {
                 RedirectToSearch();

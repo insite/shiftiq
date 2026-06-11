@@ -10,6 +10,8 @@ namespace InSite.UI.Admin.Contacts.People.Controls
 {
     public partial class LogbookList : UserControl
     {
+        protected bool IsHoursColumnVisible => CurrentSessionState.Identity.Organization.Toolkits.Logbooks.DisplayTotalLogbookHours;
+
         public int LoadData(Guid userIdentifier)
         {
             var isAdmin = CurrentSessionState.Identity.IsGranted(PermissionIdentifiers.Admin_Records);
@@ -32,6 +34,7 @@ namespace InSite.UI.Admin.Contacts.People.Controls
                     x.JournalSetupName,
                     x.UserIdentifier,
                     EntryCount = x.ExperienceCount,
+                    HourSum = x.HourSum,
                     IsAdmin = isAdmin,
                     IsValidator = isValidator
                 })

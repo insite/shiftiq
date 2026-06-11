@@ -31,18 +31,25 @@ namespace InSite.UI.Portal.Contacts.People
             if (IsPostBack)
                 return;
 
-            PortalMaster.ShowAvatar(dashboardUrl: "/ui/portal/management/dashboard/home");
             PortalMaster.RenderHelpContent(null);
 
             PageHelper.AutoBindHeader(this);
 
-            if (Organization.OrganizationIdentifier == OrganizationIdentifiers.SkillsCheck)
+            DashboardNavigation.Visible = PortalMaster.IsSalesReady;
+
+            if (PortalMaster.IsSalesReady)
+            {
+                PortalMaster.ShowAvatar(dashboardUrl: "/ui/portal/profile");
+
                 PortalMaster.HideBreadcrumbsOnly();
 
-            if (Identity.IsAuthenticated)
-                OverrideHomeLink("/ui/portal/management/dashboard/home");
+                if (Identity.IsAuthenticated)
+                    OverrideHomeLink("/ui/portal/management/dashboard/home");
+                else
+                    OverrideHomeLink("/ui/portal/billing/catalog");
+            }
             else
-                OverrideHomeLink("/ui/portal/billing/catalog");
+                PortalMaster.SidebarVisible(false);
 
             Open();
         }
@@ -63,7 +70,13 @@ namespace InSite.UI.Portal.Contacts.People
             RegistrationSection.SetTitle("Registrations", registrationCount);
 
             var recordCount = Records.LoadData(Organization.Identifier, LearnerIdentifier);
-            RecordSection.SetTitle("Records", recordCount);
+            RecordSection.SetTitle("Gradebooks", recordCount);
+
+            var programCount = PersonPrograms.LoadData(Organization.Identifier, LearnerIdentifier);
+            ProgramSection.SetTitle("Programs", programCount);
+
+            var logbookCount = PersonLogbooks.LoadData(Organization.Identifier, LearnerIdentifier);
+            LogbookSection.SetTitle("Logbooks", logbookCount);
         }
 
         private void LoadContact()

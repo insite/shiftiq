@@ -216,7 +216,7 @@ namespace InSite.Cmds.Admin.Achievements.Forms
 
             PageHelper.AutoBindHeader(this, null, info.AchievementTitle);
 
-            AchievementDetails.SetInputValues(info);
+
 
             var count = DepartmentChecklist.LoadAchievements(info.AchievementIdentifier);
             DepartmentSection.SetTitle("Departments", count);
@@ -226,6 +226,13 @@ namespace InSite.Cmds.Admin.Achievements.Forms
             var returnUrl = $"/ui/cmds/admin/achievements/edit?id={AchievementIdentifier}&panel=credentials";
 
             CredentialGrid.LoadDataByAchievementID(info.AchievementIdentifier, false, returnUrl);
+
+            var allows = ServiceLocator.AchievementSearch.CountCredentialsThatAllowSelfDeclaration(info.AchievementIdentifier);
+
+            var disallows = ServiceLocator.AchievementSearch.CountCredentialsThatDisallowSelfDeclaration(info.AchievementIdentifier);
+
+            AchievementDetails.SetInputValues(info, allows, disallows);
+
             CredentialSection.SetTitle("Learners", CredentialGrid.RowCount);
         }
 

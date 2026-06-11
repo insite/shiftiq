@@ -37,6 +37,7 @@
                 <thead>
                     <tr>
                         <th>Logbook</th>
+                        <th runat="server" visible='<%# IsHoursColumnVisible %>' style="text-align:center;">Hours</th>
                         <th style="text-align:center;">Entries</th>
                         <th></th>
                     </tr>
@@ -53,6 +54,9 @@
                         <%# Eval("JournalSetupName") %>
                     </a>
                     <asp:Literal runat="server" Visible='<%# Eval("IsValidator") %>' Text='<%# Eval("JournalSetupName") %>' />
+                </td>
+                <td runat="server" visible='<%# IsHoursColumnVisible %>' style="text-align:center;">
+                    <%# Eval("HourSum", "{0:n2}") %>
                 </td>
                 <td style="width:200px;text-align:center;">
                     <%# Eval("EntryCount") %>

@@ -5,7 +5,7 @@ using System.Web.UI.WebControls;
 
 using InSite.Common.Web.UI;
 
-using Shift.Toolbox.Reporting.PerformanceReport.Models;
+using Shift.Toolbox.Reports.PerformanceReport.Models;
 
 namespace InSite.UI.Admin.Assessments.Attempts.Controls
 {

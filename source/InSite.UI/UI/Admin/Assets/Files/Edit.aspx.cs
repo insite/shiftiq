@@ -70,7 +70,7 @@ namespace InSite.UI.Admin.Assets.Files
                 if (Model == null)
                     HttpResponseHelper.Redirect("/");
 
-                var (isValid, title) = Detail.BindModelToControls(Model);
+                var (isValid, title) = Detail.BindModelToControls(Model, BackToCase);
                 if (!isValid)
                     HttpResponseHelper.Redirect("/");
 

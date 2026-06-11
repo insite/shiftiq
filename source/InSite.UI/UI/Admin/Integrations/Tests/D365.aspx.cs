@@ -6,6 +6,8 @@ using InSite.UI.Layout.Admin;
 
 using Newtonsoft.Json;
 
+using Shift.Constant;
+
 namespace InSite.UI.Admin.Integrations.Tests
 {
     public partial class D365 : AdminBasePage
@@ -28,7 +30,7 @@ namespace InSite.UI.Admin.Integrations.Tests
                 return;
 
             if (!CanEdit)
-                HttpResponseHelper.Redirect("/ui/admin/home");
+                HttpResponseHelper.Redirect(RelativeUrl.AdminHomeUrl);
 
             PageHelper.AutoBindHeader(this);
 

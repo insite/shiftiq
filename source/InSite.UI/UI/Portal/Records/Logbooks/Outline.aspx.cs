@@ -136,7 +136,7 @@ namespace InSite.UI.Portal.Records.Logbooks
 
         private byte[] GetPdf()
         {
-            var journalSetupResultCreator = new Shift.Toolbox.Progress.LogbookResultCreator();
+            var journalSetupResultCreator = new Shift.Toolbox.Records.LogbookResultCreator();
 
             var journalSetupPDFModel = LogbookResultHelper.GetLogbookResultPdfModel(
                 JournalSetupIdentifier,

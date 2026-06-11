@@ -15,11 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Reporting\PerformanceReport\NCAS\Inspire_Logo.png" />
+    <None Remove="Reports\PerformanceReport\NCAS\Inspire_Logo.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Reporting\PerformanceReport\NCAS\Inspire_Logo.png" />
+    <EmbeddedResource Include="Reports\PerformanceReport\NCAS\Inspire_Logo.png" />
   </ItemGroup>
 
   <ItemGroup>

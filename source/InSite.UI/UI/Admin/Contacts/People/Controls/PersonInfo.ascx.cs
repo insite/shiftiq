@@ -31,30 +31,70 @@ namespace InSite.UI.Admin.Contacts.People.Controls
             AspLiteral email = null, AspLiteral personCode = null, AspLiteral birthdate = null,
             AspLiteral employer = null)
         {
+            BindUserInfo(person, user, userName, userLink, email);
+            BindPersonInfo(person, tz, personCode, birthdate, employer);
+        }
+
+        private static void BindUserInfo(QPerson person, QUser user, AspLiteral userName, HtmlAnchor userLink, AspLiteral email)
+        {
+            var hasPerson = person != null;
+
+            if (user == null)
+            {
+                if (userName != null)
+                    userName.Visible = false;
+
+                if (userLink != null)
+                    userLink.Visible = false;
+
+                if (email != null)
+                    email.Text = "N/A";
+
+                return;
+            }
+
             if (userName != null)
             {
-                userName.Text = user?.FullName;
-                userName.Visible = person == null || userLink == null;
+                userName.Text = user.FullName;
+                userName.Visible = !hasPerson || userLink == null;
             }
 
             if (userLink != null)
             {
-                userLink.InnerText = user?.FullName;
-                userLink.HRef = $"/ui/admin/contacts/people/edit?contact={user?.UserIdentifier}";
-                userLink.Visible = person != null;
+                userLink.InnerText = user.FullName;
+                userLink.HRef = $"/ui/admin/contacts/people/edit?contact={user.UserIdentifier}";
+                userLink.Visible = hasPerson;
             }
 
             if (email != null)
-                email.Text = $"<a href='mailto:{user?.Email}'>{user?.Email}</a>";
+                email.Text = $"<a href='mailto:{user.Email}'>{user.Email}</a>";
+        }
+
+        private static void BindPersonInfo(QPerson person, TimeZoneInfo tz, AspLiteral personCode, AspLiteral birthdate, AspLiteral employer)
+        {
+            if (person == null)
+            {
+                if (personCode != null)
+                    personCode.Text = "None";
+
+                if (birthdate != null)
+                    birthdate.Text = "N/A";
+
+                if (employer != null)
+                    employer.Text = "None";
+
+                return;
+            }
 
             if (personCode != null)
-                personCode.Text = person?.PersonCode ?? "None";
+                personCode.Text = person.PersonCode.IfNullOrEmpty("None");
 
-            birthdate.Text = person?.Birthdate != null ? GetLocalTime(person.Birthdate, tz) : "N/A";
+            if (birthdate != null)
+                birthdate.Text = person.Birthdate.HasValue ? GetLocalTime(person.Birthdate, tz) : "N/A";
 
             if (employer != null)
             {
-                var employerGroup = person?.EmployerGroupIdentifier != null
+                var employerGroup = person.EmployerGroupIdentifier.HasValue
                     ? ServiceLocator.GroupSearch.GetGroup(person.EmployerGroupIdentifier.Value)
                     : null;
 

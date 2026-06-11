@@ -16,6 +16,8 @@ using Shift.Common.Integration.Google;
 using Shift.Constant;
 using Shift.Contract.Presentation;
 using Shift.Sdk.Service;
+using Shift.Sdk.Service.Platform;
+using Shift.Sdk.Service.Platform.DashboardNotifications;
 using Shift.Sdk.Service.Security.Cookies;
 using Shift.Service.Content;
 using Shift.Service.Content.PageContents;
@@ -24,6 +26,7 @@ using Shift.Service.Evaluation.Workshops;
 using Shift.Service.Feedback;
 using Shift.Service.Metadata.Sequences.Data;
 using Shift.Service.Orchestration;
+using Shift.Service.Platform.Dashboard;
 using Shift.Service.Presentation;
 using Shift.Service.Workspace;
 using Shift.Toolbox;
@@ -160,15 +163,14 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
 
     services.AddSingleton<ICookieService, CookieService>();
 
-    services.AddSingleton<IFileChangeFactory>(x => new FileChangeFactory(x => string.Empty));
+    services.AddSingleton(_ => new FilePaths(settings.DataFolderShare, settings.DataFolderEnterprise));
+    services.AddSingleton<IFileChangeFactory>(_ => new FileChangeFactory(_ => string.Empty));
     services.AddSingleton<IFileSearchAsync, FileSearch>();
     services.AddSingleton<IFileStoreAsync, FileStore>();
-    services.AddSingleton<IFileManagerServiceAsync>(x =>
-    {
-        var paths = new FilePaths(settings.DataFolderShare, settings.DataFolderEnterprise);
-        return new FileManagerService(paths);
-    });
+    services.AddSingleton<IFileManagerServiceAsync, FileManagerService>();
     services.AddSingleton<IStorageServiceAsync, StorageService>();
+    services.AddSingleton<IDashboardNotificationManager, DashboardNotificationManager>();
+    services.AddSingleton<IDashboardService, DashboardService>();
 
     services.AddScoped<ISequence, Sequence>();
     services.AddScoped<ICommanderAsync, TimelineService>();
@@ -278,6 +280,10 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
 
     ImageHelper.Initialize(settings.Engine.Api.ImageMagick);
 
+    services.AddMemoryCache();
+    services.AddScoped<MailgunWebhookHandler>();
+    services.AddHostedService<MailgunWebhookListener>();
+
     return BuildApplication(builder, settings, settings.Shift.Api, telemetry);
 }
 
@@ -307,7 +313,9 @@ WebApplication BuildApplication(WebApplicationBuilder builder, AppSettings setti
             .AllowCredentials()
             .SetIsOriginAllowedToAllowWildcardSubdomains()
             .WithExposedHeaders("X-Query-Pagination", "Content-Disposition", "X-Session-Refreshed")
-            .WithOrigins(api.Origins);
+            .WithOrigins(api.Origins)
+            .SetPreflightMaxAge(TimeSpan.FromHours(1))
+            ;
     });
 
     host.UseAuthentication();

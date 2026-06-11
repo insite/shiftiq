@@ -27,7 +27,7 @@
             <tr>
                 <td id="footer_title"></td>
                 <td style="text-align:right;">
-                    Page <span id="page"></span> of <span id="topage"></span>
+                    <span id="page"></span>
                 </td>
             </tr>
         </tbody>
@@ -46,9 +46,11 @@
                 return b;
             })(window.location.search.substring(1).split('&'));
 
+            var page = variables.page;
+            var topage = variables.topage;
+
             document.getElementById('footer_title').innerText = String(variables.footer_title);
-            document.getElementById('page').innerText = String(variables.page);
-            document.getElementById('topage').innerText = String(variables.topage);
+            document.getElementById('page').innerText = variables.page_format.replace("{0}", page).replace("{1}", topage);
         })();
     </script>
 </body>

@@ -51,7 +51,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Learners
                     && !Identity.IsGranted(PermissionIdentifiers.Admin_Records)
                     && (
                         !Identity.IsGranted(PermissionIdentifiers.Portal_Logbooks)
-                        || !ServiceLocator.JournalSearch.ExistsJournalSetupUser(JournalSetupIdentifier, User.UserIdentifier, JournalSetupUserRole.Validator)
+                        || !ServiceLocator.JournalSearch.IsLogbookValidator(JournalSetupIdentifier, User.UserIdentifier)
                     )
                 )
             {

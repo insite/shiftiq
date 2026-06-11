@@ -6,7 +6,8 @@
         /// The subset of items requested within a paged data set
         /// </summary>
         /// <remarks>
-        /// Indexing starts at one (not zero) because we want page numbers to be readable and user-friendly in URLs.
+        /// Indexing starts at one (not zero) because we want page numbers to be readable and user-friendly in URLs. If
+        /// the page number is zero then paging is disabled.
         /// </remarks>
         public int Page { get; set; } = 1;
 

@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" AutoEventWireup="true" CodeBehind="Search.aspx.cs" Inherits="InSite.UI.Admin.Issues.Issues.Search" %>
 <%@ Register Src="./Controls/SearchCriteria.ascx" TagName="SearchCriteria" TagPrefix="uc" %>
 <%@ Register Src="./Controls/SearchResults.ascx" TagName="SearchResults" TagPrefix="uc" %>
-<%@ Register Src="~/UI/Layout/Common/Controls/SearchDownload.ascx" TagName="SearchDownload" TagPrefix="uc" %>
+<%@ Register Src="./Controls/SearchDownload.ascx" TagName="SearchDownload" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Messages/Messages/Controls/SendEmail.ascx" TagName="SendEmail" TagPrefix="uc" %>
 
 <asp:Content ContentPlaceHolderID="BodyContent" runat="server">

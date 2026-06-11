@@ -74,34 +74,34 @@ function setUrlParams(url: string, params: Readonly<Params<string>>) {
     return result;
 }
 
+function getBreadcrumbs(path: string, includeHomeIfNoParent: boolean = true): (FormRoute | CustomBreadcrumbItem)[] | null {
+    const formRoute = getFormRoute(path);
+    if (!formRoute) {
+        return null;
+    }
+
+    if (formRoute.customBreadcrumbs) {
+        return [
+            ...formRoute.customBreadcrumbs,
+            formRoute
+        ];
+    }
+
+    const breadcrumbs: (FormRoute | CustomBreadcrumbItem)[] = formRoute.parent
+        ? [...getBreadcrumbs(formRoute.parent.path, false)!, formRoute]
+        : includeHomeIfNoParent
+            ? [getFormRoute("/client/admin/home")!, formRoute]
+            : [formRoute];
+
+    return breadcrumbs;
+}
+
 buildList(formRoutes);
 
 export const formRouteHelper = {
     routeObjects: _routeObjects,
 
-    getBreadcrumbs(path: string): (FormRoute | CustomBreadcrumbItem)[] | null {
-        const formRoute = getFormRoute(path);
-        if (!formRoute) {
-            return null;
-        }
-
-        if (formRoute.customBreadcrumbs) {
-            return [
-                ...formRoute.customBreadcrumbs,
-                formRoute
-            ];
-        }
-
-        const breadcrumbs: FormRoute[] = [formRoute];
-        
-        let parent = formRoute.parent;
-        while (parent) {
-            breadcrumbs.splice(0, 0, parent);
-            parent = parent.parent;
-        }
-
-        return breadcrumbs;
-    },
+    getBreadcrumbs,
 
     setUrlParams,
 

@@ -17,6 +17,7 @@
             <div class="card-body">
                 <div class="mb-3">
                     <insite:Button runat="server" ID="AddUsers" Text="Add Learners" Icon="fas fa-plus-circle" ButtonStyle="Default" CssClass="me-1" />
+                    <insite:Button runat="server" ID="BulkAddEntriesButton" Text="Bulk Add Entries" Icon="fas fa-folder" ButtonStyle="Default" CssClass="me-1" />
                 </div>
 
                 <uc:UserGrid runat="server" ID="Users" IsValidator="true" />

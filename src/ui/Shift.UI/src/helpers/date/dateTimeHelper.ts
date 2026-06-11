@@ -1,5 +1,5 @@
 import { _dateTimeParser } from "./_dateTimeParser";
-import { DateParts, DateFormatType, months, TimeParts, DateTimeParts, isDateTimeInvalid, DateTime } from "./dateTimeTypes";
+import { DateParts, DateFormatType, months, TimeParts, DateTimeParts, isDateTimeInvalid, DateTime, weekDays } from "./dateTimeTypes";
 import { TimeZoneId, timeZones } from "./timeZones";
 
 const _dateFormatters = {
@@ -11,6 +11,12 @@ const _dateFormatters = {
     },
     "mmm d, yyyy": (date: DateParts) => {
         return isValidDate(date) ? `${months[date.month! - 1].short} ${date.day!}, ${date.year}` : null;
+    },
+    "dddd, mmmm d, yyyy": (date: DateParts) => {
+        return isValidDate(date) ? `${getWeekDayName(date)}, ${months[date.month! - 1].name} ${date.day!}, ${date.year}` : null;
+    },
+    "mmmm d, yyyy": (date: DateParts) => {
+        return isValidDate(date) ? `${months[date.month! - 1].name} ${date.day!}, ${date.year}` : null;
     },
 }
 
@@ -202,6 +208,11 @@ function toDate(dateTime: DateTimeParts | undefined | null): Date | null {
     const adjustedUtcMs = targetUtcMs - timeZoneOffsetInMs;
 
     return new Date(adjustedUtcMs);
+}
+
+function getWeekDayName(value: DateParts): string {
+    const date = new Date(value.year!, value.month! -1, value.day!);
+    return weekDays[date.getDay()].name;
 }
 
 export const dateTimeHelper = {

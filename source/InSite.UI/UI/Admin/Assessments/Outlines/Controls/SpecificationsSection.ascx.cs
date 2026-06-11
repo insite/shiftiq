@@ -51,6 +51,7 @@ namespace InSite.Admin.Assessments.Outlines.Controls
 
             CommandsDropDown.Click += CommandsDropDown_Click;
             SpecificationWorkshopButton.Click += SpecificationWorkshopButton_Click;
+            SpecificationWorkshopNewButton.Click += SpecificationWorkshopNewButton_Click;
         }
 
         protected override void CreateChildControls()
@@ -111,6 +112,15 @@ namespace InSite.Admin.Assessments.Outlines.Controls
             HttpResponseHelper.Redirect($"/ui/admin/assessments/specifications/workshop?bank={BankID}&spec={spec.Identifier}");
         }
 
+        private void SpecificationWorkshopNewButton_Click(object sender, EventArgs e)
+        {
+            var spec = GetSelectedSpecification();
+            if (spec == null)
+                return;
+
+            HttpResponseHelper.Redirect($"/client/admin/assessment/specs/workshop/{spec.Identifier}");
+        }
+
         #endregion
 
         #region Data binding
@@ -126,6 +136,7 @@ namespace InSite.Admin.Assessments.Outlines.Controls
 
             SpecificationSelector.Visible = hasSpecs;
             SpecificationWorkshopButton.Visible = hasSpecs;
+            SpecificationWorkshopNewButton.Visible = hasSpecs && (ServiceLocator.AppSettings.Environment.Name == EnvironmentName.Development || ServiceLocator.AppSettings.Environment.Name == EnvironmentName.Local);
             CommandColumn.Visible = canWrite;
 
             foreach (var item in CommandsDropDown.Items)

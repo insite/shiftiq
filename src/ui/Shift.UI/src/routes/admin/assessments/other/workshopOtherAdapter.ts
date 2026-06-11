@@ -3,9 +3,9 @@ import { workshopValidation } from "@/contexts/workshop/models/workshopValidatio
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 import { TimeZoneId } from "@/helpers/date/timeZones";
 import { urlHelper } from "@/helpers/urlHelper";
-import { ApiWorkshopComment } from "@/api/controllers/workshop/ApiWorkshopComment";
-import { ApiWorkshopAttachment } from "@/api/controllers/workshop/ApiWorkshopAttachment";
-import { ApiWorkshopProblemQuestion } from "@/api/controllers/workshop/ApiWorkshopProblemQuestion";
+import { ApiWorkshopComment } from "@/api/controllers/assessments/workshop/ApiWorkshopComment";
+import { ApiWorkshopAttachment } from "@/api/controllers/assessments/workshop/ApiWorkshopAttachment";
+import { ApiWorkshopProblemQuestion } from "@/api/controllers/assessments/workshop/ApiWorkshopProblemQuestion";
 
 function validateAttachmentType(attachmentType: string) {
     switch (attachmentType) {

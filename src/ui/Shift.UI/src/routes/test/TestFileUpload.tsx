@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import FormField from "@/components/form/FormField";
 import ValidationSummary from "@/components/ValidationSummary";
 import Button from "@/components/Button";
-import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
+import { ApiUploadFileInfo } from "@/api/controllers/assets/files/ApiUploadFileInfo";
 import { ControlledFileUpload } from "@/components/fileupload/ControlledFileUpload";
 import TextBox from "@/components/TextBox";
 

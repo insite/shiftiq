@@ -9,7 +9,7 @@ import { WorkshopQuestionChangeDates } from "./models/WorkshopQuestionChangeDate
 
 type ContextData = WorkshopQuestionState & {
     initQuestionState: (state: WorkshopQuestionState) => void;
-    setSectionData: (competencies: WorkshopStandard[], questions: WorkshopQuestion[]) => void;
+    setSectionData: (competencies: WorkshopStandard[], questions: WorkshopQuestion[], afterQuestionCreated?: boolean) => void;
     selectSection: (sectionId: string) => void;
     modifyQuestionComments: (questionId: string, comments: WorkshopComment[], candidateCommentCount: number) => void;
     modifyQuestionFlag: (questionId: string, flag: WorkshopFlag) => void;
@@ -27,7 +27,6 @@ type ContextData = WorkshopQuestionState & {
     modifyQuestionOptionColumnTitle: (questionId: string, optionNumber: number, columnIndex: number, textMarkdown: string | null, textHtml: string | null) => void;
     showHideComment: (questionId: string, commentId: string, hidden: boolean) => void;
     setQuestionChangeDates: (questionChangeDates: WorkshopQuestionChangeDates | null) => void;
-    addQuestion: (question: WorkshopQuestion) => void;
 }
 
 export const WorkshopQuestionProviderContext = createContext<ContextData>({
@@ -64,7 +63,6 @@ export const WorkshopQuestionProviderContext = createContext<ContextData>({
     modifyQuestionOptionColumnTitle() {},
     showHideComment() {},
     setQuestionChangeDates() {},
-    addQuestion() {},
 });
 
 export function useWorkshopQuestionProvider() {

@@ -54,11 +54,17 @@
                 <asp:TemplateField HeaderText="Email">
                     <ItemTemplate>
                         <asp:HyperLink runat="server" ID="EmailLink" />
-                        <asp:Label runat="server" ID="EmailLabel" CssClass="email-disabled" />
+                        <asp:Label runat="server" ID="EmailLabel" CssClass="text-muted" />
                     </ItemTemplate>
                 </asp:TemplateField>
 
-                <asp:BoundField HeaderText="Person Code" DataField="AccountNumber" HeaderStyle-Wrap="false" />
+                <asp:TemplateField HeaderText="Person Code" HeaderStyle-Wrap="false">
+                    <ItemTemplate>
+                        <%# Eval("AccountNumber") %>
+                        <asp:Label runat="server" ID="OrganizationLabel" CssClass="badge bg-secondary fs-sm"><%# Eval("OrganizationCode") %></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+
                 <asp:BoundField HeaderText="Function" DataField="RoleType" />
 
                 <asp:TemplateField HeaderText="Effective">

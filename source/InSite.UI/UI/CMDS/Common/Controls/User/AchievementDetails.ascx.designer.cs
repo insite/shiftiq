@@ -51,6 +51,42 @@ namespace InSite.Cmds.Controls.Training.Achievements
         protected global::InSite.Common.Web.UI.CheckBox EnableSignOff;
 
         /// <summary>
+        /// LearnerSelfDeclarationPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl LearnerSelfDeclarationPanel;
+
+        /// <summary>
+        /// LearnerSelfDeclarationStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl LearnerSelfDeclarationStatus;
+
+        /// <summary>
+        /// AllowSelfDeclarationOnCredentials control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton AllowSelfDeclarationOnCredentials;
+
+        /// <summary>
+        /// DisallowSelfDeclarationOnCredentials control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton DisallowSelfDeclarationOnCredentials;
+
+        /// <summary>
         /// IsTimeSensitive control.
         /// </summary>
         /// <remarks>

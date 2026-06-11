@@ -90,6 +90,7 @@ test("setSectionData updates the targeted selected section", () => {
         type: "setSectionData",
         competencies,
         questions: [updatedQuestion],
+        afterQuestionCreated: false,
     });
 
     expect(result.sections![0].questions![0].questionId).toEqual("q2");
@@ -126,6 +127,7 @@ test("setSectionData updates only the selected section when other sections exist
         type: "setSectionData",
         competencies: cachedCompetencies,
         questions: [cachedQuestion],
+        afterQuestionCreated: false,
     });
 
     expect(result.sections![0].questions![0].questionId).toEqual("q2");

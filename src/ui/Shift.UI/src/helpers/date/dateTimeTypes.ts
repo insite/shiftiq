@@ -27,7 +27,7 @@ export interface DateTimeInvalid {
 export type DateTime = DateTimeParts | DateTimeInvalid | null;
 export type DateOrDateTime = DateParts | DateTimeParts | DateTimeInvalid | null;
 
-export type DateFormatType = "mm/dd/yyyy" | "mmm d, yyyy" | "yyyy-mm-dd";
+export type DateFormatType = "mm/dd/yyyy" | "mmm d, yyyy" | "yyyy-mm-dd" | "dddd, mmmm d, yyyy" |  "mmmm d, yyyy";
 export type TimeFormatType = "h:m tt z" | "HH:mm:ss z";
 
 export const defaultFormatType: DateFormatType = "mmm d, yyyy";
@@ -45,6 +45,16 @@ export const months = [
     { number: 10, name: translate("October"), short: translate("Oct") },
     { number: 11, name: translate("November"), short: translate("Nov") },
     { number: 12, name: translate("December"), short: translate("Dec") },
+];
+
+export const weekDays = [
+    { name: translate("Sunday") },
+    { name: translate("Monday") },
+    { name: translate("Tuesday") },
+    { name: translate("Wednesday") },
+    { name: translate("Thursday") },
+    { name: translate("Friday") },
+    { name: translate("Saturday") },
 ];
 
 export function isDateTimeInvalid(value: DateOrDateTime | undefined): value is DateTimeInvalid {

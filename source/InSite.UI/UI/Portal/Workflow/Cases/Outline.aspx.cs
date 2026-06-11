@@ -73,7 +73,7 @@ namespace InSite.UI.Portal.Issues
             IssueStatusName.Text = model.IssueStatusName;
             IssueTitle.Text = model.IssueTitle;
             IssueDescriptionHtml.Text = model.IssueDescriptionHtml;
-            NewAttachmentPanel.Visible = model.IssueStatusCategory != "Closed";
+            AttachmentPanel.Visible = model.IssueStatusCategory != "Closed";
 
             BindAttachments();
             BindFileRequirements();
@@ -90,6 +90,6 @@ namespace InSite.UI.Portal.Issues
         }
 
         public string GetTitle()
-            => $"Case #{IssueNumber}";
+            => Translate("Case") + $" #{IssueNumber}";
     }
 }

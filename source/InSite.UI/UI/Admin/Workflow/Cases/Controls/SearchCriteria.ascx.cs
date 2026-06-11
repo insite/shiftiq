@@ -74,6 +74,7 @@ namespace InSite.Admin.Issues.Controls
                 return;
 
             SetCheckAll(MembershipStatus, "Membership Status");
+            SetCheckAll(IssueStatus, "Case Statuses");
 
             CommentCategory.EnsureDataBound();
 
@@ -95,7 +96,7 @@ namespace InSite.Admin.Issues.Controls
 
                     AdministratorUserIdentifier = ManagerIdentifier.Value,
                     IssueType = IssueType.Value,
-                    IssueStatusIdentifier = IssueStatus.ValueAsGuid,
+                    IssueStatusIdentifiers = IssueStatus.ValuesAsGuidArray,
                     IssueStatusCategory = IssueStatusCategory.Value,
                     IssueTitle = IssueTitle.Text,
                     AssigneeName = AssigneeName.Text,
@@ -187,7 +188,7 @@ namespace InSite.Admin.Issues.Controls
 
                 OwnerIdentifier.Value = value.OwnerUserIdentifier;
 
-                IssueStatus.ValueAsGuid = value.IssueStatusIdentifier;
+                IssueStatus.ValuesAsGuid = value.IssueStatusIdentifiers;
 
                 IssueCommentAssignedIdentifier.Value = value.IssueCommentAssigneeIdentifier;
                 CommentCategory.Value = value.IssueCommentCategory;
@@ -227,7 +228,7 @@ namespace InSite.Admin.Issues.Controls
         public override void Clear()
         {
             IssueNumber.Text = null;
-            IssueStatus.Value = null;
+            IssueStatus.Values = null;
             IssueStatusCategory.ClearSelection();
             IssueType.Value = null;
             IssueTitle.Text = null;

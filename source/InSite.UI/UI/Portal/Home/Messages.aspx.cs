@@ -5,11 +5,14 @@ using System.Text;
 using System.Web;
 using System.Web.UI.WebControls;
 
+using InSite.Application.Messages.Read;
 using InSite.Common.Web;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
 using InSite.Web.Helpers;
+
+using Newtonsoft.Json;
 
 using Shift.Common;
 using Shift.Constant;
@@ -21,35 +24,12 @@ namespace InSite.UI.Portal.Home
         private class DataItem
         {
             public int Sequence { get; set; }
-            public Guid MailoutIdentifier { get; set; }
-            public Guid SenderIdentifier { get; set; }
-            public Guid? SurveyIdentifier { get; set; }
-            public string ContentSubject { get; set; }
-            public string ContentBodyHtml { get; set; }
-            public string ContentBodyText { get; set; }
-            public string ContentVariables { get; set; }
-            public string SenderName { get; set; }
-            public string SenderEmail { get; set; }
-            public string RecipientVariables { get; set; }
-            public DateTimeOffset? DeliveryCompleted { get; set; }
-
-            public string ContentBody
-            {
-                get
-                {
-                    var body = ContentBodyHtml.IsEmpty() ? Markdown.ToHtml(ContentBodyText) : ContentBodyHtml;
-
-                    if (ContentVariables != null)
-                    {
-                        var variables = ServiceLocator.Serializer.Deserialize<Dictionary<string, string>>(ContentVariables);
-                        foreach (var v in variables)
-                            body = body.Replace("$" + v.Key, v.Value);
-                    }
-
-                    return body;
-                }
-            }
+            public Guid LearnerId { get; set; }
+            public Persistence.TEmailSearch.MyMessage Data { get; set; }
         }
+
+        private IDictionary<Guid, ContentContainer> _contentContainers = null;
+        private IDictionary<Guid, QRecipient> _mailoutsRecipients = null;
 
         protected override void OnInit(EventArgs e)
         {
@@ -61,6 +41,7 @@ namespace InSite.UI.Portal.Home
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+
             BindMail();
         }
 
@@ -71,25 +52,31 @@ namespace InSite.UI.Portal.Home
             PortalMaster.ShowAvatar();
             PortalMaster.EnableSidebarToggle(true);
 
+            var learnerId = GetLearnerIdentifier();
+
             var deliveries = TEmailSearch
-                .GetMyMessages(GetLearnerIdentifier(), Organization.Key)
+                .GetMyMessages(learnerId, Organization.Key)
                 .Select((x, i) => new DataItem
                 {
-                    MailoutIdentifier = x.MailoutIdentifier,
-                    SenderIdentifier = x.SenderIdentifier,
-                    SurveyIdentifier = x.SurveyIdentifier,
-                    ContentSubject = x.ContentSubject,
-                    ContentBodyHtml = x.ContentBodyHtml,
-                    ContentBodyText = x.ContentBodyText,
-                    ContentVariables = x.ContentVariables,
-                    SenderName = x.SenderName,
-                    SenderEmail = x.SenderEmail,
-                    RecipientVariables = x.RecipientVariables,
-                    DeliveryCompleted = x.DeliveryCompleted,
-                    Sequence = i + 1
+                    Sequence = i + 1,
+                    LearnerId = learnerId,
+                    Data = x
                 })
-                .Where(x => x.DeliveryCompleted.HasValue)
+                .Where(x => x.Data.DeliveryCompleted.HasValue)
                 .ToArray();
+
+            var mailoutIds = deliveries.Select(x => x.Data.MailoutIdentifier).ToArray();
+            if (mailoutIds.IsNotEmpty())
+            {
+                _contentContainers = TContentSearch.Instance.GetBlocks(mailoutIds);
+                _mailoutsRecipients = ServiceLocator.MessageSearch
+                    .GetDeliveries(new Domain.Messages.DeliveryFilter
+                    {
+                        MailoutIdentifiers = mailoutIds,
+                        RecipientIdentifier = learnerId
+                    })
+                    .ToDictionary(x => x.MailoutIdentifier);
+            }
 
             MailItems.DataSource = deliveries;
             MailItems.DataBind();
@@ -106,24 +93,83 @@ namespace InSite.UI.Portal.Home
             var item = (DataItem)Page.GetDataItem();
 
             return $"<span class='badge bg-info'>" +
-                $"{TimeZones.FormatDateOnly(item.DeliveryCompleted.Value, CurrentSessionState.Identity.User.TimeZone)} " +
-                $"{TimeZones.FormatTimeOnly(item.DeliveryCompleted.Value, CurrentSessionState.Identity.User.TimeZone)}</span>";
+                $"{TimeZones.FormatDateOnly(item.Data.DeliveryCompleted.Value, CurrentSessionState.Identity.User.TimeZone)} " +
+                $"{TimeZones.FormatTimeOnly(item.Data.DeliveryCompleted.Value, CurrentSessionState.Identity.User.TimeZone)}</span>";
         }
 
         protected string GetBodyHtml()
         {
             var item = (DataItem)Page.GetDataItem();
-            var body = item.ContentBodyText ?? item.ContentBodyHtml;
-            var html = MessageHelper.BuildPreviewHtml(Organization.OrganizationIdentifier, item.SenderIdentifier, InSite.Admin.Messages.Outlines.Forms.Outline.GetSurveyFormAsset(item.SurveyIdentifier), body);
 
-            return HttpUtility.HtmlEncode(html);
+            var content = _contentContainers.GetOrDefault(item.Data.MailoutIdentifier, () => new ContentContainer());
+
+            var email = EmailDraft.Create(
+                Organization.OrganizationIdentifier,
+                null,
+                item.Data.SenderIdentifier,
+                false
+            );
+
+            email.ContentSubject = content.Title.Text;
+            if (email.ContentSubject.IsEmpty)
+                email.ContentSubject.Default = item.Data.ContentSubject;
+
+            email.ContentBody = content.Body.Text;
+            if (email.ContentBody.IsEmpty)
+                email.ContentBody.Default = item.Data.ContentBodyHtml;
+
+            var recipient = GetRecipientAddress(item);
+            email.Recipients.Add(recipient);
+
+            if (item.Data.ContentVariables.IsNotEmpty())
+                email.ContentVariables = JsonConvert.DeserializeObject<Dictionary<string, string>>(item.Data.ContentVariables);
+
+            var message = MessageHelper.BuildMessage(email, CurrentLanguage);
+            var envelope = new EmailVariables(recipient.Identifier.Value, recipient.Address, email.OrganizationIdentifier, recipient.Variables);
+            var body = MessageHelper.ReplacePlaceholdersForMailgun(Organization.Identifier, item.Data.SenderIdentifier, null, message.Body, envelope);
+
+            return HttpUtility.HtmlEncode(body);
+        }
+
+        private EmailAddress GetRecipientAddress(DataItem item)
+        {
+            var recipient = _mailoutsRecipients.GetOrDefault(item.Data.MailoutIdentifier);
+
+            EmailAddress result;
+
+            if (recipient != null)
+            {
+                result = new EmailAddress(
+                    recipient.UserIdentifier,
+                    recipient.UserEmail,
+                    recipient.PersonName,
+                    recipient.PersonCode,
+                    recipient.PersonLanguage);
+
+                if (recipient.RecipientVariables != null)
+                    result.Variables = JsonConvert.DeserializeObject<Dictionary<string, string>>(recipient.RecipientVariables);
+            }
+            else
+            {
+                result = new EmailAddress(
+                    item.LearnerId,
+                    item.Data.RecipientEmail,
+                    item.Data.RecipientName,
+                    null,
+                    null);
+
+                if (item.Data.RecipientVariables != null)
+                    result.Variables = JsonConvert.DeserializeObject<Dictionary<string, string>>(item.Data.RecipientVariables);
+            }
+
+            return result;
         }
 
         protected string GetVariablesHtml()
         {
             var item = (DataItem)Page.GetDataItem();
-            var variables = item.RecipientVariables.IsNotEmpty()
-                ? ServiceLocator.Serializer.Deserialize<Dictionary<string, string>>(item.RecipientVariables)
+            var variables = item.Data.RecipientVariables.IsNotEmpty()
+                ? ServiceLocator.Serializer.Deserialize<Dictionary<string, string>>(item.Data.RecipientVariables)
                 : null;
 
             if (variables.IsEmpty())

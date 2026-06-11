@@ -14,27 +14,32 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
 {
     public partial class Delete : AdminBasePage, IHasParentLinkParameters
     {
-        private Guid JournalSetupID => Guid.TryParse(Request["journalsetup"], out var result) ? result : Guid.Empty;
-        private Guid ValidatorID => Guid.TryParse(Request["user"], out var result) ? result : Guid.Empty;
+        private Guid JournalSetupId => Guid.TryParse(Request["journalsetup"], out var result) ? result : Guid.Empty;
+        private Guid UserId => Guid.TryParse(Request["user"], out var result) ? result : Guid.Empty;
+        private Guid GroupId => Guid.TryParse(Request["group"], out var result) ? result : Guid.Empty;
 
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
             DeleteButton.Click += DeleteButton_Click;
-            CancelButton.NavigateUrl = $"/ui/admin/records/logbooks/outline?journalsetup={JournalSetupID}&panel=setup";
+            CancelButton.NavigateUrl = $"/ui/admin/records/logbooks/outline?journalsetup={JournalSetupId}&panel=setup";
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            var journalSetup = ServiceLocator.JournalSearch.GetJournalSetup(JournalSetupID,
+            if (IsPostBack)
+                return;
+
+            var journalSetup = ServiceLocator.JournalSearch.GetJournalSetup(JournalSetupId,
                 x => x.Event,
                 x => x.Achievement,
                 x => x.Framework,
                 x => x.Fields,
-                x => x.CompetencyRequirements);
+                x => x.CompetencyRequirements
+            );
             if (journalSetup == null || journalSetup.OrganizationIdentifier != CurrentSessionState.Identity.Organization.OrganizationIdentifier)
             {
                 HttpResponseHelper.Redirect("/ui/admin/records/logbooks/search");
@@ -43,27 +48,39 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
 
             PageHelper.AutoBindHeader(this, null, LogbookHeaderHelper.GetLogbookHeader(journalSetup, User.TimeZone));
 
-            var instructor = ServiceLocator.PersonSearch.GetPerson(ValidatorID, Organization.Key, x => x.User);
+            if (UserId != Guid.Empty)
+            {
+                var instructor = ServiceLocator.PersonSearch.GetPerson(UserId, Organization.Key, x => x.User);
+                PersonDetail.Visible = true;
+                PersonDetail.BindPerson(instructor, User.TimeZone);
+            }
+            else
+            {
+                var group = ServiceLocator.GroupSearch.GetGroup(GroupId);
+                GroupDetail.Visible = true;
+                GroupDetail.BindGroup(group);
+            }
 
-            PersonDetail.BindPerson(instructor, User.TimeZone);
-
-            LogbookName.Text = $"<a href=\"/ui/admin/records/logbooks/outline?journalsetup={JournalSetupID}\">{journalSetup.JournalSetupName}</a>";
-            var content = ServiceLocator.ContentSearch.GetBlock(JournalSetupID, MultilingualString.DefaultLanguage);
+            LogbookName.Text = $"<a href=\"/ui/admin/records/logbooks/outline?journalsetup={JournalSetupId}\">{journalSetup.JournalSetupName}</a>";
+            var content = ServiceLocator.ContentSearch.GetBlock(JournalSetupId, MultilingualString.DefaultLanguage);
             var title = content?.Title?.Text.Default;
             LogbookTitle.Text = !string.IsNullOrEmpty(title) ? title : "N/A";
         }
 
         private void DeleteButton_Click(object sender, EventArgs e)
         {
-            ServiceLocator.SendCommand(new DeleteJournalSetupUser(JournalSetupID, ValidatorID, JournalSetupUserRole.Validator));
+            if (UserId != Guid.Empty)
+                ServiceLocator.SendCommand(new DeleteJournalSetupUser(JournalSetupId, UserId, JournalSetupUserRole.Validator));
+            else
+                ServiceLocator.SendCommand(new RemoveJournalSetupGroup(JournalSetupId, GroupId, JournalSetupUserRole.Validator));
 
-            HttpResponseHelper.Redirect($"/ui/admin/records/logbooks/outline?journalsetup={JournalSetupID}&panel=setup");
+            HttpResponseHelper.Redirect($"/ui/admin/records/logbooks/outline?journalsetup={JournalSetupId}&panel=setup");
         }
 
         public string GetParentLinkParameters(IWebRoute parent)
         {
             return parent.Name.EndsWith("/outline")
-                ? $"journalsetup={JournalSetupID}&panel=setup"
+                ? $"journalsetup={JournalSetupId}&panel=setup"
                 : null;
         }
     }

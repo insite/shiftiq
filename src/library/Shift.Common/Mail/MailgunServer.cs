@@ -182,14 +182,11 @@ namespace Shift.Common
 
             var (response, responseContent) = Shift.Common.TaskRunner.RunSync(SendRequest, form, email.SystemMailbox);
 
-            var result = response.IsSuccessStatusCode
-                ? MailgunStatus.Queue()
-                : MailgunStatus.Reject("Rejected by Mailgun");
-
-            result.Data["code"] = response.StatusCode.ToString();
+            MailgunStatus result;
 
             if (response.IsSuccessStatusCode)
             {
+                result = MailgunStatus.Queue();
                 result.Data["statusId"] = ExtractMailgunStatusId(responseContent);
 
                 // If the scheduled delivery time is in the past (or within the next few minutes) then there is not
@@ -205,9 +202,12 @@ namespace Shift.Common
             }
             else
             {
+                result = MailgunStatus.Reject("Rejected by Mailgun");
                 result.Data["reason"] = response.ReasonPhrase;
                 result.Data["content"] = responseContent;
             }
+
+            result.Data["code"] = response.StatusCode.ToString();
 
             return result;
         }

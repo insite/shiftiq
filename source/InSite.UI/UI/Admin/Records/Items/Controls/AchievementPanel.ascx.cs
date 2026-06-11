@@ -92,8 +92,8 @@ namespace InSite.Admin.Records.Items.Controls
             if (item.Achievement != null)
             {
                 WhenChange.SelectedValue = item.Achievement.WhenChange == TriggerCauseChange.Changed ? "Changed" : "Released";
-                WhenGrade.SelectedValue = item.Achievement.WhenGrade == TriggerCauseGrade.Pass ? "Pass" : "Fail";
-                ThenCommand.SelectedValue = GetTriggerEffectName(item.Achievement.ThenCommand);
+                WhenPassCommand.SelectedValue = GetTriggerEffectName(item.Achievement.WhenPassCommand);
+                WhenFailCommand.SelectedValue = GetTriggerEffectName(item.Achievement.WhenFailCommand);
                 ElseCommand.SelectedValue = GetTriggerEffectName(item.Achievement.ElseCommand);
                 EffectiveAsAt.SelectedValue = item.Achievement.AchievementFixedDate.HasValue ? "Fixed" : "Current";
 
@@ -103,8 +103,8 @@ namespace InSite.Admin.Records.Items.Controls
             else
             {
                 WhenChange.SelectedValue = "Changed";
-                WhenGrade.SelectedValue = "Pass";
-                ThenCommand.SelectedValue = GetTriggerEffectName(TriggerEffectCommand.Grant);
+                WhenPassCommand.SelectedValue = GetTriggerEffectName(TriggerEffectCommand.Grant);
+                WhenFailCommand.SelectedValue = GetTriggerEffectName(TriggerEffectCommand.Void);
                 ElseCommand.SelectedValue = GetTriggerEffectName(TriggerEffectCommand.Void);
                 EffectiveAsAt.SelectedValue = "Current";
 
@@ -127,8 +127,8 @@ namespace InSite.Admin.Records.Items.Controls
                     ? new GradeItemAchievement
                     {
                         WhenChange = WhenChange.SelectedValue == "Changed" ? TriggerCauseChange.Changed : TriggerCauseChange.Released,
-                        WhenGrade = WhenGrade.SelectedValue == "Pass" ? TriggerCauseGrade.Pass : TriggerCauseGrade.Fail,
-                        ThenCommand = GetTriggerEffectEnum(ThenCommand.SelectedValue),
+                        WhenPassCommand = GetTriggerEffectEnum(WhenPassCommand.SelectedValue),
+                        WhenFailCommand = GetTriggerEffectEnum(WhenFailCommand.SelectedValue),
                         ElseCommand = GetTriggerEffectEnum(ElseCommand.SelectedValue),
                         Achievement = AchievementIdentifier.Value.Value,
                         AchievementFixedDate = EffectiveAsAt.SelectedValue == "Fixed" ? AchievementFixedDate.Value : null

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using InSite.Common.Web.UI;
 
 using Shift.Common;
+using Shift.Constant;
 using Shift.Contract;
 
 namespace InSite.UI.Layout.Common.Controls.Navigation
@@ -30,7 +31,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
 
             var environment = ServiceLocator.AppSettings.Environment;
 
-            var name = environment.Name;
+            var name = environment.GetName(ServiceLocator.AppSettings.Application.SubdomainConvention);
 
             var theme = environment.Color;
 
@@ -130,7 +131,7 @@ namespace InSite.UI.Layout.Common.Controls.Navigation
             }
             else
             {
-                AdminLink.HRef = Urls.AdminHomeUrl;
+                AdminLink.HRef = RelativeUrl.AdminHomeUrl;
                 AdminLink.InnerText = "Admin";
                 AdminItem.Visible = true;
             }

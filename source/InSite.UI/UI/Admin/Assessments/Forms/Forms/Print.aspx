@@ -112,6 +112,13 @@
                     <div class="card-body">
                         <h3>Details</h3>
                         <uc:FormDetails ID="FormDetails" runat="server" />
+
+                        <div class="form-group">
+                            <label class="form-label">Language</label>
+                            <div>
+                                <insite:LanguageComboBox runat="server" ID="ReportLanguage" AllowBlank="false" Value="en" CssClass="w-50" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -123,13 +130,14 @@
             <insite:Button runat="server" ID="BuildForm" ButtonStyle="Success" Icon="fas fa-download" Text="Print Form" />
             <insite:Button runat="server" ID="BuildAddendum" ButtonStyle="Success" Icon="fas fa-download" Text="Print Addendum" />
             <insite:Button runat="server" ID="BuildFormInternal" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Form (internal)" />
+            <insite:Button runat="server" ID="BuildFormDocx" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Form (DOCX)" />
             <insite:Button runat="server" ID="BuildFormCompact" ButtonStyle="Info" Icon="fas fa-download" Text="Print Form (compact)" />
             <insite:CloseButton runat="server" ID="GoBackButton" />
         </div>
     </div>
 
     <insite:Container runat="server" ID="BuildingPdfPanel" Visible="false">
-        <insite:LoadingPanel runat="server" ID="BuildingPdfLoadingPanel" Text="Building PDF" VisibleOnLoad="true" />
+        <insite:LoadingPanel runat="server" ID="BuildingPdfLoadingPanel" Text="Building Document" VisibleOnLoad="true" />
         <asp:Button runat="server" ID="DownloadButton" CssClass="d-none" />
         <script type="text/javascript">
             (function () {

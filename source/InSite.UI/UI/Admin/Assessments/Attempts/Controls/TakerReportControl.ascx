@@ -10,7 +10,7 @@
     <style type="text/css">
         body {
             margin: 0;
-            font-family: Calibri, Helvetica, Arial;
+            font-family: Arial;
         }
 
         table.logo-and-address {
@@ -119,15 +119,11 @@
                         <th class="header" colspan="2"><%# Translate("Exam Information") %></th>
                     </tr>
                     <tr>
-                        <td class="label"><%# Translate("Title") %></td>
-                        <td><%# Eval("ExamTitle") %></td>
-                    </tr>
-                    <tr>
                         <td class="label"><%# Translate("Language") %></td>
-                        <td><%# CurrentLanguageName %></td>
+                        <td><%# GetLanguageName() %></td>
                     </tr>
                     <tr>
-                        <td class="label"><%# Translate("Date of Exam") %></td>
+                        <td class="label"><%# Translate("Date of Exam Session") %></td>
                         <td><%# Eval("ExamDate") %></td>
                     </tr>
 
@@ -147,19 +143,11 @@
                         <ItemTemplate>
                             <tr>
                                 <td><%# Eval("FrameworkTitle") %></td>
-                                <td><%# Eval("PassOrFail") %></td>
+                                <td><%# GetPassOrFail() %></td>
                             </tr>
                         </ItemTemplate>
                     </asp:Repeater>
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="2">
-                            <b><%# Translate("Exam Passing Criteria") %>:</b>
-                            <%# Translate("TakerReport.ExamPassingCriteria") %>
-                        </td>
-                    </tr>
-                </tfoot>
             </table>
 
         </ItemTemplate>

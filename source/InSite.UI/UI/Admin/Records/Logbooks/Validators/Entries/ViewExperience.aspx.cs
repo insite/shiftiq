@@ -54,7 +54,7 @@ namespace InSite.UI.Admin.Records.Validators.Entries
                 return;
             }
 
-            if (ServiceLocator.JournalSearch.GetJournalSetupUser(experience.Journal.JournalSetupIdentifier, User.UserIdentifier, JournalSetupUserRole.Validator) == null)
+            if (!ServiceLocator.JournalSearch.IsLogbookValidator(experience.Journal.JournalSetupIdentifier, User.UserIdentifier))
             {
                 HttpResponseHelper.Redirect("/ui/admin/records/logbooks/validators/entries/search");
                 return;

@@ -11,7 +11,7 @@ using InSite.UI.Layout.Admin;
 
 using Shift.Common;
 using Shift.Constant;
-using Shift.Toolbox.Integration.DirectAccess;
+using Shift.Toolbox.Integrations.DirectAccess;
 
 namespace InSite.UI.Admin.Integrations.DirectAccess
 {
@@ -143,7 +143,7 @@ namespace InSite.UI.Admin.Integrations.DirectAccess
             });
         }
 
-        private bool ValidateData(Shift.Toolbox.Integration.DirectAccess.Individual individual, List<string> errors)
+        private bool ValidateData(Shift.Toolbox.Integrations.DirectAccess.Individual individual, List<string> errors)
         {
             if (string.IsNullOrEmpty(individual.Email))
                 individual.Email = $"{individual.IndividualKey}@itaportal.ca";

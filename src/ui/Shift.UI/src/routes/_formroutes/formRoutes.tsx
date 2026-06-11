@@ -17,6 +17,9 @@ import { IconName } from "@/components/icon/IconName";
 import PageContent from "../admin/sites/pages/content/PageContent";
 import FormWorkshop from "../admin/assessments/forms/FormWorkshop";
 import SpecWorkshop from "../admin/assessments/specs/SpecWorkshop";
+import NotificationSearch from "../admin/platform/notifications/search/NotificationSearch";
+import NotificationCreate from "../admin/platform/notifications/create/NotificationCreate";
+import NotificationEdit from "../admin/platform/notifications/edit/NotificationEdit";
 
 export interface MenuItem {
     href: string;
@@ -226,6 +229,44 @@ export const formRoutes: FormRoute[] = [
                         path: "/ui/admin/assessments/banks/outline",
                     },
                 ],
+            },
+            {
+                title: "Notifications",
+                menuTitle: "Search",
+                category: "Notifications",
+                path: "/client/admin/platform/notifications/search",
+                element: <NotificationSearch />,
+                customBreadcrumbs: [
+                    {
+                        title: "Admin",
+                        path: "/client/admin/home",
+                    },
+                    {
+                        title: "Setup",
+                        path: "/ui/admin/setup/home",
+                    },
+                ],
+                menu: [
+                    {
+                        href: "/client/admin/platform/notifications/create",
+                        icon: "plus-circle",
+                        title: "Add New Notification"
+                    },
+                ],
+                children: [
+                    {
+                        title: "New Notification",
+                        menuTitle: "New",
+                        path: "/client/admin/platform/notifications/create",
+                        element: <NotificationCreate />,
+                    },
+                    {
+                        title: "Edit Notification",
+                        menuTitle: "Edit",
+                        path: "/client/admin/platform/notifications/edit/:id",
+                        element: <NotificationEdit />,
+                    },
+                ]
             },
         ]
     },

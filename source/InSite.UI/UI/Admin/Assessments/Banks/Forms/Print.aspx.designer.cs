@@ -33,6 +33,15 @@ namespace InSite.Admin.Assessments.Banks.Forms
         protected global::InSite.Admin.Assessments.Banks.Controls.BankInfo BankDetails;
 
         /// <summary>
+        /// ReportLanguage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.LanguageComboBox ReportLanguage;
+
+        /// <summary>
         /// IncludeImages control.
         /// </summary>
         /// <remarks>
@@ -139,6 +148,15 @@ namespace InSite.Admin.Assessments.Banks.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Button BuildQuestionsInternal;
+
+        /// <summary>
+        /// BuildQuestionsDocx control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button BuildQuestionsDocx;
 
         /// <summary>
         /// BuildQuestionsCompact control.

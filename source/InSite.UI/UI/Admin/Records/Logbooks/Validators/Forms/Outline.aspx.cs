@@ -11,7 +11,9 @@ namespace InSite.UI.Admin.Records.Validators.Forms
 {
     public partial class Outline : AdminBasePage
     {
-        protected Guid JournalSetupIdentifier => Guid.TryParse(Request.QueryString["journalsetup"], out var journalSetupIdentifier) ? journalSetupIdentifier : Guid.Empty;
+        private Guid JournalSetupIdentifier => Guid.TryParse(Request.QueryString["journalsetup"], out var journalSetupIdentifier) ? journalSetupIdentifier : Guid.Empty;
+
+        private int BulkAddedEntries => int.TryParse(Request.QueryString["bulk-added-entries"], out var value) ? value : 0;
 
         protected override void OnLoad(EventArgs e)
         {
@@ -26,7 +28,7 @@ namespace InSite.UI.Admin.Records.Validators.Forms
             var journalSetup = ServiceLocator.JournalSearch.GetJournalSetup(JournalSetupIdentifier, x => x.Event, x => x.Achievement, x => x.Framework);
             if (journalSetup == null
                 || journalSetup.OrganizationIdentifier != CurrentSessionState.Identity.Organization.OrganizationIdentifier
-                || ServiceLocator.JournalSearch.GetJournalSetupUser(JournalSetupIdentifier, User.UserIdentifier, JournalSetupUserRole.Validator) == null
+                || !ServiceLocator.JournalSearch.IsLogbookValidator(JournalSetupIdentifier, User.UserIdentifier)
                 )
             {
                 HttpResponseHelper.Redirect("/ui/admin/records/logbooks/validators/search");
@@ -39,7 +41,19 @@ namespace InSite.UI.Admin.Records.Validators.Forms
 
             Users.LoadData(JournalSetupIdentifier, journalSetup.AchievementIdentifier.HasValue, null);
 
+            if (Organization.Toolkits.Logbooks?.LogbookBulkEntry == true && BulkAddedEntries > 0)
+            {
+                var text = BulkAddedEntries == 1
+                    ? "One entry was successfully added to the logbook"
+                    : $"{BulkAddedEntries} entries were successfully added to the logbook";
+
+                StatusAlert.AddMessage(AlertType.Success, text);
+            }
+
             AddUsers.NavigateUrl = $"/ui/admin/records/logbooks/validators/add-users?journalsetup={JournalSetupIdentifier}";
+
+            BulkAddEntriesButton.Visible = Organization.Toolkits.Logbooks?.LogbookBulkEntry == true;
+            BulkAddEntriesButton.NavigateUrl = $"/ui/admin/records/logbooks/validators/bulk-entry?journalsetup={JournalSetupIdentifier}";
         }
     }
 }

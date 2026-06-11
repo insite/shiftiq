@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity.Core;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -20,6 +19,12 @@ namespace InSite.Cmds.Actions.Reporting.Report
 {
     public partial class TrainingHistoryByWorker : AdminBasePage, ICmdsUserControl
     {
+        #region Constants
+
+        private const string CloseUrl = "/ui/admin/reporting";
+
+        #endregion
+
         #region Classes
 
         [Serializable]
@@ -29,7 +34,11 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public Guid[] Achievements { get; set; }
             public Guid[] Learners { get; set; }
             public bool? IsRequired { get; set; }
-            public string AchievementType { get; set; }
+            public string[] MembershipFunctions { get; set; }
+            public string CredentialStatus { get; set; }
+            public DateTime? CompletedSince { get; set; }
+            public DateTime? CompletedBefore { get; set; }
+            public bool ExcludeSelfDeclared { get; set; }
         }
 
         private class UserDataItem
@@ -67,22 +76,11 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             base.OnInit(e);
 
-            FindDepartment.AutoPostBack = true;
-            FindDepartment.ValueChanged += (s, a) => OnDepartmentChanged();
-
-            FindProgram.AutoPostBack = true;
-            FindProgram.ValueChanged += (s, a) => SetupFindAchievement();
-
-            AchievementType.AutoPostBack = true;
-            AchievementType.ValueChanged += (s, a) => SetupFindAchievement();
-
-            IsRequired.AutoPostBack = true;
-            IsRequired.SelectedIndexChanged += (s, a) => SetupFindAchievement();
+            Criteria.MessageRaised += (type, message) => ScreenStatus.AddMessage(type, message);
 
             UserRepeater.ItemDataBound += UserRepeater_ItemDataBound;
 
             DownloadXlsx.Click += DownloadXlsx_Click;
-
             ReportButton.Click += ReportButton_Click;
         }
 
@@ -95,58 +93,29 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             PageHelper.AutoBindHeader(this);
 
-            FindDepartment.Filter.OrganizationIdentifier = Organization.Identifier;
-
-            if (!Identity.HasAccessToAllCompanies)
-                FindDepartment.Filter.UserIdentifier = User.UserIdentifier;
-
-            OnDepartmentChanged();
-
-            var closeUrl = "/ui/admin/reporting";
-            CloseButton1.NavigateUrl = closeUrl;
-            CloseButton2.NavigateUrl = closeUrl;
+            CloseButton1.NavigateUrl = CloseUrl;
+            CloseButton2.NavigateUrl = CloseUrl;
         }
 
         #endregion
 
         #region Event handlers
 
-        private void OnDepartmentChanged()
-        {
-            FindLearner.Enabled = FindDepartment.HasValue;
-            FindLearner.Filter.OrganizationIdentifier = Organization.Identifier;
-            FindLearner.Filter.GroupDepartmentIdentifiers = FindDepartment.Values;
-            if (ServiceLocator.Partition.IsE03())
-                FindLearner.Filter.GroupDepartmentFunctions = new[] { "Department" };
-            FindLearner.Value = null;
-
-            SetupFindAchievement();
-        }
-
-        private void SetupFindAchievement()
-        {
-            FindAchievement.Filter.DepartmentIdentifiers = FindDepartment.Values;
-            FindAchievement.Filter.ProgramIdentifiers = FindProgram.Values;
-            FindAchievement.Filter.HasMandatoryCredential = GetIsRequired();
-
-            FindAchievement.Filter.AchievementLabels.Clear();
-            if (AchievementType.HasValue)
-                FindAchievement.Filter.AchievementLabels.Add(AchievementType.Value);
-
-            FindAchievement.Value = null;
-        }
-
         private void ReportButton_Click(object sender, EventArgs e)
         {
-            ReportTab.Visible = false;
+            if (!Page.IsValid)
+            {
+                ReportTab.Visible = false;
+                return;
+            }
 
-            if (Page.IsValid)
-                LoadReport();
+            LoadReport();
         }
 
         private void UserRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
-            if (e.Item.ItemType != ListItemType.Item && e.Item.ItemType != ListItemType.AlternatingItem)
+            var isContent = IsContentItem(e);
+            if (!isContent)
                 return;
 
             var userDataItem = (UserDataItem)e.Item.DataItem;
@@ -303,13 +272,26 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void LoadReport()
         {
+            ReportTab.Visible = false;
+
             CurrentParameters = new SearchParameters
             {
-                Departments = FindDepartment.Values,
-                Achievements = FindAchievement.Values,
-                Learners = FindLearner.Values,
-                IsRequired = GetIsRequired()
+                Departments = Criteria.DepartmentValues,
+                Achievements = Criteria.SelectedAchievements,
+                Learners = Criteria.LearnerValues,
+                IsRequired = Criteria.IsRequiredFilter,
+                MembershipFunctions = Criteria.MembershipFunctions,
+                CredentialStatus = Criteria.CredentialStatusFilter,
+                CompletedSince = Criteria.CompletedSinceFilter,
+                CompletedBefore = Criteria.CompletedBeforeFilter,
+                ExcludeSelfDeclared = Criteria.ExcludeSelfDeclared
             };
+
+            if (!Criteria.ValidateNarrowSelection(out var error))
+            {
+                ScreenStatus.AddMessage(AlertType.Error, error);
+                return;
+            }
 
             IEnumerable<UserDataItem> dataSource;
 
@@ -327,7 +309,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     return;
                 }
 
-                throw ecex;
+                throw;
             }
 
             if (!dataSource.Any())
@@ -345,7 +327,18 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private IEnumerable<UserDataItem> GetReportDataSource()
         {
-            return CmdsReportHelper.SelectTrainingHistoryPerUser(CurrentParameters.Departments, CurrentParameters.Achievements, CurrentParameters.Learners, CurrentParameters.IsRequired, CurrentParameters.AchievementType)
+            return CmdsReportHelper
+                .SelectTrainingHistoryPerUser(
+                    CurrentParameters.Departments,
+                    CurrentParameters.Achievements,
+                    CurrentParameters.Learners,
+                    CurrentParameters.IsRequired,
+                    achievementType: null,
+                    membershipFunctions: CurrentParameters.MembershipFunctions,
+                    credentialStatus: CurrentParameters.CredentialStatus,
+                    completedSince: CurrentParameters.CompletedSince,
+                    completedBefore: CurrentParameters.CompletedBefore,
+                    excludeSelfDeclared: CurrentParameters.ExcludeSelfDeclared)
                 .GroupBy(x => x.PersonFullName)
                 .Select(userGroup =>
                 {
@@ -366,15 +359,6 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     };
                 })
                 .ToArray();
-        }
-
-        #endregion
-
-        #region Helper methods
-
-        private bool? GetIsRequired()
-        {
-            return IsRequired.SelectedIndex > 0 ? bool.Parse(IsRequired.SelectedValue) : (bool?)null;
         }
 
         #endregion

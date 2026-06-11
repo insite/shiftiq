@@ -32,7 +32,7 @@ namespace InSite.UI.Admin.Integrations.DirectAccess
             SetInputValues(individual);
         }
 
-        private void SetInputValues(Shift.Toolbox.Integration.DirectAccess.Individual individual)
+        private void SetInputValues(Shift.Toolbox.Integrations.DirectAccess.Individual individual)
         {
             PageHelper.AutoBindHeader(this);
 

@@ -371,14 +371,17 @@ namespace InSite.UI.Admin.Contacts.People.Forms
             email.Variables.Clear();
             email.Variables.Add("FirstName", email.Recipient.FirstName);
             email.Variables.Add("RecipientNameFirst", email.Recipient.FirstName);
+            email.Variables.Add("RecipientFirstName", email.Recipient.FirstName);
             email.Variables.Add("LastName", email.Recipient.LastName);
             email.Variables.Add("RecipientNameLast", email.Recipient.LastName);
+            email.Variables.Add("RecipientLastName", email.Recipient.LastName);
             email.Variables.Add("FullName", email.Recipient.FullName);
             email.Variables.Add("RecipientName", email.Recipient.FullName);
             email.Variables.Add("Email", email.Recipient.Email);
             email.Variables.Add("RecipientEmail", email.Recipient.Email);
             email.Variables.Add("RecipientCode", email.Recipient.PersonCode);
             email.Variables.Add("PersonCode", email.Recipient.PersonCode);
+            email.Variables.Add("RecipientPersonCode", email.Recipient.PersonCode);
             email.Variables.Add("CompanyTitle", Organization.CompanyName);
             email.Variables.Add("SignInUrl", HttpRequestHelper.CurrentRootUrl + "/ui/lobby/signin");
         }

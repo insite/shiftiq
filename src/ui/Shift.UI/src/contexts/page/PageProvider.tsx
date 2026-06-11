@@ -23,7 +23,11 @@ interface SetBreadcrumbItemPathAction {
     path: string;
 }
 
-type Action = InitAction | SetActionSubtitleAction | SetBreadcrumbItemPathAction;
+interface HideTitleAction {
+    type: "hideTitle";
+}
+
+type Action = InitAction | SetActionSubtitleAction | SetBreadcrumbItemPathAction | HideTitleAction;
 
 interface State {
     actionTitle: string | null;
@@ -31,6 +35,7 @@ interface State {
     description: string | null;
     breadcrumbs: PageProviderContextBreadcrumbItem[];
     menu: MenuItem[] | null;
+    isTitleVisible: boolean;
 }
 
 const _initialState: State = {
@@ -39,6 +44,7 @@ const _initialState: State = {
     description: null,
     breadcrumbs: [],
     menu: null,
+    isTitleVisible: false,
 }
 
 function reducer(state: State, action: Action): State {
@@ -52,6 +58,7 @@ function reducer(state: State, action: Action): State {
                 description: null,
                 breadcrumbs: action.breadcrumbs,
                 menu: action.menu,
+                isTitleVisible: true,
             };
         }
 
@@ -85,6 +92,17 @@ function reducer(state: State, action: Action): State {
             };
         }
 
+        case "hideTitle":
+        {
+            if (!state.isTitleVisible) {
+                return state;
+            }
+            return {
+                ...state,
+                isTitleVisible: false,
+            };
+        }
+
         default:
             throw new Error(`Unknown action: ${type}`);
     }
@@ -105,6 +123,10 @@ export default function PageProvider({ children }: Props) {
 
         setBreadcrumbItemPath(originalPath: string, path: string): void {
             dispatch({ type: "setBreadcrumbItemPath", originalPath, path });
+        },
+
+        hideTitle(): void {
+            dispatch({ type: "hideTitle" });
         },
     }), [dispatch]);
 

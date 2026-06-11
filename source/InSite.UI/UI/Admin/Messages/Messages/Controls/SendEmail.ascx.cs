@@ -178,7 +178,10 @@ namespace InSite.UI.Admin.Messages.Messages.Controls
                 Variables =
                 {
                     ["FirstName"] = recipient.FirstName,
-                    ["LastName"] = recipient.LastName
+                    ["RecipientFirstName"] = recipient.FirstName,
+                    ["LastName"] = recipient.LastName,
+                    ["RecipientLastName"] = recipient.LastName,
+                    ["RecipientPersonCode"] = recipient.PersonCode
                 }
             });
 

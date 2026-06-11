@@ -5,6 +5,7 @@ import { ApiDownload, ApiDownloadFormat } from "./models/ApiDownload";
 import { ObjectIndexer } from "@/models/ObjectIndexer";
 import { Param, requestHelper } from "./requestHelper";
 import { shiftConfig } from "@/helpers/shiftConfig";
+import { localStorageHelper } from "@/helpers/localStorageHelper";
 
 
 async function afterRequest(response: Response, asBlob: true, returnNullOn404: boolean, throwAuthError: boolean): Promise<Blob>;
@@ -158,7 +159,8 @@ export const fetchHelper = {
         const response = await fetch(url, {
             method: "GET",
             headers: {
-                "Accept": "*/*"
+                "Accept": "*/*",
+                "Override-Origin": localStorageHelper.getOverrideOrigin() ?? "",
             },
             credentials: "include"
         });

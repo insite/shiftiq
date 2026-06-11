@@ -18,6 +18,7 @@
 <%@ Register Src="../../Comments/Controls/CommentRepeater.ascx" TagName="CommentRepeater" TagPrefix="uc" %>
 <%@ Register Src="../Controls/UserAuthenticationGrid.ascx" TagName="UserAuthenticationGrid" TagPrefix="uc" %>
 <%@ Register Src="../Controls/ReferralGrid.ascx" TagName="ReferralGrid" TagPrefix="uc" %>
+<%@ Register Src="../Controls/ProgramGrid.ascx" TagName="ProgramGrid" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent">
 </asp:Content>
@@ -172,6 +173,16 @@
                             <insite:UpdatePanel runat="server" ID="SurveyResponseUpdatePanel">
                                 <ContentTemplate>
                                     <uc:SurveyResponses runat="server" ID="SurveyResponseGrid" ScreenParams="contact&panel=forms" />
+                                </ContentTemplate>
+                            </insite:UpdatePanel>
+                        </insite:NavItem>
+
+                        <insite:NavItem runat="server" ID="ProgramTab" Title="Programs" Icon="far fa-graduation-cap" IconPosition="BeforeText">
+                            <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="ProgramUpdatePanel" />
+
+                            <insite:UpdatePanel runat="server" ID="ProgramUpdatePanel">
+                                <ContentTemplate>
+                                    <uc:ProgramGrid runat="server" ID="ProgramGrid" />
                                 </ContentTemplate>
                             </insite:UpdatePanel>
                         </insite:NavItem>

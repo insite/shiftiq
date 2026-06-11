@@ -349,8 +349,8 @@
                                                     <tr>
                                                         <th style="width:1.25em;"></th>
                                                         <%# GetOptionRepeaterTableHeadTitleCols() %>
-                                                        <th class="text-center" style="width:3.125em;">True</th>
-                                                        <th class="text-center" style="width:3.125em;">False</th>
+                                                        <th class="text-center" style="width:3.125em;"><%# CustomTranslate("True") %></th>
+                                                        <th class="text-center" style="width:3.125em;"><%# CustomTranslate("False") %></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -375,8 +375,8 @@
                                     <table class="table table-match">
                                         <thead>
                                             <tr>
-                                                <th>Left</th>
-                                                <th>Right</th>
+                                                <th><%# CustomTranslate("Left") %></th>
+                                                <th><%# CustomTranslate("Right") %></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -490,7 +490,7 @@
                         tBody = lastTable;
 
                     var lastTr = document.createElement('tr');
-                    lastTr.innerHTML = '<td colspan="2" style="padding-top:2.23em; text-align:center; font-weight:bold;">THIS IS THE FINAL PAGE OF QUESTIONS IN THIS EXAM</td>';
+                    lastTr.innerHTML = `<td colspan="2" style="padding-top:2.23em; text-align:center; font-weight:bold;">THIS IS THE FINAL PAGE OF QUESTIONS IN THIS EXAM</td>`;
                     tBody.appendChild(lastTr);
                 }
             })();

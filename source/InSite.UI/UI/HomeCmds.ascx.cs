@@ -263,6 +263,8 @@ namespace InSite.UI
             RelatedPersons.LoadData(User.UserIdentifier);
             MyContactsPanel.Visible = RelatedPersons.HasContacts();
 
+            InvoicingContacts.LoadData(Organization.Identifier);
+
             var roles = ContactRepository3.SelectUserRoles(User.UserIdentifier);
             Roles.DataSource = roles;
             Roles.DataBind();

@@ -69,6 +69,60 @@ namespace InSite.Cmds.Controls.Contacts.Companies
         protected global::System.Web.UI.WebControls.CheckBox EnableDivisions;
 
         /// <summary>
+        /// CustomerNumber control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox CustomerNumber;
+
+        /// <summary>
+        /// CustomerCode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox CustomerCode;
+
+        /// <summary>
+        /// InvoicingContacts control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Cmds.Controls.User.InvoicingContacts InvoicingContacts;
+
+        /// <summary>
+        /// InvoicingGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.GroupComboBox InvoicingGroup;
+
+        /// <summary>
+        /// InvoicingUser control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindUser InvoicingUser;
+
+        /// <summary>
+        /// AddInvoicingUserToGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.AddButton AddInvoicingUserToGroup;
+
+        /// <summary>
         /// LogoField control.
         /// </summary>
         /// <remarks>
@@ -112,6 +166,15 @@ namespace InSite.Cmds.Controls.Contacts.Companies
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Button RemoveLogoButton;
+
+        /// <summary>
+        /// LogoLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor LogoLink;
 
         /// <summary>
         /// LogoImage control.

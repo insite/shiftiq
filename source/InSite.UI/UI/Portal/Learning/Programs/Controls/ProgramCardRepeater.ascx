@@ -52,6 +52,8 @@
                         alt='<%# Eval("Title") %>'
                     >
 
+                    <%# GetFlagHtml() %>
+
                     <div class="card-body text-center">
                         <asp:Literal runat="server" ID="Icon" />
                         <h3 class="h5 nav-heading mb-2">

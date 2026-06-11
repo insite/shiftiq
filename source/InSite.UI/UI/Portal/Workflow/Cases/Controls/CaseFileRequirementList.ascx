@@ -5,10 +5,10 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th class="w-50">Document Type</th>
-                    <th runat="server" visible="false">Status</th>
-                    <th class="w-50">Document</th>
-                    <th runat="server" visible="false">Requested</th>
+                    <th class="w-50"><insite:Literal runat="server" Text="Document Type" /></th>
+                    <th runat="server" visible="false"><insite:Literal runat="server" Text="Status" /></th>
+                    <th class="w-50"><insite:Literal runat="server" Text="Document" /></th>
+                    <th runat="server" visible="false"><insite:Literal runat="server" Text="Requested" /></th>
                 </tr>
             </thead>
             <tbody>
@@ -44,7 +44,7 @@
                     href="#"
                     onclick='<%# Eval("Id", "issueRequestList.showFileUploader(event, \"{0}\")") %>'
                 >
-                    Upload Document
+                    <insite:Literal runat="server" Text="Upload Document" />
                 </a>
             </td>
             <td runat="server" visible="false">

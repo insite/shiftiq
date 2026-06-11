@@ -49,7 +49,7 @@
                             <div class="form-group mb-3">
                                 <label class="form-label">External Link</label>
                                 <div>
-                                    <insite:TextBox runat="server" ID="NavigateUrl" MaxLength="500" />
+                                    <insite:TextBox runat="server" ID="NavigateUrl" MaxLength="500" AllowHtml="true" />
                                 </div>
                                 <div style="margin-top:5px;">
                                     <asp:CheckBox runat="server" ID="IsNavigateUrlToNewTab" Text="Open in a new browser window" />

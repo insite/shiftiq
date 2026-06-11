@@ -26,6 +26,8 @@ namespace InSite.Admin.Workflow.Forms.Controls
                     Title = Title.Text,
                     LastModifiedSince = LastModifiedSince.Value,
                     LastModifiedBefore = LastModifiedBefore.Value,
+                    CreatedSince = CreatedSince.Value,
+                    CreatedBefore = CreatedBefore.Value,
                     CurrentStatus = CurrentStatus.ValuesArray,
                     IsLocked = LockStatus.ValueAsBoolean,
                     MessageIdentifier = MessageIdentifier.Value
@@ -44,6 +46,8 @@ namespace InSite.Admin.Workflow.Forms.Controls
 
                 LastModifiedSince.Value = value.LastModifiedSince;
                 LastModifiedBefore.Value = value.LastModifiedBefore;
+                CreatedSince.Value = value.CreatedSince;
+                CreatedBefore.Value = value.CreatedBefore;
                 MessageIdentifier.Value = value.MessageIdentifier;
                 CurrentStatus.Values = value.CurrentStatus;
 
@@ -76,6 +80,8 @@ namespace InSite.Admin.Workflow.Forms.Controls
             Title.Text = null;
             LastModifiedSince.Value = null;
             LastModifiedBefore.Value = null;
+            CreatedSince.Value = null;
+            CreatedBefore.Value = null;
             MessageIdentifier.Value = null;
             CurrentStatus.ClearSelection();
             LockStatus.ClearSelection();

@@ -61,8 +61,7 @@ public class MeController : ControllerBase
     /// </returns>
     /// <response code="200">Successfully retrieved user context. Returns SiteSettings object.</response>
     [HttpGet("context")]
-    [ProducesResponseType(typeof(SiteSettings), StatusCodes.Status200OK)]
-    public async Task<IActionResult> RetrieveContextAsync(
+    public async Task<ActionResult<SiteSettings>> RetrieveContextAsync(
         [FromQuery] bool refresh = false,
         CancellationToken cancellationToken = default)
     {
@@ -75,7 +74,12 @@ public class MeController : ControllerBase
         {
             var token = _cookieService.GetCookieToken();
             if (token != null)
+            {
+                token.OrganizationCode = principal.Organization.Slug;
+                token.OrganizationIdentifier = principal.OrganizationId;
+
                 _cookieService.AppendSecurityCookie(token);
+            }
         }
 
         return Ok(settings);
@@ -85,8 +89,7 @@ public class MeController : ControllerBase
     /// Retrieves the list of permissions granted (or denied) to me
     /// </summary>
     [HttpGet("permissions")]
-    [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
-    public IActionResult RetrievePermissions()
+    public ActionResult<string[]> RetrievePermissions()
     {
         var me = _principalProvider.GetPrincipal();
 
@@ -121,6 +124,8 @@ public class MeController : ControllerBase
             }
         }
 
+        Response.AddFingerprint(myPermissions);
+
         return Ok(myPermissions);
     }
 
@@ -148,8 +153,7 @@ public class MeController : ControllerBase
     /// Retrieves the list of roles to which I am assigned
     /// </summary>
     [HttpGet("roles")]
-    [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
-    public IActionResult RetrieveRoles()
+    public ActionResult<string[]> RetrieveRoles()
     {
         var principal = _principalProvider.GetPrincipal();
 

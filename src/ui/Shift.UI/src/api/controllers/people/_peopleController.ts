@@ -5,7 +5,7 @@ import { ApiSearchPeople } from "./ApiSearchPeople";
 export const _peopleController = {
     async search(query: ApiSearchPeople, pageIndex: number, pageSize: number, visibleColumns: string[] | null) {
         return await fetchHelper.getPagedRows<ApiPersonMatch>(
-            "/api/directory/people/search",
+            "/api/contacts/people/search",
             query,
             pageIndex,
             pageSize,

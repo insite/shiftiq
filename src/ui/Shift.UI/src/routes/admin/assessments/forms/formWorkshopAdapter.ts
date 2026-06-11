@@ -1,9 +1,9 @@
-import { ApiFormWorkshop } from "@/api/controllers/workshop/ApiFormWorkshop";
-import { ApiWorkshopStandard } from "@/api/controllers/workshop/ApiWorkshopStandard";
+import { ApiFormWorkshop } from "@/api/controllers/assessments/workshop/ApiFormWorkshop";
+import { ApiWorkshopStandard } from "@/api/controllers/assessments/workshop/ApiWorkshopStandard";
 import { WorkshopStandard } from "../../../../contexts/workshop/models/WorkshopStandard";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 import { TimeZoneId } from "@/helpers/date/timeZones";
-import { ApiFormWorkshopQuestions } from "@/api/controllers/workshop/ApiFormWorkshopQuestions";
+import { ApiFormWorkshopQuestions } from "@/api/controllers/assessments/workshop/ApiFormWorkshopQuestions";
 import { DateTimeParts } from "@/helpers/date/dateTimeTypes";
 import { FormWorkshopVerifiedQuestion } from "@/contexts/workshop/models/FormWorkshopVerifiedQuestion";
 import { FormWorkshopState } from "@/contexts/workshop/states/FormWorkshopState";

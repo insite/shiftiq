@@ -89,7 +89,7 @@
                                         Uploaded JSON
                                         <insite:RequiredValidator runat="server" ControlToValidate="UploadJsonInput" FieldName="Uploaded JSON" Display="Dynamic" ValidationGroup="Collection" />
                                     </label>
-                                    <insite:TextBox runat="server" ID="UploadJsonInput" TextMode="MultiLine" Rows="15" />
+                                    <insite:TextBox runat="server" ID="UploadJsonInput" TextMode="MultiLine" Rows="15" AllowHtml="true" />
                                     <div class="form-text">
                                     </div>
                                 </div>

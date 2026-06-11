@@ -1,6 +1,6 @@
 import { Control, Path, useController } from "react-hook-form";
 import FileUpload, { FileUploadProps } from "@/components/fileupload/FileUpload";
-import { ApiUploadFileInfo } from "@/api/controllers/file/ApiUploadFileInfo";
+import { ApiUploadFileInfo } from "@/api/controllers/assets/files/ApiUploadFileInfo";
 import { errorHelper } from "@/helpers/errorHelper";
 
 interface Props<Criteria extends object>

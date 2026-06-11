@@ -1,0 +1,91 @@
+using Microsoft.AspNetCore.Mvc;
+
+namespace Shift.Api;
+
+[ApiController]
+[ApiExplorerSettings(GroupName = "Accounts API: Organizations")]
+public class OrganizationController : ControllerBase
+{
+    private readonly OrganizationService _organizationService;
+
+    public OrganizationController(OrganizationService organizationService)
+    {
+        _organizationService = organizationService;
+    }
+
+    [HttpHead("api/accounts/organizations/{organization:guid}")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    public async Task<ActionResult<bool>> AssertAsync([FromRoute] Guid organization, CancellationToken cancellation = default)
+    {
+        var exists = await _organizationService.AssertAsync(organization, cancellation);
+
+        return Ok(exists);
+    }
+
+    [HttpGet("api/accounts/organizations/{organization:guid}")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
+    [ProducesResponseType(typeof(OrganizationModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<OrganizationModel>> RetrieveAsync([FromRoute] Guid organization, CancellationToken cancellation = default)
+    {
+        var model = await _organizationService.RetrieveAsync(organization, cancellation);
+
+        if (model == null)
+            return NotFound();
+
+        return Ok(model);
+    }
+
+    [HttpGet("api/accounts/organizations/count")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
+    public async Task<ActionResult<int>> CountAsync([FromQuery] CountOrganizations query, CancellationToken cancellation = default)
+    {
+        var count = await _organizationService.CountAsync(query, cancellation);
+
+        return Ok(count);
+    }
+
+    [HttpGet("api/accounts/organizations")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
+    public async Task<ActionResult<IEnumerable<OrganizationModel>>> CollectAsync([FromQuery] CollectOrganizations query, CancellationToken cancellation = default)
+    {
+        var models = await _organizationService.CollectAsync(query, cancellation);
+
+        var count = await _organizationService.CountAsync(query, cancellation);
+
+        Response.AddPagination(query.Filter, count);
+
+        return Ok(models);
+    }
+
+    [HttpGet("api/accounts/organizations/search")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
+    public async Task<ActionResult<IEnumerable<OrganizationMatch>>> GetSearchAsync([FromQuery] SearchOrganizations query, CancellationToken cancellation = default)
+    {
+        var matches = await _organizationService.SearchAsync(query, cancellation);
+
+        var count = await _organizationService.CountAsync(query, cancellation);
+
+        Response.AddPagination(query.Filter, count);
+
+        return Ok(matches);
+    }
+
+    [HttpPost("api/accounts/organizations/search")]
+    [HybridPermission("security/organizations", DataAccess.Read)]
+    public async Task<ActionResult<IEnumerable<OrganizationMatch>>> SearchAsync([FromBody] SearchOrganizations query, CancellationToken cancellation = default)
+    {
+        var matches = await _organizationService.SearchAsync(query, cancellation);
+
+        var count = await _organizationService.CountAsync(query, cancellation);
+
+        Response.AddPagination(query.Filter, count);
+
+        return Ok(matches);
+    }
+
+    // This entity is a current-state projection of an aggregate event/change stream. This is the reason you do not see
+    // any controller actions implemented here to create, modify, or delete this entity. Data changes to this entity are 
+    // permitted only using Timeline commands.
+}

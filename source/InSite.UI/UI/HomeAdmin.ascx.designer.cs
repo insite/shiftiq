@@ -40,14 +40,5 @@ namespace InSite.UI
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Toast WarningToast;
-
-        /// <summary>
-        /// AdminDashboardPrototype control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.UI.AdminDashboardPrototype AdminDashboardPrototype;
     }
 }

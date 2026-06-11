@@ -78,6 +78,24 @@ namespace InSite.Admin.Records.Programs.Controls
         protected global::System.Web.UI.WebControls.Image ProgramImage;
 
         /// <summary>
+        /// ProgramFlagColor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ProgramFlagColor;
+
+        /// <summary>
+        /// ProgramFlagText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ProgramFlagText;
+
+        /// <summary>
         /// WebPageSection control.
         /// </summary>
         /// <remarks>

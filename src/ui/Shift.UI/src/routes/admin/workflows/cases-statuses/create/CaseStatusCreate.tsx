@@ -1,4 +1,4 @@
-import { ApiCreateCaseStatus } from "@/api/controllers/caseStatus/ApiCreateCaseStatus";
+import { ApiCreateCaseStatus } from "@/api/controllers/workflows/caseStatuses/ApiCreateCaseStatus";
 import { shiftClient } from "@/api/shiftClient";
 import Button from "@/components/Button";
 import FormCard from "@/components/form/FormCard";

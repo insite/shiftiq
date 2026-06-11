@@ -1,4 +1,4 @@
-import { ApiCaseStatusMatch } from "@/api/controllers/caseStatus/ApiCaseStatusMatch";
+import { ApiCaseStatusMatch } from "@/api/controllers/workflows/caseStatuses/ApiCaseStatusMatch";
 
 export interface CaseStatusRow {
     statusId: string;

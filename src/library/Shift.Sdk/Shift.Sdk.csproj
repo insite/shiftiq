@@ -5,31 +5,17 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>CS1573;CS1591</NoWarn>
   </PropertyGroup>
-	
-  <ItemGroup>
-    <Compile Remove="Service\Content\Contents\Write\**" />
-    <Compile Remove="Service\Content\Sites\Process\Write\Interfaces\**" />
-    <EmbeddedResource Remove="Service\Content\Contents\Write\**" />
-    <EmbeddedResource Remove="Service\Content\Sites\Process\Write\Interfaces\**" />
-    <None Remove="Service\Content\Contents\Write\**" />
-    <None Remove="Service\Content\Sites\Process\Write\Interfaces\**" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <Compile Remove="Service\Messaging\Messages\Process\Read\Handlers\EmailProcessor.cs" />
-    <Compile Remove="Service\Messaging\Messages\Process\Read\Interfaces\IEmailStore.cs" />
-    <Compile Remove="Service\Messaging\Messages\State\Changes\EmailScheduled.cs" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <EmbeddedResource Include="UI\Navigation\sidebar-cmds.json" />
-    <EmbeddedResource Include="UI\Navigation\sidebar.json" />
-  </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Service\Messaging\Messages\State\Notifications\NotificationTypes.json" />
-    <EmbeddedResource Include="Service\Reporting\State\DataSource\Templates\Groups.json" />
-    <EmbeddedResource Include="Service\Reporting\State\DataSource\Templates\People.json" />
+    <None Remove="Service\Messages\Messages\State\Notifications\NotificationTypes.json" />
+  </ItemGroup>
+	
+  <ItemGroup>
+	<EmbeddedResource Include="Service\Messages\Messages\State\Notifications\NotificationTypes.json" />
+	<EmbeddedResource Include="Service\Reports\State\DataSource\Templates\Groups.json" />
+	<EmbeddedResource Include="Service\Reports\State\DataSource\Templates\People.json" />
+	<EmbeddedResource Include="UI\Navigation\sidebar-cmds.json" />
+    <EmbeddedResource Include="UI\Navigation\sidebar.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Service\Security\Partitions\State\" />
     <Folder Include="UI\Layout\Common\Controls\Server\Buttons\" />
   </ItemGroup>
 

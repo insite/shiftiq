@@ -41,7 +41,11 @@
 
         <asp:BoundField HeaderText="Status" DataField="DeliveryStatus" />
 
-        <asp:BoundField HeaderText="Failure Reason" DataField="DeliveryError" />
+        <asp:TemplateField HeaderText="Failure Reason" ItemStyle-Wrap="false">
+            <ItemTemplate>
+                <div style="white-space:pre-wrap;"><%# Eval("DeliveryError") %></div>
+            </ItemTemplate>
+        </asp:TemplateField>
 
     </Columns>
 </insite:Grid>
