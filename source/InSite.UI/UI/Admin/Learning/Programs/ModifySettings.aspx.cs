@@ -73,15 +73,18 @@ namespace InSite.Admin.Records.Programs
                 {
                     ProgramIdentifier = program.ProgramIdentifier,
                     ObjectIdentifier = achievement.AchievementIdentifier,
+                    ObjectType = "Achievement",
                     TaskLifetimeMonths = achievement.LifetimeMonths,
                     TaskIsRequired = achievement.IsRequired,
-                    TaskIsPlanned = achievement.IsPlanned
+                    TaskIsPlanned = achievement.IsPlanned,
+                    TaskCompletionRequirement = "Credential Granted",
+                    TaskIdentifier = UniqueIdentifier.Create()
                 };
 
                 items.Add(item);
             }
 
-            TaskStore.Update(items);
+            TaskStore.UpdateOrInsert(items);
 
             Outline.Redirect(program.ProgramIdentifier, tab: "settings");
         }

@@ -58,6 +58,19 @@ namespace InSite.UI.Portal.Security
 
         #endregion
 
+        #region Caches (process-wide)
+
+        private const int LogoCacheTimeoutSeconds = 3600;
+        private const int PartitionsCacheTimeoutSeconds = 300;
+
+        private static readonly MemoryCache<string, string> _logoCache = new MemoryCache<string, string>();
+
+        private static readonly object _partitionsLock = new object();
+        private static List<PartitionRegistration> _cachedPartitions;
+        private static DateTimeOffset _cachedPartitionsExpiry;
+
+        #endregion
+
         #region Properties
 
         private bool IsLogin => Request["login"] == "1";
@@ -141,10 +154,27 @@ namespace InSite.UI.Portal.Security
 
         private bool TryGetPartitions(out List<PartitionRegistration> partitions)
         {
+            lock (_partitionsLock)
+            {
+                if (_cachedPartitions != null && _cachedPartitionsExpiry > DateTimeOffset.UtcNow)
+                {
+                    partitions = _cachedPartitions;
+                    return true;
+                }
+            }
+
             try
             {
                 var client = new PartitionClient(ServiceLocator.AppSettings.Engine);
-                partitions = client.GetPartitions();
+                var fresh = client.GetPartitions();
+
+                lock (_partitionsLock)
+                {
+                    _cachedPartitions = fresh;
+                    _cachedPartitionsExpiry = DateTimeOffset.UtcNow.AddSeconds(PartitionsCacheTimeoutSeconds);
+                }
+
+                partitions = fresh;
                 return true;
             }
             catch (Exception ex)
@@ -229,20 +259,24 @@ namespace InSite.UI.Portal.Security
         }
 
         // Returns the URL when it points at an image that actually exists, otherwise null.
+        // Result is cached process-wide for LogoCacheTimeoutSeconds so the per-request HTTP HEAD
+        // cost (10s timeout in ImageHelper.Exists) is paid only on first encounter.
 
         private static string ResolveExisting(string logoUrl)
         {
             if (string.IsNullOrEmpty(logoUrl))
                 return null;
 
+            if (_logoCache.TryGet(logoUrl, out var cached))
+                return cached;
+
             var isAbsolute = Uri.TryCreate(logoUrl, UriKind.Absolute, out var uri);
 
-            if (!isAbsolute)
-                return null;
+            var result = isAbsolute && ImageHelper.Exists(uri) ? logoUrl : null;
 
-            var exists = ImageHelper.Exists(uri);
+            _logoCache.Add(logoUrl, result, LogoCacheTimeoutSeconds);
 
-            return exists ? logoUrl : null;
+            return result;
         }
 
         private static bool IsClosed(AccountRegistration account)

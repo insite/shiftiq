@@ -103,9 +103,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
 
                 if (item.Section.AttemptSection?.IsBreakTimer == true)
                 {
-                    var message = item.Section.AttemptSection.TimeLimit > 0
-                        ? $"Your assessment has been paused for {item.Section.AttemptSection.TimeLimit.Value.Minutes().Humanize()}."
-                        : "Your assessment has been paused.";
+                    var message = CreateBreakMessage(item.Section.AttemptSection.TimeLimit);
 
                     controls.Alert.Text = "<div class=\"alert alert-warning\">" +
                         "<i class=\"far fa-exclamation-triangle me-2\"></i>" + message +
@@ -117,6 +115,20 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
 
                 NavItems.Add(navItemInfo);
             }
+        }
+
+        private string CreateBreakMessage(int? timeLimit)
+        {
+            if (timeLimit == null || timeLimit <= 0)
+                return Translate("Your assessment has been paused.");
+
+            var message = timeLimit == 1
+                ? "Your assessment has been paused for one minute."
+                : "Your assessment has been paused for {0} minutes.";
+
+            var translated = Translate(message);
+
+            return string.Format(translated, timeLimit);
         }
 
         public void SetActiveSection(int index)

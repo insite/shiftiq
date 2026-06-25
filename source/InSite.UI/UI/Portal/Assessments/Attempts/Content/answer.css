@@ -190,6 +190,7 @@ a.glossary-term {
             font-size: 0.75rem;
             margin-top: -0.75rem;
             margin-left: 0.25rem;
+            white-space: nowrap;
         }
 
         #attempt-commands #timer > div {

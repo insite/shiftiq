@@ -56,6 +56,6 @@ namespace Shift.Common
         public string FileStoragePath => GetPhysicalPathToShareFolder("Files");
         public string TempFolderPath => GetPhysicalPathToShareFolder("Files", "Temp");
         public string NotificationsFolderPath => GetPhysicalPathToShareFolder("Notifications");
-        public string PermissionRefreshFilePath => Path.Combine(GetPhysicalPathToShareFolder("Exchange"), "PermissionRefresh.txt");
+        public string PermissionRefreshFilePath => Path.Combine(GetPhysicalPathToEnterpriseFolder("Exchange"), "PermissionRefresh.txt");
     }
 }

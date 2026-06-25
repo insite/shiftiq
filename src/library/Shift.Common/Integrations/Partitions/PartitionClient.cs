@@ -83,7 +83,27 @@ namespace Shift.Common.Integration.Partitions
                 var result = await StaticHttpClient.Client.SendAsync(request);
 
                 if (HttpStatusCode.OK != result.StatusCode)
-                    throw new InvalidOperationException($"Partition registration failed: the Hub API returned HTTP {result.StatusCode}. {result.ReasonPhrase}");
+                {
+                    var body = await ReadBodyAsync(result);
+                    throw new InvalidOperationException(
+                        $"Partition registration failed: the Hub API returned HTTP {(int)result.StatusCode} {result.StatusCode} ({result.ReasonPhrase}). {body}");
+                }
+            }
+        }
+
+        private static async Task<string> ReadBodyAsync(HttpResponseMessage response)
+        {
+            if (response.Content == null)
+                return string.Empty;
+
+            try
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                return string.IsNullOrWhiteSpace(body) ? string.Empty : body.Trim();
+            }
+            catch
+            {
+                return string.Empty;
             }
         }
 

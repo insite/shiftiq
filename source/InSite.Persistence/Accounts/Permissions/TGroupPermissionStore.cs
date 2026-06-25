@@ -84,7 +84,10 @@ namespace InSite.Persistence
 
                     db.SaveChanges();
 
-                    var organizationCode = db.Organizations.Single(x => x.OrganizationIdentifier == organizationId.Value);
+                    var organizationCode = db.Organizations
+                        .Where(x => x.OrganizationIdentifier == organizationId.Value)
+                        .Select(x => x.OrganizationCode)
+                        .FirstOrDefault();
 
                     isPartitionPermissionChanged = StringHelper.Equals(organizationCode, PermissionCache.Partition);
                 }

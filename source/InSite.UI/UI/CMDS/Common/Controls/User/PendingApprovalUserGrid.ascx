@@ -27,7 +27,7 @@
                 <a href="mailto:<%# Eval("Email") %>"><%# Eval("Email") %></a>
             </td>
             <td>
-                <%# GetGroupList(Container.DataItem) %>
+                <%# Eval("Roles") %>
             </td>
         </tr>
     </ItemTemplate>

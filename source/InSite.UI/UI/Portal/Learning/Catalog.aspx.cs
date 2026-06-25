@@ -79,6 +79,19 @@ namespace InSite.UI.Portal.Learning
             }
         }
 
+        private Guid? RequestedAchievementId
+        {
+            get
+            {
+                var achievement = Request.QueryString["achievement"];
+
+                if (!achievement.HasValue())
+                    return null;
+
+                return Guid.TryParse(HttpUtility.UrlDecode(achievement), out var id) ? id : (Guid?)null;
+            }
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -90,6 +103,17 @@ namespace InSite.UI.Portal.Learning
 
             var groups = Identity.Groups.Select(x => x.Identifier).ToArray();
             _search = new CourseCatalogSearch(Identity.Organization.Identifier, RequestedCatalogId, groups, ViewEntireCatalog, ServiceLocator.Partition);
+
+            var achievementId = RequestedAchievementId;
+
+            if (achievementId.HasValue)
+            {
+                var courseIds = CourseSearch.BindCourses(
+                    x => x.CourseIdentifier,
+                    x => x.Gradebook.AchievementIdentifier == achievementId.Value);
+
+                _search.RestrictToCourses(courseIds);
+            }
 
             CatalogRepeater.DataBinding += CatalogRepeater_DataBinding;
             CatalogRepeater.ItemCreated += CatalogRepeater_ItemCreated;

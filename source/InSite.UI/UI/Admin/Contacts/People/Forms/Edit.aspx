@@ -45,6 +45,7 @@
                             </insite:NavItem>
 
                             <insite:NavItem runat="server" Title="Other">
+                                <div class="clearfix"></div>
                                 <uc:EditTabOther runat="server" ID="OtherTabContent" />
                             </insite:NavItem>
 
@@ -53,6 +54,7 @@
                             </insite:NavItem>
 
                             <insite:NavItem runat="server" ID="AddressSubTab" Title="Addresses">
+                                <div class="clearfix"></div>
                                 <uc:AddressList runat="server" ID="AddressList" ContactType="User" ValidationGroup="Person" />
                             </insite:NavItem>
 

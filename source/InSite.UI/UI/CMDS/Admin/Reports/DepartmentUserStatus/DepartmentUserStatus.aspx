@@ -94,7 +94,7 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <insite:Button runat="server" ID="SnapshotButton" ButtonStyle="Success" Icon="fas fa-camera" Text="Take Snapshot" />
+                    <insite:Button runat="server" ID="SnapshotButton" ButtonStyle="Success" Icon="fas fa-camera" Text="Take Snapshot" DisableAfterClick="true" />
                     <p class="form-text mt-3">
                         Click this button to recalculate the compliance statistics for the active organization account.
                     </p>

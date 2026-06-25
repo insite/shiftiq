@@ -32,6 +32,16 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
         public string BadgeImageUrl { get; set; }
 
         public bool IsSelfDeclared { get; set; }
+
+        public bool IsCourse { get; set; }
+
+        public Guid AchievementIdentifier { get; set; }
+
+        public Guid? CourseIdentifier { get; set; }
+
+        public int CourseCount { get; set; }
+
+        public string StatusMessageHtml { get; set; }
     }
 
     public partial class SearchResults : SearchResultsGridViewController<VCredentialFilter>
@@ -75,6 +85,25 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             var files = ServiceLocator.FileSearch
                 .GetModels(filter.OrganizationIdentifier, credentials.Select(x => x.CredentialIdentifier).ToArray(), null, false);
 
+            var achievementIds = credentials.Select(x => x.AchievementIdentifier).Distinct().ToArray();
+            var coursesByAchievement = new Dictionary<Guid, List<Guid>>();
+            if (achievementIds.Length > 0)
+            {
+                var courseLinks = CourseSearch.BindCourses(
+                    x => new { AchievementId = x.Gradebook.AchievementIdentifier.Value, x.CourseIdentifier },
+                    x => x.Gradebook.AchievementIdentifier.HasValue && achievementIds.Contains(x.Gradebook.AchievementIdentifier.Value));
+
+                foreach (var link in courseLinks)
+                {
+                    if (!coursesByAchievement.TryGetValue(link.AchievementId, out var list))
+                    {
+                        list = new List<Guid>();
+                        coursesByAchievement.Add(link.AchievementId, list);
+                    }
+                    list.Add(link.CourseIdentifier);
+                }
+            }
+
             foreach (var credential in credentials)
             {
                 var item = new SearchResultItem();
@@ -87,6 +116,14 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
                 var layout = credential.AchievementCertificateLayoutCode;
 
                 item.IsSelfDeclared = credential.AuthorityType == "Self";
+                item.AchievementIdentifier = credential.AchievementIdentifier;
+                if (coursesByAchievement.TryGetValue(credential.AchievementIdentifier, out var courseIds) && courseIds.Count > 0)
+                {
+                    item.IsCourse = true;
+                    item.CourseCount = courseIds.Count;
+                    if (courseIds.Count == 1)
+                        item.CourseIdentifier = courseIds[0];
+                }
 
                 item.AchievementType = credential.AchievementLabel;
                 item.AchievementTitle = credential.AchievementTitle;
@@ -109,6 +146,7 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
                 item.DownloadLink = GetDownloadLink(id, status, fileUrl, badgeUrl, layout);
                 item.DeleteLink = GetDeleteLink(item);
+                item.StatusMessageHtml = GetStatusMessageHtml(status, credential.AchievementAllowSelfDeclared, item.AchievementIdentifier, item.CourseIdentifier, item.CourseCount);
 
                 items.Add(item);
             }
@@ -149,6 +187,27 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             var html = $"<a title='Delete Certificate' class='text-danger' href='/ui/portal/record/credentials/learners/delete?credential={item.CredentialIdentifier}'><i class='fa-solid fa-trash-alt'></i></a>";
 
             return html;
+        }
+
+        private string GetStatusMessageHtml(CredentialStatus status, bool achievementAllowSelfDeclared, Guid achievementId, Guid? singleCourseId, int courseCount)
+        {
+            if (status != CredentialStatus.Expired || achievementAllowSelfDeclared)
+                return string.Empty;
+
+            if (courseCount == 1 && singleCourseId.HasValue)
+            {
+                var label = System.Web.HttpUtility.HtmlEncode(Translate("Take the course"));
+                return $"<div class='form-text'><a href='/ui/portal/learning/course/{singleCourseId.Value}'>{label}</a></div>";
+            }
+
+            if (courseCount > 1)
+            {
+                var label = System.Web.HttpUtility.HtmlEncode(Translate("Take a course"));
+                return $"<div class='form-text'><a href='/ui/portal/learning/catalog?achievement={achievementId}'>{label}</a></div>";
+            }
+
+            var text = System.Web.HttpUtility.HtmlEncode(Translate("Please contact your administrator with a copy of your renewed certificate"));
+            return $"<div class='form-text text-danger'>{text}</div>";
         }
 
         public static string GetDownloadLink(Guid id, CredentialStatus status, string downloadUrl, string badgeUrl, string layout)

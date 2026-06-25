@@ -1,9 +1,11 @@
 ﻿<%@ Control AutoEventWireup="true" CodeBehind="CommentRepeater.ascx.cs" Inherits="InSite.Admin.Contacts.Comments.Controls.CommentRepeater" Language="C#" %>
 
-<div class="mb-3">
+<div class="mb-3 float-end">
     <insite:AddButton ID="AddCommentButton" runat="server" Text="New Comment" />
     <insite:DownloadButton ID="DownloadXlsxButton" runat="server" />
 </div>
+
+<div class="clearfix"></div>
 
 <asp:Repeater runat="server" ID="Repeater">
     <ItemTemplate>

@@ -140,13 +140,6 @@ namespace InSite.Admin.Contacts.People.Controls
             var organizationCode = (string)DataBinder.Eval(row, "OrganizationCode");
             var groupParentId = (Guid?)DataBinder.Eval(row, "GroupParentIdentifier");
 
-            if (name.HasValue())
-            {
-                var separatorIndex = name.IndexOf('/', 1);
-                if (separatorIndex != -1)
-                    name = name.Substring(separatorIndex, name.Length - separatorIndex);
-            }
-
             var allowEditGroup = Identity.IsGranted("ui/admin/contacts/groups/edit") && Organization.OrganizationIdentifier == organizationIdentifier;
 
             var groupEditorLink = (HyperLink)e.Row.FindControl("GroupEditorLink");

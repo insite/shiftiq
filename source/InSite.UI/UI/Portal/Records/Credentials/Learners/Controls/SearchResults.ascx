@@ -11,6 +11,7 @@
                     <%# Eval("AchievementTitle") %>
                     <div class="form-text">
                         <%# ( (bool)Eval("IsSelfDeclared") ? "<span class='badge bg-info'>Self-Declared</span>" : "" ) %>
+                        <%# ( (bool)Eval("IsCourse") ? "<span class='badge bg-primary'>e-Learning</span>" : "" ) %>
                         <%# Eval("AchievementType") %>
                     </div>
                 </ItemTemplate>
@@ -28,6 +29,7 @@
             <asp:TemplateField HeaderText="Status">
                 <ItemTemplate>
                     <%# Eval("CredentialStatus") %>
+                    <%# Eval("StatusMessageHtml") %>
                 </ItemTemplate>
             </asp:TemplateField>
 

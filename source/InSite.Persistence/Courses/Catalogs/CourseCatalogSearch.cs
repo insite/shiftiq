@@ -104,6 +104,18 @@ namespace InSite.Persistence
             GetCategories(filter);
         }
 
+        public void RestrictToCourses(Guid[] courseIds)
+        {
+            if (courseIds == null)
+                return;
+
+            var allowed = new HashSet<Guid>(courseIds);
+
+            _datasource = _datasource.Where(x => allowed.Contains(x.CourseIdentifier)).ToList();
+
+            GetCategories(null);
+        }
+
         private void GetCategories(CatalogItemFilter filter)
         {
             var query = _datasource.AsQueryable();

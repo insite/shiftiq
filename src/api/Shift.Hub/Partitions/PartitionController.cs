@@ -16,13 +16,24 @@ namespace Shift.Hub.Partitions
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RegisterAsync([FromBody] PartitionRegistration partition)
         {
-            await _store.EnsureSchemaAsync();
+            try
+            {
+                await _store.EnsureSchemaAsync();
 
-            await _store.UpsertAsync(partition);
+                await _store.UpsertAsync(partition);
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    detail: ex.ToString(),
+                    title: "Partition registration failed.",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet]

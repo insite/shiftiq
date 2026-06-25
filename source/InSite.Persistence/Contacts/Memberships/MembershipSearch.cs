@@ -203,6 +203,50 @@ namespace InSite.Persistence
             }
         }
 
+        public class PendingApprovalUserRow
+        {
+            public Guid UserIdentifier { get; set; }
+            public string FullName { get; set; }
+            public string Email { get; set; }
+            public string Roles { get; set; }
+        }
+
+        public static IReadOnlyList<PendingApprovalUserRow> SelectPendingApprovalUsers()
+        {
+            const string sql = @"
+;with PendingUserIds as (
+    select UserIdentifier
+    from contacts.QPerson
+    where UserAccessGranted is null
+)
+select U.UserIdentifier
+     , U.FullName
+     , U.Email
+     , STRING_AGG(G.GroupName, ', ') WITHIN GROUP (ORDER BY G.GroupName) as Roles
+from PendingUserIds P
+    inner join identities.QUser U
+        on U.UserIdentifier = P.UserIdentifier
+       and U.AccessGrantedToCmds = 1
+       and U.UtcArchived is null
+    inner join contacts.QMembership M on M.UserIdentifier = U.UserIdentifier
+    inner join contacts.QGroup G
+        on G.GroupIdentifier = M.GroupIdentifier
+       and G.OrganizationIdentifier = @cmdsOrg
+       and G.GroupType = @roleType
+       and (G.GroupName like 'CMDS%' or G.GroupName like @traineePrefix + '%')
+group by U.UserIdentifier, U.FullName, U.Email
+order by U.FullName;";
+
+            using (var db = new InternalDbContext())
+            {
+                return db.Database.SqlQuery<PendingApprovalUserRow>(
+                    sql,
+                    new SqlParameter("@cmdsOrg", OrganizationIdentifiers.CMDS),
+                    new SqlParameter("@roleType", GroupTypes.Role),
+                    new SqlParameter("@traineePrefix", GroupNames.Trainee)).ToArray();
+            }
+        }
+
         public static IReadOnlyList<RoleMembership> SelectMembershipDetails(int? groupKey, Guid? userKey)
         {
             const string query = @"

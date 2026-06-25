@@ -61,7 +61,7 @@ namespace InSite.Persistence
             }
         }
 
-        public static void Update(List<TTask> items)
+        public static void UpdateOrInsert(List<TTask> items)
         {
             if (items.Count == 0)
                 return;

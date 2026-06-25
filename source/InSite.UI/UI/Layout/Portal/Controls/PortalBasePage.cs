@@ -315,6 +315,13 @@ namespace InSite.UI.Layout.Portal
             if (StringHelper.StartsWith(rawUrl, lti))
                 return;
 
+            if (!HasAuthenticationCookies())
+            {
+                var signinUrl = $"/ui/lobby/signin?returnurl={HttpUtility.UrlEncode(rawUrl)}";
+                RedirectToUrl(this, signinUrl);
+                return;
+            }
+
             var signoutWebUrl = SignOut.GetWebUrl();
             if (!string.IsNullOrEmpty(rawUrl))
                 signoutWebUrl.QueryString.Add("returnurl", HttpUtility.UrlEncode(rawUrl));
@@ -322,6 +329,23 @@ namespace InSite.UI.Layout.Portal
             signoutWebUrl.QueryString.Add("error", "Authentication is required for access to this page.");
 
             RedirectToUrl(this, signoutWebUrl.ToString());
+        }
+
+        private bool HasAuthenticationCookies()
+        {
+            var cookieNames = new[]
+            {
+                ServiceLocator.AppSettings.Security.Cookie.Name,
+                ServiceLocator.AppSettings.Security.IdCookie.Name,
+            };
+
+            foreach (var name in cookieNames)
+            {
+                if (!string.IsNullOrEmpty(name) && Request.Cookies[name] != null)
+                    return true;
+            }
+
+            return false;
         }
 
         private bool IsAuthorizationRequirementSatisfied()

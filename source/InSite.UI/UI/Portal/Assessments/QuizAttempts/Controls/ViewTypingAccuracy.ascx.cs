@@ -145,7 +145,13 @@ namespace InSite.UI.Portal.Assessments.QuizAttempts.Controls
 
         private void QuestionPanel_Request(object sender, StringValueArgs e)
         {
-            if (e.Value != "next")
+            if (!e.Value.StartsWith("next|"))
+                return;
+
+            if (!int.TryParse(e.Value.Substring(5), out var clientQuestionIndex))
+                return;
+
+            if (QuestionIndex != clientQuestionIndex || QuestionIndex >= Questions.Length - 1)
                 return;
 
             QuestionIndex++;

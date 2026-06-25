@@ -4,6 +4,7 @@
     let inputText = null;
     let isStarted = false;
     let isStopped = false;
+    let isGoingNext = false;
 
     let elInputs = null;
     let elNext = null;
@@ -22,6 +23,8 @@
             initInputs(quizState.inputIds);
 
             elLoading.classList.remove('show');
+
+            isGoingNext = false;
         }
     });
 
@@ -102,7 +105,12 @@
         if (!isStarted || isStopped)
             return false;
 
-        elQuestionPanel.ajaxRequest("next");
+        if (isGoingNext)
+            return true;
+
+        isGoingNext = true;
+
+        elQuestionPanel.ajaxRequest('next|' + String(questionIndex));
         elLoading.classList.add('show');
 
         if (elNext) {
@@ -117,6 +125,7 @@
             return false;
 
         isStopped = true;
+
         quizTimer.stop();
         elUpdate.ajaxRequest('complete|' + String(quizTimer.getElapsed()) + '|' + JSON.stringify(inputText));
         elLoading.classList.add('show');
@@ -192,6 +201,8 @@
 
     function onInputKeydown(e) {
         if (e.altKey === true || e.ctrlKey === true) {
+            e.preventDefault();
+        } else if (isGoingNext) {
             e.preventDefault();
         } else if (e.code === 'Tab') {
             e.preventDefault();

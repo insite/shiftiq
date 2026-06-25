@@ -99,6 +99,8 @@ public class SecretController : ShiftControllerBase
 
         var value = Secret.CreateValue();
 
+        secretExpiryInDays = ValidateLifetimeInDays(secretExpiryInDays);
+
         var secretExpiry = DateTimeOffset.Now.AddDays(secretExpiryInDays);
 
         await _personSecretService.CreateAsync(new CreatePersonSecret
@@ -108,7 +110,7 @@ public class SecretController : ShiftControllerBase
             SecretType = type,
             SecretName = name,
             SecretValue = value,
-            SecretLifetimeLimit = tokenLifetimeInMinutes,
+            SecretLifetimeLimit = ValidateLifetimeInMinutes(tokenLifetimeInMinutes),
             SecretExpiry = secretExpiry
         });
 
@@ -118,5 +120,27 @@ public class SecretController : ShiftControllerBase
             return secret;
 
         throw new InvalidOperationException($"Unable retrieve new secret {secretId}");
+    }
+
+    private int ValidateLifetimeInMinutes(int minutes)
+    {
+        var minimum = 1;
+        var maximum = 365 * 24 * 60; // 365 days × 24 hours × 60 minutes = 525,600 minutes
+
+        if (minutes < minimum || maximum < minutes)
+            return maximum;
+
+        return minutes;
+    }
+
+    private int ValidateLifetimeInDays(int days)
+    {
+        var minimum = 1;
+        var maximum = 365; // 365 days
+
+        if (days < minimum || maximum < days)
+            return maximum;
+
+        return days;
     }
 }
