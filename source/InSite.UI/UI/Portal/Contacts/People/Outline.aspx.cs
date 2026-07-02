@@ -6,7 +6,6 @@ using InSite.Common.Web.UI;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
 
-using Shift.Constant;
 using Shift.Sdk.UI;
 
 namespace InSite.UI.Portal.Contacts.People
@@ -63,8 +62,8 @@ namespace InSite.UI.Portal.Contacts.People
 
             Detail.SetModel(_user, _person);
 
-            var achievementCount = Achievements.LoadData(Organization.Identifier, LearnerIdentifier);
-            AchievementSection.SetTitle("Achievements", achievementCount);
+            Achievements.LoadData(Organization.Identifier, LearnerIdentifier);
+            AchievementSection.SetTitle("Achievements", Achievements.RowCount);
 
             var registrationCount = Registrations.LoadData(Organization.Identifier, LearnerIdentifier);
             RegistrationSection.SetTitle("Registrations", registrationCount);

@@ -306,6 +306,9 @@ namespace InSite.Portal.Assessments.Attempts
             tabLabel: {GetLabelAndJsEncode("[Assessments.Attempts.Answer.Timer].[Tab]")},
             breakLabel: {GetLabelAndJsEncode("[Assessments.Attempts.Answer.Timer].[Break]")}
         }},
+        loadingPanel: {{
+            loadingLabel: {TranslateAndJsEncode("Loading...")}
+        }},
     }};
 </script>
 ";

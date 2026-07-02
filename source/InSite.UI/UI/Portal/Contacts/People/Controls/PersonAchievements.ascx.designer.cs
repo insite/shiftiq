@@ -24,12 +24,12 @@ namespace InSite.UI.Portal.Contacts.People.Controls
         protected global::System.Web.UI.WebControls.Literal NoAchievements;
 
         /// <summary>
-        /// AchievementGrid control.
+        /// Grid control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Grid AchievementGrid;
+        protected global::InSite.Common.Web.UI.Grid Grid;
     }
 }

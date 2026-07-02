@@ -33,6 +33,15 @@ namespace InSite.Admin.Workflow.Forms
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl TranslationSection;
 
         /// <summary>
+        /// UpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel UpdatePanel;
+
+        /// <summary>
         /// PageCount control.
         /// </summary>
         /// <remarks>

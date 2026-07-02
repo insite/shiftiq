@@ -37,6 +37,7 @@ namespace InSite.Application.Registrations.Read
         QRegistration GetRegistration(QRegistrationFilter filter, params Expression<Func<QRegistration, object>>[] includes);
 
         List<QRegistration> GetRegistrations(QRegistrationFilter filter, params Expression<Func<QRegistration, object>>[] includes);
+        List<RegistrationSearchDataItem> GetRegistrationSearchResults(QRegistrationFilter filter);
 
         Guid? GetRegistrationIdentifier(QRegistrationFilter filter);
         List<Guid> GetRegistrationIdentifiers(QRegistrationFilter filter);

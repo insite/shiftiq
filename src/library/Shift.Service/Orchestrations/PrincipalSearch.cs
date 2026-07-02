@@ -75,6 +75,8 @@ public class PrincipalSearch : IPrincipalSearch
 
         AddAuthority(principal, person);
 
+        principal.SecretId = personSecret.SecretIdentifier;
+
         principal.Partition = new Model
         {
             Identifier = _appSettings.Partition.Identifier,

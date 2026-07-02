@@ -14,7 +14,34 @@ namespace Shift.Common.Timeline.Snapshots
     /// </summary>
     public class SnapshotRepository : IChangeRepository
     {
-        private readonly IGuidCache<AggregateRoot> _cache;
+        public class CachedAggregate
+        {
+            private readonly IJsonSerializer _serializer;
+            private string _serializedState;
+
+            public AggregateRoot Aggregate { get; }
+
+            public string GetSerializedState()
+            {
+                if (_serializedState == null)
+                {
+                    Aggregate.LockAndRun(() =>
+                    {
+                        _serializedState = _serializer.Serialize(Aggregate.State);
+                    });
+                }
+                return _serializedState;
+            }
+
+            public CachedAggregate(AggregateRoot aggregate, IJsonSerializer serializer)
+            {
+                Aggregate = aggregate;
+
+                _serializer = serializer;
+            }
+        }
+
+        private readonly IGuidCache<CachedAggregate> _cache;
         private readonly IJsonSerializer _serializer;
 
         private readonly ISnapshotStore _snapshotStore;
@@ -36,7 +63,7 @@ namespace Shift.Common.Timeline.Snapshots
             _snapshotStore = snapshotStore ?? throw new ArgumentNullException(nameof(snapshotStore));
             _snapshotStrategy = snapshotStrategy ?? throw new ArgumentNullException(nameof(snapshotStrategy));
 
-            _cache = ServiceLocator.Instance.GetService<IGuidCache<AggregateRoot>>();
+            _cache = ServiceLocator.Instance.GetService<IGuidCache<CachedAggregate>>();
             _serializer = ServiceLocator.Instance.GetService<IJsonSerializer>();
         }
 
@@ -47,14 +74,12 @@ namespace Shift.Common.Timeline.Snapshots
         {
             var concurrencyChange = false;
 
-            var previous = (T)_cache.Get(aggregate.AggregateIdentifier);
+            var previous = (T)_cache.Get(aggregate.AggregateIdentifier)?.Aggregate;
 
             if (previous != null && aggregate != previous)
                 throw new ConcurrencyException($"Aggregate {aggregate.AggregateIdentifier} version {aggregate.AggregateVersion} cannot be saved because another aggregate (version {aggregate.AggregateVersion}) already exists in the cache with the same identifier. Your code might be trying to create a new aggregate that is already created.");
 
-            // Cache the aggregate for 5 minutes.
-            lock (_cache)
-                _cache.Add(aggregate.AggregateIdentifier, aggregate, 5 * 60, true);
+            AddCachedAggregate(new CachedAggregate(aggregate, _serializer));
 
             IChange[] changes = null;
 
@@ -73,48 +98,55 @@ namespace Shift.Common.Timeline.Snapshots
             return changes;
         }
 
+        private void AddCachedAggregate(CachedAggregate cachedAggregate)
+        {
+            // Cache the aggregate for 5 minutes.
+            _cache.Add(cachedAggregate.Aggregate.AggregateIdentifier, cachedAggregate, 5 * 60, true);
+        }
+
         /// <summary>
         /// Gets the aggregate.
         /// </summary>
         public T Get<T>(Guid aggregateId, int? version = -1) where T : AggregateRoot
         {
-            T aggregate;
+            return (T)GetOrCreateCachedAggregate<T>(aggregateId).Aggregate;
+        }
 
-            lock (_cache)
+        private CachedAggregate GetOrCreateCachedAggregate<T>(Guid aggregateId) where T : AggregateRoot
+        {
+            CachedAggregate cachedAggregate = _cache.Get(aggregateId);
+            if (cachedAggregate != null)
             {
-                aggregate = (T)_cache.Get(aggregateId);
-
-                if (aggregate == null)
-                    aggregate = CreateAggregate<T>(aggregateId, null);
-
-                _cache.Add(aggregate.AggregateIdentifier, aggregate, 5 * 60, true);
+                AddCachedAggregate(cachedAggregate);
+                return cachedAggregate;
             }
 
-            return aggregate;
+            var aggregate = CreateAggregate<T>(aggregateId, null);
+
+            cachedAggregate = _cache.Get(aggregateId);
+            if (cachedAggregate != null)
+                return cachedAggregate;
+
+            cachedAggregate = new CachedAggregate(aggregate, _serializer);
+
+            AddCachedAggregate(cachedAggregate);
+
+            return cachedAggregate;
         }
 
         public T GetClone<T>(Guid aggregateId, int? expectedVersion = -1) where T : AggregateRoot
         {
-            var aggregate = Get<T>(aggregateId);
-            if (aggregate != null)
-            {
-                T clone = default;
+            var cachedAggregate = GetOrCreateCachedAggregate<T>(aggregateId);
+            var originalState = cachedAggregate.GetSerializedState();
+            var aggregate = cachedAggregate.Aggregate;
 
-                aggregate.LockAndRun(() =>
-                {
-                    var originalState = _serializer.Serialize(aggregate.State);
+            var clone = AggregateFactory<T>.CreateAggregate();
+            clone.AggregateIdentifier = aggregate.AggregateIdentifier;
+            clone.RootAggregateIdentifier = aggregate.RootAggregateIdentifier;
+            clone.AggregateVersion = aggregate.AggregateVersion;
+            clone.State = _serializer.Deserialize<AggregateState>(originalState, aggregate.State.GetType(), false);
 
-                    clone = AggregateFactory<T>.CreateAggregate();
-                    clone.AggregateIdentifier = aggregate.AggregateIdentifier;
-                    clone.RootAggregateIdentifier = aggregate.RootAggregateIdentifier;
-                    clone.AggregateVersion = aggregate.AggregateVersion;
-                    clone.State = _serializer.Deserialize<AggregateState>(originalState, aggregate.State.GetType(), false);
-                });
-
-                return clone;
-            }
-
-            return CreateAggregate<T>(aggregateId, expectedVersion);
+            return clone;
         }
 
         public void LockAndRun<T>(Guid aggregateId, Action<T> action) where T : AggregateRoot

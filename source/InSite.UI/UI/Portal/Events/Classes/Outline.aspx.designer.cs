@@ -87,13 +87,13 @@ namespace InSite.UI.Portal.Events.Classes
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl AlertFull;
 
         /// <summary>
-        /// WaitlistNote control.
+        /// AlertFullWithWaitlist control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Literal WaitlistNote;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AlertFullWithWaitlist;
 
         /// <summary>
         /// AlertClosed control.

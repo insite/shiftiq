@@ -214,8 +214,9 @@ namespace InSite.Application.Records.Read
                  )
             {
                 var effectCommand = c.Completed != null ? whenPassCommand.Value : whenFailCommand.Value;
+                var granted = item.AchievementFixedDate ?? c.Completed;
 
-                var grants = BuildCommands(effectCommand, gradebook.OrganizationIdentifier, item.AchievementIdentifier.Value, progress.UserIdentifier, c.Completed, null, null);
+                var grants = BuildCommands(effectCommand, gradebook.OrganizationIdentifier, item.AchievementIdentifier.Value, progress.UserIdentifier, granted, null, null);
 
                 foreach (var grant in grants)
                     Send(change, grant);

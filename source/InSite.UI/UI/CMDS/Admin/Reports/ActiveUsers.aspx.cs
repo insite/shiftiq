@@ -24,17 +24,13 @@ namespace InSite.Cmds.Actions.Reports
         {
             base.OnInit(e);
 
-            MembershipFunction.AutoPostBack = true;
-            MembershipFunction.SelectedIndexChanged += (x, y) => BindModelToControls();
-
             DownloadButton.Click += (x, y) =>
             {
                 var excel = new ActiveUsersExcel(ddlGroupBy.Value, CreateCsv, DescribeDepartments);
                 excel.ExportSearchResultsToXlsx(CreateGroups());
             };
 
-            ddlGroupBy.AutoPostBack = true;
-            ddlGroupBy.ValueChanged += (x, y) => BindModelToControls();
+            ReportButton.Click += (x, y) => BindModelToControls();
 
             BindMembershipFunctions(true, true);
         }
@@ -59,6 +55,8 @@ namespace InSite.Cmds.Actions.Reports
 
             var dept = new SystemListItem("Department");
 
+            var none = new SystemListItem("None");
+
             org.Selected = isOrganizationChecked;
 
             dept.Selected = true;
@@ -73,27 +71,25 @@ namespace InSite.Cmds.Actions.Reports
             MembershipFunction.Items.Add(org);
 
             MembershipFunction.Items.Add(dept);
+
+            MembershipFunction.Items.Add(none);
         }
 
         private void BindModelToControls()
         {
+            DepartmentsHelp.Visible = ddlGroupBy.Value != "Department";
+
             var dict = CreateGroups();
+
+            var totalPeople = dict.Values.SelectMany(v => v).Select(e => e.Identifier).Distinct().Count();
+            ResultCount.InnerText = totalPeople == 1 ? "1 result" : $"{totalPeople:N0} results";
             var keys = dict.Keys.OrderBy(k => k).ToArray();
 
             switch (ddlGroupBy.Value)
             {
-                case "Organization":
+                case "DoNotGroup":
                     foreach (var group in keys)
                     {
-                        var company = group;
-
-                        var header = new HtmlGenericControl
-                        {
-                            TagName = "h2",
-                            InnerHtml = group
-                        };
-                        place.Controls.Add(header);
-
                         var dt = new DataTable();
                         dt.Columns.Add("User");
                         dt.Columns.Add("Employment");
@@ -109,7 +105,7 @@ namespace InSite.Cmds.Actions.Reports
                             var row = dt.NewRow();
 
                             row["User"] = $"{employee.Name}<br />{employee.Email}";
-                            row["Employment"] = DescribeDepartments(employee.Employments);
+                            row["Employment"] = DescribeDepartments(employee.Employments, html: true);
                             row["Profiles"] = employee.Profiles;
                             row["Status"] = employee.Status;
                             row["LastLogin"] = employee.LastAuthenticated.HasValue ? (object)employee.LastAuthenticated : DBNull.Value;
@@ -125,7 +121,7 @@ namespace InSite.Cmds.Actions.Reports
                             CssClass = "table table-striped"
                         };
 
-                        var nameField = new BoundField { HeaderText = "User", DataField = "User" };
+                        var nameField = new BoundField { HeaderText = "Person", DataField = "User" };
                         nameField.ItemStyle.Wrap = false;
                         nameField.HtmlEncode = false;
 
@@ -134,7 +130,7 @@ namespace InSite.Cmds.Actions.Reports
                         lastLoginField.DataFormatString = "{0:MMM d, yyyy}";
 
                         gv.Columns.Add(nameField);
-                        gv.Columns.Add(new BoundField { HeaderText = "Employment", DataField = "Employment" });
+                        gv.Columns.Add(new BoundField { HeaderText = "Departments", DataField = "Employment", HtmlEncode = false });
                         gv.Columns.Add(new BoundField { HeaderText = "Profiles", DataField = "Profiles" });
                         gv.Columns.Add(new BoundField { HeaderText = "Status", DataField = "Status" });
                         gv.Columns.Add(lastLoginField);
@@ -148,13 +144,9 @@ namespace InSite.Cmds.Actions.Reports
                     }
 
                     break;
-                case "OrganizationAndDepartment":
+                case "Department":
                     foreach (var group in keys)
                     {
-                        var strs = group.Split(new[] { " - " }, StringSplitOptions.RemoveEmptyEntries);
-                        var company = strs[0];
-                        var department = strs[1];
-
                         var header = new HtmlGenericControl
                         {
                             TagName = "h3",
@@ -193,7 +185,7 @@ namespace InSite.Cmds.Actions.Reports
                             CssClass = "table table-striped"
                         };
 
-                        var nameField = new BoundField { HeaderText = "Name", DataField = "Name" };
+                        var nameField = new BoundField { HeaderText = "Person", DataField = "Name" };
                         nameField.ItemStyle.Wrap = false;
 
                         var lastLoginField = new BoundField { HeaderText = "Last Login", DataField = "LastLogin" };
@@ -218,8 +210,6 @@ namespace InSite.Cmds.Actions.Reports
                 case "Role":
                     foreach (var group in keys)
                     {
-                        var role = group;
-
                         var header = new HtmlGenericControl
                         {
                             TagName = "h3",
@@ -258,7 +248,7 @@ namespace InSite.Cmds.Actions.Reports
                             CssClass = "table table-striped"
                         };
 
-                        var nameField = new BoundField { HeaderText = "Name", DataField = "Name" };
+                        var nameField = new BoundField { HeaderText = "Person", DataField = "Name" };
                         nameField.ItemStyle.Wrap = false;
 
                         var lastLoginField = new BoundField { HeaderText = "Last Login", DataField = "LastLogin" };
@@ -269,7 +259,7 @@ namespace InSite.Cmds.Actions.Reports
                         gv.Columns.Add(new BoundField { HeaderText = "Email", DataField = "Email" });
                         gv.Columns.Add(new BoundField
                         {
-                            HeaderText = "Employments",
+                            HeaderText = "Departments",
                             DataField = "Employments",
                             HtmlEncode = false
                         });
@@ -297,21 +287,11 @@ namespace InSite.Cmds.Actions.Reports
 
             switch (ddlGroupBy.Value)
             {
-                case "Organization":
-                    foreach (var employee in data)
-                        foreach (var empl in employee.Employments)
-                        {
-                            var groupName = empl.Company;
-
-                            if (!result.ContainsKey(groupName))
-                                result.Add(groupName, new List<ContactRepository2.CompanyEmployee> { employee });
-                            else if (!result[groupName].Any(ce => ce.Name == employee.Name))
-                                result[groupName].Add(employee);
-                        }
-
+                case "DoNotGroup":
+                    result.Add(string.Empty, data.ToList());
                     break;
 
-                case "OrganizationAndDepartment":
+                case "Department":
                     foreach (var employee in data)
                         foreach (var empl in employee.Employments)
                         {
@@ -345,7 +325,7 @@ namespace InSite.Cmds.Actions.Reports
         private IList<ContactRepository2.CompanyEmployee> CreateDataSource()
         {
             var employmentTypes = GetEmploymentTypes();
-            var data = ContactRepository2.SelectActiveUsers(Organization.Identifier, employmentTypes, ExcludeGroup.Text);
+            var data = ContactRepository2.SelectActiveUsers(Organization.Identifier, employmentTypes, IncludeNoMemberships(), ExcludeGroup.Text, NameFilter.Text);
 
             foreach (var item in data)
                 if (item.LastAuthenticated.HasValue && item.LastAuthenticated.Value.Year == 1)
@@ -370,7 +350,18 @@ namespace InSite.Cmds.Actions.Reports
             return list;
         }
 
+        private bool IncludeNoMemberships()
+        {
+            var item = MembershipFunction.Items.FindByValue("None");
+            return item != null && item.Selected;
+        }
+
         private string DescribeDepartments(IList<ContactRepository2.Employment> employments)
+        {
+            return DescribeDepartments(employments, html: false);
+        }
+
+        private string DescribeDepartments(IList<ContactRepository2.Employment> employments, bool html)
         {
             var types = new[]
             {
@@ -385,7 +376,9 @@ namespace InSite.Cmds.Actions.Reports
             {
                 var departments = employments
                     .Where(e => string.Equals(e.EmploymentType, type, StringComparison.OrdinalIgnoreCase))
-                    .Select(e => $"{e.Department} [{e.Profiles}]")
+                    .Select(e => html
+                        ? $"{e.Department} <small class=\"text-body-secondary\">[{e.Profiles}]</small>"
+                        : $"{e.Department} [{e.Profiles}]")
                     .Distinct()
                     .OrderBy(e => e)
                     .ToList();
@@ -402,7 +395,7 @@ namespace InSite.Cmds.Actions.Reports
 
             var companies = employments.Select(e => e.Company).Distinct().OrderBy(c => c);
             foreach (var company in companies)
-                builder.AppendFormat("<strong>{0}</strong><br/>{1}<br/>", company, DescribeDepartments(employments));
+                builder.AppendFormat("<strong>{0}</strong><br/>{1}<br/>", company, DescribeDepartments(employments, html: true));
 
             if (builder.Length >= 5)
                 builder.Remove(builder.Length - 5, 5);

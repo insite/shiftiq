@@ -619,6 +619,7 @@ namespace InSite.Persistence
                 {
                     _commander.Send(new CompleteDelivery(email.MessageIdentifier.Value, email.MailoutIdentifier, envelope.RecipientIdentifier.Value, null));
                 }
+                _commander.Send(new StartMailout(email.MessageIdentifier.Value, email.MailoutIdentifier));
                 _commander.Send(new CompleteMailout(email.MessageIdentifier.Value, email.MailoutIdentifier));
             }
             else

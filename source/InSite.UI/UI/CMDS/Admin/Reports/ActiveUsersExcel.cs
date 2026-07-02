@@ -34,7 +34,7 @@ namespace InSite.Cmds.Actions.Reports
 
             switch (_groupBy)
             {
-                case "Organization":
+                case "DoNotGroup":
                     AddCell(employee.Name);
                     AddCell(employee.Email);
                     AddCell(_describe(employee.Employments), wrapText: true);
@@ -45,7 +45,7 @@ namespace InSite.Cmds.Actions.Reports
                     AddCell(_csv(employee.Roles), wrapText: true);
                     AddCell(employee.OrganizationCount, HorizontalAlignment.Right);
                     break;
-                case "OrganizationAndDepartment":
+                case "Department":
                     AddCell(employee.Name);
                     AddCell(employee.Email);
                     AddCell(employee.Profiles, HorizontalAlignment.Right);
@@ -100,8 +100,8 @@ namespace InSite.Cmds.Actions.Reports
 
             switch (_groupBy)
             {
-                case "Organization":
-                    AddCell("Name");
+                case "DoNotGroup":
+                    AddCell("Person");
                     AddCell("Email");
                     AddCell("Departments");
                     AddCell("Profiles");
@@ -110,8 +110,8 @@ namespace InSite.Cmds.Actions.Reports
                     AddCell("Roles");
                     AddCell("Organizations");
                     break;
-                case "OrganizationAndDepartment":
-                    AddCell("Name");
+                case "Department":
+                    AddCell("Person");
                     AddCell("Email");
                     AddCell("Profiles");
                     AddCell("Status");
@@ -120,9 +120,9 @@ namespace InSite.Cmds.Actions.Reports
                     AddCell("Organizations");
                     break;
                 case "Role":
-                    AddCell("Name");
+                    AddCell("Person");
                     AddCell("Email");
-                    AddCell("Employments");
+                    AddCell("Departments");
                     AddCell("Profiles");
                     AddCell("Status");
                     AddCell("Last Authenticated");
@@ -166,11 +166,14 @@ namespace InSite.Cmds.Actions.Reports
                 if (rowIndex > 0)
                     rowIndex++;
 
-                xlsxSheet.Cells.Add(new XlsxCell(0, rowIndex++, xlsxSheet.Columns.Count)
+                if (!string.IsNullOrEmpty(group))
                 {
-                    Style = groupHeaderStyle,
-                    Value = group
-                });
+                    xlsxSheet.Cells.Add(new XlsxCell(0, rowIndex++, xlsxSheet.Columns.Count)
+                    {
+                        Style = groupHeaderStyle,
+                        Value = group
+                    });
+                }
 
                 AddXlsxHeader(xlsxSheet, rowIndex++);
 
@@ -185,7 +188,7 @@ namespace InSite.Cmds.Actions.Reports
         {
             switch (_groupBy)
             {
-                case "Organization":
+                case "DoNotGroup":
                     table.Columns[0].Width = 30; //Name
                     table.Columns[1].Width = 30; //Email
                     table.Columns[2].Width = 60; //Departments
@@ -195,7 +198,7 @@ namespace InSite.Cmds.Actions.Reports
                     table.Columns[6].Width = 60; //Roles
                     table.Columns[7].Width = 20; //Companies
                     break;
-                case "OrganizationAndDepartment":
+                case "Department":
                     table.Columns[0].Width = 30; //Name
                     table.Columns[1].Width = 30; //Email
                     table.Columns[2].Width = 20; //Profiles

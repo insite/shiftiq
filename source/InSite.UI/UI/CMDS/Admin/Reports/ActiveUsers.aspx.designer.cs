@@ -42,13 +42,13 @@ namespace InSite.Cmds.Actions.Reports
         protected global::InSite.Common.Web.UI.ComboBox ddlGroupBy;
 
         /// <summary>
-        /// ExcludeGroup control.
+        /// NameFilter control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox ExcludeGroup;
+        protected global::InSite.Common.Web.UI.TextBox NameFilter;
 
         /// <summary>
         /// MembershipFunction control.
@@ -58,6 +58,42 @@ namespace InSite.Cmds.Actions.Reports
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.CheckBoxList MembershipFunction;
+
+        /// <summary>
+        /// ExcludeGroup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox ExcludeGroup;
+
+        /// <summary>
+        /// ReportButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.SearchButton ReportButton;
+
+        /// <summary>
+        /// ResultCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ResultCount;
+
+        /// <summary>
+        /// DepartmentsHelp control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DepartmentsHelp;
 
         /// <summary>
         /// place control.

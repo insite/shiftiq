@@ -130,7 +130,10 @@ namespace Shift.Common
         ProxyAgentEmail,
 
         [EnumMember(Value = "paging")]
-        Paging
+        Paging,
+
+        [EnumMember(Value = "sec_id")]
+        SecretId,
     }
 
     public static class ClaimNameExtensions

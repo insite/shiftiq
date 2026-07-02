@@ -434,7 +434,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
                 var prevForms = form.EnumeratePreviousVersions().Select(y => new FormItem
                 {
                     Form = y,
-                    PublicationStatus = ServiceLocator.BankSearch.GetForm(form.Identifier)?.FormPublicationStatus
+                    PublicationStatus = y.Publication?.Status.GetName()
                 });
 
                 PreviousVersions.DataSource = prevForms;

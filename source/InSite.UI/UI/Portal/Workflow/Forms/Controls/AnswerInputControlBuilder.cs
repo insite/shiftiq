@@ -7,8 +7,6 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using Humanizer;
 
 using InSite.Admin.Assets.Glossaries.Utilities;
@@ -19,6 +17,7 @@ using InSite.Domain.Surveys.Sessions;
 using InSite.UI.Layout.Lobby;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 using CustomValidator = System.Web.UI.WebControls.CustomValidator;
@@ -297,7 +296,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                     ControlToValidate = inputID,
                     Display = ValidatorDisplay.None,
                     RenderMode = ValidatorRenderModeEnum.Exclamation,
-                    ErrorMessage = "This question is mandatory"
+                    ErrorMessage = Translate("This question is mandatory")
                 };
             }
         }

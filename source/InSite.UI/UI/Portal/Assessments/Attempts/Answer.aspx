@@ -54,7 +54,7 @@
                 <a runat="server" id="ViewFormulasLink" title="View Formulas" class="btn btn-sm btn-default ms-1 fs-6">
                     <i class="fal fa-square-root-alt"></i>
                 </a>
-                <div id="timer" class="mx-2" style="display:none;"></div>
+                <div id="timer" class="ms-2 me-4" style="display:none;"></div>
                 <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked ms-1" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-tab" PostBackEnabled="false" />
                 <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked ms-1" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-section" PostBackEnabled="false" />
                 <insite:Button runat="server" ButtonStyle="Success" CssClass="exam-locked ms-1" Icon="fas fas fa-arrow-alt-right" Text="Next" data-action="next-question" PostBackEnabled="false" />

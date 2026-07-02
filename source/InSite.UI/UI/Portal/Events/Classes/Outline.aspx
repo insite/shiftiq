@@ -40,7 +40,12 @@
     <div runat="server" id="AlertFull" class="alert alert-warning" role="alert">
         <i class="far fa-exclamation-triangle fs-xl"></i> <strong><insite:Literal runat="server" Text="Warning:" /></strong>
         <insite:Literal runat="server" Text="No seats are available." />
-        <insite:Literal runat="server" ID="WaitlistNote" Text="You may add your name to the waiting list, and we'll contact you if a seat opens up." />
+    </div>
+
+    <div runat="server" id="AlertFullWithWaitlist" class="alert alert-warning" role="alert">
+        <h4 class="pt-2 alert-heading"><insite:Literal runat="server" Text="Please Note:" /></h4>
+        <p><strong><insite:Literal runat="server" Text="Registration is currently unavailable for this class." /></strong></p>
+        <p><insite:Literal runat="server" Text="You may add your name to the waiting list, and we'll contact you if registration becomes available." /></p>
     </div>
 
     <div runat="server" id="AlertClosed" class="alert alert-warning" role="alert">

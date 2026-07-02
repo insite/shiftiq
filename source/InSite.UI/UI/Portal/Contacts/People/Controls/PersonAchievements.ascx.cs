@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Web.UI.WebControls;
 
@@ -6,20 +7,28 @@ using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
 
 using Shift.Common;
+using Shift.Common.Linq;
 
 namespace InSite.UI.Portal.Contacts.People.Controls
 {
-    public partial class PersonAchievements : BaseUserControl
+    public partial class PersonAchievements : SearchResultsGridViewController<VCredentialFilter>
     {
-        public int LoadData(Guid organizationId, Guid userId)
+        protected override bool IsFinder => false;
+
+        public void LoadData(Guid organizationId, Guid userId)
         {
-            var filter = new VCredentialFilter
+            Search(new VCredentialFilter
             {
                 OrganizationIdentifier = organizationId,
                 UserIdentifier = userId
-            };
+            });
+        }
 
-            var credentials = ServiceLocator.AchievementSearch.GetCredentials(filter)
+        protected override IListSource SelectData(VCredentialFilter filter)
+        {
+            filter.OrderBy = nameof(VCredential.AchievementLabel) + "," + nameof(VCredential.AchievementTitle);
+
+            var list = ServiceLocator.AchievementSearch.GetCredentials(filter)
                 .Select(x => new
                 {
                     AchievementTitle = x.AchievementTitle,
@@ -29,17 +38,16 @@ namespace InSite.UI.Portal.Contacts.People.Controls
                     CredentialGranted = x.CredentialGranted,
                     CredentialRevoked = x.CredentialRevoked
                 })
-                .OrderBy(x => x.AchievementLabel)
-                .ThenBy(x => x.AchievementTitle)
                 .ToList();
 
-            AchievementGrid.DataSource = credentials;
-            AchievementGrid.DataBind();
-            AchievementGrid.Visible = credentials.Count > 0;
+            NoAchievements.Visible = list.Count == 0;
 
-            NoAchievements.Visible = credentials.Count == 0;
+            return list.ToSearchResult();
+        }
 
-            return credentials.Count;
+        protected override int SelectCount(VCredentialFilter filter)
+        {
+            return ServiceLocator.AchievementSearch.CountCredentials(filter);
         }
 
         protected string LocalizeDate(object date)

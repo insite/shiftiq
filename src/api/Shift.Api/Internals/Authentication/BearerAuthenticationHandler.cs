@@ -48,14 +48,20 @@ public class BearerAuthenticationHandler : AuthenticationHandler<BearerAuthentic
 
         var encoder = new JwtEncoder();
 
-        var token = encoder.Extract("Bearer", Request.Headers["Authorization"].ToString());
+        var token = encoder.Extract("Bearer", Request.Headers.Authorization.ToString());
 
         if (token == null)
             return AuthenticateResult.NoResult();
 
-        var isValidated = encoder.Validate(AuthenticationSchemeNames.Bearer, token,
-            _security.Secret, _security.Token.Audience,
-            _converter, out ClaimsPrincipal? principal, out ValidationFailure validation);
+        var isValidated = encoder.Validate(
+            AuthenticationSchemeNames.Bearer,
+            token,
+            _security.Secret,
+            _security.Token.Audience,
+            _converter,
+            out ClaimsPrincipal? principal,
+            out ValidationFailure validation
+        );
 
         if (!isValidated)
             return helper.Fail("Bearer authorization token validation failed", validation);

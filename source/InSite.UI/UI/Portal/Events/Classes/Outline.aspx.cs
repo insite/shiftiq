@@ -104,6 +104,7 @@ namespace InSite.UI.Portal.Events.Classes
             AlertMoved.Visible = false;
             AlertCancelled.Visible = false;
             AlertFull.Visible = false;
+            AlertFullWithWaitlist.Visible = false;
             RegisterButton.Visible = false;
             AddToWaitingListButton.Visible = false;
             RegisterEmployeeLink.Visible = false;
@@ -143,8 +144,9 @@ namespace InSite.UI.Portal.Events.Classes
                 }
                 else
                 {
-                    AlertFull.Visible = !hasSelfRegistration;
-                    WaitlistNote.Visible = @event.WaitlistEnabled;
+                    AlertFull.Visible = !hasSelfRegistration && !@event.WaitlistEnabled;
+                    AlertFullWithWaitlist.Visible = !hasSelfRegistration && @event.WaitlistEnabled;
+
                     AddToWaitingListButton.Visible = !hasSelfRegistration && @event.WaitlistEnabled;
                     AddEmployeeToWaitingListLink.Visible = @event.WaitlistEnabled;
                 }

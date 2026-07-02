@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 
 using Shift.Common.Timeline.Commands;
 
 using InSite.Application.Standards.Write;
-
-using Shift.Constant;
 
 namespace InSite.Persistence.Plugin.CMDS
 {
@@ -135,60 +134,145 @@ WHERE (GroupName = @RoleName OR GroupName = @RoleName) AND UserIdentifier = @Use
             }
         }
 
-        public static IEnumerable<CompanyEmployee> SelectActiveUsers(Guid organization, IEnumerable<string> employmentTypes, string excludeGroup)
+        private class ActiveUserRow
         {
-            var departmentEmploymentType = MembershipType.Department;
-            var companyEmploymentType = MembershipType.Organization;
-            var administrationEmploymentType = MembershipType.Administration;
+            public Guid UserIdentifier { get; set; }
+            public string FullName { get; set; }
+            public string Email { get; set; }
+            public DateTimeOffset? LastAuthenticated { get; set; }
+            public int Profiles { get; set; }
+            public int OrganizationCount { get; set; }
+            public string Status { get; set; }
+        }
+
+        private class ActiveUserEmploymentRow
+        {
+            public Guid UserIdentifier { get; set; }
+            public string MembershipType { get; set; }
+            public Guid OrganizationIdentifier { get; set; }
+            public string Company { get; set; }
+            public string Department { get; set; }
+            public int Profiles { get; set; }
+        }
+
+        private class ActiveUserRoleRow
+        {
+            public Guid UserIdentifier { get; set; }
+            public string Role { get; set; }
+        }
+
+        public static IEnumerable<CompanyEmployee> SelectActiveUsers(Guid organization, IEnumerable<string> employmentTypes, bool includeNoMemberships, string excludeGroup, string nameFilter)
+        {
+            var employmentTypeList = employmentTypes?.ToList() ?? new List<string>();
+            if (employmentTypeList.Count == 0 && !includeNoMemberships)
+                return new List<CompanyEmployee>();
+
+            var excludeGroupPattern = string.IsNullOrEmpty(excludeGroup)
+                ? (object)DBNull.Value
+                : EscapeLikePattern(excludeGroup) + "%";
+
+            var trimmedName = nameFilter?.Trim();
+            var nameFilterPattern = string.IsNullOrEmpty(trimmedName)
+                ? (object)DBNull.Value
+                : "%" + EscapeLikePattern(trimmedName) + "%";
+
+            var employmentTypesCsv = string.Join(",", employmentTypeList);
 
             using (var db = new InternalDbContext())
             {
-                var users = db.Persons
-                    .Where(x => x.OrganizationIdentifier == organization && x.User.AccessGrantedToCmds && x.User.UtcArchived == null)
-                    .Select(x => new CompanyEmployee
-                    {
-                        Identifier = x.UserIdentifier,
-                        Name = x.User.FullName,
-                        Email = x.User.Email,
-                        Profiles = x.User.DepartmentProfiles.Count(),
-                        OrganizationCount = x.User.Memberships.Where(m => m.Group.GroupType == "Department").Select(m => m.Group.OrganizationIdentifier).Distinct().Count(),
-                        Status = x.User.Persons.Any(r => r.UserAccessGranted.HasValue) ? "Approved" : "Pending Approval",
-                        Employments = x.User.Memberships
-                            .Where(
-                                y => y.Group.OrganizationIdentifier == organization
-                                  && y.Group.GroupType == GroupTypes.Department
-                                  && (excludeGroup == null || !y.Group.GroupName.StartsWith(excludeGroup))
-                                  && employmentTypes.Contains(y.MembershipType)
-                                  && (
-                                    y.MembershipType == departmentEmploymentType
-                                    || y.MembershipType == companyEmploymentType
-                                    || y.MembershipType == administrationEmploymentType))
-                            .Select(y => new Employment
-                            {
-                                EmploymentType = y.MembershipType,
-                                OrganizationIdentifier = y.Group.Organization.OrganizationIdentifier,
-                                Company = y.Group.Organization.CompanyName,
-                                Department = y.Group.GroupName,
-                                Profiles = x.User.DepartmentProfiles.Count(z => z.DepartmentIdentifier == y.GroupIdentifier)
-                            })
-                            .ToList(),
-                        Roles = x.User.Memberships
-                            .Where(y => y.Group.GroupType == GroupTypes.Role && (excludeGroup == null || !y.Group.GroupName.StartsWith(excludeGroup)))
-                            .Select(y => y.Group.GroupName)
-                            .ToList(),
-                        LastAuthenticated = x.LastAuthenticated
-                    })
+                var sw = Stopwatch.StartNew();
+                var userRows = db.Database.SqlQuery<ActiveUserRow>(
+                        "EXEC contacts.GetActiveUsers @Organization, @NameFilter, @EmploymentTypes, @IncludeNoMemberships",
+                        new SqlParameter("@Organization", organization),
+                        new SqlParameter("@NameFilter", nameFilterPattern),
+                        new SqlParameter("@EmploymentTypes", (object)employmentTypesCsv),
+                        new SqlParameter("@IncludeNoMemberships", includeNoMemberships))
                     .ToList();
+                sw.Stop();
+                InSite.ServiceLocator.Logger?.Information(
+                    "SelectActiveUsers Q1(users) org={Org} rows={Rows} elapsed={Ms}ms",
+                    organization, userRows.Count, sw.ElapsedMilliseconds);
 
-                return users;
+                var dict = userRows.ToDictionary(
+                    r => r.UserIdentifier,
+                    r => new CompanyEmployee
+                    {
+                        Identifier = r.UserIdentifier,
+                        Name = r.FullName,
+                        Email = r.Email,
+                        LastAuthenticated = r.LastAuthenticated,
+                        Profiles = r.Profiles,
+                        OrganizationCount = r.OrganizationCount,
+                        Status = r.Status,
+                        Employments = new List<Employment>(),
+                        Roles = new List<string>()
+                    });
+
+                if (dict.Count == 0)
+                    return new List<CompanyEmployee>();
+
+                sw.Restart();
+                var employments = db.Database.SqlQuery<ActiveUserEmploymentRow>(
+                    "EXEC contacts.GetActiveUserEmployments @Organization, @ExcludeGroupPattern, @EmploymentTypes",
+                    new SqlParameter("@Organization", organization),
+                    new SqlParameter("@ExcludeGroupPattern", excludeGroupPattern),
+                    new SqlParameter("@EmploymentTypes", employmentTypesCsv)).ToList();
+                sw.Stop();
+                InSite.ServiceLocator.Logger?.Information(
+                    "SelectActiveUsers Q2(employments) org={Org} rows={Rows} elapsed={Ms}ms",
+                    organization, employments.Count, sw.ElapsedMilliseconds);
+
+                foreach (var row in employments)
+                {
+                    if (!dict.TryGetValue(row.UserIdentifier, out var employee))
+                        continue;
+
+                    employee.Employments.Add(new Employment
+                    {
+                        EmploymentType = row.MembershipType,
+                        OrganizationIdentifier = row.OrganizationIdentifier,
+                        Company = row.Company,
+                        Department = row.Department,
+                        Profiles = row.Profiles
+                    });
+                }
+
+                sw.Restart();
+                var roles = db.Database.SqlQuery<ActiveUserRoleRow>(
+                    "EXEC contacts.GetActiveUserRoles @Organization, @ExcludeGroupPattern",
+                    new SqlParameter("@Organization", organization),
+                    new SqlParameter("@ExcludeGroupPattern", excludeGroupPattern)).ToList();
+                sw.Stop();
+                InSite.ServiceLocator.Logger?.Information(
+                    "SelectActiveUsers Q3(roles) org={Org} rows={Rows} elapsed={Ms}ms",
+                    organization, roles.Count, sw.ElapsedMilliseconds);
+
+                foreach (var row in roles)
+                {
+                    if (!dict.TryGetValue(row.UserIdentifier, out var employee))
+                        continue;
+
+                    employee.Roles.Add(row.Role);
+                }
+
+                return dict.Values.ToList();
             }
+        }
+
+        private static string EscapeLikePattern(string input)
+        {
+            return input
+                .Replace("\\", "\\\\")
+                .Replace("%", "\\%")
+                .Replace("_", "\\_")
+                .Replace("[", "\\[");
         }
 
         public static void DeleteDepartmentReferences(Guid department)
         {
             const string query = @"
 DELETE FROM achievements.TAchievementDepartment WHERE DepartmentIdentifier = @DepartmentIdentifier;
-DELETE FROM contacts.Membership WHERE GroupIdentifier = @DepartmentIdentifier;
+DELETE FROM contacts.QMembership WHERE GroupIdentifier = @DepartmentIdentifier;
 DELETE FROM standards.DepartmentProfileCompetency WHERE DepartmentIdentifier = @DepartmentIdentifier;
 DELETE FROM standards.DepartmentProfileUser WHERE DepartmentIdentifier = @DepartmentIdentifier;
 ";

@@ -1383,30 +1383,27 @@ END
             var withSortExpression = "cmdsPerson.FullName";
 
             string membershipOrgCodeExpr;
+            string membershipOrgApply;
+            string membershipTypesCsv = null;
 
             if (filter.OrganizationIdentifier.HasValue)
             {
-                var assignmentWhere = filter.RoleType.IsNotEmpty()
-                    ? string.Format(" AND mm.MembershipType IN ({0})", CsvConverter.ConvertListToCsvText(filter.RoleType, true))
+                membershipTypesCsv = filter.RoleType.IsNotEmpty()
+                    ? string.Join(",", filter.RoleType)
                     : null;
 
-                membershipOrgCodeExpr = string.Format(@"
-(
-    SELECT TOP 1 mo.OrganizationCode
-      FROM contacts.Membership AS mm WITH (NOLOCK)
-           INNER JOIN identities.Department AS depMM WITH (NOLOCK)
-             ON depMM.DepartmentIdentifier = mm.GroupIdentifier
-           INNER JOIN accounts.QOrganization AS mo WITH (NOLOCK)
-             ON mo.OrganizationIdentifier = mm.OrganizationIdentifier
-      WHERE mm.UserIdentifier = cmdsPerson.UserIdentifier
-        AND depMM.OrganizationIdentifier = @OrganizationIdentifier
-        AND mm.OrganizationIdentifier <> depMM.OrganizationIdentifier
-        {0}
-)", assignmentWhere);
+                membershipOrgCodeExpr = "moc.OrganizationCode";
+                membershipOrgApply = @"
+  OUTER APPLY contacts.GetMembershipOrganizationCode(
+      OrderedPersons.UserIdentifier,
+      @OrganizationIdentifier,
+      @MembershipTypes
+  ) AS moc";
             }
             else
             {
                 membershipOrgCodeExpr = "NULL";
+                membershipOrgApply = string.Empty;
             }
 
             string companyModeExpr, companyNameExpr, companyJoin;
@@ -1473,7 +1470,6 @@ WITH OrderedPersons AS
         ,0 AS Lists
         ,HomeAddress.City AS AddressCity
         ,HomeAddress.Province AS AddressProvince
-        ,{6} AS MembershipOrganizationCode
         ,ROW_NUMBER() OVER(ORDER BY {2}) AS RowNumber
     FROM identities.QUser AS cmdsPerson WITH (NOLOCK)
     LEFT JOIN contacts.QPerson AS P WITH (NOLOCK) ON P.UserIdentifier = cmdsPerson.UserIdentifier AND P.OrganizationIdentifier = @PersonOrganizationIdentifier
@@ -1483,15 +1479,19 @@ WITH OrderedPersons AS
     WHERE {0}
 )
 SELECT *
-  FROM OrderedPersons
+      ,{6} AS MembershipOrganizationCode
+  FROM OrderedPersons{7}
   WHERE RowNumber BETWEEN @StartRow AND @EndRow
-  ORDER BY {1}", where, sortExpression, withSortExpression, companyModeExpr, companyNameExpr, companyJoin, membershipOrgCodeExpr);
+  ORDER BY {1}", where, sortExpression, withSortExpression, companyModeExpr, companyNameExpr, companyJoin, membershipOrgCodeExpr, membershipOrgApply);
 
             var (startRow, endRow) = filter?.Paging != null ? filter.Paging.ToStartEnd() : (0, int.MaxValue);
 
             var parameters = GetParametersForFilter(filter, null, organization);
             parameters.Add(new SqlParameter("StartRow", startRow));
             parameters.Add(new SqlParameter("EndRow", endRow));
+
+            if (filter.OrganizationIdentifier.HasValue)
+                parameters.Add(new SqlParameter("MembershipTypes", (object)membershipTypesCsv ?? DBNull.Value));
 
             return DatabaseHelper.CreateDataTable(query, 120, parameters.ToArray());
         }

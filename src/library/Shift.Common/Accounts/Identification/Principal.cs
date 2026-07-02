@@ -7,6 +7,7 @@ namespace Shift.Common
     public class Principal : IPrincipal, ISimplePrincipal
     {
         public Guid CookieId { get; set; }
+        public Guid SecretId { get; set; }
 
         public Actor User { get; set; }
         public Model Person { get; set; }

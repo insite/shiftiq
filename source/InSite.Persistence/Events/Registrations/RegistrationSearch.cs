@@ -11,6 +11,7 @@ using InSite.Persistence.Foundation;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Constant;
 
 namespace InSite.Persistence
 {
@@ -291,6 +292,66 @@ namespace InSite.Persistence
             }
         }
 
+        public List<RegistrationSearchDataItem> GetRegistrationSearchResults(QRegistrationFilter filter)
+        {
+            using (var db = CreateContext())
+            {
+                var organizationId = filter.OrganizationIdentifier.EmptyIfNull();
+                var query = CreateQuery(filter, db);
+
+                query = filter.OrderBy.IsEmpty()
+                    ? query.OrderBy(x => x.Attempt.AttemptStarted)
+                    : query.OrderBy(filter.OrderBy);
+
+                return query
+                    .ApplyPaging(filter)
+                    .Select(x => new RegistrationSearchDataItem
+                    {
+                        EventScheduledStart = x.Event.EventScheduledStart,
+                        EventScheduledEnd = x.Event.EventScheduledEnd,
+                        EventType = x.Event.EventType,
+                        EventIdentifier = x.EventIdentifier,
+                        EventTitle = x.Event.EventTitle,
+                        EventAchievementTitle = x.Event.Achievement.AchievementTitle,
+                        EventAchievementDescription = x.Event.Achievement.AchievementDescription,
+                        RegistrationRequestedOn = x.RegistrationRequestedOn,
+                        CandidateIdentifier = x.CandidateIdentifier,
+                        CandidateFullName = x.Candidate.UserFullName,
+                        CandidatePersonCode = x.Candidate.PersonCode,
+                        CandidateFirstLanguage = x.Candidate.FirstLanguage,
+                        CandidatePostalCode = x.Candidate.HomeAddress.PostalCode,
+                        ApprovalStatus = x.ApprovalStatus,
+                        AttendanceStatus = x.AttendanceStatus,
+                        RegistrationFee = x.RegistrationFee,
+                        RegistrationIdentifier = x.RegistrationIdentifier,
+                        CandidateEmail = x.Candidate.UserEmail,
+                        CandidateEmailEnabled = x.Candidate.UserEmailEnabled,
+                        EmployerGroupName = x.Employer.GroupName,
+                        EmployerGroupIdentifier = x.Employer.GroupIdentifier,
+                        EmployerGroupRegion = x.Employer.GroupRegion,
+                        EmployerGroupStatus = x.Employer.GroupStatus,
+                        CandidatePhone = x.Candidate.UserPhone,
+                        RegistrationSequence = x.RegistrationSequence,
+                        WorkBasedHoursToDate = x.WorkBasedHoursToDate,
+                        RegistrationComment = x.RegistrationComment,
+                        IncludeInT2202 = x.IncludeInT2202,
+                        PaymentStatus = x.Payment.PaymentStatus,
+                        RegistrationRequestedByIdentifier = x.RegistrationRequestedByPerson.UserIdentifier,
+                        RegistrationRequestedByName = x.RegistrationRequestedByPerson.UserFullName,
+                        RegistrationRequestedByEmail = x.RegistrationRequestedByPerson.UserEmail,
+                        BillingCode = x.BillingCode,
+                        ExamFormTitle = x.Form.FormTitle,
+                        ExamFormName = x.Form.FormName,
+                        ExamFormCode = x.Form.FormCode,
+                        DepartmentNames = x.Candidate.User.Memberships
+                            .Where(m => m.Group.OrganizationIdentifier == organizationId
+                                     && m.Group.GroupType == GroupTypes.Department)
+                            .Select(m => m.Group.GroupName)
+                    })
+                    .ToList();
+            }
+        }
+
         public Guid? GetRegistrationIdentifier(QRegistrationFilter filter)
         {
             using (var db = CreateContext())
@@ -372,7 +433,6 @@ namespace InSite.Persistence
                 return list
                     .GroupBy(x => x.EventIdentifier)
                     .ToDictionary(x => x.Key, y => y.ToList());
-
             }
         }
 

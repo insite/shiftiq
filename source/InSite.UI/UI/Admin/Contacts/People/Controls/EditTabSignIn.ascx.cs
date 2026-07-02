@@ -134,7 +134,7 @@ namespace InSite.UI.Admin.Contacts.People.Controls
             {
                 IsUserAccessGrantedDateTime.Text = string.Empty;
                 IsUserAccessGrantedDateTime.Visible = false;
-                IsUserAccessGranted.Text = "Access not Granted to Organization";
+                IsUserAccessGranted.Text = "Access Granted to Organization";
             }
 
             IsUserAccountApprovedCmds.Visible = ServiceLocator.Partition.IsE03();

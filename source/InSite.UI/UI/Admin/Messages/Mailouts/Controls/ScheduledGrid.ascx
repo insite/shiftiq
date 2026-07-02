@@ -13,7 +13,7 @@
                 <asp:TemplateField ItemStyle-Width="90px" ItemStyle-HorizontalAlign="Center" ItemStyle-Wrap="false">
                     <ItemTemplate>
                         <insite:IconLink runat="server" Name="file-alt" Type="Regular" NavigateUrl='<%# Eval("MailoutIdentifier", "/ui/admin/messages/reports/mailout-summary?mailout={0}") %>' />
-                        <insite:IconButton runat="server" Visible='<%# !(bool)Eval("IsStarted") %>' Name="ban" ToolTip="Cancel Mailout" CommandName="Clear" CommandArgument='<%# Eval("MailoutIdentifier") %>' OnClientClick="return confirm('Are you sure you want to cancel this mailout?')"></insite:IconButton>
+                        <insite:IconButton runat="server" Visible='<%# !(bool)Eval("IsStarted") && !(bool)Eval("IsCompleted") %>' Name="ban" ToolTip="Cancel Mailout" CommandName="Clear" CommandArgument='<%# Eval("MailoutIdentifier") %>' OnClientClick="return confirm('Are you sure you want to cancel this mailout?')"></insite:IconButton>
                         <insite:IconButton runat="server" Visible='<%# !(bool)Eval("IsCompleted") %>' Name="flag-checkered" ToolTip="Complete Mailout" CommandName="Complete" CommandArgument='<%# Eval("MailoutIdentifier") %>' OnClientClick="return confirm('Are you sure you want to mark this mailout completed?')"></insite:IconButton>
                     </ItemTemplate>
                 </asp:TemplateField>

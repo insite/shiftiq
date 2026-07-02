@@ -157,7 +157,7 @@ namespace Shift.Common
             var host = url.Host;
             var subdomain = host.Substring(0, host.IndexOf('.'));
 
-            foreach (var prefix in SubdomainConvention.KnownPrefixes)
+            foreach (var prefix in SubdomainConvention.ActivePrefixes)
             {
                 if (subdomain.StartsWith(prefix))
                     return subdomain.Substring(prefix.Length);
@@ -165,7 +165,7 @@ namespace Shift.Common
 
             try
             {
-                foreach (var bare in SubdomainConvention.KnownBareSubdomains)
+                foreach (var bare in SubdomainConvention.ActiveBareSubdomains)
                 {
                     if (subdomain == bare)
                     {

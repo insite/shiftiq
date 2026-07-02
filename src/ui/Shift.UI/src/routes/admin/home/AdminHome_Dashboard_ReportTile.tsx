@@ -23,7 +23,7 @@ const items: {
         href: "/ui/admin/records/gradebooks/search",
     },
     {
-        title: "Custom Repports",
+        title: "Custom Reports",
         iconName: "box-magnifying-glass",
         href: "/ui/admin/reporting",
     },

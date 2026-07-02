@@ -5,7 +5,7 @@
 
         <asp:Literal runat="server" ID="NoAchievements" Text="No achievements to display." />
 
-        <insite:Grid runat="server" id="AchievementGrid">
+        <insite:Grid runat="server" ID="Grid">
             <Columns>
 
                 <asp:TemplateField HeaderText="Achievement">

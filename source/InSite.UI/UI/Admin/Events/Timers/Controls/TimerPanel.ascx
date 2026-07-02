@@ -146,7 +146,7 @@
                                 <insite:IconLink runat="server" Name="file-alt" Type="Regular"
                                     NavigateUrl='<%# Eval("MailoutIdentifier", "/ui/admin/messages/reports/mailout-summary?mailout={0}") %>' />
 
-                                <insite:IconButton runat="server" Visible='<%# !(bool)Eval("IsStarted") %>' Name="ban" ToolTip="Cancel Mailout"
+                                <insite:IconButton runat="server" Visible='<%# !(bool)Eval("IsStarted") && !(bool)Eval("IsCompleted") %>' Name="ban" ToolTip="Cancel Mailout"
                                     CommandName="Cancel" CommandArgument='<%# Eval("MailoutIdentifier") %>'
                                     OnClientClick="return confirm('Are you sure you want to cancel this mailout?')" />
 

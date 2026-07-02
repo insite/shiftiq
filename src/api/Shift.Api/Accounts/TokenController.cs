@@ -1,4 +1,6 @@
-﻿using Humanizer;
+﻿using System.ComponentModel.DataAnnotations;
+
+using Humanizer;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +10,8 @@ namespace Shift.Api;
 [ApiExplorerSettings(GroupName = "Accounts API")]
 public class TokenController : ShiftControllerBase
 {
+    public record ValidateInput([Required] string Token);
+
     private readonly SecuritySettings _securitySettings;
 
     private readonly IClaimConverter _claimConverter;
@@ -133,24 +137,26 @@ public class TokenController : ShiftControllerBase
     }
 
     [HttpPost("api/accounts/tokens/validate")]
-    public async Task<ActionResult<JwtValidateResult>> ValidateAsync()
+    public async Task<ActionResult<JwtValidateResult>> ValidateAsync(ValidateInput input)
     {
-        var token = string.Empty;
-
-        using (var reader = new StreamReader(Request.Body))
-        {
-            token = await reader.ReadToEndAsync();
-        }
+        var token = input.Token;
 
         var encoder = new JwtEncoder();
 
-        var jwt = encoder.Decode(token);
+        IJwt jwt;
+
+        try
+        {
+            jwt = encoder.Decode(token);
+        }
+        catch
+        {
+            return BadRequest("JWT parsing failed");
+        }
 
         var tokenSettings = _securitySettings.Token;
 
         var audience = tokenSettings.Audience;
-
-        var issuer = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
         var result = new JwtValidateResult
         {
@@ -189,7 +195,7 @@ public class TokenController : ShiftControllerBase
 
         var issuer = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-        var expiry = DateTime.UtcNow.Add(TimeSpan.FromMinutes(lifetime));
+        var expiry = DateTime.UtcNow.Add(TimeSpan.FromSeconds(lifetime));
 
         var claims = new Jwt(principalClaims, subject, issuer, audience, expiry);
 

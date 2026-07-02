@@ -30,30 +30,41 @@
                     <insite:UpdatePanel runat="server" ID="UpdatePanel">
                         <ContentTemplate>
                             <div class="row">
-                                <div class="col-lg-2">
-                                    <label class="form-label">Group by</label>
+                                <div class="col-lg-3">
+                                    <label class="form-label">Grouping</label>
                                     <insite:ComboBox runat="server" ID="ddlGroupBy">
                                         <Items>
-                                            <insite:ComboBoxOption Text="Organization" Value="Organization" />
-                                            <insite:ComboBoxOption Text="Department" Value="OrganizationAndDepartment" />
-                                            <insite:ComboBoxOption Text="Role" Value="Role" />
+                                            <insite:ComboBoxOption Text="Do not group results" Value="DoNotGroup" />
+                                            <insite:ComboBoxOption Text="Group by department" Value="Department" />
+                                            <insite:ComboBoxOption Text="Group by role" Value="Role" />
                                         </Items>
                                     </insite:ComboBox>
                                 </div>
                                 <div class="col-lg-2">
-                                    <label class="form-label">Exclude</label>
+                                    <label class="form-label">Person Name</label>
+                                    <insite:TextBox runat="server" ID="NameFilter" />
+                                </div>
+                                <div class="col-lg-5">
+                                    <label class="form-label d-block">Membership Scope</label>
+                                    <insite:CheckBoxList runat="server" ID="MembershipFunction" RepeatLayout="Flow" RepeatDirection="Horizontal" />
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="form-label">Hide Department/Role</label>
                                     <insite:TextBox runat="server" ID="ExcludeGroup" />
                                 </div>
-                                <div class="col-lg-8">
-                                    <label class="form-label d-block">Filter by</label>
-                                    <insite:CheckBoxList runat="server" ID="MembershipFunction" RepeatLayout="Flow" RepeatDirection="Horizontal" />
-                                    
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-lg-12">
+                                    <insite:SearchButton runat="server" ID="ReportButton" Text="Search" Icon="fas fa-search" />
+                                    <small runat="server" id="ResultCount" class="text-body-secondary ms-2"></small>
+                                    <small class="text-body-secondary ms-2">&bull;</small>
+                                    <small runat="server" id="DepartmentsHelp" class="text-body-secondary ms-2">Numbers in [brackets] show how many profiles the person has in that department</small>
                                 </div>
                             </div>
                             <br />
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <asp:PlaceHolder runat="server" ID="place"></asp:PlaceHolder>
+                                    <asp:PlaceHolder runat="server" ID="place" EnableViewState="false"></asp:PlaceHolder>
                                 </div>
                             </div>
                         </ContentTemplate>

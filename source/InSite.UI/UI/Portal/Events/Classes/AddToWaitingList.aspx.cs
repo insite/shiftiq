@@ -4,8 +4,6 @@ using System.Linq;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Contacts.Read;
 using InSite.Application.Events.Read;
 using InSite.Application.Groups.Write;
@@ -14,7 +12,6 @@ using InSite.Common.Web;
 using InSite.Domain.Contacts;
 using InSite.Domain.Events;
 using InSite.Domain.Messages;
-using InSite.Domain.Organizations;
 using InSite.Persistence;
 using InSite.UI.Admin.Events.Classes.Controls;
 using InSite.UI.Layout.Admin;
@@ -24,6 +21,7 @@ using InSite.Web.Helpers;
 using InSite.Web.Security;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Events.Classes
@@ -168,19 +166,21 @@ namespace InSite.UI.Portal.Events.Classes
             }
 
             var @event = ServiceLocator.EventSearch.GetEvent(EventIdentifier.Value, x => x.Registrations);
-            var classDataFields = @event.GetRegistrationFields().ToList();
-            var organizationDataFields = Organization.Fields.ClassRegistration.ToList();
-            var candidate = @event != null && CandidateIdentifier.HasValue ? UserSearch.Select(CandidateIdentifier.Value) : null;
-
-            if (@event == null
-                || @event.OrganizationIdentifier != Organization.OrganizationIdentifier
-                || candidate == null && CandidateIdentifier.HasValue
-                )
-            {
+            if (@event == null || @event.OrganizationIdentifier != Organization.OrganizationIdentifier)
                 NavigateToSearch();
+
+            User candidate = null;
+
+            if (CandidateIdentifier.HasValue)
+            {
+                candidate = UserSearch.Select(CandidateIdentifier.Value);
+                if (candidate == null)
+                    NavigateToSearch();
             }
 
-            var registration = CandidateIdentifier.HasValue ? @event.Registrations.FirstOrDefault(x => x.CandidateIdentifier == CandidateIdentifier) : null;
+            var registration = CandidateIdentifier.HasValue
+                ? @event.Registrations.FirstOrDefault(x => x.CandidateIdentifier == CandidateIdentifier)
+                : null;
             if (registration != null
                 && (
                     string.Equals(registration.ApprovalStatus, "Waitlisted", StringComparison.OrdinalIgnoreCase)
@@ -189,6 +189,9 @@ namespace InSite.UI.Portal.Events.Classes
             {
                 HttpResponseHelper.Redirect(GetOutlineLink());
             }
+
+            var classDataFields = @event.GetRegistrationFields().ToList();
+            var organizationDataFields = Organization.Fields.ClassRegistration.ToList();
 
             PageHelper.AutoBindHeader(this);
 

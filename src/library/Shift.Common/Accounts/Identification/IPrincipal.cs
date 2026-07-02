@@ -23,6 +23,7 @@ namespace Shift.Common
     public interface IPrincipal : System.Security.Principal.IIdentity, System.Security.Principal.IPrincipal, ISimplePrincipal
     {
         Guid CookieId { get; set; }
+        Guid SecretId { get; set; }
 
         IJwt Claims { get; set; }
 

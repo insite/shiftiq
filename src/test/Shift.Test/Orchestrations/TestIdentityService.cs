@@ -120,6 +120,12 @@ namespace Shift.Test
             set { }
         }
 
+        public Guid SecretId
+        {
+            get => Guid.Empty;
+            set { }
+        }
+
         public IJwt Claims { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public Actor User

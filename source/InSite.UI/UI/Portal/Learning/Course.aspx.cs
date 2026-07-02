@@ -880,24 +880,22 @@ namespace InSite.UI.Portal.Learning
                     + ": "
                     + TimeSpan.FromMinutes(activity.DurationMinutes.Value).Humanize(precision: 2, culture: CurrentCulture);
 
-            if (link.Target == "_self" || link.Target == "_top" || link.Target == "_embed")
+            if (activity.ContentDeliveryPlatform == "Scoop")
             {
-                var href = $"/ui/portal/integrations/scorm/launch/{activity.Identifier}";
+                var scormPackageSlug = activity.Hook;
 
-                if (activity.ContentDeliveryPlatform == "Scoop")
-                {
-                    var scormPackageSlug = activity.Hook;
+                // Scoop does not use the activity identifier as for a SCORM Package ID. Instead it uses a URL-
+                // friendly alphanumeric slug. Therefore, if the SCORM Package Slug is missing (or if it matches the
+                // Shift activity identifier) then the launch button should navigate to a blank page.
 
-                    // Scoop does not use the activity identifier as for a SCORM Package ID. Instead it uses a URL-
-                    // friendly alphanumeric slug. Therefore, if the SCORM Package Slug is missing (or if it matches the
-                    // Shift activity identifier) then the launch button should navigate to a blank page.
-
-                    href = scormPackageSlug.IsEmpty() || StringHelper.Equals(scormPackageSlug, activityId.ToString())
-                        ? BlankHref
-                        : Launch.GetScoopLaunchUrl(Request.Url.Host, scormPackageSlug, courseId, activityId);
-                }
-
-                ScormStartUrl.HRef = href;
+                ScormStartUrl.HRef = scormPackageSlug.IsEmpty() || StringHelper.Equals(scormPackageSlug, activityId.ToString())
+                    ? BlankHref
+                    : Launch.GetScoopLaunchUrl(Request.Url.Host, scormPackageSlug, courseId, activityId);
+                ScormStartUrl.Target = link.Target.IsEmpty() ? "_self" : link.Target;
+            }
+            else if (link.Target == "_self" || link.Target == "_top" || link.Target == "_embed")
+            {
+                ScormStartUrl.HRef = $"/ui/portal/integrations/scorm/launch/{activity.Identifier}";
                 ScormStartUrl.Target = "_self";
             }
             else

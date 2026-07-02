@@ -84,7 +84,7 @@ namespace InSite.UI.Lobby.Integration.Lti
 
             var isValidOrganizationSecret = StringHelper.Equals(submittedSecret, configuredSecret);
 
-            if (hasSecret && isValidOrganizationSecret)
+            if (!hasSecret || !isValidOrganizationSecret)
             {
                 errors.Add($"OAuth Validation Failed: Organization Secret Mismatch");
                 return null;

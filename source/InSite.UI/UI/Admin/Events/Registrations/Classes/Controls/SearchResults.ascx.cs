@@ -11,7 +11,6 @@ using InSite.Common.Web.UI;
 
 using Shift.Common;
 using Shift.Common.Linq;
-using Shift.Constant;
 
 namespace InSite.Admin.Events.Registrations.Controls
 {
@@ -30,75 +29,51 @@ namespace InSite.Admin.Events.Registrations.Controls
 
             filter.OrderBy = "RegistrationRequestedOn desc";
 
-            return ServiceLocator.RegistrationSearch
-                .GetRegistrations(
-                    filter,
-                    x => x.Event.Achievement,
-                    x => x.Candidate.HomeAddress,
-                    x => x.Candidate.User.Memberships.Select(y => y.Group),
-                    x => x.Employer,
-                    x => x.Customer,
-                    x => x.Payment,
-                    x => x.RegistrationRequestedByPerson,
-                    x => x.Seat,
-                    x => x.Form
-                )
+            return ServiceLocator.RegistrationSearch.GetRegistrationSearchResults(filter)
                 .Select(x => new
                 {
-                    EventScheduledStart = x.Event.EventScheduledStart,
-                    EventScheduledEnd = x.Event.EventScheduledEnd,
-                    EventType = x.Event.EventType,
-                    EventTypePlural = x.Event.EventType.Pluralize().ToLower(),
+                    EventScheduledStart = x.EventScheduledStart,
+                    EventScheduledEnd = x.EventScheduledEnd,
+                    EventType = x.EventType,
+                    EventTypePlural = x.EventType.Pluralize().ToLower(),
                     EventIdentifier = x.EventIdentifier,
-                    EventTitle = x.Event.EventTitle,
-                    EventAchievementTitle = x.Event.Achievement?.AchievementTitle,
-                    EventAchievementDescription = x.Event.Achievement?.AchievementDescription,
+                    EventTitle = x.EventTitle,
+                    EventAchievementTitle = x.EventAchievementTitle,
+                    EventAchievementDescription = x.EventAchievementDescription,
                     RegistrationRequestedOn = x.RegistrationRequestedOn,
                     CandidateIdentifier = x.CandidateIdentifier,
-                    UserFullName = x.Candidate?.UserFullName,
-                    PersonCode = x.Candidate?.PersonCode,
-                    RegistrantIsELL = x.Candidate?.FirstLanguage,
-                    RegistrantPostalCode = x.Candidate?.HomeAddress?.PostalCode,
+                    UserFullName = x.CandidateFullName,
+                    PersonCode = x.CandidatePersonCode,
+                    RegistrantIsELL = x.CandidateFirstLanguage,
+                    RegistrantPostalCode = x.CandidatePostalCode,
                     ApprovalStatus = x.ApprovalStatus,
                     AttendanceStatus = x.AttendanceStatus,
                     RegistrationFee = x.RegistrationFee,
                     RegistrationIdentifier = x.RegistrationIdentifier,
-                    Email = x.Candidate?.UserEmail,
-                    EmailEnabled = x.Candidate?.UserEmailEnabled,
-                    EmployerGroupName = x.Employer?.GroupName,
-                    EmployerGroupIdentifier = x.Employer?.GroupIdentifier,
-                    EmployerGroupRegion = x.Employer?.GroupRegion,
-                    EmployerGroupStatus = x.Employer?.GroupStatus,
-                    Phone = x.Candidate?.UserPhone,
-                    LearnerId = x.Candidate?.PersonCode,
+                    Email = x.CandidateEmail,
+                    EmailEnabled = x.CandidateEmailEnabled,
+                    EmployerGroupName = x.EmployerGroupName,
+                    EmployerGroupIdentifier = x.EmployerGroupIdentifier,
+                    EmployerGroupRegion = x.EmployerGroupRegion,
+                    EmployerGroupStatus = x.EmployerGroupStatus,
+                    Phone = x.CandidatePhone,
+                    LearnerId = x.CandidatePersonCode,
                     RegistrationSequence = x.RegistrationSequence,
                     WorkBasedHoursToDate = x.WorkBasedHoursToDate,
                     RegistrationComment = x.RegistrationComment,
                     IncludeInT2202 = x.IncludeInT2202 ? "Yes" : "No",
-                    PaymentStatus = string.Equals(x.Payment?.PaymentStatus, "Completed", StringComparison.OrdinalIgnoreCase) ? "Paid" : x.Payment?.PaymentStatus,
-                    RegistrationRequestedByIdentifier = x.RegistrationRequestedByPerson?.UserIdentifier,
-                    RegistrationRequestedByName = x.RegistrationRequestedByPerson?.UserFullName,
-                    RegistrationRequestedByEmail = x.RegistrationRequestedByPerson?.UserEmail,
+                    PaymentStatus = string.Equals(x.PaymentStatus, "Completed", StringComparison.OrdinalIgnoreCase) ? "Paid" : x.PaymentStatus,
+                    RegistrationRequestedByIdentifier = x.RegistrationRequestedByIdentifier,
+                    RegistrationRequestedByName = x.RegistrationRequestedByName,
+                    RegistrationRequestedByEmail = x.RegistrationRequestedByEmail,
                     BillingCode = x.BillingCode,
-                    Department = GetDepartment(x),
-                    ExamFormTitle = x.Form?.FormTitle,
-                    ExamFormName = x.Form?.FormName,
-                    ExamFormCode = x.Form?.FormCode
+                    Department = string.Join(", ", x.DepartmentNames),
+                    ExamFormTitle = x.ExamFormTitle,
+                    ExamFormName = x.ExamFormName,
+                    ExamFormCode = x.ExamFormCode
                 })
                 .ToList()
                 .ToSearchResult();
-        }
-
-        private static string GetDepartment(QRegistration registration)
-        {
-            var departments = registration.Candidate.User.Memberships
-                .Where(x =>
-                    x.Group.OrganizationIdentifier == Organization.Identifier
-                    && string.Equals(x.Group.GroupType, GroupTypes.Department)
-                )
-                .Select(y => y.Group.GroupName);
-
-            return string.Join(", ", departments);
         }
 
         protected string GetScheduledTime()

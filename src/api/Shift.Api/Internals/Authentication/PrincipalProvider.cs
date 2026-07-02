@@ -10,13 +10,27 @@ namespace Shift.Api
 
         private readonly IGroupLookupService _groupLookupService;
 
-        public PrincipalProvider(IHttpContextAccessor httpContextAccessor, IClaimConverter claimConverter, IGroupLookupService groupLookupService)
+        private readonly PersonReader _personReader;
+
+        private readonly QPersonSecretReader _personSecretReader;
+
+        public PrincipalProvider(
+            IHttpContextAccessor httpContextAccessor,
+            IClaimConverter claimConverter,
+            IGroupLookupService groupLookupService,
+            PersonReader personReader,
+            QPersonSecretReader personSecretReader
+        )
         {
             _httpContextAccessor = httpContextAccessor;
 
             _claimConverter = claimConverter;
 
             _groupLookupService = groupLookupService;
+
+            _personReader = personReader;
+
+            _personSecretReader = personSecretReader;
         }
 
         public Guid OrganizationId
@@ -62,11 +76,14 @@ namespace Shift.Api
 
             // Convert from claims (most expensive operation)
 
-            principal = context.User != null
-                ? _claimConverter.ToPrincipal(context.User.Claims)
-                : _claimConverter.ToPrincipal(Array.Empty<System.Security.Claims.Claim>());
-
-            TaskRunner.RunSync(async () => await RehydrateAsync(principal));
+            if (context.User != null)
+            {
+                principal = _claimConverter.ToPrincipal(context.User.Claims);
+                
+                TaskRunner.RunSync(async () => principal = await RehydrateAsync(principal, context.User.Identity?.AuthenticationType));
+            }
+            else
+                principal = _claimConverter.ToPrincipal(Array.Empty<System.Security.Claims.Claim>());
 
             // Cache in both locations
 
@@ -77,13 +94,44 @@ namespace Shift.Api
             return principal;
         }
 
-        private async Task RehydrateAsync(IPrincipal principal)
+        private async Task<IPrincipal> RehydrateAsync(IPrincipal principal, string? authenticationType)
         {
+            if (!await IsUserValidAsync(principal, authenticationType))
+                return _claimConverter.ToPrincipal(Array.Empty<System.Security.Claims.Claim>());
+
             var names = await _groupLookupService.GetGroupNamesAsync(principal.RoleIds);
 
             foreach (var role in principal.Roles)
+            {
                 if (names.TryGetValue(role.Identifier, out var name))
                     role.Name = name;
+            }
+
+            return principal;
+        }
+
+        private async Task<bool> IsUserValidAsync(IPrincipal principal, string? autheticationType)
+        {
+            if (autheticationType != AuthenticationSchemeNames.Bearer)
+                return true;
+
+            var person = await _personReader.RetrieveAsync(principal.Person.Identifier);
+
+            if (person == null
+                || person.UserIdentifier != principal.UserId
+                || person.OrganizationIdentifier != principal.OrganizationId
+                || !person.IsDeveloper
+            )
+            {
+                return false;
+            }
+
+            var personSecret = await _personSecretReader.RetrieveAsync(principal.SecretId);
+
+            return personSecret != null
+                && personSecret.PersonIdentifier == principal.Person.Identifier
+                && personSecret.SecretExpiry > DateTimeOffset.UtcNow
+                ;
         }
 
         public TimeZoneInfo GetTimeZone()

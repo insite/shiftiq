@@ -405,7 +405,7 @@
                     }
 
                     vs.forEach(x => {
-                        const error = x.errormessage ?? 'This question is mandatory';
+                        const error = x.errormessage ?? '<%= Translate("This question is mandatory") %>';
                         const item = {
                             top: line.offsetTop,
                             message: error + ': ' + message
@@ -472,7 +472,7 @@
                 title = title.replace(/\*/g, '');
                 title = truncateLabel(sanitizeLabel(title), 50);
 
-                return title ? `This question is mandatory: ${title}` : null;
+                return title ? `<%= Translate("This question is mandatory") %>: ${title}` : null;
             }
         }
     })();

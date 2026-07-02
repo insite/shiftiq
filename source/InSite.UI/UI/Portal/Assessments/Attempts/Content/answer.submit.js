@@ -143,7 +143,7 @@
 
         helper.confirmAttempt($form).done(function () {
             if (!requestState.isComplete) {
-                lockExam('Loading...', null, true);
+                lockExam(_answerStrings.loadingPanel.loadingLabel, null, true);
                 completeExam();
             }
         }).fail(function () {
@@ -250,7 +250,7 @@
 
                 promise.done(function () {
                     if (!requestState.isNextQuestion) {
-                        $lockPanel = createLoadingPanel('Loading...', null, true);
+                        $lockPanel = createLoadingPanel(_answerStrings.loadingPanel.loadingLabel, null, true);
                         submitNextQuestion();
                     }
                 }).fail(function () {
@@ -266,7 +266,7 @@
 
                 promise.done(function () {
                     if (!requestState.isNextQuestion) {
-                        $lockPanel = createLoadingPanel('Loading...', null, true);
+                        $lockPanel = createLoadingPanel(_answerStrings.loadingPanel.loadingLabel, null, true);
                         submitNextQuestion();
                     }
                 }).fail(function () {
@@ -284,7 +284,7 @@
 
                 promise.done(function () {
                     if (!requestState.isNextSection) {
-                        $lockPanel = createLoadingPanel('Loading...', null, true);
+                        $lockPanel = createLoadingPanel(_answerStrings.loadingPanel.loadingLabel, null, true);
                         submitNextSection();
                     }
                 }).fail(function () {
@@ -300,7 +300,7 @@
 
                 promise.done(function () {
                     if (!requestState.isNextSection) {
-                        $lockPanel = createLoadingPanel('Loading...', null, true);
+                        $lockPanel = createLoadingPanel(_answerStrings.loadingPanel.loadingLabel, null, true);
                         submitNextSection();
                     }
                 }).fail(function () {
@@ -1000,12 +1000,12 @@
                     }
                 } else if (_tabsSingleQuestionEnabled == true) {
                     if (!requestState.isNextQuestion) {
-                        $lockPanel = createLoadingPanel('Loading...', null, true);
+                        $lockPanel = createLoadingPanel(_answerStrings.loadingPanel.loadingLabel, null, true);
                         submitNextQuestion();
                     }
                 } else {
                     if (!requestState.isNextSection) {
-                        $lockPanel = createLoadingPanel('Loading...', null, true);
+                        $lockPanel = createLoadingPanel(_answerStrings.loadingPanel.loadingLabel, null, true);
                         submitNextSection();
                     }
                 }

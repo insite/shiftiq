@@ -61,20 +61,27 @@ namespace Shift.Common
             }
         }
 
-        /// <summary>
-        /// Every non-empty prefix used by any convention. Used by inbound host parsers
-        /// that must accept hosts authored before a convention switch.
-        /// </summary>
-        public static IReadOnlyList<string> KnownPrefixes { get; } = new[]
-        {
-            "local-", "dev-", "sandbox-",
-            "work-", "test-", "demo-", "live-"
-        };
+        private static readonly string[] ShiftPrefixes = { "local-", "dev-", "sandbox-" };
+        private static readonly string[] CmdsPrefixes = { "work-", "test-", "demo-", "live-" };
+        private static readonly string[] ShiftBareSubdomains = { "local", "dev", "sandbox" };
+        private static readonly string[] CmdsBareSubdomains = { "work", "test", "demo", "live" };
 
-        public static IReadOnlyList<string> KnownBareSubdomains { get; } = new[]
-        {
-            "local", "dev", "sandbox",
-            "work", "test", "demo", "live"
-        };
+        /// <summary>
+        /// Prefixes valid for the currently active convention. Used by parsers that must
+        /// reject tenant subdomains whose codes happen to collide with a sibling
+        /// convention's environment names (e.g. tenant <c>demo</c> on a Shift partition).
+        /// </summary>
+        public static IReadOnlyList<string> ActivePrefixes
+            => string.Equals(Current, Cmds, System.StringComparison.OrdinalIgnoreCase)
+                ? CmdsPrefixes
+                : ShiftPrefixes;
+
+        /// <summary>
+        /// Bare environment subdomains valid for the currently active convention.
+        /// </summary>
+        public static IReadOnlyList<string> ActiveBareSubdomains
+            => string.Equals(Current, Cmds, System.StringComparison.OrdinalIgnoreCase)
+                ? CmdsBareSubdomains
+                : ShiftBareSubdomains;
     }
 }

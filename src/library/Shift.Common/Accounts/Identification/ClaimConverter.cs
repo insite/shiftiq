@@ -32,7 +32,8 @@ namespace Shift.Common
                 ToClaim(ClaimName.UserId, principal.User.Identifier.ToString()),
                 ToClaim(ClaimName.UserEmail, principal.User.Email),
                 ToClaim(ClaimName.UserName, principal.User.Name),
-                ToClaim(ClaimName.Authority, principal.Authority.ToString())
+                ToClaim(ClaimName.Authority, principal.Authority.ToString()),
+                ToClaim(ClaimName.SecretId, principal.SecretId.ToString()),
             };
 
             if (principal.User.Phone.IsNotEmpty())
@@ -186,6 +187,7 @@ namespace Shift.Common
                 Roles = GetRoles(ClaimName.Role),
                 IPAddress = GetClaim(ClaimName.UserIp),
                 Authority = GetAuthority(ClaimName.Authority),
+                SecretId = GetClaimAsGuid(ClaimName.SecretId)
             };
 
             principal.IsAuthenticated = principal.User.Identifier != Guid.Empty;
