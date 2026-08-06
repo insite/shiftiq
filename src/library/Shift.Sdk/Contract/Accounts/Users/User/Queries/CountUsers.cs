@@ -11,5 +11,7 @@ namespace Shift.Contract
         public Guid[] UserIds { get; set; }
         public string UserEmailExact { get; set; }
         public string UserFullNameContains { get; set; }
+        public DateTimeOffset? LastChangeTimeSince { get; set; }
+        public DateTimeOffset? LastChangeTimeBefore { get; set; }
     }
 }

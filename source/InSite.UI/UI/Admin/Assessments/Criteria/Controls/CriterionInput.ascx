@@ -1,5 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="CriterionInput.ascx.cs" Inherits="InSite.Admin.Assessments.Criteria.Controls.CriterionInput" %>
 
+<%@ Register Src="~/UI/Admin/Assessments/Sections/Controls/TabConfigurationDetails.ascx" TagName="TabConfigDetails" TagPrefix="uc" %>
+
 <div class="row mb-3">
 
     <div class="col-lg-6 mb-3 mb-lg-0">
@@ -17,7 +19,6 @@
                 </div>
 
             </div>
-
         </div>
     </div>
 
@@ -54,6 +55,8 @@
                     </div>
                 </div>
 
+                <uc:TabConfigDetails runat="server" ID="TabConfig" />
+
             </div>
         </div>
 
@@ -72,8 +75,7 @@
                 <div runat="server" id="TagFilter" class="form-group mb-3">
                     <label class="form-label">
                         Count per Question Tag
-                <insite:RequiredValidator runat="server" ControlToValidate="CriterionTagFilter" ValidationGroup="Assessment" />
-
+                        <insite:RequiredValidator runat="server" ControlToValidate="CriterionTagFilter" ValidationGroup="Assessment" />
                     </label>
                     <div>
                         <insite:TextBox runat="server" ID="CriterionTagFilter" TextMode="MultiLine" Rows="4" ValidationGroup="Assessment" />

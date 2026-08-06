@@ -102,6 +102,15 @@ namespace InSite.Admin.Assessments.Criteria.Forms
             {
                 ServiceLocator.SendCommand(new ChangeCriterionFilter(BankID, CriterionID, values.SetWeight, values.QuestionLimit, null, null));
             }
+
+            var tabConfig = values.TabConfig;
+
+            ServiceLocator.SendCommand(new ReconfigureCriterionTab(
+                BankID, CriterionID,
+                tabConfig.WarningOnNextTabEnabled,
+                tabConfig.BreakTimerEnabled,
+                tabConfig.TimeLimit,
+                tabConfig.TimerType));
         }
 
         #endregion

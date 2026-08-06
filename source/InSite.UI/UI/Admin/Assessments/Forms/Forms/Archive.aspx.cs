@@ -19,7 +19,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
     {
         private Guid BankID => Guid.TryParse(Request.QueryString["bank"], out var value) ? value : Guid.Empty;
 
-        private Guid FormID => Guid.Parse(Request["form"]);
+        private Guid FormID => Guid.TryParse(Request["form"], out var value) ? value : Guid.Empty;
 
         private string CommandName => Request["command"];
 
@@ -35,17 +35,39 @@ namespace InSite.Admin.Assessments.Forms.Forms
             base.OnLoad(e);
 
             if (!CanEdit)
-                RedirectToSearch();
+            {
+                ShowAlert(a => a.ShowPermissionDenied("archive assessment forms"));
+                return;
+            }
 
             if (!IsPostBack)
             {
                 var bank = ServiceLocator.BankSearch.GetBankState(BankID);
                 if (bank == null)
-                    RedirectToSearch();
+                {
+                    ShowAlert(a =>
+                    {
+                        if (BankID == Guid.Empty)
+                            a.ShowBankMissing();
+                        else
+                            a.ShowBankNotFound(BankID);
+                    });
+                    return;
+                }
 
                 var form = bank.FindForm(FormID);
                 if (form == null)
-                    RedirectToReader();
+                {
+                    var bankName = bank.Name;
+                    ShowAlert(a =>
+                    {
+                        if (FormID == Guid.Empty)
+                            a.ShowFormMissing(BankID, bankName);
+                        else
+                            a.ShowFormNotFound(FormID, BankID, bankName);
+                    });
+                    return;
+                }
 
                 var title = $"{(bank.Content.Title?.Default).IfNullOrEmpty(bank.Name)} <span class=\"form-text\">Asset #{bank.Asset}</span>";
                 PageHelper.AutoBindHeader(this, null, title);
@@ -133,7 +155,11 @@ namespace InSite.Admin.Assessments.Forms.Forms
             RedirectToReader(FormID);
         }
 
-        private void RedirectToSearch() => HttpResponseHelper.Redirect($"/ui/admin/assessments/banks/search", true);
+        private void ShowAlert(Action<InSite.Admin.Assessments.Forms.Controls.FormPageAlert> configure)
+        {
+            ContentPanel.Visible = false;
+            configure(PageAlert);
+        }
 
         private void RedirectToReader(Guid? form = null)
         {

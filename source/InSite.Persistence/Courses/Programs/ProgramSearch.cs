@@ -64,6 +64,12 @@ namespace InSite.Persistence
             }
         }
 
+        public static bool ExistPrograms(TProgramFilter filter)
+        {
+            using (var db = CreateContext())
+                return CreateQuery(filter, db).Any();
+        }
+
         public static List<TProgram> SelectProgramsByCategory(Guid categoryId)
         {
             using (var db = CreateContext())
@@ -116,6 +122,24 @@ namespace InSite.Persistence
                     x => db.TTasks.Any(
                         t => t.ProgramIdentifier == x.ProgramIdentifier
                           && filter.TaskObjectIdentifiers.Contains(t.ObjectIdentifier)));
+            }
+
+            if (filter.EligibleParentForProgramIdentifier.HasValue)
+            {
+                var childId = filter.EligibleParentForProgramIdentifier.Value;
+
+                // Nesting is limited to one level, so a program that already has a parent cannot
+                // become a parent. This also rules out every cycle: a cycle needs the candidate to
+                // sit below the child, and anything below something has a parent.
+                query = query.Where(x => !db.TProgramContainments.Any(c => c.ChildProgramIdentifier == x.ProgramIdentifier));
+
+                // Guid.Empty means the child does not exist yet, so it has no identity to collide
+                // with and no parents to duplicate.
+                if (childId != Guid.Empty)
+                    query = query.Where(x => x.ProgramIdentifier != childId
+                        && !db.TProgramContainments.Any(c =>
+                            c.ParentProgramIdentifier == x.ProgramIdentifier
+                            && c.ChildProgramIdentifier == childId));
             }
 
             return query;

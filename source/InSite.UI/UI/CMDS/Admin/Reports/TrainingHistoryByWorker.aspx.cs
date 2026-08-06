@@ -30,6 +30,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         [Serializable]
         private class SearchParameters
         {
+            public Guid OrganizationIdentifier { get; set; }
             public Guid[] Departments { get; set; }
             public Guid[] Achievements { get; set; }
             public Guid[] Learners { get; set; }
@@ -39,11 +40,17 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public DateTime? CompletedSince { get; set; }
             public DateTime? CompletedBefore { get; set; }
             public bool ExcludeSelfDeclared { get; set; }
+            public string JobDivisionMode { get; set; }
+            public string JobDivision { get; set; }
         }
 
         private class UserDataItem
         {
             public string PersonFullName { get; set; }
+
+            public string PersonEmail { get; set; }
+
+            public string JobDivision { get; set; }
 
             public IEnumerable<AchievementDataItem> Achievements { get; set; }
         }
@@ -184,7 +191,13 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 {
                     var userNameCell = sheet.Cells[rowNumber, 1, rowNumber, 5];
                     userNameCell.Merge = true;
-                    userNameCell.Value = user.PersonFullName;
+                    var userName = string.IsNullOrEmpty(user.PersonEmail)
+                        ? user.PersonFullName
+                        : $"{user.PersonFullName} ({user.PersonEmail})";
+
+                    userNameCell.Value = string.IsNullOrEmpty(user.JobDivision)
+                        ? userName
+                        : $"{userName} - Job Division: {user.JobDivision}";
 
                     rowNumber++;
                     sheet.Row(rowNumber++).Height = 10;
@@ -276,6 +289,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             CurrentParameters = new SearchParameters
             {
+                OrganizationIdentifier = Organization.Identifier,
                 Departments = Criteria.DepartmentValues,
                 Achievements = Criteria.SelectedAchievements,
                 Learners = Criteria.LearnerValues,
@@ -284,7 +298,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 CredentialStatus = Criteria.CredentialStatusFilter,
                 CompletedSince = Criteria.CompletedSinceFilter,
                 CompletedBefore = Criteria.CompletedBeforeFilter,
-                ExcludeSelfDeclared = Criteria.ExcludeSelfDeclared
+                ExcludeSelfDeclared = Criteria.ExcludeSelfDeclared,
+                JobDivisionMode = Criteria.JobDivisionMode,
+                JobDivision = Criteria.JobDivisionFilter
             };
 
             if (!Criteria.ValidateNarrowSelection(out var error))
@@ -338,8 +354,13 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     credentialStatus: CurrentParameters.CredentialStatus,
                     completedSince: CurrentParameters.CompletedSince,
                     completedBefore: CurrentParameters.CompletedBefore,
-                    excludeSelfDeclared: CurrentParameters.ExcludeSelfDeclared)
-                .GroupBy(x => x.PersonFullName)
+                    excludeSelfDeclared: CurrentParameters.ExcludeSelfDeclared,
+                    organizationId: CurrentParameters.OrganizationIdentifier,
+                    jobDivisionMode: CurrentParameters.JobDivisionMode,
+                    jobDivision: CurrentParameters.JobDivision)
+                // Group by identifier, not name: learners can share a first and last name, and grouping by name
+                // merged them into a single person block. The email address is what disambiguates them on screen.
+                .GroupBy(x => x.UserIdentifier)
                 .Select(userGroup =>
                 {
                     var firstUser = userGroup.First();
@@ -347,6 +368,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     return new UserDataItem
                     {
                         PersonFullName = firstUser.PersonFullName,
+                        PersonEmail = firstUser.PersonEmail,
+                        JobDivision = firstUser.JobDivision,
                         Achievements = userGroup.Select(x => new AchievementDataItem
                         {
                             AchievementTitle = x.ResourceTitle,

@@ -90,7 +90,7 @@ public class CredentialReader : IEntityReader
                 .OrderBy(criteria.Filter.Sort ?? DefaultSort)
                 .ApplyPaging(criteria.Filter);
 
-            return ToMatchesAsync(query, cancellation);
+            return ToMatchesAsync(query, DateTimeOffset.UtcNow, cancellation);
 
         }, cancellation);
     }
@@ -126,6 +126,16 @@ public class CredentialReader : IEntityReader
         if (criteria.UserId.HasValue)
             query = query.Where(x => x.UserIdentifier == criteria.UserId);
 
+        if (criteria.ModifiedFrom.HasValue)
+            query = query.Where(x => x.CredentialModified >= criteria.ModifiedFrom.Value);
+
+        if (criteria.ModifiedBefore.HasValue)
+            query = query.Where(x => x.CredentialModified < criteria.ModifiedBefore.Value);
+
+        if (criteria.PersonCode.IsNotEmpty())
+            query = query.Where(c => c.User!.People.Any(p => p.OrganizationIdentifier == c.OrganizationIdentifier
+                                                          && p.PersonCode == criteria.PersonCode));
+
         return query;
     }
 
@@ -136,20 +146,34 @@ public class CredentialReader : IEntityReader
         return await query(db);
     }
 
-    public static async Task<List<CredentialMatch>> ToMatchesAsync(IQueryable<CredentialEntity> queryable, CancellationToken cancellation = default)
+    public static async Task<List<CredentialMatch>> ToMatchesAsync(IQueryable<CredentialEntity> queryable, DateTimeOffset now, CancellationToken cancellation = default)
     {
         var matches = await queryable
             .Select(entity => new CredentialMatch
             {
                 AchievementId = entity.AchievementIdentifier,
+                AchievementLabel = entity.Achievement!.AchievementLabel,
+                AchievementTitle = entity.Achievement.AchievementTitle,
 
-                UserId = entity.UserIdentifier,
+                AchievementEffectiveDate = entity.CredentialGranted,
+                AchievementExpiryDate = entity.CredentialExpirationExpected,
+                AchievementValid =
+                    entity.CredentialGranted != null
+                    && entity.CredentialRevoked == null
+                    && (entity.CredentialExpirationExpected == null
+                        || entity.CredentialExpirationExpected >= now),
 
                 CredentialId = entity.CredentialIdentifier,
                 CredentialIssued = entity.CredentialGranted,
                 CredentialStatus = entity.CredentialStatus,
                 CredentialNecessity = entity.CredentialNecessity,
-                CredentialIsRequired = entity.CredentialNecessity == "Mandatory"
+                CredentialIsRequired = entity.CredentialNecessity == "Mandatory",
+
+                UserId = entity.UserIdentifier,
+                PersonCode = entity.User!.People
+                    .Where(p => p.OrganizationIdentifier == entity.OrganizationIdentifier)
+                    .Select(p => p.PersonCode)
+                    .FirstOrDefault()
             })
             .ToListAsync(cancellation);
 

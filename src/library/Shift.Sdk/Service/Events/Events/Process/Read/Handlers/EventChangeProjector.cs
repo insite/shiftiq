@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Domain.Events;
+
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Application.Events.Read
 {
@@ -453,6 +453,9 @@ namespace InSite.Application.Events.Read
                     case EventMessageType.ReminderInstructor:
                         x.WhenEventReminderRequestedNotifyInstructorMessageIdentifier = e.MessageId;
                         break;
+                    case EventMessageType.CompletedLearner:
+                        x.WhenEventCompletedNotifyLearnerMessageIdentifier = e.MessageId;
+                        break;
                     default:
                         throw new ArgumentException($"Unsupported message: {e.MessageType}");
                 }
@@ -471,7 +474,10 @@ namespace InSite.Application.Events.Read
         {
             _eventStore.UpdateEvent(e, x =>
             {
-                x.ReminderMessageSent = e.ChangeTime;
+                if (e.MessageType == EventMessageType.ReminderLearner || e.MessageType == EventMessageType.ReminderInstructor)
+                    x.ReminderMessageSent = e.ChangeTime;
+                else if (e.MessageType == EventMessageType.CompletedLearner)
+                    x.CompletedMessageSent = e.ChangeTime;
             });
         }
 

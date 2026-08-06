@@ -26,12 +26,6 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
             set { ViewState[nameof(Enabled)] = value; }
         }
 
-        public bool IsMoveStarted
-        {
-            get { return ViewState[nameof(IsMoveStarted)] == null ? false : (bool)ViewState[nameof(IsMoveStarted)]; }
-            set { ViewState[nameof(IsMoveStarted)] = value; }
-        }
-
         #endregion
 
         #region Initialization & Loading
@@ -110,14 +104,6 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
             ParentProfile.Enabled = false;
         }
 
-        public void SwitchToMoveMode()
-        {
-            IsMoveStarted = true;
-            Enabled = true;
-            OrganizationScope.Enabled = true;
-            ParentField.Visible = false;
-        }
-
         #endregion
 
         #region Helper methods
@@ -127,7 +113,7 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
             switch (OrganizationScope.Value)
             {
                 case AccountScopes.Organization:
-                    ParentField.Visible = !IsMoveStarted;
+                    ParentField.Visible = true;
                     break;
 
                 default:

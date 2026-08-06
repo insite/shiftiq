@@ -39,6 +39,11 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Collects the list of users that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to users modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/accounts/users/collect")]
     [HybridPermission("security/users", DataAccess.Read)]
     [EndpointName("collectUsers")]
@@ -81,6 +86,11 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Counts the users that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the count to users modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/accounts/users/count")]
     [HybridPermission("security/users", DataAccess.Read)]
     [EndpointName("countUsers")]
@@ -112,7 +122,14 @@ public class UserController : ShiftControllerBase
 
     /// <summary>
     /// Downloads the list of users that match specific criteria
-    /// </summary>    
+    /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to download only users modified within a specific window,
+    /// which is useful for incremental integrations that already hold most of the user data. Both parameters accept
+    /// ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00". LastChangeTimeSince is inclusive;
+    /// LastChangeTimeBefore is exclusive. When polling for deltas, subtract a small overlap (for example five
+    /// minutes) from the previous poll time to allow for projection lag.
+    /// </remarks>
     [HttpPost("api/accounts/users/download")]
     [HybridPermission("security/users", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -195,6 +212,11 @@ public class UserController : ShiftControllerBase
     /// <summary>
     /// Searches for the list of users that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to users modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/accounts/users/search")]
     [HybridPermission("security/users", DataAccess.Read)]
     [EndpointName("searchUsers")]

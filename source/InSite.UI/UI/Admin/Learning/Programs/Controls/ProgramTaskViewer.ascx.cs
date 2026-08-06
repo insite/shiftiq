@@ -81,7 +81,9 @@ namespace InSite.UI.Admin.Records.Programs.Controls
             var item = (ProgramTaskItem)e.Item.DataItem;
 
             var name = e.Item.FindControl("TaskName");
-            ((ITextControl)name).Text = item.TaskName;
+            ((ITextControl)name).Text = item.IsInherited
+                ? item.TaskName + " <span class='badge bg-info fs-sm ms-2' title='Inherited from a parent program'>Inherited</span>"
+                : item.TaskName;
 
             SetTaskEditLinkVisibility(name, item.ObjectType.ToString());
 

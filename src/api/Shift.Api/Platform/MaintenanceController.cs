@@ -15,7 +15,7 @@ public class MaintenanceController : ShiftControllerBase
     [HttpGet("api/platform/maintenance/lockout")]
     [HybridPermission("platform/maintenance-lockout", DataAccess.Read)]
     [EndpointName("retrieveMaintenanceLockout")]
-    public async Task<ActionResult<LockoutResult>> RetrieveMaintenanceLockoutAsync(AppSettings appSettings)
+    public ActionResult<LockoutResult> RetrieveMaintenanceLockout(AppSettings appSettings)
     {
         var lockoutList = appSettings.Platform.Maintenance.Lockouts;
         if (lockoutList == null || lockoutList.Length == 0)

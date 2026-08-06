@@ -7,7 +7,7 @@ import { useLoadingProvider } from "@/contexts/loading/LoadingProviderContext";
 import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { useWorkshopQuestionProvider } from "@/contexts/workshop/WorkshopQuestionProviderContext";
 import { WorkshopStandard } from "@/contexts/workshop/models/WorkshopStandard";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { workshopQuestionAdapter } from "./workshopQuestionAdapter";
 import WorkshopQuestions_Filter from "./WorkshopQuestions_Filter";
 import WorkshopQuestions_Row from "./WorkshopQuestions_Row";
@@ -89,14 +89,38 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
         }
     }, [defaultFilter]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (scrolledToQuestionRef.current || !selectedQuestionId || !filteredQuestions.some(question => question.questionId === selectedQuestionId)) {
             return;
         }
 
-        moveToQuestion(selectedQuestionId);
+        let cancelled = false;
 
-        scrolledToQuestionRef.current = true;
+        scrollAfterImages();
+
+        async function scrollAfterImages() {
+            const images = Array.from(document.images);
+            await Promise.all(
+                images.map((img) => {
+                    if (img.complete) {
+                        return Promise.resolve();
+                    }
+                    return new Promise<void>((resolve) => {
+                        img.addEventListener("load", () => resolve(), { once: true });
+                        img.addEventListener("error", () => resolve(), { once: true });
+                    });
+                })
+            );
+
+            if (cancelled) {
+                return;
+            }
+
+            moveToQuestion(selectedQuestionId!);
+            scrolledToQuestionRef.current = true;
+        }
+
+        return () => { cancelled = true };
     }, [selectedQuestionId, filteredQuestions]);
 
     useEffect(() => {
@@ -323,7 +347,7 @@ function getDefaultCompetencyId(competencies: WorkshopStandard[] | null): string
 }
 
 function handleMoveTop(tableRef: React.RefObject<HTMLTableElement | null>) {
-    const table = tableRef.current;
+    const table = tableRef.current;    
     if (!table) {
         return;
     }

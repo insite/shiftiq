@@ -181,8 +181,7 @@ namespace InSite.Admin.Events.Exams.Forms
 
             // Find the group that has the same name as the activity type.
             var parent = ServiceLocator.GroupSearch
-                .GetGroups(new QGroupFilter { GroupName = examType, OrganizationIdentifier = Organization.Identifier })
-                .FirstOrDefault();
+                .GetFirstGroup(new QGroupFilter { GroupNameExact = examType, OrganizationIdentifier = Organization.Identifier });
 
             return parent?.GroupIdentifier;
         }

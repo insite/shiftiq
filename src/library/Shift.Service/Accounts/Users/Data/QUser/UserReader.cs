@@ -55,6 +55,15 @@ public class UserReader : IEntityReader
         }, cancellation);
     }
 
+    public Task<bool> ExistsAsync(IUserCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+            return query.AnyAsync(cancellation);
+        }, cancellation);
+    }
+
     public async IAsyncEnumerable<UserEntity> DownloadAsync(IUserCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -135,6 +144,12 @@ public class UserReader : IEntityReader
 
         if (criteria.UserFullNameContains.IsNotEmpty())
             query = query.Where(x => x.FullName.Contains(criteria.UserFullNameContains));
+
+        if (criteria.LastChangeTimeSince.HasValue)
+            query = query.Where(x => criteria.LastChangeTimeSince.Value <= x.LastChangeTime);
+
+        if (criteria.LastChangeTimeBefore.HasValue)
+            query = query.Where(x => x.LastChangeTime < criteria.LastChangeTimeBefore.Value);
 
         return query;
     }

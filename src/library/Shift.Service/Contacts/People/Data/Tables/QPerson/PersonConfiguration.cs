@@ -97,6 +97,10 @@ public class PersonConfiguration : IEntityTypeConfiguration<PersonEntity>
         builder.Property(x => x.SinModified).HasColumnName("SinModified");
         builder.Property(x => x.AgeGroup).HasColumnName("AgeGroup").IsUnicode(false).HasMaxLength(20);
 
+        builder.Property(x => x.LastChangeTime).HasColumnName("LastChangeTime").IsRequired();
+        builder.Property(x => x.LastChangeType).HasColumnName("LastChangeType").IsRequired().IsUnicode(false).HasMaxLength(100);
+        builder.Property(x => x.LastChangeUser).HasColumnName("LastChangeUser").IsRequired();
+
         builder.HasOne(e => e.BillingAddress)
             .WithMany()
             .HasForeignKey(e => e.BillingAddressIdentifier);

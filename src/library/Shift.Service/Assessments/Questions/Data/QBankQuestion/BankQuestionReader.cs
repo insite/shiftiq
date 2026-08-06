@@ -14,4 +14,16 @@ public class BankQuestionReader(IDbContextFactory<TableDbContext> context) : IEn
             .Where(x => x.BankIdentifier == bankId)
             .ToListAsync();
     }
+
+    public async Task<List<BankQuestionEntity>> CollectByIdsAsync(IEnumerable<Guid> questionIds)
+    {
+        if (!questionIds.Any())
+            return [];
+
+        using var db = context.CreateDbContext();
+
+        return await db.BankQuestion
+            .Where(x => questionIds.Contains(x.QuestionIdentifier))
+            .ToListAsync();
+    }
 }

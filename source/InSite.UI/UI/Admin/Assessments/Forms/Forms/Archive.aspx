@@ -1,6 +1,7 @@
 <%@ Page Language="C#" CodeBehind="Archive.aspx.cs" Inherits="InSite.Admin.Assessments.Forms.Forms.Archive" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormInfo.ascx" TagName="FormDetails" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
@@ -15,6 +16,8 @@
             }
     </style>
 
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:Alert runat="server" ID="EditorStatus" />
     <insite:ValidationSummary runat="server" ValidationGroup="Form" />
@@ -124,5 +127,7 @@
             <insite:CancelButton runat="server" ID="CancelButton" CausesValidation="false" />
         </div>
     </div>
+
+    </asp:Panel>
 
 </asp:Content>

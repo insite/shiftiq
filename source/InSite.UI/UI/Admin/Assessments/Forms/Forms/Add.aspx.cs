@@ -79,7 +79,10 @@ namespace InSite.Admin.Assessments.Forms.Forms
             base.OnLoad(e);
 
             if (!CanEdit)
-                RedirectToFinder();
+            {
+                ShowAlert(a => a.ShowPermissionDenied("add assessment forms"));
+                return;
+            }
 
             if (!IsPostBack)
                 Open();
@@ -159,7 +162,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
             PreviewData = new List<FormInfo>();
 
-            var questionListData = new List<List<Tuple<Criterion, List<Question>>>>();
+            var questionListData = new List<List<(Criterion, List<Question>)>>();
 
             for (var i = 1; i <= formCount; i++)
             {
@@ -208,7 +211,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             NextButton.Visible = false;
         }
 
-        private void BindQuestionList(List<Tuple<Criterion, List<Question>>> data, QuestionList list, Alert alert)
+        private void BindQuestionList(List<(Criterion, List<Question>)> data, QuestionList list, Alert alert)
         {
             if (data.Count == 0)
             {
@@ -247,7 +250,16 @@ namespace InSite.Admin.Assessments.Forms.Forms
         {
             var bank = ServiceLocator.BankSearch.GetBankState(BankID);
             if (bank == null)
-                RedirectToFinder();
+            {
+                ShowAlert(a =>
+                {
+                    if (BankID == Guid.Empty)
+                        a.ShowBankMissing();
+                    else
+                        a.ShowBankNotFound(BankID);
+                });
+                return;
+            }
 
             var title =
                 $"{(bank.Content.Title?.Default).IfNullOrEmpty(bank.Name)} <span class=\"form-text\">Asset #{bank.Asset}</span>";
@@ -275,7 +287,16 @@ namespace InSite.Admin.Assessments.Forms.Forms
         {
             var bank = ServiceLocator.BankSearch.GetBankState(BankID);
             if (bank == null)
-                RedirectToFinder();
+            {
+                ShowAlert(a =>
+                {
+                    if (BankID == Guid.Empty)
+                        a.ShowBankMissing();
+                    else
+                        a.ShowBankNotFound(BankID);
+                });
+                return;
+            }
 
             Guid specId, formId;
 
@@ -524,8 +545,11 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
         #region IHasParentLinkParameters
 
-        private void RedirectToFinder() =>
-            HttpResponseHelper.Redirect($"/ui/admin/assessments/banks/search", true);
+        private void ShowAlert(Action<InSite.Admin.Assessments.Forms.Controls.FormPageAlert> configure)
+        {
+            ContentPanel.Visible = false;
+            configure(PageAlert);
+        }
 
         private void RedirectBack() =>
             HttpResponseHelper.Redirect(GetBackUrl(), true);

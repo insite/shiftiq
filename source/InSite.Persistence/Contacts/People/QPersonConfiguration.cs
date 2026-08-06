@@ -52,6 +52,10 @@ namespace InSite.Persistence
             Property(x => x.UserApproveReason).IsUnicode(false).HasMaxLength(200);
             Property(x => x.WebSiteUrl).IsUnicode(false).HasMaxLength(500);
 
+            Property(x => x.LastChangeTime).IsRequired();
+            Property(x => x.LastChangeType).IsRequired().IsUnicode(false).HasMaxLength(100);
+            Property(x => x.LastChangeUser).IsRequired();
+
             HasOptional(a => a.BillingAddress).WithMany(b => b.BillingPersons).HasForeignKey(c => c.BillingAddressIdentifier).WillCascadeOnDelete(false);
             HasOptional(a => a.HomeAddress).WithMany(b => b.HomePersons).HasForeignKey(c => c.HomeAddressIdentifier).WillCascadeOnDelete(false);
             HasOptional(a => a.ShippingAddress).WithMany(b => b.ShippingPersons).HasForeignKey(c => c.ShippingAddressIdentifier).WillCascadeOnDelete(false);

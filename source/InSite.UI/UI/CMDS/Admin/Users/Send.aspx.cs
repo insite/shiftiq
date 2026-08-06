@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 
 using InSite.Admin.Contacts.People.Utilities;
@@ -44,6 +45,8 @@ namespace InSite.Cmds.Admin.People.Forms
         {
             base.OnLoad(e);
 
+            BindOutboxWarning();
+
             if (IsPostBack)
                 return;
 
@@ -73,6 +76,40 @@ namespace InSite.Cmds.Admin.People.Forms
                 SendStatus.AddMessage(AlertType.Error, ex.Message);
                 SendButton.Visible = false;
             }
+        }
+
+        private void BindOutboxWarning()
+        {
+            var application = ServiceLocator.AppSettings.Application;
+
+            var isEnabled = string.Compare(application.EmailOutbox, "Enabled", true) == 0;
+            if (isEnabled)
+                return;
+
+            string message;
+
+            if (application.EmailOutboxDisabled)
+            {
+                message = "The email outbox is disabled in this environment. The Send button records the message but no email is delivered to anyone.";
+            }
+            else if (application.EmailOutboxFiltered)
+            {
+                var whitelist = string.Join(", ", new[]
+                {
+                    ServiceLocator.Partition.WhitelistDomains,
+                    ServiceLocator.Partition.WhitelistEmails
+                }.Where(x => x.HasValue()));
+
+                message = whitelist.HasValue()
+                    ? $"The email outbox is filtered in this environment. The Send button delivers the message only to whitelisted recipients ({whitelist}). Every other address is dropped."
+                    : "The email outbox is filtered in this environment. The Send button delivers the message only to whitelisted recipients. Every other address is dropped.";
+            }
+            else
+            {
+                message = $"The email outbox is set to \"{application.EmailOutbox}\", not Enabled. The Send button may not deliver the message.";
+            }
+
+            OutboxWarning.AddMessage(AlertType.Warning, message);
         }
 
         private Guid[] CarbonCopy(string text)

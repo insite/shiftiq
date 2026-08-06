@@ -99,7 +99,7 @@ namespace InSite.UI.Portal.Learning
             var m = Page.Master as PortalMaster;
             if (m != null)
                 if (ServiceLocator.Partition.IsE03())
-                    m.OverrideHomeLink("/ui/portal/learning/catalog");
+                    m.OverrideHomeLink("/ui/portal/learning/catalogue");
 
             var groups = Identity.Groups.Select(x => x.Identifier).ToArray();
             _search = new CourseCatalogSearch(Identity.Organization.Identifier, RequestedCatalogId, groups, ViewEntireCatalog, ServiceLocator.Partition);
@@ -146,7 +146,7 @@ namespace InSite.UI.Portal.Learning
             if (IsPostBack)
                 return;
 
-            if (Page.Request.Url.AbsolutePath != "/ui/portal/learning/catalog")
+            if (Page.Request.Url.AbsolutePath != "/ui/portal/learning/catalogue")
             {
                 PortalMaster.ShowAvatar();
                 CategoryPanel.Style["display"] = "none";

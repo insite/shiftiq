@@ -265,13 +265,14 @@ DELETE FROM achievements.QAchievement WHERE AchievementIdentifier = @Achievement
                         AchievementIdentifier = e.Achievement,
                         CredentialIdentifier = e.AggregateIdentifier,
                         OrganizationIdentifier = e.Tenant,
-                        UserIdentifier = e.User,
+                        UserIdentifier = e.User
                     };
                     db.QCredentials.Add(credential);
                 }
 
                 credential.CredentialAssigned = e.Assigned;
                 credential.CredentialStatus = status.ToString();
+                credential.CredentialModified = e.ChangeTime;
 
                 db.SaveChanges();
             }
@@ -288,6 +289,8 @@ DELETE FROM achievements.QAchievement WHERE AchievementIdentifier = @Achievement
                     return;
 
                 change(credential);
+
+                credential.CredentialModified = e.ChangeTime;
 
                 if (!string.IsNullOrEmpty(actionType))
                 {
@@ -376,6 +379,15 @@ DELETE FROM achievements.QAchievement WHERE AchievementIdentifier = @Achievement
             Update(e, null, null, null, (QCredential credential) =>
             {
                 SetExpiration(credential, e.Expiration);
+            });
+        }
+
+        public void UpdateCredential(CredentialSubmitted e, CredentialStatus status)
+        {
+            Update(e, "Submitted", e.Submitted, null, credential =>
+            {
+                credential.CredentialSubmitted = e.Submitted;
+                credential.CredentialStatus = status.ToString();
             });
         }
 
@@ -557,7 +569,11 @@ DELETE FROM records.QCredentialHistory WHERE AggregateIdentifier = @CredentialId
                 }
                 credential.CredentialExpirationExpected = CredentialState.CalculateExpectedExpiry(expiration, credential.CredentialGranted);
 
-                if (credential.CredentialExpirationExpected.HasValue)
+                // A submitted credential is awaiting administrator review, so changing its expiration must not
+                // promote it to Valid.
+                var isSubmitted = credential.CredentialStatus == CredentialStatus.Submitted.ToString();
+
+                if (credential.CredentialExpirationExpected.HasValue && !isSubmitted)
                 {
                     if (credential.CredentialExpirationExpected < DateTimeOffset.UtcNow)
                         credential.CredentialStatus = CredentialStatus.Expired.ToString();

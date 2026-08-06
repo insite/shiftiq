@@ -23,9 +23,9 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
         private class SectionInfo
         {
-            public Guid ID => _section.Identifier;
-            public string Title => _section.Content.Title?.Default;
-            public string Summary => _section.Content.Summary?.Default;
+            public Guid ID { get; private set; }
+            public string Title { get; private set; }
+            public string Summary { get; private set; }
 
             public string SummaryHtml => Markdown.ToHtml(Summary);
             public bool HasTitle => !string.IsNullOrEmpty(Title);
@@ -33,11 +33,18 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
             public List<PreviewQuestionModel> Questions { get; } = new List<PreviewQuestionModel>();
 
-            private Domain.Banks.Section _section;
-
             public SectionInfo(Domain.Banks.Section section)
             {
-                _section = section;
+                ID = section.Identifier;
+                Title = section.Content.Title?.Default;
+                Summary = section.Content.Summary?.Default;
+            }
+
+            public SectionInfo(Domain.Banks.Criterion criterion)
+            {
+                ID = criterion.Identifier;
+                Title = (criterion.Content.Title?.Default).IfNullOrEmpty(criterion.Name);
+                Summary = (criterion.Content.Summary?.Default).NullIfEmpty();
             }
         }
 
@@ -103,11 +110,30 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
             var bank = ServiceLocator.BankSearch.GetBankState(BankID);
             if (bank == null)
-                RedirectToSearch();
+            {
+                ShowAlert(a =>
+                {
+                    if (BankID == Guid.Empty)
+                        a.ShowBankMissing();
+                    else
+                        a.ShowBankNotFound(BankID);
+                });
+                return;
+            }
 
             var form = bank.FindForm(FormID);
             if (form == null)
-                RedirectToReader();
+            {
+                var bankName = bank.Name;
+                ShowAlert(a =>
+                {
+                    if (FormID == Guid.Empty)
+                        a.ShowFormMissing(BankID, bankName);
+                    else
+                        a.ShowFormNotFound(FormID, BankID, bankName);
+                });
+                return;
+            }
 
             PageHelper.AutoBindHeader(
                 this,
@@ -127,7 +153,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             SectionRepeater.Visible = false;
             SectionPanel.Visible = false;
 
-            var questions = AttemptHelper.CreateAttemptQuestions(form, false, Language.Default);
+            var questions = AttemptQuestionBuilder.Build(form, false, Language.Default);
             if (questions.Length == 0)
             {
                 ScreenStatus.AddMessage(
@@ -150,12 +176,12 @@ namespace InSite.Admin.Assessments.Forms.Forms
             if (spec.Type == SpecificationType.Static)
                 BindStaticForm(form, questions);
             else
-                BindDynamicForm(bank, questions);
+                BindDynamicForm(form, questions);
 
             Images = AttemptImageInfo.CreateDictionary(bank.EnumerateAllAttachments());
         }
 
-        private void BindStaticForm(Form form, IList<AttemptQuestion> questions)
+        private void BindStaticForm(Form form, AttemptQuestion[] questions)
         {
             var spec = form.Specification;
             var fieldMapping = form.Sections.SelectMany(x => x.Fields).ToDictionary(f => f.QuestionIdentifier);
@@ -163,7 +189,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             SectionInfo section = null;
             var sections = new List<SectionInfo>();
 
-            for (var i = 0; i < questions.Count; i++)
+            for (var i = 0; i < questions.Length; i++)
             {
                 var attemptQuestion = questions[i];
                 var field = fieldMapping[attemptQuestion.Identifier];
@@ -206,14 +232,66 @@ namespace InSite.Admin.Assessments.Forms.Forms
             }
         }
 
-        private void BindDynamicForm(BankState bank, IEnumerable<AttemptQuestion> questions)
+        private void BindDynamicForm(Form form, AttemptQuestion[] questions)
         {
-            SectionPanel.Visible = true;
-            SectionPanel.LoadData(null, questions.Select((attemptQuestion, index) =>
+            var spec = form.Specification;
+            var bank = spec.Bank;
+
+            if (spec.SectionsAsTabsEnabled)
             {
-                var bankQuestion = bank.FindQuestion(attemptQuestion.Identifier);
-                return new PreviewQuestionModel(index + 1, bankQuestion, attemptQuestion);
-            }));
+                SectionInfo section = null;
+                var sections = new List<SectionInfo>();
+                var questionNumber = 1;
+
+                foreach (var group in questions.GroupBy(x => x.Section))
+                {
+                    var cIndex = group.Key ?? -1;
+                    var criterion = cIndex >= 0 && cIndex < spec.Criteria.Count
+                        ? spec.Criteria[cIndex]
+                        : new Criterion();
+
+                    foreach (var aQuestion in group)
+                    {
+                        var bQuestion = bank.FindQuestion(aQuestion.Identifier);
+                        var model = new PreviewQuestionModel(questionNumber++, bQuestion, aQuestion);
+
+                        if (section == null || section.ID != criterion.Identifier)
+                            sections.Add(section = new SectionInfo(criterion));
+
+                        section.Questions.Add(model);
+                    }
+                }
+
+                SectionNav.Visible = true;
+                SectionNavItemsCount = sections.Count;
+
+                NextTabButton.Visible = !spec.TabNavigationEnabled && !spec.SingleQuestionPerTabEnabled;
+                NextQuestionButton.Visible = !spec.TabNavigationEnabled && spec.SingleQuestionPerTabEnabled;
+
+                if (spec.SingleQuestionPerTabEnabled)
+                    SectionNav.CssClass = "single-question";
+
+                for (var i = 0; i < sections.Count; i++)
+                {
+                    var sectionInfo = sections[i];
+
+                    AddSectionNavItem(out var navItem, out var sectionPanel);
+
+                    navItem.Title = sections[i].Title.IfNullOrEmpty("(Untitled)");
+                    sectionPanel.LoadData(
+                        sectionInfo.HasSummary ? sectionInfo.SummaryHtml : null,
+                        sectionInfo.Questions);
+                }
+            }
+            else
+            {
+                SectionPanel.Visible = true;
+                SectionPanel.LoadData(null, questions.Select((attemptQuestion, index) =>
+                {
+                    var bankQuestion = bank.FindQuestion(attemptQuestion.Identifier);
+                    return new PreviewQuestionModel(index + 1, bankQuestion, attemptQuestion);
+                }));
+            }
         }
 
         #endregion
@@ -236,7 +314,11 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
         #region Methods (redirect)
 
-        private void RedirectToSearch() => HttpResponseHelper.Redirect($"/ui/admin/assessments/banks/search", true);
+        private void ShowAlert(Action<InSite.Admin.Assessments.Forms.Controls.FormPageAlert> configure)
+        {
+            ContentPanel.Visible = false;
+            configure(PageAlert);
+        }
 
         private string GetReaderUrl(Guid? formId = null)
         {

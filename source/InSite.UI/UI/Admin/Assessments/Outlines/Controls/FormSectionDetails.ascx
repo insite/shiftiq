@@ -82,6 +82,9 @@
                             <div>
                                 <asp:Literal runat="server" ID="WarningOnNextTabEnabled" />
                             </div>
+                            <div class="form-text">
+                                Whether the candidate is warned before moving on to the next tab.
+                            </div>
                         </div>
 
                         <div runat="server" id="BreakTimerEnabledField" class="form-group mb-3">
@@ -90,6 +93,9 @@
                             </label>
                             <div>
                                 <asp:Literal runat="server" ID="BreakTimerEnabled" />
+                            </div>
+                            <div class="form-text">
+                                Whether the time spent on this tab is excluded from the attempt's total time.
                             </div>
                         </div>
 
@@ -100,6 +106,9 @@
                             <div>
                                 <asp:Literal runat="server" ID="TimeLimit" />
                             </div>
+                            <div class="form-text">
+                                The maximum number of minutes the candidate can stay on this tab.
+                            </div>
                         </div>
 
                         <div runat="server" id="TimerTypeField" class="form-group mb-3">
@@ -108,6 +117,9 @@
                             </label>
                             <div>
                                 <asp:Literal runat="server" ID="TimerType" />
+                            </div>
+                            <div class="form-text">
+                                Whether the candidate can leave the tab before the time limit is reached (Optional) or must wait for it to elapse (Enforced).
                             </div>
                         </div>
 

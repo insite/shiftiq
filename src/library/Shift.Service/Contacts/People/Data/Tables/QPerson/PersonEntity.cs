@@ -101,4 +101,8 @@ public partial class PersonEntity: ISystemRoles
     public DateTime? ImmigrationLandingDate { get; set; }
     public DateTime? MemberEndDate { get; set; }
     public DateTime? MemberStartDate { get; set; }
+
+    public DateTimeOffset LastChangeTime { get; set; }
+    public string LastChangeType { get; set; } = null!;
+    public Guid LastChangeUser { get; set; }
 }

@@ -35,6 +35,7 @@ namespace InSite.Persistence
             get => PersonOrganizationIdentifiers != null && PersonOrganizationIdentifiers.Length == 1 ? PersonOrganizationIdentifiers[0] : (Guid?)null;
             set => PersonOrganizationIdentifiers = value.HasValue ? new[] { value.Value } : null;
         }
+        public Guid? PersonOnlyOrganizationIdentifier { get; set; }
         public bool? PersonEmailEnabled { get; set; }
 
         public UserFilterMembership[] Memberships { get; set; }

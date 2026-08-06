@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useWorkshopQuestionProvider } from "@/contexts/workshop/WorkshopQuestionProviderContext";
 import IconButton from "@/components/iconbutton/IconButton";
 import { shiftClient } from "@/api/shiftClient";
+import { flagEnumToTextClass } from "@/contexts/workshop/models/WorkshopEnums";
+import Icon from "@/components/icon/Icon";
 
 interface Props {
     questionId: string;
@@ -95,6 +97,11 @@ export default function WorkshopQuestions_Comments({
                                     <div className="mt-2" dangerouslySetInnerHTML={{ __html: comment.text }} />
                                 </div>
                                 <div className="col-md-1 d-flex align-items-end justify-content-start gap-0 flex-column">
+                                    {comment.flag !== "None" && (
+                                        <span className={flagEnumToTextClass(comment.flag)}>
+                                            <Icon style="solid" name="flag" />
+                                        </span>
+                                    )}
                                     <ActionLink
                                         title="Revise Comment"
                                         icon={{ style: "solid", name: "pencil", className: "icon" }}

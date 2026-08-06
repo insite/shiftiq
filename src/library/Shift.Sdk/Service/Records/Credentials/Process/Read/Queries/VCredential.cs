@@ -40,6 +40,7 @@ namespace InSite.Application.Records.Read
         public string UserFullName { get; set; }
         public string UserLastName { get; set; }
         public string UserRegion { get; set; }
+        public string UserTimeZone { get; set; }
         public string BadgeImageUrl { get; set; }
         public string PersonCode { get; set; }
 
@@ -76,6 +77,7 @@ namespace InSite.Application.Records.Read
         public string CredentialGrantedDescription { get; set; }
         public decimal? CredentialGrantedScore { get; set; }
         public DateTimeOffset? CredentialRevoked { get; set; }
+        public DateTimeOffset? CredentialSubmitted { get; set; }
         public DateTimeOffset? UserArchived { get; set; }
         public string CertificateFingerPrint => $"{CredentialIdentifier};{AchievementIdentifier};{CredentialStatus};{CredentialGranted.ToJsTime()};{(int?)(CredentialGrantedScore * 100)};{CredentialExpirationExpected.ToJsTime()};{UserIdentifier};{UserEmail};{UserFirstName};{UserLastName};{AchievementTitle}";
         public bool IsCredentialGranted => CredentialGranted.HasValue;

@@ -186,7 +186,7 @@ namespace InSite.Admin.Events.Candidates.Forms
             }
 
             var allTypes = ServiceLocator.RegistrationSearch.GetAccommodationTypes(Organization.OrganizationIdentifier);
-            AccommodationTypeSelector.AdditionalOptions = allTypes;
+            AccommodationTypeSelector.Settings.AdditionalOptions = allTypes;
             AccommodationTypeSelector.RefreshData();
         }
 

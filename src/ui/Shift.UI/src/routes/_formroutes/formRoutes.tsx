@@ -20,6 +20,11 @@ import SpecWorkshop from "../admin/assessments/specs/SpecWorkshop";
 import NotificationSearch from "../admin/platform/notifications/search/NotificationSearch";
 import NotificationCreate from "../admin/platform/notifications/create/NotificationCreate";
 import NotificationEdit from "../admin/platform/notifications/edit/NotificationEdit";
+import ChatbotIndex from "../admin/chatbot/index/ChatbotIndex";
+import ChatbotSystemPrompt from "../admin/chatbot/system-prompt/ChatbotSystemPrompt";
+import PersonIntegration from "../admin/contacts/people/integration/PersonIntegration";
+import CEPerformanceReport from "../test/reports/ce-performance/CEPerformanceReport";
+import CapabilityReport from "../test/reports/capability/CapabilityReport";
 
 export interface MenuItem {
     href: string;
@@ -67,6 +72,18 @@ export const formRoutes: FormRoute[] = [
                         title: "React Test",
                         path: "/client/test",
                         element: <TestIndex />,
+                        children: [
+                            {
+                                title: "CE Performance",
+                                path: "/client/test/reports/ce-performance",
+                                element: <CEPerformanceReport />,
+                            },
+                            {
+                                title: "Capability Framework Wheel",
+                                path: "/client/test/reports/capability",
+                                element: <CapabilityReport />,
+                            },
+                        ]
                     },
                 ]
             },
@@ -267,6 +284,43 @@ export const formRoutes: FormRoute[] = [
                         element: <NotificationEdit />,
                     },
                 ]
+            },
+            {
+                title: "AI Assistant Jasper",
+                path: "/client/admin/chatbot",
+                element: <ChatbotIndex />,
+                customBreadcrumbs: [
+                    {
+                        title: "Admin",
+                        path: "/client/admin/home",
+                    },
+                    {
+                        title: "Setup",
+                        path: "/ui/admin/setup/home",
+                    },
+                ],
+                children: [
+                    {
+                        title: "Modify System Prompt",
+                        path: "/client/admin/chatbot/system-prompt",
+                        element: <ChatbotSystemPrompt />,
+                    }
+                ]
+            },
+            {
+                title: "Integration Portal",
+                path: "/client/admin/contacts/people/integration",
+                element: <PersonIntegration />,
+                customBreadcrumbs: [
+                    {
+                        title: "Admin",
+                        path: "/client/admin/home",
+                    },
+                    {
+                        title: "Contacts",
+                        path: "/ui/admin/contacts/home",
+                    },
+                ],
             },
         ]
     },

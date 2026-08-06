@@ -15,6 +15,7 @@ import { useWorkshopQuestionProvider } from "@/contexts/workshop/WorkshopQuestio
 import { urlHelper } from "@/helpers/urlHelper";
 import { numberHelper } from "@/helpers/numberHelper";
 import WorkshopQuestions_SelectFile from "./WorkshopQuestions_SelectFile";
+import { workshopQuestionTextHelper } from "./workshopQuestionTextHelper";
 
 interface Props {
     id: string;
@@ -75,13 +76,15 @@ export default function WorkshopQuestions_Row({
     }
 
     async function handleSaveTitle(value: MultiLanguageText) {
-        const valueToSave = JSON.stringify(value);
+        const serverValue = workshopQuestionTextHelper.toServerMultiLanguage(value);
+        const valueToSave = JSON.stringify(serverValue);
         const html = await shiftClient.workshop.modifyQuestion(bankId, question.questionId, "Title", null, valueToSave);
         modifyQuestionTitle(question.questionId, value, html);
     }
 
     async function handleSaveColumnHeader(columnIndex: number, value: string) {
-        const html = await shiftClient.workshop.modifyQuestion(bankId, question.questionId, "ColumnHeader", columnIndex, value);
+        const serverValue = workshopQuestionTextHelper.toServerMarkdown(value);
+        const html = await shiftClient.workshop.modifyQuestion(bankId, question.questionId, "ColumnHeader", columnIndex, serverValue);
         modifyQuestionColumnHeader(question.questionId, columnIndex, value, html);
     }
 
@@ -91,8 +94,9 @@ export default function WorkshopQuestions_Row({
     }
 
     async function handleSaveOptionTitle(optionNumber: number, columnIndex: number | null, title: string) {
+        const serverValue = workshopQuestionTextHelper.toServerMarkdown(title);
         const field = columnIndex === null ? "Title" : "ColumnTitle";
-        const html = await shiftClient.workshop.modifyOption(bankId, question.questionId, optionNumber, field, columnIndex, title);
+        const html = await shiftClient.workshop.modifyOption(bankId, question.questionId, optionNumber, field, columnIndex, serverValue);
 
         if (columnIndex === null) {
             modifyQuestionOptionTitle(question.questionId, optionNumber, title, html);

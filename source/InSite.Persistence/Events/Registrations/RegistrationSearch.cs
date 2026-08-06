@@ -346,7 +346,10 @@ namespace InSite.Persistence
                         DepartmentNames = x.Candidate.User.Memberships
                             .Where(m => m.Group.OrganizationIdentifier == organizationId
                                      && m.Group.GroupType == GroupTypes.Department)
-                            .Select(m => m.Group.GroupName)
+                            .Select(m => m.Group.GroupName),
+                        AccommodationNames = x.Accommodations
+                            .OrderBy(y => y.AccommodationType).ThenBy(y => y.AccommodationName)
+                            .Select(y => y.AccommodationName)
                     })
                     .ToList();
             }
@@ -913,6 +916,9 @@ namespace InSite.Persistence
 
             if (inputFilter.CandidateMembershipGroupIdentifier.HasValue)
                 query = query.Where(x => db.QMemberships.Any(y => y.UserIdentifier == x.CandidateIdentifier && y.GroupIdentifier == inputFilter.CandidateMembershipGroupIdentifier));
+
+            if (inputFilter.AccommodationTypes.IsNotEmpty())
+                query = query.Where(x => x.Accommodations.Any(y => inputFilter.AccommodationTypes.Contains(y.AccommodationName)));
 
             return query;
         }

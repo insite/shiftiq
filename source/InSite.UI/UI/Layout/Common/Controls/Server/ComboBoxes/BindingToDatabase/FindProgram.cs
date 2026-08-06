@@ -54,5 +54,11 @@ namespace InSite.Common.Web.UI
             Value = x.ProgramIdentifier,
             Text = x.ProgramName,
         };
+
+        public bool HasAnyItem()
+        {
+            var filter = GetFilter((string)null);
+            return ProgramSearch.ExistPrograms(filter);
+        }
     }
 }

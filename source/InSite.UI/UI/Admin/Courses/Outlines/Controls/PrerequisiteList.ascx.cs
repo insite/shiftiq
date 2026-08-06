@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Courses.Read;
 using InSite.Application.Courses.Write;
 using InSite.Common.Web.UI;
@@ -11,6 +9,8 @@ using InSite.Domain.Courses;
 using InSite.Persistence;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
+using Shift.Constant;
 
 using TriggerChangeEnum = InSite.Domain.Courses.TriggerChange;
 
@@ -75,6 +75,25 @@ namespace InSite.Admin.Courses.Outlines.Controls
             PrerequisiteRepeater.DataBinding += PrerequisiteRepeater_DataBinding;
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (IsPostBack)
+                return;
+
+            TriggerChange.LoadItems(
+                PrerequisiteType.ActivityCompleted,
+                PrerequisiteType.AssessmentPassed,
+                PrerequisiteType.AssessmentFailed,
+                PrerequisiteType.AssessmentScored,
+                PrerequisiteType.QuestionAnsweredCorrectly,
+                PrerequisiteType.QuestionAnsweredIncorrectly,
+                PrerequisiteType.GradeItemPassed,
+                PrerequisiteType.GradeItemFailed
+            );
+        }
+
         private void PrerequisiteRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName != "PrerequisiteDelete")
@@ -106,9 +125,10 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
         private void TriggerChange_ValueChanged(object sender, EventArgs e)
         {
-            var type = TriggerChange.Value;
+            var type = TriggerChange.Value.EmptyIfNull();
+            var isActivityCompleted = type == "ActivityCompleted";
 
-            TriggerActivityField.Visible = type == "ActivityCompleted";
+            TriggerActivityField.Visible = isActivityCompleted;
 
             TriggerAssessmentFormIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             TriggerFormField.Visible = type.StartsWith("Assessment");
@@ -125,6 +145,9 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 TriggerGradeItemIdentifier.RefreshData();
                 TriggerGradeItemField.Visible = type.StartsWith("Grade");
             }
+
+            if (ObjectType == PrerequisiteObjectType.Activity && isActivityCompleted && !TriggerActivityIdentifier.HasValue)
+                TriggerActivityIdentifier.ValueAsGuid = CourseSearch.GetPrecedingLesson(ContainerIdentifier);
         }
 
         private void TriggerAssessmentBankIdentifier_ValueChanged(object sender, EventArgs e)
@@ -134,14 +157,15 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
         public void SaveChanges()
         {
-            if (TriggerChange.Value == "None")
+            if (TriggerChange.Value.IsEmpty())
                 return;
 
             TriggerType type;
             Guid? triggerId;
             int? scoreFrom = null, scoreThru = null;
 
-            var triggerChange = (TriggerChangeEnum)Enum.Parse(typeof(TriggerChangeEnum), TriggerChange.Value, true);
+            var triggerChange = TriggerChange.Value.ToEnum<TriggerChangeEnum>();
+
             switch (triggerChange)
             {
                 case TriggerChangeEnum.ActivityCompleted:
@@ -178,7 +202,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 Identifier = UniqueIdentifier.Create(),
                 TriggerIdentifier = triggerId.Value,
                 TriggerType = type,
-                TriggerChange = (TriggerChangeEnum)Enum.Parse(typeof(TriggerChangeEnum), TriggerChange.Value, true),
+                TriggerChange = triggerChange,
                 TriggerConditionScoreFrom = scoreFrom,
                 TriggerConditionScoreThru = scoreThru
             });

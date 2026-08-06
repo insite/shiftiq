@@ -32,6 +32,7 @@ namespace InSite.Application.Issues.Read
         int CountAttachments(QIssueAttachmentFilter filter);
         List<VIssueAttachment> GetAttachments(QIssueAttachmentFilter filter);
         VIssueAttachment GetAttachment(Guid issue, string fileName);
+        bool ExistsAttachment(QIssueAttachmentFilter filter);
 
         QIssueFileRequirement GetFileRequirement(Guid issue, string requestedFileCategory);
         List<VIssueFileRequirement> GetFileRequirements(Guid issue);

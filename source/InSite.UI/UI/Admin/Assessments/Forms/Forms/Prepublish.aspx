@@ -1,9 +1,13 @@
 <%@ Page Language="C#" CodeBehind="Prepublish.aspx.cs" Inherits="InSite.Admin.Assessments.Forms.Forms.Prepublish" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register TagPrefix="assessments" Assembly="InSite.UI" Namespace="InSite.Admin.Assessments.Web.UI" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:Alert runat="server" ID="EditorStatus" />
 
@@ -82,5 +86,7 @@
     </insite:Nav>
 
     <insite:CancelButton runat="server" ID="CancelButton" />
+
+    </asp:Panel>
 
 </asp:Content>

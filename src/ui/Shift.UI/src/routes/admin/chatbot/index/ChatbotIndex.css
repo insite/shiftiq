@@ -1,0 +1,51 @@
+.chatbot-session {
+    .textblock {
+        margin-bottom: 0.75rem;
+
+        & > p {
+            margin: 0;
+        }
+    }
+
+    .textblock-user {
+        padding: 1rem;
+        margin-left: 50%;
+        background-color: #f4f4f4;
+        border-radius: 1rem;
+    }
+
+    .textblock-llm {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .textblock-direct {
+        padding: 1rem;
+        background-color: #fbfbfb;
+        border-radius: 1rem;
+    }
+
+    .textblock-table {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+
+        table {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.chatbot-input {
+    margin-left: 20%;
+    margin-right: 20%;
+    display: flex;
+    gap: 0.25rem;
+
+    .insite-combobox {
+        width: 180px !important;
+    }
+}
+
+.chatbot-system-prompt {
+    margin-left: 20%;
+}

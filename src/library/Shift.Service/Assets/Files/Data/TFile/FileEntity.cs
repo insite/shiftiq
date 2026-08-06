@@ -27,6 +27,7 @@ public partial class FileEntity
     public string? FilePath { get; set; }
     public string FileStatus { get; set; } = null!;
     public string? FileSubcategory { get; set; }
+    public string? FileTag { get; set; }
     public string? FileUrl { get; set; }
     public string ObjectType { get; set; } = null!;
 

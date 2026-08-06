@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using InSite.Application.Registrations.Read;
 using InSite.Common;
@@ -10,7 +11,6 @@ namespace InSite.Admin.Events.Registrations.Controls
 {
     public partial class SearchCriteria : SearchCriteriaController<QRegistrationFilter>
     {
-
         public override QRegistrationFilter Filter
         {
             get
@@ -41,9 +41,10 @@ namespace InSite.Admin.Events.Registrations.Controls
                     EventType = "Class",
                     BillingCode = BillingCode.Text,
                     CandidateMembershipGroupIdentifier = DepartmentId.Value,
-                    ExamFormIdentifier = ExamFormIdentifier.Value
+                    ExamFormIdentifier = ExamFormIdentifier.Value,
+                    AccommodationTypes = AccommodationType.Values.ToArray(),
                 };
-
+                
                 GetCheckedShowColumns(filter);
 
                 return filter;
@@ -72,6 +73,7 @@ namespace InSite.Admin.Events.Registrations.Controls
                 BillingCode.Text = value.BillingCode;
                 DepartmentId.Value = value.CandidateMembershipGroupIdentifier;
                 ExamFormIdentifier.Value = value.ExamFormIdentifier;
+                AccommodationType.Values = value.AccommodationTypes;
             }
         }
 
@@ -120,6 +122,7 @@ namespace InSite.Admin.Events.Registrations.Controls
             BillingCode.Text = null;
             DepartmentId.Value = null;
             ExamFormIdentifier.Value = null;
+            AccommodationType.ClearSelection();
         }
 
         protected static string GetEmptyMessage(string text) => LabelHelper.GetLabelContentText(text);

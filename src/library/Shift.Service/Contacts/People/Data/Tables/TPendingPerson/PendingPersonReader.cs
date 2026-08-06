@@ -1,7 +1,5 @@
 using System.Runtime.CompilerServices;
 
-using Humanizer;
-
 using Microsoft.EntityFrameworkCore;
 
 using Shift.Common;
@@ -13,8 +11,7 @@ namespace Shift.Service.Directory;
 public class PendingPersonReader : IEntityReader
 {
     private string DefaultEntitySort = "SubmittedAt DESC";
-    private string DefaultMatchSort = "SubmittedAt DESC";
-
+ 
     private readonly IDbContextFactory<TableDbContext> _context;
 
     public PendingPersonReader(IDbContextFactory<TableDbContext> context)
@@ -28,8 +25,8 @@ public class PendingPersonReader : IEntityReader
         {
             var query = BuildEntityQueryable(db);
 
-            return query.AnyAsync(x => x.PendingId == pending
-                    && (organization == null || organization == x.OrganizationId),
+            return query.AnyAsync(x => x.PendingPersonIdentifier == pending
+                    && (organization == null || organization == x.OrganizationIdentifier),
                 cancellation);
 
         }, cancellation);
@@ -46,6 +43,35 @@ public class PendingPersonReader : IEntityReader
                 .ApplyPaging(criteria.Filter)
                 .ToListAsync(cancellation);
 
+        }, cancellation);
+    }
+
+    public Task<PendingPersonImportModel[]> CollectImportAsync(IPendingPersonCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildEntityQueryable(db, criteria);
+
+            return query
+                .OrderBy(criteria.Filter.Sort ?? DefaultEntitySort)
+                .ApplyPaging(criteria.Filter)
+                .Select(x => new PendingPersonImportModel
+                {
+                    PendingPersonId = x.PendingPersonIdentifier,
+                    PersonCode = x.PersonCode,
+                    UserEmail = x.UserEmail,
+                    UserFirstName = x.UserFirstName,
+                    UserLastName = x.UserLastName,
+                    EmployeeStatus = x.EmployeeStatus,
+                    MatchCount = db.QPerson
+                        .Where(y =>
+                            y.OrganizationIdentifier == x.OrganizationIdentifier
+                            && y.User!.FirstName == x.UserFirstName
+                            && y.User!.LastName == x.UserLastName
+                        )
+                        .Count()
+                })
+                .ToArrayAsync(cancellation);
         }, cancellation);
     }
 
@@ -78,34 +104,7 @@ public class PendingPersonReader : IEntityReader
         {
             var query = BuildEntityQueryable(db);
 
-            return query.FirstOrDefaultAsync(x => x.PendingId == pending, cancellation);
-
-        }, cancellation);
-    }
-
-    public Task<List<PendingPersonMatch>> SearchAsync(IPendingPersonCriteria criteria, TimeZoneInfo? timezone, CancellationToken cancellation = default)
-    {
-        return ExecuteAsync(async db =>
-        {
-            var query = BuildMatchQueryable(db, criteria);
-
-            query = query
-                .OrderBy(criteria.Filter.Sort ?? DefaultMatchSort)
-                .ApplyPaging(criteria.Filter);
-
-            var results = await query.ToListAsync(cancellation);
-
-            foreach (var item in results)
-            {
-                var since = DateTimeOffset.Now - item.SubmittedAt;
-
-                var humanized = since.Humanize();
-
-                item.SubmittedWhen = Common.TimeZones.Format(item.SubmittedAt, timezone)
-                    + $" ({humanized} ago)";
-            }
-
-            return results;
+            return query.FirstOrDefaultAsync(x => x.PendingPersonIdentifier == pending, cancellation);
 
         }, cancellation);
     }
@@ -133,7 +132,7 @@ public class PendingPersonReader : IEntityReader
         var query = BuildEntityQueryable(db);
 
         if (criteria.OrganizationId != null)
-            query = query.Where(x => x.OrganizationId == criteria.OrganizationId);
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
 
         if (criteria.SubmittedBy != null)
             query = query.Where(x => x.SubmittedBy == criteria.SubmittedBy);
@@ -143,60 +142,6 @@ public class PendingPersonReader : IEntityReader
 
         if (criteria.SubmittedBefore != null)
             query = query.Where(x => x.SubmittedAt < criteria.SubmittedBefore);
-
-        if (criteria.PersonId != null)
-            query = query.Where(x => x.PersonId == criteria.PersonId);
-
-        if (criteria.UserId != null)
-            query = query.Where(x => x.UserId == criteria.UserId);
-
-        if (!string.IsNullOrEmpty(criteria.PersonCode))
-            query = query.Where(x => x.PersonCode.Contains(criteria.PersonCode));
-
-        if (!string.IsNullOrEmpty(criteria.UserEmail))
-            query = query.Where(x => x.UserEmail.Contains(criteria.UserEmail));
-
-        if (!string.IsNullOrEmpty(criteria.UserFirstName))
-            query = query.Where(x => x.UserFirstName.Contains(criteria.UserFirstName));
-
-        if (!string.IsNullOrEmpty(criteria.UserLastName))
-            query = query.Where(x => x.UserLastName.Contains(criteria.UserLastName));
-
-        return query;
-    }
-
-    private IQueryable<PendingPersonMatch> BuildMatchQueryable(TableDbContext db)
-    {
-        var query = db.PendingPersonMatch
-            .AsNoTracking()
-            .Select(x => x);
-
-        return query;
-    }
-
-    private IQueryable<PendingPersonMatch> BuildMatchQueryable(TableDbContext db, IPendingPersonCriteria criteria)
-    {
-        ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
-
-        var query = BuildMatchQueryable(db);
-
-        if (criteria.OrganizationId != null)
-            query = query.Where(x => x.OrganizationId == criteria.OrganizationId);
-
-        if (criteria.SubmittedBy != null)
-            query = query.Where(x => x.SubmittedBy == criteria.SubmittedBy);
-
-        if (criteria.SubmittedSince != null)
-            query = query.Where(x => x.SubmittedAt >= criteria.SubmittedSince);
-
-        if (criteria.SubmittedBefore != null)
-            query = query.Where(x => x.SubmittedAt < criteria.SubmittedBefore);
-
-        if (criteria.PersonId != null)
-            query = query.Where(x => x.PersonId == criteria.PersonId);
-
-        if (criteria.UserId != null)
-            query = query.Where(x => x.UserId == criteria.UserId);
 
         if (!string.IsNullOrEmpty(criteria.PersonCode))
             query = query.Where(x => x.PersonCode.Contains(criteria.PersonCode));

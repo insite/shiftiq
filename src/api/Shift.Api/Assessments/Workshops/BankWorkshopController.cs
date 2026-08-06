@@ -12,7 +12,7 @@ using Shift.Service.Competency;
 namespace Shift.Api.Assessments.Workshops;
 
 [ApiController]
-[ApiExplorerSettings(GroupName = "Assessments API: Workshops")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class BankWorkshopController(IPrincipalProvider principalProvider, ITimelineQuery timelineQuery) : ShiftControllerBase
 {
     public class QuestionInput

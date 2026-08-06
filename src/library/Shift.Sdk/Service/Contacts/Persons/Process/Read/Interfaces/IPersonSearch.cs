@@ -29,6 +29,7 @@ namespace InSite.Application.Contacts.Read
         List<PersonOrganizationListDataItem> GetPersonsForOrganizationList(QPersonFilter filter);
 
         List<string> GetJobDivisions(Guid organizationId);
+        bool HasAccessGrantedJobDivisions(Guid organizationId);
         List<PersonName> GetNames(Guid organizationId);
     }
 }

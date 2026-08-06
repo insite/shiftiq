@@ -40,6 +40,12 @@ namespace InSite.Common.Web.UI.Chart
             set => Configuration.Options.Plugins.Legend.Position = value;
         }
 
+        public bool MaintainAspectRatio
+        {
+            get => Configuration.Options.MaintainAspectRatio;
+            set => Configuration.Options.MaintainAspectRatio = value;
+        }
+
         #endregion
 
         #region Methods
@@ -115,7 +121,7 @@ function onChartHover (e,i) {
             string func = null;
 
             if (DataType == ChartDataType.Percent)
-                func = @"function (item, data) { return data.labels[item.index] + ': ' + data.datasets[item.datasetIndex].data[item.index].toFixed(2) + ' %'; }";
+                func = @"function (item) { return String(item.label) + ': ' + item.parsed.toFixed(2) + ' %'; }";
 
             Configuration.Options.Plugins.Tooltip.Callbacks.LabelJsFunction = func;
         }

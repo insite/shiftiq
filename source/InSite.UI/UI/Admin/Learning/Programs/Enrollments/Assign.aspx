@@ -7,6 +7,8 @@
 
     <insite:ValidationSummary runat="server" ValidationGroup="Assign" />
 
+    <insite:ValidationSummary runat="server" ValidationGroup="Search" />
+
     <asp:CustomValidator ID="EmployeeRequired" runat="server" Display="None" ValidationGroup="Assign" ErrorMessage="There are no learners selected." />
 
     <insite:Nav runat="server" ID="NavPanel">
@@ -26,6 +28,7 @@
                                     <label class="form-label">
                                         Department
                                         <insite:RequiredValidator runat="server" ControlToValidate="DepartmentIdentifier" FieldName="Department" ValidationGroup="Assign" />
+                                        <insite:RequiredValidator runat="server" ControlToValidate="DepartmentIdentifier" FieldName="Department" ValidationGroup="Search" />
                                     </label>
                                     <cmds:FindDepartment ID="DepartmentIdentifier" runat="server" />
                                 </div>
@@ -53,7 +56,7 @@
                                 </div>
 
                                 <div class="my-3">
-                                    <insite:FilterButton runat="server" ID="SearchButton" />
+                                    <insite:FilterButton runat="server" ID="SearchButton" ValidationGroup="Search" />
                                 </div>
 
                                 <div runat="server" id="LearnersPanel" visible="false" class="form-group mt-4 mb-3 pt-3 border-top">
@@ -166,6 +169,8 @@
                                 <dd class="col-sm-10">An achievement outside the program, already assigned to the learner, to be removed from their training plan</dd>
                                 <dt class="col-sm-2 text-end"><span class='badge bg-danger'><i class='fa-solid fa-trash-alt me-1'></i>Delete</span></dt>
                                 <dd class="col-sm-10">An achievement outside the program, already assigned to the learner, to be deleted from both their education and training plan</dd>
+                                <dt class="col-sm-2 text-end"><span class='badge bg-secondary'><i class='fa-solid fa-lock me-1'></i>No change</span></dt>
+                                <dd class="col-sm-10">An achievement outside the program that is still required or planned by another program the learner is enrolled in, so it will not be changed or deleted</dd>
                             </dl>
 
                             <div runat="server" id="DownloadAlert" class="alert alert-danger">
@@ -204,10 +209,10 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <insite:CheckBox runat="server" ID="IsPlanned" Checked='<%# Eval("IsPlanned") %>' RenderMode="Input" />
+                                        <insite:CheckBox runat="server" ID="IsPlanned" Checked='<%# Eval("IsPlanned") %>' Enabled='<%# (string)Eval("Action") != "Protected" %>' RenderMode="Input" />
                                     </td>
                                     <td class="text-center">
-                                        <insite:CheckBox runat="server" ID="IsRequired" Checked='<%# Eval("IsRequired") %>' RenderMode="Input" />
+                                        <insite:CheckBox runat="server" ID="IsRequired" Checked='<%# Eval("IsRequired") %>' Enabled='<%# (string)Eval("Action") != "Protected" %>' RenderMode="Input" />
                                     </td>
                                     <td class="text-center">
                                         <asp:Literal runat="server" Text='<%# Eval("LifetimeMonths") %>' />

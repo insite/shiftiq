@@ -17,16 +17,34 @@ using Shift.Toolbox;
 
 namespace InSite.Cmds.Actions.Reporting.Report
 {
-    using ReportDataSource = GroupTable<TrainingExpiryDates.CompanyGroupNode, DefaultGroupNode<DefaultGroupLeaf>, TrainingExpiryDates.CellData>;
+    using ReportDataSource = GroupTable<TrainingExpiryDates.CompanyGroupNode, TrainingExpiryDates.EmployeeGroupNode, TrainingExpiryDates.CellData>;
 
     public partial class TrainingExpiryDates : AdminBasePage, ICmdsUserControl
     {
         #region Constants
 
         private const string CloseUrl = "/ui/admin/reporting";
+
+        /// <summary>
+        /// The largest number of body cells we are willing to render into the on-screen pivot table. Tune from real
+        /// data: the Excel download has no such limit.
+        /// </summary>
+        /// <remarks>
+        /// The binding constraint is the browser, not the network. Every cell is a DOM node the device has to lay
+        /// out inside one table, and a phone runs out of memory long before it runs out of bandwidth. 250,000 cells
+        /// rendered but took mobile browsers down, which is the thing this limit exists to prevent.
+        /// </remarks>
+        private const int MaximumRenderedCells = 50000;
+
         private const string StatusValid = "Valid";
         private const string ColorExpired = "#ff6347";
         private const string ColorExpiringSoon = "#ffff99";
+
+        // The on-screen table colours cells by class; the Excel export needs the hex values above. Both are derived
+        // from the single decision in GetColor, so the two outputs cannot drift apart. The leading space is
+        // deliberate - these append to class="data-cell", matching how the even/odd row classes are written.
+        private const string ClassExpired = " expired";
+        private const string ClassExpiringSoon = " expiring";
 
         #endregion
 
@@ -44,6 +62,30 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public DateTime? CompletedSince { get; set; }
             public DateTime? CompletedBefore { get; set; }
             public bool ExcludeSelfDeclared { get; set; }
+            public string JobDivisionMode { get; set; }
+            public string JobDivision { get; set; }
+        }
+
+        internal class EmployeeGroupNode : GroupNode<DefaultGroupLeaf>, IComparable<EmployeeGroupNode>
+        {
+            public string Text { get; set; }
+
+            public string Email { get; set; }
+
+            public string JobDivision { get; set; }
+
+            public int CompareTo(EmployeeGroupNode other)
+            {
+                if (other == null)
+                    return 1;
+
+                // Learners can share a full name, so the email address breaks the tie and keeps their order stable.
+                var result = string.Compare(Text, other.Text, StringComparison.Ordinal);
+                if (result != 0)
+                    return result;
+
+                return string.Compare(Email, other.Email, StringComparison.Ordinal);
+            }
         }
 
         internal class CompanyGroupNode : GroupNode<DefaultGroupLeaf>, IComparable<CompanyGroupNode>
@@ -87,7 +129,11 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             public string Text { get; private set; }
 
+            /// <summary>Hex colour for the Excel export.</summary>
             public string Color { get; private set; }
+
+            /// <summary>Class suffix for the on-screen table, with its leading space.</summary>
+            public string CssClass { get; private set; }
 
             #endregion
 
@@ -97,6 +143,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             {
                 Text = GetText(row);
                 Color = GetColor(row);
+                CssClass = GetCssClass(Color);
             }
 
             #endregion
@@ -150,6 +197,17 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     return ColorExpiringSoon;
 
                 return null;
+            }
+
+            private static string GetCssClass(string color)
+            {
+                if (color == ColorExpired)
+                    return ClassExpired;
+
+                if (color == ColorExpiringSoon)
+                    return ClassExpiringSoon;
+
+                return string.Empty;
             }
 
             #endregion
@@ -234,7 +292,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             if (!isContent)
                 return;
 
-            var employeeGroup = (DefaultGroupNode<DefaultGroupLeaf>)e.Item.DataItem;
+            var employeeGroup = (EmployeeGroupNode)e.Item.DataItem;
             var departmentRepeater = (Repeater)e.Item.FindControl("DepartmentRepeater");
             departmentRepeater.DataSource = employeeGroup.Children;
             departmentRepeater.DataBind();
@@ -284,7 +342,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 CredentialStatus = Criteria.CredentialStatusFilter,
                 CompletedSince = Criteria.CompletedSinceFilter,
                 CompletedBefore = Criteria.CompletedBeforeFilter,
-                ExcludeSelfDeclared = Criteria.ExcludeSelfDeclared
+                ExcludeSelfDeclared = Criteria.ExcludeSelfDeclared,
+                JobDivisionMode = Criteria.JobDivisionMode,
+                JobDivision = Criteria.JobDivisionFilter
             };
 
             if (!Criteria.ValidateNarrowSelection(out var error))
@@ -321,6 +381,21 @@ namespace InSite.Cmds.Actions.Reporting.Report
             ReportTab.Visible = true;
             ReportTab.IsSelected = true;
 
+            // The on-screen report is a pivot: one column per achievement, one cell per achievement per
+            // employee-department row, all in a single table. Wide results render fine in Excel but take the browser
+            // down, so past the cap we show the tab for its download button and leave the table unbound.
+            var cellCount = CountRenderedCells(dataSource);
+
+            ReportTablePanel.Visible = cellCount <= MaximumRenderedCells;
+
+            if (!ReportTablePanel.Visible)
+            {
+                ScreenStatus.AddMessage(
+                    AlertType.Warning,
+                    $"This report is too large to display on screen ({cellCount:N0} cells). Download it as Excel, or narrow your selection and run it again.");
+                return;
+            }
+
             CompanyHeaderRepeater.DataSource = dataSource.Columns;
             CompanyHeaderRepeater.DataBind();
 
@@ -329,6 +404,18 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             EmployeeRepeater.DataSource = dataSource.Rows;
             EmployeeRepeater.DataBind();
+        }
+
+        /// <summary>
+        /// Counts the data cells the on-screen table would render: one per achievement column per
+        /// employee-department row, matching what CellRepeater binds.
+        /// </summary>
+        private static long CountRenderedCells(ReportDataSource dataSource)
+        {
+            long columnCount = dataSource.Columns.Sum(x => x.Children.Count);
+            long rowCount = dataSource.Rows.Sum(x => x.Children.Count);
+
+            return columnCount * rowCount;
         }
 
         private ReportDataSource GetReportDataSource()
@@ -346,7 +433,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 credentialStatus: CurrentParameters.CredentialStatus,
                 completedSince: CurrentParameters.CompletedSince,
                 completedBefore: CurrentParameters.CompletedBefore,
-                excludeSelfDeclared: CurrentParameters.ExcludeSelfDeclared);
+                excludeSelfDeclared: CurrentParameters.ExcludeSelfDeclared,
+                jobDivisionMode: CurrentParameters.JobDivisionMode,
+                jobDivision: CurrentParameters.JobDivision);
 
             var result = new ReportDataSource();
 
@@ -366,7 +455,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 // Row
 
                 var employeeGroup = result.Rows.GetOrAdd(
-                    () => new DefaultGroupNode<DefaultGroupLeaf> { Text = row.FullName },
+                    () => new EmployeeGroupNode { Text = row.FullName, Email = row.Email, JobDivision = row.JobDivision },
                     row.UserIdentifier);
                 var departmentGroup = employeeGroup.Children.GetOrAdd(
                     () => new DefaultGroupLeaf { Text = row.DepartmentName },
@@ -419,14 +508,20 @@ namespace InSite.Cmds.Actions.Reporting.Report
             const int AchievementHeaderRow = 1;
 
             sheet.Columns[0].Width = 25;
-            sheet.Columns[1].Width = 20;
+            sheet.Columns[1].Width = 30;
+            sheet.Columns[2].Width = 20;
+            sheet.Columns[3].Width = 20;
 
             var companyColIndex = 0;
+            sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
+            sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
             sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
             sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
 
             var achievementColIndex = 0;
             sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Employee" });
+            sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Email" });
+            sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Job Division" });
             sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Department" });
 
             foreach (var companyGroup in dataSource.Columns)
@@ -457,7 +552,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             const int FirstDataRow = 2;
             const int EmployeeColumn = 0;
-            const int DepartmentColumn = 1;
+            const int EmailColumn = 1;
+            const int JobDivisionColumn = 2;
+            const int DepartmentColumn = 3;
 
             var rowIndex = FirstDataRow;
             var columnLeaves = dataSource.Columns.SelectMany(x => x.Children).ToArray();
@@ -465,6 +562,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
             foreach (var employeeGroup in dataSource.Rows)
             {
                 sheet.Cells.Add(new XlsxCell(EmployeeColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.Text });
+                sheet.Cells.Add(new XlsxCell(EmailColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.Email });
+                sheet.Cells.Add(new XlsxCell(JobDivisionColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.JobDivision });
 
                 foreach (var departmentLeaf in employeeGroup.Children)
                 {

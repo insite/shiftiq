@@ -47,6 +47,7 @@ namespace InSite.Application.Attempts.Read
         public int? ActiveQuestionIndex { get; set; }
         public int? ActiveSectionIndex { get; set; }
         public string TabTimeLimit { get; set; }
+        public bool CriteriaAsSectionsEnabled { get; set; }
 
         public DateTimeOffset? AttemptGraded { get; set; }
         public DateTimeOffset? AttemptImported { get; set; }

@@ -76,6 +76,10 @@ namespace InSite.Persistence
                                                         ? DateTimeOffset.UtcNow
                                                         : distribution.Modified;
 
+                entity.Transferred = distribution.Transferred;
+                entity.TransferredFromUserIdentifier = distribution.TransferredFromUserIdentifier;
+                entity.TransferredByUserIdentifier = distribution.TransferredByUserIdentifier;
+
                 db.SaveChanges();
             }
         }

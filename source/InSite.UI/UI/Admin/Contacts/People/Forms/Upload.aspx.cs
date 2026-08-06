@@ -1130,15 +1130,13 @@ namespace InSite.Admin.Contacts.People.Forms
             if (GroupText.Text.IsEmpty())
                 return null;
 
-            var filter = new QGroupFilter
+            var group = ServiceLocator.GroupSearch.GetFirstGroup(new QGroupFilter
             {
                 OrganizationIdentifier = Organization.OrganizationIdentifier,
-                GroupName = GroupText.Text
-            };
-
-            var list = ServiceLocator.GroupSearch.GetGroups(filter);
-            if (list.Count > 0 && !StringHelper.Equals(list[0].GroupType, "Person"))
-                return list[0].GroupIdentifier;
+                GroupNameExact = GroupText.Text
+            });
+            if (group != null && !StringHelper.Equals(group.GroupType, "Person"))
+                return group.GroupIdentifier;
 
             var id = UniqueIdentifier.Create();
 

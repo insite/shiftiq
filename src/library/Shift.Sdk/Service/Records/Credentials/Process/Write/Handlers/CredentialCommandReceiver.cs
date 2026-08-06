@@ -26,6 +26,7 @@ namespace InSite.Application.Records.Write
 
             commander.Subscribe<DescribeCredential>(Handle);
             commander.Subscribe<GrantCredential>(Handle);
+            commander.Subscribe<SubmitCredential>(Handle);
             commander.Subscribe<ExpireCredential>(Handle);
             commander.Subscribe<RevokeCredential>(Handle);
             commander.Subscribe<SendCredentialNotification>(Handle);
@@ -141,6 +142,15 @@ namespace InSite.Application.Records.Write
             _repository.LockAndRun<CredentialAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 aggregate.GrantCredential(c.Granted, c.Description, c.Score, c.EmployerGroup, c.EmployerGroupStatus);
+                Commit(aggregate, c);
+            });
+        }
+
+        public void Handle(SubmitCredential c)
+        {
+            _repository.LockAndRun<CredentialAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.SubmitCredential(c.Submitted, c.Description);
                 Commit(aggregate, c);
             });
         }

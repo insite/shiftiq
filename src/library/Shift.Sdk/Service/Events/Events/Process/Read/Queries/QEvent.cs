@@ -28,6 +28,7 @@ namespace InSite.Application.Events.Read
         public Guid? MandatorySurveyFormIdentifier { get; set; }
         public Guid? WhenEventReminderRequestedNotifyLearnerMessageIdentifier { get; set; }
         public Guid? WhenEventReminderRequestedNotifyInstructorMessageIdentifier { get; set; }
+        public Guid? WhenEventCompletedNotifyLearnerMessageIdentifier { get; set; }
 
         public string EventBillingType { get; set; }
         public string EventClassCode { get; set; }
@@ -90,6 +91,7 @@ namespace InSite.Application.Events.Read
         public DateTimeOffset? RegistrationStart { get; set; }
         public DateTimeOffset? RegistrationLocked { get; set; }
         public DateTimeOffset? ReminderMessageSent { get; set; }
+        public DateTimeOffset? CompletedMessageSent { get; set; }
 
         public virtual VGroup VenueLocation { get; set; }
         public virtual VGroup VenueOffice { get; set; }

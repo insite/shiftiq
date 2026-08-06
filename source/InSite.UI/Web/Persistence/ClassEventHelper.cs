@@ -67,6 +67,7 @@ namespace InSite.Common.Web
 
             public Guid? ReminderLearnerMessageId { get; set; }
             public Guid? ReminderInstructorMessageId { get; set; }
+            public Guid? CompletedLearnerMessageId { get; set; }
 
             public ICollection<Seat> Seats { get; set; }
             public ICollection<RegistrationField> RegistrationFields { get; set; }
@@ -181,6 +182,9 @@ namespace InSite.Common.Web
                 WhenEventReminderRequestedNotifyInstructorMessageIdentifier = data.ReminderInstructorMessageId.HasValue && messageExists(data.ReminderInstructorMessageId.Value)
                     ? data.ReminderInstructorMessageId
                     : null,
+                WhenEventCompletedNotifyLearnerMessageIdentifier = data.CompletedLearnerMessageId.HasValue && messageExists(data.CompletedLearnerMessageId.Value)
+                    ? data.CompletedLearnerMessageId
+                    : null,
                 Seats = data.Seats.EmptyIfNull().Select(seat =>
                 {
                     var configuration = new SeatConfiguration();
@@ -268,6 +272,7 @@ namespace InSite.Common.Web
                 RegistrationStart = @event.RegistrationStart,
                 ReminderLearnerMessageId = @event.WhenEventReminderRequestedNotifyLearnerMessageIdentifier,
                 ReminderInstructorMessageId = @event.WhenEventReminderRequestedNotifyInstructorMessageIdentifier,
+                CompletedLearnerMessageId = @event.WhenEventCompletedNotifyLearnerMessageIdentifier,
                 PrivacyGroups = groupPermissions,
                 Seats = @event.Seats.EmptyIfNull().Select(seat =>
                 {

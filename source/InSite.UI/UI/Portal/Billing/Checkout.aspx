@@ -229,7 +229,6 @@
                             <insite:TextBox runat="server" ID="LastName" CssClass="form-control" MaxLength="40" />
                         </div>
 
-
                         <div class="mb-3">
                             <label class="form-label">
                                 Company
@@ -244,6 +243,10 @@
                                 <insite:RequiredValidator runat="server" FieldName="Email" ControlToValidate="Email" ValidationGroup="Checkout" />
                             </label>
                             <insite:TextBox runat="server" ID="Email" CssClass="form-control" TextMode="Email" MaxLength="254" />
+                        </div>
+
+                        <div runat="server" id="AssignToSkillsCheckTransferField" class="mb-3">
+                            <insite:CheckBox runat="server" ID="AssignToSkillsCheckTransfer" Text="Purchase for Distribution to Other Organizations" Checked="true" />
                         </div>
                     </div>
 

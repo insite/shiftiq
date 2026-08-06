@@ -10,7 +10,7 @@
 	<ItemGroup>
 		<None Include="..\..\..\source\InSite.Maintenance\Scripts\Upgrades\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Link>Metadata\Upgrades\Scripts\%(RecursiveDir)%(Filename)%(Extension)</Link>
+			<Link>Schemas\Upgrades\Scripts\%(RecursiveDir)%(Filename)%(Extension)</Link>
 		</None>
 	</ItemGroup>
 
@@ -57,7 +57,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Metadata\CreateDatabaseObjects.sql">
+	  <None Include="Schemas\CreateDatabaseObjects.sql">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

@@ -1,11 +1,15 @@
 <%@ Page Language="C#" CodeBehind="Delete.aspx.cs" Inherits="InSite.Admin.Assessments.Forms.Forms.Delete" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormInfo.ascx" TagName="FormDetails" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 <insite:PageHeadContent runat="server">
     <link href="/UI/Admin/Assessments/Outlines/Forms/Outline.css" rel="stylesheet" />
 </insite:PageHeadContent>
+
+<uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+<asp:Panel runat="server" ID="ContentPanel">
 
 <div id="desktop">
 
@@ -84,4 +88,7 @@
         </div>
     </div>
 </div>
+
+</asp:Panel>
+
 </asp:Content>

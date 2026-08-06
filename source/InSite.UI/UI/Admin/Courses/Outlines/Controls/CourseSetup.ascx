@@ -39,7 +39,7 @@
                                 <insite:TextBox runat="server" ID="CourseCode" MaxLength="30" />
                             </div>
                             <div class="form-text">
-                                An alphanumeric code used to identify the course in a catalog.
+                                An alphanumeric code used to identify the course in a catalogue.
                             </div>
                         </div>
         
@@ -382,18 +382,18 @@
                 <div class="card">
                     <div class="card-body">
 
-                        <h3>Catalog Settings</h3>
+                        <h3>Catalogue Settings</h3>
 
                         <div class="form-group mb-3">
                             <label class="form-label">
-                                Catalog
+                                Catalogue
                             </label>
                             <insite:CatalogComboBox runat="server" ID="CatalogIdentifier" AllowBlank="true" />
                         </div>
 
                         <div class="form-group mb-3">
                             <label class="form-label">
-                                Sequence in Catalog
+                                Sequence in Catalogue
                             </label>
                             <insite:NumericBox runat="server" ID="CatalogSequence" NumericMode="Integer" />
                         </div>

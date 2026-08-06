@@ -15,6 +15,15 @@ namespace InSite.Cmds.Admin.People.Forms
     {
 
         /// <summary>
+        /// OutboxWarning control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Alert OutboxWarning;
+
+        /// <summary>
         /// SendStatus control.
         /// </summary>
         /// <remarks>

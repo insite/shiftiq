@@ -67,6 +67,32 @@ namespace InSite.Persistence
                     query = query.Where(x => subQuery.Any(p => p.ObjectIdentifier == x.CourseIdentifier));
             }
 
+            if (filter.IsVisibleInCatalog == true)
+                query = query.Where(x => x.CatalogIdentifier != null && !x.CourseIsHidden && !x.Catalog.IsHidden);
+            else if (filter.IsVisibleInCatalog == false)
+                query = query.Where(x => x.CatalogIdentifier == null || x.CourseIsHidden || x.Catalog.IsHidden);
+
+            if (filter.IsRestricted.HasValue)
+            {
+                var restricted = context.TGroupPermissions.AsQueryable()
+                    .Select(p => p.ObjectIdentifier);
+
+                if (filter.IsRestricted.Value)
+                    query = query.Where(x => restricted.Contains(x.CourseIdentifier));
+                else
+                    query = query.Where(x => !restricted.Contains(x.CourseIdentifier));
+            }
+
+            var permissionGroups = filter.PermissionGroupIdentifiers;
+            if (permissionGroups != null && permissionGroups.Length > 0)
+            {
+                var permitted = context.TGroupPermissions.AsQueryable()
+                    .Where(p => permissionGroups.Contains(p.GroupIdentifier))
+                    .Select(p => p.ObjectIdentifier);
+
+                query = query.Where(x => permitted.Contains(x.CourseIdentifier));
+            }
+
             return query;
         }
 
@@ -125,6 +151,32 @@ namespace InSite.Persistence
 
                 if (hasPageFilter)
                     query = query.Where(x => subQuery.Any(p => p.ObjectIdentifier == x.CourseId));
+            }
+
+            if (filter.IsVisibleInCatalog == true)
+                query = query.Where(x => x.CatalogId != null && !x.CourseIsHidden && x.CatalogIsHidden == false);
+            else if (filter.IsVisibleInCatalog == false)
+                query = query.Where(x => x.CatalogId == null || x.CourseIsHidden || x.CatalogIsHidden == true);
+
+            if (filter.IsRestricted.HasValue)
+            {
+                var restricted = context.TGroupPermissions.AsQueryable()
+                    .Select(p => p.ObjectIdentifier);
+
+                if (filter.IsRestricted.Value)
+                    query = query.Where(x => restricted.Contains(x.CourseId));
+                else
+                    query = query.Where(x => !restricted.Contains(x.CourseId));
+            }
+
+            var permissionGroups = filter.PermissionGroupIdentifiers;
+            if (permissionGroups != null && permissionGroups.Length > 0)
+            {
+                var permitted = context.TGroupPermissions.AsQueryable()
+                    .Where(p => permissionGroups.Contains(p.GroupIdentifier))
+                    .Select(p => p.ObjectIdentifier);
+
+                query = query.Where(x => permitted.Contains(x.CourseId));
             }
 
             return query;

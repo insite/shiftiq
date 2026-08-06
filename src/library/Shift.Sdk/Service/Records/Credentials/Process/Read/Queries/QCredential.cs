@@ -46,7 +46,9 @@ namespace InSite.Application.Records.Read
         public DateTimeOffset? CredentialExpired { get; set; }
         public DateTimeOffset? CredentialGranted { get; set; }
         public DateTimeOffset? CredentialRevoked { get; set; }
+        public DateTimeOffset? CredentialSubmitted { get; set; }
         public DateTimeOffset? ExpirationFixedDate { get; set; }
+        public DateTimeOffset CredentialModified { get; set; }
 
         public string TransactionHash { get; set; }
         public string PublisherAddress { get; set; }

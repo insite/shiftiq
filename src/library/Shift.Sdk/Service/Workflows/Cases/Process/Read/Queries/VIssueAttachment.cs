@@ -9,6 +9,7 @@ namespace InSite.Application.Issues.Read
         public Guid OrganizationIdentifier { get; set; }
         public Guid TopicUserIdentifier { get; set; }
         public Guid FileIdentifier { get; set; }
+        public Guid AttachmentIdentifier { get; set; }
 
         public string FileName { get; set; }
         public string InputterUserName { get; set; }
@@ -20,5 +21,7 @@ namespace InSite.Application.Issues.Read
         public int IssueNumber { get; set; }
 
         public DateTimeOffset FileUploaded { get; set; }
+
+        public virtual VIssue Issue { get; set; }
     }
 }

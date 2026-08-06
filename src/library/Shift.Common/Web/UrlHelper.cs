@@ -59,6 +59,30 @@ namespace Shift.Common
 
         }
 
+        private static readonly string[] AbsoluteUrlSchemes = { "http://", "https://", "data:" };
+
+        /// <summary>
+        /// Returns true when the URL already carries its own host or scheme, and therefore must not
+        /// be prefixed with a partition or organization host.
+        /// </summary>
+        /// <remarks>
+        /// Fields such as the organization logo allow open text, so they contain a site-relative
+        /// path in some rows and a fully-qualified URL in others. Prefixing an address that is already
+        /// absolute produces garbage like this:
+        ///   https://dev-cmds.cmds.app/https://assets.cmds.app/img/logos/partners/orlen.png.
+        /// </remarks>
+        public static bool IsAbsoluteUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return false;
+
+            // A protocol-relative URL ("//host/path") is already host-qualified
+            if (url.StartsWith("//", StringComparison.Ordinal))
+                return true;
+
+            return StringHelper.StartsWithAny(url, AbsoluteUrlSchemes);
+        }
+
         public static string GetAbsoluteUrl(string domain, EnvironmentName environment, string relativeUrl, string organizationCode)
         {
             return GetAbsoluteUrl(domain, new EnvironmentModel(environment), relativeUrl, organizationCode);
@@ -68,6 +92,11 @@ namespace Shift.Common
         {
             if (string.IsNullOrEmpty(relativeUrl))
                 return null;
+
+            relativeUrl = relativeUrl.Trim();
+
+            if (IsAbsoluteUrl(relativeUrl))
+                return relativeUrl;
 
             var url = new StringBuilder();
             url.Append("https://");
@@ -93,6 +122,9 @@ namespace Shift.Common
                 return null;
 
             relativeUrl = relativeUrl.Trim();
+
+            if (IsAbsoluteUrl(relativeUrl))
+                return relativeUrl;
 
             if (relativeUrl.StartsWith("~", StringComparison.CurrentCulture))
                 relativeUrl = relativeUrl.Substring(2);

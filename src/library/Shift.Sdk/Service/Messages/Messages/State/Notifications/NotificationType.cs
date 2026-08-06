@@ -20,6 +20,7 @@
 
         ClassReminderLearner,
         ClassReminderInstructor,
+        ClassCompletedLearner,
 
         CourseCompleted,
         CourseStalled,

@@ -193,11 +193,11 @@ namespace Shift.Common
                 // enough time for an admin to login to Mailgun and cancel it. Therefore, consider it a delivered email
                 // message - when callbacks from Mailgun are not yet supported.
 
-                var cutoff = DateTimeOffset.Now.AddMinutes(_settings.MinutesBeforeCancellationIsDisallowed);
-
-                if (email.MailoutScheduled <= cutoff && !_settings.MailgunCallbackEnabled)
+                if (!_settings.MailgunCallbackEnabled)
                 {
-                    result = MailgunStatus.Deliver();
+                    var cutoff = DateTimeOffset.Now.AddMinutes(_settings.MinutesBeforeCancellationIsDisallowed);
+                    if (!email.MailoutScheduled.HasValue || email.MailoutScheduled.Value <= cutoff)
+                        result = MailgunStatus.Deliver();
                 }
             }
             else

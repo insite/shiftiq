@@ -9,8 +9,6 @@ namespace Shift.Contract
         QueryFilter Filter { get; set; }
 
         Guid? SubmittedBy { get; set; }
-        Guid? PersonId { get; set; }
-        Guid? UserId { get; set; }
 
         string PersonCode { get; set; }
         string UserEmail { get; set; }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Web;
-using System.Web.UI;
 
 using InSite.Application.Contacts.Read;
 using InSite.Application.Files.Read;
@@ -10,14 +6,9 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.Web.Helpers;
 
-using Shift.Common.File;
-using Shift.Common.Integration.ImageMagick;
-using Shift.Constant;
-using Shift.Toolbox;
-
 namespace InSite.UI.Layout.Common.Controls
 {
-    public partial class ProfilePictureUpload : UserControl
+    public partial class ProfilePictureUpload : BaseUserControl
     {
         public event EventHandler<ProfileUploadEventArgs> ProfileUploadCompleted;
 
@@ -114,12 +105,24 @@ namespace InSite.UI.Layout.Common.Controls
             var oldUrl = user.ImageUrl;
 
             var size = ProfilePictureHelper.MaxProfileImageSize;
+            var fileClaims = new FileClaim[0];
+            var securityGroupId = Organization.Toolkits.Contacts.ProfileSecurityGroupId;
+
+            if (securityGroupId.HasValue && ServiceLocator.GroupSearch.GroupExists(securityGroupId.Value))
+            {
+                fileClaims = new[]
+                {
+                    new FileClaim { ObjectType = FileClaimObjectType.Person, ObjectIdentifier = UserID.Value },
+                    new FileClaim { ObjectType = FileClaimObjectType.Group, ObjectIdentifier = securityGroupId.Value }
+                };
+            }
 
             var newUrl = ProfilePictureToUploadV2.AdjustImageSaveAndGetUrl(
                 UserID.Value,
                 FileObjectType.User,
                 size,
-                size);
+                size,
+                fileClaims);
 
             if (string.IsNullOrWhiteSpace(newUrl))
             {
@@ -135,7 +138,6 @@ namespace InSite.UI.Layout.Common.Controls
 
             return true;
         }
-
 
         private void UpdateUserProfileImage(string imgUrl)
         {

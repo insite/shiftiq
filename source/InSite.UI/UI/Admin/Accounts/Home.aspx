@@ -4,6 +4,8 @@
 
 <asp:Content ContentPlaceHolderID="BodyContent" runat="server">
 
+    <insite:Alert runat="server" ID="ScreenStatus" />
+
     <section class="pb-4 mb-md-2">
 
         <h2 class="h4 mb-3">Organizations</h2>
@@ -47,7 +49,8 @@
 
                 <div class="row mt-4">
                     <div class="col-lg-12">
-                        <asp:LinkButton runat="server" ID="ClearOrganizationCache"><i class="fas fa-undo me-1"></i>Clear Cache</asp:LinkButton>
+                        <asp:LinkButton runat="server" ID="ClearOrganizationCache" CssClass="me-3"><i class="fas fa-undo me-1"></i>Clear Cache</asp:LinkButton>
+                        <asp:LinkButton runat="server" ID="ResyncOrganizationsWithHub"><i class="fas fa-cloud-upload me-1"></i>Resync with Hub</asp:LinkButton>
                     </div>
                 </div>
 

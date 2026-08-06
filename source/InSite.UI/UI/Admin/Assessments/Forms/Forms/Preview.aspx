@@ -1,9 +1,13 @@
 <%@ Page Language="C#" CodeBehind="Preview.aspx.cs" Inherits="InSite.Admin.Assessments.Forms.Forms.Preview" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register TagPrefix="uc" TagName="PreviewSectionPanel" Src="~/UI/Admin/Assessments/Forms/Controls/PreviewSectionPanel.ascx" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:Alert runat="server" ID="ScreenStatus" />
 
@@ -36,6 +40,8 @@
             <insite:CloseButton runat="server" ID="CloseButton" />
         </div>
     </section>
+
+    </asp:Panel>
 
     <insite:PageHeadContent runat="server">
         <insite:ResourceLink runat="server" Type="Css" Url="/UI/Admin/assessments/questions/content/styles/preview.css" />

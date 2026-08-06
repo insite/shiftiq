@@ -60,6 +60,15 @@ public class PersonReader : IEntityReader
         }, cancellation);
     }
 
+    public Task<bool> ExistsAsync(IPersonCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+            return query.AnyAsync(cancellation);
+        }, cancellation);
+    }
+
     public async IAsyncEnumerable<PersonEntity> DownloadAsync(IPersonCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -83,7 +92,7 @@ public class PersonReader : IEntityReader
         }, cancellation);
     }
 
-    public Task<List<PersonMatch>> SearchAsync(IPersonCriteria criteria, CancellationToken cancellation = default)
+    public Task<PersonMatch[]> SearchAsync(IPersonCriteria criteria, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
@@ -128,11 +137,20 @@ public class PersonReader : IEntityReader
         if (!string.IsNullOrEmpty(criteria.EmailExact))
             query = query.Where(x => x.User!.Email == criteria.EmailExact);
 
+        if (!string.IsNullOrEmpty(criteria.EmailLike))
+            query = query.Where(x => x.User!.Email.Contains(criteria.EmailLike));
+
         if (criteria.EventRole != null)
             query = query.Where(x => x.User!.Events.Any(e => e.OrganizationIdentifier == x.OrganizationIdentifier && e.AttendeeRole == criteria.EventRole));
 
         if (!string.IsNullOrEmpty(criteria.FullName))
             query = query.Where(x => x.User!.FullName.Contains(criteria.FullName));
+
+        if (!string.IsNullOrEmpty(criteria.FirstNameExact))
+            query = query.Where(x => x.User!.FirstName == criteria.FirstNameExact);
+
+        if (!string.IsNullOrEmpty(criteria.LastNameExact))
+            query = query.Where(x => x.User!.LastName == criteria.LastNameExact);
 
         if (criteria.OrganizationId != null)
             query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId);
@@ -145,6 +163,12 @@ public class PersonReader : IEntityReader
 
         if (criteria.LastAuthenticatedSince.HasValue)
             query = query.Where(x => x.LastAuthenticated >= criteria.LastAuthenticatedSince);
+
+        if (criteria.LastChangeTimeSince.HasValue)
+            query = query.Where(x => criteria.LastChangeTimeSince.Value <= x.LastChangeTime);
+
+        if (criteria.LastChangeTimeBefore.HasValue)
+            query = query.Where(x => x.LastChangeTime < criteria.LastChangeTimeBefore.Value);
 
         if (criteria.IsApproved.HasValue)
         {
@@ -163,13 +187,13 @@ public class PersonReader : IEntityReader
         return await query(db);
     }
 
-    public static async Task<List<PersonMatch>> ToMatchesAsync(IQueryable<PersonEntity> queryable, CancellationToken cancellation = default)
+    public static async Task<PersonMatch[]> ToMatchesAsync(IQueryable<PersonEntity> queryable, CancellationToken cancellation = default)
     {
         var adapter = new PersonAdapter();
 
         var matches = await queryable
             .Select(entity => adapter.ToMatch(entity))
-            .ToListAsync(cancellation);
+            .ToArrayAsync(cancellation);
 
         return matches;
     }

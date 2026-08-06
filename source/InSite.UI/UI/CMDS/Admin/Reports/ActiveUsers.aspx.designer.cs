@@ -87,6 +87,15 @@ namespace InSite.Cmds.Actions.Reports
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ResultCount;
 
         /// <summary>
+        /// HelpSeparator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl HelpSeparator;
+
+        /// <summary>
         /// DepartmentsHelp control.
         /// </summary>
         /// <remarks>
@@ -94,6 +103,15 @@ namespace InSite.Cmds.Actions.Reports
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl DepartmentsHelp;
+
+        /// <summary>
+        /// ScreenStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Alert ScreenStatus;
 
         /// <summary>
         /// place control.

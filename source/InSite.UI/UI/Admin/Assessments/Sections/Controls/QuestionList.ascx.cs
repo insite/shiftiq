@@ -55,15 +55,12 @@ namespace InSite.Admin.Assessments.Sections.Controls
 
         #region Public methods
 
-        public void LoadData(Criterion sieve, List<Question> questions)
+        public void LoadData(Criterion criterion, List<Question> questions)
         {
-            LoadData(new Tuple<Criterion, List<Question>>[]
-            {
-                new Tuple<Criterion, List<Question>>(sieve, questions)
-            });
+            LoadData(new (Criterion, List<Question>)[] { (criterion, questions) });
         }
 
-        public void LoadData(IEnumerable<Tuple<Criterion, List<Question>>> sieves)
+        public void LoadData(IEnumerable<(Criterion, List<Question>)> sieves)
         {
             var sieveInfos = new List<CriterionInfo>();
 

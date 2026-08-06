@@ -183,6 +183,8 @@ namespace InSite.Domain.Organizations
             contacts.EnableOperatorGroup = e.Contacts.EnableOperatorGroup;
             contacts.EnableTraineeDepartment = e.Contacts.EnableTraineeDepartment;
             contacts.PortalSearchRequiresReferral = e.Contacts.PortalSearchRequiresReferral;
+            contacts.ProfileSecurityGroupId = e.Contacts.ProfileSecurityGroupId;
+            contacts.DisplayIntegrationPortalLink = e.Contacts.DisplayIntegrationPortalLink;
         }
 
         public void When(OrganizationCreated e)
@@ -283,6 +285,7 @@ namespace InSite.Domain.Organizations
             issues.DefaultAdministratorUploadFileView = e.Issues.DefaultAdministratorUploadFileView;
             issues.PortalUploadClaimGroups = e.Issues.PortalUploadClaimGroups.EmptyIfNull().Select(x => x).ToArray();
             issues.NewAttachmentUpload = e.Issues.NewAttachmentUpload;
+            issues.CaseDocumentCopy = e.Issues.CaseDocumentCopy;
         }
 
         public void When(OrganizationLocalizationModified e)
@@ -307,6 +310,8 @@ namespace InSite.Domain.Organizations
             location.Mobile = e.Location.Mobile.NullIfEmpty();
             location.Fax = e.Location.Fax.NullIfEmpty();
             location.Email = e.Location.Email.NullIfEmpty();
+            location.TaxNumberLabel = e.Location.TaxNumberLabel.NullIfEmpty();
+            location.TaxNumberValue = e.Location.TaxNumberValue.NullIfEmpty();
         }
 
         public void When(OrganizationNCSHASettingsModified e)
@@ -368,6 +373,7 @@ namespace InSite.Domain.Organizations
             settings.ProductCustomerGroup = e.Settings.ProductCustomerGroup;
             settings.ManagerGroup = e.Settings.ManagerGroup;
             settings.LearnerGroup = e.Settings.LearnerGroup;
+            settings.TransferGroup = e.Settings.TransferGroup;
         }
 
         public void When(OrganizationSecretModified e)

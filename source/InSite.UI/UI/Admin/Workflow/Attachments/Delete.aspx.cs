@@ -74,7 +74,16 @@ namespace InSite.Admin.Issues.Attachments.Forms
             }
 
             if (file != null)
-                ServiceLocator.StorageService.Delete(file.FileIdentifier);
+            {
+                var isFileAttached = ServiceLocator.IssueSearch.ExistsAttachment(new QIssueAttachmentFilter
+                {
+                    OrganizationIdentifier = Organization.Identifier,
+                    FilterIdentifier = file.FileIdentifier
+                });
+
+                if (!isFileAttached)
+                    ServiceLocator.StorageService.Delete(file.FileIdentifier);
+            }
 
             RedirectToOutline();
         }

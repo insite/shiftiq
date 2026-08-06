@@ -11,7 +11,6 @@
         public string UniqueName { get; set; }
 
         public bool? ForeignColumnRequired { get; set; }
-        public bool IsEnforced { get; set; }
 
         public int ForeignSchemaId { get; set; }
         public int ForeignTableId { get; set; }

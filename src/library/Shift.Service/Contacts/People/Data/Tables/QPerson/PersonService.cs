@@ -22,7 +22,7 @@ public class PersonService : IEntityService
         return await _reader.AssertAsync(person, organization, cancellation);
     }
 
-    public async Task<IEnumerable<PersonModel>> CollectAsync(IPersonCriteria criteria, CancellationToken cancellation = default)
+    public async Task<PersonModel[]> CollectAsync(IPersonCriteria criteria, CancellationToken cancellation = default)
     {
         var entities = await _reader.CollectAsync(criteria, cancellation);
 
@@ -73,7 +73,7 @@ public class PersonService : IEntityService
         return entity != null ? _adapter.ToModel(entity) : null;
     }
 
-    public async Task<IEnumerable<PersonMatch>> SearchAsync(IPersonCriteria criteria, CancellationToken cancellation = default)
+    public async Task<PersonMatch[]> SearchAsync(IPersonCriteria criteria, CancellationToken cancellation = default)
     {
         return await _reader.SearchAsync(criteria, cancellation);
     }

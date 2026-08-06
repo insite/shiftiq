@@ -13,16 +13,16 @@
 
         <div class="col-lg-6">                                   
                 
-            <h2 class="h4 mb-3">Catalog</h2>
-                
+            <h2 class="h4 mb-3">Catalogue</h2>
+
             <dl class="row">
-                <dt class="col-sm-3">Catalog Name:</dt>
+                <dt class="col-sm-3">Catalogue Name:</dt>
                 <dd class="col-sm-9"><asp:Literal runat="server" ID="CatalogName" /></dd>
             </dl>
 
             <div runat="server" id="ConfirmMessage" class="alert alert-danger mt-4" role="alert">
                 <i class="fas fa-stop-circle"></i> <strong>Confirm:</strong>
-                Are you sure you want to delete this catalog?	
+                Are you sure you want to delete this catalogue?
             </div>	
 
             <div>
@@ -47,7 +47,7 @@
             <table class="table table-striped table-bordered table-metrics" style="width: 100%;">
                 <tr>
                     <td>
-                        Catalogs
+                        Catalogues
                     </td>
                     <td>
                         1

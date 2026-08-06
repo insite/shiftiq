@@ -24,8 +24,6 @@ export default function WorkshopProblems() {
         );
     }
 
-    console.log("formId", formId);//\\
-
     const returnUrl = urlHelper.getInSiteReturnUrl("tab=problems");
 
     return (

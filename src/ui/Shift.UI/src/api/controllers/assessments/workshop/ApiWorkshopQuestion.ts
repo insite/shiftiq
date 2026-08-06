@@ -51,8 +51,9 @@ export interface ApiWorkshopQuestion {
     };
 
     Source: {
+        BankId: string;
         QuestionId: string;
-        QuestionAssetNumber: number;
+        QuestionAssetNumber: string;
     } | null | undefined;
 
     Forms: {

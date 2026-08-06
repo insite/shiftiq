@@ -203,9 +203,15 @@
                                                         <insite:UpdatePanel runat="server" ID="ContentSurveyUpdatePanel">
                                                             <ContentTemplate>
                                                                 <div class="form-group mb-3">
+                                                                    <div class="float-end">
+                                                                        <insite:IconLink Name="pencil" runat="server" ID="EditMandatorySurveyFormLink" ToolTip="Open Form Outline" Visible="false" />
+                                                                    </div>
                                                                     <asp:Label runat="server" AssociatedControlID="MandatorySurveyFormIdentifier" Text="Mandatory Form Submission" CssClass="form-label" />
                                                                     <div>
                                                                         <insite:FindWorkflowForm runat="server" ID="MandatorySurveyFormIdentifier" />
+                                                                    </div>
+                                                                    <div class="mt-1">
+                                                                        <asp:Literal runat="server" ID="MandatorySurveyFormStatus" />
                                                                     </div>
                                                                     <div class="form-text">
                                                                         If a mandatory form is added, users must submit a submission before proceeding with their registration.

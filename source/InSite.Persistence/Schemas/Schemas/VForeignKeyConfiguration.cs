@@ -4,7 +4,7 @@ namespace InSite.Persistence
 {
     public class VForeignKeyConfiguration : EntityTypeConfiguration<VForeignKey>
     {
-        public VForeignKeyConfiguration() : this("databases") { }
+        public VForeignKeyConfiguration() : this("schemas") { }
 
         public VForeignKeyConfiguration(string schema)
         {
@@ -17,7 +17,6 @@ namespace InSite.Persistence
             Property(x => x.ForeignSchemaName).IsRequired().IsUnicode(true).HasMaxLength(128);
             Property(x => x.ForeignTableId).IsRequired();
             Property(x => x.ForeignTableName).IsRequired().IsUnicode(true).HasMaxLength(128);
-            Property(x => x.IsEnforced).IsOptional();
             Property(x => x.PrimaryColumnName).IsRequired().IsUnicode(true).HasMaxLength(138);
             Property(x => x.PrimarySchemaId).IsRequired();
             Property(x => x.PrimarySchemaName).IsOptional().IsUnicode(true).HasMaxLength(128);

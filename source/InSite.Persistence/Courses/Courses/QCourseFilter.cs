@@ -17,9 +17,13 @@ namespace InSite.Persistence
         public int? CourseAsset { get; set; }
         public bool? HasGradebook { get; set; }
         public bool? HasWebPage { get; set; }
+        public bool? IsVisibleInCatalog { get; set; }
+        public bool? IsRestricted { get; set; }
 
         public DateTimeOffset? WebPageAuthoredSince { get; set; }
         public DateTimeOffset? WebPageAuthoredBefore { get; set; }
+
+        public Guid[] PermissionGroupIdentifiers { get; set; }
 
         public Guid? AlwaysIncludeCourseIdentifier { get; set; }
 

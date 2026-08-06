@@ -72,8 +72,6 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
             LockButton.Click += (s, a) => LockUnlock(true);
             UnlockButton.Click += (s, a) => LockUnlock(false);
             CopyButton.Click += CopyButton_Click;
-            MoveButton.Click += MoveButton_Click;
-            ConfirmMoveButton.Click += ConfirmMoveButton_Click;
             SaveButton.Click += SaveButton_Click;
             DeleteButton.Click += DeleteButton_Click;
         }
@@ -199,21 +197,6 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
             HttpResponseHelper.Redirect(editUrl);
         }
 
-        private void MoveButton_Click(object sender, EventArgs e)
-        {
-            ProfileOwnerHeading.InnerText = "Move Profile";
-            ProfileOwnership.SwitchToMoveMode();
-            ProfileOwnerConfirm.Visible = true;
-        }
-
-        private void ConfirmMoveButton_Click(object sender, EventArgs e)
-        {
-            var id = Copy();
-
-            if (Delete())
-                HttpResponseHelper.Redirect($"{SelfUrl}?id={id}");
-        }
-
         #endregion
 
         #region Load & Save
@@ -227,7 +210,7 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
             PageHelper.AutoBindHeader(
                 this,
                 new BreadcrumbItem("Add New Profile", CreateUrl, null, null),
-                "#" + info.Code);
+                info.Code);
 
             if (IsLocked)
                 ScreenStatus.AddMessage(AlertType.Information, "Changes to this profile cannot be made because it is currently locked.");
@@ -237,7 +220,32 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
             var competencyCount = CompetencyList.LoadData(info);
             CompetencyTab.SetTitle("Competencies", competencyCount);
 
+            LoadDivergenceAlert();
+
             LoadPersons();
+        }
+
+        private void LoadDivergenceAlert()
+        {
+            var variance = ProfileRepository.GetCompetencyVariance(StandardIdentifier);
+
+            if (variance.Missing == 0 && variance.Extra == 0)
+            {
+                DivergenceAlert.Visible = false;
+                return;
+            }
+
+            var parts = new List<string>();
+
+            if (variance.Missing > 0)
+                parts.Add($"{variance.Missing} parent profile {(variance.Missing == 1 ? "competency is" : "competencies are")} missing from this profile");
+
+            if (variance.Extra > 0)
+                parts.Add($"{variance.Extra} {(variance.Extra == 1 ? "competency is" : "competencies are")} not in the parent profile");
+
+            DivergenceAlertText.Text = string.Join("; ", parts)
+                + $". <a href=\"/ui/cmds/admin/standards/profiles/compare?id={StandardIdentifier}\" class=\"alert-link\">Fix it</a>";
+            DivergenceAlert.Visible = true;
         }
 
         private void LoadPersons()

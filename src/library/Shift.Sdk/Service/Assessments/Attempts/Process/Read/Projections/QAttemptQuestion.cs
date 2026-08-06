@@ -31,6 +31,7 @@ namespace InSite.Application.Attempts.Read
         public decimal? AnswerPoints { get; set; }
         public decimal? QuestionCutScore { get; set; }
         public decimal? QuestionPoints { get; set; }
+        public int? ResponseDuration { get; set; }
         public int? PinLimit { get; set; }
         public string HotspotImage { get; set; }
         public bool? ShowShapes { get; set; }

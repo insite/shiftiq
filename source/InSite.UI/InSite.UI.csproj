@@ -404,6 +404,13 @@
     <Compile Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationPlatform.ascx.designer.cs">
       <DependentUpon>DetailConfigurationPlatform.ascx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationLocationTaxNumber.ascx.cs">
+      <DependentUpon>DetailConfigurationLocationTaxNumber.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationLocationTaxNumber.ascx.designer.cs">
+      <DependentUpon>DetailConfigurationLocationTaxNumber.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationUpload.ascx.cs">
       <DependentUpon>DetailConfigurationUpload.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -635,6 +642,13 @@
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\TakerReport\PersonRow.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\TakerReport\TakerReportReader.cs" />
     <Compile Include="UI\Admin\Assessments\Attempts\Utilities\TakerReport\TakerReportUploader.cs" />
+    <Compile Include="UI\Admin\Assessments\Criteria\Forms\Content.aspx.cs">
+      <DependentUpon>Content.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Assessments\Criteria\Forms\Content.aspx.designer.cs">
+      <DependentUpon>Content.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Assessments\Fields\Forms\Pin.aspx.cs">
       <DependentUpon>Pin.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -816,6 +830,13 @@
     <Compile Include="UI\Admin\Assessments\Quizzes\Search.aspx.designer.cs">
       <DependentUpon>Search.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Admin\Assessments\Sections\Controls\TabConfigurationDetails.ascx.cs">
+      <DependentUpon>TabConfigurationDetails.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Assessments\Sections\Controls\TabConfigurationDetails.ascx.designer.cs">
+      <DependentUpon>TabConfigurationDetails.ascx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Assessments\Sections\Forms\Reconfigure.aspx.cs">
       <DependentUpon>Reconfigure.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -987,32 +1008,11 @@
     <Compile Include="UI\Admin\Courses\Resources\Controls\EditDetailContent.ascx.designer.cs">
       <DependentUpon>EditDetailContent.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Entities\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Entities\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Entities\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Entities\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Entities\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Entities\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Database\DatabaseObjectCounters.ascx.cs">
+    <Compile Include="UI\Admin\Schemas\DatabaseObjectCounters.ascx.cs">
       <DependentUpon>DatabaseObjectCounters.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\DatabaseObjectCounters.ascx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\DatabaseObjectCounters.ascx.designer.cs">
       <DependentUpon>DatabaseObjectCounters.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Events\Classes\ChangePrivacy.aspx.cs">
@@ -1530,6 +1530,42 @@
     <Compile Include="UI\Admin\Reports\Changes\Models\ReaderHelper.cs" />
     <Compile Include="UI\Admin\Reports\Changes\Models\UserChangeReader.cs" />
     <Compile Include="UI\Admin\Reports\Changes\Models\EmployerGroupParser.cs" />
+    <Compile Include="UI\Admin\Reports\Controls\ProgramEnrollmentsCriteria.ascx.cs">
+      <DependentUpon>ProgramEnrollmentsCriteria.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\Controls\ProgramEnrollmentsCriteria.ascx.designer.cs">
+      <DependentUpon>ProgramEnrollmentsCriteria.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\Dashboards\Controls\DashboardChart.ascx.cs">
+      <DependentUpon>DashboardChart.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\Dashboards\Controls\DashboardChart.ascx.designer.cs">
+      <DependentUpon>DashboardChart.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\Dashboards\Utilities\DashboardBuilder.cs" />
+    <Compile Include="UI\Admin\Reports\ProgramEnrollments.aspx.cs">
+      <DependentUpon>ProgramEnrollments.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\ProgramEnrollments.aspx.designer.cs">
+      <DependentUpon>ProgramEnrollments.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\Controls\ProgramAchievementsCriteria.ascx.cs">
+      <DependentUpon>ProgramAchievementsCriteria.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\Controls\ProgramAchievementsCriteria.ascx.designer.cs">
+      <DependentUpon>ProgramAchievementsCriteria.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\ProgramAchievements.aspx.cs">
+      <DependentUpon>ProgramAchievements.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Reports\ProgramAchievements.aspx.designer.cs">
+      <DependentUpon>ProgramAchievements.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Admin\Reports\Utilities\Database.cs" />
     <Compile Include="UI\Admin\Sales\Orders\Controls\SearchCriteria.ascx.cs">
       <DependentUpon>SearchCriteria.ascx</DependentUpon>
@@ -2044,6 +2080,7 @@
       <DependentUpon>Launch.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\MenuHelperFactory.cs" />
+    <Compile Include="UI\Portal\Assessments\Attempts\Utilities\AttemptQuestionBuilder.cs" />
     <Compile Include="UI\Portal\Billing\Cart.aspx.cs">
       <DependentUpon>Cart.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2516,6 +2553,7 @@
     <Compile Include="UI\Portal\Records\Credentials\Learners\Delete.aspx.designer.cs">
       <DependentUpon>Delete.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Portal\Records\Credentials\Utilities\CertificateHelper.cs" />
     <Compile Include="UI\Portal\Records\Logbooks\Controls\ExperienceFields\Media.ascx.cs">
       <DependentUpon>Media.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3276,11 +3314,11 @@
     <Compile Include="UI\Admin\Courses\Reports\Controls\RecentList.ascx.designer.cs">
       <DependentUpon>RecentList.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Outline.aspx.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Outline.aspx.cs">
       <DependentUpon>Outline.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Outline.aspx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Outline.aspx.designer.cs">
       <DependentUpon>Outline.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Events\Appointments\Controls\AppointmentInfo.ascx.cs">
@@ -4022,7 +4060,6 @@
     <Compile Include="UI\Admin\Reports\Dashboards\Controls\CommentCaseGrid.ascx.designer.cs">
       <DependentUpon>CommentCaseGrid.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Reports\Dashboards\Controls\DashboardBuilder.cs" />
     <Compile Include="UI\Admin\Reports\Dashboards\Home.aspx.cs">
       <DependentUpon>Home.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -4051,25 +4088,18 @@
     <Compile Include="UI\Admin\Workflow\Cases\Reports.aspx.designer.cs">
       <DependentUpon>Reports.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Search.aspx.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Search.aspx.cs">
       <DependentUpon>Search.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Search.aspx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Search.aspx.designer.cs">
       <DependentUpon>Search.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Search.aspx.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Search.aspx.designer.cs">
-      <DependentUpon>Search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Tables\Search.aspx.cs">
+    <Compile Include="UI\Admin\Schemas\Tables\Search.aspx.cs">
       <DependentUpon>Search.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Tables\Search.aspx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Tables\Search.aspx.designer.cs">
       <DependentUpon>Search.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Reporting\LoginHistory.aspx.cs">
@@ -6308,6 +6338,7 @@
     <Content Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationLocationAddress.ascx" />
     <Content Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationLocationDescription.ascx" />
     <Content Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationPlatform.ascx" />
+    <Content Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationLocationTaxNumber.ascx" />
     <Content Include="UI\Admin\Accounts\Organizations\Controls\DetailConfigurationUpload.ascx" />
     <Content Include="UI\Admin\Accounts\Organizations\Controls\DetailOrganization.ascx" />
     <Content Include="UI\Admin\Accounts\Permissions\Controls\Detail.ascx" />
@@ -6390,6 +6421,7 @@
     <Content Include="UI\Admin\Assessments\BanksComments\Search.aspx" />
     <Content Include="UI\Admin\Assessments\Banks\Controls\BankDetail.ascx" />
     <Content Include="UI\Admin\Assessments\Banks\Search.aspx" />
+    <Content Include="UI\Admin\Assessments\Criteria\Forms\Content.aspx" />
     <Content Include="UI\Admin\Assessments\Fields\Forms\Pin.aspx" />
     <Content Include="UI\Admin\Assessments\Forms\ChangeGradebook.aspx" />
     <Content Include="UI\Admin\Assessments\Forms\Controls\PreviewSectionPanel.ascx" />
@@ -6433,6 +6465,7 @@
     <Content Include="UI\Admin\Assessments\Quizzes\Delete.aspx" />
     <Content Include="UI\Admin\Assessments\Quizzes\Edit.aspx" />
     <Content Include="UI\Admin\Assessments\Quizzes\Search.aspx" />
+    <Content Include="UI\Admin\Assessments\Sections\Controls\TabConfigurationDetails.ascx" />
     <Content Include="UI\Admin\Assessments\Sections\Forms\Reconfigure.aspx" />
     <Content Include="UI\Admin\Assessments\Sets\Samples\LxrMerge.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -6551,10 +6584,7 @@
     <Content Include="UI\Admin\Courses\Outlines\Controls\PrerequisiteList.ascx" />
     <Content Include="UI\Admin\Contacts\Reports\Envelopes\MailingListLabels.aspx" />
     <Content Include="UI\Admin\Courses\Resources\Controls\EditDetailContent.ascx" />
-    <Content Include="UI\Admin\Database\Entities\Search.aspx" />
-    <Content Include="UI\Admin\Database\Entities\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Database\Entities\SearchResults.ascx" />
-    <Content Include="UI\Admin\Database\DatabaseObjectCounters.ascx" />
+    <Content Include="UI\Admin\Schemas\DatabaseObjectCounters.ascx" />
     <Content Include="UI\Admin\Events\Classes\ChangePrivacy.aspx" />
     <Content Include="UI\Admin\Events\Classes\Controls\ClassAssessmentList.ascx" />
     <Content Include="UI\Admin\Events\Classes\Controls\ClassNotificationTab.ascx" />
@@ -6628,6 +6658,11 @@
     <Content Include="UI\Admin\Reporting\Controls\DashboardUsers.ascx" />
     <Content Include="UI\Admin\Reporting\Home.aspx" />
     <Content Include="UI\Admin\Reporting\CurrentUserSessions.aspx" />
+    <Content Include="UI\Admin\Reports\Controls\ProgramEnrollmentsCriteria.ascx" />
+    <Content Include="UI\Admin\Reports\Dashboards\Controls\DashboardChart.ascx" />
+    <Content Include="UI\Admin\Reports\ProgramEnrollments.aspx" />
+    <Content Include="UI\Admin\Reports\Controls\ProgramAchievementsCriteria.ascx" />
+    <Content Include="UI\Admin\Reports\ProgramAchievements.aspx" />
     <Content Include="UI\Admin\Sales\Orders\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Sales\Orders\Controls\SearchResults.ascx" />
     <Content Include="UI\Admin\Sales\Orders\Search.aspx" />
@@ -6668,7 +6703,7 @@
     <Content Include="UI\Admin\Courses\Outlines\Controls\PrivacySettings.ascx" />
     <Content Include="UI\Admin\Courses\Links\Search.aspx" />
     <Content Include="UI\Admin\Courses\Search.aspx" />
-    <Content Include="UI\Admin\Database\Columns\Outline.aspx" />
+    <Content Include="UI\Admin\Schemas\Columns\Outline.aspx" />
     <Content Include="UI\Admin\Events\Appointments\Controls\AppointmentInfo.ascx" />
     <Content Include="UI\Admin\Events\Appointments\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Events\Appointments\Controls\SearchDownload.ascx" />
@@ -6793,9 +6828,8 @@
     <Content Include="UI\Admin\Reports\Delete.aspx" />
     <Content Include="UI\Admin\Reports\Impersonations\Search.aspx" />
     <Content Include="UI\Admin\Workflow\Cases\Reports.aspx" />
-    <Content Include="UI\Admin\Database\Columns\Search.aspx" />
-    <Content Include="UI\Admin\Database\Constraints\Search.aspx" />
-    <Content Include="UI\Admin\Database\Tables\Search.aspx" />
+    <Content Include="UI\Admin\Schemas\Columns\Search.aspx" />
+    <Content Include="UI\Admin\Schemas\Tables\Search.aspx" />
     <Content Include="UI\Admin\Reporting\LoginHistory.aspx" />
     <Content Include="UI\Admin\Reports\Queries\Search.aspx" />
     <Content Include="UI\Admin\Sales\Discounts\Search.aspx" />
@@ -7064,6 +7098,7 @@
     <Content Include="UI\Admin\Assessments\Forms\Controls\FormContent.ascx" />
     <Content Include="UI\Admin\Assessments\Forms\Controls\FormDetails.ascx" />
     <Content Include="UI\Admin\Assessments\Forms\Controls\FormNameField.ascx" />
+    <Content Include="UI\Admin\Assessments\Forms\Controls\FormPageAlert.ascx" />
     <Content Include="UI\Admin\Assessments\Forms\Controls\FormPopupSelector.ascx" />
     <Content Include="UI\Admin\Assessments\Forms\Controls\FormPopupSelectorWindow.ascx" />
     <Content Include="UI\Admin\Assessments\Forms\Controls\SearchCriteria.ascx" />
@@ -7462,6 +7497,7 @@
     <Content Include="UI\Layout\Common\Styles\skills.min.css">
       <DependentUpon>skills.css</DependentUpon>
     </Content>
+    <Content Include="UI\Layout\Portal\Images\CardPlaceholder.png" />
     <Content Include="UI\Layout\Portal\Images\Default-cmds.png" />
     <Content Include="UI\Layout\Portal\Images\Default-shift.png" />
     <Content Include="UI\Layout\Portal\Images\Default-skills.png" />
@@ -8946,21 +8982,17 @@
     <Content Include="UI\Admin\Assets\Collections\Forms\CreateItem.aspx" />
     <Content Include="UI\Admin\Assets\Collections\Forms\Edit.aspx" />
     <Content Include="UI\Admin\Assets\Collections\Forms\EditItem.aspx" />
-    <Content Include="UI\Admin\Database\Columns\Controls\ColumnGrid.ascx" />
-    <Content Include="UI\Admin\Database\Columns\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Database\Columns\Controls\SearchResults.ascx" />
-    <Content Include="UI\Admin\Database\Constraints\Controls\ConstraintGrid.ascx" />
-    <Content Include="UI\Admin\Database\Constraints\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Database\Constraints\Controls\SearchResults.ascx" />
-    <Content Include="UI\Admin\Database\Constraints\Outline.aspx" />
+    <Content Include="UI\Admin\Schemas\Columns\Controls\ColumnGrid.ascx" />
+    <Content Include="UI\Admin\Schemas\Columns\Controls\SearchCriteria.ascx" />
+    <Content Include="UI\Admin\Schemas\Columns\Controls\SearchResults.ascx" />
     <Content Include="UI\Admin\Assets\Labels\Controls\Detail.ascx" />
     <Content Include="UI\Admin\Assets\Labels\Controls\SearchCriteria.ascx" />
     <Content Include="UI\Admin\Assets\Labels\Controls\SearchResults.ascx" />
     <Content Include="UI\Admin\Assets\Labels\Create.aspx" />
     <Content Include="UI\Admin\Assets\Labels\Edit.aspx" />
-    <Content Include="UI\Admin\Database\Tables\Controls\SearchCriteria.ascx" />
-    <Content Include="UI\Admin\Database\Tables\Controls\SearchResults.ascx" />
-    <Content Include="UI\Admin\Database\Tables\Outline.aspx" />
+    <Content Include="UI\Admin\Schemas\Tables\Controls\SearchCriteria.ascx" />
+    <Content Include="UI\Admin\Schemas\Tables\Controls\SearchResults.ascx" />
+    <Content Include="UI\Admin\Schemas\Tables\Outline.aspx" />
     <Content Include="UI\Admin\Assessments\Attempts\Content\Upload-Attempt.txt" />
     <Content Include="UI\Lobby\Models\Agreement-en.md" />
     <Content Include="UI\Lobby\Models\Agreement-fr.md" />
@@ -10653,6 +10685,13 @@
     </Compile>
     <Compile Include="UI\Admin\Assessments\Forms\Controls\FormPopupSelector.ascx.designer.cs">
       <DependentUpon>FormPopupSelector.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Admin\Assessments\Forms\Controls\FormPageAlert.ascx.cs">
+      <DependentUpon>FormPageAlert.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Admin\Assessments\Forms\Controls\FormPageAlert.ascx.designer.cs">
+      <DependentUpon>FormPageAlert.ascx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Assessments\Forms\Controls\FormPopupSelectorWindow.ascx.cs">
       <DependentUpon>FormPopupSelectorWindow.ascx</DependentUpon>
@@ -14592,54 +14631,26 @@
     <Compile Include="UI\Admin\Assets\Collections\Forms\EditItem.aspx.designer.cs">
       <DependentUpon>EditItem.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Controls\ColumnGrid.ascx.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Controls\ColumnGrid.ascx.cs">
       <DependentUpon>ColumnGrid.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Controls\ColumnGrid.ascx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Controls\ColumnGrid.ascx.designer.cs">
       <DependentUpon>ColumnGrid.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Controls\SearchCriteria.ascx.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Controls\SearchCriteria.ascx.cs">
       <DependentUpon>SearchCriteria.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Controls\SearchCriteria.ascx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Controls\SearchCriteria.ascx.designer.cs">
       <DependentUpon>SearchCriteria.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Controls\SearchResults.ascx.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Controls\SearchResults.ascx.cs">
       <DependentUpon>SearchResults.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Columns\Controls\SearchResults.ascx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Columns\Controls\SearchResults.ascx.designer.cs">
       <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Controls\ConstraintGrid.ascx.cs">
-      <DependentUpon>ConstraintGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Controls\ConstraintGrid.ascx.designer.cs">
-      <DependentUpon>ConstraintGrid.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Controls\SearchCriteria.ascx.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Controls\SearchCriteria.ascx.designer.cs">
-      <DependentUpon>SearchCriteria.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Controls\SearchResults.ascx.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Controls\SearchResults.ascx.designer.cs">
-      <DependentUpon>SearchResults.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Outline.aspx.cs">
-      <DependentUpon>Outline.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UI\Admin\Database\Constraints\Outline.aspx.designer.cs">
-      <DependentUpon>Outline.aspx</DependentUpon>
     </Compile>
     <Compile Include="UI\Admin\Assets\Labels\Controls\Detail.ascx.cs">
       <DependentUpon>Detail.ascx</DependentUpon>
@@ -14676,25 +14687,25 @@
     <Compile Include="UI\Admin\Assets\Labels\Edit.aspx.designer.cs">
       <DependentUpon>Edit.aspx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Tables\Controls\SearchCriteria.ascx.cs">
+    <Compile Include="UI\Admin\Schemas\Tables\Controls\SearchCriteria.ascx.cs">
       <DependentUpon>SearchCriteria.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Tables\Controls\SearchCriteria.ascx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Tables\Controls\SearchCriteria.ascx.designer.cs">
       <DependentUpon>SearchCriteria.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Tables\Controls\SearchResults.ascx.cs">
+    <Compile Include="UI\Admin\Schemas\Tables\Controls\SearchResults.ascx.cs">
       <DependentUpon>SearchResults.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Tables\Controls\SearchResults.ascx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Tables\Controls\SearchResults.ascx.designer.cs">
       <DependentUpon>SearchResults.ascx</DependentUpon>
     </Compile>
-    <Compile Include="UI\Admin\Database\Tables\Outline.aspx.cs">
+    <Compile Include="UI\Admin\Schemas\Tables\Outline.aspx.cs">
       <DependentUpon>Outline.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Admin\Database\Tables\Outline.aspx.designer.cs">
+    <Compile Include="UI\Admin\Schemas\Tables\Outline.aspx.designer.cs">
       <DependentUpon>Outline.aspx</DependentUpon>
     </Compile>
     <Compile Include="Web\Routing\RoutingConfiguration.cs" />
@@ -16536,6 +16547,7 @@
     <Content Include="UI\Portal\Controls\HomeAdminPanel.ascx" />
     <Content Include="UI\Portal\Controls\LaunchCardRepeater.ascx" />
     <Content Include="UI\Portal\Learning\Catalog.aspx" />
+    <Content Include="UI\Portal\Learning\CatalogRedirect.aspx" />
     <Content Include="UI\Portal\Records\Credentials\Certificate.aspx" />
     <Content Include="UI\Portal\Error.aspx" />
     <Content Include="UI\Portal\Billing\Controls\CardDetail.ascx" />
@@ -17061,6 +17073,13 @@
     <Compile Include="UI\Portal\Learning\Catalog.aspx.designer.cs">
       <DependentUpon>Catalog.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UI\Portal\Learning\CatalogRedirect.aspx.cs">
+      <DependentUpon>CatalogRedirect.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Portal\Learning\CatalogRedirect.aspx.designer.cs">
+      <DependentUpon>CatalogRedirect.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Portal\Records\Credentials\Certificate.aspx.cs">
       <DependentUpon>Certificate.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -17394,7 +17413,6 @@
     <Compile Include="UI\Layout\Common\Controls\Server\Controllers\SearchCriteriaController.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="UI\Layout\Common\Controls\Server\Charts\BarChartX.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Icons\IconButton.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\Icons\IconLink.cs" />
     <Compile Include="UI\Layout\Common\Controls\Server\TextBoxes\InPlaceTextEditor.cs" />

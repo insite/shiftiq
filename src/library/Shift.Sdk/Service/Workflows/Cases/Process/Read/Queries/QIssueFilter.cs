@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.Application.Issues.Read
 {
@@ -25,7 +25,8 @@ namespace InSite.Application.Issues.Read
         public Guid? TopicUserIdentifier { get; set; }
         public Guid[] TopicUserIdentifiers { get; set; }
         public Guid? TopicUserConnectedFromUserIdentifier { get; set; }
-        public Guid? TopicDepartmentIdentifier { get; set; } 
+        public Guid? TopicDepartmentIdentifier { get; set; }
+        public Guid? ExcludeIssueIdentifier { get; set; }
         public int? IssueNumber { get; set; }
         public Guid[] AssigneeEmployer { get; set; }
         public string PersonCode { get; set; }
@@ -65,6 +66,7 @@ namespace InSite.Application.Issues.Read
         public DateTimeOffset? AttachmentUploadedSince { get; set; }
         public DateTimeOffset? AttachmentUploadedBefore { get; set; }
         public bool OnlyRequestedFiles { get; set; }
+        public DocumentFilterType DocumentFilter { get; set; }
 
         public QIssueFilter Clone()
         {

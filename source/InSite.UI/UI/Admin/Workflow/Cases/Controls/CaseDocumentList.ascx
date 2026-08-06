@@ -4,10 +4,13 @@
 
 <asp:Repeater runat="server" ID="ListRepeater">
     <HeaderTemplate>
-        <table class="table table-striped">
+        <table id="<%= ListRepeater.ClientID %>" class="table table-striped">
             <thead>
                 <tr>
-                    <th></th>
+                    <insite:Container runat="server" Visible='<%# Organization.Toolkits.Issues.CaseDocumentCopy %>'>
+                        <th style="width:10px;"></th>
+                    </insite:Container>
+                    <th style="width:10px;"></th>
                     <th>Document Type</th>
                     <th>Status</th>
                     <th>Document</th>
@@ -22,7 +25,12 @@
     </HeaderTemplate>
     <ItemTemplate>
         <tr>
-            <td style="width:70px;">
+            <insite:Container runat="server" Visible='<%# Organization.Toolkits.Issues.CaseDocumentCopy %>'>
+                <td class="text-nowrap">
+                    <insite:CheckBox runat="server" ID="IsSelected" RenderMode="Input" />
+                </td>
+            </insite:Container>
+            <td class="text-nowrap">
                 <insite:IconLink runat="server"
                     Name="pencil"
                     ToolTip="Edit File Properties"
@@ -33,7 +41,7 @@
                     ToolTip="Delete File"
                     NavigateUrl='<%# string.Format("/ui/admin/workflow/attachments/delete?case={0}&file={1}", IssueIdentifier, Eval("FileName")) %>'
                 />
-            </td>
+            </t>
             <td>
                 <%# Eval("DocumentType") %>
 
@@ -106,3 +114,40 @@
         </table>
     </FooterTemplate>
 </asp:Repeater>
+
+<insite:PageFooterContent runat="server">
+    <script type="text/javascript">
+        (function () {
+            const callbackFuncName = <%= HttpUtility.JavaScriptStringEncode(ClientSelectCallback, true) %>;
+            if (!callbackFuncName)
+                return;
+
+            let funcObj = null;
+
+            document.addEventListener('DOMContentLoaded', function () {
+                funcObj = inSite.common.getObjByName(callbackFuncName);
+                if (typeof funcObj !== 'function')
+                    funcObj = null;
+
+                onChkChange();
+            });
+
+            const chks = document.querySelectorAll('#<%= ListRepeater.ClientID %> > tbody > tr > td input[type="checkbox"][id$="IsSelected"]');
+            chks.forEach(chk => chk.addEventListener('change', onChkChange));
+
+            function onChkChange() {
+                if (funcObj == null)
+                    return;
+
+                let checkedCount = 0;
+
+                chks.forEach(checkbox => {
+                    if (checkbox.checked)
+                        checkedCount++;
+                });
+
+                funcObj.call(window, { checkedCount: checkedCount });
+            }
+        })();
+    </script>
+</insite:PageFooterContent>

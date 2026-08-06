@@ -36,6 +36,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public string CredentialStatus { get; set; }
             public string MembershipFunction { get; set; }
             public bool ExcludeSelfDeclaredCredentials { get; set; }
+            public string JobDivisionMode { get; set; }
+            public string JobDivision { get; set; }
         }
 
         #endregion
@@ -107,8 +109,10 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 .Select(x => new
                 {
                     Person = x.FullName,
+                    Email = x.Email,
                     Organization = x.CompanyName,
                     Department = x.DepartmentName,
+                    JobDivision = x.JobDivision,
                     Achievement = x.AchievementTitle,
                     AchievementType = x.AchievementLabel,
                     Completed = x.DateCompleted.HasValue ? x.DateCompleted.Value.UtcDateTime : (DateTime?)null,
@@ -121,8 +125,10 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             var helper = new XlsxExportHelper();
             helper.Map("Person", "Person");
+            helper.Map("Email", "Email");
             helper.Map("Organization", "Organization");
             helper.Map("Department", "Department");
+            helper.Map("JobDivision", "Job Division");
             helper.Map("Achievement", "Achievement", 60, HorizontalAlignment.Left);
             helper.Map("AchievementType", "Achievement Type", 35, HorizontalAlignment.Left);
             helper.Map("Completed", "Completed", "MMM d, yyyy", 20, HorizontalAlignment.Center);
@@ -182,7 +188,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 CurrentParameters.CredentialStatus,
                 CurrentParameters.MembershipFunction,
                 CurrentParameters.ExcludeSelfDeclaredCredentials,
-                achievementType: null);
+                achievementType: null,
+                jobDivisionMode: CurrentParameters.JobDivisionMode,
+                jobDivision: CurrentParameters.JobDivision);
         }
 
         private SearchParameters BuildSearchParameters(Guid[] departments)
@@ -197,7 +205,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 CredentialGranted = new DateTimeRange(Criteria.CompletedSinceFilter, Criteria.CompletedBeforeFilter),
                 CredentialStatus = Criteria.CredentialStatusFilter,
                 MembershipFunction = string.Join(",", Criteria.MembershipFunctions),
-                ExcludeSelfDeclaredCredentials = Criteria.ExcludeSelfDeclared
+                ExcludeSelfDeclaredCredentials = Criteria.ExcludeSelfDeclared,
+                JobDivisionMode = Criteria.JobDivisionMode,
+                JobDivision = Criteria.JobDivisionFilter
             };
         }
 

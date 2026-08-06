@@ -2,9 +2,13 @@
 
 <%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormInfo.ascx" TagName="FormDetails" TagPrefix="uc" %>
 <%@ Register TagPrefix="uc" TagName="CodeField" Src="../Controls/FormCodeField.ascx" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:Alert runat="server" ID="EditorStatus" />
     <insite:ValidationSummary runat="server" ValidationGroup="Assessment" />
@@ -61,5 +65,7 @@
             <insite:CancelButton runat="server" ID="CancelButton" CausesValidation="false" />
         </div>
     </div>
+
+    </asp:Panel>
 
 </asp:Content>

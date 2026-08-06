@@ -262,6 +262,12 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
             ServiceLocator.SendCommand(expiry);
 
+            // Send this last. A self-uploaded certificate is not valid until an administrator reviews it, and both
+            // the authority change and the expiration change would otherwise leave the credential marked Valid.
+            var submit = new SubmitCredential(NewCredentialId, DateTimeOffset.UtcNow, description);
+
+            ServiceLocator.SendCommand(submit);
+
             HttpResponseHelper.Redirect(Page.Request.RawUrl);
         }
     }

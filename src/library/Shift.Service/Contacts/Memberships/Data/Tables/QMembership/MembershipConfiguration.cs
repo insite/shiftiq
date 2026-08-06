@@ -22,6 +22,10 @@ public class MembershipConfiguration : IEntityTypeConfiguration<MembershipEntity
         builder.Property(x => x.Modified).HasColumnName("Modified").IsRequired();
         builder.Property(x => x.ModifiedBy).HasColumnName("ModifiedBy").IsRequired();
 
+        builder.Property(x => x.LastChangeTime).HasColumnName("LastChangeTime").IsRequired();
+        builder.Property(x => x.LastChangeType).HasColumnName("LastChangeType").IsRequired().IsUnicode(false).HasMaxLength(100);
+        builder.Property(x => x.LastChangeUser).HasColumnName("LastChangeUser").IsRequired();
+
         builder.HasOne(x => x.Group)
             .WithMany(x => x.Memberships)
             .HasForeignKey(x => x.GroupIdentifier)

@@ -272,12 +272,12 @@ namespace InSite.Api.Controllers
 
         private void SetPersonWithEmployer(OrderInfo orderInfo, QPerson person)
         {
-            var group = ServiceLocator.GroupSearch.GetGroups(
+            var group = ServiceLocator.GroupSearch.GetFirstGroup(
                 new QGroupFilter()
                 {
-                    GroupName = orderInfo.CheckoutInfo.Company,
+                    GroupNameExact = orderInfo.CheckoutInfo.Company,
                     GroupType = "Employer"
-                }).FirstOrDefault();
+                });
 
             if (group != null)
             {

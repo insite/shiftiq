@@ -78,6 +78,42 @@ namespace InSite.Cmds.Controls.Reporting.Report
         protected global::InSite.Common.Web.UI.CheckBox MembershipDepartment;
 
         /// <summary>
+        /// JobDivisionSection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder JobDivisionSection;
+
+        /// <summary>
+        /// JobDivisionPresence control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox JobDivisionPresence;
+
+        /// <summary>
+        /// JobDivisionValuePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder JobDivisionValuePanel;
+
+        /// <summary>
+        /// JobDivisionValue control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.JobDivisionComboBox JobDivisionValue;
+
+        /// <summary>
         /// CredentialStatus control.
         /// </summary>
         /// <remarks>

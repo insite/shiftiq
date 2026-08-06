@@ -39,6 +39,11 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Collects the list of user connections that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to user connections modified
+    /// within a specific window. Both parameters accept ISO 8601 date-time values, for example
+    /// "2026-07-06T14:00:00+00:00". LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/accounts/users-connections/collect")]
     [HybridPermission("security/users-connections", DataAccess.Read)]
     [EndpointName("collectUserConnections")]
@@ -75,6 +80,11 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Counts the user connections that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the count to user connections modified
+    /// within a specific window. Both parameters accept ISO 8601 date-time values, for example
+    /// "2026-07-06T14:00:00+00:00". LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/accounts/users-connections/count")]
     [HybridPermission("security/users-connections", DataAccess.Read)]
     [EndpointName("countUserConnections")]
@@ -106,7 +116,14 @@ public class UserConnectionController : ShiftControllerBase
 
     /// <summary>
     /// Downloads the list of user connections that match specific criteria
-    /// </summary>    
+    /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to download only user connections modified within a
+    /// specific window, which is useful for incremental integrations that already hold most of the data. Both
+    /// parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00". LastChangeTimeSince
+    /// is inclusive; LastChangeTimeBefore is exclusive. When polling for deltas, subtract a small overlap (for
+    /// example five minutes) from the previous poll time to allow for projection lag.
+    /// </remarks>
     [HttpPost("api/accounts/users-connections/download")]
     [HybridPermission("security/users-connections", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -174,6 +191,11 @@ public class UserConnectionController : ShiftControllerBase
     /// <summary>
     /// Searches for the list of user connections that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to user connections modified
+    /// within a specific window. Both parameters accept ISO 8601 date-time values, for example
+    /// "2026-07-06T14:00:00+00:00". LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/accounts/users-connections/search")]
     [HybridPermission("security/users-connections", DataAccess.Read)]
     [EndpointName("searchUserConnections")]

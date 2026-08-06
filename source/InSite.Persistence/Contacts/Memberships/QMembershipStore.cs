@@ -48,6 +48,7 @@ namespace InSite.Persistence
                 };
 
                 SetTimestamp(entity, e);
+                SetLastChange(entity, e);
 
                 db.QMemberships.Add(entity);
                 db.SaveChanges();
@@ -71,6 +72,7 @@ namespace InSite.Persistence
                 };
 
                 SetTimestamp(entity, e);
+                SetLastChange(entity, e);
 
                 db.QMemberships.Add(entity);
                 db.SaveChanges();
@@ -88,6 +90,7 @@ namespace InSite.Persistence
                 action(entity);
 
                 SetTimestamp(entity, e);
+                SetLastChange(entity, e);
 
                 db.SaveChanges();
             }
@@ -97,6 +100,13 @@ namespace InSite.Persistence
         {
             entity.Modified = change.ChangeTime;
             entity.ModifiedBy = change.OriginUser;
+        }
+
+        private static void SetLastChange(QMembership entity, IChange change)
+        {
+            entity.LastChangeTime = change.ChangeTime;
+            entity.LastChangeType = change.GetType().Name;
+            entity.LastChangeUser = change.OriginUser;
         }
     }
 }

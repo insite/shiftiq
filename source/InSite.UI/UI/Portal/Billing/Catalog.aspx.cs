@@ -26,7 +26,7 @@ namespace InSite.UI.Portal.Billing
             if (IsPostBack)
                 return;
 
-            PageHelper.AutoBindHeader(this, null, "Catalog");
+            PageHelper.AutoBindHeader(this, null, "Catalogue");
             
             CatalogDetail.LoadData();
 

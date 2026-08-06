@@ -38,6 +38,21 @@
                     <div class="col-lg-7">
                         <div class="card border-0 shadow-lg h-100">
                             <div class="card-body" data-track-id="outline" data-track-title="Course Outline tab">
+
+                                <asp:Repeater runat="server" ID="ActivityBreadcrumb">
+                                    <HeaderTemplate>
+                                        <nav aria-label="breadcrumb">
+                                            <ol class="breadcrumb">
+                                    </HeaderTemplate>
+                                    <FooterTemplate>
+                                            </ol>
+                                        </nav>
+                                    </FooterTemplate>
+                                    <ItemTemplate>
+                                        <li class="breadcrumb-item<%# (bool)Eval("IsActive") ? " active" : string.Empty %>" <%# (bool)Eval("IsActive") ? "aria-current=\"page\"" : string.Empty %>><%# HttpUtility.HtmlEncode((string)Eval("Text")) %></li>
+                                    </ItemTemplate>
+                                </asp:Repeater>
+
                                 <asp:PlaceHolder runat="server" ID="ActivityPlaceHolder" />
                             </div>
                         </div>

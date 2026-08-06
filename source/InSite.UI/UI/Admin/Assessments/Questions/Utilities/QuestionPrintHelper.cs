@@ -159,7 +159,7 @@ namespace InSite.Admin.Assessments.Questions.Utilities
 
         public static IQuestionInfo[] GetQuestions(Form form, string language)
         {
-            var questions = AttemptHelper.CreateAttemptQuestions(form, false, language);
+            var questions = AttemptQuestionBuilder.Build(form, false, language);
             if (questions.Length == 0)
                 return new IQuestionInfo[0];
 

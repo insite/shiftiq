@@ -25,7 +25,8 @@ namespace Shift.Contract.Presentation
         public string AdminNavigationLogo { get; set; }
         public string UserHostAddress { get; set; }
         public int SessionTimeoutMinutes { get; set; }
-        public List<MenuModel> NavigationGroups { get; set; }
+        public List<MenuModel> AllApps { get; set; }
+        public List<MenuLinkModel> FrequentlyUsedApps { get; set; }
         public List<MenuLinkModel> ShortcutGroups { get; set; }
         public List<MenuModel> AdminNavigationGroups { get; set; }
         public int PlatformSearchDownloadMaximumRows { get; set; }

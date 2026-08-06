@@ -1,9 +1,5 @@
 using System.Linq;
 
-using Shift.Common;
-
-using ContentLabel = Shift.Constant.ContentLabel;
-
 namespace InSite.Persistence
 {
     public static class StandardMapper
@@ -19,6 +15,7 @@ namespace InSite.Persistence
                 Code = entity.Code,
                 Hook = entity.StandardHook,
                 Icon = entity.Icon,
+                Tag = entity.StandardLabel,
                 IsHidden = entity.IsHidden,
                 IsPractical = entity.IsPractical,
                 IsPublished = entity.IsPublished,

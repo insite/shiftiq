@@ -458,7 +458,7 @@ namespace InSite.Admin.Events.Registrations.Forms
             }
 
             var allTypes = ServiceLocator.RegistrationSearch.GetAccommodationTypes(Organization.OrganizationIdentifier);
-            AccommodationTypeSelector.AdditionalOptions = allTypes;
+            AccommodationTypeSelector.Settings.AdditionalOptions = allTypes;
             AccommodationTypeSelector.RefreshData();
         }
 

@@ -19,7 +19,7 @@
 
     <a runat="server" id="MyCatalog" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/management/dashboard/catalog">
         <i class="fas fa-check fs-lg me-2"></i>
-        SkillsCheck Catalog
+        SkillsCheck Catalogue
     </a>
 
     <a runat="server" id="MyBadges" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/management/dashboard/reports" visible="false">

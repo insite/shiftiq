@@ -428,6 +428,10 @@ namespace InSite.Domain.Events
                     if (messageId == Data.WhenEventReminderRequestedNotifyInstructorMessageIdentifier)
                         return;
                     break;
+                case EventMessageType.CompletedLearner:
+                    if (messageId == Data.WhenEventCompletedNotifyLearnerMessageIdentifier)
+                        return;
+                    break;
                 default:
                     throw new ArgumentException($"Unsupported message: {messageType}");
             }

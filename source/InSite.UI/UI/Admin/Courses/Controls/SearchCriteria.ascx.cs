@@ -3,6 +3,8 @@
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 
+using Shift.Common;
+
 namespace InSite.Admin.Courses
 {
     public partial class SearchCriteria : SearchCriteriaController<QCourseFilter>
@@ -22,6 +24,9 @@ namespace InSite.Admin.Courses
                     WebPageAuthoredSince = WebPageAuthoredSince.Value,
                     WebPageAuthoredBefore = WebPageAuthoredBefore.Value,
                     GradebookTitle = GradebookTitle.Text,
+                    IsVisibleInCatalog = CatalogVisibility.ValueAsBoolean,
+                    IsRestricted = CatalogAccess.ValueAsBoolean,
+                    PermissionGroupIdentifiers = PermissionGroupIdentifiers.Values.NullIfEmpty(),
                 };
 
                 GetCheckedShowColumns(filter);
@@ -38,7 +43,17 @@ namespace InSite.Admin.Courses
                 WebPageAuthoredSince.Value = value.WebPageAuthoredSince;
                 WebPageAuthoredBefore.Value = value.WebPageAuthoredBefore;
                 GradebookTitle.Text = value.GradebookTitle;
+                CatalogVisibility.ValueAsBoolean = value.IsVisibleInCatalog;
+                CatalogAccess.ValueAsBoolean = value.IsRestricted;
+                PermissionGroupIdentifiers.Values = value.PermissionGroupIdentifiers;
             }
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            PermissionGroupIdentifiers.Filter.OrganizationIdentifier = Organization.Identifier;
         }
 
         public override void Clear()
@@ -51,6 +66,9 @@ namespace InSite.Admin.Courses
             WebPageAuthoredSince.Value = null;
             WebPageAuthoredBefore.Value = null;
             GradebookTitle.Text = null;
+            CatalogVisibility.ValueAsBoolean = null;
+            CatalogAccess.ValueAsBoolean = null;
+            PermissionGroupIdentifiers.Values = null;
         }
     }
 }

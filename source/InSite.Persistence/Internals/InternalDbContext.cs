@@ -241,6 +241,7 @@ namespace InSite.Persistence
         public DbSet<TProduct> TProducts { get; set; }
         public DbSet<TProgram> TPrograms { get; set; }
         public DbSet<TProgramCategory> TProgramCategories { get; set; }
+        public DbSet<TProgramContainment> TProgramContainments { get; set; }
         public DbSet<TProgramEnrollment> TProgramEnrollments { get; set; }
         public DbSet<TProgramGroupEnrollment> TProgramGroupEnrollments { get; set; }
         public DbSet<TQuiz> TQuizzes { get; set; }
@@ -255,6 +256,7 @@ namespace InSite.Persistence
         public DbSet<TTask> TTasks { get; set; }
         public DbSet<TTaskEnrollment> TTaskEnrollments { get; set; }
         public DbSet<TTax> TTaxes { get; set; }
+        public DbSet<TToolkitVisit> TToolkitVisits { get; set; }
         public DbSet<TUserAuthenticationFactor> TUserAuthenticationFactors { get; set; }
         public DbSet<TUserSession> TUserSessions { get; set; }
         public DbSet<TUserSessionCache> TUserSessionCaches { get; set; }
@@ -597,6 +599,7 @@ namespace InSite.Persistence
             builder.Configurations.Add(new TOrderItemConfiguration());
             builder.Configurations.Add(new TProgramConfiguration());
             builder.Configurations.Add(new TProgramCategoryConfiguration());
+            builder.Configurations.Add(new TProgramContainmentConfiguration());
             builder.Configurations.Add(new TProgramEnrollmentConfiguration());
             builder.Configurations.Add(new TProgramGroupEnrollmentConfiguration());
             builder.Configurations.Add(new TTaxConfiguration());
@@ -614,6 +617,7 @@ namespace InSite.Persistence
             builder.Configurations.Add(new TSenderOrganizationConfiguration());
             builder.Configurations.Add(new TTaskConfiguration());
             builder.Configurations.Add(new TTaskEnrollmentConfiguration());
+            builder.Configurations.Add(new TToolkitVisitConfiguration());
             builder.Configurations.Add(new TUserAuthenticationFactorConfiguration());
             builder.Configurations.Add(new TUserSessionCacheConfiguration());
             builder.Configurations.Add(new TUserSessionCacheSummaryConfiguration());

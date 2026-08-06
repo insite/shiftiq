@@ -92,6 +92,7 @@ export default function SpecWorkshop_Details_Competencies({
                                             control={control}
                                             name={`criteria.${criterionIndex}.competencies.${competencyIndex}.tax1Count`}
                                             readOnly={disabled}
+                                            disableEnter
                                             className="spec-workshop-input-sm text-end form-control-sm d-inline px-2"
                                             onChange={value => handleTax1CountChange(criterion.criterionId, competency.standard.standardId, value)}
                                         />
@@ -101,6 +102,7 @@ export default function SpecWorkshop_Details_Competencies({
                                             control={control}
                                             name={`criteria.${criterionIndex}.competencies.${competencyIndex}.tax2Count`}
                                             readOnly={disabled}
+                                            disableEnter
                                             className="spec-workshop-input-sm text-end form-control-sm d-inline px-2"
                                             onChange={value => handleTax2CountChange(criterion.criterionId, competency.standard.standardId, value)}
                                         />
@@ -110,6 +112,7 @@ export default function SpecWorkshop_Details_Competencies({
                                             control={control}
                                             name={`criteria.${criterionIndex}.competencies.${competencyIndex}.tax3Count`}
                                             readOnly={disabled}
+                                            disableEnter
                                             className="spec-workshop-input-sm text-end form-control-sm d-inline px-2"
                                             onChange={value => handleTax3CountChange(criterion.criterionId, competency.standard.standardId, value)}
                                         />

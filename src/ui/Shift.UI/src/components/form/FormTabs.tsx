@@ -4,6 +4,7 @@ import Icon from "../icon/Icon";
 import { ObjectIndexer } from "@/models/ObjectIndexer";
 import { IconStyle } from "../icon/IconStyle";
 import { IconName } from "../icon/IconName";
+import { numberHelper } from "@/helpers/numberHelper";
 
 interface Props {
     defaultTab: string;
@@ -59,6 +60,7 @@ interface TitleProps {
 function Title({ props }: TitleProps) {
     const title = (props as ObjectIndexer)["title"] as ReactNode;
     const subtitle = (props as ObjectIndexer)["subtitle"] as string;
+    const count = (props as ObjectIndexer)["count"] as number;
 
     const icon = (props as ObjectIndexer)["icon"] as {
         style: IconStyle;
@@ -69,11 +71,15 @@ function Title({ props }: TitleProps) {
         <>
             {icon && <Icon style={icon.style} name={icon.name} className="me-2" />}
             {title}
-            {subtitle && (
+            {subtitle ? (
                 <small className="text-body-secondary ms-1">
                     {subtitle}
                 </small>
-            )}
+            ) : count !== undefined && count !== null ? (
+                <small className="text-body-secondary ms-1">
+                    {`(${numberHelper.formatInt(count)})`}
+                </small>
+            ) : null}
         </>
     );
 }

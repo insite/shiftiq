@@ -1,7 +1,12 @@
 <%@ Page Language="C#" CodeBehind="ModifyProctoring.aspx.cs" Inherits="InSite.Admin.Assessments.Forms.Forms.ModifyProctoring" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
+
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:Alert runat="server" ID="EditorStatus" />
     <insite:ValidationSummary runat="server" ValidationGroup="Assessment" />
@@ -51,10 +56,15 @@
                                         <insite:NumericBox runat="server" ID="TimeLimit" Width="120px" MinValue="0" MaxValue="262800" NumericMode="Integer" CssClass="d-inline-block" />
                                         minutes
                                     </div>
-                                    <div class="form-text">
-                                        This is the number of minutes allowed for each attempt on the exam.
-                                            <span class="text-danger">Note this is required to enable the countdown timer and the autosave function for exam candidates.
-                                            </span>
+                                    <div runat="server" id="TimeLimitHelpDefault" class="form-text">
+                                        This is the number of minutes permitted for each attempt on the exam.
+                                        <span class="text-danger">
+                                            This is required to enable the countdown timer and the autosave function for exam candidates.
+                                        </span>
+                                    </div>
+                                    <div runat="server" id="TimeLimitHelpCalculated" class="form-text" visible="false">
+                                        This is the total time permitted for each attempt, calculated automatically as the sum of the section time limits.
+                                        To update the time limit, please adjust the settings within each section of the form, as section time limits control the overall timing.
                                     </div>
                                 </div>
 
@@ -142,5 +152,7 @@
             <insite:CancelButton runat="server" ID="CancelButton" />
         </div>
     </div>
+
+    </asp:Panel>
 
 </asp:Content>

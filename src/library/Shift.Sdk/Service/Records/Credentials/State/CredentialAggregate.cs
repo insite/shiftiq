@@ -127,6 +127,12 @@ namespace InSite.Domain.Records
                 Apply(new CredentialEmployerChanged(employerGroup, employerGroupStatus));
         }
 
+        public void SubmitCredential(DateTimeOffset submitted, string description)
+        {
+            if (AllowChanges())
+                Apply(new CredentialSubmitted(submitted, description));
+        }
+
         public void RevokeCredential(DateTimeOffset revoked, string reason, decimal? score)
         {
             if (AllowChanges())

@@ -201,14 +201,14 @@ namespace InSite.Admin.Issues.Controls
                 return;
 
             var issueStatusId = IssueStatus.ValueAsGuid;
-
             if (!issueStatusId.HasValue)
                 return;
 
             var commands = new List<Command>();
+            var statusCategory = ServiceLocator.IssueSearch.GetStatus(issueStatusId.Value)?.StatusCategory;
 
             foreach (var item in SelectedItems)
-                commands.Add(new ChangeIssueStatus(item, issueStatusId.Value, DateTimeOffset.UtcNow));
+                commands.Add(new ChangeIssueStatus(item, issueStatusId.Value, DateTimeOffset.UtcNow, statusCategory));
 
             if (commands.Count == 0)
                 return;
@@ -226,10 +226,11 @@ namespace InSite.Admin.Issues.Controls
                 return;
 
             var statusId = BulkUpdateCaseStatus.ValueAsGuid.Value;
+            var statusCategory = ServiceLocator.IssueSearch.GetStatus(statusId)?.StatusCategory;
 
             var commands = new List<Command>();
             foreach (var caseId in SelectedItems)
-                commands.Add(new ChangeIssueStatus(caseId, statusId, DateTimeOffset.UtcNow));
+                commands.Add(new ChangeIssueStatus(caseId, statusId, DateTimeOffset.UtcNow, statusCategory));
 
             ServiceLocator.SendCommands(commands);
 

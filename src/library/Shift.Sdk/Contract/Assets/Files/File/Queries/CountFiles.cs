@@ -1,5 +1,7 @@
 using System;
 
+using InSite.Application.Files.Read;
+
 using Shift.Common;
 
 namespace Shift.Contract
@@ -20,5 +22,7 @@ namespace Shift.Contract
         public DateTimeOffset? FileUploadedBefore { get; set; }
 
         public bool? HasClaims { get; set; }
+
+        public FileTag? FileTag { get; set; }
     }
 }

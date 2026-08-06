@@ -42,10 +42,19 @@
                             text-align: center;
                         }
 
-                        .table-report-container table.table-report > thead > tr > th.dept-cell {
+                        .table-report-container table.table-report > thead > tr > th.division-cell {
                             position: -webkit-sticky;
                             position: sticky;
                             left: 160px;
+                            z-index: 3;
+                            vertical-align: middle;
+                            text-align: center;
+                        }
+
+                        .table-report-container table.table-report > thead > tr > th.dept-cell {
+                            position: -webkit-sticky;
+                            position: sticky;
+                            left: 320px;
                             z-index: 3;
                             vertical-align: middle;
                             text-align: center;
@@ -78,10 +87,21 @@
                         width: 144px;
                     }
 
-                .table-report-container table.table-report > tbody > tr > td.dept-cell {
+                .table-report-container table.table-report > tbody > tr > td.division-cell {
                     position: -webkit-sticky;
                     position: sticky;
                     left: 160px;
+                    z-index: 1;
+                }
+
+                    .table-report-container table.table-report > tbody > tr > td.division-cell > div {
+                        width: 144px;
+                    }
+
+                .table-report-container table.table-report > tbody > tr > td.dept-cell {
+                    position: -webkit-sticky;
+                    position: sticky;
+                    left: 320px;
                     z-index: 1;
                     background-color: #ffffff;
                 }
@@ -98,6 +118,17 @@
                     white-space: nowrap;
                     text-align: center;
                 }
+
+                    /* Status colours belong here rather than in an inline style attribute. The pivot
+                       renders one cell per achievement per employee-department row, so a 25-byte
+                       style attribute on every cell is measured in megabytes at report scale. */
+                    .table-report-container table.table-report > tbody > tr > td.data-cell.expired {
+                        background-color: #ff6347;
+                    }
+
+                    .table-report-container table.table-report > tbody > tr > td.data-cell.expiring {
+                        background-color: #ffff99;
+                    }
 
                 .table-report-container table.table-report > tbody > tr > td.even {
                     background-color: #ffffff;
@@ -167,26 +198,24 @@
                         EnableAfter="10000"
                     />
 
-                    <div class="table-report-container">
+                    <div runat="server" id="ReportTablePanel" class="table-report-container">
                         <table class="table table-striped table-report">
                             <thead>
                                 <tr>
-                                    <td colspan="2" class="group-header first-cell"></td>
+                                    <td colspan="3" class="group-header first-cell"></td>
+                                    <%-- Templates below are deliberately written on one line. Literal text in an
+                                         ItemTemplate, indentation included, is emitted once per bound item, so
+                                         formatting these for readability costs ~180 bytes on every cell. --%>
                                     <asp:Repeater runat="server" ID="CompanyHeaderRepeater">
-                                        <ItemTemplate>
-                                            <td colspan="<%# Eval("Children.Count") %>" class="group-header">
-                                                Worker Training Expiry Dates for <%# Eval("Name") %> :: <%# string.Join(", ", (IEnumerable<string>)Eval("Departments")) %>
-                                            </td>
-                                        </ItemTemplate>
+                                        <ItemTemplate><td colspan="<%# Eval("Children.Count") %>" class="group-header">Worker Training Expiry Dates for <%# Eval("Name") %> :: <%# string.Join(", ", (IEnumerable<string>)Eval("Departments")) %></td></ItemTemplate>
                                     </asp:Repeater>
                                 </tr>
                                 <tr>
                                     <th class="name-cell">Employee</th>
+                                    <th class="division-cell">Job Division</th>
                                     <th class="dept-cell">Department</th>
                                     <asp:Repeater runat="server" ID="AchievementHeaderRepeater">
-                                        <ItemTemplate>
-                                            <th class="resource-cell"><div><%# Eval("Text") %></div></th>
-                                        </ItemTemplate>
+                                        <ItemTemplate><th class="resource-cell"><div><%# Eval("Text") %></div></th></ItemTemplate>
                                     </asp:Repeater>
                                 </tr>
                             </thead>
@@ -194,21 +223,11 @@
                                 <asp:Repeater runat="server" ID="EmployeeRepeater">
                                     <ItemTemplate>
                                         <tr>
-                                            <td rowspan="<%# Eval("Children.Count") %>" class="name-cell<%# (Container.ItemIndex + 1) % 2 == 0 ? " even" : " odd" %>"><div><%# Eval("Text") %></div></td>
+                                            <td rowspan="<%# Eval("Children.Count") %>" class="name-cell<%# (Container.ItemIndex + 1) % 2 == 0 ? " even" : " odd" %>"><div><%# Eval("Text") %></div><div class="form-text"><%# Eval("Email") %></div></td>
+                                            <td rowspan="<%# Eval("Children.Count") %>" class="division-cell<%# (Container.ItemIndex + 1) % 2 == 0 ? " even" : " odd" %>"><div><%# Eval("JobDivision") %></div></td>
                                             <asp:Repeater runat="server" ID="DepartmentRepeater">
-                                                <ItemTemplate>
-                                                    <td class="dept-cell"><div><%# Eval("Text") %></div></td>
-                                                    <asp:Repeater runat="server" ID="CellRepeater">
-                                                        <ItemTemplate>
-                                                            <td class="data-cell" style="<%# Eval("Color") == null ? null : Eval("Color", "background-color:{0};") %>">
-                                                                <%# Eval("Text") %>
-                                                            </td>
-                                                        </ItemTemplate>
-                                                    </asp:Repeater>
-                                                </ItemTemplate>
-                                                <SeparatorTemplate>
-                                                    </tr><tr>
-                                                </SeparatorTemplate>
+                                                <ItemTemplate><td class="dept-cell"><div><%# Eval("Text") %></div></td><asp:Repeater runat="server" ID="CellRepeater"><ItemTemplate><td class="data-cell<%# Eval("CssClass") %>"><%# Eval("Text") %></td></ItemTemplate></asp:Repeater></ItemTemplate>
+                                                <SeparatorTemplate></tr><tr></SeparatorTemplate>
                                             </asp:Repeater>
                                         </tr>
                                     </ItemTemplate>

@@ -96,7 +96,7 @@ namespace InSite.UI.Portal.Home.Learning
         private void SetCardStatus(List<CourseDistributionGridItem> distributions)
         {
             var first = distributions[0];
-            var status = first.GetStatus();
+            var status = first.GetStatus(null);
 
             if (status == CourseDistributionGridItem.StatusType.NotStarted)
             {
@@ -130,7 +130,7 @@ namespace InSite.UI.Portal.Home.Learning
                     "<span class='fst-italic fw-bold text-success'>Level up your skills!</span>";
                 AttemptCardBody.InnerHtml =
                     "We found another SkillsCheck you might be interested in. " +
-                    "Add to Cart or View Catalog to see more.";
+                    "Add to Cart or View Catalogue to see more.";
                 AttemptCardAddToCartButton.Visible = true;
                 AttemptCardViewCatalogButton.Visible = true;
                 AttemptCardViewCatalogButton.NavigateUrl = "/ui/portal/learning/dashboard/catalog";

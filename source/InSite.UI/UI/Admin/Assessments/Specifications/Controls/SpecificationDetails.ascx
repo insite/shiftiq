@@ -56,60 +56,57 @@
             </div>
         </div>
 
-        <insite:Container runat="server" ID="ScenarioFields">
-            <div class="form-group mb-3">
-                <label class="form-label">
-                    Sections as Tabs
-                    <insite:IconButton runat="server" ID="DisableSectionsAsTabsButton" Name="toggle-on" CssClass="ms-1" />
-                    <insite:IconButton runat="server" ID="EnableSectionsAsTabsButton" Name="toggle-off" CssClass="ms-1" />
-                </label>
-                <div>
-                    <asp:Literal runat="server" ID="SectionsAsTabsOutput" />
-                </div>
-                <div class="form-text">
-                    If this feature is enabled then each form's section will appear in a tab at the top of the form.
-                </div>
+        <div class="form-group mb-3">
+            <label class="form-label">
+                Sections as Tabs
+                <insite:IconButton runat="server" ID="DisableSectionsAsTabsButton" Name="toggle-on" CssClass="ms-1" />
+                <insite:IconButton runat="server" ID="EnableSectionsAsTabsButton" Name="toggle-off" CssClass="ms-1" />
+            </label>
+            <div>
+                <asp:Literal runat="server" ID="SectionsAsTabsOutput" />
             </div>
-
-            <div runat="server" id="TabNavigationField" class="form-group mb-3" visible="false">
-                <label class="form-label">
-                    Tab Navigation
-                    <insite:IconButton runat="server" ID="DisableTabNavigationButton" Name="toggle-on" CssClass="ms-1" />
-                    <insite:IconButton runat="server" ID="EnableTabNavigationButton" Name="toggle-off" CssClass="ms-1" />
-                </label>
-                <div>
-                    <asp:Literal runat="server" ID="TabNavigationOutput" />
-                </div>
-                <div class="form-text">
-                    When enabled, Next and Previous buttons are displayed and learner can freely move around tabs.
-                    When disabled, only Next button is displayed and only forward progression through the assessment is allowed.
-                </div>
+            <div class="form-text">
+                If this feature is enabled then each form's section will appear in a tab at the top of the form.
             </div>
+        </div>
 
-            <div runat="server" id="SingleQuestionPerTabField" class="form-group mb-3" visible="false">
-                <label class="form-label">
-                    Single Question per Tab
-                    <insite:IconButton runat="server" ID="DisableSingleQuestionPerTabButton" Name="toggle-on" CssClass="ms-1" />
-                    <insite:IconButton runat="server" ID="EnableSingleQuestionPerTabButton" Name="toggle-off" CssClass="ms-1" />
-                </label>
-                <div>
-                    <asp:Literal runat="server" ID="SingleQuestionPerTabOutput" />
-                </div>
-                <div class="form-text">
-                    If this feature is enabled then only one question is displayed on the current tab at a time.
-                </div>
+        <div runat="server" id="TabNavigationField" class="form-group mb-3" visible="false">
+            <label class="form-label">
+                Tab Navigation
+                <insite:IconButton runat="server" ID="DisableTabNavigationButton" Name="toggle-on" CssClass="ms-1" />
+                <insite:IconButton runat="server" ID="EnableTabNavigationButton" Name="toggle-off" CssClass="ms-1" />
+            </label>
+            <div>
+                <asp:Literal runat="server" ID="TabNavigationOutput" />
             </div>
-
-            <div runat="server" id="TabTimeLimitField" class="form-group mb-3" visible="false">
-                <label class="form-label">
-                    Tab Time Limit
-                </label>
-                <div>
-                    <asp:Literal runat="server" ID="TabTimeLimitOutput" />
-                </div>
+            <div class="form-text">
+                When enabled, Next and Previous buttons are displayed and learner can freely move around tabs.
+                When disabled, only Next button is displayed and only forward progression through the assessment is allowed.
             </div>
+        </div>
 
-        </insite:Container>
+        <div runat="server" id="SingleQuestionPerTabField" class="form-group mb-3" visible="false">
+            <label class="form-label">
+                Single Question per Tab
+                <insite:IconButton runat="server" ID="DisableSingleQuestionPerTabButton" Name="toggle-on" CssClass="ms-1" />
+                <insite:IconButton runat="server" ID="EnableSingleQuestionPerTabButton" Name="toggle-off" CssClass="ms-1" />
+            </label>
+            <div>
+                <asp:Literal runat="server" ID="SingleQuestionPerTabOutput" />
+            </div>
+            <div class="form-text">
+                If this feature is enabled then only one question is displayed on the current tab at a time.
+            </div>
+        </div>
+
+        <div runat="server" id="TabTimeLimitField" class="form-group mb-3" visible="false">
+            <label class="form-label">
+                Tab Time Limit
+            </label>
+            <div>
+                <asp:Literal runat="server" ID="TabTimeLimitOutput" />
+            </div>
+        </div>
 
     </div>
     <div class="col-lg-6">

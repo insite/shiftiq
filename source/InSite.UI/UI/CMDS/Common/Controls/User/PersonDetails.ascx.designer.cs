@@ -384,6 +384,24 @@ namespace InSite.Cmds.Admin.People.Controls
         protected global::InSite.Common.Web.UI.TextBox JobTitle;
 
         /// <summary>
+        /// JobDivisionField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl JobDivisionField;
+
+        /// <summary>
+        /// JobDivisionRequiredValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.RequiredValidator JobDivisionRequiredValidator;
+
+        /// <summary>
         /// JobDivision control.
         /// </summary>
         /// <remarks>
@@ -445,6 +463,42 @@ namespace InSite.Cmds.Admin.People.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.DateTimeOffsetSelector PasswordExpires;
+
+        /// <summary>
+        /// PersonIsLearner control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox PersonIsLearner;
+
+        /// <summary>
+        /// PersonIsAdministrator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox PersonIsAdministrator;
+
+        /// <summary>
+        /// PersonIsDeveloper control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox PersonIsDeveloper;
+
+        /// <summary>
+        /// PersonIsOperator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox PersonIsOperator;
 
         /// <summary>
         /// UserRoleList control.

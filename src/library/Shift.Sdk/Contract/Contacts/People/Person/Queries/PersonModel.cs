@@ -149,5 +149,9 @@ namespace Shift.Contract
         public DateTimeOffset Modified { get; set; }
         public Guid ModifiedBy { get; set; }
         public DateTimeOffset? SinModified { get; set; }
+
+        public DateTimeOffset LastChangeTime { get; set; }
+        public string LastChangeType { get; set; }
+        public Guid LastChangeUser { get; set; }
     }
 }

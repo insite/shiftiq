@@ -34,6 +34,7 @@ namespace InSite.Application.Records.Read
         void UpdateCredential(CredentialExpired2 e, CredentialStatus status);
         void UpdateCredential(CredentialGranted3 e, CredentialStatus status);
         void UpdateCredential(CredentialRevoked2 e, CredentialStatus status);
+        void UpdateCredential(CredentialSubmitted e, CredentialStatus status);
         void UpdateCredential(CredentialNotificationSent e);
         void UpdateCredential(CredentialEmployerChanged e);
         void UpdateCredential(CredentialTagged e);

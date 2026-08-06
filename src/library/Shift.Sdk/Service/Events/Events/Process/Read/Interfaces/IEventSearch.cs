@@ -13,6 +13,7 @@ namespace InSite.Application.Events.Read
     public interface IEventSearch
     {
         List<QEvent> GetEventsForReminder(DateTimeOffset start, DateTimeOffset end, bool ignoreScheduleStart);
+        List<QEvent> GetEventsForCompleted(DateTimeOffset now, bool includeSent, bool ignoreScheduleEnd);
 
         List<ApprenticeSummary> GetApprenticeSummary(QEventFilter filter);
         List<EventParticipationSummary> GetEventParticipationSummary(QEventFilter filter);

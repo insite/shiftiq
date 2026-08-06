@@ -139,6 +139,14 @@
     "Courier": "Mailgun"
   },
   {
+    "Slug": "ClassCompletedLearner",
+    "MessageType": "Notification",
+    "Subject": "Class Completed",
+    "Purpose": "This notification is sent to learner subscribers after the class completed. (Configured in each event)",
+    "Variables": "EventTitle",
+    "Courier": "Mailgun"
+  },
+  {
     "Slug": "CmdsBlogSubscriptionRequested",
     "MessageType": "Alert",
     "Subject": "CMDS Blog Subscription",

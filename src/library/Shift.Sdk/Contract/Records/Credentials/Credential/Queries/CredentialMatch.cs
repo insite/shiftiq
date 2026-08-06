@@ -13,5 +13,13 @@ namespace Shift.Contract
         public string CredentialNecessity { get; set; }
 
         public bool CredentialIsRequired { get; set; }
+
+        public string AchievementLabel { get; set; }
+        public string AchievementTitle { get; set; }
+
+        public string PersonCode { get; set; }
+        public DateTimeOffset? AchievementEffectiveDate { get; set; }
+        public DateTimeOffset? AchievementExpiryDate { get; set; }
+        public bool AchievementValid { get; set; }
     }
 }

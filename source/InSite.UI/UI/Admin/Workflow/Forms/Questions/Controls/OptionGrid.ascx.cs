@@ -344,7 +344,7 @@ namespace InSite.Admin.Workflow.Forms.Questions.Controls
                 {
                     Identifier = Identifiers[i],
                     Letter = letterInput.Text,
-                    Points = pointsInput.ValueAsDecimal.Value,
+                    Points = pointsInput.ValueAsDecimal ?? 0,
                     Category = categoryInput.Text,
                     IsSummaryVisible = stateData.SummaryRows.ContainsKey(i) && stateData.SummaryRows[i],
                     Content = stateData.Content[i]

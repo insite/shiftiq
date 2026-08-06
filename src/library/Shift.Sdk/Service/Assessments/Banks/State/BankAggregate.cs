@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Domain.Banks
@@ -553,10 +552,27 @@ namespace InSite.Domain.Banks
             Apply(e);
         }
 
+        public void ChangeCriterionContent(Guid criterion, ContentExamCriterion content)
+        {
+            if (content == null)
+                return;
+
+            var c = Data.FindCriterion(criterion);
+            if (c == null)
+                return;
+
+            if (c.Content.IsEqual(content))
+                return;
+
+            var e = new CriterionContentChanged(criterion, content);
+
+            Apply(e);
+        }
+
         public void ChangeCriterionFilter(Guid criterion, decimal setWeight, int? questionLimit, string tagFilter, PivotTable pivotFilter)
         {
-            var s = Data.FindCriterion(criterion);
-            if (s == null)
+            var c = Data.FindCriterion(criterion);
+            if (c == null)
                 return;
 
             var e = new CriterionFilterChanged(criterion, setWeight, questionLimit, tagFilter, pivotFilter);
@@ -1378,6 +1394,33 @@ namespace InSite.Domain.Banks
             Apply(new FormPublished(form, publication));
         }
 
+        public void ReconfigureCriterionTab(Guid criterionId, bool warningOnNextTabEnabled, bool breakTimerEnabled, int timeLimit, FormSectionTimeType timerType)
+        {
+            if (timeLimit < 0 || timeLimit > 1440)
+                return;
+
+            var crierion = Data.FindCriterion(criterionId);
+            if (crierion == null)
+                return;
+
+            var specification = crierion.Specification;
+            if (!specification.SectionsAsTabsEnabled || specification.TabNavigationEnabled)
+                return;
+
+            var tabConfig = crierion.TabConfiguration;
+            var isChanged = tabConfig.WarningOnNextTabEnabled != warningOnNextTabEnabled
+                || tabConfig.BreakTimerEnabled != breakTimerEnabled
+                || tabConfig.TimeLimit != timeLimit
+                || tabConfig.TimerType != timerType;
+
+            if (!isChanged)
+                return;
+
+            var e = new CriterionTabReconfigured(criterionId, warningOnNextTabEnabled, breakTimerEnabled, timeLimit, timerType);
+
+            Apply(e);
+        }
+
         public void ReconfigureSection(Guid sectionId, bool warningOnNextTabEnabled, bool breakTimerEnabled, int timeLimit, FormSectionTimeType timerType)
         {
             if (timeLimit < 0 || timeLimit > 1440)
@@ -1391,10 +1434,12 @@ namespace InSite.Domain.Banks
             if (!specification.SectionsAsTabsEnabled || specification.TabNavigationEnabled)
                 return;
 
-            var isChanged = section.WarningOnNextTabEnabled != warningOnNextTabEnabled
-                || section.BreakTimerEnabled != breakTimerEnabled
-                || section.TimeLimit != timeLimit
-                || section.TimerType != timerType;
+            var tabConfig = section.TabConfiguration;
+            var isChanged = tabConfig.WarningOnNextTabEnabled != warningOnNextTabEnabled
+                || tabConfig.BreakTimerEnabled != breakTimerEnabled
+                || tabConfig.TimeLimit != timeLimit
+                || tabConfig.TimerType != timerType;
+
             if (!isChanged)
                 return;
 
@@ -1588,7 +1633,7 @@ namespace InSite.Domain.Banks
         public void DisableSectionsAsTabs(Guid specification)
         {
             var s = Data.FindSpecification(specification);
-            if (s == null || s.Type != SpecificationType.Static || !s.SectionsAsTabsEnabled)
+            if (s == null || !s.SectionsAsTabsEnabled)
                 return;
 
             var e = new SectionsAsTabsDisabled(specification);
@@ -1599,7 +1644,7 @@ namespace InSite.Domain.Banks
         public void EnableSectionsAsTabs(Guid specification)
         {
             var s = Data.FindSpecification(specification);
-            if (s == null || s.Type != SpecificationType.Static || s.SectionsAsTabsEnabled)
+            if (s == null || s.SectionsAsTabsEnabled)
                 return;
 
             var e = new SectionsAsTabsEnabled(specification);
@@ -1610,7 +1655,7 @@ namespace InSite.Domain.Banks
         public void DisableTabNavigation(Guid specification)
         {
             var s = Data.FindSpecification(specification);
-            if (s == null || s.Type != SpecificationType.Static || !s.SectionsAsTabsEnabled || !s.TabNavigationEnabled)
+            if (s == null || !s.SectionsAsTabsEnabled || !s.TabNavigationEnabled)
                 return;
 
             var e = new TabNavigationDisabled(specification);
@@ -1621,7 +1666,7 @@ namespace InSite.Domain.Banks
         public void EnableTabNavigation(Guid specification)
         {
             var s = Data.FindSpecification(specification);
-            if (s == null || s.Type != SpecificationType.Static || !s.SectionsAsTabsEnabled || s.TabNavigationEnabled)
+            if (s == null || !s.SectionsAsTabsEnabled || s.TabNavigationEnabled)
                 return;
 
             var e = new TabNavigationEnabled(specification);
@@ -1632,7 +1677,7 @@ namespace InSite.Domain.Banks
         public void DisableSingleQuestionPerTab(Guid specification)
         {
             var s = Data.FindSpecification(specification);
-            if (s == null || s.Type != SpecificationType.Static || !s.SectionsAsTabsEnabled || s.TabNavigationEnabled || !s.SingleQuestionPerTabEnabled)
+            if (s == null || !s.SectionsAsTabsEnabled || s.TabNavigationEnabled || !s.SingleQuestionPerTabEnabled)
                 return;
 
             var e = new SingleQuestionPerTabDisabled(specification);
@@ -1643,7 +1688,7 @@ namespace InSite.Domain.Banks
         public void EnableSingleQuestionPerTab(Guid specification)
         {
             var s = Data.FindSpecification(specification);
-            if (s == null || s.Type != SpecificationType.Static || !s.SectionsAsTabsEnabled || s.TabNavigationEnabled || s.SingleQuestionPerTabEnabled)
+            if (s == null || !s.SectionsAsTabsEnabled || s.TabNavigationEnabled || s.SingleQuestionPerTabEnabled)
                 return;
 
             var e = new SingleQuestionPerTabEnabled(specification);

@@ -50,13 +50,12 @@ namespace InSite.Application.Events.Write
             _appSettings = appSettings;
         }
 
-        public int CreateNotifications(Guid? eventIdentifier, bool ignoreScheduleStart)
+        public int CreateNotifications(Guid? eventIdentifier, bool ignoreScheduleStartEnd)
         {
-            var events = GetNotProceededEvents(eventIdentifier, ignoreScheduleStart);
+            var count = 0;
 
-            int count = 0;
-
-            foreach (var @event in events)
+            var reminderEvents = GetNotProceededReminderEvents(eventIdentifier, ignoreScheduleStartEnd);
+            foreach (var @event in reminderEvents)
             {
                 var organization = _getOrganization(@event.OrganizationIdentifier);
                 var venue = @event.VenueLocationIdentifier.HasValue ? _groupSearch.GetGroup(@event.VenueLocationIdentifier.Value) : null;
@@ -66,10 +65,17 @@ namespace InSite.Application.Events.Write
                 count += ProceedEventForInstructors(@event, organization, venue, venueAddress);
             }
 
+            var completedEvents = GetNotProceededCompletedEvents(eventIdentifier, ignoreScheduleStartEnd);
+            foreach (var @event in completedEvents)
+            {
+                var organization = _getOrganization(@event.OrganizationIdentifier);
+                count += ProceedEventForCompletedLearners(@event, organization);
+            }
+
             return count;
         }
 
-        private List<QEvent> GetNotProceededEvents(Guid? eventIdentifier, bool ignoreScheduleStart)
+        private List<QEvent> GetNotProceededReminderEvents(Guid? eventIdentifier, bool ignoreScheduleStart)
         {
             var events = eventIdentifier.HasValue && ignoreScheduleStart
                 ? new List<QEvent> { _eventSearch.GetEvent(eventIdentifier.Value) }
@@ -87,6 +93,24 @@ namespace InSite.Application.Events.Write
                     || x.ReminderMessageSent <= x.EventScheduledStart.AddDays(-x.SendReminderBeforeDays.Value).AddHours(-AllowanceInHours)
                 )
                 .ToList();
+        }
+
+        private List<QEvent> GetNotProceededCompletedEvents(Guid? eventIdentifier, bool ignoreScheduleEnd)
+        {
+            var now = DateTimeOffset.UtcNow;
+
+            if (!eventIdentifier.HasValue)
+                return _eventSearch.GetEventsForCompleted(now, false, ignoreScheduleEnd);
+
+            var @event = _eventSearch.GetEvent(eventIdentifier.Value);
+
+            if (ignoreScheduleEnd)
+                return new List<QEvent> { @event };
+
+            if (@event.CompletedMessageSent.HasValue || @event.EventScheduledEnd > now)
+                return new List<QEvent>();
+
+            return new List<QEvent> { @event };
         }
 
         private int ProceedEventForLearners(QEvent @event, OrganizationState organization, QGroup venue, QGroupAddress venueAddress)
@@ -183,7 +207,41 @@ namespace InSite.Application.Events.Write
                 notifications.Add((instructor.UserIdentifier, notification));
             }
 
-            SendNotifications(@event.EventIdentifier, EventMessageType.ReminderLearner, @event.WhenEventReminderRequestedNotifyLearnerMessageIdentifier.Value, notifications);
+            SendNotifications(@event.EventIdentifier, EventMessageType.ReminderInstructor, @event.WhenEventReminderRequestedNotifyInstructorMessageIdentifier.Value, notifications);
+
+            return notifications.Count;
+        }
+
+        private int ProceedEventForCompletedLearners(QEvent @event, OrganizationState organization)
+        {
+            if (@event.WhenEventCompletedNotifyLearnerMessageIdentifier == null)
+                return 0;
+
+            var registrations = _registrationSearch.GetRegistrations(new QRegistrationFilter
+            {
+                EventIdentifier = @event.EventIdentifier,
+                ApprovalStatus = "Registered"
+            }, x => x.Candidate);
+
+            var notifications = new List<(Guid, Notification)>();
+
+            foreach (var registration in registrations)
+            {
+                var notification = new ClassCompletedLearnerNotification
+                {
+                    OriginOrganization = @event.OrganizationIdentifier,
+                    MessageIdentifier = @event.WhenEventCompletedNotifyLearnerMessageIdentifier.Value,
+                    EventTitle = @event.EventTitle,
+                };
+
+                notifications.Add((registration.CandidateIdentifier, notification));
+            }
+
+            SendNotifications(
+                @event.EventIdentifier,
+                EventMessageType.CompletedLearner,
+                @event.WhenEventCompletedNotifyLearnerMessageIdentifier.Value,
+                notifications);
 
             return notifications.Count;
         }

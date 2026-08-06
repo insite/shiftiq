@@ -19,6 +19,7 @@ using Shift.Service.Timeline;
 using Shift.Service.Utility;
 using Shift.Service.Workflow;
 using Shift.Service.Workspace;
+using Shift.Service.Reports;
 
 namespace Shift.Service;
 
@@ -47,6 +48,7 @@ public class TableDbContext : DbContext
     internal DbSet<AddressEntity> QPersonAddress { get; set; }
     internal DbSet<GroupEntity> QGroup { get; set; }
     internal DbSet<MembershipEntity> QMembership { get; set; }
+    internal DbSet<MembershipDeletionEntity> QMembershipDeletion { get; set; }
     internal DbSet<PersonEntity> QPerson { get; set; }
     internal DbSet<QPersonSecretEntity> QPersonSecret { get; set; }
 
@@ -63,7 +65,6 @@ public class TableDbContext : DbContext
 
     // Domain: Directory
     internal DbSet<PendingPersonEntity> PendingPerson { get; set; }
-    internal DbSet<PendingPersonMatch> PendingPersonMatch { get; set; }
 
     // Domain: Learning
     internal DbSet<CourseEntity> Course { get; set; }
@@ -76,6 +77,10 @@ public class TableDbContext : DbContext
     internal DbSet<GradebookEntity> QGradebook { get; set; }
     internal DbSet<QGradebookEnrollmentEntity> QGradebookEnrollment { get; set; }
     internal DbSet<PeriodEntity> QPeriod { get; set; }
+
+    // Domain: Reports
+    internal DbSet<ToolkitVisitEntity> TToolkitVisit { get; set; }
+    internal DbSet<ToolkitUsageEntity> TToolkitUsage { get; set; }
 
     // Domain: Workflow
     internal DbSet<CaseDocumentEntity> QCaseDocument { get; set; }
@@ -146,8 +151,8 @@ public class TableDbContext : DbContext
         builder.ApplyConfiguration(new AddressConfiguration());
         builder.ApplyConfiguration(new GroupConfiguration());
         builder.ApplyConfiguration(new MembershipConfiguration());
+        builder.ApplyConfiguration(new MembershipDeletionConfiguration());
         builder.ApplyConfiguration(new PendingPersonConfiguration());
-        builder.ApplyConfiguration(new PendingPersonMatchConfiguration());
         builder.ApplyConfiguration(new PersonConfiguration());
         builder.ApplyConfiguration(new QPersonSecretConfiguration());
 
@@ -169,6 +174,10 @@ public class TableDbContext : DbContext
         builder.ApplyConfiguration(new GradebookConfiguration());
         builder.ApplyConfiguration(new QGradebookEnrollmentConfiguration());
         builder.ApplyConfiguration(new PeriodConfiguration());
+
+        // Domain: Reports
+        builder.ApplyConfiguration(new ToolkitVisitConfiguration());
+        builder.ApplyConfiguration(new ToolkitUsageConfiguration());
 
         // Domain: Workflow
         builder.ApplyConfiguration(new CaseConfiguration());

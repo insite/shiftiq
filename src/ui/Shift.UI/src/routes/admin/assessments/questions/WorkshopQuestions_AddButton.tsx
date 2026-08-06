@@ -77,6 +77,7 @@ export default function WorkshopQuestions_AddButton({
         <Dropdown as={ButtonGroup}>
             <Button
                 variant="add"
+                type="button"
                 iconStyle="regular"
                 title="Add a new multiple choice question to selected set"
                 isLoading={isAddingNewQuestion}

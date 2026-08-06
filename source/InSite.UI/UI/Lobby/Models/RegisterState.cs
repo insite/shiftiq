@@ -15,14 +15,12 @@ namespace InSite.UI.Lobby
     public class RegisterState
     {
         private HttpSessionState _session { get; set; }
-        private NameValueCollection _parameters { get; set; }
         private string _formKey { get; set; }
 
-        public RegisterState(OrganizationState organization, HttpSessionState session, NameValueCollection parameters, string formKey)
+        public RegisterState(OrganizationState organization, HttpSessionState session, string formKey)
         {
             Organization = organization;
             _session = session;
-            _parameters = parameters;
             _formKey = formKey;
         }
 
@@ -72,9 +70,6 @@ namespace InSite.UI.Lobby
                 return logoUrl;
             }
         }
-
-        public string RequestedGroupName
-            => HttpUtility.UrlDecode(_parameters["group"]).NullIfEmpty();
 
         private object GetSessionValue([CallerMemberName] string name = null)
         {

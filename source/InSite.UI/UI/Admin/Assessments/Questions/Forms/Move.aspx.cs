@@ -422,7 +422,7 @@ namespace InSite.Admin.Assessments.Questions.Forms
 
         private void BindMappingQuestionRepeater(BankState bank)
         {
-            IEnumerable<Question> questions;
+            Question[] questions;
 
             if (SpecificationID != Guid.Empty)
             {
@@ -432,7 +432,7 @@ namespace InSite.Admin.Assessments.Questions.Forms
                 if (SetID != Guid.Empty)
                     sets = sets.Where(x => x.Identifier == SetID);
 
-                questions = sets.SelectMany(x => x.Questions);
+                questions = sets.SelectMany(x => x.Questions).ToArray();
             }
             else
             {

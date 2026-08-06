@@ -57,6 +57,9 @@ namespace InSite.Admin.Accounts.Organizations.Forms
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
+            if (!Page.IsValid)
+                return;
+
             var organization = OrganizationSearch.Select(OrganizationID);
 
             Details.GetInputValues(organization);

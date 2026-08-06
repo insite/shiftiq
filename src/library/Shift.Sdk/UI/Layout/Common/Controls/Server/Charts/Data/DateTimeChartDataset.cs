@@ -73,6 +73,8 @@ namespace Shift.Sdk.UI
 
         #region Methods
 
+        IChartDatasetItem IChartDataset.NewItem() => NewItem();
+
         public DateTimeChartDatasetItem NewItem()
         {
             _dataset.Add();

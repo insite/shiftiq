@@ -33,7 +33,7 @@
                         You have <asp:Label runat="server" ID="CreditCountSpan" CssClass="CatalogDetail_CreditCount" /> <asp:Literal runat="server" ID="CreditText" />!
                     </div>
                     <div class="mb-0 text-white">
-                        Select your SkillsChecks from the Catalog below and click Save Changes.
+                        Select your SkillsChecks from the Catalogue below and click Save Changes.
                         They’ll be automatically added to your account and activated on your Management Dashboard.
                     </div>
                 </div>

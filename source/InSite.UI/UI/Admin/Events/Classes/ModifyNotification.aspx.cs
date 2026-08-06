@@ -64,6 +64,9 @@ namespace InSite.UI.Admin.Events.Classes
             ReminderInstructorMessage.Filter.Type = MessageTypeName.Notification;
             ReminderInstructorMessage.Value = @event.WhenEventReminderRequestedNotifyInstructorMessageIdentifier;
 
+            CompletedLearnerMessage.Filter.Type = MessageTypeName.Notification;
+            CompletedLearnerMessage.Value = @event.WhenEventCompletedNotifyLearnerMessageIdentifier;
+
             SendReminderBeforeDays.ValueAsInt = @event.SendReminderBeforeDays;
 
             CancelButton.NavigateUrl = OutlineUrl;
@@ -78,6 +81,7 @@ namespace InSite.UI.Admin.Events.Classes
             {
                 new ConnectEventMessage(EventIdentifier, EventMessageType.ReminderLearner, ReminderLearnerMessage.Value),
                 new ConnectEventMessage(EventIdentifier, EventMessageType.ReminderInstructor, ReminderInstructorMessage.Value),
+                new ConnectEventMessage(EventIdentifier, EventMessageType.CompletedLearner, CompletedLearnerMessage.Value),
                 new ModifyEventMessagePeriod(EventIdentifier, SendReminderBeforeDays.ValueAsInt)
             };
 

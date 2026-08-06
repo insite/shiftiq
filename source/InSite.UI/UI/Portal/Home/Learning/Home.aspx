@@ -73,7 +73,7 @@
         <div class="row mb-4">
             <div class="col-5">
                 <h6 class="text-info">Welcome to SkillsCheck – Helping you align your skills with in-demand training and employment opportunities</h6>
-                <h6>Here you'll find your assigned SkillsChecks, or you can browse our catalog to explore other opportunities</h6>
+                <h6>Here you'll find your assigned SkillsChecks, or you can browse our catalogue to explore other opportunities</h6>
             </div>
             <div class="col-7 ps-0">
                 <div runat="server" id="AttemptCard" class="card">
@@ -93,7 +93,7 @@
                                     <insite:Button runat="server" ID="AttemptCardContinueButton" Text="Continue" ButtonStyle="Success" />
                                     <insite:Button runat="server" ID="AttemptCardAddToCartButton" Text="Add to Cart" ButtonStyle="Success"
                                         OnClientClick="alert('Not Implemented'); return false;" />
-                                    <insite:Button runat="server" ID="AttemptCardViewCatalogButton" Text="View Catalog" ButtonStyle="Success" />
+                                    <insite:Button runat="server" ID="AttemptCardViewCatalogButton" Text="View Catalogue" ButtonStyle="Success" />
                                 </div>
                             </div>
                         </div>

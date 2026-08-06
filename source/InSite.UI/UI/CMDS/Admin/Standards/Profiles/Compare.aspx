@@ -12,11 +12,6 @@
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 
     <section runat="server" ID="CompareSection" class="mb-3">
-        
-        <h2 class="h4 mb-3">
-            <i class="far fa-ruler-triangle me-1"></i>
-            Compare
-        </h2>
 
         <div class="card border-0 shadow-lg h-100">
             <div class="card-body">
@@ -29,28 +24,30 @@
                             <tbody>
 
                                 <tr class="no-accent">
-                                    <td class="w-50 align-top pe-2">
+                                    <td class="w-50 align-top pe-2" colspan="2">
 
-                                        <div class="d-inline-block align-middle me-2" style="width:calc(100% - 160px);">
-                                            <cmds:FindProfile ID="Profile1" runat="server" /> 
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 me-2">
+                                                <cmds:FindProfile ID="Profile1" runat="server" />
+                                            </div>
+                                            <insite:Button runat="server" ID="EditProfile1" Icon="fas fa-pencil" ToolTip="Edit profile" Enabled="false" ButtonStyle="Default" Size="Default" />
                                         </div>
-                                    
-                                        <insite:Button runat="server" ID="EditProfile1" Text="Edit Profile" Icon="fas fa-pencil" Enabled="false" ButtonStyle="Default" Size="Default" />
 
-                                        <div runat="server" id="ProfileDetails1" class="my-3">
+                                        <div runat="server" id="ProfileDetails1" class="alert alert-info my-3">
                                             <asp:Literal ID="CompetencyCount1" runat="server" />
                                         </div>
 
                                     </td>
-                                    <td class="w-50 align-top ps-2" colspan="2">
+                                    <td class="w-50 align-top ps-2" colspan="3">
 
-                                        <div class="d-inline-block align-middle me-2" style="width:calc(100% - 160px);">
-                                            <cmds:FindProfile ID="Profile2" runat="server"  /> 
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 me-2">
+                                                <cmds:FindProfile ID="Profile2" runat="server" />
+                                            </div>
+                                            <insite:Button runat="server" ID="EditProfile2" Icon="fas fa-pencil" ToolTip="Edit profile" Enabled="false" ButtonStyle="Default" Size="Default" />
                                         </div>
 
-                                        <insite:Button runat="server" ID="EditProfile2" Text="Edit Profile" Icon="fas fa-pencil" Enabled="false" ButtonStyle="Default" Size="Default" />
-
-                                        <div runat="server" id="ProfileDetails2" class="my-3">
+                                        <div runat="server" id="ProfileDetails2" class="alert alert-info my-3">
                                             <asp:Literal ID="CompetencyCount2" runat="server" />
                                         </div>
 
@@ -60,28 +57,34 @@
                                 <asp:Repeater ID="Differences" runat="server">
                                     <ItemTemplate>
                                         <tr>
-                                            <td class="p-2">
-                                                <%# Eval("LeftText") %>
+                                            <td class="align-top p-2 text-nowrap">
+                                                <%# Eval("LeftCode") %>
+                                            </td>
+                                            <td class="align-top p-2">
+                                                <%# Eval("LeftTitle") %>
                                             </td>
                                             <td class="text-nowrap align-top p-2" style="width:16px;">
                                                 <cmds:IconButton ID="DeleteCompetencyButton" runat="server"
                                                     Visible='<%# !(bool)Eval("IsRightEmpty") && !IsRightProfileLocked %>'
-                                                    IsFontIcon="true" CssClass="trash-alt"
+                                                    IsFontIcon="true" CssClass="trash-alt" ForeColor="Red"
                                                     CommandName="DeleteCompetency"
                                                     CommandArgument='<%# Eval("CompetencyStandardIdentifier") %>'
                                                     ToolTip="Delete competency"
                                                     ConfirmText="Are you sure you want to delete competency from this profile?"
                                                 />
                                                 <cmds:IconButton ID="AddCompetencyButton" runat="server"
-                                                    Visible='<%# (bool)Eval("IsRightEmpty") && Eval("RightText") != null && !IsLeftProfileLocked %>'
+                                                    Visible='<%# (bool)Eval("IsRightEmpty") && Eval("RightCode") != null && !IsLeftProfileLocked %>'
                                                     IsFontIcon="true" CssClass="plus-circle"
                                                     CommandName="AddCompetency"
                                                     CommandArgument='<%# Eval("CompetencyStandardIdentifier") %>'
                                                     ToolTip="Add competency"
                                                 />
                                             </td>
-                                            <td class="align-top p-2" >
-                                                <%# Eval("RightText") %>
+                                            <td class="align-top p-2 text-nowrap">
+                                                <%# Eval("RightCode") %>
+                                            </td>
+                                            <td class="align-top p-2">
+                                                <%# Eval("RightTitle") %>
                                             </td>
                                         </tr>
                                     </ItemTemplate>
@@ -90,28 +93,34 @@
                                 <asp:Repeater ID="Similarities" runat="server">
                                     <HeaderTemplate>
                                         <tr class="no-accent">
-                                            <td colspan="3">
+                                            <td colspan="5">
                                                 <hr />
                                             </td>
                                         </tr>
                                     </HeaderTemplate>
                                     <ItemTemplate>
                                         <tr>
-                                            <td class="p-2">
-                                                <%# Eval("LeftText") %>
+                                            <td class="align-top p-2 text-nowrap">
+                                                <%# Eval("LeftCode") %>
+                                            </td>
+                                            <td class="align-top p-2">
+                                                <%# Eval("LeftTitle") %>
                                             </td>
                                             <td class="text-nowrap align-top p-2" style="width:16px;">
                                                 <cmds:IconButton ID="DeleteCompetencyButton" runat="server"
                                                     Visible='<%# !IsLeftProfileLocked && !IsRightProfileLocked %>'
-                                                    IsFontIcon="true" CssClass="trash-alt"
+                                                    IsFontIcon="true" CssClass="trash-alt" ForeColor="Red"
                                                     CommandName="DeleteCompetency"
                                                     CommandArgument='<%# Eval("CompetencyStandardIdentifier") %>'
                                                     ToolTip="Delete competency"
                                                     ConfirmText="Are you sure you want to delete competency from this profile?"
                                                 />
                                             </td>
-                                            <td class="align-top p-2" >
-                                                <%# Eval("RightText") %>
+                                            <td class="align-top p-2 text-nowrap">
+                                                <%# Eval("RightCode") %>
+                                            </td>
+                                            <td class="align-top p-2">
+                                                <%# Eval("RightTitle") %>
                                             </td>
                                         </tr>
                                     </ItemTemplate>

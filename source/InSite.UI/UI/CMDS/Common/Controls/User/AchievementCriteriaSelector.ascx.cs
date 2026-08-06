@@ -10,11 +10,36 @@ using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Sdk.UI;
 
 namespace InSite.Cmds.Controls.Reporting.Report
 {
+    /// <summary>
+    /// The achievements the user asked for, resolved from the per-type selection modes. An empty
+    /// <see cref="Achievements"/> array combined with <see cref="IsEveryTypeAll"/> means "every achievement", which
+    /// the report queries express by applying no achievement filter at all.
+    /// </summary>
+    public sealed class AchievementSelection
+    {
+        public AchievementSelection(Guid[] achievements, bool isEveryTypeAll)
+        {
+            Achievements = achievements ?? new Guid[0];
+            IsEveryTypeAll = isEveryTypeAll;
+        }
+
+        public Guid[] Achievements { get; }
+
+        public bool IsEveryTypeAll { get; }
+
+        public bool HasSelection => IsEveryTypeAll || Achievements.Length > 0;
+    }
+
     public partial class AchievementCriteriaSelector : UserControl
     {
+        private const string ModeNone = "None";
+        private const string ModeAll = "All";
+        private const string ModeSpecific = "Specific";
+
         [Serializable]
         private class AchievementGroup
         {
@@ -26,6 +51,23 @@ namespace InSite.Cmds.Controls.Reporting.Report
         {
             get => (AchievementGroup[])ViewState[nameof(Achievements)];
             set => ViewState[nameof(Achievements)] = value;
+        }
+
+        /// <summary>
+        /// When enabled, each achievement type gets a None/All/Specific mode selector and the picker is shown only
+        /// for the types set to Specific. Off by default so the hosts that predate the modes keep the Select All and
+        /// Clear All buttons.
+        /// </summary>
+        public bool EnableSelectionModes
+        {
+            get => (bool)(ViewState[nameof(EnableSelectionModes)] ?? false);
+            set => ViewState[nameof(EnableSelectionModes)] = value;
+        }
+
+        public bool EnableSingleSelection
+        {
+            get => (bool)(ViewState[nameof(EnableSingleSelection)] ?? false);
+            set => ViewState[nameof(EnableSingleSelection)] = value;
         }
 
         protected override void OnInit(EventArgs e)
@@ -43,10 +85,42 @@ namespace InSite.Cmds.Controls.Reporting.Report
             if (e.Item.ItemType != ListItemType.AlternatingItem && e.Item.ItemType != ListItemType.Item)
                 return;
 
-            var selector = (FindEntity)e.Item.FindControl("AchievementSelector");
+            var selector = GetSelector(e.Item);
             selector.NeedDataCount += AchievementSelector_NeedDataCount;
             selector.NeedDataSource += AchievementSelector_NeedDataSource;
             selector.NeedSelectedItems += AchievementSelector_NeedSelectedItems;
+
+            if (EnableSingleSelection)
+            {
+                selector.MaxSelectionCount = 1;
+                selector.AutoPostBack = true;
+                selector.ValueChanged += AchievementSelector_ValueChanged;
+            }
+
+            var mode = (ComboBox)e.Item.FindControl("ModeSelector");
+            mode.Visible = EnableSelectionModes && !EnableSingleSelection;
+        }
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+
+            if (EnableSingleSelection || !EnableSelectionModes)
+                return;
+
+            // Applied here rather than in the combo's ValueChanged handler so the picker is in the right state on the
+            // first render too, not only after a mode is changed.
+            foreach (RepeaterItem item in Repeater.Items)
+            {
+                var mode = GetMode(item);
+                var selector = GetSelector(item);
+                var isSpecific = mode == ModeSpecific;
+
+                selector.Visible = isSpecific;
+
+                if (!isSpecific)
+                    selector.Values = null;
+            }
         }
 
         private void AchievementSelector_NeedDataCount(object sender, FindEntity.CountArgs args)
@@ -78,11 +152,26 @@ namespace InSite.Cmds.Controls.Reporting.Report
             args.Items = items.Where(x => args.Identifiers.Contains(x.Value)).ToArray();
         }
 
+        private void AchievementSelector_ValueChanged(object sender, FindEntityValueChangedEventArgs e)
+        {
+            if (e.NewValue == null)
+                return;
+
+            var changed = (FindEntity)sender;
+
+            foreach (RepeaterItem item in Repeater.Items)
+            {
+                var selector = GetSelector(item);
+                if (selector != changed)
+                    selector.Values = null;
+            }
+        }
+
         private void SelectAllButton_Click(object sender, EventArgs e)
         {
             foreach (RepeaterItem item in Repeater.Items)
             {
-                var selector = (FindEntity)item.FindControl("AchievementSelector");
+                var selector = GetSelector(item);
                 selector.Values = Achievements[item.ItemIndex].Items.Select(x => x.Value).ToArray();
             }
         }
@@ -91,7 +180,7 @@ namespace InSite.Cmds.Controls.Reporting.Report
         {
             foreach (RepeaterItem item in Repeater.Items)
             {
-                var selector = (FindEntity)item.FindControl("AchievementSelector");
+                var selector = GetSelector(item);
                 selector.Values = null;
             }
         }
@@ -101,12 +190,27 @@ namespace InSite.Cmds.Controls.Reporting.Report
             var data = departments.IsNotEmpty()
                 ? VCmdsCredentialSearch.SelectAchievementsByDepartment(departments, null, isRequired)
                 : null;
+
+            return BindAchievements(data);
+        }
+
+        public bool LoadDataByOrganization(Guid organizationId, string[] categories, bool? isRequired)
+        {
+            var data = VCmdsCredentialSearch.SelectAchievementsByOrganization(organizationId, categories, isRequired);
+
+            return BindAchievements(data);
+        }
+
+        private bool BindAchievements(List<VCmdsAchievement> data)
+        {
             var hasData = data.IsNotEmpty();
 
             Achievements = hasData ? CreateGroups(data) : null;
 
-            SelectAllButton.Visible = hasData;
-            DeselectAllButton.Visible = hasData;
+            var showButtons = hasData && !EnableSelectionModes && !EnableSingleSelection;
+
+            SelectAllButton.Visible = showButtons;
+            DeselectAllButton.Visible = showButtons;
 
             Repeater.DataSource = Achievements;
             Repeater.DataBind();
@@ -143,28 +247,68 @@ namespace InSite.Cmds.Controls.Reporting.Report
         public Guid[] GetSelectedAchievements()
         {
             return Repeater.Items.Cast<RepeaterItem>()
-                .Select(x => (FindEntity)x.FindControl("AchievementSelector"))
+                .Select(x => GetSelector(x))
                 .SelectMany(x => x.Values)
                 .ToArray();
         }
 
+        /// <summary>
+        /// Resolves the per-type modes into the achievement identifiers to filter on. When every type is set to All
+        /// the result is an empty array, which every report query reads as "no achievement filter" - the cheapest
+        /// path through the query, since it skips the identifier list entirely.
+        /// </summary>
+        public AchievementSelection ResolveSelection()
+        {
+            if (EnableSingleSelection)
+                return new AchievementSelection(GetSelectedAchievements().Take(1).ToArray(), false);
+
+            if (!EnableSelectionModes)
+                return new AchievementSelection(GetSelectedAchievements(), false);
+
+            var items = Repeater.Items.Cast<RepeaterItem>().ToArray();
+            if (items.Length == 0)
+                return new AchievementSelection(new Guid[0], false);
+
+            var isEveryTypeAll = items.All(x => GetMode(x) == ModeAll);
+            if (isEveryTypeAll)
+                return new AchievementSelection(new Guid[0], true);
+
+            var identifiers = new List<Guid>();
+
+            foreach (var item in items)
+            {
+                var mode = GetMode(item);
+
+                if (mode == ModeNone)
+                {
+                    continue;
+                }
+                else if (mode == ModeAll)
+                {
+                    var group = Achievements[item.ItemIndex];
+                    identifiers.AddRange(group.Items.Select(x => x.Value));
+                }
+                else if (mode == ModeSpecific)
+                {
+                    var selector = GetSelector(item);
+                    identifiers.AddRange(selector.Values);
+                }
+            }
+
+            return new AchievementSelection(identifiers.Distinct().ToArray(), false);
+        }
+
+        private static FindEntity GetSelector(RepeaterItem item) =>
+            (FindEntity)item.FindControl("AchievementSelector");
+
+        private static string GetMode(RepeaterItem item) =>
+            ((ComboBox)item.FindControl("ModeSelector")).Value;
+
         public bool HasValue()
         {
             return Repeater.Items.Cast<RepeaterItem>()
-                .Select(x => (FindEntity)x.FindControl("AchievementSelector"))
+                .Select(x => GetSelector(x))
                 .Any(x => x.HasValue);
-        }
-
-        public bool IsAllSelected()
-        {
-            if (Achievements == null || Achievements.Length == 0)
-                return false;
-
-            var totalCount = Achievements.Sum(g => g.Items.Length);
-            if (totalCount == 0)
-                return false;
-
-            return GetSelectedAchievements().Length >= totalCount;
         }
     }
 }

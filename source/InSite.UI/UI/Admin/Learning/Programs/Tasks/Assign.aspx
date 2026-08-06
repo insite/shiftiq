@@ -108,10 +108,10 @@
                                                     <%# GetDisplayTextType((string)Eval("Type")) %>
                                                 </td>
                                                 <td>
-                                                    <%# Eval("TaskTitle") %>
+                                                    <%# Eval("TaskTitle") %><%# (bool)Eval("IsInherited") ? " <span class='badge bg-info fs-sm ms-2' title='Inherited from a parent program'>Inherited</span>" : "" %>
                                                 </td>
                                                 <td>
-                                                    <insite:IconButton runat="server" CommandName="Delete" Name="trash-alt" CommandArgument='<%# Eval("TaskIdentifier") %>' ToolTip="Remove Item" OnClientClick="if (!confirm('Are you sure you want to remove this item?')) return false;" />
+                                                    <insite:IconButton runat="server" CommandName="Delete" Name="trash-alt" CommandArgument='<%# Eval("TaskIdentifier") %>' ToolTip="Remove Item" Visible='<%# !(bool)Eval("IsInherited") %>' OnClientClick="if (!confirm('Are you sure you want to remove this item?')) return false;" />
                                                 </td>
                                             </tr>
                                         </div>

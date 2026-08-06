@@ -322,6 +322,7 @@ namespace InSite.Persistence.Plugin.CMDS
             public string DepartmentName { get; set; }
             public Guid UserIdentifier { get; set; }
             public string FullName { get; set; }
+            public string Email { get; set; }
             public string AchievementTitle { get; set; }
             public string AchievementLabel { get; set; }
             public DateTimeOffset? DateAssigned { get; set; }
@@ -331,6 +332,7 @@ namespace InSite.Persistence.Plugin.CMDS
             public bool IsTimeSensitive { get; set; }
             public decimal? GradePercent { get; set; }
             public string CredentialStatus { get; set; }
+            public string JobDivision { get; set; }
         }
 
         public class TrainingExpiryDate
@@ -341,6 +343,7 @@ namespace InSite.Persistence.Plugin.CMDS
             public string DepartmentName { get; set; }
             public Guid UserIdentifier { get; set; }
             public string FullName { get; set; }
+            public string Email { get; set; }
             public Guid AchievementIdentifier { get; set; }
             public string AchievementTitle { get; set; }
             public DateTimeOffset? DateCompleted { get; set; }
@@ -349,17 +352,21 @@ namespace InSite.Persistence.Plugin.CMDS
             public bool IsTimeSensitive { get; set; }
             public string Status { get; set; }
             public bool IsQuizPassed { get; set; }
+            public string JobDivision { get; set; }
         }
 
         public class TrainingHistoryPerUser
         {
+            public Guid UserIdentifier { get; set; }
             public string PersonFullName { get; set; }
+            public string PersonEmail { get; set; }
             public string ResourceTitle { get; set; }
             public DateTimeOffset? DateCompleted { get; set; }
             public DateTimeOffset? ExpirationDate { get; set; }
             public string AccreditorName { get; set; }
             public bool IsCompetent { get; set; }
             public decimal? Score { get; set; }
+            public string JobDivision { get; set; }
         }
 
         public class TrainingRequirementsPerUser
@@ -501,7 +508,10 @@ namespace InSite.Persistence.Plugin.CMDS
                 string credentialStatus,
                 DateTime? completedSince,
                 DateTime? completedBefore,
-                bool excludeSelfDeclared
+                bool excludeSelfDeclared,
+                Guid organizationId,
+                string jobDivisionMode,
+                string jobDivision
             )
         {
             using (var db = new InternalDbContext(false, false))
@@ -545,15 +555,29 @@ namespace InSite.Persistence.Plugin.CMDS
                 if (excludeSelfDeclared)
                     credentials = credentials.Where(x => !x.AchievementAllowSelfDeclared || x.AuthorityType == null || x.AuthorityType != "Self");
 
+                if (jobDivisionMode == "With")
+                    credentials = credentials.Where(x => db.QPersons.Any(p => p.UserIdentifier == x.UserIdentifier && p.OrganizationIdentifier == organizationId && p.JobDivision != null));
+                else if (jobDivisionMode == "Without")
+                    credentials = credentials.Where(x => !db.QPersons.Any(p => p.UserIdentifier == x.UserIdentifier && p.OrganizationIdentifier == organizationId && p.JobDivision != null));
+
+                if (!string.IsNullOrEmpty(jobDivision))
+                    credentials = credentials.Where(x => db.QPersons.Any(p => p.UserIdentifier == x.UserIdentifier && p.OrganizationIdentifier == organizationId && p.JobDivision == jobDivision));
+
                 return credentials
                     .Select(x => new TrainingHistoryPerUser
                     {
+                        UserIdentifier = x.UserIdentifier,
                         PersonFullName = x.UserFullName,
+                        PersonEmail = x.UserEmail,
                         ResourceTitle = x.AchievementTitle,
                         DateCompleted = x.CredentialGranted,
                         ExpirationDate = x.CredentialExpirationExpected,
                         AccreditorName = x.AuthorityName,
-                        IsCompetent = x.CredentialGranted != null // && x.AchievementLabel != "Module"
+                        IsCompetent = x.CredentialGranted != null, // && x.AchievementLabel != "Module"
+                        JobDivision = db.QPersons
+                            .Where(p => p.UserIdentifier == x.UserIdentifier && p.OrganizationIdentifier == organizationId)
+                            .Select(p => p.JobDivision)
+                            .FirstOrDefault()
                     })
                     .OrderBy(x => x.PersonFullName)
                     .ThenBy(x => x.ResourceTitle)
@@ -561,7 +585,7 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
-        public static IEnumerable<TrainingExpiryDate> SelectTrainingExpiryDates(Guid[] organizations, Guid[] departments, Guid[] resources, Guid[] learners, bool? isRequired, string achievementType, string[] membershipFunctions, string credentialStatus, DateTime? completedSince, DateTime? completedBefore, bool excludeSelfDeclared)
+        public static IEnumerable<TrainingExpiryDate> SelectTrainingExpiryDates(Guid[] organizations, Guid[] departments, Guid[] resources, Guid[] learners, bool? isRequired, string achievementType, string[] membershipFunctions, string credentialStatus, DateTime? completedSince, DateTime? completedBefore, bool excludeSelfDeclared, string jobDivisionMode, string jobDivision)
         {
             var sqlParameters = new SqlParameter[]
             {
@@ -575,7 +599,9 @@ namespace InSite.Persistence.Plugin.CMDS
                 new SqlParameter("@CredentialStatus", string.IsNullOrEmpty(credentialStatus) ? (object)DBNull.Value : credentialStatus),
                 new SqlParameter("@CompletedSince", completedSince.HasValue ? (object)completedSince.Value.Date : DBNull.Value),
                 new SqlParameter("@CompletedBefore", completedBefore.HasValue ? (object)completedBefore.Value.Date : DBNull.Value),
-                new SqlParameter("@ExcludeSelfDeclared", excludeSelfDeclared)
+                new SqlParameter("@ExcludeSelfDeclared", excludeSelfDeclared),
+                new SqlParameter("@JobDivisionMode", string.IsNullOrEmpty(jobDivisionMode) ? string.Empty : jobDivisionMode),
+                new SqlParameter("@JobDivision", string.IsNullOrEmpty(jobDivision) ? (object)DBNull.Value : jobDivision)
             };
 
             using (var db = new InternalDbContext())
@@ -583,7 +609,7 @@ namespace InSite.Persistence.Plugin.CMDS
                 db.Database.CommandTimeout = 60 * 5;
 
                 return db.Database
-                    .SqlQuery<TrainingExpiryDate>("EXEC custom_cmds.SelectTrainingExpiryDates @OrganizationIdentifiers, @Departments, @Achievements, @Learners, @IsRequired, @AchievementType, @MembershipFunctions, @CredentialStatus, @CompletedSince, @CompletedBefore, @ExcludeSelfDeclared", sqlParameters)
+                    .SqlQuery<TrainingExpiryDate>("EXEC custom_cmds.SelectTrainingExpiryDates @OrganizationIdentifiers, @Departments, @Achievements, @Learners, @IsRequired, @AchievementType, @MembershipFunctions, @CredentialStatus, @CompletedSince, @CompletedBefore, @ExcludeSelfDeclared, @JobDivisionMode, @JobDivision", sqlParameters)
                     .ToList();
             }
         }
@@ -597,7 +623,9 @@ namespace InSite.Persistence.Plugin.CMDS
             string credentialStatus,
             string membershipFunction,
             bool? allowSelfDeclaredAchievements,
-            string achievementType)
+            string achievementType,
+            string jobDivisionMode,
+            string jobDivision)
         {
             var sqlParameters = new SqlParameter[]
             {
@@ -610,12 +638,14 @@ namespace InSite.Persistence.Plugin.CMDS
                 new SqlParameter("@CredentialStatus", string.IsNullOrEmpty(credentialStatus) ? (object)DBNull.Value : credentialStatus),
                 new SqlParameter("@MembershipType", string.IsNullOrEmpty(membershipFunction) ? (object)DBNull.Value : membershipFunction),
                 new SqlParameter("@AllowSelfDeclared", allowSelfDeclaredAchievements ?? (object)DBNull.Value),
-                new SqlParameter("@AchievementType", achievementType.IsNotEmpty() ? achievementType : (object)DBNull.Value)
+                new SqlParameter("@AchievementType", achievementType.IsNotEmpty() ? achievementType : (object)DBNull.Value),
+                new SqlParameter("@JobDivisionMode", string.IsNullOrEmpty(jobDivisionMode) ? string.Empty : jobDivisionMode),
+                new SqlParameter("@JobDivision", string.IsNullOrEmpty(jobDivision) ? (object)DBNull.Value : jobDivision)
             };
 
             using (var db = new InternalDbContext())
             {
-                db.Database.CommandTimeout = 60 * 5; // 5 minutes
+                db.Database.CommandTimeout = 60; // 1 minute
 
                 return db.Database
                     .SqlQuery<TrainingCompletionDate>(
@@ -629,7 +659,9 @@ namespace InSite.Persistence.Plugin.CMDS
                         ", @CredentialStatus" +
                         ", @MembershipType" +
                         ", @AllowSelfDeclared" +
-                        ", @AchievementType"
+                        ", @AchievementType" +
+                        ", @JobDivisionMode" +
+                        ", @JobDivision"
                         , sqlParameters)
                     .ToList();
             }

@@ -23,7 +23,10 @@ namespace InSite.Application.Courses.Read
             InProgress,
 
             [Description("Completed")]
-            Completed
+            Completed,
+
+            [Description("Transferred")]
+            Transferred
         }
 
         public Guid? LearnerUserIdentifier { get; set; }
@@ -42,6 +45,8 @@ namespace InSite.Application.Courses.Read
         public Guid? CourseIdentifier { get; set; }
         public Guid? EventIdentifier { get; set; }
         public Guid ManagerUserIdentifier { get; set; }
+        public string ManagerUserName { get; set; }
+        public Guid? DistributionTransferredFromUserIdentifier { get; set; }
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset Modified { get; set; }
         public Guid? CourseEnrollmentIdentifier { get; set; }
@@ -49,13 +54,17 @@ namespace InSite.Application.Courses.Read
         public string DistributionStatus { get; set; }
         public DateTimeOffset? DistributionRedeemed { get; set; }
         public DateTimeOffset? DistributionExpiry { get; set; }
+        public DateTimeOffset? DistributionTransferred { get; set; }
         public string DistributionComment { get; set; }
         public string ProductType { get; set; }
         public string ProductName { get; set; }
         public string ProductImageUrl { get; set; }
 
-        public StatusType GetStatus()
+        public StatusType GetStatus(Guid? viewerUserId)
         {
+            if (viewerUserId.HasValue && !LearnerUserIdentifier.HasValue && DistributionTransferred.HasValue && DistributionTransferredFromUserIdentifier == viewerUserId)
+                return StatusType.Transferred;
+
             if (!LearnerUserIdentifier.HasValue)
                 return StatusType.Unassigned;
 

@@ -1702,11 +1702,12 @@ namespace InSite.Domain.Banks
         public void When(SectionReconfigured e)
         {
             var section = FindSection(e.Section);
+            var tabConfig = section.TabConfiguration;
 
-            section.WarningOnNextTabEnabled = e.WarningOnNextTabEnabled;
-            section.BreakTimerEnabled = e.BreakTimerEnabled;
-            section.TimeLimit = e.TimeLimit;
-            section.TimerType = e.TimerType;
+            tabConfig.WarningOnNextTabEnabled = e.WarningOnNextTabEnabled;
+            tabConfig.BreakTimerEnabled = e.BreakTimerEnabled;
+            tabConfig.TimeLimit = e.TimeLimit;
+            tabConfig.TimerType = e.TimerType;
         }
 
         public void When(SectionsReordered e)
@@ -1884,6 +1885,13 @@ namespace InSite.Domain.Banks
             criterion.UpdateFilterType();
         }
 
+        public void When(CriterionContentChanged e)
+        {
+            var criterion = FindCriterion(e.Criterion);
+
+            criterion.Content = e.Content.Clone();
+        }
+
         public void When(CriterionFilterChanged e)
         {
             var criterion = FindCriterion(e.Criterion);
@@ -1908,6 +1916,17 @@ namespace InSite.Domain.Banks
         public void When(CriterionDeleted e)
         {
             RemoveCriterion(e);
+        }
+
+        public void When(CriterionTabReconfigured e)
+        {
+            var criterion = FindCriterion(e.Criterion);
+            var tabConfig = criterion.TabConfiguration;
+
+            tabConfig.WarningOnNextTabEnabled = e.WarningOnNextTabEnabled;
+            tabConfig.BreakTimerEnabled = e.BreakTimerEnabled;
+            tabConfig.TimeLimit = e.TimeLimit;
+            tabConfig.TimerType = e.TimerType;
         }
 
         public void When(SpecificationAdded e)

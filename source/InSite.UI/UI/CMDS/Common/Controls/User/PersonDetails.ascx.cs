@@ -5,12 +5,12 @@ using System.Web.UI.WebControls;
 using Humanizer;
 
 using InSite.Application.Contacts.Read;
-using InSite.Application.People.Write;
 using InSite.Common.Web.UI;
 using InSite.Custom.CMDS.Common.Controls.Server;
 using InSite.Domain.Contacts;
 using InSite.Persistence;
 using InSite.Web.Data;
+using InSite.Web.Helpers;
 
 using Shift.Common;
 using Shift.Constant;
@@ -237,13 +237,15 @@ namespace InSite.Cmds.Admin.People.Controls
                 }
                 else
                 {
-                    Status.Value = PersonStatusSelector.Disabled;
+                    // A new person is approved by default; an existing person without access granted is disabled.
+                    Status.Value = isNew ? PersonStatusSelector.Approved : PersonStatusSelector.Disabled;
                     StatusTimestamp.Text = string.Empty;
                 }
 
                 PasswordExpires.Value = user.UserPasswordExpired;
 
                 LoadRoles1(user.UserIdentifier);
+                LoadSystemRoles(user.UserIdentifier);
             }
 
             if (isUserDetailsVisible)
@@ -257,21 +259,59 @@ namespace InSite.Cmds.Admin.People.Controls
 
             ShowSentCount();
 
+            ApplyJobDivisionFieldSettings();
+
             LockEmploymentDetails();
 
             CommentRepeater.LoadData(user.UserIdentifier, Organization.Identifier);
+        }
+
+        /// <summary>
+        /// Applies the organization's Portal Profile field settings to the Job Division field. The
+        /// settings are configured on the Fields tab of the organization editor.
+        /// </summary>
+        private void ApplyJobDivisionFieldSettings()
+        {
+            var defaultField = PortalFieldInfo.UserProfile.First(x => x.FieldName == nameof(Person.JobDivision));
+            var organizationField = Organization.Fields?.User?.FirstOrDefault(x => x.FieldName == defaultField.FieldName);
+
+            var isVisible = defaultField.IsVisible;
+            var isRequired = defaultField.IsRequired;
+
+            if (organizationField != null)
+            {
+                isVisible = organizationField.IsVisible;
+
+                if (defaultField.CanChangeRequired)
+                    isRequired = organizationField.IsRequired;
+            }
+
+            JobDivisionField.Visible = isVisible;
+
+            // A field that is not on the form can't be filled in, so a hidden field is never required.
+            JobDivisionRequiredValidator.Visible = isVisible && isRequired;
         }
 
         private void LockEmploymentDetails()
         {
             var isLocked = Organization.Toolkits.Contacts?.ReadOnlyEmploymentDetails ?? false;
 
-            foreach (var control in EmploymentPanel.Controls)
+            LockTextBoxes(EmploymentPanel, isLocked);
+        }
+
+        private static void LockTextBoxes(System.Web.UI.Control parent, bool isLocked)
+        {
+            foreach (System.Web.UI.Control control in parent.Controls)
             {
                 if (control is Common.Web.UI.TextBox box)
                 {
                     box.Enabled = !isLocked;
+                    continue;
                 }
+
+                var hasChildren = control.HasControls();
+                if (hasChildren)
+                    LockTextBoxes(control, isLocked);
             }
         }
 
@@ -330,6 +370,23 @@ namespace InSite.Cmds.Admin.People.Controls
                 }
             }
 
+            if (LoginTab.Visible)
+            {
+                // A disabled checkbox is display-only: the authenticated user is not assigned to the role,
+                // so the input value is ignored and the person keeps the current role assignment.
+                if (PersonIsLearner.Enabled)
+                    person.IsLearner = PersonIsLearner.Checked;
+
+                if (PersonIsAdministrator.Enabled)
+                    person.IsAdministrator = PersonIsAdministrator.Checked;
+
+                if (PersonIsDeveloper.Enabled)
+                    person.IsDeveloper = PersonIsDeveloper.Checked;
+
+                if (PersonIsOperator.Enabled)
+                    person.IsOperator = PersonIsOperator.Checked;
+            }
+
             user.PhoneMobile = Phone.Format(PhoneMobile.Text);
 
             if (person != null)
@@ -359,6 +416,31 @@ namespace InSite.Cmds.Admin.People.Controls
         public void SaveRoles(Guid userId)
         {
             SaveCmdsUserGroups(UserRoleList, userId);
+        }
+
+        private void LoadSystemRoles(Guid userId)
+        {
+            var isNew = userId == Guid.Empty;
+
+            var person = !isNew
+                ? ServiceLocator.PersonSearch.GetPerson(userId, Organization.Identifier)
+                : null;
+
+            // A new person is a learner by default.
+            PersonIsLearner.Checked = person?.IsLearner ?? isNew;
+            PersonIsAdministrator.Checked = person?.IsAdministrator ?? false;
+            PersonIsDeveloper.Checked = person?.IsDeveloper ?? false;
+            PersonIsOperator.Checked = person?.IsOperator ?? false;
+
+            // A role checkbox is enabled only if the authenticated user is also assigned to the role. This
+            // prevents a user from granting a role that exceeds their own access (e.g. a non-developer
+            // granting the developer role).
+            var viewer = ServiceLocator.PersonSearch.GetPerson(User.UserIdentifier, Organization.Identifier);
+
+            PersonIsLearner.Enabled = viewer?.IsLearner ?? false;
+            PersonIsAdministrator.Enabled = viewer?.IsAdministrator ?? false;
+            PersonIsDeveloper.Enabled = viewer?.IsDeveloper ?? false;
+            PersonIsOperator.Enabled = viewer?.IsOperator ?? false;
         }
 
         #endregion
@@ -447,8 +529,6 @@ namespace InSite.Cmds.Admin.People.Controls
 
             var user = UserSearch.Select(userKey);
 
-            var memberships = MembershipSearch.Select(x => x.UserIdentifier == userKey, x => x.Group);
-
             foreach (System.Web.UI.WebControls.ListItem item in list.Items)
             {
                 var groupId = Guid.Parse(item.Value);
@@ -474,13 +554,6 @@ namespace InSite.Cmds.Admin.People.Controls
                     MembershipStore.Delete(MembershipSearch.Select(groupId, user.UserIdentifier));
                 }
             }
-
-            var isImpersonator = memberships.Any(x => x.Group.GroupName == "CMDS Impersonators");
-
-            user = UserSearch.Select(userKey, x => x.Persons);
-
-            foreach (var person in user.Persons)
-                ServiceLocator.SendCommand(new ModifyPersonFieldBool(person.PersonIdentifier, PersonField.IsAdministrator, isImpersonator));
         }
 
         internal void SetPasswordExpires(DateTimeOffset expiry)

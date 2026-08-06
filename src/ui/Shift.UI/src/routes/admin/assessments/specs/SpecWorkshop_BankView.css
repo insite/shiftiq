@@ -3,9 +3,9 @@
         background-color: white;
     }
 
-    > tbody > tr[data-competency] > td.cell-t1-actual,
-    > tbody > tr[data-competency] > td.cell-t2-actual,
-    > tbody > tr[data-competency] > td.cell-t3-actual {
+    > tbody > tr.competency > td.cell-t1-actual,
+    > tbody > tr.competency > td.cell-t2-actual,
+    > tbody > tr.competency > td.cell-t3-actual {
         background-color: #f9f9f9;
     }
 }

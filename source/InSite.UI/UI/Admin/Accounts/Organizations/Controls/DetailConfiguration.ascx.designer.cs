@@ -42,6 +42,15 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
         protected global::InSite.UI.Admin.Accounts.Organizations.Controls.DetailConfigurationLocationAddress DetailLocationAddress;
 
         /// <summary>
+        /// DetailLocationTaxNumber control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.UI.Admin.Accounts.Organizations.Controls.DetailConfigurationLocationTaxNumber DetailLocationTaxNumber;
+
+        /// <summary>
         /// UrlTab control.
         /// </summary>
         /// <remarks>

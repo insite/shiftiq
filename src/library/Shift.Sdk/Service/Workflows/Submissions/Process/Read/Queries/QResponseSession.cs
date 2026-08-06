@@ -31,7 +31,7 @@ namespace InSite.Application.Surveys.Read
         public Guid? LastAnsweredQuestionIdentifier { get; set; }
 
         public virtual VUser Respondent { get; set; }
-        public virtual VUser Assessor{ get; set; }
+        public virtual VUser Assessor { get; set; }
         public virtual QSurveyForm SurveyForm { get; set; }
 
         public virtual ICollection<QResponseAnswer> QResponseAnswers { get; set; }

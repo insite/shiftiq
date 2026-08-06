@@ -7,11 +7,15 @@
 <%@ Register TagPrefix="uc" TagName="WorkshopQuestionRepeater" Src="~/UI/Admin/Assessments/Questions/Controls/WorkshopQuestionRepeater.ascx" %>
 <%@ Register TagPrefix="uc" TagName="AttachmentsTabsNav" Src="~/UI/Admin/Assessments/Attachments/Controls/AttachmentsTabsNav.ascx" %>
 <%@ Register TagPrefix="uc" TagName="ProblemRepeater" Src="~/UI/Admin/Assessments/Outlines/Controls/ProblemRepeater.ascx" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent">
 </asp:Content>
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:Nav runat="server" ID="NavPanel">
 
@@ -395,5 +399,7 @@
             }
         </script>
     </insite:PageFooterContent>
+
+    </asp:Panel>
 
 </asp:Content>

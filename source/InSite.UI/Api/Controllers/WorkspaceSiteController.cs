@@ -341,12 +341,11 @@ namespace InSite.Api.Controllers
             if (userId == null)
                 return JsonBadRequest("Subscribing to the blog is available to CMDS users only. Please contact admin_cmds@keyera.com for more information.");
 
-            var groupFilter = new QGroupFilter { GroupName = "CMDS Blog Subscribers", OrganizationIdentifier = OrganizationIdentifiers.CMDS };
-            var groups = ServiceLocator.GroupSearch.GetGroups(groupFilter);
-            if (groups.Count == 0)
-                return JsonBadRequest($"Group not found: {groupFilter.GroupName}");
+            var groupFilter = new QGroupFilter { GroupNameExact = "CMDS Blog Subscribers", OrganizationIdentifier = OrganizationIdentifiers.CMDS };
+            var group = ServiceLocator.GroupSearch.GetFirstGroup(groupFilter);
+            if (group == null)
+                return JsonBadRequest($"Group not found: {groupFilter.GroupNameExact}");
 
-            var group = groups.First();
             MembershipHelper.Save(group.GroupIdentifier, userId.Value, "Membership");
 
             var messageFilter = new MessageFilter

@@ -46,10 +46,12 @@ public class CookieService(
         }
     }
 
-    public void AppendSecurityCookie(CookieToken token)
+    public void AppendSecurityCookie(CookieToken token, bool resetId)
     {
         token.ResetCreated();
-        token.ResetID();
+
+        if (resetId)
+            token.ResetID();
 
         var domain = GetSecurityDomain();
         var settings = appSettings.Security.Cookie;

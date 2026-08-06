@@ -24,7 +24,7 @@ export default function SpecWorkshop_BankView_Criterion({ criterion }: Props) {
             </tr>
 
             {criterion.competencies.map(competency => (
-                <tr key={competency.standard.standardId}>
+                <tr key={competency.standard.standardId} className="competency">
                     <td>
                         <WorkshopStandardDisplay standard={competency.standard} />
                     </td>

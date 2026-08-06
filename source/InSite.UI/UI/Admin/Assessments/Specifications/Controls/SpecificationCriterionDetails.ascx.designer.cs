@@ -24,6 +24,15 @@ namespace InSite.Admin.Assessments.Specifications.Controls
         protected global::InSite.Common.Web.UI.NavItem CriterionTab;
 
         /// <summary>
+        /// CriterionUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel CriterionUpdatePanel;
+
+        /// <summary>
         /// CriterionDetail control.
         /// </summary>
         /// <remarks>

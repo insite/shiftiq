@@ -137,7 +137,7 @@ namespace InSite.Application.Messages.Write
         public void Send(Guid organizationId, Guid userId, AlertLearningWelcomeEmail alert)
             => SendAlert(organizationId, userId, userId, alert, NotificationType.LearningWelcomeEmail);
 
-        public void Send(Guid organizationId, Guid userId, AlertManagementWelcomeEmail alert, string[] attachments = null)
+        public Guid[] Send(Guid organizationId, Guid userId, AlertManagementWelcomeEmail alert, string[] attachments = null)
             => SendAlert(organizationId, userId, userId, alert, NotificationType.ManagementWelcomeEmail, null, null, null, attachments);
 
         public void Send(Guid organizationId, Guid userId, Guid? administratorUserId, AlertWorkflowAttachmentUpload alert)

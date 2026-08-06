@@ -1,10 +1,7 @@
 ﻿<%@ Page Language="C#" CodeBehind="Reconfigure.aspx.cs" Inherits="InSite.UI.Admin.Assessments.Sections.Forms.Reconfigure" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register Src="~/UI/Admin/Assessments/Criteria/Controls/Detail.ascx" TagName="CriterionDetails" TagPrefix="uc" %>
-
-
-<%--
-<%@ Register TagPrefix="uc" TagName="ConfigurationDetails" Src="../Controls/ConfigurationDetails.ascx" %>--%>
+<%@ Register Src="~/UI/Admin/Assessments/Sections/Controls/TabConfigurationDetails.ascx" TagName="TabConfigDetails" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
@@ -73,49 +70,7 @@
                     <div class="card-body">
                         <h3>Configuration</h3>
 
-                        <insite:UpdateProgress runat="server" AssociatedUpdatePanelID="ConfigurationUpdatePanel" />
-
-                        <insite:UpdatePanel runat="server" ID="ConfigurationUpdatePanel">
-                            <ContentTemplate>
-
-                                <div class="form-group mb-3">
-                                    <label class="form-label">
-                                        Warning on Next Tab
-                                    </label>
-                                    <div>
-                                        <insite:BooleanComboBox runat="server" ID="WarningOnNextTab" TrueText="Show" FalseText="Disabled" AllowBlank="false" />
-                                    </div>
-                                </div>
-
-                                <div runat="server" id="BreakTimerField" class="form-group mb-3">
-                                    <label class="form-label">
-                                        Break Timer
-                                    </label>
-                                    <div>
-                                        <insite:BooleanComboBox runat="server" ID="BreakTimer" TrueText="Enabled" FalseText="Disabled" AllowBlank="false" />
-                                    </div>
-                                </div>
-
-                                <div runat="server" id="TimeLimitField" class="form-group mb-3">
-                                    <label class="form-label">
-                                        Time Limit (minutes)
-                                    </label>
-                                    <div>
-                                        <insite:NumericBox runat="server" ID="TimeLimit" Width="100%" MinValue="0" MaxValue="1440" NumericMode="Integer" />
-                                    </div>
-                                </div>
-
-                                <div runat="server" id="TimerTypeField" class="form-group mb-3">
-                                    <label class="form-label">
-                                        Timer Type
-                                    </label>
-                                    <div>
-                                        <insite:ComboBox runat="server" ID="TimerType" AllowBlank="false" />
-                                    </div>
-                                </div>
-
-                            </ContentTemplate>
-                        </insite:UpdatePanel>
+                        <uc:TabConfigDetails runat="server" ID="TabConfig" />
                     </div>
                 </div>
 

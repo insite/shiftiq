@@ -15,5 +15,9 @@ namespace Shift.Contract
         public DateTimeOffset MembershipEffective { get; set; }
         public DateTimeOffset? MembershipExpiry { get; set; }
         public DateTimeOffset Modified { get; set; }
+
+        public DateTimeOffset LastChangeTime { get; set; }
+        public string LastChangeType { get; set; }
+        public Guid LastChangeUser { get; set; }
     }
 }

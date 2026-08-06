@@ -44,5 +44,6 @@ namespace InSite.Domain.Registrations
         public string ExamFormName { get; set; }
         public string ExamFormCode { get; set; }
         public IEnumerable<string> DepartmentNames { get; set; }
+        public IEnumerable<string> AccommodationNames { get; set; }
     }
 }

@@ -300,7 +300,10 @@ namespace InSite.Application.Surveys.Read
             var status = workflow.IssueStatusIdentifier;
             if (status.HasValue)
             {
-                _commander.Send(new ChangeIssueStatus(id, status.Value, now)
+
+                var statusCategory = _issues.GetStatus(status.Value)?.StatusCategory;
+
+                _commander.Send(new ChangeIssueStatus(id, status.Value, now, statusCategory)
                 {
                     OriginOrganization = e.OriginOrganization
                 });

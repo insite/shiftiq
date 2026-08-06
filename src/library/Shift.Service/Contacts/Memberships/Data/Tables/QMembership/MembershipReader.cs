@@ -31,7 +31,7 @@ public class MembershipReader : IEntityReader
         }, cancellation);
     }
 
-    public Task<List<MembershipEntity>> CollectAsync(IMembershipCriteria criteria, Guid currentUserId, CancellationToken cancellation = default)
+    public Task<List<MembershipEntity>> CollectAsync(IMembershipCriteria criteria, Guid? currentUserId, CancellationToken cancellation = default)
     {
         return ExecuteAsync(db =>
         {
@@ -53,6 +53,15 @@ public class MembershipReader : IEntityReader
 
             return query.CountAsync(cancellation);
 
+        }, cancellation);
+    }
+
+    public Task<bool> ExistsAsync(IMembershipCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria, null);
+            return query.AnyAsync(cancellation);
         }, cancellation);
     }
 
@@ -94,6 +103,17 @@ public class MembershipReader : IEntityReader
         }, cancellation);
     }
 
+    public Task<Guid?> RetrieveDeletedMembershipIdAsync(Guid userId, Guid groupId, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            return db.QMembershipDeletion
+                .Where(x => x.UserIdentifier == userId && x.GroupIdentifier == groupId)
+                .Select(x => (Guid?)x.MembershipIdentifier)
+                .FirstOrDefaultAsync(cancellation);
+        }, cancellation);
+    }
+
     /// <summary>
     /// Creates a queryable for events
     /// </summary>
@@ -112,17 +132,24 @@ public class MembershipReader : IEntityReader
         return query;
     }
 
-    private IQueryable<MembershipEntity> BuildQueryable(TableDbContext db, IMembershipCriteria criteria, Guid currentUserId)
+    private IQueryable<MembershipEntity> BuildQueryable(TableDbContext db, IMembershipCriteria criteria, Guid? currentUserId)
     {
         ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
 
-        // If the user is an operator for the partition then the user is allowed to run a partition-wide query.
+        IQueryable<MembershipEntity> query;
 
-        var partitionId = OrganizationIdentifiers.Global;
+        if (currentUserId != null)
+        {
+            // If the user is an operator for the partition then the user is allowed to run a partition-wide query.
 
-        var allowPartitionQuery = db.QPerson.Any(p => p.UserIdentifier == currentUserId && p.OrganizationIdentifier == partitionId && p.IsOperator);
+            var partitionId = OrganizationIdentifiers.Global;
 
-        var query = BuildQueryable(db, allowPartitionQuery && criteria.AccountScope == "Partition");
+            var allowPartitionQuery = db.QPerson.Any(p => p.UserIdentifier == currentUserId && p.OrganizationIdentifier == partitionId && p.IsOperator);
+
+            query = BuildQueryable(db, allowPartitionQuery && criteria.AccountScope == "Partition");
+        }
+        else
+            query = db.QMembership;
 
         if (criteria.GroupId != null)
             query = query.Where(x => x.GroupIdentifier == criteria.GroupId.Value);
@@ -150,6 +177,12 @@ public class MembershipReader : IEntityReader
 
         if (criteria.ModifiedBefore.HasValue)
             query = query.Where(x => x.Modified < criteria.ModifiedBefore);
+
+        if (criteria.LastChangeTimeSince.HasValue)
+            query = query.Where(x => criteria.LastChangeTimeSince.Value <= x.LastChangeTime);
+
+        if (criteria.LastChangeTimeBefore.HasValue)
+            query = query.Where(x => x.LastChangeTime < criteria.LastChangeTimeBefore.Value);
 
         return query;
     }

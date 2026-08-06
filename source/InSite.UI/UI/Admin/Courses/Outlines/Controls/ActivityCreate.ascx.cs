@@ -294,6 +294,13 @@ namespace InSite.Admin.Courses.Outlines.Controls
                     activity.ActivityMode = "Preview";
                     activity.ActivityUrl = $"/ui/portal/integrations/scorm/launch/{activity.ActivityIdentifier}";
                     activity.ActivityPlatform = ActivityPlatform.Value;
+
+                    // Scoop always renders its own UI in-tab with a return-to-Shift button. Persist
+                    // _self so the stored target reflects reality regardless of the "Open in a new
+                    // window or tab" checkbox state.
+
+                    if (activity.ActivityPlatform == "Scoop")
+                        activity.ActivityUrlTarget = "_self";
                 }
                 else
                     activity.ActivityUrlType = "Internal";

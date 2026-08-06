@@ -20,8 +20,10 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
         protected class DifferenceItem
         {
             public Guid CompetencyStandardIdentifier { get; set; }
-            public string LeftText { get; set; }
-            public string RightText { get; set; }
+            public string LeftCode { get; set; }
+            public string LeftTitle { get; set; }
+            public string RightCode { get; set; }
+            public string RightTitle { get; set; }
             public bool IsRightEmpty { get; set; }
         }
 
@@ -170,7 +172,7 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
 
             var count = ProfileCompetencyRepository.SelectCount(Profile1.Value.Value, false);
 
-            CompetencyCount1.Text = string.Format("{0:n0} Competenc{1}", count, count == 1 ? "y" : "ies");
+            CompetencyCount1.Text = string.Format("{0:n0} competenc{1}", count, count == 1 ? "y" : "ies");
             EditProfile1.NavigateUrl = string.Format("/ui/cmds/admin/standards/profiles/edit?id={0}", Profile1.Value);
 
             var profile = StandardSearch.Select(Profile1.Value.Value);
@@ -188,7 +190,7 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
 
             var count = ProfileCompetencyRepository.SelectCount(Profile2.Value.Value, false);
 
-            CompetencyCount2.Text = string.Format("{0:n0} Competenc{1}", count, count == 1 ? "y" : "ies");
+            CompetencyCount2.Text = string.Format("{0:n0} competenc{1}", count, count == 1 ? "y" : "ies");
             EditProfile2.NavigateUrl = string.Format("/ui/cmds/admin/standards/profiles/edit?id={0}", Profile2.Value);
 
             var profile = StandardSearch.Select(Profile2.Value.Value);
@@ -203,8 +205,10 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
                 DifferenceItem item = new DifferenceItem
                 {
                     CompetencyStandardIdentifier = (Guid)row["CompetencyStandardIdentifier"],
-                    LeftText = GetCompetencyText(row),
-                    RightText = Profile2.HasValue ? NA : null,
+                    LeftCode = GetCompetencyCode(row),
+                    LeftTitle = GetCompetencyTitle(row),
+                    RightCode = Profile2.HasValue ? NA : null,
+                    RightTitle = null,
                     IsRightEmpty = true
                 };
 
@@ -219,8 +223,10 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
                 DifferenceItem item = new DifferenceItem
                 {
                     CompetencyStandardIdentifier = (Guid)row["CompetencyStandardIdentifier"],
-                    LeftText = Profile1.HasValue ? NA : null,
-                    RightText = GetCompetencyText(row),
+                    LeftCode = Profile1.HasValue ? NA : null,
+                    LeftTitle = null,
+                    RightCode = GetCompetencyCode(row),
+                    RightTitle = GetCompetencyTitle(row),
                     IsRightEmpty = false
                 };
 
@@ -232,27 +238,40 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
         {
             foreach (DataRow row in table.Rows)
             {
+                var code = GetCompetencyCode(row);
+                var title = GetCompetencyTitle(row);
+
                 DifferenceItem item = new DifferenceItem
                 {
                     CompetencyStandardIdentifier = (Guid)row["CompetencyStandardIdentifier"],
-                    LeftText = GetCompetencyText(row)
+                    LeftCode = code,
+                    LeftTitle = title,
+                    RightCode = code,
+                    RightTitle = title,
+                    IsRightEmpty = false
                 };
-                item.RightText = item.LeftText;
-                item.IsRightEmpty = false;
 
                 similarityItems.Add(item);
             }
         }
 
-        private static string GetCompetencyText(DataRow row)
+        private static string GetCompetencyCode(DataRow row)
         {
             return string.Format(
-                "<a target='_blank' href='/ui/cmds/admin/standards/competencies/edit?id={0}'>{1}</a>. {2} <span class='form-text'><br />{3}</span>",
+                "<a target='_blank' href='/ui/cmds/admin/standards/competencies/edit?id={0}'>{1}</a>",
                 row["CompetencyStandardIdentifier"],
-                row["Number"],
-                row["Summary"],
-                row["NumberOld"]
-                );
+                row["Number"]);
+        }
+
+        private static string GetCompetencyTitle(DataRow row)
+        {
+            var summary = row["Summary"];
+            var numberOld = row["NumberOld"];
+
+            if (numberOld == DBNull.Value || string.IsNullOrEmpty(numberOld?.ToString()))
+                return summary?.ToString();
+
+            return string.Format("{0}<br /><span class='form-text'>{1}</span>", summary, numberOld);
         }
 
         #endregion

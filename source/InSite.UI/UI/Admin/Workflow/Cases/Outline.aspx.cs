@@ -21,6 +21,8 @@ namespace InSite.Admin.Issues.Outlines.Forms
             base.OnInit(e);
 
             CommentsSection.LoadIssue = LoadIssue;
+
+            AttachmentsSection.Alert += (s, a) => StatusAlert.AddMessage(a);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -78,7 +80,7 @@ namespace InSite.Admin.Issues.Outlines.Forms
                 ? issue.TopicUserIdentifier
                 : null;
 
-            AttachmentsSection.BindModelToControls(CaseIdentifier.Value, respondentUserId);
+            AttachmentsSection.BindModelToControls(CaseIdentifier.Value, respondentUserId, issue.TopicUserIdentifier);
 
             CommentNavItem.IsSelected = Request.QueryString["panel"] == "comments";
             AttachmentNavItem.IsSelected = Request.QueryString["panel"] == "attachments";

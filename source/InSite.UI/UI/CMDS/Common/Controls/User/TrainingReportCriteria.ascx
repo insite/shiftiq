@@ -1,7 +1,12 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TrainingReportCriteria.ascx.cs" Inherits="InSite.Cmds.Controls.Reporting.Report.TrainingReportCriteria" %>
 <%@ Register Src="~/UI/CMDS/Common/Controls/User/AchievementCriteriaSelector.ascx" TagName="AchievementCriteriaSelector" TagPrefix="uc" %>
 
-<insite:CustomValidator runat="server" ID="AchievementSelectorValidator" ErrorMessage="At least one achievement must be selected." Display="None" />
+<insite:CustomValidator runat="server" ID="AchievementSelectorValidator" ErrorMessage="Set at least one achievement type to All, or pick specific achievements." Display="None" />
+
+<insite:Alert runat="server" Indicator="Information">
+    <strong>Please note:</strong> to prevent timeout errors, the system does not allow reporting on all achievements for all departments at the same time.
+    If all achievements are selected, then a selection of departments must be made.
+</insite:Alert>
 
 <div class="row">
     <div class="col-lg-6">
@@ -49,6 +54,26 @@
             </div>
         </div>
 
+        <asp:PlaceHolder runat="server" ID="JobDivisionSection">
+            <div class="form-group mb-3">
+                <label class="form-label">
+                    Job Division
+                </label>
+                <insite:ComboBox runat="server" ID="JobDivisionPresence" AllowBlank="false" AutoPostBack="true">
+                    <Items>
+                        <insite:ComboBoxOption Value="" Text="With or without a job division" />
+                        <insite:ComboBoxOption Value="With" Text="With a job division" />
+                        <insite:ComboBoxOption Value="Without" Text="Without a job division" />
+                    </Items>
+                </insite:ComboBox>
+                <asp:PlaceHolder runat="server" ID="JobDivisionValuePanel">
+                    <div class="mt-2">
+                        <insite:JobDivisionComboBox runat="server" ID="JobDivisionValue" EmptyMessage="All job divisions" />
+                    </div>
+                </asp:PlaceHolder>
+            </div>
+        </asp:PlaceHolder>
+
         <div class="form-group mb-3">
             <label class="form-label">
                 Credential Status
@@ -83,7 +108,7 @@
     </div>
     <div class="col-lg-6">
 
-        <uc:AchievementCriteriaSelector runat="server" ID="AchievementSelector" />
+        <uc:AchievementCriteriaSelector runat="server" ID="AchievementSelector" EnableSelectionModes="true" />
 
     </div>
 </div>

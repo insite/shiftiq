@@ -63,6 +63,9 @@ namespace InSite.Admin.Records.Programs
 
             AchievementListEditor.Refreshed += AchievementEditor_Refreshed;
 
+            AddParentsButton.Click += AddParentsButton_Click;
+            ParentRepeater.ItemCommand += ParentRepeater_ItemCommand;
+
             InitTab();
         }
 
@@ -86,6 +89,7 @@ namespace InSite.Admin.Records.Programs
             var isPublication = tab == "publication";
 
             SelectTab(CatalogTab, tab == "catalog");
+            SelectTab(HierarchyTab, tab == "hierarchy");
             SelectTab(ContentTab, tab == "content");
             SelectTab(LearnerTab, tab == "enrollments");
             SelectTab(PublicationTab, isPublication);
@@ -117,6 +121,10 @@ namespace InSite.Admin.Records.Programs
             var status = Request.QueryString["status"];
             if (status == "learners_assigned")
                 StatusAlert.AddMessage(AlertType.Success, "This training plan has been successfully assigned to the users you selected.");
+            else if (status == "parents_added")
+                StatusAlert.AddMessage(AlertType.Success, "The parent programs have been linked and their tasks are now inherited by this program.");
+            else if (status == "parent_removed")
+                StatusAlert.AddMessage(AlertType.Success, "The parent program has been removed.");
 
             ValidateQueryString();
             BindModelToControls(InitModel());
@@ -213,6 +221,8 @@ namespace InSite.Admin.Records.Programs
 
                 AssessmentTaskRepeater.Visible = LogbookTaskRepeater.Visible = SurveyTaskRepeater.Visible = CourseTaskRepeater.Visible = true;
             }
+
+            BindHierarchy(model.ProgramIdentifier);
 
             CurrentDepartmentIdentifier = model.GroupIdentifier ?? Guid.Empty;
 
@@ -320,6 +330,125 @@ namespace InSite.Admin.Records.Programs
 
         #endregion
 
+        #region Hierarchy
+
+        private const int MaxParentCount = 10;
+
+        private void BindHierarchy(Guid programId)
+        {
+            var parents = ProgramContainmentSearch.SelectParentPrograms(programId);
+            var sources = ProgramContainmentSearch.SelectParentTaskSources(programId);
+            var inheritedObjects = TaskSearch
+                .Select(x => x.ProgramIdentifier == programId && x.TaskIsInherited)
+                .Select(x => x.ObjectIdentifier)
+                .ToHashSet();
+
+            var items = parents.Select(parent =>
+            {
+                var supplied = sources
+                    .Where(x => x.ParentProgramIdentifier == parent.ProgramIdentifier)
+                    .Select(x => x.ObjectIdentifier)
+                    .ToHashSet();
+
+                var otherParents = sources
+                    .Where(x => x.ParentProgramIdentifier != parent.ProgramIdentifier)
+                    .Select(x => x.ObjectIdentifier)
+                    .ToHashSet();
+
+                var exclusive = supplied.Count(x => !otherParents.Contains(x) && inheritedObjects.Contains(x));
+
+                // Explicitly indicate the credential survives. Losing the task removes the
+                // learner's progress toward it, which reads like the credential itself is being
+                // taken away when it is only being retagged.
+                var confirmMessage = exclusive > 0
+                    ? $"Remove this parent program? {"inherited task".ToQuantity(exclusive)} supplied only by this parent will be removed from this program, along with learner task progress for them. Learners keep the credentials themselves; priority and necessity are updated to match the programs that still require them."
+                    : "Remove this parent program? No inherited tasks will be removed because every task it supplies is still supplied by another parent or is a local task.";
+
+                return new
+                {
+                    parent.ProgramIdentifier,
+                    parent.ProgramName,
+                    OutlineUrl = GetNavigateUrl(parent.ProgramIdentifier, tab: "hierarchy"),
+                    TaskSummary = $"Supplies {"task".ToQuantity(supplied.Count)}, {exclusive} exclusively",
+                    ConfirmScript = $"return confirm('{confirmMessage.Replace("'", "\\'")}');"
+                };
+            }).ToArray();
+
+            ParentRepeater.DataSource = items;
+            ParentRepeater.DataBind();
+            NoParentsMessage.Visible = items.Length == 0;
+
+            var children = ProgramContainmentSearch
+                .SelectChildPrograms(programId)
+                .Select(x => new
+                {
+                    x.ProgramName,
+                    OutlineUrl = GetNavigateUrl(x.ProgramIdentifier, tab: "hierarchy")
+                })
+                .ToArray();
+
+            ChildRepeater.DataSource = children;
+            ChildRepeater.DataBind();
+            NoChildrenMessage.Visible = children.Length == 0;
+
+            // Depth cap: a program that is already a parent cannot be given parents.
+            AddParentsField.Visible = children.Length == 0;
+            IsParentMessage.Visible = children.Length > 0;
+
+            // Offer only programs that can legally be linked, rather than accepting an
+            // invalid choice and rejecting it on save.
+            AddParentPrograms.Filter.EligibleParentForProgramIdentifier = programId;
+        }
+
+        private void AddParentsButton_Click(object sender, EventArgs e)
+        {
+            var parentIds = AddParentPrograms.Values;
+            if (parentIds.Length == 0)
+                return;
+
+            var programId = ProgramID.Value;
+            var existingCount = ProgramContainmentSearch.GetParentIdentifiers(programId).Length;
+
+            if (existingCount + parentIds.Length > MaxParentCount)
+            {
+                StatusAlert.AddMessage(AlertType.Error, $"A program can have at most {MaxParentCount} parent programs.");
+                BindHierarchy(programId);
+                return;
+            }
+
+            try
+            {
+                ProgramContainmentStore.Insert(parentIds, programId, Organization.Identifier, User.Identifier);
+            }
+            catch (InvalidOperationException ex)
+            {
+                StatusAlert.AddMessage(AlertType.Error, ex.Message);
+                BindHierarchy(programId);
+                return;
+            }
+
+            Redirect(programId, status: "parents_added", tab: "hierarchy");
+        }
+
+        private void ParentRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName != "RemoveParent")
+                return;
+
+            var parentId = Guid.Parse((string)e.CommandArgument);
+            var programId = ProgramID.Value;
+
+            // Unlinking a parent drops the tasks it supplied. ProgramContainmentStore hands
+            // off to ProgramContainmentCascade, which recomputes the inherited rows and then
+            // moves the enrolled learners' credentials to match. Achievements another of the
+            // learner's programs still claims keep that program's settings.
+            ProgramContainmentStore.Delete(parentId, programId);
+
+            Redirect(programId, status: "parent_removed", tab: "hierarchy");
+        }
+
+        #endregion
+
         #region Achievements Only
 
         private Guid CurrentDepartmentIdentifier
@@ -342,7 +471,22 @@ namespace InSite.Admin.Records.Programs
 
         private void DeleteAchievements(IEnumerable<Guid> achievements)
         {
-            TaskStore.Delete(ProgramID.Value, achievements);
+            var requested = achievements.ToList();
+
+            var inherited = TaskSearch
+                .Select(x => x.ProgramIdentifier == ProgramID.Value && x.TaskIsInherited)
+                .Select(x => x.ObjectIdentifier)
+                .ToHashSet();
+
+            var deletable = requested.Where(x => !inherited.Contains(x)).ToList();
+
+            if (deletable.Count > 0)
+                TaskStore.Delete(ProgramID.Value, deletable, CascadeToLearners.Checked);
+
+            var skipped = requested.Count - deletable.Count;
+            if (skipped > 0)
+                StatusAlert.AddMessage(AlertType.Warning,
+                    $"{"inherited achievement".ToQuantity(skipped)} cannot be removed here. Remove the parent program that supplies them instead.");
 
             TaskGrid.BindModelToControls(ProgramID.Value);
         }
@@ -350,6 +494,7 @@ namespace InSite.Admin.Records.Programs
         private int InsertAchievements(IEnumerable<Guid> achievements)
         {
             var items = new List<TTask>();
+            var lifetimes = ProgramTaskDefaults.GetLifetimeMonths(achievements);
 
             foreach (var id in achievements)
             {
@@ -360,13 +505,21 @@ namespace InSite.Admin.Records.Programs
                     ObjectType = "Achievement",
                     OrganizationIdentifier = Organization.Identifier,
                     TaskCompletionRequirement = "Credential Granted",
-                    TaskIdentifier = UniqueIdentifier.Create()
+                    TaskIdentifier = UniqueIdentifier.Create(),
+
+                    // A new task is part of the curriculum from the moment it is added, so it 
+                    // starts planned and required. Relax it on the program settings page (which is
+                    // optional, of course, if an administrator wants it).
+                    TaskIsPlanned = true,
+                    TaskIsRequired = true
                 };
+
+                ProgramTaskDefaults.Apply(entity, lifetimes);
 
                 items.Add(entity);
             }
 
-            TaskStore.Insert(items);
+            TaskStore.Insert(items, CascadeToLearners.Checked);
 
             TaskGrid.BindModelToControls(ProgramID.Value);
 

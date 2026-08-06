@@ -16,6 +16,8 @@ namespace InSite.Domain.Organizations
         public bool EnableOperatorGroup { get; set; }
         public bool EnableTraineeDepartment { get; set; }
         public bool PortalSearchRequiresReferral { get; set; }
+        public Guid? ProfileSecurityGroupId { get; set; }
+        public bool DisplayIntegrationPortalLink { get; set; }
 
         public bool IsEqual(ContactSettings other)
         {
@@ -27,7 +29,9 @@ namespace InSite.Domain.Organizations
                 DisableLeaderRelationshipCreation == other.DisableLeaderRelationshipCreation &&
                 EnableOperatorGroup == other.EnableOperatorGroup &&
                 EnableTraineeDepartment == other.EnableTraineeDepartment &&
-                PortalSearchRequiresReferral == other.PortalSearchRequiresReferral
+                PortalSearchRequiresReferral == other.PortalSearchRequiresReferral &&
+                ProfileSecurityGroupId == other.ProfileSecurityGroupId &&
+                DisplayIntegrationPortalLink == other.DisplayIntegrationPortalLink
                 ;
         }
     }

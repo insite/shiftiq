@@ -2,6 +2,6 @@
 {
     public enum CredentialStatus
     {
-        Undefined, Pending, Valid, Expired, Revoked
+        Undefined, Pending, Valid, Expired, Revoked, Submitted
     }
 }

@@ -10,7 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title runat="server" id="PageTitle"></title>
 
-    <link href="/library/fonts/font-awesome/7.1.0/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="/library/fonts/font-awesome-6.5.1/css/all.min.css" rel="stylesheet" type="text/css">
 
     <style type="text/css">
 
@@ -62,6 +62,7 @@
             margin-bottom: 0.5in;
             margin-top: 0.80em;
             width: 100%;
+            table-layout: fixed;
         }
 
             table.question > tbody > tr.title > td {
@@ -73,6 +74,10 @@
                     width: 0.35in;
                     padding-right: 0.25em;
                     text-align: right;
+                }
+
+                table.question > tbody > tr.title > td.qtext {
+                    word-wrap: break-word;
                 }
 
             table.question > tbody > tr > td > .table-option {

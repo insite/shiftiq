@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Shift.Common;
 
@@ -101,6 +102,7 @@ namespace InSite.Application.Registrations.Read
         public string RegistrationRequestedByName { get; set; }
         public Guid[] ExcludeCandidateIdentifier { get; set; }
         public Guid? CandidateMembershipGroupIdentifier { get; set; }
+        public string[] AccommodationTypes { get; set; }
 
         public QRegistrationFilter Clone()
         {

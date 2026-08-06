@@ -14,6 +14,7 @@ namespace InSite.Domain.Organizations
         public bool DefaultCandidateUploadFileView { get; set; }
         public bool DefaultAdministratorUploadFileView { get; set; }
         public bool NewAttachmentUpload { get; set; }
+        public bool CaseDocumentCopy { get; set; }
 
         public IssueSettings()
         {
@@ -21,6 +22,7 @@ namespace InSite.Domain.Organizations
             DefaultCandidateUploadFileView = true;
             DefaultAdministratorUploadFileView = false;
             NewAttachmentUpload = false;
+            CaseDocumentCopy = false;
         }
 
         public bool ShouldSerializePortalUploadClaimGroups() => PortalUploadClaimGroups.IsNotEmpty();
@@ -32,6 +34,7 @@ namespace InSite.Domain.Organizations
                 || DefaultCandidateUploadFileView != other.DefaultCandidateUploadFileView
                 || DefaultAdministratorUploadFileView != other.DefaultAdministratorUploadFileView
                 || NewAttachmentUpload != other.NewAttachmentUpload
+                || CaseDocumentCopy != other.CaseDocumentCopy
                 )
             {
                 return false;

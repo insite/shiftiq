@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
-using System.Web.WebPages;
 
 using InSite.Application.Contacts.Read;
 using InSite.Application.Issues.Read;
 using InSite.Common.Web.UI;
 
+using Shift.Common;
 using Shift.Constant;
 
 using static InSite.UI.Admin.Issues.Issues.Search;
@@ -62,6 +61,9 @@ namespace InSite.Admin.Issues.Controls
             AttachmentFileStatus.AutoPostBack = true;
             AttachmentFileStatus.ValueChanged += (x, y) => SetAttachmentsVisible();
 
+            DocumentFilter.AutoPostBack = true;
+            DocumentFilter.ValueChanged += (x, y) => SetAttachmentsVisible();
+
             CommentCategory.AutoPostBack = true;
             CommentCategory.ValueChanged += (s, a) => OnCommentCategoryChanged(a.NewValue);
         }
@@ -84,6 +86,11 @@ namespace InSite.Admin.Issues.Controls
             AssigneeEmployerIdentifiers.Filter.OrganizationIdentifier = Organization.OrganizationIdentifier;
 
             EnsureFileStatusBound();
+
+            DocumentFilter.LoadItems(
+                DocumentFilterType.All,
+                DocumentFilterType.RequestedOnly,
+                DocumentFilterType.UploadedOnly);
         }
 
         public override QIssueFilter Filter
@@ -129,6 +136,7 @@ namespace InSite.Admin.Issues.Controls
                     AttachmentFileCategory = AttachmentFileCategory.Value,
                     AttachmentDocumentName = AttachmentDocumentName.Text,
                     AttachmentHasClaims = !string.IsNullOrEmpty(AttachmentHasClaims.Value) ? bool.Parse(AttachmentHasClaims.Value) : (bool?)null,
+                    DocumentFilter = DocumentFilter.Value.ToEnum(DocumentFilterType.All),
                     AttachmentFileExpirySince = AttachmentFileExpirySince.Value,
                     AttachmentFileExpiryBefore = AttachmentFileExpiryBefore.Value,
                     AttachmentFileReceivedSince = AttachmentFileReceivedSince.Value,
@@ -142,7 +150,7 @@ namespace InSite.Admin.Issues.Controls
 
                     OnlyRequestedFiles = AttachmentFileStatus.Value == OutstandingOption,
 
-                    TopicUserConnectedFromUserIdentifier = 
+                    TopicUserConnectedFromUserIdentifier =
                         !Identity.IsAdministrator && Organization.Toolkits.Issues?.DisplayOnlyConnectedCases == true && HasConnections
                             ? User.Identifier
                             : (Guid?)null
@@ -209,6 +217,7 @@ namespace InSite.Admin.Issues.Controls
                 AttachmentHasClaims.ClearSelection();
                 AttachmentHasClaims.Value = value.AttachmentHasClaims?.ToString()?.ToLower();
 
+                DocumentFilter.Value = value.DocumentFilter.GetName();
                 AttachmentFileExpirySince.Value = value.AttachmentFileExpirySince?.LocalDateTime;
                 AttachmentFileExpiryBefore.Value = value.AttachmentFileExpiryBefore?.LocalDateTime;
                 AttachmentFileReceivedSince.Value = value.AttachmentFileReceivedSince?.LocalDateTime;
@@ -265,6 +274,7 @@ namespace InSite.Admin.Issues.Controls
             AttachmentFileCategory.ClearSelection();
             AttachmentDocumentName.Text = null;
             AttachmentHasClaims.ClearSelection();
+            DocumentFilter.ClearSelection();
             AttachmentFileExpirySince.Value = null;
             AttachmentFileExpiryBefore.Value = null;
             AttachmentFileReceivedSince.Value = null;
@@ -292,20 +302,22 @@ namespace InSite.Admin.Issues.Controls
         private void SetAttachmentsVisible()
         {
             var isAttachmentsVisible = AttachmentFileStatus.Value != OutstandingOption;
+            var isRequestedOnly = DocumentFilter.Value.ToEnum(DocumentFilterType.All) == DocumentFilterType.RequestedOnly;
 
             AttachmentFileCategoryField.Visible = isAttachmentsVisible;
-            AttachmentDocumentNameField.Visible = isAttachmentsVisible;
-            AttachmentHasClaimsField.Visible = isAttachmentsVisible;
-            AttachmentFileExpirySinceField.Visible = isAttachmentsVisible;
-            AttachmentFileExpiryBeforeField.Visible = isAttachmentsVisible;
-            AttachmentFileReceivedSinceField.Visible = isAttachmentsVisible;
-            AttachmentFileReceivedBeforeField.Visible = isAttachmentsVisible;
-            AttachmentFileAlternatedSinceField.Visible = isAttachmentsVisible;
-            AttachmentFileAlternatedBeforeField.Visible = isAttachmentsVisible;
-            AttachmentApprovedSinceField.Visible = isAttachmentsVisible;
-            AttachmentApprovedBeforeField.Visible = isAttachmentsVisible;
-            AttachmentUploadedSinceField.Visible = isAttachmentsVisible;
-            AttachmentUploadedBeforeField.Visible = isAttachmentsVisible;
+            AttachmentDocumentNameField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentHasClaimsField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            RequestedDocumentsField.Visible = isAttachmentsVisible;
+            AttachmentFileExpirySinceField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentFileExpiryBeforeField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentFileReceivedSinceField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentFileReceivedBeforeField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentFileAlternatedSinceField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentFileAlternatedBeforeField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentApprovedSinceField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentApprovedBeforeField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentUploadedSinceField.Visible = isAttachmentsVisible && !isRequestedOnly;
+            AttachmentUploadedBeforeField.Visible = isAttachmentsVisible && !isRequestedOnly;
         }
 
         private void EnsureFileStatusBound()

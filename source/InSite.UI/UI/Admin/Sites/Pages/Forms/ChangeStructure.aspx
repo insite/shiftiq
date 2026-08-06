@@ -51,8 +51,8 @@
                                 <div>
                                     <insite:TextBox runat="server" ID="NavigateUrl" MaxLength="500" AllowHtml="true" />
                                 </div>
-                                <div style="margin-top:5px;">
-                                    <asp:CheckBox runat="server" ID="IsNavigateUrlToNewTab" Text="Open in a new browser window" />
+                                <div class="mt-1">
+                                    <insite:CheckBox runat="server" ID="IsNavigateUrlToNewTab" Text="Open in a new browser window" />
                                 </div>
                                 <div class="form-text">
                                     Fully-qualified URL for a web page that is external to this web site.

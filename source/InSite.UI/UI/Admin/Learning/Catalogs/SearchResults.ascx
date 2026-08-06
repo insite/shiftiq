@@ -4,7 +4,7 @@
     <insite:Grid runat="server" ID="Grid" DataKeyNames="CatalogIdentifier">
         <Columns>
 
-            <asp:TemplateField HeaderText="Catalog Name"> 
+            <asp:TemplateField HeaderText="Catalogue Name">
                 <ItemTemplate>
                     <a href='/ui/admin/learning/catalogs/edit?<%# Eval("CatalogIdentifier", "catalog={0}") %>'><%# Eval("CatalogName") %></a>
                 </ItemTemplate>

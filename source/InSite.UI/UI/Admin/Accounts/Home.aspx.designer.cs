@@ -15,6 +15,15 @@ namespace InSite.UI.Admin.Accounts
     {
 
         /// <summary>
+        /// ScreenStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Alert ScreenStatus;
+
+        /// <summary>
         /// OrganizationCounter control.
         /// </summary>
         /// <remarks>
@@ -103,6 +112,15 @@ namespace InSite.UI.Admin.Accounts
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.LinkButton ClearOrganizationCache;
+
+        /// <summary>
+        /// ResyncOrganizationsWithHub control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton ResyncOrganizationsWithHub;
 
         /// <summary>
         /// UserCounter control.

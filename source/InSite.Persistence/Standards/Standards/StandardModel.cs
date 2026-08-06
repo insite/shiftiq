@@ -31,6 +31,9 @@ namespace InSite.Persistence
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore), MaxLength(32)]
         public string Icon { get; set; }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore), MaxLength(64)]
+        public string Tag { get; set; }
+
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsHidden { get; set; }
 

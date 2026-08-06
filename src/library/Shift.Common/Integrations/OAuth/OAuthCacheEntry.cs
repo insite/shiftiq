@@ -4,8 +4,10 @@ namespace Shift.Common
 {
     public class OAuthCacheEntry
     {
-        public Guid TenantId { get; set; }
-        public string URL { get; set; }
-        public OAuthAuthenticationMethods Method { get; set; }
+        public const int LifetimeSeconds = 5 * 60;
+
+        public Guid OrganizationId { get; set; }
+        public string Url { get; set; }
+        public OAuthMethod Method { get; set; }
     }
 }

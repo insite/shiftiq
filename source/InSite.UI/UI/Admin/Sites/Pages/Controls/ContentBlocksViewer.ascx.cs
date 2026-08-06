@@ -160,7 +160,7 @@ namespace InSite.Admin.Sites.Pages.Controls
             Title.Text = page.Title;
             Hook.Text = page.Hook;
             EditLink.NavigateUrl = editUrl;
-            EditLink2.NavigateUrl = editUrl2;
+            // EditLink2.NavigateUrl = editUrl2; TODO: Remove non-React content editor
 
 
             if (content == null)

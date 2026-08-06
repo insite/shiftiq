@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading;
 
 using InSite.Application.Organizations.Read;
 using InSite.Domain.Organizations;
@@ -15,15 +15,43 @@ namespace InSite.Persistence
 {
     public class OrganizationSearch : IOrganizationSearch
     {
-        private static readonly ConcurrentDictionary<Guid, OrganizationState> CacheById
-            = new ConcurrentDictionary<Guid, OrganizationState>();
-
-        private static readonly ConcurrentDictionary<string, OrganizationState> CacheByCode
-            = new ConcurrentDictionary<string, OrganizationState>();
-
         internal InternalDbContext CreateContext() => new InternalDbContext(false);
 
         #region Cache
+
+        private interface IReadOnlySnapshot
+        {
+            IReadOnlyDictionary<Guid, OrganizationState> ById { get; }
+            IReadOnlyDictionary<string, OrganizationState> ByCode { get; }
+        }
+
+        private sealed class Snapshot : IReadOnlySnapshot
+        {
+            public Dictionary<Guid, OrganizationState> ById { get; }
+            public Dictionary<string, OrganizationState> ByCode { get; }
+
+            IReadOnlyDictionary<Guid, OrganizationState> IReadOnlySnapshot.ById => ById;
+            IReadOnlyDictionary<string, OrganizationState> IReadOnlySnapshot.ByCode => ByCode;
+
+            public Snapshot() : this(0) { }
+
+            public Snapshot(int capacity)
+            {
+                ById = new Dictionary<Guid, OrganizationState>(capacity);
+                ByCode = new Dictionary<string, OrganizationState>(capacity, StringComparer.OrdinalIgnoreCase);
+            }
+
+            public Snapshot(Snapshot source)
+            {
+                ById = new Dictionary<Guid, OrganizationState>(source.ById);
+                ByCode = new Dictionary<string, OrganizationState>(source.ByCode, source.ByCode.Comparer);
+            }
+        }
+
+        private static IReadOnlySnapshot _snapshot = new Snapshot();
+        private static readonly object _snapshotWriteLock = new object();
+
+        private static IReadOnlySnapshot GetSnapshot() => Volatile.Read(ref _snapshot);
 
         public OrganizationState GetModel(Guid organization)
         {
@@ -32,17 +60,20 @@ namespace InSite.Persistence
 
         public static string GetPersonFullNamePolicy(Guid organization)
         {
-            var model = Select(organization);
+            var snapshot = GetSnapshot();
 
-            return model?.Toolkits?.Contacts?.FullNamePolicy;
+            return snapshot.ById.TryGetValue(organization, out var state)
+                ? state.Toolkits?.Contacts?.FullNamePolicy
+                : null;
         }
 
         public static OrganizationState Select(Guid id)
         {
-            if (CacheById.TryGetValue(id, out var state))
-                return state.CloneJson();
+            var snapshot = GetSnapshot();
 
-            return null;
+            return snapshot.ById.TryGetValue(id, out var state)
+                ? state.CloneJson()
+                : null;
         }
 
         public static OrganizationState Select(string code)
@@ -50,10 +81,11 @@ namespace InSite.Persistence
             if (code.IsEmpty())
                 return null;
 
-            if (CacheByCode.TryGetValue(code, out var state))
-                return state.CloneJson();
+            var snapshot = GetSnapshot();
 
-            return null;
+            return snapshot.ByCode.TryGetValue(code, out var state)
+                ? state.CloneJson()
+                : null;
         }
 
         #endregion
@@ -108,36 +140,48 @@ namespace InSite.Persistence
 
         public static void Refresh()
         {
-            CacheById.Clear();
-            CacheByCode.Clear();
-
-            using (var db = new InternalDbContext())
+            lock (_snapshotWriteLock)
             {
-                var entities = db.Organizations.AsNoTracking().ToList();
+                List<VOrganization> entities;
+                using (var db = new InternalDbContext())
+                    entities = db.Organizations.AsNoTracking().ToList();
+
+                var snapshot = new Snapshot(entities.Count);
 
                 foreach (var entity in entities)
                 {
-                    var organization = OrganizationAdapter.CreatePacket(entity);
+                    var model = OrganizationAdapter.CreatePacket(entity);
 
-                    CacheById.TryAdd(organization.Identifier, organization);
-                    CacheByCode.TryAdd(organization.Code, organization);
+                    snapshot.ById[model.Identifier] = model;
+                    snapshot.ByCode[model.Code] = model;
                 }
+
+                Volatile.Write(ref _snapshot, snapshot);
             }
         }
 
         public static void Refresh(Guid organizationId)
         {
-            using (var db = new InternalDbContext())
+            lock (_snapshotWriteLock)
             {
-                var entity = db.Organizations.FirstOrDefault(x => x.OrganizationIdentifier == organizationId);
+                VOrganization entity;
+                using (var db = new InternalDbContext())
+                    entity = db.Organizations.FirstOrDefault(x => x.OrganizationIdentifier == organizationId);
+
+                if (entity == null)
+                    throw ApplicationError.Create("Organization not found: {0}", organizationId);
+
+                var snapshot = new Snapshot((Snapshot)GetSnapshot());
+
+                if (snapshot.ById.TryGetValue(organizationId, out var cachedOrg))
+                    snapshot.ByCode.Remove(cachedOrg.Code);
 
                 var model = OrganizationAdapter.CreatePacket(entity);
 
-                if (CacheById.TryRemove(organizationId, out _))
-                    CacheById.TryAdd(organizationId, model);
+                snapshot.ById[model.Identifier] = model;
+                snapshot.ByCode[model.Code] = model;
 
-                if (CacheByCode.TryRemove(model.Code, out _))
-                    CacheByCode.TryAdd(model.Code, model);
+                Volatile.Write(ref _snapshot, snapshot);
             }
         }
 

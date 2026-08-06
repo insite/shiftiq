@@ -1,0 +1,76 @@
+.CapabilityReport {
+    background: #fff;
+    padding: 0.75rem 1rem 1.5rem;
+}
+
+.capability-report-canvas {
+    background: #fff;
+    margin: 0 auto;
+    max-width: 39rem;
+    overflow-x: auto;
+}
+
+.capability-wheel {
+    display: block;
+    height: auto;
+    min-width: 0;
+    width: 100%;
+}
+
+.capability-wheel-frame {
+    transform-origin: center;
+}
+
+.capability-wheel-segment {
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.capability-wheel-spoke {
+    stroke-linecap: square;
+    stroke-opacity: 0.8;
+    stroke-width: 2;
+}
+
+.capability-wheel-label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: 0;
+    pointer-events: none;
+}
+
+.capability-ahri-logo {
+    font-family: Arial, Helvetica, sans-serif;
+    pointer-events: none;
+}
+
+.capability-ahri-logo-main {
+    font-size: 60px;
+    font-weight: 900;
+    letter-spacing: 0;
+}
+
+.capability-ahri-logo-subtitle {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.capability-ahri-logo-corner {
+    fill: none;
+    stroke-linecap: square;
+    stroke-width: 8;
+}
+
+.capability-wheel-legend {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 36px;
+    letter-spacing: 0;
+}
+
+@media (max-width: 820px) {
+    .CapabilityReport {
+        padding: 0.5rem;
+    }
+}

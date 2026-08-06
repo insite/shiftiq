@@ -11,5 +11,7 @@ export interface ApiSearchFiles {
     FileUploadedSince?: string | null;
     FileUploadedBefore?: string | null;
 
+    FileTag?: string | null;
+
     HasClaims?: boolean | null;
 }

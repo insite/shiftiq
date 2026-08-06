@@ -13,5 +13,6 @@
         public ApiSettings SwiftSmsGateway { get; set; }
         public SSRS SSRS { get; set; }
         public RabbitMq RabbitMq { get; set; }
+        public OpenAISettings OpenAI { get; set; }
     }
 }

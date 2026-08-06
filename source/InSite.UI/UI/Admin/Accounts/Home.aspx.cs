@@ -2,7 +2,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
 
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
@@ -22,6 +21,19 @@ namespace InSite.UI.Admin.Accounts
             {
                 OrganizationSearch.Refresh();
                 Global.InitIntegrations();
+            };
+
+            ResyncOrganizationsWithHub.Click += (x, y) =>
+            {
+                try
+                {
+                    Global.RegisterPartition();
+                    ScreenStatus.AddMessage(AlertType.Success, "Organizations resynced with the Hub.");
+                }
+                catch (Exception ex)
+                {
+                    ScreenStatus.AddMessage(AlertType.Error, $"Resync failed: {ex.Message}");
+                }
             };
         }
 
@@ -90,7 +102,7 @@ namespace InSite.UI.Admin.Accounts
             }
         }
 
-        public static void LoadCounter(HtmlGenericControl card, Literal counter, bool visible, int count, HtmlAnchor link, string action)
+        public static void LoadCounter(HtmlGenericControl card, System.Web.UI.WebControls.Literal counter, bool visible, int count, HtmlAnchor link, string action)
         {
             card.Visible = visible;
             link.HRef = action;

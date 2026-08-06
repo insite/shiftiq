@@ -27,6 +27,8 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
                     ProfileDescription = Description.Text,
 
                     ParentProfileStandardIdentifier = ParentProfile.Value,
+                    HasParent = HasParent.ValueAsBoolean,
+                    IsDiverged = IsDiverged.ValueAsBoolean,
 
                     ProfileScope = ProfileScope.Value
                 };
@@ -44,6 +46,8 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
                 Description.Text = value.ProfileDescription;
 
                 ParentProfile.Value = value.ParentProfileStandardIdentifier;
+                HasParent.ValueAsBoolean = value.HasParent;
+                IsDiverged.ValueAsBoolean = value.IsDiverged;
 
                 ProfileScope.Value = string.IsNullOrEmpty(value.ProfileScope)
                     ? OrganizationScopeSelector.ScopeOrganization
@@ -85,6 +89,8 @@ namespace InSite.Cmds.Controls.Profiles.Profiles
             Description.Text = null;
 
             ParentProfile.Value = null;
+            HasParent.ClearSelection();
+            IsDiverged.ClearSelection();
             ProfileScope.Value = OrganizationScopeSelector.ScopeOrganization;
 
             LoadParentProfiles();

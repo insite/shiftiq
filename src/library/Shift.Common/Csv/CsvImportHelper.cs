@@ -16,13 +16,13 @@ namespace Shift.Common
 
         #region Public methods
 
-        public static string[][] GetValues(Stream csv, int? columnCount, bool autoDetermineSeparator, Encoding encoding)
+        public static string[][] GetValues(Stream csv, int? columnCount, bool autoDetermineSeparator, Encoding encoding, int? maxLineCount = null)
         {
             using (var reader = new StreamReader(csv, encoding))
-                return GetValues(reader, columnCount, autoDetermineSeparator);
+                return GetValues(reader, columnCount, autoDetermineSeparator, maxLineCount);
         }
 
-        public static string[][] GetValues(TextReader reader, int? columnCount, bool autoDetermineSeparator)
+        public static string[][] GetValues(TextReader reader, int? columnCount, bool autoDetermineSeparator, int? maxLineCount = null)
         {
             var list = new List<string[]>();
             var separator = autoDetermineSeparator ? (char?)null : CsvSeparator;
@@ -30,7 +30,7 @@ namespace Shift.Common
             string line;
             int lineNumber = 1;
 
-            while ((line = reader.ReadLine()) != null)
+            while ((maxLineCount == null || maxLineCount.Value >= lineNumber) && (line = reader.ReadLine()) != null)
             {
                 if (separator == null)
                     separator = line.Contains("\t") ? '\t' : CsvSeparator;

@@ -57,7 +57,7 @@ namespace InSite.UI.Admin.Integrations.Tests.Controls
             var dataItem = (GrantRegistrationAccommodation)e.Item.DataItem;
 
             var typeSelector = (AccommodationTypeComboBox)e.Item.FindControl("TypeSelector");
-            typeSelector.AdditionalOptions = AccommodationAdditionalTypes;
+            typeSelector.Settings.AdditionalOptions = AccommodationAdditionalTypes;
             typeSelector.RefreshData();
             typeSelector.Value = dataItem.Type;
 

@@ -26,6 +26,8 @@ namespace InSite.Persistence
             Property(x => x.TopicUserEmail).IsRequired().IsUnicode(false).HasMaxLength(254);
             Property(x => x.TopicUserIdentifier).IsRequired();
             Property(x => x.TopicUserName).IsRequired().IsUnicode(false).HasMaxLength(120);
+
+            HasRequired(a => a.Issue).WithMany(b => b.IssueAttachments).HasForeignKey(c => c.IssueIdentifier).WillCascadeOnDelete(false);
         }
     }
 }

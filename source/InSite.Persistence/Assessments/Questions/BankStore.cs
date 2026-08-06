@@ -1410,6 +1410,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             });
         }
 
+        public void Update(CriterionContentChanged e) => UpdateCursor(e, null);
+
         public void Update(CriterionFilterChanged e) => UpdateCursor(e, null);
 
         public void Update(CriterionFilterDeleted e) => UpdateCursor(e, null);
@@ -1433,6 +1435,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                           && x.ContainerIdentifier == e.Criterion));
             });
         }
+
+        public void Update(CriterionTabReconfigured e) => UpdateCursor(e, null);
 
         public void Update(SpecificationAdded e)
         {

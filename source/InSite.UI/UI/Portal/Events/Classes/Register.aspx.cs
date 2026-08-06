@@ -1166,13 +1166,12 @@ namespace InSite.UI.Portal.Events.Classes
             var groupName = NewCompanyName.Text.Trim();
 
             var group = ServiceLocator.GroupSearch
-                .GetGroups(new QGroupFilter
+                .GetFirstGroup(new QGroupFilter
                 {
-                    GroupName = groupName,
+                    GroupNameExact = groupName,
                     OrganizationIdentifier = Organization.Identifier,
                     GroupType = GroupTypes.Employer
-                })
-                .FirstOrDefault();
+                });
 
             if (group == null)
                 group = CreateNewEmployerGroup();

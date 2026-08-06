@@ -43,5 +43,9 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         builder.Property(x => x.LoginOrganizationCode).HasColumnName("LoginOrganizationCode").IsUnicode(false).HasMaxLength(30);
         builder.Property(x => x.OldUserPasswordHash).HasColumnName("OldUserPasswordHash").IsUnicode(false).HasMaxLength(70);
         builder.Property(x => x.UserPasswordChangeRequested).HasColumnName("UserPasswordChangeRequested");
+
+        builder.Property(x => x.LastChangeTime).HasColumnName("LastChangeTime").IsRequired();
+        builder.Property(x => x.LastChangeType).HasColumnName("LastChangeType").IsRequired().IsUnicode(false).HasMaxLength(100);
+        builder.Property(x => x.LastChangeUser).HasColumnName("LastChangeUser").IsRequired();
     }
 }

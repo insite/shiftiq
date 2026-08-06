@@ -656,6 +656,18 @@ namespace InSite.Domain.Messages
         public string GradebookURL { get; set; }
     }
 
+    public class ClassCompletedLearnerNotification : Notification
+    {
+        public ClassCompletedLearnerNotification()
+        {
+            Type = NotificationType.ClassCompletedLearner;
+        }
+
+        public string EventTitle { get; set; }
+        public string EventDate { get; set; }
+        public string EventTime { get; set; }
+    }
+
     public class CourseCompletedNotification : Notification
     {
         public CourseCompletedNotification()

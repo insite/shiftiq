@@ -1,7 +1,12 @@
 <%@ Page Language="C#" CodeBehind="ChangeAddendum.aspx.cs" Inherits="InSite.Admin.Assessments.Forms.Forms.ChangeAddendum" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
+
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:PageHeadContent runat="server">
         <style type="text/css">
@@ -98,6 +103,8 @@
             </div>
         </div>
     </insite:Container>
+
+    </asp:Panel>
 
     <insite:PageFooterContent runat="server">
         <script type="text/javascript">

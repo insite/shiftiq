@@ -35,7 +35,7 @@
                             <div>
                                 <insite:TextBox runat="server" ID="ProgramCode" MaxLength="20" />
                             </div>
-                            <div class="form-text">The catalog code for this program.</div>
+                            <div class="form-text">The catalogue code for this program.</div>
                         </div>
 
                         <div class="form-group mb-3">
@@ -79,7 +79,7 @@
                                 Description
                             </label>
                             <div>
-                                <insite:TextBox runat="server" ID="ProgramDescription" TextMode="MultiLine" Rows="5" MaxLength="500"/>
+                                <insite:TextBox runat="server" ID="ProgramDescription" TextMode="MultiLine" Rows="5" MaxLength="700"/>
                             </div>
                             <div class="form-text">The description for this program.</div>
                         </div>

@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title runat="server" id="PageTitle"></title>
 
-    <link href="/library/fonts/font-awesome/7.1.0/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="/library/fonts/font-awesome-6.5.1/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="/library/fonts/roboto/roboto-v20-latin-ext_latin.css" rel="stylesheet" type="text/css">
 
     <style type="text/css">

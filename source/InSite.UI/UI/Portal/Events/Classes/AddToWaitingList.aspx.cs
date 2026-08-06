@@ -518,13 +518,12 @@ namespace InSite.UI.Portal.Events.Classes
                 return EmployerGroupIdentifier.Value;
 
             var group = ServiceLocator.GroupSearch
-                .GetGroups(new QGroupFilter
+                .GetFirstGroup(new QGroupFilter
                 {
-                    GroupName = NewEmployerName.Text,
+                    GroupNameExact = NewEmployerName.Text,
                     OrganizationIdentifier = Organization.Identifier,
                     GroupType = GroupTypes.Employer
-                })
-                .FirstOrDefault();
+                });
 
             if (group == null)
                 group = CreateNewEmployerGroup();

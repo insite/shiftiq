@@ -44,50 +44,48 @@
     </div>
 </div>
 
-<insite:Container runat="server" ID="ScenarioFields">
-    <div class="form-group mb-3">
-        <label class="form-label">
-            Sections as Tabs
-        </label>
-        <div>
-            <insite:BooleanComboBox runat="server" ID="SectionsAsTabsEnabled" TrueText="Enabled" FalseText="Disabled" AllowBlank="false" />
-        </div>
-        <div class="form-text">
-            If this feature is enabled then each form's section will appear in a tab at the top of the form.
-        </div>
+<div class="form-group mb-3">
+    <label class="form-label">
+        Sections as Tabs
+    </label>
+    <div>
+        <insite:BooleanComboBox runat="server" ID="SectionsAsTabsEnabled" TrueText="Enabled" FalseText="Disabled" AllowBlank="false" />
     </div>
+    <div class="form-text">
+        If this feature is enabled then each form's section will appear in a tab at the top of the form.
+    </div>
+</div>
 
-    <div runat="server" id="TabNavigationField" class="form-group mb-3">
-        <label class="form-label">
-            Tab Navigation
-        </label>
-        <div>
-            <insite:BooleanComboBox runat="server" ID="TabNavigationEnabled" TrueText="Enabled" FalseText="Disabled" AllowBlank="false" />
-        </div>
-        <div class="form-text">
-            When enabled, Next and Previous buttons are displayed and learner can freely move around tabs.
-            When disabled, only Next button is displayed and only forward progression through the assessment is allowed.
-        </div>
+<div runat="server" id="TabNavigationField" class="form-group mb-3">
+    <label class="form-label">
+        Tab Navigation
+    </label>
+    <div>
+        <insite:BooleanComboBox runat="server" ID="TabNavigationEnabled" TrueText="Enabled" FalseText="Disabled" AllowBlank="false" />
     </div>
+    <div class="form-text">
+        When enabled, Next and Previous buttons are displayed and learner can freely move around tabs.
+        When disabled, only Next button is displayed and only forward progression through the assessment is allowed.
+    </div>
+</div>
 
-    <div runat="server" ID="SingleQuestionPerTabField" class="form-group mb-3">
-        <label class="form-label">
-            Single Question per Tab
-        </label>
-        <div>
-            <insite:BooleanComboBox runat="server" ID="SingleQuestionPerTabEnabled" TrueText="Enabled" FalseText="Disabled" AllowBlank="false" />
-        </div>
-        <div class="form-text">
-            If this feature is enabled then only one question is displayed on the current tab at a time.
-        </div>
+<div runat="server" ID="SingleQuestionPerTabField" class="form-group mb-3">
+    <label class="form-label">
+        Single Question per Tab
+    </label>
+    <div>
+        <insite:BooleanComboBox runat="server" ID="SingleQuestionPerTabEnabled" TrueText="Enabled" FalseText="Disabled" AllowBlank="false" />
     </div>
+    <div class="form-text">
+        If this feature is enabled then only one question is displayed on the current tab at a time.
+    </div>
+</div>
 
-    <div runat="server" ID="TabTimeLimitField" class="form-group mb-3">
-        <label class="form-label">
-            Tab Time Limit
-        </label>
-        <div>
-            <insite:ComboBox runat="server" ID="TabTimeLimit" AllowBlank="false" />
-        </div>
+<div runat="server" ID="TabTimeLimitField" class="form-group mb-3">
+    <label class="form-label">
+        Tab Time Limit
+    </label>
+    <div>
+        <insite:ComboBox runat="server" ID="TabTimeLimit" AllowBlank="false" />
     </div>
-</insite:Container>
+</div>

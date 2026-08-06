@@ -80,7 +80,7 @@
                 <asp:Literal runat="server" ID="Code" />
             </div>
             <div class="form-text">
-                Alpha numeric catalog reference code for the form (required for Exam event scheduling).
+                Alpha numeric catalogue reference code for the form (required for Exam event scheduling).
             </div>
         </div>
 
@@ -346,13 +346,17 @@
                 Time Limit
             </label>
             <div>
-                <asp:Literal runat="server" ID="TimeLimit" /> minute(s)
+                <asp:Literal runat="server" ID="TimeLimit" />
             </div>
-            <div class="form-text">
-                This is the number of minutes permitted for each attempt on the exam. 
+            <div runat="server" id="TimeLimitHelpDefault" class="form-text">
+                This is the number of minutes permitted for each attempt on the exam.
                 <span class="text-danger">
                     This is required to enable the countdown timer and the autosave function for exam candidates.
                 </span>
+            </div>
+            <div runat="server" id="TimeLimitHelpCalculated" class="form-text" visible="false">
+                This is the total time permitted for each attempt, calculated automatically as the sum of the section time limits.
+                To update the time limit, please adjust the settings within each section of the form, as section time limits control the overall timing.
             </div>
         </div>
 

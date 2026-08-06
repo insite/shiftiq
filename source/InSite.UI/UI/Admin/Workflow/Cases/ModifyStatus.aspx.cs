@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using InSite.Application.Cases.Write;
 using InSite.Application.Issues.Read;
@@ -12,7 +14,7 @@ using Shift.Common;
 
 namespace InSite.Admin.Issues.Forms
 {
-    public partial class ChangeStatus : AdminBasePage, IHasParentLinkParameters
+    public partial class ModifyStatus : AdminBasePage, IHasParentLinkParameters
     {
         #region Properties
 
@@ -20,9 +22,15 @@ namespace InSite.Admin.Issues.Forms
 
         #endregion
 
-        #region Initialization
+        #region Fields
 
         private VIssue _issue;
+        private static readonly IReadOnlyCollection<string> _validCategories =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Open", "Closed" };
+
+        #endregion
+
+        #region Initialization
 
         protected override void OnInit(EventArgs e)
         {
@@ -32,9 +40,6 @@ namespace InSite.Admin.Issues.Forms
 
             if (_issue == null || !CaseVisibilityHelper.IsCaseVisible(_issue))
                 RedirectToSearch();
-
-            IssueStatus.IssueType = _issue.IssueType;
-            IssueStatusEffective.Value = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, User.TimeZone);
 
             SaveButton.Click += SaveButton_Click;
         }
@@ -52,6 +57,14 @@ namespace InSite.Admin.Issues.Forms
 
             CaseInfo.BindIssue(_issue, User.TimeZone, true, false);
 
+            var statusCategory = Request.QueryString["category"];
+            if (_validCategories.Contains(statusCategory))
+                IssueStatus.StatusCategory = statusCategory;
+
+            IssueStatus.IssueType = _issue.IssueType;
+
+            IssueStatusEffective.Value = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, User.TimeZone);
+
             CancelButton.NavigateUrl = GetOutlineUrl(CaseIdentifier);
         }
 
@@ -66,11 +79,12 @@ namespace InSite.Admin.Issues.Forms
 
             var issue = ServiceLocator.IssueSearch.GetIssue(CaseIdentifier);
 
-            var status = IssueStatus.ValueAsGuid;
-            if (status.HasValue && issue.IssueStatusIdentifier != status)
+            var statusId = IssueStatus.ValueAsGuid;
+            if (statusId.HasValue && issue.IssueStatusIdentifier != statusId)
             {
-                var command = new ChangeIssueStatus(CaseIdentifier, status.Value, IssueStatusEffective.Value ?? DateTimeOffset.UtcNow);
-                ServiceLocator.SendCommand(command);
+                var statusCategory = ServiceLocator.IssueSearch.GetStatus(statusId.Value)?.StatusCategory;
+                ServiceLocator.SendCommand(new ChangeIssueStatus(
+                    CaseIdentifier, statusId.Value, IssueStatusEffective.Value ?? DateTimeOffset.UtcNow, statusCategory));
             }
 
             RedirectToOutline();

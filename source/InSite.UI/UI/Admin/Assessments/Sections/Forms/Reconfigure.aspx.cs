@@ -10,7 +10,6 @@ using InSite.UI.Layout.Admin;
 
 using Shift.Common;
 using Shift.Constant;
-using Shift.Sdk.UI;
 
 namespace InSite.UI.Admin.Assessments.Sections.Forms
 {
@@ -22,12 +21,6 @@ namespace InSite.UI.Admin.Assessments.Sections.Forms
 
         private Guid SectionID => Guid.TryParse(Request.QueryString["section"], out var value) ? value : Guid.Empty;
 
-        private SpecificationTabTimeLimit TabTimeLimit
-        {
-            get => (SpecificationTabTimeLimit)ViewState[nameof(TabTimeLimit)];
-            set => ViewState[nameof(TabTimeLimit)] = value;
-        }
-
         #endregion
 
         #region Loading
@@ -35,8 +28,6 @@ namespace InSite.UI.Admin.Assessments.Sections.Forms
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
-
-            BreakTimer.ValueChanged += BreakTimer_ValueChanged;
 
             SaveButton.Click += SaveButton_Click;
         }
@@ -51,21 +42,12 @@ namespace InSite.UI.Admin.Assessments.Sections.Forms
             if (IsPostBack)
                 return;
 
-            TimerType.LoadItems(
-                FormSectionTimeType.Optional,
-                FormSectionTimeType.Enforced);
-
             Open();
         }
 
         #endregion
 
         #region Event handlers
-
-        private void BreakTimer_ValueChanged(object sender, ComboBoxValueChangedEventArgs e)
-        {
-            SetConfigurationFieldsVisibility();
-        }
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
@@ -103,16 +85,16 @@ namespace InSite.UI.Admin.Assessments.Sections.Forms
 
         private void Save()
         {
-            var section = new Section();
+            var tabConfig = new SectionTabConfiguration();
 
-            GetInputValues(section);
+            TabConfig.GetValues(tabConfig);
 
-            section.WarningOnNextTabEnabled = WarningOnNextTab.ValueAsBoolean.Value;
-            section.BreakTimerEnabled = BreakTimer.ValueAsBoolean.Value;
-            section.TimeLimit = TimeLimit.ValueAsInt ?? 0;
-            section.TimerType = TimerType.Value.ToEnum<FormSectionTimeType>();
-
-            ServiceLocator.SendCommand(new ReconfigureSection(BankID, SectionID, section.WarningOnNextTabEnabled, section.BreakTimerEnabled, section.TimeLimit, section.TimerType));
+            ServiceLocator.SendCommand(new ReconfigureSection(
+                BankID, SectionID,
+                tabConfig.WarningOnNextTabEnabled,
+                tabConfig.BreakTimerEnabled,
+                tabConfig.TimeLimit,
+                tabConfig.TimerType));
         }
 
         #endregion
@@ -139,15 +121,7 @@ namespace InSite.UI.Admin.Assessments.Sections.Forms
 
             // Configuration
 
-            TabTimeLimit = specification.TabTimeLimit;
-
-            WarningOnNextTab.ValueAsBoolean = section.WarningOnNextTabEnabled;
-            BreakTimer.ValueAsBoolean = section.BreakTimerEnabled;
-            BreakTimer.AutoPostBack = TabTimeLimit == SpecificationTabTimeLimit.SomeTabs;
-            TimeLimit.ValueAsInt = section.TimeLimit;
-            TimerType.Value = section.TimerType.GetName();
-
-            SetConfigurationFieldsVisibility();
+            TabConfig.SetValues(section.TabConfiguration, specification.TabTimeLimit);
 
             // Criterion
 
@@ -170,25 +144,6 @@ namespace InSite.UI.Admin.Assessments.Sections.Forms
             // Other
 
             CancelButton.NavigateUrl = GetReaderUrl(section.Identifier);
-        }
-
-        private void SetConfigurationFieldsVisibility()
-        {
-            var limitSomeTabs = TabTimeLimit == SpecificationTabTimeLimit.SomeTabs;
-            var limitAllTabs = TabTimeLimit == SpecificationTabTimeLimit.AllTabs;
-            var breakTimerEnabled = BreakTimer.ValueAsBoolean.Value;
-
-            BreakTimerField.Visible = limitSomeTabs || limitAllTabs;
-            TimeLimitField.Visible = limitAllTabs || limitSomeTabs && breakTimerEnabled;
-            TimerTypeField.Visible = limitAllTabs || limitSomeTabs && breakTimerEnabled;
-        }
-
-        private void GetInputValues(Section section)
-        {
-            section.WarningOnNextTabEnabled = WarningOnNextTab.ValueAsBoolean.Value;
-            section.BreakTimerEnabled = BreakTimer.ValueAsBoolean.Value;
-            section.TimeLimit = TimeLimit.ValueAsInt ?? 0;
-            section.TimerType = TimerType.Value.ToEnum<FormSectionTimeType>();
         }
 
         #endregion

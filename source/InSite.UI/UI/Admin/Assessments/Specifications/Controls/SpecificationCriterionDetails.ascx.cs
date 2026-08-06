@@ -25,7 +25,7 @@ namespace InSite.Admin.Assessments.Specifications.Controls
             set => ViewState[nameof(CanWrite)] = value;
         }
 
-        public Guid? CriterionID => CriterionDetail.CriterionID;
+        public Guid? CriterionID => CriterionDetail.CriterionId;
 
         #endregion
 
@@ -33,7 +33,16 @@ namespace InSite.Admin.Assessments.Specifications.Controls
         {
             base.OnInit(e);
 
+            SpecificationContent.Load += SpecificationContent_Load;
             SpecificationContent.ContentInitialization += SpecificationContent_ContentInitialization;
+        }
+
+        private void SpecificationContent_Load(object sender, EventArgs e)
+        {
+            var repeater = (ContentRepeater)sender;
+            var control = (SpecificationDetails)repeater.Control;
+
+            control.SpecificationModified += SpecificationContent_SpecificationModified;
         }
 
         private void SpecificationContent_ContentInitialization(object sender, EventArgs e)
@@ -46,6 +55,12 @@ namespace InSite.Admin.Assessments.Specifications.Controls
                 return;
 
             control.SetInputValues(spec, CanWrite);
+        }
+
+        private void SpecificationContent_SpecificationModified(object sender, SpecificationDetails.SpecificationArgs e)
+        {
+            CriterionUpdatePanel.Update();
+            CriterionDetail.SetTabConfigInputValues(e.Specification);
         }
 
         public void SetInputValues(Criterion sieve, bool canWrite)

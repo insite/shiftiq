@@ -26,6 +26,7 @@ export default function FileSearch() {
                 fileUploadedBefore: null,
                 fileUploadedBy: "",
                 visibility: "",
+                fileTag: "",
                 visibleColumns: [],
                 sortByColumn: ""
             }}
@@ -54,6 +55,7 @@ async function load(pageIndex: number, criteria: FileCriteria, timeZoneId: TimeZ
         fileUploaded: dateTimeHelper.parseServerDateTime(row.FileUploaded, timeZoneId)!,
         userId: row.UserId,
         userName: row.UserFullName || "Someone Someone",
+        fileTag: row.FileTag ?? null,
         visibility: row.HasClaims ? "Private" : "Public",
     }));
 }

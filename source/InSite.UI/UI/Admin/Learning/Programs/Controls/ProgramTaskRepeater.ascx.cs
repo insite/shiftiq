@@ -108,7 +108,13 @@ namespace InSite.UI.Admin.Records.Programs.Controls
 
             var name = (CheckBox)e.Item.FindControl("TaskName");
             name.Checked = item.IsSelected;
-            name.Text = item.TaskName;
+            name.Text = item.IsInherited
+                ? item.TaskName + " <span class='badge bg-info fs-sm ms-2' title='Inherited from a parent program'>Inherited</span>"
+                : item.TaskName;
+
+            // Inherited tasks can only be removed by unlinking the parent program.
+            if (item.IsInherited)
+                name.Enabled = false;
 
             var identifier = (HiddenField)e.Item.FindControl("TaskIdentifier");
 

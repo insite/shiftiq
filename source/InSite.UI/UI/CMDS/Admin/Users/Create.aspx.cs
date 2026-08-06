@@ -148,8 +148,7 @@ namespace InSite.Cmds.Admin.People.Forms
             }
 
             var learnerGroupId = ServiceLocator.GroupSearch
-                .GetGroups(new QGroupFilter { GroupName = "CMDS Workers" })
-                .FirstOrDefault()
+                .GetFirstGroup(new QGroupFilter { GroupNameExact = "CMDS Workers" })
                 .GroupIdentifier;
 
             MembershipHelper.Save(learnerGroupId, user.UserIdentifier, "Membership");

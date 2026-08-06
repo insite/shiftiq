@@ -14,7 +14,7 @@
 
     <a class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/learning/dashboard/catalog">
         <i class="fas fa-check fs-lg opacity-60 me-2"></i>
-        SkillsCheck Catalog
+        SkillsCheck Catalogue
     </a>
 
 </div>

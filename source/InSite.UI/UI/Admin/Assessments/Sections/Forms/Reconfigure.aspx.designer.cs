@@ -51,76 +51,13 @@ namespace InSite.UI.Admin.Assessments.Sections.Forms
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl SectionContentSummary;
 
         /// <summary>
-        /// ConfigurationUpdatePanel control.
+        /// TabConfig control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.UpdatePanel ConfigurationUpdatePanel;
-
-        /// <summary>
-        /// WarningOnNextTab control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.BooleanComboBox WarningOnNextTab;
-
-        /// <summary>
-        /// BreakTimerField control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl BreakTimerField;
-
-        /// <summary>
-        /// BreakTimer control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.BooleanComboBox BreakTimer;
-
-        /// <summary>
-        /// TimeLimitField control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TimeLimitField;
-
-        /// <summary>
-        /// TimeLimit control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.NumericBox TimeLimit;
-
-        /// <summary>
-        /// TimerTypeField control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TimerTypeField;
-
-        /// <summary>
-        /// TimerType control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.ComboBox TimerType;
+        protected global::InSite.UI.Admin.Assessments.Sections.Controls.TabConfigurationDetails TabConfig;
 
         /// <summary>
         /// SetRepeater control.

@@ -41,5 +41,9 @@ namespace Shift.Contract
         public DateTimeOffset UserPasswordExpired { get; set; }
         public DateTimeOffset? UtcArchived { get; set; }
         public DateTimeOffset? UtcUnarchived { get; set; }
+
+        public DateTimeOffset LastChangeTime { get; set; }
+        public string LastChangeType { get; set; }
+        public Guid LastChangeUser { get; set; }
     }
 }

@@ -17,6 +17,7 @@ import { WorkshopStandard } from "@/contexts/workshop/models/WorkshopStandard";
 import { workshopValidation } from "@/contexts/workshop/models/workshopValidation";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 import { ListItem } from "@/models/listItem";
+import { workshopQuestionTextHelper } from "./workshopQuestionTextHelper";
 
 const emptyArea: WorkshopStandard = {
     standardId: "",
@@ -57,11 +58,11 @@ function getCompetencies(standards: ApiWorkshopStandard[], hasFramework: boolean
     const frameworkId = framework?.standardId ?? null;
 
     const areas = standards
-        .filter(x => x.ParentId === frameworkId)
+        .filter(x => frameworkId && x.ParentId === frameworkId || !frameworkId && !x.ParentId)
         .map(x => getStandard(x, framework));
 
     const competencies = standards
-        .filter(x => x.ParentId)
+        .filter(x => x.ParentId && !areas.find(y => y.standardId === x.StandardId.toLowerCase()))
         .map(x => getStandard(x, areas.find(y => y.standardId === x.ParentId!.toLowerCase()) ?? emptyArea));
 
     return {
@@ -111,7 +112,7 @@ function getQuestions(questions: ApiWorkshopQuestion[]): WorkshopQuestion[] {
         questionFormSequence: q.QuestionFormSequence ?? null,
         questionFlag: workshopValidation.validateFlag(q.QuestionFlag),
         questionType: workshopValidation.validateQuestionType(q.QuestionType),
-        questionTitle: q.QuestionTitle,
+        questionTitle: workshopQuestionTextHelper.toLocalMultiLanguage(q.QuestionTitle),
         questionTitleHtml: q.QuestionTitleHtml ?? null,
         rationale: q.Rationale ?? null,
         rationaleOnCorrectAnswer: q.RationaleOnCorrectAnswer ?? null,
@@ -134,7 +135,7 @@ function getQuestions(questions: ApiWorkshopQuestion[]): WorkshopQuestion[] {
         layoutColumns: q.LayoutColumns ? q.LayoutColumns.map(x => ({
             alignment: workshopValidation.validateAlignment(x.Alignment),
             cssClass: x.CssClass ?? null,
-            textMarkdown: x.TextMarkdown ?? null,
+            textMarkdown: x.TextMarkdown ? workshopQuestionTextHelper.toLocalMarkdown(x.TextMarkdown) : null,
             textHtml: x.TextHtml ?? null,
         })) : null,
         candidateCommentCount: q.CandidateCommentCount,
@@ -150,6 +151,7 @@ function getQuestions(questions: ApiWorkshopQuestion[]): WorkshopQuestion[] {
         },
 
         source: q.Source ? {
+            bankId: q.Source.BankId,
             questionId: q.Source.QuestionId,
             questionAssetNumber: q.Source.QuestionAssetNumber,
         } : null,
@@ -166,12 +168,12 @@ function getQuestions(questions: ApiWorkshopQuestion[]): WorkshopQuestion[] {
         options: q.Options ? q.Options.map(o => ({
             number: o.Number,
             letter: o.Letter,
-            titleMarkdown: o.TitleMarkdown ?? null,
+            titleMarkdown: o.TitleMarkdown ? workshopQuestionTextHelper.toLocalMarkdown(o.TitleMarkdown) : null,
             titleHtml: o.TitleHtml ?? null,
             points: o.Points,
             isTrue: o.IsTrue ?? null,
             columns: o.Columns ? o.Columns.map(x => ({
-                textMarkdown: x.TextMarkdown ?? null,
+                textMarkdown: x.TextMarkdown ? workshopQuestionTextHelper.toLocalMarkdown(x.TextMarkdown) : null,
                 textHtml: x.TextHtml ?? null,
             })) : null,
         })) : null,

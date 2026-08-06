@@ -46,6 +46,7 @@ namespace InSite.Persistence
             Property(x => x.CredentialGranted).IsOptional();
             Property(x => x.CredentialHours).IsOptional();
             Property(x => x.CredentialRevoked).IsOptional();
+            Property(x => x.CredentialSubmitted).IsOptional();
             Property(x => x.CredentialStatus).IsOptional().IsUnicode(false).HasMaxLength(10);
             Property(x => x.EmployerGroupIdentifier).IsOptional();
             Property(x => x.EmployerGroupName).IsOptional().IsUnicode(false).HasMaxLength(148);

@@ -19,7 +19,7 @@ namespace InSite.Persistence
             Property(x => x.ExecutionErrors).IsOptional().IsUnicode(false).HasMaxLength(500);
             Property(x => x.RequestContentData).IsOptional().IsUnicode(false);
             Property(x => x.RequestContentType).IsOptional().IsUnicode(false).HasMaxLength(100);
-            Property(x => x.RequestHeaders).IsOptional().IsUnicode(false).HasMaxLength(5000);
+            Property(x => x.RequestHeaders).IsOptional().IsUnicode(false).IsMaxLength();
             Property(x => x.RequestMethod).IsRequired().IsUnicode(false).HasMaxLength(6);
             Property(x => x.RequestStarted).IsRequired();
             Property(x => x.RequestStatus).IsRequired().IsUnicode(false).HasMaxLength(16);

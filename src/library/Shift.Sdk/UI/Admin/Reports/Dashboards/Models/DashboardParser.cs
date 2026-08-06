@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Newtonsoft.Json;
+
+using Shift.Common;
 
 namespace Shift.Sdk.UI
 {
@@ -37,21 +40,11 @@ namespace Shift.Sdk.UI
 
                     model.File = dashboard;
 
-                    foreach (var panel in model.Panels)
-                        foreach (var widget in panel.Widgets)
-                        {
-                            if (widget.Query.File != null)
-                            {
-                                widget.Query.File = Path.Combine(_folder, model.Title, widget.Query.File);
-                                widget.Query.Sql = File.ReadAllText(widget.Query.File);
-
-                                if (widget.Query.FileRaw != null)
-                                {
-                                    widget.Query.FileRaw = Path.Combine(_folder, model.Title, widget.Query.FileRaw);
-                                    widget.Query.SqlRaw = File.ReadAllText(widget.Query.FileRaw);
-                                }
-                            }
-                        }
+                    foreach (var widget in model.Panels.SelectMany(x => x.Widgets))
+                    {
+                        ResolveQueries(model, widget);
+                        ValidateWidget(model, widget);
+                    }
 
                     _models.Add(model);
                 }
@@ -75,5 +68,90 @@ namespace Shift.Sdk.UI
             if (_models.Count == 0)
                 Errors.Add("There are no dashboards defined for your organization.");
         }
+
+        #region Queries
+
+        private void ResolveQueries(DashboardModel model, DashboardWidget widget)
+        {
+            ResolveQuery(model, widget.Query);
+
+            if (widget.Chart == null)
+                return;
+
+            if ((widget.Chart.Query?.File).IsEmpty())
+            {
+                widget.Chart.Query = widget.Query;
+                return;
+            }
+
+            ResolveQuery(model, widget.Chart.Query);
+        }
+
+        private void ResolveQuery(DashboardModel model, DashboardQuery query)
+        {
+            if ((query?.File).IsEmpty())
+                return;
+
+            query.File = Path.Combine(_folder, model.Title, query.File);
+            query.Sql = File.ReadAllText(query.File);
+
+            if (query.FileRaw.IsEmpty())
+                return;
+
+            query.FileRaw = Path.Combine(_folder, model.Title, query.FileRaw);
+            query.SqlRaw = File.ReadAllText(query.FileRaw);
+        }
+
+        #endregion
+
+        #region Validation
+
+        private void ValidateWidget(DashboardModel model, DashboardWidget widget)
+        {
+            var name = widget.Title.IfNullOrEmpty(widget.Code);
+
+            if (widget.Type == DashboardWidgetType.None)
+            {
+                AddError(model, name, $"the widget type is not supported.");
+                return;
+            }
+
+            if (widget.Type != DashboardWidgetType.Chart && (widget.Query?.Sql).IsEmpty())
+                AddError(model, name, "the widget requires a Query section with the correct filename");
+
+            if (widget.Type != DashboardWidgetType.Chart && widget.Type != DashboardWidgetType.ChartTable)
+                return;
+
+            if (widget.Chart == null)
+            {
+                AddError(model, name, "the widget requires a Chart section");
+                return;
+            }
+
+            if (widget.Chart.Type != DashboardChartType.Bar && widget.Chart.Type != DashboardChartType.Pie)
+                AddError(model, name, $"the chart type '{widget.Chart.Type}' is not supported.");
+
+            if ((widget.Chart.Query?.Sql).IsEmpty())
+                AddError(model, name, "the chart requires a Query section with the correct filename or a Query section on the widget");
+
+            if (widget.Chart.Label.IsEmpty())
+                AddError(model, name, "the chart requires a Label column");
+
+            if (widget.Chart.Datasets.IsEmpty())
+                AddError(model, name, "the chart requires at least one dataset");
+            else if (widget.Chart.Datasets.Any(x => x.Name.IsEmpty()))
+                AddError(model, name, "every chart dataset requires the Name of a value column");
+        }
+
+        private void AddError(DashboardModel model, string widgetName, string message)
+        {
+            var error = $"Error in {model.Title}, widget {widgetName}: {message}.";
+
+            model.Error = model.Error.IsEmpty() ? error : model.Error + " " + error;
+
+            Errors.Add(error);
+        }
+
+        #endregion
     }
 }

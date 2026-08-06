@@ -118,14 +118,50 @@ namespace InSite.Admin.Contacts.People.Controls
         {
             var filteredItems = Items;
 
-            if (!string.IsNullOrEmpty(FilterText.Text))
-                filteredItems = filteredItems.Where(x => x.Name.IndexOf(FilterText.Text, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+            if (FilterText.Text.IsNotEmpty())
+                filteredItems = FilterWithHierarchy(filteredItems, FilterText.Text);
 
             if (ShowNotIncludedToReport.SelectedValue == "Hide")
                 filteredItems = filteredItems.Where(x => x.Level == 0 || x.IncludeToReport).ToList();
 
             ItemRepeater.DataSource = filteredItems;
             ItemRepeater.DataBind();
+        }
+
+        private List<GradeGridItem> FilterWithHierarchy(List<GradeGridItem> items, string text)
+        {
+            var keep = new bool[items.Count];
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+                var isMatch = item.Name?.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (!isMatch)
+                    continue;
+
+                keep[i] = true;
+
+                var parentLevel = item.Level - 1;
+                for (var j = i - 1; j >= 0 && parentLevel >= 0; j--)
+                {
+                    if (items[j].Level != parentLevel)
+                        continue;
+
+                    keep[j] = true;
+                    parentLevel--;
+                }
+
+                for (var j = i + 1; j < items.Count; j++)
+                {
+                    if (items[j].Level > items[i].Level)
+                        keep[j] = true;
+                    else
+                        break;
+                }
+            }
+
+            return items.Where((x, i) => keep[i]).ToList();
         }
 
         private void AddItems(Guid userIdentifier, Guid gradebookIdentifier, GradebookState dataGradebook, List<GradeGridItem> output, List<GradeItem> input, int level, bool parentIncludeToReport)

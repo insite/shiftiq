@@ -46,17 +46,33 @@ namespace InSite
         }
 
         /// <summary>
-        /// Retrives and validates the organization code from the subdomain in the URL for the HTTP Request.
+        /// Retrieves and validates the organization code from the subdomain in the URL for the HTTP Request.
         /// </summary>
+        /// <remarks>
+        /// Tenant resolution parses the URL subdomain, strips the environment prefix (e.g. "local-"), and looks up the
+        /// remainder as an organization code. When either step fails, the caller is redirected to <c>/400</c> with a
+        /// diagnostic message so that operators can distinguish "no code in the URL" from "code does not match a
+        /// seeded organization" without reading server logs.
+        /// </remarks>
         private static string GetValidatedOrganizationCode(Uri url)
         {
             var code = UrlHelper.GetOrganizationCode(url);
             if (string.IsNullOrEmpty(code))
-                HttpResponseHelper.SendHttp400();
+            {
+                Serilog.Log.Warning("Tenant resolution failed: no organization code could be parsed from host {Host}.", url.Host);
+                HttpResponseHelper.SendHttp400(
+                    $"The host '{url.Host}' does not carry a tenant subdomain. Expected format is '<prefix><code>.<domain>' " +
+                    $"(for example 'local-e02.insite.com'). Check the URL used to reach this site.");
+            }
 
             var organization = OrganizationSearch.Select(code);
             if (organization == null)
-                HttpResponseHelper.SendHttp400();
+            {
+                Serilog.Log.Warning("Tenant resolution failed: host {Host} parsed to organization code {Code}, but no matching row exists in QOrganization.", url.Host, code);
+                HttpResponseHelper.SendHttp400(
+                    $"The URL '{url.Host}' resolves to organization code '{code}', but no organization with that code is seeded in this environment. " +
+                    $"Add a row to QOrganization with OrganizationCode = '{code}', or use a URL whose subdomain matches an existing organization.");
+            }
 
             return code;
         }

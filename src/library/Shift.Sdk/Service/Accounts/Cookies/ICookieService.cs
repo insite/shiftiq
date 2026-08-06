@@ -11,7 +11,7 @@ namespace Shift.Sdk.Service.Security.Cookies
 
         string GetSecurityDomain();
         CookieToken GetCookieToken();
-        void AppendSecurityCookie(CookieToken token);
+        void AppendSecurityCookie(CookieToken token, bool resetId);
         void DeleteSecurityCookie();
     }
 }

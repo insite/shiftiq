@@ -243,6 +243,26 @@ namespace InSite.Persistence
             }
         }
 
+        public List<QEvent> GetEventsForCompleted(DateTimeOffset now, bool includeSent, bool ignoreScheduleEnd)
+        {
+            using (var db = CreateContext())
+            {
+                var query = db.Events.AsQueryable()
+                    .Where(x => x.WhenEventCompletedNotifyLearnerMessageIdentifier.HasValue && x.EventScheduledEnd.HasValue);
+
+                if (!includeSent)
+                    query = query.Where(x => x.CompletedMessageSent == null);
+
+                if (!ignoreScheduleEnd)
+                    query = query.Where(x => x.EventScheduledEnd <= now);
+
+                return query
+                    .OrderBy(x => x.OrganizationIdentifier)
+                    .ThenBy(x => x.EventScheduledEnd)
+                    .ToList();
+            }
+        }
+
         public List<ApprenticeSummary> GetApprenticeSummary(QEventFilter filter)
         {
             using (var db = CreateContext())

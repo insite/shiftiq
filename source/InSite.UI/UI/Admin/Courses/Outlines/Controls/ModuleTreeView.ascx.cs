@@ -8,8 +8,6 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Admin.Courses.Courses;
 using InSite.Application.Courses.Read;
 using InSite.Application.Courses.Write;
@@ -23,9 +21,11 @@ using InSite.UI.Portal.Learning.Models;
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 using ActivityField = InSite.Domain.Courses.ActivityField;
+using AspCheckBox = System.Web.UI.WebControls.CheckBox;
 
 namespace InSite.Admin.Courses.Outlines.Controls
 {
@@ -110,7 +110,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
         protected Guid CourseIdentifier => Model.Identifier;
 
-        protected bool ShowMetadataChecked => ShowMetadata.Checked;
+        protected bool ShowMetadataChecked => ShowMetadata1.Checked;
 
         private bool IsPublished
         {
@@ -149,14 +149,25 @@ namespace InSite.Admin.Courses.Outlines.Controls
             ReorderSaveButton.Click += ReorderSaveButton_Click;
             ReorderCancelButton.Click += ReorderCancelButton_Click;
 
-            ShowMetadata.AutoPostBack = true;
-            ShowMetadata.CheckedChanged += (x, y) => { CurrentSessionState.ShowMetadata = ShowMetadata.Checked; HttpResponseHelper.Redirect(Request.RawUrl); };
-            ShowMetadata.Checked = CurrentSessionState.ShowMetadata;
+            ShowMetadata1.AutoPostBack = true;
+            ShowMetadata1.CheckedChanged += (x, y) => ShowMetadata_CheckedChanged(ShowMetadata1, ShowMetadata2);
+            ShowMetadata1.Checked = CurrentSessionState.ShowMetadata;
+
+            ShowMetadata2.AutoPostBack = true;
+            ShowMetadata2.CheckedChanged += (x, y) => ShowMetadata_CheckedChanged(ShowMetadata2, ShowMetadata1);
+            ShowMetadata2.Checked = CurrentSessionState.ShowMetadata;
         }
 
         #endregion
 
         #region Event handlers
+
+        private void ShowMetadata_CheckedChanged(AspCheckBox chkTarget, AspCheckBox chkDuplicate)
+        {
+            CurrentSessionState.ShowMetadata = chkTarget.Checked;
+            chkDuplicate.Checked = chkTarget.Checked;
+            HttpResponseHelper.Redirect(Request.RawUrl);
+        }
 
         private void ActionCommandsDropDown_Click(object sender, CommandEventArgs e)
         {
@@ -372,7 +383,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
             UnitComboBoxWrapper.Visible = Model.AllowMultipleUnits;
             UnitComboBox.CourseID = courseId;
-            UnitComboBox.ShowCodes = ShowMetadata.Checked;
+            UnitComboBox.ShowCodes = ShowMetadata1.Checked;
             UnitComboBox.RefreshData();
             UnitCommandWrapper.Visible = Model.AllowMultipleUnits;
 
@@ -411,7 +422,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
             UnitComboBox.ValueAsGuid = UnitIdentifier;
 
-            if (ShowMetadata.Checked)
+            if (ShowMetadata1.Checked)
             {
                 var u = Model.FindUnit(UnitIdentifier);
                 if (u.Prerequisites.Count > 0)
@@ -419,7 +430,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
                         $"{u.Content.Title.GetText()} (Unlocked by {Shift.Common.Humanizer.ToQuantity(u.Prerequisites.Count, "Prerequisite")})";
             }
 
-            ActionCommandsDropDown.GetItem<DropDownButtonLinkItem>("ActionPreview").NavigateUrl = 
+            ActionCommandsDropDown.GetItem<DropDownButtonLinkItem>("ActionPreview").NavigateUrl =
                 isPublished && previewUrl.IsNotEmpty() ? previewUrl : ProgressState.GetPreviewUrl(courseId);
 
             ActionCommandsDropDown.Items["ActionReorder"].Visible = modules.Count > 0 || Model.AllowMultipleUnits && UnitComboBox.Items.Count > 0;
@@ -455,7 +466,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
         protected string CreateMetadataHtmlForModule(object moduleIdentifier)
         {
-            if (!ShowMetadata.Checked)
+            if (!ShowMetadata1.Checked)
                 return string.Empty;
 
             var moduleId = (Guid)moduleIdentifier;
@@ -467,8 +478,15 @@ namespace InSite.Admin.Courses.Outlines.Controls
             if (module.IsAdaptive)
                 html.Append(CreateLabelHtml("info", "This module is adaptive.", $"Adaptive"));
 
-            if (module.Prerequisites.Count > 0)
-                html.Append(CreateLabelHtml("warning", "", $"Unlocked by {Shift.Common.Humanizer.ToQuantity(module.Prerequisites.Count, "Prerequisite")}"));
+            if (module.Prerequisites.IsNotEmpty())
+            {
+                foreach (var pr in module.Prerequisites)
+                {
+                    var objName = CourseSearch.GetPrerequisiteTriggerDescription(pr.Condition.Type, pr.Condition.Identifier);
+
+                    html.Append(CreateLabelHtml("warning", "", $"Prerequisite - {pr.Type.GetDescription()}: {objName}"));
+                }
+            }
 
             return html.ToString();
 
@@ -483,7 +501,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
         protected string CreateMetadataHtml(object activityIdentifier)
         {
-            if (!ShowMetadata.Checked)
+            if (!ShowMetadata1.Checked)
                 return string.Empty;
 
             if (_labels == null)
@@ -509,12 +527,15 @@ namespace InSite.Admin.Courses.Outlines.Controls
                         "This activity is adaptive.",
                         "Adaptive"));
 
-            if (activity.Prerequisites.Count > 0)
-                html.Append(
-                    CreateLabelHtml(
-                        "warning",
-                        "",
-                        $"Unlocked by {Shift.Common.Humanizer.ToQuantity(activity.Prerequisites.Count, "Prerequisite")}"));
+            if (activity.Prerequisites.IsNotEmpty())
+            {
+                foreach (var pr in activity.Prerequisites)
+                {
+                    var objName = CourseSearch.GetPrerequisiteTriggerDescription(pr.Condition.Type, pr.Condition.Identifier);
+
+                    html.Append(CreateLabelHtml("warning", "", $"Prerequisite - {pr.Type.GetDescription()}: {objName}"));
+                }
+            }
 
             if (activity.Requirement != RequirementType.None)
                 html.Append(

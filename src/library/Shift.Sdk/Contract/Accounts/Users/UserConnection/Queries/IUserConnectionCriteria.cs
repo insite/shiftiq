@@ -10,5 +10,7 @@ namespace Shift.Contract
 
         DateTimeOffset? ConnectedSince { get; set; }
         DateTimeOffset? ConnectedBefore { get; set; }
+        DateTimeOffset? LastChangeTimeSince { get; set; }
+        DateTimeOffset? LastChangeTimeBefore { get; set; }
     }
 }

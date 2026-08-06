@@ -68,7 +68,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
         protected bool HasContent(string name)
         {
             var item = (AttemptSectionInfo)Page.GetDataItem();
-            return item.BankSection?.Content[name]?.IsEmpty == false;
+            return item.BankSectionContent?[name]?.IsEmpty == false;
         }
 
         protected string GetContentText(string name)
@@ -78,7 +78,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
 
         private string GetContentText(AttemptSectionInfo item, string name)
         {
-            return item.BankSection?.Content[name]?.Get(_attempt.Attempt.AttemptLanguage);
+            return item.BankSectionContent?[name]?.Get(_attempt.Attempt.AttemptLanguage);
         }
 
         protected string GetContentHtml(string name)

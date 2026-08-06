@@ -19,6 +19,9 @@ import { _timelineController } from "./controllers/timeline/_timelineController"
 import { _workshopController } from "./controllers/assessments/workshop/_workshopController";
 import { _dashboardController } from "./controllers/platform/dashboard/_dashboardController";
 import { _maintenanceController } from "./controllers/platform/maintenance/_maintenanceController";
+import { _chatbotController } from "./controllers/chatbot/_chatbotController";
+import { _pendingPeopleController } from "./controllers/pending-people/_pendingPeopleController";
+import { _toolkitUsageController } from "./controllers/reports/_toolkitUsageController";
 
 export const shiftClient = {
     me: {
@@ -41,6 +44,7 @@ export const shiftClient = {
     file: _fileController,
     user: _userController,
     people: _peopleController,
+    pendingPeople: _pendingPeopleController,
     standard: _standardController,
     cookie: _cookieController,
     caseStatus: _caseStatusController,
@@ -49,6 +53,8 @@ export const shiftClient = {
     workshop: _workshopController,
     dashboard: _dashboardController,
     maintenance: _maintenanceController,
+    chatbot: _chatbotController,
+    toolkitUsage: _toolkitUsageController,
 
     command: _commandController,
     timeline: _timelineController,

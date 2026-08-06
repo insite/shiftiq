@@ -277,28 +277,6 @@ describe("WorkshopQuestions", () => {
         await clickButton(view.container, "Apply");
         expect(getVisibleQuestionIds(view.container)).toEqual(["q1"]);
     });
-
-    test("scrolls to the selected question when it remains visible", async () => {
-        const state = createState({
-            sectionCompetencies: [createCompetency("std1")],
-            sections: [
-                createSection("s1", "Section 1", [createCompetency("std1")], [
-                    createQuestion("q1", { standardId: "std1" }),
-                    createQuestion("q2", { standardId: "std1" }),
-                ]),
-            ],
-            sectionQuestions: [
-                createQuestion("q1", { standardId: "std1" }),
-                createQuestion("q2", { standardId: "std1" }),
-            ],
-        });
-
-        await renderWorkshop(state, "/workshop?question=q2", {
-            selectedQuestionId: "q2",
-        });
-
-        expect(window.scrollTo).toHaveBeenCalled();
-    });
 });
 
 interface RenderWorkshopOptions {

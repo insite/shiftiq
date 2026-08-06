@@ -44,6 +44,7 @@ namespace InSite.Admin.Sites.Pages
                 PageDetails.BindPage(page);
 
                 ContentLabels.Text = page.ContentLabels;
+                Hook.Text = page.Hook;
                 Icon.Text = page.PageIcon;
                 ContentControl.Value = page.ContentControl;
                 SetContentTemplate(page);
@@ -57,10 +58,12 @@ namespace InSite.Admin.Sites.Pages
             if (!Page.IsValid)
                 return;
 
+            var entity = GetEntityValues();
+
             var commands = new PageCommandGenerator().
                 GetDifferencePageSetupCommands(
-                    GetEntityValues(),
-                    GetInputValues()
+                    entity,
+                    GetInputValues(entity)
                 );
 
             foreach (var command in commands)
@@ -130,8 +133,6 @@ namespace InSite.Admin.Sites.Pages
                 Hook = page.Hook,
                 ContentLabels = page.ContentLabels,
                 ContentControl = page.ContentControl,
-                AuthorName = page.AuthorName,
-                AuthorDate = page.AuthorDate,
 
                 Assessment = page.ObjectType == "Assessment" ? page.ObjectIdentifier : null,
                 Catalog = page.ObjectType == "Catalog" ? page.ObjectIdentifier : null,
@@ -141,14 +142,18 @@ namespace InSite.Admin.Sites.Pages
             };
         }
 
-        private PageState GetInputValues()
+        private PageState GetInputValues(PageState entity)
         {
+            // There is no assessment input on this screen, so carry the existing value forward. It
+            // is only cleared when the layout is switched to something other than an assessment.
+
             return new PageState()
             {
                 Hook = Hook.Text,
                 Icon = Icon.Text,
                 ContentControl = ContentControl.Value,
                 ContentLabels = ContentLabels.Text,
+                Assessment = ContentControl.Value == "Assessment" ? entity.Assessment : null,
                 Catalog = CatalogIdentifier.ValueAsGuid,
                 Course = CourseIdentifier.Value,
                 Survey = SurveyIdentifier.Value,

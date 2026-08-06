@@ -62,6 +62,7 @@ export default function SpecWorkshop_Details({ control, isSaving }: Props) {
                             control={control}
                             name="formLimit"
                             readOnly={disabled}
+                            disableEnter
                             required="Required Number of Forms"
                             validate={value => value === null || value < 0 ? "Required Number of Forms: Must be 0 or greater" : undefined}
                             onChange={handleFormLimitChange}
@@ -75,6 +76,7 @@ export default function SpecWorkshop_Details({ control, isSaving }: Props) {
                             control={control}
                             name="questionLimit"
                             readOnly={disabled}
+                            disableEnter
                             required="Required Number of Questions per Form"
                             validate={value => value !== null && value < 0 ? "Required Number of Questions per Form: Must be 0 or greater" : undefined}
                             onChange={handleFormQuestionChange}

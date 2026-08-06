@@ -53,9 +53,9 @@ namespace Shift.Common
         {
             var stateId = OAuthCacheService.Add(new OAuthCacheEntry
             {
-                Method = OAuthAuthenticationMethods.Google,
-                TenantId = organizationId,
-                URL = url
+                Method = OAuthMethod.Google,
+                OrganizationId = organizationId,
+                Url = url
             });
             var sb = new StringBuilder(AuthorizationRequestURL);
             sb.Append("?");
@@ -74,7 +74,7 @@ namespace Shift.Common
             if (cacheEntry == null)
                 return new OAuthAuthenticationResult();
 
-            if (cacheEntry.TenantId != organizationId)
+            if (cacheEntry.OrganizationId != organizationId)
             {
                 return new OAuthAuthenticationResult
                 {
@@ -110,7 +110,7 @@ namespace Shift.Common
             return new OAuthAuthenticationResult
             {
                 Authorized = true,
-                AuthenticationMethod = OAuthAuthenticationMethods.Google,
+                AuthenticationMethod = OAuthMethod.Google,
                 BearerToken = accessToken,
                 EmailAddress = userProfile.email,
                 FirstName = userProfile.given_name,

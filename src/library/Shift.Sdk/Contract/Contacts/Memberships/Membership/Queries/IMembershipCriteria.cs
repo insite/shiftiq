@@ -19,5 +19,7 @@ namespace Shift.Contract
         DateTimeOffset? MembershipExpiryBefore { get; set; }
         DateTimeOffset? ModifiedSince { get; set; }
         DateTimeOffset? ModifiedBefore { get; set; }
+        DateTimeOffset? LastChangeTimeSince { get; set; }
+        DateTimeOffset? LastChangeTimeBefore { get; set; }
     }
 }

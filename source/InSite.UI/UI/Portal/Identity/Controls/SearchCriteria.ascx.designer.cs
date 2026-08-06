@@ -48,7 +48,7 @@ namespace InSite.UI.Desktops.Design.Users.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.NumericBox  SessionCount;
+        protected global::InSite.Common.Web.UI.NumericBox SessionCount;
 
         /// <summary>
         /// SearchButton control.
@@ -85,6 +85,15 @@ namespace InSite.UI.Desktops.Design.Users.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.DateSelector LastAuthenticatedBefore;
+
+        /// <summary>
+        /// ApprovalFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox ApprovalFilter;
 
         /// <summary>
         /// FilterManager control.

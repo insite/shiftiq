@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.UI;
 
 using InSite.Application.Records.Read;
@@ -29,8 +30,8 @@ namespace InSite.Admin.Records.Programs
 
             AchievementListEditor.InitDelegates(
                 Organization.Identifier,
-                null,
-                null,
+                (list) => FilterToSelectedAchievements(list),
+                (achievements) => UnbookmarkAchievements(achievements),
                 (achievements) => BookmarkAchievements(achievements),
                 "template");
 
@@ -38,6 +39,10 @@ namespace InSite.Admin.Records.Programs
             {
                 DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
                 DepartmentIdentifier.Value = null;
+
+                // Offer only programs that can legally be a parent. The program being created has
+                // no identifier yet, so only the nesting rule applies.
+                ParentPrograms.Filter.EligibleParentForProgramIdentifier = Guid.Empty;
             }
 
             Step1SaveButton.Click += Step1SaveButton_Click;
@@ -60,13 +65,55 @@ namespace InSite.Admin.Records.Programs
                 list.Add(achievement);
 
             foreach (var achievement in achievements)
-                list.Add(achievement);
+                if (!list.Contains(achievement))
+                    list.Add(achievement);
 
             BookmarkedAchievements = list;
 
             Step2NextButton_Click(this, new EventArgs());
 
             return BookmarkedAchievements.Count;
+        }
+
+        /// <summary>
+        /// Achievements supplied by the selected parent programs. These show as
+        /// preselected in the wizard and are created as inherited tasks by the
+        /// containment cascade, not as local tasks.
+        /// </summary>
+        private HashSet<Guid> GetParentAchievementIdentifiers()
+        {
+            var parentIds = ParentPrograms.Values;
+            if (parentIds.Length == 0)
+                return new HashSet<Guid>();
+
+            return TaskSearch
+                .Select(x => parentIds.Contains(x.ProgramIdentifier))
+                .Select(x => x.ObjectIdentifier)
+                .ToHashSet();
+        }
+
+        private List<AchievementListGridItem> FilterToSelectedAchievements(List<AchievementListGridItem> list)
+        {
+            var selected = GetParentAchievementIdentifiers();
+
+            foreach (var achievement in BookmarkedAchievements)
+                selected.Add(achievement);
+
+            return list.Where(x => selected.Contains(x.AchievementIdentifier)).ToList();
+        }
+
+        private void UnbookmarkAchievements(IEnumerable<Guid> achievements)
+        {
+            var requested = achievements.ToList();
+            var parentAchievements = GetParentAchievementIdentifiers();
+
+            BookmarkedAchievements = BookmarkedAchievements
+                .Where(x => !requested.Contains(x) || parentAchievements.Contains(x))
+                .ToList();
+
+            if (requested.Any(x => parentAchievements.Contains(x)))
+                AlertStatus.AddMessage(Shift.Constant.AlertType.Warning,
+                    "Achievements supplied by a parent program cannot be removed here. Remove the parent program from the selection instead.");
         }
 
         private void ProgramTypeChanged()
@@ -97,9 +144,34 @@ namespace InSite.Admin.Records.Programs
             CancelButton.NavigateUrl = "/ui/admin/records/home";
         }
 
+        /// <summary>
+        /// Program nesting is limited to one level: a program that already has parents
+        /// of its own cannot be selected as a parent.
+        /// </summary>
+        private bool ValidateParentPrograms()
+        {
+            if (ParentPrograms.SelectedCount == 0)
+                return true;
+
+            foreach (var item in ParentPrograms.Items)
+            {
+                if (ProgramContainmentSearch.GetParentIdentifiers(item.Value).Length > 0)
+                {
+                    AlertStatus.AddMessage(Shift.Constant.AlertType.Error,
+                        $"\"{item.Text}\" has a parent program of its own, so it cannot be a parent. Program nesting is limited to one level.");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private void Step1SaveButton_Click(object sender, EventArgs e)
         {
             if (!Page.IsValid)
+                return;
+
+            if (!ValidateParentPrograms())
                 return;
 
             var programId = UniqueIdentifier.Create();
@@ -120,6 +192,9 @@ namespace InSite.Admin.Records.Programs
             ProgramStore.Insert(program, User.Identifier);
             InsertContent(program);
 
+            if (ParentPrograms.SelectedCount > 0)
+                ProgramContainmentStore.Insert(ParentPrograms.Values, programId, Organization.Identifier, User.Identifier);
+
             Outline.Redirect(programId);
         }
 
@@ -133,6 +208,9 @@ namespace InSite.Admin.Records.Programs
         private void Step1NextButton_Click(object sender, EventArgs e)
         {
             if (!Page.IsValid)
+                return;
+
+            if (!ValidateParentPrograms())
                 return;
 
             Step2Section.Visible = true;
@@ -150,7 +228,12 @@ namespace InSite.Admin.Records.Programs
             Step3Section.Visible = true;
             Step3Section.IsSelected = true;
 
-            TaskGrid.BindModelToControls(BookmarkedAchievements);
+            var achievementIds = GetParentAchievementIdentifiers();
+
+            foreach (var achievement in BookmarkedAchievements)
+                achievementIds.Add(achievement);
+
+            TaskGrid.BindModelToControls(achievementIds, ParentPrograms.Values);
         }
 
         private void Step3SaveButton_Click(object sender, EventArgs e)
@@ -158,7 +241,11 @@ namespace InSite.Admin.Records.Programs
             if (!Page.IsValid)
                 return;
 
+            if (!ValidateParentPrograms())
+                return;
+
             var achievements = TaskGrid.GetAchievements();
+            var parentAchievements = GetParentAchievementIdentifiers();
 
             var programId = UniqueIdentifier.Create();
             var list = new TProgram
@@ -174,6 +261,11 @@ namespace InSite.Admin.Records.Programs
 
             foreach (var achievement in achievements)
             {
+                // Parent-supplied achievements become inherited tasks through the
+                // containment cascade when the parent links are saved below.
+                if (parentAchievements.Contains(achievement.AchievementIdentifier))
+                    continue;
+
                 var item = new TTask
                 {
                     ObjectType = "Achievement",
@@ -191,6 +283,9 @@ namespace InSite.Admin.Records.Programs
             }
 
             ProgramStore.Insert(list, User.Identifier);
+
+            if (ParentPrograms.SelectedCount > 0)
+                ProgramContainmentStore.Insert(ParentPrograms.Values, programId, Organization.Identifier, User.Identifier);
 
             NavPanel.Visible = false;
 

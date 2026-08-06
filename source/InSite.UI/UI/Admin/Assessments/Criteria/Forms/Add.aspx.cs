@@ -165,7 +165,7 @@ namespace InSite.Admin.Assessments.Criteria.Forms
                     QuestionSets.Items.Add(new System.Web.UI.WebControls.ListItem($"{set.Sequence}. {set.Name}", set.Identifier.ToString()));
             }
 
-            CriterionInput.SetDefaultInputValues();
+            CriterionInput.SetDefaultInputValues(spec);
 
             OnFilterTypeChanged();
 

@@ -5,14 +5,14 @@
 <div class="row mb-3">
     <div class="col-md-6 mb-3 mb-md-0">
 
-		<div class="card mb-3">
-			<div class="card-body">
+        <div class="card mb-3 h-100">
+            <div class="card-body">
 
                 <h3>Class Reminder Notifications</h3>
 
                 <div class="form-group mb-3">
                     <div class="float-end">
-                        <insite:IconLink Name="pencil" runat="server" id="ToLearnerLink" style="padding:8px" ToolTip="Change Message" />
+                        <insite:IconLink Name="pencil" runat="server" id="ReminderToLearnerLink" style="padding:8px" ToolTip="Change Message" />
                     </div>
                     <label class="form-label">
                         To Learner
@@ -24,7 +24,7 @@
 
                 <div class="form-group mb-3">
                     <div class="float-end">
-                        <insite:IconLink Name="pencil" runat="server" id="ToInstructorsLink" style="padding:8px" ToolTip="Change Message" />
+                        <insite:IconLink Name="pencil" runat="server" id="ReminderToInstructorsLink" style="padding:8px" ToolTip="Change Message" />
                     </div>
                     <label class="form-label">
                         To Instructors
@@ -48,13 +48,13 @@
 
             </div>
         </div>
-                                    
+
     </div>
 
     <div runat="server" id="TestPanel" visible="false" class="col-md-6 mb-3 mb-md-0">
 
-		<div class="card mb-3">
-			<div class="card-body">
+        <div class="card mb-3 h-100">
+            <div class="card-body">
 
                 <h3>
                     Trigger Notifications Manually
@@ -67,7 +67,7 @@
 
                 <div class="form-group mb-3">
                     <label class="form-label">
-                        Last Sent Message
+                        Reminder Last Sent
                     </label>
                     <div>
                         <asp:Literal runat="server" ID="ReminderMessageSent" />
@@ -76,12 +76,21 @@
 
                 <div class="form-group mb-3">
                     <label class="form-label">
-                        Ignore when the class is scheduled and always send notifications
+                        Completed Last Sent
                     </label>
                     <div>
-                        <asp:RadioButtonList runat="server" ID="IgnoreScheduleStart">
+                        <asp:Literal runat="server" ID="CompletedMessageSent" />
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="form-label">
+                        Ignore the class schedule and always send notifications
+                    </label>
+                    <div>
+                        <asp:RadioButtonList runat="server" ID="IgnoreSchedule">
                             <asp:ListItem Value="Yes" Text="Yes (always send)" />
-                            <asp:ListItem Value="No" Text="No (use scheduled start field)" Selected="true" />
+                            <asp:ListItem Value="No" Text="No (respect scheduled start/end dates)" Selected="true" />
                         </asp:RadioButtonList>
                     </div>
                 </div>
@@ -98,6 +107,30 @@
 
             </div>
         </div>
-                                    
+
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6 mb-3 mb-md-0">
+        <div class="card mb-3 h-100">
+            <div class="card-body">
+
+                <h3>Class Completed Notification</h3>
+
+                <div class="form-group mb-3">
+                    <div class="float-end">
+                        <insite:IconLink Name="pencil" runat="server" id="CompletedToLearnerLink" style="padding:8px" ToolTip="Change Message" />
+                    </div>
+                    <label class="form-label">
+                        To Learner
+                    </label>
+                    <div>
+                        <asp:Literal runat="server" ID="CompletedLearnerMessage" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>

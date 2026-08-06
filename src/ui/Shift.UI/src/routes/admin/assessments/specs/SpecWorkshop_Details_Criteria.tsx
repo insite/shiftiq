@@ -60,6 +60,7 @@ export default function SpecWorkshop_Details_Criteria({
                                 control={control}
                                 name={`criteria.${criterionIndex}.weightPercent`}
                                 readOnly={disabled}
+                                disableEnter
                                 className="spec-workshop-input-sm text-end form-control-sm d-inline px-2"
                                 onChange={value => handleWeightChange(criterion.criterionId, value)}
                             />

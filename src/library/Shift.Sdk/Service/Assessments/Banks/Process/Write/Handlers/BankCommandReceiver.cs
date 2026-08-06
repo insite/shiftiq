@@ -86,6 +86,7 @@ namespace InSite.Application.Banks.Write
             commander.Subscribe<ChangeSetRandomization>(Handle);
             commander.Subscribe<ChangeSectionContent>(Handle);
             commander.Subscribe<ChangeSetStandard>(Handle);
+            commander.Subscribe<ChangeCriterionContent>(Handle);
             commander.Subscribe<ChangeCriterionFilter>(Handle);
             commander.Subscribe<ChangeSpecificationCalculation>(Handle);
             commander.Subscribe<ChangeSpecificationContent>(Handle);
@@ -103,6 +104,7 @@ namespace InSite.Application.Banks.Write
             commander.Subscribe<MoveQuestion>(Handle);
             commander.Subscribe<PostComment>(Handle);
             commander.Subscribe<PublishForm>(Handle);
+            commander.Subscribe<ReconfigureCriterionTab>(Handle);
             commander.Subscribe<ReconfigureSection>(Handle);
             commander.Subscribe<ReconfigureSpecification>(Handle);
             commander.Subscribe<RejectComment>(Handle);
@@ -749,6 +751,14 @@ namespace InSite.Application.Banks.Write
             Commit(aggregate, c);
         }
 
+        public void Handle(ChangeCriterionContent c)
+        {
+            var aggregate = _repository.Get<BankAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
+            aggregate.ChangeCriterionContent(c.Criterion, c.Content);
+
+            Commit(aggregate, c);
+        }
+
         public void Handle(ChangeCriterionFilter c)
         {
             var aggregate = _repository.Get<BankAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
@@ -950,6 +960,14 @@ namespace InSite.Application.Banks.Write
         {
             var aggregate = _repository.Get<BankAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
             aggregate.PublishForm(c.Form, c.Publication);
+
+            Commit(aggregate, c);
+        }
+
+        public void Handle(ReconfigureCriterionTab c)
+        {
+            var aggregate = _repository.Get<BankAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
+            aggregate.ReconfigureCriterionTab(c.Criterion, c.WarningOnNextTabEnabled, c.BreakTimerEnabled, c.TimeLimit, c.TimerType);
 
             Commit(aggregate, c);
         }

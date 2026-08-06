@@ -16,6 +16,7 @@ export interface IntegerTextBoxProps {
     value?: number | null;
     defaultValue?: number | null;
     error?: FieldError | string;
+    disableEnter?: boolean;
     onBlur?(): void;
     onChange?(value: number | null): void;
     onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
@@ -34,6 +35,7 @@ export default function IntegerTextBox({
     value,
     defaultValue,
     error,
+    disableEnter = false,
     onBlur,
     onChange,
     onKeyDown
@@ -84,7 +86,7 @@ export default function IntegerTextBox({
             submitChangedValue();
         }
 
-        if (!isAllowed) {
+        if (!isAllowed || disableEnter && e.key === "Enter") {
             e.preventDefault();
         } else {
             onKeyDown?.(e);

@@ -73,6 +73,7 @@ namespace InSite.Admin.Assessments.Attempts.Utilities
                 QuestionPoints = x.QuestionPoints,
                 AnswerPoints = x.AnswerPoints,
                 AnswerOptionKey = x.AnswerOptionKey,
+                ResponseDuration = x.ResponseDuration,
 
                 QuestionType = x.QuestionType,
                 AnswerOptionSequence = x.AnswerOptionSequence,
@@ -91,6 +92,8 @@ namespace InSite.Admin.Assessments.Attempts.Utilities
                 CompetencyAreaTitle = x.CompetencyAreaTitle,
                 CompetencyAreaIdentifier = x.CompetencyAreaIdentifier
             });
+
+            public int? ResponseDuration { get; set; }
 
             public string CompetencyItemValue => GetCompetencyValue(CompetencyItemLabel, CompetencyItemCode, CompetencyItemTitle);
             public string CompetencyAreaValue => GetCompetencyValue(CompetencyItemLabel, CompetencyItemCode, CompetencyItemTitle);
@@ -188,12 +191,13 @@ namespace InSite.Admin.Assessments.Attempts.Utilities
 
         private static readonly (string Column, string Title, Type Type, string Format, double? Width, GetQuestionColumnValue GetValue)[] QuestionColumns =
         {
-            ("Q{0}ID", "Identifier",              typeof(Guid), null, 40,      (ExportData d, Question bq, ExportQuestionEntity aq) => (object)aq.QuestionIdentifier),
-            ("Q{0}CD", "Question Code",           typeof(string), null, null,  (ExportData d, Question bq, ExportQuestionEntity aq) => bq.Classification.Code ?? (object)DBNull.Value),
+            ("Q{0}ID",  "Identifier",             typeof(Guid), null, 40,      (ExportData d, Question bq, ExportQuestionEntity aq) => (object)aq.QuestionIdentifier),
+            ("Q{0}CD",  "Question Code",          typeof(string), null, null,  (ExportData d, Question bq, ExportQuestionEntity aq) => bq.Classification.Code ?? (object)DBNull.Value),
             ("Q{0}TXT", "Question Text",          typeof(string), null, null,  (ExportData d, Question bq, ExportQuestionEntity aq) => aq.QuestionText ?? (object)DBNull.Value),
             ("Q{0}RSP", "Response Text",          typeof(string), null, null,  GetResponseText),
             ("Q{0}AOS", "Answer Option Sequence", typeof(int), null, null,     GetAnswerOptionSequence),
             ("Q{0}PNT", "Answer Points",          typeof(decimal), null, null, (ExportData d, Question bq, ExportQuestionEntity aq) => aq.AnswerPoints ?? (object)DBNull.Value),
+            ("Q{0}RT",  "Response Time",          typeof(int), null, null,     (ExportData d, Question bq, ExportQuestionEntity aq) => aq.ResponseDuration ?? (object)DBNull.Value),
             ("Q{0}COA", "Competency Area",        typeof(string), null, null,  (ExportData d, Question bq, ExportQuestionEntity aq) => aq.CompetencyAreaValue ?? (object)DBNull.Value),
             ("Q{0}AOM", "Competency",             typeof(string), null, null,  (ExportData d, Question bq, ExportQuestionEntity aq) => aq.CompetencyItemValue ?? (object)DBNull.Value)
         };

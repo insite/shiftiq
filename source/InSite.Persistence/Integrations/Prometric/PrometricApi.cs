@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
+using InSite.Application.Banks.Read;
 using InSite.Application.Integrations.Prometric;
 using InSite.Application.Registrations.Read;
 using InSite.Domain.Integrations.Prometric;
@@ -25,7 +26,11 @@ namespace InSite.Persistence.Integration.Prometric
 
         private readonly IApiRequestLogger _logger;
 
+        private IBankSearch _bankSearch;
+
         public PrometricOptions Prometric { get; set; }
+
+        private bool _isInited = false;
 
         public PrometricApi(
             EnvironmentName environment,
@@ -42,6 +47,16 @@ namespace InSite.Persistence.Integration.Prometric
             Prometric = environment == EnvironmentName.Production
                 ? prometricEnvironments.Production
                 : prometricEnvironments.Test;
+        }
+
+        internal void Init(IBankSearch bankSearch)
+        {
+            if (_isInited)
+                return;
+
+            _bankSearch = bankSearch;
+
+            _isInited = true;
         }
 
         public bool EligibilityExists(GetEligibilityInput input)
@@ -259,6 +274,10 @@ namespace InSite.Persistence.Integration.Prometric
             };
 
             var timeLimit = (decimal?)registration.Form.FormTimeLimit;
+
+            var formState = _bankSearch?.GetBankState(registration.Form.BankIdentifier)?.FindForm(registration.Form.FormIdentifier);
+            if (formState != null)
+                timeLimit = formState.CalculateFormTimeLimit();
 
             input.Accommodations = registration.Accommodations
                 .EmptyIfNull()

@@ -155,13 +155,6 @@ namespace InSite.Admin.Assessments.Outlines.Controls
                 hiddenFields.Add(DetailsField.Source);
             }
 
-            var specification = form.Specification;
-            var limitAllTabs = specification.IsTabTimeLimitAllowed
-                && specification.TabTimeLimit == SpecificationTabTimeLimit.AllTabs;
-
-            if (limitAllTabs)
-                hiddenFields.Add(DetailsField.TimeLimit);
-
             control.HiddenFields = hiddenFields.ToArray();
         }
 
@@ -283,8 +276,8 @@ namespace InSite.Admin.Assessments.Outlines.Controls
             ReloadQuestions(section, false);
 
             SectionNumber.Text = $"{section.Sequence} of {form.Sections.Count}";
-            SectionContentTitle.InnerText = (section.Content.Title?.Default).IfNullOrEmpty("None");
-            SectionContentSummary.InnerText = (section.Content.Summary?.Default).IfNullOrEmpty("None");
+            SectionContentTitle.InnerText = (section.Content.Title?.Get(CurrentLanguage)).IfNullOrEmpty("None");
+            SectionContentSummary.InnerText = (section.Content.Summary?.Get(CurrentLanguage)).IfNullOrEmpty("None");
 
             DeleteSectionLink.NavigateUrl = $"/admin/assessments/sections/delete?bank={BankID}&section={SectionID}";
             EditSectionContentTitle.NavigateUrl = $"/ui/admin/assessments/sections/content?bank={BankID}&section={SectionID}&tab=title";
@@ -318,17 +311,18 @@ namespace InSite.Admin.Assessments.Outlines.Controls
 
             var limitSomeTabs = specification.TabTimeLimit == SpecificationTabTimeLimit.SomeTabs;
             var limitAllTabs = specification.TabTimeLimit == SpecificationTabTimeLimit.AllTabs;
+            var tabConfig = section.TabConfiguration;
 
-            WarningOnNextTabEnabled.Text = section.WarningOnNextTabEnabled ? "Show" : "Disabled";
+            WarningOnNextTabEnabled.Text = tabConfig.WarningOnNextTabEnabled ? "Show" : "Disabled";
 
             BreakTimerEnabledField.Visible = limitSomeTabs || limitAllTabs;
-            BreakTimerEnabled.Text = section.BreakTimerEnabled ? "Enabled" : "Disabled";
+            BreakTimerEnabled.Text = tabConfig.BreakTimerEnabled ? "Enabled" : "Disabled";
 
-            TimeLimitField.Visible = limitAllTabs || limitSomeTabs && section.BreakTimerEnabled;
-            TimeLimit.Text = section.TimeLimit <= 0 ? "None" : $"{section.TimeLimit} minute(s)";
+            TimeLimitField.Visible = limitAllTabs || limitSomeTabs && tabConfig.BreakTimerEnabled;
+            TimeLimit.Text = tabConfig.TimeLimit <= 0 ? "None" : $"{tabConfig.TimeLimit} minute(s)";
 
-            TimerTypeField.Visible = limitAllTabs || limitSomeTabs && section.BreakTimerEnabled;
-            TimerType.Text = section.TimerType.GetDescription();
+            TimerTypeField.Visible = limitAllTabs || limitSomeTabs && tabConfig.BreakTimerEnabled;
+            TimerType.Text = tabConfig.TimerType.GetDescription();
         }
 
         private void SetEditLinkVisibility(bool visible)

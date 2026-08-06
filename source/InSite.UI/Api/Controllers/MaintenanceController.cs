@@ -235,6 +235,17 @@ namespace InSite.UI.Api
             });
         }
 
+        [HttpPost]
+        [Route("api/maintenance/calculate-toolkit-usage")]
+        public HttpResponseMessage CalculateToolkitUsage()
+        {
+            return ExecuteMaintenanceRoutine(() =>
+            {
+                var count = TToolkitUsageStore.Calculate();
+                return JsonSuccess(new { Count = count });
+            });
+        }
+
         private HttpResponseMessage ExecuteMaintenanceRoutine(Func<HttpResponseMessage> routine)
         {
             var root = Global.GetRootSentinel();

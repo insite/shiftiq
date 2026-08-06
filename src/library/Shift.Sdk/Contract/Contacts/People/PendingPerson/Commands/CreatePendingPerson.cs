@@ -6,12 +6,6 @@ namespace Shift.Contract
     public class CreatePendingPerson
     {
         [Required]
-        public Guid PendingId { get; set; }
-
-        public Guid? PersonId { get; set; }
-        public Guid? UserId { get; set; }
-
-        [Required]
         public string PersonCode { get; set; }
 
         [Required]
@@ -22,5 +16,8 @@ namespace Shift.Contract
 
         [Required]
         public string UserLastName { get; set; }
+
+        [Required]
+        public string EmployeeStatus { get; set; }
     }
 }

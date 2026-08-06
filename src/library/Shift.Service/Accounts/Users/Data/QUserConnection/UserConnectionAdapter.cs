@@ -52,7 +52,10 @@ public class UserConnectionAdapter : IEntityAdapter
             IsValidator = entity.IsValidator,
             FromUserId = entity.FromUserIdentifier,
             ToUserId = entity.ToUserIdentifier,
-            IsLeader = entity.IsLeader
+            IsLeader = entity.IsLeader,
+            LastChangeTime = entity.LastChangeTime,
+            LastChangeType = entity.LastChangeType,
+            LastChangeUser = entity.LastChangeUser
         };
 
         return model;

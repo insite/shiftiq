@@ -67,6 +67,7 @@ namespace InSite.UI.Portal.Learning.Programs.Models
             var employerGroupId = GetEmployerGroupId();
             var comment = CreateComment(programs);
             var issueTitle = CaseType + " - " + string.Join(", ", programs.Select(x => x.ProgramName));
+            var statusCategory = ServiceLocator.IssueSearch.GetStatus(caseStatusId)?.StatusCategory;
 
             var commands = new List<ICommand>
             {
@@ -74,7 +75,7 @@ namespace InSite.UI.Portal.Learning.Programs.Models
                 new AssignUser(caseId, supervisorUserId, "Administrator"),
                 new AssignUser(caseId, UserId, "Topic"),
                 new AssignUser(caseId, supervisorUserId, "Owner"),
-                new ChangeIssueStatus(caseId, caseStatusId, DateTimeOffset.UtcNow),
+                new ChangeIssueStatus(caseId, caseStatusId, DateTimeOffset.UtcNow, statusCategory),
             };
 
             if (employerGroupId.HasValue)

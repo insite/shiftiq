@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -8,7 +7,6 @@ using System.Web.UI;
 
 using Humanizer;
 
-using InSite.Admin.Assessments.Sections.Models;
 using InSite.Application.Attempts.Read;
 using InSite.Application.Attempts.Write;
 using InSite.Application.Banks.Write;
@@ -23,9 +21,6 @@ using InSite.UI.Admin.Records.Programs.Utilities;
 
 using Shift.Common;
 using Shift.Constant;
-
-using BankQuestion = InSite.Domain.Banks.Question;
-using BankSection = InSite.Domain.Banks.Section;
 
 namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 {
@@ -126,9 +121,9 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 
         #region Methods (Commands)
 
-        public static Guid StartAttempt(Guid organizationId, Guid assessorId, Guid learnerId, Form bankForm, Guid? registrationId, int timeLimit, string language)
+        public static Guid StartAttempt(Guid organizationId, Guid assessorId, Guid learnerId, Form bankForm, Guid? registrationId, int timeLimit, int timeExtension, string language)
         {
-            var questions = CreateAttemptQuestions(bankForm, true, language);
+            var questions = AttemptQuestionBuilder.Build(bankForm, true, language);
             if (questions.Length == 0)
                 throw new InvalidOperationException(
                     $"The exam form assigned to this assessment " +
@@ -145,9 +140,36 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                 SectionsAsTabs = spec.SectionsAsTabsEnabled,
                 TabNavigation = spec.TabNavigationEnabled,
                 SingleQuestionPerTab = spec.SingleQuestionPerTabEnabled,
-                TabTimeLimit = spec.TabTimeLimit
+                TabTimeLimit = spec.TabTimeLimit,
+                CriteriaAsSections = spec.SectionsAsTabsEnabled && spec.Type == SpecificationType.Dynamic
             };
             var sections = AttemptStarter.CreateSections(bankForm);
+
+            if (timeExtension > 0 && bankForm.IsTabTimeLimitEnabledForAll())
+            {
+                var examSections = sections.Where(x => !x.IsBreakTimer).ToArray();
+                var totalExamTime = examSections.Sum(x => x.TimeLimit);
+
+                var allocations = examSections
+                    .Select(x =>
+                    {
+                        var exact = ((decimal)x.TimeLimit / totalExamTime) * timeExtension;
+                        var baseValue = (int)Math.Floor(exact);
+                        return (Section: x, BaseValue: baseValue, Remainder: exact - baseValue);
+                    })
+                    .ToArray();
+                var leftover = timeExtension - allocations.Sum(a => a.BaseValue);
+
+                var ranked = allocations
+                    .OrderByDescending(x => x.Remainder).ThenBy(x => x.Section.Identifier)
+                    .ToArray();
+
+                for (var i = 0; i < ranked.Length; i++)
+                {
+                    var extra = i < leftover ? 1 : 0;
+                    ranked[i].Section.TimeLimit += ranked[i].BaseValue + extra;
+                }
+            }
 
             var start = new StartAttempt(
                 attemptId, organizationId, bankId, bankForm.Identifier, assessorId, learnerId, registrationId, HttpContext.Current?.Request.UserAgent,
@@ -567,147 +589,6 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             };
 
             ServiceLocator.AlertMailer.Send(notification, null);
-        }
-
-        public static AttemptQuestion[] CreateAttemptQuestions(Form bankForm, bool allowRandomization, string language)
-        {
-            var questions = new List<BankQuestion>();
-            var sectionMapping = new Dictionary<Guid, Tuple<BankSection, List<BankQuestion>>>();
-            var sectionIndexMapping = new Dictionary<Guid, int>();
-            var setMapping = new Dictionary<Guid, Tuple<Set, List<int>>>();
-
-            if (bankForm.Specification.Type == SpecificationType.Static)
-            {
-                for (var sectionIndex = 0; sectionIndex < bankForm.Sections.Count; sectionIndex++)
-                {
-                    var section = bankForm.Sections[sectionIndex];
-
-                    foreach (var field in section.Fields)
-                    {
-                        var index = questions.Count;
-                        var question = field.Question;
-                        var set = question.Set;
-
-                        if (!sectionMapping.ContainsKey(section.Identifier))
-                            sectionMapping.Add(section.Identifier, new Tuple<BankSection, List<BankQuestion>>(section, new List<BankQuestion>()));
-
-                        if (!setMapping.ContainsKey(set.Identifier))
-                            setMapping.Add(set.Identifier, new Tuple<Set, List<int>>(set, new List<int>()));
-
-                        questions.Add(question);
-                        sectionMapping[section.Identifier].Item2.Add(question);
-                        sectionIndexMapping.Add(question.Identifier, sectionIndex);
-                        setMapping[set.Identifier].Item2.Add(index);
-                    }
-                }
-            }
-            else
-            {
-                var criteria = bankForm.Specification.Criteria;
-
-                if (criteria.Count > 0)
-                {
-                    var questionFilter = new QuestionFilterHelper(criteria, null, false);
-                    var questionGroups = questionFilter.GetResult();
-
-                    questions.AddRange(questionGroups.SelectMany(x => x.Item2));
-                }
-                else
-                {
-                    foreach (var set in bankForm.Specification.Bank.Sets)
-                    {
-                        if (!setMapping.ContainsKey(set.Identifier))
-                            setMapping.Add(set.Identifier, new Tuple<Set, List<int>>(set, new List<int>()));
-
-                        foreach (var question in set.Questions)
-                        {
-                            var index = questions.Count;
-                            questions.Add(question);
-                            setMapping[set.Identifier].Item2.Add(index);
-                        }
-                    }
-                }
-            }
-
-            var questionIndexes = new int?[questions.Count];
-
-            if (allowRandomization)
-            {
-                foreach (var sm in setMapping.Values)
-                {
-                    var set = sm.Item1;
-                    var indexes = sm.Item2;
-
-                    if (!set.Randomization.Enabled)
-                        continue;
-
-                    var count = set.Randomization.Count <= 0 || set.Randomization.Count > indexes.Count
-                        ? indexes.Count
-                        : set.Randomization.Count;
-
-                    var random = new Random();
-
-                    while (count > 0)
-                    {
-                        var randomIndex = random.Next(count--);
-                        var index1 = indexes[randomIndex];
-                        var index2 = indexes[count];
-
-                        var buffer = questionIndexes[index1] ?? index1;
-                        questionIndexes[index1] = questionIndexes[index2] ?? index2;
-                        questionIndexes[index2] = buffer;
-                    }
-                }
-            }
-
-            var hiddenQuestions = new HashSet<Guid>();
-
-            foreach (var sm in sectionMapping.Values)
-            {
-                var sieve = sm.Item1.Criterion;
-                if (string.IsNullOrEmpty(sieve.TagFilter))
-                    continue;
-
-                var filter = QuestionDisplayFilter.Parse(sieve.TagFilter);
-
-                var sectionQuestions = sm.Item2.ToArray();
-                sectionQuestions.Shuffle();
-
-                for (var i = 0; i < sectionQuestions.Length; i++)
-                {
-                    var question = sectionQuestions[i];
-                    var tag = question.Classification.Tag != null ? filter[question.Classification.Tag] : null;
-
-                    if (tag != null && tag.Allows)
-                        tag.Increment();
-                    else
-                        hiddenQuestions.Add(question.Identifier);
-                }
-            }
-
-            var displayCount = bankForm.Specification.QuestionLimit > 0
-                            && bankForm.Specification.QuestionLimit < questions.Count
-                ? bankForm.Specification.QuestionLimit
-                : questions.Count;
-            var result = new List<AttemptQuestion>();
-
-            for (var i = 0; i < questions.Count && result.Count < displayCount; i++)
-            {
-                var index = questionIndexes[i] ?? i;
-                var question = questions[index];
-
-                if (hiddenQuestions.Contains(question.Identifier))
-                    continue;
-
-                var attemptQuestion = AttemptStarter.CreateQuestion(question, allowRandomization, language);
-
-                if (sectionIndexMapping.TryGetValue(attemptQuestion.Identifier, out var sectionIndex))
-                    attemptQuestion.Section = sectionIndex;
-
-                result.Add(attemptQuestion);
-            }
-
-            return result.ToArray();
         }
 
         #endregion

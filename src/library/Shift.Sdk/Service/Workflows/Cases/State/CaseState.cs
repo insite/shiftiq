@@ -124,7 +124,7 @@ namespace InSite.Domain.Issues
 
         public void When(CaseClosed e)
         { 
-            Closed = e.ChangeTime; 
+            Closed = e.Closed ?? e.ChangeTime; 
             ClosedBy = e.OriginUser; 
         }
         

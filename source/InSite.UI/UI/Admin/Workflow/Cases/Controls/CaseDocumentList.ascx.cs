@@ -19,6 +19,7 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
     {
         class FileItem
         {
+            public Guid AttachmentId { get; internal set; }
             public Guid FileIdentifier { get; set; }
             public bool HasFile { get; set; }
             public string DownloadUrl { get; set; }
@@ -45,6 +46,24 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
 
         private Dictionary<Guid, string> _users;
 
+        public int ItemsCount
+        {
+            get => (int)ViewState[nameof(ItemsCount)];
+            private set => ViewState[nameof(ItemsCount)] = value;
+        }
+
+        public string ClientSelectCallback
+        {
+            get => (string)ViewState[nameof(ClientSelectCallback)];
+            set => ViewState[nameof(ClientSelectCallback)] = value;
+        }
+
+        private Guid[] ItemKeys
+        {
+            get => (Guid[])ViewState[nameof(ItemKeys)];
+            set => ViewState[nameof(ItemKeys)] = value;
+        }
+
         public void BindIssueFiles(Guid issueIdentifier, Guid? respondentUserId)
         {
             IssueIdentifier = issueIdentifier;
@@ -68,11 +87,15 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
 
         private void BindItems(List<FileItem> items)
         {
+            ItemKeys = items.Select(x => x.AttachmentId).ToArray();
+
             ListRepeater.DataSource = items;
             ListRepeater.DataBind();
             ListRepeater.Visible = items.Count > 0;
 
             RepeaterNoItems.Visible = items.Count == 0;
+
+            ItemsCount = items.Count;
         }
 
         private void AddIssueAttachments(List<FileItem> items)
@@ -105,13 +128,22 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
                 ? new FileItem()
                 : GetFileItemFromModel(fileModel);
 
+            item.AttachmentId = attachment.AttachmentIdentifier;
             item.FileName = HttpUtility.HtmlEncode(attachment.FileName);
             item.UploadedTime = FormatDate(attachment.FileUploaded);
             item.FileUploaded = attachment.FileUploaded;
             item.UploadedBy = attachment.InputterUserName;
             item.Source = "Case";
-            item.AllowLearnerToView = fileModel.Properties.AllowLearnerToView;
-            item.ReceivedTime = FormatDate(fileModel.Properties.Received);
+
+            if (fileModel != null)
+            {
+                item.AllowLearnerToView = fileModel.Properties.AllowLearnerToView;
+                item.ReceivedTime = FormatDate(fileModel.Properties.Received);
+            }
+            else
+            {
+                item.AllowLearnerToView = false;
+            }
 
             return item;
         }
@@ -236,6 +268,33 @@ namespace InSite.UI.Admin.Issues.Outlines.Controls
             _users.Add(userId.Value, name);
 
             return name;
+        }
+
+        public Guid[] GetSelectedAttachmentIds()
+        {
+            var result = new List<Guid>();
+
+            for (var i = 0; i < ListRepeater.Items.Count; i++)
+            {
+                var item = ListRepeater.Items[i];
+                var chk = (ICheckBox)item.FindControl("IsSelected");
+
+                if (chk.Checked)
+                    result.Add(ItemKeys[i]);
+            }
+
+            return result.ToArray();
+        }
+
+        public void ClearSelectedAttachments()
+        {
+            for (var i = 0; i < ListRepeater.Items.Count; i++)
+            {
+                var item = ListRepeater.Items[i];
+                var chk = (ICheckBox)item.FindControl("IsSelected");
+
+                chk.Checked = false;
+            }
         }
     }
 }

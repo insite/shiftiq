@@ -12,6 +12,7 @@ import {
     MDXEditor,
     MDXEditorMethods,
     Separator,
+    StrikeThroughSupSubToggles,
     diffSourcePlugin,
     headingsPlugin,
     imagePlugin,
@@ -192,6 +193,8 @@ export default function RichTextEditor_Markdown({
                                     </ButtonWithTooltip>
                                 )}
                                 <InsertTable />
+                                <Separator />
+                                <StrikeThroughSupSubToggles />
                             </DiffSourceToggleWrapper>
                         )
                     })

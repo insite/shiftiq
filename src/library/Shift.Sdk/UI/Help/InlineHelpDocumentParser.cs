@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
 
 using Shift.Common;
@@ -13,6 +12,12 @@ namespace Shift.Sdk.UI.Help
 
         private static readonly MemoryCache<string, Instructions> MarkdownCache = new MemoryCache<string, Instructions>();
 
+        /// <summary>
+        /// The number of seconds an unreadable document stays cached as empty before it is downloaded again. Inline
+        /// help is decoration, so a missing or broken URL must not break the page that asks for it.
+        /// </summary>
+        private const int FailureCacheSeconds = 300;
+
         public Lexicon ParseLexicon(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -21,13 +26,24 @@ namespace Shift.Sdk.UI.Help
             if (LexiconCache.TryGet(url, out Lexicon lexicon))
                 return lexicon;
 
-            var input = Shift.Common.TaskRunner.RunSync(StaticHttpClient.Client.GetStringAsync, url);
+            try
+            {
+                var input = Shift.Common.TaskRunner.RunSync(StaticHttpClient.Client.GetStringAsync, url);
 
-            var output = Lexicon.FromJson(input);
+                var output = Lexicon.FromJson(input);
 
-            LexiconCache.Add(input, output);
+                LexiconCache.Add(url, output);
 
-            return output;
+                return output;
+            }
+            catch (Exception)
+            {
+                var empty = new Lexicon();
+
+                LexiconCache.Add(url, empty, FailureCacheSeconds);
+
+                return empty;
+            }
         }
 
         /// <summary>
@@ -37,29 +53,29 @@ namespace Shift.Sdk.UI.Help
         /// <returns>A list of MarkdownSection objects</returns>
         public Instructions ParseInstructions(string url)
         {
+            if (string.IsNullOrEmpty(url))
+                return new Instructions();
+
+            if (MarkdownCache.TryGet(url, out Instructions instructions))
+                return instructions;
+
             try
             {
-                if (string.IsNullOrEmpty(url))
-                    return new Instructions();
-
-                if (MarkdownCache.TryGet(url, out Instructions instructions))
-                    return instructions;
-
                 var input = Shift.Common.TaskRunner.RunSync(StaticHttpClient.Client.GetStringAsync, url);
 
                 var output = ParseMarkdownContent(input);
 
-                MarkdownCache.Add(input, output);
+                MarkdownCache.Add(url, output);
 
                 return output;
             }
-            catch (HttpRequestException ex)
+            catch (Exception)
             {
-                throw new InvalidOperationException($"Failed to download markdown file: {ex.Message}", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Error parsing markdown: {ex.Message}", ex);
+                var empty = new Instructions();
+
+                MarkdownCache.Add(url, empty, FailureCacheSeconds);
+
+                return empty;
             }
         }
 

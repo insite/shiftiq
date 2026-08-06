@@ -117,7 +117,7 @@ namespace InSite.Application.Issues.Write
         public void Handle(ChangeIssueStatus c)
         {
             var aggregate = _repository.Get<CaseAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
-            aggregate.ChangeIssueStatus(c.Status, c.Effective);
+            aggregate.ChangeIssueStatus(c.Status, c.Effective, c.Category);
             Commit(aggregate, c);
         }
 
@@ -140,7 +140,7 @@ namespace InSite.Application.Issues.Write
         public void Handle(CloseIssue c)
         {
             var aggregate = _repository.Get<CaseAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
-            aggregate.CloseIssue();
+            aggregate.CloseIssue(c.Closed);
             Commit(aggregate, c);
         }
 

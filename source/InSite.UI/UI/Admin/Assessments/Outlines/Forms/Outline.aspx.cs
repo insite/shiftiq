@@ -174,7 +174,13 @@ namespace InSite.Admin.Assessments.Outlines.Forms
 
                     if (spec.IsTabTimeLimitAllowed && spec.TabTimeLimit == SpecificationTabTimeLimit.AllTabs)
                     {
-                        if (form.Sections.Any(x => x.TimeLimit == 0))
+                        var timeLimits = spec.Type == SpecificationType.Static
+                            ? form.Sections.Select(x => x.TabConfiguration.TimeLimit)
+                            : spec.Type == SpecificationType.Dynamic
+                                ? form.Specification.Criteria.Select(x => x.TabConfiguration.TimeLimit)
+                                : throw new ApplicationError($"Unknown specification type: {spec.Type}");
+
+                        if (timeLimits.Any(x => x == 0))
                         {
                             var formLink = $"/ui/admin/assessments/banks/outline?bank={_bank.Identifier}&form={form.Identifier}";
 

@@ -5,7 +5,7 @@ using Shift.Service.Assessment;
 namespace Shift.Api.Assessments.Workshops;
 
 [ApiController]
-[ApiExplorerSettings(GroupName = "Assessments API: Workshops")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class SpecWorkshopController(
     IPrincipalProvider principalProvider,
     BankSpecificationReader specificationReader,

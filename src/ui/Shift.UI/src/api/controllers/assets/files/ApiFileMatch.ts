@@ -12,4 +12,5 @@ export interface ApiFileMatch {
     UserId: string;
     UserFullName: string;
     HasClaims: boolean;
+    FileTag: string | null | undefined;
 }

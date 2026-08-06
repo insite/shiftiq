@@ -31,6 +31,10 @@ namespace InSite.Persistence
             Property(x => x.SoundexLastName).IsUnicode(false).HasMaxLength(4);
             Property(x => x.TimeZone).IsRequired().IsUnicode(false).HasMaxLength(40);
             Property(x => x.UserPasswordHash).IsRequired().IsUnicode(false).HasMaxLength(70);
+
+            Property(x => x.LastChangeTime).IsRequired();
+            Property(x => x.LastChangeType).IsRequired().IsUnicode(false).HasMaxLength(100);
+            Property(x => x.LastChangeUser).IsRequired();
         }
     }
 }

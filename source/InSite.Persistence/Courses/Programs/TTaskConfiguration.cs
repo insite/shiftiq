@@ -21,6 +21,7 @@ namespace InSite.Persistence
             Property(x => x.TaskImage).IsOptional().IsUnicode(false).HasMaxLength(200);
             Property(x => x.TaskIdentifier).IsRequired();
             Property(x => x.TaskIsRequired).IsRequired();
+            Property(x => x.TaskIsInherited).IsRequired();
             Property(x => x.TaskLifetimeMonths).IsOptional();
             Property(x => x.TaskSequence).IsRequired();
 

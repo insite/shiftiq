@@ -60,6 +60,15 @@ namespace InSite.Admin.Courses.Outlines.Controls
         protected global::InSite.Common.Web.UI.Button CollapseAllButton;
 
         /// <summary>
+        /// ShowMetadata1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox ShowMetadata1;
+
+        /// <summary>
         /// UnitComboBoxWrapper control.
         /// </summary>
         /// <remarks>
@@ -267,13 +276,13 @@ namespace InSite.Admin.Courses.Outlines.Controls
         protected global::System.Web.UI.WebControls.HyperLink UnitQuizCreateLink;
 
         /// <summary>
-        /// ShowMetadata control.
+        /// ShowMetadata2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox ShowMetadata;
+        protected global::System.Web.UI.WebControls.CheckBox ShowMetadata2;
 
         /// <summary>
         /// TreeReorderWrapper control.

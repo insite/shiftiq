@@ -9,7 +9,7 @@
                 <div class="col-6">
 
                     <div class="mb-2">
-                        <insite:TextBox ID="CatalogName" runat="server" EmptyMessage="Catalog Name" MaxLength="100" />
+                        <insite:TextBox ID="CatalogName" runat="server" EmptyMessage="Catalogue Name" MaxLength="100" />
                     </div> 
 
                     <div class="mb-2">

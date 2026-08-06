@@ -5,6 +5,7 @@ using InSite.Application.Banks.Write;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
+using InSite.UI.Admin.Assessments.Forms.Utilities;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
@@ -17,9 +18,15 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
         private Guid BankID => Guid.TryParse(Request.QueryString["bank"], out var value) ? value : Guid.Empty;
 
-        private Guid FormID => Guid.Parse(Request.QueryString["form"]);
+        private Guid FormID => Guid.TryParse(Request.QueryString["form"], out var value) ? value : Guid.Empty;
 
         private Guid? SectionID => Guid.TryParse(Request.QueryString["section"], out var value) ? value : (Guid?)null;
+
+        private int? PreservedTimeLimit
+        {
+            get => (int?)ViewState[nameof(PreservedTimeLimit)];
+            set => ViewState[nameof(PreservedTimeLimit)] = value;
+        }
 
         #endregion
 
@@ -37,7 +44,10 @@ namespace InSite.Admin.Assessments.Forms.Forms
             base.OnLoad(e);
 
             if (!CanEdit)
-                RedirectToSearch();
+            {
+                ShowAlert(a => a.ShowPermissionDenied("modify form proctoring"));
+                return;
+            }
 
             if (!IsPostBack)
                 Open();
@@ -65,11 +75,30 @@ namespace InSite.Admin.Assessments.Forms.Forms
         {
             var bank = ServiceLocator.BankSearch.GetBankState(BankID);
             if (bank == null)
-                RedirectToSearch();
+            {
+                ShowAlert(a =>
+                {
+                    if (BankID == Guid.Empty)
+                        a.ShowBankMissing();
+                    else
+                        a.ShowBankNotFound(BankID);
+                });
+                return;
+            }
 
             var form = bank.FindForm(FormID);
             if (form == null)
-                RedirectToReader();
+            {
+                var bankName = bank.Name;
+                ShowAlert(a =>
+                {
+                    if (FormID == Guid.Empty)
+                        a.ShowFormMissing(BankID, bankName);
+                    else
+                        a.ShowFormNotFound(FormID, BankID, bankName);
+                });
+                return;
+            }
 
             SetInputValues(form);
         }
@@ -80,7 +109,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             {
                 Opened = Opened.Value,
                 Closed = Closed.Value,
-                TimeLimit = TimeLimit.ValueAsInt.Value,
+                TimeLimit = PreservedTimeLimit ?? TimeLimit.ValueAsInt.Value,
                 IsTimerVisible = IsTimerVisible.ValueAsBoolean.Value,
                 AttemptLimit = AttemptLimit.ValueAsInt.Value,
                 AttemptLimitPerSession = AttemptLimitPerSession.ValueAsInt.Value,
@@ -108,10 +137,9 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
             Opened.Value = form.Invigilation.Opened;
             Closed.Value = form.Invigilation.Closed;
-            TimeLimit.ValueAsInt = Number.NullIfOutOfRange(form.Invigilation.TimeLimit, (int)TimeLimit.MinValue, (int)TimeLimit.MaxValue) ?? 0;
             IsTimerVisible.ValueAsBoolean = form.Invigilation.IsTimerVisible;
             AttemptLimit.ValueAsInt = form.Invigilation.AttemptLimit;
-
+            SetTimeLimitValue(form);
             AttemptLimitPerSession.ValueAsInt = form.Invigilation.AttemptLimitPerSession;
             TimeLimitPerSession.ValueAsInt = form.Invigilation.TimeLimitPerSession;
             TimeLimitPerLockout.ValueAsInt = form.Invigilation.TimeLimitPerLockout;
@@ -119,11 +147,36 @@ namespace InSite.Admin.Assessments.Forms.Forms
             CancelButton.NavigateUrl = GetReaderUrl(FormID, SectionID);
         }
 
+        private void SetTimeLimitValue(Form form)
+        {
+            var isCalculatedTimeLimit = form.IsTabTimeLimitEnabledForAll();
+
+            TimeLimitHelpDefault.Visible = !isCalculatedTimeLimit;
+            TimeLimitHelpCalculated.Visible = isCalculatedTimeLimit;
+            TimeLimit.Enabled = !isCalculatedTimeLimit;
+
+            if (isCalculatedTimeLimit)
+            {
+                var formTimeLimit = form.CalculateFormTimeLimit();
+
+                PreservedTimeLimit = form.Invigilation.TimeLimit;
+                TimeLimit.ValueAsInt = formTimeLimit < 0 ? (int?)null : formTimeLimit;
+            }
+            else
+            {
+                TimeLimit.ValueAsInt = Number.NullIfOutOfRange(form.Invigilation.TimeLimit, (int)TimeLimit.MinValue, (int)TimeLimit.MaxValue) ?? 0;
+            }
+        }
+
         #endregion
 
         #region Methods (redirect)
 
-        private static void RedirectToSearch() => HttpResponseHelper.Redirect($"/ui/admin/assessments/banks/search", true);
+        private void ShowAlert(Action<InSite.Admin.Assessments.Forms.Controls.FormPageAlert> configure)
+        {
+            ContentPanel.Visible = false;
+            configure(PageAlert);
+        }
 
         private void RedirectToReader(Guid? formId = null, Guid? sectionId = null)
         {

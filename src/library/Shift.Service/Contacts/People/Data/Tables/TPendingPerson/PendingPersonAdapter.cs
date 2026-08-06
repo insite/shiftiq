@@ -10,9 +10,7 @@ public class PendingPersonAdapter : IEntityAdapter
         entity.UserFirstName = modify.UserFirstName;
         entity.UserLastName = modify.UserLastName;
         entity.UserEmail = modify.UserEmail;
-        entity.UserId = modify.UserId;
         entity.PersonCode = modify.PersonCode;
-        entity.PersonId = modify.PersonId;
     }
 
     public string Serialize<T>(IEnumerable<T> models, string format, string includes)
@@ -26,36 +24,43 @@ public class PendingPersonAdapter : IEntityAdapter
     {
         var entity = new PendingPersonEntity
         {
-            PendingId = create.PendingId,
+            PendingPersonIdentifier = UniqueIdentifier.Create(),
             UserFirstName = create.UserFirstName,
             UserLastName = create.UserLastName,
             UserEmail = create.UserEmail,
-            UserId = create.UserId,
             PersonCode = create.PersonCode,
-            PersonId = create.PersonId
+            EmployeeStatus = create.EmployeeStatus
         };
         return entity;
     }
 
-    public IEnumerable<PendingPersonModel> ToModel(IEnumerable<PendingPersonEntity> entities, TimeZoneInfo? timezone)
+    public PendingPersonModel[] ToModel(IEnumerable<PendingPersonEntity> entities)
     {
-        return entities.Select(e => ToModel(e, timezone));
+        return entities.Select(e => ToModel(e)).ToArray();
     }
 
-    public PendingPersonModel ToModel(PendingPersonEntity entity, TimeZoneInfo? timezone)
+    public PendingPersonModel ToModel(PendingPersonEntity entity)
     {
         var model = new PendingPersonModel
         {
-            OrganizationId = entity.OrganizationId,
-            SubmittedAt = entity.SubmittedAt,
+            PendingPersonIdentifier = entity.PendingPersonIdentifier,
+            OrganizationIdentifier = entity.OrganizationIdentifier,
+            GroupIdentifier = entity.GroupIdentifier,
             SubmittedBy = entity.SubmittedBy,
-            PendingId = entity.PendingId,
+            PersonCode = entity.PersonCode,
+            UserEmail = entity.UserEmail,
             UserFirstName = entity.UserFirstName,
             UserLastName = entity.UserLastName,
-            UserEmail = entity.UserEmail,
-            UserId = entity.UserId,
-            PersonCode = entity.PersonCode,
-            PersonId = entity.PersonId
+            UserMiddleName = entity.UserMiddleName,
+            JobDivision = entity.JobDivision,
+            JobTitle = entity.JobTitle,
+            WorkAddressStreet1 = entity.WorkAddressStreet1,
+            WorkAddressStreet2 = entity.WorkAddressStreet2,
+            WorkAddressCity = entity.WorkAddressCity,
+            WorkAddressProvince = entity.WorkAddressProvince,
+            WorkAddressPostalCode = entity.WorkAddressPostalCode,
+            EmployeeStatus = entity.EmployeeStatus,
+            SubmittedAt = entity.SubmittedAt,
         };
 
         return model;

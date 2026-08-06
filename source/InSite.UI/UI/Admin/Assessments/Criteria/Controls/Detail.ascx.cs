@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 
+using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
 
@@ -13,10 +14,10 @@ namespace InSite.Admin.Assessments.Criteria.Controls
     {
         #region Properties
 
-        public Guid? CriterionID
+        public Guid? CriterionId
         {
-            get => (Guid?)ViewState[nameof(CriterionID)];
-            set => ViewState[nameof(CriterionID)] = value;
+            get => (Guid?)ViewState[nameof(CriterionId)];
+            private set => ViewState[nameof(CriterionId)] = value;
         }
 
         #endregion
@@ -37,9 +38,11 @@ namespace InSite.Admin.Assessments.Criteria.Controls
 
         public void SetInputValues(Criterion criterion, bool canWrite)
         {
-            CriterionID = criterion.Identifier;
+            var spec = criterion.Specification;
+            var bankId = spec.Bank.Identifier;
+            var criterionId = CriterionId = criterion.Identifier;
 
-            CriterionNumber.Text = $"{criterion.Sequence} of {criterion.Specification.Criteria.Count}";
+            CriterionNumber.Text = $"{criterion.Sequence} of {spec.Criteria.Count}";
 
             SetRepeater.DataSource = criterion.Sets;
             SetRepeater.DataBind();
@@ -72,11 +75,23 @@ namespace InSite.Admin.Assessments.Criteria.Controls
 
             FilterType.Text = hasBasicFilter ? "Filter with Question Tags" : hasAdvancedFilter ? "Filter with Pivot Table" : "Include All Questions";
 
-            EditSetFilter1.NavigateUrl = $"/ui/admin/assessments/criteria/change-filter?bank={criterion.Specification.Bank.Identifier}&criterion={criterion.Identifier}";
-            EditSetFilter2.NavigateUrl = EditSetFilter1.NavigateUrl;
-            EditSetFilter3.NavigateUrl = EditSetFilter1.NavigateUrl;
+            var editCriterionUrl = $"/ui/admin/assessments/criteria/change-filter?bank={bankId}&criterion={criterionId}";
+            EditCriterionLink1.NavigateUrl = editCriterionUrl;
+            EditCriterionLink2.NavigateUrl = editCriterionUrl;
+            EditCriterionLink3.NavigateUrl = editCriterionUrl;
+            EditCriterionLink4.NavigateUrl = editCriterionUrl;
+            EditCriterionLink5.NavigateUrl = editCriterionUrl;
+            EditCriterionLink6.NavigateUrl = editCriterionUrl;
+            EditCriterionLink7.NavigateUrl = editCriterionUrl;
 
-            DeleteCriterionLink.NavigateUrl = $"/admin/assessments/criteria/delete?bank={criterion.Specification.Bank.Identifier}&criterion={criterion.Identifier}";
+            DeleteCriterionLink.NavigateUrl = $"/admin/assessments/criteria/delete?bank={bankId}&criterion={criterionId}";
+
+            OutputContentTitle.InnerText = (criterion.Content.Title?.Default).IfNullOrEmpty("None");
+            OutputContentSummary.InnerText = (criterion.Content.Summary?.Default).IfNullOrEmpty("None");
+
+            ContentContainer.Visible = spec.Type == SpecificationType.Dynamic;
+            EditContentTitle.NavigateUrl = $"/ui/admin/assessments/criteria/content?bank={bankId}&criterion={criterionId}&tab=title";
+            EditContentSummary.NavigateUrl = $"/ui/admin/assessments/criteria/content?bank={bankId}&criterion={criterionId}&tab=summary";
 
             BasicFilterContainer.Visible = hasBasicFilter;
             BasicFilterOutput.InnerText = criterion.TagFilter;
@@ -88,9 +103,50 @@ namespace InSite.Admin.Assessments.Criteria.Controls
                 AdvancedFilterOutput.LoadData(criterion);
 
             DeleteCriterionLink.Visible = canWrite;
-            EditSetFilter1.Visible = canWrite;
-            EditSetFilter2.Visible = canWrite;
-            EditSetFilter3.Visible = canWrite;
+            EditCriterionLink1.Visible = canWrite;
+            EditCriterionLink2.Visible = canWrite;
+            EditCriterionLink3.Visible = canWrite;
+            EditCriterionLink4.Visible = canWrite;
+            EditCriterionLink5.Visible = canWrite;
+            EditCriterionLink6.Visible = canWrite;
+            EditCriterionLink7.Visible = canWrite;
+
+            SetTabConfigInputValues(criterion);
+        }
+
+        public void SetTabConfigInputValues(Specification specification)
+        {
+            var id = CriterionId;
+            var criterion = specification.Criteria.FirstOrDefault(x => x.Identifier == id);
+
+            if (criterion == null)
+                HttpResponseHelper.Redirect(Request.RawUrl);
+
+            SetTabConfigInputValues(criterion);
+        }
+
+        private void SetTabConfigInputValues(Criterion criterion)
+        {
+            var spec = criterion.Specification;
+            var tabConfig = criterion.TabConfiguration;
+
+            TabConfigContainer.Visible = spec.Type == SpecificationType.Dynamic
+                && spec.SectionsAsTabsEnabled
+                && !spec.TabNavigationEnabled;
+
+            var limitSomeTabs = spec.TabTimeLimit == SpecificationTabTimeLimit.SomeTabs;
+            var limitAllTabs = spec.TabTimeLimit == SpecificationTabTimeLimit.AllTabs;
+
+            WarningOnNextTabEnabled.Text = tabConfig.WarningOnNextTabEnabled ? "Show" : "Disabled";
+
+            BreakTimerEnabledField.Visible = limitSomeTabs || limitAllTabs;
+            BreakTimerEnabled.Text = tabConfig.BreakTimerEnabled ? "Enabled" : "Disabled";
+
+            TimeLimitField.Visible = limitAllTabs || limitSomeTabs && tabConfig.BreakTimerEnabled;
+            TimeLimit.Text = tabConfig.TimeLimit <= 0 ? "None" : $"{tabConfig.TimeLimit} minute(s)";
+
+            TimerTypeField.Visible = limitAllTabs || limitSomeTabs && tabConfig.BreakTimerEnabled;
+            TimerType.Text = tabConfig.TimerType.GetDescription();
         }
 
         #endregion

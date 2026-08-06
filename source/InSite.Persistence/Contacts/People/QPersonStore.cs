@@ -35,6 +35,8 @@ namespace InSite.Persistence
             entity.Modified = entity.Created;
             entity.ModifiedBy = entity.CreatedBy;
 
+            SetLastChange(entity, e);
+
             using (var db = new InternalDbContext())
             {
                 db.QPersons.Add(entity);
@@ -83,6 +85,8 @@ namespace InSite.Persistence
                 else
                     DeleteAddress(entity, e.OriginUser, e.AddressType, GetAddressDb, RemoveAddressDb);
 
+                SetLastChange(entity, e);
+
                 db.SaveChanges();
 
                 QPersonAddress GetAddressDb(Guid addressId) => db.QPersonAddresses.Where(x => x.AddressIdentifier == addressId).FirstOrDefault();
@@ -107,6 +111,8 @@ namespace InSite.Persistence
                 else
                     DeleteComment(entity, e.OriginUser, e.Comment.Comment, GetCommentDb, RemoveCommentDb);
 
+                SetLastChange(entity, e);
+
                 db.SaveChanges();
 
                 QComment GetCommentDb(Guid commentId) => db.QComments.Where(x => x.CommentIdentifier == commentId).FirstOrDefault();
@@ -129,8 +135,17 @@ namespace InSite.Persistence
                 entity.Modified = DateTimeOffset.UtcNow;
                 entity.ModifiedBy = e.OriginUser;
 
+                SetLastChange(entity, e);
+
                 db.SaveChanges();
             }
+        }
+
+        private static void SetLastChange(QPerson person, IChange change)
+        {
+            person.LastChangeTime = change.ChangeTime;
+            person.LastChangeType = change.GetType().Name;
+            person.LastChangeUser = change.OriginUser;
         }
 
         private static void UpdateComment(

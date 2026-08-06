@@ -2,11 +2,13 @@
 using System.Linq;
 using System.Text.Encodings.Web;
 
+using InSite.Application.Contacts.Read;
 using InSite.Application.People.Write;
 using InSite.Common.Web;
 using InSite.Domain.Organizations;
 using InSite.Persistence;
 using InSite.UI.Layout.Lobby.Controls;
+using InSite.Web.Data;
 using InSite.Web.Security;
 using InSite.Web.SignIn;
 
@@ -49,6 +51,8 @@ namespace InSite.UI.Lobby.SignInPages
 
         private void RedirectToSuccessPage(bool isAuthentication, User user, OrganizationState organization, string redirectUrl)
         {
+            var registrationGroup = RegistrationGroup;
+
             try
             {
                 Response.Headers["X-Successful-Login-Attempt"] = SuccessfulSignInHappened.ToString();
@@ -68,6 +72,8 @@ namespace InSite.UI.Lobby.SignInPages
                 AppSentry.SentryError(ex);
                 RedirectToSignInErrorPage(SignInErrorCodes.UnknownException, true, "An unexpected error occurred. Please try again later.");
             }
+
+            TryAddRegistrationGroup(organization.Identifier, user.UserIdentifier, registrationGroup);
 
             var url = ServiceLocator.Urls.GetApplicationUrl(organization.OrganizationCode) + "/ui/lobby/signin-success";
             HttpResponseHelper.Redirect(url);
@@ -122,6 +128,33 @@ namespace InSite.UI.Lobby.SignInPages
             RecentSessionHelper.Clear();
 
             return redirectUrl;
+        }
+
+        private void TryAddRegistrationGroup(Guid organizationId, Guid userId, string groupName)
+        {
+            if (groupName.IsEmpty())
+                return;
+
+            if (CurrentSessionState.Identity?.Impersonator != null)
+                return;
+
+            try
+            {
+                var group = ServiceLocator.GroupSearch.GetFirstGroup(new QGroupFilter
+                {
+                    OrganizationIdentifier = organizationId,
+                    GroupType = GroupTypes.Role,
+                    AllowSelfSubscription = true,
+                    GroupNameExact = groupName
+                });
+
+                if (group != null)
+                    MembershipHelper.Save(group.GroupIdentifier, userId, null);
+            }
+            catch (Exception ex)
+            {
+                AppSentry.SentryError(ex);
+            }
         }
     }
 }

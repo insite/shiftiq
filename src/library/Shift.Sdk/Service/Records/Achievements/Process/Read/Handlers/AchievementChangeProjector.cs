@@ -63,6 +63,7 @@ namespace InSite.Application.Records.Read
             publisher.Subscribe<CredentialExpired2>(Handle);
             publisher.Subscribe<CredentialEmployerChanged>(Handle);
             publisher.Subscribe<CredentialGranted3>(Handle);
+            publisher.Subscribe<CredentialSubmitted>(Handle);
             publisher.Subscribe<CredentialNotificationSent>(Handle);
             publisher.Subscribe<CredentialAuthorityChanged>(Handle);
             publisher.Subscribe<CredentialExpirationChanged>(Handle);
@@ -140,6 +141,9 @@ namespace InSite.Application.Records.Read
 
         public void Handle(CredentialGranted3 e)
             => _store.UpdateCredential(e, CredentialStatus.Valid);
+
+        public void Handle(CredentialSubmitted e)
+            => _store.UpdateCredential(e, CredentialStatus.Submitted);
 
         public void Handle(CredentialNotificationSent e)
             => _store.UpdateCredential(e);

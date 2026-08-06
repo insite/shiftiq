@@ -50,7 +50,7 @@
         <ItemTemplate>
             <tr>
                 <td>
-                    <a runat="server" visible='<%# Eval("IsAdmin") %>' href='<%# Eval("JournalSetupIdentifier", "/ui/admin/records/logbooks/outline?id={0}") %>'>
+                    <a runat="server" visible='<%# Eval("IsAdmin") %>' href='<%# Eval("JournalSetupIdentifier", "/ui/admin/records/logbooks/outline?journalsetup={0}") %>'>
                         <%# Eval("JournalSetupName") %>
                     </a>
                     <asp:Literal runat="server" Visible='<%# Eval("IsValidator") %>' Text='<%# Eval("JournalSetupName") %>' />

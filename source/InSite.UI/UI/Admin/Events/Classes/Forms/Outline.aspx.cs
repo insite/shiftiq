@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 
 using InSite.Admin.Events.Classes.Controls;
+using InSite.Application.Events.Read;
 using InSite.Application.Events.Write;
 using InSite.Application.Gradebooks.Write;
 using InSite.Common.Web;
@@ -12,6 +13,7 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Admin.Events.Classes.Controls;
 using InSite.UI.Layout.Admin;
+using InSite.UI.Portal.Events.Classes.Models;
 
 using Shift.Common;
 using Shift.Common.Timeline.Commands;
@@ -60,6 +62,70 @@ namespace InSite.Admin.Events.Classes.Forms
         private void MandatorySurveyFormIdentifier_ValueChanged(object sender, FindEntityValueChangedEventArgs e)
         {
             ServiceLocator.SendCommand(new ModifyMandatorySurvey(EventID.Value, e.NewValue));
+
+            BindMandatorySurveyFormLink(e.NewValue);
+        }
+
+        private void BindMandatorySurveyFormLink(Guid? formId)
+        {
+            EditMandatorySurveyFormLink.Visible = formId.HasValue;
+            EditMandatorySurveyFormLink.NavigateUrl = formId.HasValue
+                ? $"/ui/admin/workflow/forms/outline?form={formId}"
+                : null;
+
+            MandatorySurveyFormStatus.Text = GetSurveyFormStatusHtml(formId);
+        }
+
+        private static string GetSurveyFormStatusHtml(Guid? formId)
+        {
+            if (!formId.HasValue)
+                return null;
+
+            var surveyForm = ServiceLocator.SurveySearch.GetSurveyForm(formId.Value);
+            if (surveyForm == null)
+                return null;
+
+            var status = surveyForm.SurveyFormStatus.ToEnumNullable<SurveyFormStatus>();
+            if (status == null)
+                return null;
+
+            switch (status.Value)
+            {
+                case SurveyFormStatus.Opened:
+                    return "<span class='badge bg-success' title='This form is accepting submissions'>Open</span>";
+                case SurveyFormStatus.Drafted:
+                    return "<span class='badge bg-info' title='This form is not published: registrants cannot submit it'>Draft</span>";
+                case SurveyFormStatus.Closed:
+                    return "<span class='badge bg-primary' title='This form is not accepting submissions'>Closed</span>";
+                case SurveyFormStatus.Archived:
+                    return "<span class='badge bg-secondary' title='This form is not accepting submissions'>Archived</span>";
+                default:
+                    return null;
+            }
+        }
+
+        private void CheckMandatorySurveyFormIsPublished(QEvent ev)
+        {
+            if (!ev.MandatorySurveyFormIdentifier.HasValue)
+                return;
+
+            var checkClassResult = RegistrationHelper.CheckClass(ev);
+            if (checkClassResult != CheckClassResult.ClassOpen)
+                return;
+
+            var surveyForm = ServiceLocator.SurveySearch.GetSurveyForm(ev.MandatorySurveyFormIdentifier.Value);
+            if (surveyForm == null)
+                return;
+
+            var isFormOpen = string.Equals(surveyForm.SurveyFormStatus, SurveyFormStatus.Opened.GetName(), StringComparison.OrdinalIgnoreCase);
+            if (isFormOpen)
+                return;
+
+            var formTitle = HttpUtility.HtmlEncode(StringHelper.FirstValue(surveyForm.SurveyFormTitle, surveyForm.SurveyFormName));
+
+            StatusAlert.AddMessage(
+                AlertType.Error,
+                $"Registration for this class event is open, with mandatory submission of the form <b>{formTitle}</b>, but the form is NOT published.");
         }
 
         private void FindGradebook_Click(object sender, EventArgs e)
@@ -246,6 +312,9 @@ namespace InSite.Admin.Events.Classes.Forms
 
             MandatorySurveyFormIdentifier.Value = ev.MandatorySurveyFormIdentifier;
 
+            BindMandatorySurveyFormLink(ev.MandatorySurveyFormIdentifier);
+
+            CheckMandatorySurveyFormIsPublished(ev);
 
             LoadRegistrations(showForms, registrationsPage);
 

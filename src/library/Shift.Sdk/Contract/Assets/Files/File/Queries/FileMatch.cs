@@ -16,6 +16,7 @@ namespace Shift.Contract
         public DateTimeOffset FileUploaded { get; set; }
         public Guid UserId { get; set; }
         public string UserFullName { get; set; }
+        public string FileTag { get; set; }
         public bool HasClaims { get; set; }
     }
 }

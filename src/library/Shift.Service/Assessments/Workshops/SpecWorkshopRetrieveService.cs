@@ -4,6 +4,7 @@ using InSite.Domain.Banks;
 using Shift.Contract;
 
 using Shift.Sdk.Service;
+using Shift.Service.Assessment;
 using Shift.Service.Competency;
 using Shift.Service.Content;
 using Shift.Service.Evaluation.Workshops.Creators;
@@ -16,6 +17,7 @@ namespace Shift.Service.Evaluation.Workshops;
 public class SpecWorkshopRetrieveService(
     ITimelineQuery timelineQuery,
     StandardReader standardReader,
+    BankQuestionReader questionReader,
     UserReader userReader,
     UploadReader uploadReader,
     FileReader fileReader,
@@ -47,7 +49,9 @@ public class SpecWorkshopRetrieveService(
         result.Comments = await commentCreator.CreateAsync(comments, true);
         result.Attachments = await new WorkshopAttachmentCreator(userReader, uploadReader, fileReader, changeReader, storageService).CreateAsync(bank);
         result.ProblemQuestions = WorkshopProblemQuestionCreator.Create(spec.Bank.Sets.SelectMany(x => x.Questions));
-        result.QuestionData = await new WorkshopQuestionCreator(bank, standardReader, collectionItemReader).CreateInitDataAsync(spec, setId, questionId, commentCreator);
+
+        result.QuestionData = await new WorkshopQuestionCreator(bank, standardReader, questionReader, collectionItemReader)
+            .CreateInitDataAsync(spec, setId, questionId, commentCreator);
 
         return result;
     }
@@ -65,7 +69,7 @@ public class SpecWorkshopRetrieveService(
 
         var commentCreator = new WorkshopCommentCreator(bank, timeZone, userReader);
 
-        return await new WorkshopQuestionCreator(bank, standardReader, collectionItemReader).CreateSetDataAsync(set, commentCreator);
+        return await new WorkshopQuestionCreator(bank, standardReader, questionReader, collectionItemReader).CreateSetDataAsync(set, commentCreator);
     }
 
     public async Task<WorkshopQuestionComments> RetrieveQuestionCommentsAsync(Guid bankId, Guid questionId, TimeZoneInfo timeZone)

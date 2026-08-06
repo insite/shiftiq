@@ -13,6 +13,8 @@ namespace InSite.Persistence.Plugin.CMDS
         public String ProfileVisibility { get; set; }
         public String ProfileScope { get; set; }
         public Guid? ParentProfileStandardIdentifier { get; set; }
+        public Boolean? HasParent { get; set; }
+        public Boolean? IsDiverged { get; set; }
 
         public Guid? OrganizationIdentifier { get; set; }
         public Guid? DepartmentIdentifier { get; set; }

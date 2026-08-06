@@ -84,7 +84,7 @@ namespace InSite.Admin.Records.Programs
                 items.Add(item);
             }
 
-            TaskStore.UpdateOrInsert(items);
+            TaskStore.UpdateOrInsert(items, CascadeToLearners.Checked);
 
             Outline.Redirect(program.ProgramIdentifier, tab: "settings");
         }

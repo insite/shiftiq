@@ -32,7 +32,7 @@ namespace InSite.Admin.Workflow.Forms.Controls
 
         public void LoadReport(SurveyState survey)
         {
-            DefaultCss.Text = $@"<link href='{PathHelper.ToAbsoluteUrl("/library/fonts/font-awesome/7.1.0/css/all.min.css")}' rel='stylesheet' type='text/css' media='all'>";
+            DefaultCss.Text = $@"<link href='{PathHelper.ToAbsoluteUrl("/library/fonts/font-awesome-6.5.1/css/all.min.css")}' rel='stylesheet' type='text/css' media='all'>";
 
             Title.InnerText = survey != null ? survey.Form.Name : "Invalid Form Key";
 

@@ -196,6 +196,7 @@ namespace InSite.Persistence
                 ApprovedTime = file.ApprovedTime,
                 ApprovedUserIdentifier = file.ApprovedUserIdentifier,
                 AllowLearnerToView = file.AllowLearnerToView,
+                Tag = file.FileTag?.ToEnum<FileTag>(),
             };
 
             model.Properties = properties;

@@ -17,20 +17,9 @@ public class ExceptionHandlingMiddleware
 
     public static Problem ReportUnexpectedProblem(Exception ex, string? doingWhat, HttpContext context, IMonitor monitor)
     {
-        var message = "Our team is looking into the problem for you. " +
-            ex.GetFormattedMessages();
-
-        var requestUrl = context?.Request?.GetDisplayUrl();
-
-        if (requestUrl != null)
-            message = $"HTTP endpoint {requestUrl} returned an unexpected response. " + message;
-
-        if (doingWhat != null)
-            message = $"An error occurred {doingWhat}. " + message;
-
         var uri = monitor?.Error(ex);
 
-        var problem = ProblemFactory.InternalServerError(message, uri);
+        var problem = ProblemFactory.InternalServerError("Unexpected error. Our team is looking into the problem for you.", uri);
 
         return problem;
     }

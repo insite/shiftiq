@@ -44,7 +44,7 @@ namespace InSite.Domain.Banks
         /// Indicates if the tab time limit parameter can be applied
         /// </summary>
         [JsonIgnore]
-        public bool IsTabTimeLimitAllowed => Type == SpecificationType.Static && SectionsAsTabsEnabled && !TabNavigationEnabled;
+        public bool IsTabTimeLimitAllowed => SectionsAsTabsEnabled && !TabNavigationEnabled;
 
         /// <summary>
         /// Uniquely identifies the specification.

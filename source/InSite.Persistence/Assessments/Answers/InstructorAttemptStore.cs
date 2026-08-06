@@ -267,7 +267,8 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
                 SingleQuestionPerTabEnabled = e.SingleQuestionPerTabEnabled,
                 FormSectionsCount = e.FormSectionsCount,
                 ActiveSectionIndex = e.ActiveSectionIndex,
-                ActiveQuestionIndex = e.ActiveQuestionIndex
+                ActiveQuestionIndex = e.ActiveQuestionIndex,
+                CriteriaAsSectionsEnabled = false
             };
 
             UpdateAttemptTime(result, state);
@@ -329,7 +330,8 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
                 TabNavigationEnabled = e.Configuration.TabNavigation,
                 SingleQuestionPerTabEnabled = e.Configuration.SingleQuestionPerTab,
                 ActiveSectionIndex = state.ActiveSectionIndex,
-                ActiveQuestionIndex = state.ActiveQuestionIndex
+                ActiveQuestionIndex = state.ActiveQuestionIndex,
+                CriteriaAsSectionsEnabled = e.Configuration.CriteriaAsSections,
             };
 
             UpdateAttemptTime(result, state);
@@ -640,6 +642,7 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
                 UpdateAttemptScore(attempt);
                 UpdateAttemptTime(attempt, state);
                 UpdateAllSectionsTime(db, state);
+                UpdateAllQuestionsTime(db, state);
 
                 attempt.AttemptStatus = "Submitted";
 
@@ -944,6 +947,7 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
 
                 UpdateAttemptTime(attempt, state);
                 UpdateAllSectionsTime(db, state);
+                UpdateAllQuestionsTime(db, state);
 
                 db.SaveChanges();
             }
@@ -962,6 +966,7 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
 
                 UpdateAttemptTime(attempt, state);
                 UpdateAllSectionsTime(db, state);
+                UpdateAllQuestionsTime(db, state);
 
                 db.SaveChanges();
             }
@@ -995,7 +1000,8 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
 
         private static void UpdateAllSectionsTime(InternalDbContext db, AttemptState state)
         {
-            if (!state.Configuration.SectionsAsTabs || state.Configuration.TabNavigation)
+            var config = state.Configuration;
+            if (!config.SectionsAsTabs || config.TabNavigation)
                 return;
 
             var entities = db.QAttemptSections.Where(x => x.AttemptIdentifier == state.Identifier).ToArray();
@@ -1004,6 +1010,23 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
                 var sectionState = state.Sections[sectionEntity.SectionIndex];
 
                 UpdateSectionTime(sectionEntity, sectionState);
+            }
+        }
+
+        private static void UpdateAllQuestionsTime(InternalDbContext db, AttemptState aState)
+        {
+            var config = aState.Configuration;
+            if (!config.SectionsAsTabs || config.TabNavigation || !config.SingleQuestionPerTab)
+                return;
+
+            var entities = db.QAttemptQuestions
+                .Where(x => x.AttemptIdentifier == aState.Identifier && x.ParentQuestionIdentifier == null)
+                .ToArray();
+
+            foreach (var entity in entities)
+            {
+                var qState = aState.Questions.First(x => x.QuestionIdentifier == entity.QuestionIdentifier);
+                entity.ResponseDuration = qState.Duration;
             }
         }
 
@@ -1224,6 +1247,7 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
                 summary.OnAfterUpdate(attempt);
 
                 UpdateAllSectionsTime(db, state);
+                UpdateAllQuestionsTime(db, state);
 
                 db.SaveChanges();
             }

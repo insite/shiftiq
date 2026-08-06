@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -36,6 +35,14 @@ namespace InSite.Persistence
             }
         }
 
+        public bool GroupExists(Guid groupId)
+        {
+            using (var db = CreateContext())
+            {
+                return db.QGroups.Any(x => x.GroupIdentifier == groupId);
+            }
+        }
+
         public string GetGroupName(Guid groupId)
         {
             using (var db = CreateContext())
@@ -66,6 +73,20 @@ namespace InSite.Persistence
                     : query.OrderBy(x => x.GroupName);
 
                 return query.ApplyPaging(filter).ToList();
+            }
+        }
+
+        public QGroup GetFirstGroup(QGroupFilter filter, params Expression<Func<QGroup, object>>[] includes)
+        {
+            using (var db = CreateContext())
+            {
+                var query = CreateQueryByQGroupFilter(filter, db).ApplyIncludes(includes);
+
+                query = filter.OrderBy.HasValue()
+                    ? query.OrderBy(filter.OrderBy)
+                    : query.OrderBy(x => x.GroupName);
+
+                return query.FirstOrDefault();
             }
         }
 
@@ -221,8 +242,8 @@ namespace InSite.Persistence
             if (filter.GroupType.HasValue())
                 query = query.Where(x => x.GroupType == filter.GroupType);
 
-            if (filter.GroupName.HasValue())
-                query = query.Where(x => x.GroupName == filter.GroupName);
+            if (filter.GroupNameExact.HasValue())
+                query = query.Where(x => x.GroupName == filter.GroupNameExact);
 
             if (filter.GroupNameLike.HasValue())
                 query = query.Where(x => x.GroupName.Contains(filter.GroupNameLike));

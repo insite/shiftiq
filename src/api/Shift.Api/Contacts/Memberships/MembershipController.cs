@@ -41,6 +41,12 @@ public class MembershipController : ShiftControllerBase
     /// <summary>
     /// Collects the list of memberships that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to memberships modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive. ModifiedSince and ModifiedBefore are
+    /// also supported for the same purpose against the legacy Modified timestamp.
+    /// </remarks>
     [HttpPost("api/contacts/memberships/collect")]
     [HybridPermission("directory/memberships", DataAccess.Read)]
     [EndpointName("collectMemberships")]
@@ -82,6 +88,12 @@ public class MembershipController : ShiftControllerBase
     /// <summary>
     /// Counts the memberships that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the count to memberships modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive. ModifiedSince and ModifiedBefore are
+    /// also supported for the same purpose against the legacy Modified timestamp.
+    /// </remarks>
     [HttpPost("api/contacts/memberships/count")]
     [HybridPermission("directory/memberships", DataAccess.Read)]
     [EndpointName("countMemberships")]
@@ -115,7 +127,15 @@ public class MembershipController : ShiftControllerBase
 
     /// <summary>
     /// Downloads the list of memberships that match specific criteria
-    /// </summary>    
+    /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to download only memberships modified within a specific
+    /// window, which is useful for incremental integrations that already hold most of the data. Both parameters
+    /// accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00". LastChangeTimeSince is inclusive;
+    /// LastChangeTimeBefore is exclusive. ModifiedSince and ModifiedBefore are also supported against the legacy
+    /// Modified timestamp. When polling for deltas, subtract a small overlap (for example five minutes) from the
+    /// previous poll time to allow for projection lag.
+    /// </remarks>
     [HttpPost("api/contacts/memberships/download")]
     [HybridPermission("directory/memberships", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -189,6 +209,12 @@ public class MembershipController : ShiftControllerBase
     /// <summary>
     /// Searches for the list of memberships that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to memberships modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive. ModifiedSince and ModifiedBefore are
+    /// also supported for the same purpose against the legacy Modified timestamp.
+    /// </remarks>
     [HttpPost("api/contacts/memberships/search")]
     [HybridPermission("directory/memberships", DataAccess.Read)]
     [EndpointName("searchMemberships")]

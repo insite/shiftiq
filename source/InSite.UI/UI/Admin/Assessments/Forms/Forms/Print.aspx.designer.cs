@@ -15,6 +15,24 @@ namespace InSite.Admin.Assessments.Forms.Forms
     {
 
         /// <summary>
+        /// PageAlert control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Admin.Assessments.Forms.Controls.FormPageAlert PageAlert;
+
+        /// <summary>
+        /// ContentPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel ContentPanel;
+
+        /// <summary>
         /// PrintStatus control.
         /// </summary>
         /// <remarks>

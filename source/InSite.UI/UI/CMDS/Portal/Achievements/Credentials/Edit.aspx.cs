@@ -199,6 +199,12 @@ namespace InSite.Custom.CMDS.User.Progressions.Forms
                 return false;
             }
 
+            if (item.Completed.HasValue && item.Completed.Value > DateTime.UtcNow)
+            {
+                EditorStatus.AddMessage(AlertType.Error, "Please select a date before today. You can add future achievements after they are completed.");
+                return false;
+            }
+
             var commands = new List<Command>();
 
             var expiration = new Expiration(credential.CredentialExpirationType, credential.CredentialExpirationFixedDate, credential.CredentialExpirationLifetimeQuantity, credential.CredentialExpirationLifetimeUnit);

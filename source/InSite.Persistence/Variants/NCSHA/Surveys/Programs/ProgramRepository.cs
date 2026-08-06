@@ -505,7 +505,7 @@ VALUES
             var table = DatabaseHelper.CreateDataTable(@"
 select ColumnName
      , MaximumLength
-from databases.VTableColumn
+from schemas.VTableColumn
 where SchemaName = 'custom_ncsha'
       and len(ColumnName) = 5
       and (

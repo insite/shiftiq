@@ -78,15 +78,6 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
         protected global::InSite.Common.Web.UI.Button CopyButton;
 
         /// <summary>
-        /// MoveButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.Button MoveButton;
-
-        /// <summary>
         /// CopyButtonSpacer control.
         /// </summary>
         /// <remarks>
@@ -312,15 +303,6 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
         protected global::System.Web.UI.WebControls.Literal DescriptionOutput;
 
         /// <summary>
-        /// ProfileOwnerHeading control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfileOwnerHeading;
-
-        /// <summary>
         /// ProfileOwnership control.
         /// </summary>
         /// <remarks>
@@ -330,22 +312,22 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
         protected global::InSite.Cmds.Controls.Profiles.Profiles.ProfileOwner ProfileOwnership;
 
         /// <summary>
-        /// ProfileOwnerConfirm control.
+        /// DivergenceAlert control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProfileOwnerConfirm;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DivergenceAlert;
 
         /// <summary>
-        /// ConfirmMoveButton control.
+        /// DivergenceAlertText control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Button ConfirmMoveButton;
+        protected global::System.Web.UI.WebControls.Literal DivergenceAlertText;
 
         /// <summary>
         /// CompetencyTab control.

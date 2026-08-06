@@ -3,6 +3,7 @@ import { formRouteHelper } from "@/routes/formRouteHelper";
 import { ReactNode, useEffect, useMemo, useReducer } from "react";
 import { useLocation } from "react-router";
 import { PageProviderContext, PageProviderContextBreadcrumbItem } from "./PageProviderContext";
+import { shiftClient } from "@/api/shiftClient";
 
 interface InitAction {
     type: "init";
@@ -150,6 +151,10 @@ export default function PageProvider({ children }: Props) {
         })) ?? [];
 
         dispatch({ type: "init", actionTitle, breadcrumbs, menu });
+    }, [location.pathname]);
+
+    useEffect(() => {
+        shiftClient.toolkitUsage.visit(location.pathname);
     }, [location.pathname]);
 
     useEffect(() => {

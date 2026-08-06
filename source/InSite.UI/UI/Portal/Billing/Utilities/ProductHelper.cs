@@ -336,8 +336,7 @@ namespace InSite.UI.Portal.Billing.Utilities
                 return;
 
             var group = ServiceLocator.GroupSearch
-                .GetGroups(new QGroupFilter() { OrganizationIdentifier = orgId, GroupName = groupName })
-                .FirstOrDefault();
+                .GetFirstGroup(new QGroupFilter() { OrganizationIdentifier = orgId, GroupNameExact = groupName });
 
             if (group == null)
                 return;

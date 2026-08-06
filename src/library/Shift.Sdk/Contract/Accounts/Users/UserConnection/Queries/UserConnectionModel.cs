@@ -13,5 +13,9 @@ namespace Shift.Contract
         public bool IsValidator { get; set; }
 
         public DateTimeOffset Connected { get; set; }
+
+        public DateTimeOffset LastChangeTime { get; set; }
+        public string LastChangeType { get; set; }
+        public Guid LastChangeUser { get; set; }
     }
 }

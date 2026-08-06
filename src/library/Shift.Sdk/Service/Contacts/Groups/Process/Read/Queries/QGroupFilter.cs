@@ -13,7 +13,7 @@ namespace InSite.Application.Contacts.Read
         public Guid? ConnectParentGroupIdentifier { get; set; }
         public Guid? GroupStatusIdentifier { get; set; }
         public string GroupType { get; set; }
-        public string GroupName { get; set; }
+        public string GroupNameExact { get; set; }
         public string GroupNameLike { get; set; }
         public string GroupCode { get; set; }
 

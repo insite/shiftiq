@@ -404,6 +404,26 @@
                     modal.hide();
             }
         })();
+
+        (function () {
+            window.addEventListener('load', function () {
+                const y = sessionStorage.getItem('doneScrollY');
+                if (y !== null) {
+                    const yValue = parseInt(y);
+                    if (!isNaN(yValue))
+                        window.scrollTo(0, yValue);
+
+                    sessionStorage.removeItem('doneScrollY');
+                }
+
+                const btn = document.getElementById('<%= DoneButton.ClientID %>');
+                if (btn) {
+                    btn.addEventListener('click', function () {
+                        sessionStorage.setItem('doneScrollY', window.scrollY);
+                    });
+                }
+            });
+        })();
     </script>
 
 </asp:Content>

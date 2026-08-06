@@ -194,6 +194,10 @@
                                 </insite:ComboBox>
                             </div>
 
+                            <div runat="server" id="RequestedDocumentsField" class="mb-2">
+                                <insite:ComboBox runat="server" ID="DocumentFilter" EmptyMessage="Document Request" AllowBlank="false" />
+                            </div>
+
                             <div runat="server" id="AttachmentFileExpirySinceField" class="mb-2">
                                 <insite:DateSelector ID="AttachmentFileExpirySince" runat="server" EmptyMessage="Expired Since" />
                             </div>

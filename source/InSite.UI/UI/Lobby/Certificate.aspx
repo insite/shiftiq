@@ -47,7 +47,7 @@
         <asp:HiddenField runat="server" ID="fingerPrint" />
         <br />
         <br />
-        <div runat="server" id="ControlPannel" style="margin: auto" class="text-center">
+        <div runat="server" id="SharePanel" style="margin: auto" class="text-center">
             <b style="color: #355C74">Share via: </b>
             <a href="javascript:void(0)" onclick="clipboardClick()">
                 <i title="Copy to clipboard">
@@ -69,6 +69,7 @@
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
     <div class="row mainTab">
         <div class="col-lg-12">
+            <asp:Literal runat="server" ID="customCertificateImage" Visible="false" />
             <div id="certificateData" class="certificateContainer certificateImageC1" runat="server">
                 <div style="text-align: left;">
                     <span style="font-size: 15px"><b runat="server" id="name" style="position: absolute; margin-top: 233px; margin-left: 95px;"></b></span>

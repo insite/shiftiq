@@ -95,6 +95,11 @@
     <Compile Include="Assessments\Questions\TQuizConfiguration.cs" />
     <Compile Include="Assessments\Questions\TQuizSearch.cs" />
     <Compile Include="Assessments\Questions\TQuizStore.cs" />
+    <Compile Include="Reports\Reports\ReportHelper.cs" />
+    <Compile Include="Reports\ToolkitUsages\TToolkitUsageStore.cs" />
+    <Compile Include="Reports\ToolkitVisits\TToolkitVisit.cs" />
+    <Compile Include="Reports\ToolkitVisits\TToolkitVisitConfiguration.cs" />
+    <Compile Include="Reports\ToolkitVisits\TToolkitVisitStore.cs" />
     <Compile Include="Sales\OrderItems\TOrderItemConfiguration.cs" />
     <Compile Include="Sales\Orders\TOrderConfiguration.cs" />
     <Compile Include="Sales\Invoices\MissingInvoiceNumber.cs" />
@@ -150,8 +155,6 @@
     <Compile Include="Contacts\People\PersonCriteria.cs" />
     <Compile Include="Contacts\People\PersonExamRegistrationFilter.cs" />
     <Compile Include="Records\Progressions\VStatementConfiguration.cs" />
-    <Compile Include="Schemas\Entities\UnexpectedCollectionItem.cs" />
-    <Compile Include="Schemas\Entities\UnexpectedStorageTable.cs" />
     <Compile Include="Accounts\Permissions\OrganizationPermission.cs" />
     <Compile Include="Accounts\Permissions\OrganizationPermissionConfiguration.cs" />
     <Compile Include="Accounts\Permissions\PermissionCache.cs" />
@@ -175,10 +178,6 @@
     <Compile Include="Sites\Pages\VSitemap.cs" />
     <Compile Include="Sites\Pages\VWebPageHierarchyConfiguration.cs" />
     <Compile Include="Schemas\Schemas\StorageObject.cs" />
-    <Compile Include="Schemas\Entities\TEntity.cs" />
-    <Compile Include="Schemas\Entities\TEntityConfiguration.cs" />
-    <Compile Include="Schemas\Entities\TEntityFilter.cs" />
-    <Compile Include="Schemas\Entities\TEntitySearch.cs" />
     <Compile Include="Accounts\Users\TUserSessionDetail.cs" />
     <Compile Include="Accounts\Users\TUserSessionHelper.cs" />
     <Compile Include="Accounts\Users\TUserAuthenticationFactor.cs" />
@@ -256,6 +255,7 @@
     <Compile Include="Courses\Enrollments\VLearnerActivitySearch.cs" />
     <Compile Include="Courses\Enrollments\VLearnerActivityUserProgram.cs" />
     <Compile Include="Courses\Enrollments\VLearnerProgramCount.cs" />
+    <Compile Include="Courses\Programs\LearnerTaskDemand.cs" />
     <Compile Include="Courses\Programs\TaskSearchItem.cs" />
     <Compile Include="Events\Registrations\XRegistrationTimerConfiguration.cs" />
     <Compile Include="Settings\Senders\TSenderOrganization.cs" />
@@ -372,10 +372,16 @@
     <Compile Include="Courses\Programs\ProgramSearch.cs" />
     <Compile Include="Courses\Programs\ProgramSearch1.cs" />
     <Compile Include="Courses\Programs\ProgramSearch2.cs" />
+    <Compile Include="Courses\Programs\Graphs\ProgramGraph.cs" />
+    <Compile Include="Courses\Programs\ProgramContainmentCascade.cs" />
+    <Compile Include="Courses\Programs\ProgramContainmentSearch.cs" />
+    <Compile Include="Courses\Programs\ProgramContainmentStore.cs" />
+    <Compile Include="Courses\Programs\ProgramTaskCascade.cs" />
     <Compile Include="Courses\Programs\ProgramStore.cs" />
     <Compile Include="Courses\Programs\ProgramStore1.cs" />
     <Compile Include="Courses\Programs\ProgramEnrollmentTaskCompletionCounterForUsers.cs" />
     <Compile Include="Courses\Programs\ProgramService.cs" />
+    <Compile Include="Courses\Programs\ProgramTaskDefaults.cs" />
     <Compile Include="Courses\Programs\TaskSearch.cs" />
     <Compile Include="Courses\Programs\TaskStore.cs" />
     <Compile Include="Accounts\Users\LoginMethods.cs" />
@@ -433,10 +439,6 @@
     <Compile Include="Variants\NCSHA\Surveys\Programs\NcshaMigrator.cs" />
     <Compile Include="Schemas\Schemas\VForeignKey.cs" />
     <Compile Include="Schemas\Schemas\VForeignKeyConfiguration.cs" />
-    <Compile Include="Schemas\Schemas\VForeignKeyConstraint.cs" />
-    <Compile Include="Schemas\Schemas\VForeignKeyConstraintConfiguration.cs" />
-    <Compile Include="Schemas\Schemas\VForeignKeyFilter.cs" />
-    <Compile Include="Schemas\Schemas\VForeignKeySearch.cs" />
     <Compile Include="Schemas\Schemas\VPrimaryKey.cs" />
     <Compile Include="Schemas\Schemas\VPrimaryKeyConfiguration.cs" />
     <Compile Include="Schemas\Schemas\VSchema.cs" />
@@ -521,6 +523,7 @@
     <Compile Include="Records\Gradebooks\QGradeItemCompetencyConfiguration.cs" />
     <Compile Include="Records\Regulations\QJournalSetupUserConfiguration.cs" />
     <Compile Include="Courses\Programs\TProgramConfiguration.cs" />
+    <Compile Include="Courses\Programs\TProgramContainmentConfiguration.cs" />
     <Compile Include="Records\Progressions\QProgressConfiguration.cs" />
     <Compile Include="Courses\Enrollments\QEnrollmentConfiguration.cs" />
     <Compile Include="Sales\Products\TProductConfiguration.cs" />

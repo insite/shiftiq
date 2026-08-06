@@ -42,8 +42,8 @@ namespace Shift.Service.Content
         public string GetFileUrl(Guid fileId, string fileName, bool download = false, bool legacyLink = false)
         {
             var url = legacyLink
-                ? $"/api/assets/files/{fileId}/{fileName}".ToLower()
-                : $"/api/content/files/{fileId}/{fileName}".ToLower();
+                ? $"/api/content/files/{fileId}/{fileName}".ToLower()
+                : $"/api/assets/files/{fileId}/{fileName}".ToLower();
 
             if (download)
                 url += "?download=1";
@@ -413,14 +413,16 @@ namespace Shift.Service.Content
 
         private static FileGrantStatus Authorize(ISimplePrincipal identity, FileStorageModel? model)
         {
+            var claims = model?.Claims ?? [];
+
             if (model == null
-                || !identity.IsOperator && identity.OrganizationId != model.OrganizationIdentifier
+                || !identity.IsOperator
+                    && identity.OrganizationId != model.OrganizationIdentifier
+                    && (identity.OrganizationId != Guid.Empty || claims.Any()) // A special case for non-authenticated request to a public file
                 )
             {
                 return FileGrantStatus.NoFile;
             }
-
-            var claims = model.Claims ?? [];
 
             if (identity.IsOperator
                 || !claims.Any()

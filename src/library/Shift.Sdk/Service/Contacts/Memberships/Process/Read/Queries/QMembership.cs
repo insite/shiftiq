@@ -18,6 +18,10 @@ namespace InSite.Application.Contacts.Read
         public DateTimeOffset Modified { get; set; }
         public Guid ModifiedBy { get; set; }
 
+        public DateTimeOffset LastChangeTime { get; set; }
+        public string LastChangeType { get; set; }
+        public Guid LastChangeUser { get; set; }
+
         public virtual QUser User { get; set; }
         public virtual QGroup Group { get; set; }
 

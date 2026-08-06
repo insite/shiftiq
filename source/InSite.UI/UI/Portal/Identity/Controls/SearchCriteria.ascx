@@ -47,6 +47,15 @@
                         <insite:DateSelector ID="LastAuthenticatedBefore" runat="server" EmptyMessage="Last Authenticated Before" />
                     </div>
 
+                    <div class="mb-2">
+                        <insite:ComboBox runat="server" ID="ApprovalFilter">
+                            <Items>
+                                <insite:ComboBoxOption Value="Approved" Text="Approved users only" Selected="true" />
+                                <insite:ComboBoxOption Value="All" Text="All users" />
+                            </Items>
+                        </insite:ComboBox>
+                    </div>
+
                 </div>
             </div>
         </div>

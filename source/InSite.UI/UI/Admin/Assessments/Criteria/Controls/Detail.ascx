@@ -25,7 +25,7 @@
         <div class="form-group mb-3">
             <label class="form-label">
                 Set Weight
-                <insite:IconLink Name="pencil" runat="server" id="EditSetFilter1" ToolTip="Change Filter" CssClass="ms-1" />
+                <insite:IconLink Name="pencil" runat="server" id="EditCriterionLink1" ToolTip="Change Filter" CssClass="ms-1" />
             </label>
             <div>
                 <asp:Literal runat="server" ID="SetWeight" />
@@ -39,7 +39,7 @@
         <div runat="server" id="QuestionLimitField" class="form-group mb-3">
             <label class="form-label">
                 Question Limit
-                <insite:IconLink Name="pencil" runat="server" id="EditSetFilter2" ToolTip="Change Filter" CssClass="ms-1" />
+                <insite:IconLink Name="pencil" runat="server" id="EditCriterionLink2" ToolTip="Change Filter" CssClass="ms-1" />
             </label>
             <div>
                 <asp:Literal runat="server" ID="QuestionLimit" />
@@ -52,7 +52,7 @@
         <div class="form-group mb-3">
             <label class="form-label">
                 Filter Type
-                <insite:IconLink Name="pencil" runat="server" id="EditSetFilter3" ToolTip="Change Filter" CssClass="ms-1" />
+                <insite:IconLink Name="pencil" runat="server" id="EditCriterionLink3" ToolTip="Change Filter" CssClass="ms-1" />
             </label>
             <div>
                 <asp:Literal runat="server" ID="FilterType" />
@@ -66,6 +66,60 @@
             <h3>Tag Filter</h3>
             <div class="ps-1">
                 <span runat="server" id="BasicFilterOutput" style="white-space:pre-wrap;"></span>
+            </div>
+        </insite:Container>
+
+        <insite:Container runat="server" ID="TabConfigContainer">
+            <div class="form-group mb-3">
+                <label class="form-label">
+                    Warning on Next Tab
+                    <insite:IconLink Name="pencil" runat="server" id="EditCriterionLink4" ToolTip="Change Configuration" CssClass="ms-1" />
+                </label>
+                <div>
+                    <asp:Literal runat="server" ID="WarningOnNextTabEnabled" />
+                </div>
+                <div class="form-text">
+                    Whether the candidate is warned before moving on to the next tab.
+                </div>
+            </div>
+
+            <div runat="server" id="BreakTimerEnabledField" class="form-group mb-3">
+                <label class="form-label">
+                    Break Timer
+                    <insite:IconLink Name="pencil" runat="server" id="EditCriterionLink5" ToolTip="Change Configuration" CssClass="ms-1" />
+                </label>
+                <div>
+                    <asp:Literal runat="server" ID="BreakTimerEnabled" />
+                </div>
+                <div class="form-text">
+                    Whether the time spent on this tab is excluded from the attempt's total time.
+                </div>
+            </div>
+
+            <div runat="server" id="TimeLimitField" class="form-group mb-3">
+                <label class="form-label">
+                    Time Limit
+                    <insite:IconLink Name="pencil" runat="server" id="EditCriterionLink6" ToolTip="Change Configuration" CssClass="ms-1" />
+                </label>
+                <div>
+                    <asp:Literal runat="server" ID="TimeLimit" />
+                </div>
+                <div class="form-text">
+                    The maximum number of minutes the candidate can stay on this tab.
+                </div>
+            </div>
+
+            <div runat="server" id="TimerTypeField" class="form-group mb-3">
+                <label class="form-label">
+                    Timer Type
+                    <insite:IconLink Name="pencil" runat="server" id="EditCriterionLink7" ToolTip="Change Configuration" CssClass="ms-1" />
+                </label>
+                <div>
+                    <asp:Literal runat="server" ID="TimerType" />
+                </div>
+                <div class="form-text">
+                    Whether the candidate can leave the tab before the time limit is reached (Optional) or must wait for it to elapse (Enforced).
+                </div>
             </div>
         </insite:Container>
 
@@ -142,6 +196,36 @@
                 </ItemTemplate>
             </asp:Repeater>
             
+        </insite:Container>
+
+        <insite:Container runat="server" ID="ContentContainer">
+            <h3>Content</h3>
+
+            <div class="form-group mb-3">
+                <label class="form-label">
+                    Title
+                    <insite:IconLink Name="pencil" runat="server" ID="EditContentTitle" ToolTip="Revise External Title" CssClass="ms-1" />
+                </label>
+                <div>
+                    <span runat="server" id="OutputContentTitle" style="white-space:pre-wrap;"></span>
+                </div>
+                <div class="form-text">
+                    The external title for this criterion.
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label">
+                    Summary
+                    <insite:IconLink Name="pencil" runat="server" ID="EditContentSummary" ToolTip="Revise Summary" CssClass="ms-1" />
+                </label>
+                <div>
+                    <span runat="server" id="OutputContentSummary" style="white-space:pre-wrap;"></span>
+                </div>
+                <div class="form-text">
+                    The purpose of this criterion.
+                </div>
+            </div>
         </insite:Container>
 
     </div>

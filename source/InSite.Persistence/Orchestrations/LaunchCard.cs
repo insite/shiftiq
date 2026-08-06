@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 
 using Shift.Common;
 
@@ -6,6 +7,12 @@ namespace InSite.Persistence.Content
 {
     public class LaunchCard
     {
+        /// <summary>
+        /// Shown in place of a card image that is specified but cannot be found
+        /// </summary>
+        public const string PlaceholderImageUrl = "/UI/Layout/Portal/Images/CardPlaceholder.png";
+
+
         public Guid Identifier { get; set; }
 
         public int Sequence { get; set; }
@@ -51,8 +58,32 @@ namespace InSite.Persistence.Content
         public string GetIconHtml()
             => $"<span><i class='{Icon} fa-3x mb-3'></i></span>";
 
+        /// <summary>
+        /// Returns the image markup to render. A card image cannot be verified on the server: an
+        /// application-relative URL such as "/files/orientations/cover.png" is rewritten to a
+        /// handler that serves the file from tenant storage, so it never exists as a physical file
+        /// under the application root. The specified URL is rendered as is, and the browser falls
+        /// back to the placeholder when it cannot be loaded.
+        /// </summary>
         public string GetImageHtml()
-            => $"<img class='card-img-top' src='{Image}' alt='{Title}'>";
+        {
+            var value = Image?.Trim();
+
+            var isPlaceholder = string.IsNullOrEmpty(value);
+
+            // The placeholder is the only image whose dimensions are known here, so it is the only
+            // one given an explicit size. The fallback applies the same size when it swaps a broken
+            // image for the placeholder.
+
+            var size = isPlaceholder ? " width=\"300\" height=\"200\"" : string.Empty;
+
+            var src = HttpUtility.HtmlAttributeEncode(isPlaceholder ? PlaceholderImageUrl : value);
+            var alt = HttpUtility.HtmlAttributeEncode(Title);
+
+            var fallback = $"this.onerror=null;this.src='{PlaceholderImageUrl}';this.width=300;this.height=200;";
+
+            return $"<img class=\"card-img-top\" src=\"{src}\" alt=\"{alt}\"{size} onerror=\"{fallback}\">";
+        }
 
         public string GetProgressHtml()
         {

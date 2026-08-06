@@ -41,6 +41,11 @@ public class GroupController : ShiftControllerBase
     /// <summary>
     /// Collects the list of groups that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to groups modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/contacts/groups/collect")]
     [HybridPermission("directory/groups", DataAccess.Read)]
     [EndpointName("collectGroups")]
@@ -80,6 +85,11 @@ public class GroupController : ShiftControllerBase
     /// <summary>
     /// Counts the groups that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the count to groups modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/contacts/groups/count")]
     [HybridPermission("directory/groups", DataAccess.Read)]
     [EndpointName("countGroups")]
@@ -111,7 +121,14 @@ public class GroupController : ShiftControllerBase
 
     /// <summary>
     /// Downloads the list of groups that match specific criteria
-    /// </summary>    
+    /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to download only groups modified within a specific window,
+    /// which is useful for incremental integrations that already hold most of the data. Both parameters accept
+    /// ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00". LastChangeTimeSince is inclusive;
+    /// LastChangeTimeBefore is exclusive. When polling for deltas, subtract a small overlap (for example five
+    /// minutes) from the previous poll time to allow for projection lag.
+    /// </remarks>
     [HttpPost("api/contacts/groups/download")]
     [HybridPermission("directory/groups", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -183,6 +200,11 @@ public class GroupController : ShiftControllerBase
     /// <summary>
     /// Searches for the list of groups that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to groups modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/contacts/groups/search")]
     [HybridPermission("directory/groups", DataAccess.Read)]
     [EndpointName("searchGroups")]

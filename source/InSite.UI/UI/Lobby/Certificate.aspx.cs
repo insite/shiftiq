@@ -4,7 +4,10 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 
+using InSite.Application.Records.Read;
 using InSite.Common.Web;
+using InSite.Common.Web.UI.Certificates;
+using InSite.UI.Portal.Records.Credentials.Utilities;
 
 using Shift.Common;
 
@@ -12,131 +15,174 @@ namespace InSite.UI.Lobby
 {
     public partial class CeritifcateVerify : Page
     {
+        private BaseCertificate _certificate;
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
+            if (!Guid.TryParse(Request.QueryString["cid"], out var credentialId))
+                HttpResponseHelper.SendHttp404();
+
+            var credential = ServiceLocator.AchievementSearch.GetCredential(credentialId);
+            if (credential == null || credential.UserTimeZone == null)
+                HttpResponseHelper.SendHttp404();
+
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(credential.UserTimeZone.IfNullOrEmpty("UTC"));
+
+            _certificate = CertificateHelper.TryCreateCredential(credential, timeZone);
+
+            if (TryHandleFormat(credentialId, Request.QueryString["format"]))
+                return;
+
             var brand = ServiceLocator.AppSettings.Partition.Brand;
+            var ogImageUrl = _certificate == null
+                ? $"{Request.Url.Authority}/UI/Layout/Common/Parts/img/cert2.jpg"
+                : $"https://{Request.Url.Authority}/ui/lobby/certificate?cid={credentialId}&format=image";
 
-            var cid = Request.QueryString["cid"];
+            SetOpenGraphTags(brand, credential, ogImageUrl);
+            SetSidebarValues(credential);
+            RenderCertificate(credential);
+            SetupSharePanel(credential, brand);
+        }
 
-            if (!string.IsNullOrEmpty(cid))
+        private bool TryHandleFormat(Guid credentialId, string format)
+        {
+            if (format.IsEmpty())
+                return false;
+
+            if (!string.Equals(format, "image", StringComparison.OrdinalIgnoreCase))
+                HttpResponseHelper.SendHttp404();
+
+            if (_certificate == null)
+                HttpResponseHelper.SendHttp404();
+
+            var png = _certificate.CreatePng(Response, Guid.NewGuid().ToString(), 1000, 1000);
+            Response.Clear();
+            Response.ContentType = "image/png";
+            Response.BinaryWrite(png);
+            Response.End();
+            return true;
+        }
+
+        private void SetOpenGraphTags(string brand, VCredential credential, string ogImageUrl)
+        {
+            Page.Title = $"{brand}: {credential.UserFullName}'s certificate of completion for {credential.AchievementTitle}.";
+
+            AddMeta("og:title", Page.Title);
+            AddMeta("og:description", $"{credential.UserFullName} has successfully finished {credential.AchievementTitle} on {brand}.");
+            AddMeta("og:url", Request.Url.ToString());
+            AddMeta("og:image", ogImageUrl);
+        }
+
+        private void AddMeta(string property, string content)
+        {
+            var meta = new HtmlMeta();
+            meta.Attributes.Add("property", property);
+            meta.Content = content;
+            Header.Controls.Add(meta);
+        }
+
+        private void RenderCertificate(VCredential credential)
+        {
+            if (_certificate == null)
             {
-                if (Guid.TryParse(cid, out var id))
-                {
-                    var x = ServiceLocator.AchievementSearch.GetCredential(id);
-                    if (!(x is null))
-                    {
-                        Page.Title = $"{brand}: {x.UserFullName}'s certificate of completion for {x.AchievementTitle}.";
-                        var ogtitle = new HtmlMeta();
-                        ogtitle.Attributes.Add("property", "og:title");
-                        ogtitle.Content = Page.Title;
-                        Header.Controls.Add(ogtitle);
-                        var ogdesc = new HtmlMeta();
-                        ogdesc.Attributes.Add("property", "og:description");
-                        ogdesc.Content = $"{x.UserFullName} has successfully finished {x.AchievementTitle} on {brand}.";
-                        Header.Controls.Add(ogdesc);
-                        var ogurl = new HtmlMeta();
-                        ogurl.Attributes.Add("property", "og:url");
-                        ogurl.Content = Request.Url.ToString();
-                        Header.Controls.Add(ogurl);
-                        var ogimage = new HtmlMeta();
-                        ogimage.Attributes.Add("property", "og:image");
-                        ogimage.Content = $"{Request.Url.Authority}/UI/Layout/Common/Parts/img/cert2.jpg";
-                        Header.Controls.Add(ogimage);
+                name.InnerText = credential.UserFullName;
+                coursTitle.InnerText = credential.AchievementTitle;
+                ccid.InnerText = $"certificate Identifier: {credential.CredentialIdentifier}";
+                datetime.InnerText = credential.CredentialGranted.ToDateString();
 
-                        name.InnerText = x.UserFullName;
-                        name2.InnerText = x.UserFullName;
-                        name3.InnerText = x.UserFullName;
-                        coursTitle.InnerText = x.AchievementTitle;
-                        course2.InnerText = string.Equals(x.AchievementTitle, x.AchievementLabel) ? x.AchievementTitle : $"{x.AchievementTitle}:{x.AchievementLabel}";
-                        course3.InnerText = x.AchievementTitle;
-                        if (!string.Equals(x.AchievementTitle, x.AchievementLabel))
-                        {
-                            course4.InnerText = x.AchievementLabel;
-                        }
-                        else course4.Visible = false;
-                        ccid.InnerText = $"certificate Identifier: {cid}";
-                        if (!(x.CredentialHours is null))
-                        {
-                            course5.InnerText = $"Total Hours:{x.CredentialHours ?? 0}";
-                        }
-                        else
-                        {
-                            course5.Visible = false;
-                        }
-                        if (!(x.CredentialGrantedScore is null))
-                        {
-                            course6.InnerText = $"Credential Score:{x.CredentialHours ?? 0}";
-                        }
-                        else
-                        {
-                            course6.Visible = false;
-                        }
-                        fingerPrint.Value = x.CertificateFingerPrint;
-                        datetime.InnerText = x.CredentialGranted.ToDateString();
-                        date.InnerText = x.CredentialGranted.ToDateString();
-                        if (x.CredentialExpirationExpected.HasValue)
-                        {
-                            exp.InnerText = x.CredentialExpirationExpected.ToDateString();
-                            exdatetime.InnerText = x.CredentialExpirationExpected.ToDateString();
-                        }
-                        else
-                        {
-                            ExpSentence.Visible = false;
-                            certificateData.Attributes["class"] = "certificateContainer certificateImageC2";
-                        }
-                        if (CurrentSessionState.Identity.IsAuthenticated)
-                        {
-                            if (CurrentSessionState.Identity.User.UserIdentifier == x.UserIdentifier)
-                            {
-                                ControlPannel.Visible = true;
-                                FaceBook.NavigateUrl = GenerateFaceBookLink(id, Request);
-                                Twitter.NavigateUrl = GenerateTwitterLink(id, x.AchievementTitle, Request);
-                                LinkedIn.NavigateUrl = GenerateLinkedInLink(id, Request);
-                                Mail.NavigateUrl = GenerateEmailContent(brand, id, x.AchievementTitle, Request);
-                            }
-                            else
-                            {
-                                ControlPannel.Visible = false;
-                            }
-                        }
-                        else
-                        {
-                            ControlPannel.Visible = false;
-                        }
-                        return;
-                    }
-                }
+                if (credential.CredentialExpirationExpected.HasValue)
+                    exdatetime.InnerText = credential.CredentialExpirationExpected.ToDateString();
+                else
+                    certificateData.Attributes["class"] = "certificateContainer certificateImageC2";
             }
-
-            HttpResponseHelper.SendHttp404();
+            else
+            {
+                var png = _certificate.CreatePng(Response, Guid.NewGuid().ToString(), 1000, 1000);
+                customCertificateImage.Text =
+                    $"<img alt=\"\" style=\"max-width:900px;width:100%;height:auto;\" " +
+                    $"src=\"data:image/png;base64,{Convert.ToBase64String(png)}\" />";
+                customCertificateImage.Visible = true;
+                certificateData.Visible = false;
+            }
         }
 
-        public static string GenerateVerificationLink(Guid certificateId, HttpRequest request, bool encode = true)
+        private void SetSidebarValues(VCredential credential)
         {
-            if (encode) return UrlEncoder.Default.Encode($"https://{request.Url.Authority}/ui/lobby/certificate?cid={certificateId}");
-            else return $"https://{request.Url.Authority}/ui/lobby/certificate?cid={certificateId}";
+            name2.InnerText = credential.UserFullName;
+            name3.InnerText = credential.UserFullName;
+
+            course2.InnerText = string.Equals(credential.AchievementTitle, credential.AchievementLabel)
+                ? credential.AchievementTitle
+                : $"{credential.AchievementTitle}:{credential.AchievementLabel}";
+            course3.InnerText = credential.AchievementTitle;
+
+            if (!string.Equals(credential.AchievementTitle, credential.AchievementLabel))
+                course4.InnerText = credential.AchievementLabel;
+            else
+                course4.Visible = false;
+
+            if (credential.CredentialHours == null)
+                course5.Visible = false;
+            else
+                course5.InnerText = $"Total Hours:{credential.CredentialHours ?? 0}";
+
+            if (credential.CredentialGrantedScore == null)
+                course6.Visible = false;
+            else
+                course6.InnerText = $"Credential Score:{credential.CredentialGrantedScore ?? 0}";
+
+            fingerPrint.Value = credential.CertificateFingerPrint;
+            date.InnerText = credential.CredentialGranted.ToDateString();
+
+            if (credential.CredentialExpirationExpected.HasValue)
+                exp.InnerText = credential.CredentialExpirationExpected.ToDateString();
+            else
+                ExpSentence.Visible = false;
         }
 
-        public static string GenerateTwitterLink(Guid certificateId, string courseName, HttpRequest request)
+        private void SetupSharePanel(VCredential credential, string brand)
         {
-            return $"https://twitter.com/intent/tweet?text={UrlEncoder.Default.Encode($"I have received a new certificate for finishing the \"{(courseName.Length > 30 ? courseName.Substring(0, 25) + "..." : courseName)}\" on @shiftiq")} {GenerateVerificationLink(certificateId, request)}";
+            var isOwner = CurrentSessionState.Identity.IsAuthenticated
+                       && CurrentSessionState.Identity.User.UserIdentifier == credential.UserIdentifier;
+
+            SharePanel.Visible = isOwner;
+
+            if (!isOwner)
+                return;
+
+            FaceBook.NavigateUrl = GetFacebookLink(credential.CredentialIdentifier, Request);
+            Twitter.NavigateUrl = GetTwitterLink(credential.CredentialIdentifier, credential.AchievementTitle, Request);
+            LinkedIn.NavigateUrl = GetLinkedInLink(credential.CredentialIdentifier, Request);
+            Mail.NavigateUrl = GetEmailContent(brand, credential.CredentialIdentifier, credential.AchievementTitle, Request);
         }
 
-        public static string GenerateLinkedInLink(Guid certificateId, HttpRequest request)
+        public static string GetVerificationLink(Guid certificateId, HttpRequest request, bool encode = true)
         {
-            return $"https://www.linkedin.com/sharing/share-offsite?url={GenerateVerificationLink(certificateId, request, true)}";
+            return encode
+                ? UrlEncoder.Default.Encode($"https://{request.Url.Authority}/ui/lobby/certificate?cid={certificateId}")
+                : $"https://{request.Url.Authority}/ui/lobby/certificate?cid={certificateId}";
         }
 
-        public static string GenerateFaceBookLink(Guid certificateId, HttpRequest request)
+        public static string GetTwitterLink(Guid certificateId, string courseName, HttpRequest request)
         {
-            return $"https://www.facebook.com/dialog/feed?app_id=853724959053613&display=popup&link={GenerateVerificationLink(certificateId, request)}&redirect_uri=https%3A%2F%2Fwww.facebook.com&hashtag={UrlEncoder.Default.Encode("#")}ShiftiQ";
+            return $"https://twitter.com/intent/tweet?text={UrlEncoder.Default.Encode($"I have received a new certificate for finishing the \"{(courseName.Length > 30 ? courseName.Substring(0, 25) + "..." : courseName)}\" on @shiftiq")} {GetVerificationLink(certificateId, request)}";
         }
 
-        public static string GenerateEmailContent(string brand, Guid certificateId, string courseName, HttpRequest request)
+        public static string GetLinkedInLink(Guid certificateId, HttpRequest request)
         {
-            return $"mailto:?Subject=I have successfully completed {courseName} on {brand}!&body=I have received a new certificate for finishing the \"{(courseName.Length > 30 ? courseName.Substring(0, 25) + "..." : courseName)}\" on {brand}.%0D%0AView my certificate here: {GenerateVerificationLink(certificateId, request)}";
+            return $"https://www.linkedin.com/sharing/share-offsite?url={GetVerificationLink(certificateId, request, true)}";
+        }
+
+        public static string GetFacebookLink(Guid certificateId, HttpRequest request)
+        {
+            return $"https://www.facebook.com/dialog/feed?app_id=853724959053613&display=popup&link={GetVerificationLink(certificateId, request)}&redirect_uri=https%3A%2F%2Fwww.facebook.com&hashtag={UrlEncoder.Default.Encode("#")}ShiftiQ";
+        }
+
+        public static string GetEmailContent(string brand, Guid certificateId, string courseName, HttpRequest request)
+        {
+            return $"mailto:?Subject=I have successfully completed {courseName} on {brand}!&body=I have received a new certificate for finishing the \"{(courseName.Length > 30 ? courseName.Substring(0, 25) + "..." : courseName)}\" on {brand}.%0D%0AView my certificate here: {GetVerificationLink(certificateId, request)}";
         }
     }
 }

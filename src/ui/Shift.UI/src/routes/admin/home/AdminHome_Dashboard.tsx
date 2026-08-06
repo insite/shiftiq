@@ -68,8 +68,6 @@ export default function AdminHome_Dashboard({ dashboard }: Props) {
                     </div>
                 </>
             )}
-
-            <h3>My Apps</h3>
         </>
     );
 }

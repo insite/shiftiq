@@ -266,9 +266,8 @@ namespace InSite.Admin.Courses.Courses
                 if (!_groups.TryGetValue(group, out var identifier))
                 {
                     identifier = ServiceLocator.GroupSearch
-                        .GetGroups(new QGroupFilter { OrganizationIdentifier = _identity.Organization.Identifier, GroupName = group })
-                        .FirstOrDefault()?
-                        .GroupIdentifier;
+                        .GetFirstGroup(new QGroupFilter { OrganizationIdentifier = _identity.Organization.Identifier, GroupNameExact = group })
+                        ?.GroupIdentifier;
 
                     _groups.Add(group, identifier);
 

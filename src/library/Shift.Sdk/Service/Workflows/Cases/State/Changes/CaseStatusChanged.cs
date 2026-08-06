@@ -8,11 +8,13 @@ namespace InSite.Domain.Issues
     {
         public Guid Status { get; set; }
         public DateTimeOffset Effective { get; set; }
+        public string Category { get; set; }
 
-        public CaseStatusChanged(Guid status, DateTimeOffset effective)
+        public CaseStatusChanged(Guid status, DateTimeOffset effective, string category)
         {
             Status = status;
             Effective = effective;
+            Category = category;
         }
     }
 }

@@ -28,7 +28,7 @@
                             <span runat="server" id="CatalogCount" class="badge badge-floating badge-pill bg-primary"></span>
                             <div class="card-body text-center">
                                 <i class='far fa-books fa-3x mb-3'></i>
-                                <h3 class='h5 nav-heading mb-2 text-break'>Catalogs</h3>
+                                <h3 class='h5 nav-heading mb-2 text-break'>Catalogues</h3>
                             </div>
                         </a>
                     </div>

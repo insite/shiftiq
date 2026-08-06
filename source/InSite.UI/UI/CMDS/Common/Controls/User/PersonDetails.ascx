@@ -216,8 +216,11 @@
                                 <insite:TextBox runat="server" ID="JobTitle" MaxLength="256" />
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label class="form-label">Job Division</label>
+                            <div runat="server" id="JobDivisionField" class="form-group mb-3">
+                                <label class="form-label">
+                                    Job Division
+                                    <insite:RequiredValidator runat="server" ID="JobDivisionRequiredValidator" FieldName="Job Division" ControlToValidate="JobDivision" ValidationGroup="ContactInfo" Display="Dynamic" Visible="false" />
+                                </label>
                                 <insite:TextBox runat="server" ID="JobDivision" MaxLength="100" />
                             </div>
 
@@ -252,6 +255,22 @@
                                 Password Expiry
                             </label>
                             <insite:DateTimeOffsetSelector runat="server" ID="PasswordExpires" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">
+                                System Roles
+                            </label>
+                            <insite:CheckBox runat="server" ID="PersonIsLearner" Text="Learner" />
+                            <insite:CheckBox runat="server" ID="PersonIsAdministrator" Text="Administrator" />
+                            <insite:CheckBox runat="server" ID="PersonIsDeveloper" Text="Developer" />
+                            <insite:CheckBox runat="server" ID="PersonIsOperator" Text="Operator" />
+                            <div class="form-text">
+                                <strong>Learners</strong> have access to the learning portal and appear in organizational reports as students, employees, contractors, or members.
+                                <strong>Administrators</strong> have access to administrative tools and settings within the organization's account.
+                                <strong>Developers</strong> have access to the API for building integrations and applications.
+                                <strong>Operators</strong> have complete platform access to provide business and technical support to the organization.
+                            </div>
                         </div>
 
                     </div>

@@ -3,12 +3,13 @@
 <%@ Register Src="~/UI/Admin/Accounts/Organizations/Controls/DetailConfigurationPlatform.ascx" TagName="DetailConfigurationPlatform" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Accounts/Organizations/Controls/DetailConfigurationLocationDescription.ascx" TagName="DetailConfigurationLocationDescription" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Accounts/Organizations/Controls/DetailConfigurationLocationAddress.ascx" TagName="DetailConfigurationLocationAddress" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Admin/Accounts/Organizations/Controls/DetailConfigurationLocationTaxNumber.ascx" TagName="DetailConfigurationLocationTaxNumber" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Accounts/Organizations/Controls/DetailConfigurationCustomizationUrl.ascx" TagName="DetailConfigurationCustomizationUrl" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Accounts/Organizations/Controls/DetailConfigurationBambora.ascx" TagName="DetailConfigurationBambora" TagPrefix="uc" %>
 <%@ Register Src="~/UI/Admin/Accounts/Organizations/Controls/DetailConfigurationUpload.ascx" TagName="DetailConfigurationUpload" TagPrefix="uc" %>
 
 <insite:Nav runat="server">
-            
+
     <insite:NavItem runat="server" Title="Platform">
         <uc:DetailConfigurationPlatform runat="server" ID="DetailPlatform" />
     </insite:NavItem>
@@ -16,7 +17,7 @@
     <insite:NavItem runat="server" Title="Location">
         <div class="row">
             <div class="col-md-6">
-                            
+
                 <h3>Type and Description</h3>
 
                 <uc:DetailConfigurationLocationDescription runat="server" ID="DetailLocationDescription" />
@@ -28,6 +29,15 @@
 
                 <uc:DetailConfigurationLocationAddress runat="server" ID="DetailLocationAddress" />
                     
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+
+                <h3>Tax Number</h3>
+
+                <uc:DetailConfigurationLocationTaxNumber runat="server" ID="DetailLocationTaxNumber" />
+
             </div>
         </div>
     </insite:NavItem>
@@ -47,7 +57,7 @@
     <insite:NavItem runat="server" Title="Advanced">
         <div class="row">
             <div class="col-lg-12">
-                            
+
                 <h3>JSON</h3>
 
                 <div class="form-group mb-3">
@@ -125,7 +135,6 @@
 
     </style>
 </insite:PageHeadContent>
-
 
 <insite:PageFooterContent runat="server">
 

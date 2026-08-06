@@ -294,6 +294,24 @@ namespace InSite.UI.Portal.Billing
         protected global::InSite.Common.Web.UI.TextBox Email;
 
         /// <summary>
+        /// AssignToSkillsCheckTransferField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AssignToSkillsCheckTransferField;
+
+        /// <summary>
+        /// AssignToSkillsCheckTransfer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox AssignToSkillsCheckTransfer;
+
+        /// <summary>
         /// ContinueShopping control.
         /// </summary>
         /// <remarks>

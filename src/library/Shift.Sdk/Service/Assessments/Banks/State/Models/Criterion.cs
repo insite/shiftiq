@@ -68,6 +68,11 @@ namespace InSite.Domain.Banks
         public int Sequence => 1 + Specification.Criteria.IndexOf(this);
 
         /// <summary>
+        /// Sets need support for multilingual titles, summaries, etc.
+        /// </summary>
+        public ContentExamCriterion Content { get; set; }
+
+        /// <summary>
         /// The desired weighting for the question set to which this criterion applies, within the overall specification. 
         /// The sum of all SetWeight values for the criteria in a specification must equal 1 (i.e. 100 percent).
         /// </summary>
@@ -97,16 +102,21 @@ namespace InSite.Domain.Banks
         public PivotTable PivotFilter { get; set; }
 
         /// <summary>
+        /// Configuration for this criterion's behavior when presented as a tab.
+        /// </summary>
+        public SectionTabConfiguration TabConfiguration { get; set; }
+
+        /// <summary>
         /// Constructs an empty criterion.
         /// </summary>
         public Criterion()
         {
             SetIdentifiers = new List<Guid>();
-
             PivotFilter = new PivotTable();
-
             Sections = new List<Section>();
             Sets = new List<Set>();
+            Content = new ContentExamCriterion();
+            TabConfiguration = new SectionTabConfiguration();
         }
 
         public Criterion Clone()
@@ -115,8 +125,10 @@ namespace InSite.Domain.Banks
 
             this.ShallowCopyTo(clone);
 
+            clone.Content = Content?.Clone();
             clone.SetIdentifiers = SetIdentifiers.ToList();
             clone.PivotFilter = PivotFilter.CloneJson();
+            clone.TabConfiguration = TabConfiguration.Clone();
 
             return clone;
         }
@@ -132,6 +144,11 @@ namespace InSite.Domain.Banks
         public bool ShouldSerializePivotFilter()
         {
             return PivotFilter != null && !PivotFilter.IsEmpty;
+        }
+
+        public bool ShouldSerializeContent()
+        {
+            return Content != null && !Content.IsEmpty;
         }
 
         public void UpdateFilterType()

@@ -46,10 +46,10 @@ test("/api/me/context: authenticated operator", async () => {
     expect(result.CurrentLanguage.length).toBe(2);
     expect(result.CurrentLanguage).toBe(result.CurrentLanguage.toLowerCase());
     expect(result.SupportedLanguages.length).toBeGreaterThanOrEqual(1);
-    expect(result.NavigationGroups.length).toBe(3);
-    expect(result.NavigationGroups[0].MenuItems.length).toBeGreaterThanOrEqual(1);
-    expect(result.NavigationGroups[1].MenuItems.length).toBeGreaterThanOrEqual(1);
-    expect(result.NavigationGroups[2].MenuItems.length).toBeGreaterThanOrEqual(1);
+    expect(result.AllApps.length).toBe(3);
+    expect(result.AllApps[0].MenuItems.length).toBeGreaterThanOrEqual(1);
+    expect(result.AllApps[1].MenuItems.length).toBeGreaterThanOrEqual(1);
+    expect(result.AllApps[2].MenuItems.length).toBeGreaterThanOrEqual(1);
     expect(result.AdminNavigationGroups.length).toBeGreaterThanOrEqual(1);
     expect(result.RecentLinksKey.length).toBeGreaterThanOrEqual(1);
     expect(result.StylePath).toBeTypeOf("string");

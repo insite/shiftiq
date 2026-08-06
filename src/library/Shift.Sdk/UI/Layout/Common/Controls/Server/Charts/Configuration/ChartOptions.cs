@@ -3,8 +3,6 @@ using System.ComponentModel;
 
 using Newtonsoft.Json;
 
-using Shift.Sdk.UI;
-
 namespace Shift.Sdk.UI
 {
     [Serializable, JsonObject(MemberSerialization = MemberSerialization.OptIn)]
@@ -29,6 +27,9 @@ namespace Shift.Sdk.UI
 
         [JsonProperty(PropertyName = "animation")]
         public ChartOptionsAnimation Animation { get; private set; }
+
+        [JsonProperty(PropertyName = "scales", NullValueHandling = NullValueHandling.Ignore)]
+        public ChartOptionsScales Scales { get; set; }
 
         #endregion
 

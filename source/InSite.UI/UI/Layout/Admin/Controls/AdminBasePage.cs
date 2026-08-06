@@ -2,6 +2,7 @@
 using System.Web.UI;
 
 using InSite.Common.Web.UI;
+using InSite.Persistence;
 
 using Shift.Common;
 using Shift.Constant;
@@ -39,6 +40,9 @@ namespace InSite.UI.Layout.Admin
 
             if (Page.Master is AdminHome a)
                 a.RenderHelpContent(ActionModel);
+
+            if (Identity.IsAuthenticated)
+                TToolkitVisitStore.Visit(Organization.Identifier, User.Identifier, CookieTokenModule.Current.ID, ActionModel.ActionIdentifier);
         }
 
         public override void ApplyAccessControl()

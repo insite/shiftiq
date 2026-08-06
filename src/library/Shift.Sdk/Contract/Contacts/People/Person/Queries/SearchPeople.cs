@@ -11,11 +11,16 @@ namespace Shift.Contract
         public Guid? UserId { get; set; }
 
         public string EmailExact { get; set; }
+        public string EmailLike { get; set; }
         public string EventRole { get; set; }
         public string FullName { get; set; }
         public string PersonCode { get; set; }
+        public string FirstNameExact { get; set; }
+        public string LastNameExact { get; set; }
 
         public DateTimeOffset? LastAuthenticatedSince { get; set; }
+        public DateTimeOffset? LastChangeTimeSince { get; set; }
+        public DateTimeOffset? LastChangeTimeBefore { get; set; }
 
         public bool? IsApproved { get; set; }
     }

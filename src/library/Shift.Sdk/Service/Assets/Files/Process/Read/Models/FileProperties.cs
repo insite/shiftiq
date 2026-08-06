@@ -10,6 +10,7 @@ namespace InSite.Application.Files.Read
         public string Category { get; set; }
         public string Subcategory { get; set; }
         public string Status { get; set; }
+        public FileTag? Tag { get; set; }
         public DateTimeOffset? Expiry { get; set; }
         public DateTimeOffset? Received { get; set; }
         public DateTimeOffset? Alternated { get; set; }

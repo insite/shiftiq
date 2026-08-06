@@ -53,7 +53,7 @@ namespace InSite.Admin.Sites.Pages.Controls
             Title = data.Label;
             Description = data.Description;
             EditLink.NavigateUrl = data.EditUrl;
-            EditLink2.NavigateUrl = data.EditUrl2;
+            // EditLink2.NavigateUrl = data.EditUrl2; TODO: Remove non-React content editor
             Value = data.Value.Clone();
 
             var languageValues = data.Value

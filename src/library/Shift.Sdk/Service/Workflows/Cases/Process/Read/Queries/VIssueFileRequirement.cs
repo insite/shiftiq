@@ -14,5 +14,7 @@ namespace InSite.Application.Issues.Read
         public string RequestedFrom { get; set; }
         public string RequestedFileDescription { get; set; }
         public string RequestedFileStatus { get; set; }
+
+        public virtual VIssue Issue { get; set; }
     }
 }

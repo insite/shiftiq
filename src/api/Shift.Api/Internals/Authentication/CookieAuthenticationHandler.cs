@@ -115,7 +115,7 @@ public class CookieAuthenticationHandler : AuthenticationHandler<CookieAuthentic
         token.OrganizationCode = organization.OrganizationCode;
         token.OrganizationIdentifier = organization.OrganizationIdentifier;
 
-        _cookieService.AppendSecurityCookie(token);
+        _cookieService.AppendSecurityCookie(token, true);
 
         return token;
     }

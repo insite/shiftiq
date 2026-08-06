@@ -28,11 +28,27 @@ namespace InSite.UI.Lobby
 {
     public partial class Register : Layout.Lobby.LobbyBasePage
     {
-        private RegisterState _state;
+        #region Enums
+
+        private enum ExistingUserResult { NewUser, NewPerson, PersonPendingAccess, PersonWithAccess }
+
+        #endregion
 
         #region Properties
-        private string RegistrationGroup => Page.Request.QueryString["group"]?.ToString();
+
+        private string RegistrationGroup
+        {
+            get => (string)ViewState[nameof(RegistrationGroup)];
+            set => ViewState[nameof(RegistrationGroup)] = value;
+        }
+
         private string ReturnVerifiedUrl => Page.Request.QueryString["returnVerified"]?.ToString();
+
+        #endregion
+
+        #region Fields
+
+        private RegisterState _state;
 
         #endregion
 
@@ -63,7 +79,13 @@ namespace InSite.UI.Lobby
         {
             base.OnLoad(e);
 
-            _state = new RegisterState(Organization, Session, Request.QueryString, FormKey.Value);
+            if (!IsPostBack)
+                LoadGroup();
+
+            if (Context.User != null && Context.User.Identity.IsAuthenticated)
+                HttpResponseHelper.Redirect(GetSignInUrl());
+
+            _state = new RegisterState(Organization, Session, FormKey.Value);
 
             if (IsPostBack)
                 return;
@@ -77,13 +99,59 @@ namespace InSite.UI.Lobby
                 return;
 
             if (LoadCmdsView())
+            {
+                SetSignInUrl();
                 return;
+            }
 
             if (LoadRegisterView())
+            {
+                SetSignInUrl();
                 return;
+            }
 
             LoadDisabledView();
 
+            void SetSignInUrl()
+            {
+                ReturningUsersLink.HRef = GetSignInUrl().ToString();
+            }
+
+            WebUrl GetSignInUrl()
+            {
+                var result = new WebUrl(InSite.Web.SignIn.SignInLogic.GetUrl());
+
+                if (!RegistrationGroup.IsEmpty())
+                    result.QueryString["group"] = RegistrationGroup;
+
+                return result;
+            }
+        }
+
+        private void LoadGroup()
+        {
+            RegistrationGroup = null;
+
+            var groupName = Page.Request.QueryString["group"]?.ToString();
+            if (groupName.IsEmpty())
+                return;
+
+            if (GetUserRegistrationMode() == UserRegistrationMode.AllowSelfRegistrationByLink)
+            {
+                RegistrationGroup = groupName;
+                return;
+            }
+
+            var groupExists = ServiceLocator.GroupSearch.GroupExists(new QGroupFilter
+            {
+                OrganizationIdentifier = Organization.Identifier,
+                GroupType = GroupTypes.Role,
+                AllowSelfSubscription = true,
+                GroupNameExact = groupName,
+            });
+
+            if (groupExists)
+                RegistrationGroup = groupName;
         }
 
         private void LoadMiddleNamePanel()
@@ -106,7 +174,7 @@ namespace InSite.UI.Lobby
 
         private void LoadSelfSubscriptionRoles()
         {
-            var registerGroup = _state.RequestedGroupName;
+            var registerGroup = RegistrationGroup;
 
             var filter = new QGroupFilter
             {
@@ -173,7 +241,7 @@ namespace InSite.UI.Lobby
 
         private bool LoadRegisterView()
         {
-            if (!IsRegistrationEnabled(Organization, RegistrationGroup))
+            if (!IsRegistrationEnabled(RegistrationGroup))
                 return false;
 
             _state.ServerFormKey = new RegisterFormValidationKey();
@@ -181,10 +249,6 @@ namespace InSite.UI.Lobby
             FormKey.Value = _state.ClientFormKey.ToString();
 
             RegisterSubmitButton.Text = LabelHelper.GetTranslation("Continue");
-
-            { // Company
-
-            }
 
             { // Fields Visibility
                 var r = Organization.PlatformCustomization.UserRegistration;
@@ -257,7 +321,6 @@ namespace InSite.UI.Lobby
             var factory = RegisterUser();
 
             AddUserToGroups(factory.User.UserIdentifier, factory.Person.EmployerGroupIdentifier);
-            AddPersonDepartment(factory.Person, Request["group"]);
 
             QPersonSecret secret = null;
 
@@ -414,50 +477,11 @@ namespace InSite.UI.Lobby
             }
 
             HttpResponseHelper.Redirect($"{decodedReturnVerifiedUrl}?token={token}");
-
         }
 
         #endregion
 
         #region Adding
-
-        private void AddPersonDepartment(QPerson person, string groupName)
-        {
-            if (!string.IsNullOrEmpty(groupName))
-            {
-                AssignPersonDepartment(person, groupName);
-            }
-            else if (GroupList.Items != null && GroupList.Items.Count > 0)
-            {
-                foreach (RepeaterItem outer in GroupList.Items)
-                {
-                    var inner = (Repeater)outer.FindControl("InnerRepeater");
-                    foreach (RepeaterItem innerItem in inner.Items)
-                    {
-                        var toggle = (IRadioButton)innerItem.FindControl("GroupIdentifier");
-                        if (toggle.Checked)
-                        {
-                            AssignPersonDepartment(person, toggle.Text);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        private static void AssignPersonDepartment(QPerson person, string groupName)
-        {
-            Guid? departmentId = null;
-
-            if (departmentId.HasValue && MembershipPermissionHelper.CanModifyMembership(departmentId.Value))
-            {
-                var p = PersonSearch.Select(Organization.Identifier, person.UserIdentifier);
-                if (p != null && p.CandidateIsActivelySeeking != true)
-                    ServiceLocator.SendCommand(new ModifyPersonFieldBool(p.PersonIdentifier, PersonField.CandidateIsActivelySeeking, true));
-
-                MembershipStore.Save(MembershipFactory.Create(person.UserIdentifier, departmentId.Value, Organization.Identifier));
-            }
-        }
 
         private void AddUserToGroups(Guid user, Guid? group)
         {
@@ -517,49 +541,60 @@ namespace InSite.UI.Lobby
                 return false;
             }
 
-            return ValidateUser(emailAddress);
+            var validationResult = ValidateUser(emailAddress);
+
+            if (validationResult == ExistingUserResult.PersonWithAccess)
+            {
+                if (RegistrationGroup.IsNotEmpty())
+                {
+                    var url = new WebUrl(InSite.Web.SignIn.SignInLogic.GetUrl());
+                    url.QueryString["group"] = RegistrationGroup;
+                    url.QueryString["register"] = "already-registered";
+
+                    HttpResponseHelper.Redirect(url);
+                }
+                else
+                {
+                    var errorMessage = GetDisplayText("User Account Registration Failed: Duplicate Email Address", null)
+                        .Replace("$RegisterEmail", emailAddress)
+                        .Replace("$SignInUrl", InSite.Web.SignIn.SignInLogic.GetUrl())
+                        .Replace("$ResetPasswordUrl", ResetPassword.GetUrl());
+
+                    Status.AddMessage(AlertType.Error, Markdown.ToHtml(errorMessage));
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
-        private bool ValidateUser(string emailAddress)
+        private ExistingUserResult ValidateUser(string emailAddress)
         {
-            var contact = UserSearch.BindFirst(
+            var organizationId = Organization.Key;
+            var user = UserSearch.BindFirst(
                 x => new
                 {
-                    Organizations = x.Persons.Select(y => y.OrganizationIdentifier).ToList(),
-                    x.UserPasswordHash,
-                    x.UserLicenseAccepted,
                     x.UserIdentifier,
-                    x.FullName
+                    Person = x.Persons.FirstOrDefault(p => p.OrganizationIdentifier == organizationId)
                 },
                 new UserFilter
                 {
                     EmailExact = emailAddress,
                 });
 
-            if (contact == null)
-                return true;
+            if (user == null)
+                return ExistingUserResult.NewUser;
 
-            if (!contact.Organizations.Contains(Organization.Key))
+            if (user.Person == null)
             {
-                PersonStore.Insert(PersonFactory.Create(contact.UserIdentifier, Organization.Key, null, false, null));
-                contact.Organizations.Add(Organization.Key);
-                return true;
+                PersonStore.Insert(PersonFactory.Create(user.UserIdentifier, organizationId, null, false, null));
+                return ExistingUserResult.NewPerson;
             }
 
-            var person = PersonSearch.Select(Organization.Key, contact.UserIdentifier);
-
-            if (person != null && person.UserAccessGranted.HasValue)
-            {
-                var errorMessage = GetDisplayText("User Account Registration Failed: Duplicate Email Address", null)
-                    .Replace("$RegisterEmail", emailAddress)
-                    .Replace("$SignInUrl", InSite.Web.SignIn.SignInLogic.GetUrl())
-                    .Replace("$ResetPasswordUrl", ResetPassword.GetUrl());
-
-                Status.AddMessage(AlertType.Error, Markdown.ToHtml(errorMessage));
-                return false;
-            }
-
-            return true;
+            return !user.Person.UserAccessGranted.HasValue
+                ? ExistingUserResult.PersonPendingAccess
+                : ExistingUserResult.PersonWithAccess;
         }
 
         private bool ValidateEmployer()
@@ -629,13 +664,16 @@ namespace InSite.UI.Lobby
             CustomContentHtml.Text = Markdown.ToHtml(content.ContentText);
         }
 
-        internal static bool IsRegistrationEnabled(Domain.Organizations.OrganizationState organization, string groupName)
+        private static UserRegistrationMode GetUserRegistrationMode() =>
+            Organization.PlatformCustomization?.UserRegistration?.RegistrationMode
+                ?? UserRegistrationMode.DisallowSelfRegistration;
+
+        internal static bool IsRegistrationEnabled(string groupName)
         {
-            if (organization == null)
+            if (Organization == null)
                 return false;
 
-            var userRegistrationMode = Organization.PlatformCustomization?.UserRegistration?.RegistrationMode
-                ?? UserRegistrationMode.DisallowSelfRegistration;
+            var userRegistrationMode = GetUserRegistrationMode();
 
             switch (userRegistrationMode)
             {
@@ -644,18 +682,13 @@ namespace InSite.UI.Lobby
                 case UserRegistrationMode.AllowSelfRegistrationOnLogin:
                     return true;
                 case UserRegistrationMode.AllowSelfRegistrationByLink:
-                    if (groupName != null)
+                    return groupName.IsNotEmpty() && ServiceLocator.GroupSearch.GroupExists(new QGroupFilter
                     {
-                        var filter = new QGroupFilter
-                        {
-                            OrganizationIdentifier = Organization.Key,
-                            GroupType = GroupTypes.Role,
-                            AllowSelfSubscription = true
-                        };
-                        return ServiceLocator.GroupSearch.GetGroups(filter)
-                            .Any(x => x.GroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase));
-                    }
-                    return false;
+                        OrganizationIdentifier = Organization.Key,
+                        GroupType = GroupTypes.Role,
+                        AllowSelfSubscription = true,
+                        GroupNameExact = groupName
+                    });
                 default:
                     throw new ArgumentException($"Unknown mode: {userRegistrationMode}");
             }
@@ -677,11 +710,11 @@ namespace InSite.UI.Lobby
                     var filter = new QGroupFilter
                     {
                         OrganizationIdentifier = Organization.Identifier,
-                        GroupName = groupName,
+                        GroupNameExact = groupName,
                         GroupType = GroupTypes.Employer
                     };
 
-                    var group = ServiceLocator.GroupSearch.GetGroups(filter).FirstOrDefault()?.GroupIdentifier;
+                    var group = ServiceLocator.GroupSearch.GetFirstGroup(filter)?.GroupIdentifier;
 
                     if (group == null)
                     {

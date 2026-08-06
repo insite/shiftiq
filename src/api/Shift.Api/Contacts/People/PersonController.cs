@@ -1,4 +1,8 @@
+using InSite.Application.Files.Read;
+
 using Microsoft.AspNetCore.Mvc;
+
+using Shift.Service.Content;
 
 using Shift.Service.Directory;
 
@@ -41,6 +45,11 @@ public class PersonController : ShiftControllerBase
     /// <summary>
     /// Collects the list of people that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to people modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/contacts/people/collect")]
     [HybridPermission("directory/people", DataAccess.Read)]
     [EndpointName("collectPeople")]
@@ -59,7 +68,7 @@ public class PersonController : ShiftControllerBase
         return await CollectAsync(query, cancellation);
     }
 
-    private async Task<ActionResult<IEnumerable<PersonModel>>> CollectAsync(CollectPeople query, CancellationToken cancellation)
+    private async Task<PersonModel[]> CollectAsync(CollectPeople query, CancellationToken cancellation)
     {
         var principal = _principalProvider.GetPrincipal();
 
@@ -74,12 +83,17 @@ public class PersonController : ShiftControllerBase
 
         Response.AddPagination(query.Filter, count);
 
-        return Ok(models);
+        return models;
     }
 
     /// <summary>
     /// Counts the people that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the count to people modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/contacts/people/count")]
     [HybridPermission("directory/people", DataAccess.Read)]
     [EndpointName("countPeople")]
@@ -106,12 +120,19 @@ public class PersonController : ShiftControllerBase
 
         var count = await _personService.CountAsync(query, cancellation);
 
-        return Ok(new CountResult(count));
+        return new CountResult(count);
     }
 
     /// <summary>
     /// Downloads the list of people that match specific criteria
-    /// </summary>    
+    /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to download only people modified within a specific window,
+    /// which is useful for incremental integrations that already hold most of the data. Both parameters accept
+    /// ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00". LastChangeTimeSince is inclusive;
+    /// LastChangeTimeBefore is exclusive. When polling for deltas, subtract a small overlap (for example five
+    /// minutes) from the previous poll time to allow for projection lag.
+    /// </remarks>
     [HttpPost("api/contacts/people/download")]
     [HybridPermission("directory/people", DataAccess.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -177,16 +198,21 @@ public class PersonController : ShiftControllerBase
         if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
             return NotFound();
 
-        return Ok(model);
+        return model;
     }
 
     /// <summary>
     /// Searches for the list of people that match specific criteria
     /// </summary>
+    /// <remarks>
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to people modified within a
+    /// specific window. Both parameters accept ISO 8601 date-time values, for example "2026-07-06T14:00:00+00:00".
+    /// LastChangeTimeSince is inclusive; LastChangeTimeBefore is exclusive.
+    /// </remarks>
     [HttpPost("api/contacts/people/search")]
     [HybridPermission("directory/people", DataAccess.Read)]
     [EndpointName("searchPeople")]
-    public async Task<ActionResult<IEnumerable<PersonMatch>>> PostSearchAsync([FromBody] SearchPeople query, CancellationToken cancellation = default)
+    public async Task<ActionResult<PersonMatch[]>> PostSearchAsync([FromBody] SearchPeople query, CancellationToken cancellation = default)
     {
         return await SearchAsync(query, cancellation);
     }
@@ -196,12 +222,12 @@ public class PersonController : ShiftControllerBase
     [EndpointName("searchPeople_get")]
     [AliasFor("searchPeople")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<IEnumerable<PersonMatch>>> GetSearchAsync([FromQuery] SearchPeople query, CancellationToken cancellation = default)
+    public async Task<ActionResult<PersonMatch[]>> GetSearchAsync([FromQuery] SearchPeople query, CancellationToken cancellation = default)
     {
         return await SearchAsync(query, cancellation);
     }
 
-    private async Task<ActionResult<IEnumerable<PersonMatch>>> SearchAsync(SearchPeople query, CancellationToken cancellation)
+    private async Task<PersonMatch[]> SearchAsync(SearchPeople query, CancellationToken cancellation)
     {
         var principal = _principalProvider.GetPrincipal();
 
@@ -216,8 +242,113 @@ public class PersonController : ShiftControllerBase
 
         Response.AddPagination(query.Filter, count);
 
-        return Ok(matches);
+        return matches;
     }
 
     #endregion Queries
+
+    #region Import
+
+    public class ImportResultItem
+    {
+        public required string PersonCode { get; init; }
+        public required ImportPersonResult.StatusEnum Status { get; init; }
+        public Guid? PendingPersonId { get; init; }
+        public Guid? UserId { get; init; }
+        public ValidationFailure? Failure { get; init; }
+    }
+
+    public class ImportResult
+    {
+        public required Guid? ReportFileId { get; init; }
+        public required string? ReportFileName { get; init; }
+        public required ImportResultItem[] ImportedPeople { get; init; }
+    }
+
+    [HttpPost("api/contacts/people/import")]
+    [HybridPermission("directory/people", DataAccess.Update)]
+    [EndpointName("importPeople")]
+    public async Task<ActionResult<ImportResult>> ImportAsync(
+        IPersonImporter importer,
+        IPersonImportReporter reporter,
+        OrganizationService organizationService,
+        OrganizationAdapter organizationAdapter,
+        ImportPerson[] imports
+        )
+    {
+        var principal = _principalProvider.GetPrincipal();
+        var submittedBy = principal.UserId;
+        var submittedByName = principal.Name;
+
+        var organizationId = principal.Organization.Identifier;
+        var organization = await organizationService.RetrieveAsync(organizationId) ?? throw new ArgumentNullException($"Organization {organizationId} is not found");
+        var organizationData = organizationAdapter.ToData(organization);
+        var fullNamePolicy = organizationData.Toolkits?.Contacts?.FullNamePolicy;
+        var timeZone = organizationData.TimeZone.Id;
+
+        var result = await importer.ImportAsync(organizationId, fullNamePolicy, timeZone, submittedBy, submittedByName, imports);
+        var file = await reporter.SaveReportAsync(organizationId, submittedBy, timeZone, result, true);
+
+        return new ImportResult
+        {
+            ReportFileId = file?.FileIdentifier,
+            ReportFileName = file?.FileName,
+            ImportedPeople = result.Select(x => new ImportResultItem
+            {
+                PersonCode = x.Input.PersonCode,
+                Status = x.Status,
+                PendingPersonId = x.PendingPersonId,
+                UserId = x.UserId,
+                Failure = x.Failure
+            })
+            .ToArray(),
+        };
+    }
+
+    public class ImportReport
+    {
+        public required Guid FileId { get; init; }
+        public required string FileName { get; init; }
+        public required string DocumentName { get; init; }
+        public required DateTimeOffset FileUploaded { get; init; }
+        public required int FileSize { get; init; }
+        public required Guid UserId { get; init; }
+        public required string UserFullName { get; init; }
+    }
+
+    public class SearchImportReports : Query<IEnumerable<ImportReport>>
+    {
+    }
+
+    [HttpPost("api/contacts/people/search-import-report")]
+    [HybridPermission("directory/people", DataAccess.Read)]
+    [EndpointName("searchImportReport")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<ActionResult<ImportReport[]>> SearchImportReportAsync(FileService fileService, SearchImportReports criteria, CancellationToken cancellation = default)
+    {
+        var principal = _principalProvider.GetPrincipal();
+
+        var searchFiles = new SearchFiles { OrganizationId = principal.OrganizationId, ObjectId = principal.OrganizationId, FileTag = FileTag.PersonImport };
+        searchFiles.Filter.Page = criteria.Filter.Page;
+        searchFiles.Filter.Sort = nameof(FileEntity.FileUploaded) + " desc";
+
+        var files = await fileService.SearchAsync(searchFiles, cancellation);
+        var count = await fileService.CountAsync(searchFiles, cancellation);
+
+        Response.AddPagination(searchFiles.Filter, count);
+
+        return files.Select(x => new ImportReport
+        {
+            FileId = x.FileId,
+            FileName = x.FileName,
+            DocumentName = x.DocumentName,
+            FileUploaded = x.FileUploaded,
+            FileSize = x.FileSize,
+            UserId = x.UserId,
+            UserFullName = x.UserFullName
+        })
+        .ToArray();
+    }
+
+    #endregion
 }

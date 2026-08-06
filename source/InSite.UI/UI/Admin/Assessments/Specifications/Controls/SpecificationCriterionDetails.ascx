@@ -6,7 +6,11 @@
 <insite:Nav runat="server">
             
     <insite:NavItem runat="server" ID="CriterionTab" Title="Criterion">
-        <uc:CriterionDetail runat="server" ID="CriterionDetail" />
+        <insite:UpdatePanel runat="server" ID="CriterionUpdatePanel" UpdateMode="Conditional">
+            <ContentTemplate>
+                <uc:CriterionDetail runat="server" ID="CriterionDetail" />
+            </ContentTemplate>
+        </insite:UpdatePanel>
     </insite:NavItem>
 
     <insite:NavItem runat="server" ID="SpecificationTab" Title="Specification">

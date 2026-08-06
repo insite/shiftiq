@@ -1,4 +1,4 @@
-<%@ Page Language="C#" CodeBehind="ModifyStatus.aspx.cs" Inherits="InSite.Admin.Issues.Forms.ChangeStatus" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
+<%@ Page Language="C#" CodeBehind="ModifyStatus.aspx.cs" Inherits="InSite.Admin.Issues.Forms.ModifyStatus" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register TagName="CaseInfo" TagPrefix="uc" Src="./Controls/CaseInfo.ascx" %>
 

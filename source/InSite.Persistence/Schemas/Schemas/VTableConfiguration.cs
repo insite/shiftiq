@@ -4,7 +4,7 @@ namespace InSite.Persistence
 {
     public class VTableConfiguration : EntityTypeConfiguration<VTable>
     {
-        public VTableConfiguration() : this("databases") { }
+        public VTableConfiguration() : this("schemas") { }
 
         public VTableConfiguration(string schema)
         {

@@ -42,6 +42,8 @@ namespace Shift.Test
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<INavigationService, TestNavigationService>();
 
+            services.AddSingleton(new FilePaths(Settings.DataFolderShare, Settings.DataFolderEnterprise));
+
             services.AddSingleton<PermissionListLoader>();
             services.AddSingleton<PermissionMatrixLoader>();
             services.AddSingleton<PermissionCache>();

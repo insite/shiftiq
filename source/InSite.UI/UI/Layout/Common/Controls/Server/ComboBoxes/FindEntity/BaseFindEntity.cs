@@ -388,7 +388,7 @@ namespace InSite.Common.Web.UI
             {
                 EnsureItemsPopulated();
 
-                return ItemsInternal.Select(x => x.AsReadOnly());
+                return ItemsInternal.EmptyIfNull().Select(x => x.AsReadOnly());
             }
         }
 

@@ -2,7 +2,7 @@ using System;
 
 namespace Shift.Sdk.UI
 {
-    public class DateTimeChartDatasetItem
+    public class DateTimeChartDatasetItem : IChartDatasetItem
     {
         #region Properties
 

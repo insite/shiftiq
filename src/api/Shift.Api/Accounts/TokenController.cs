@@ -137,7 +137,7 @@ public class TokenController : ShiftControllerBase
     }
 
     [HttpPost("api/accounts/tokens/validate")]
-    public async Task<ActionResult<JwtValidateResult>> ValidateAsync(ValidateInput input)
+    public ActionResult<JwtValidateResult> Validate(ValidateInput input)
     {
         var token = input.Token;
 

@@ -16,13 +16,13 @@ namespace InSite.Persistence
 {
     public class SurveyStore : ISurveyStore
     {
-        private readonly TContentStore ContentStore;
+        private readonly IContentStore _contentStore;
 
         public const string CommentContainerType = "Survey Form";
 
-        public SurveyStore()
+        public SurveyStore(IContentStore contentStore)
         {
-            ContentStore = new TContentStore();
+            _contentStore = contentStore;
         }
 
         internal InternalDbContext CreateContext() => new InternalDbContext(true) { EnablePrepareToSaveChanges = false };
@@ -275,7 +275,7 @@ namespace InSite.Persistence
                 survey.SurveyFormTitle = e.Content.Title.Text.Default.NullIfEmpty()?.MaxLength(256);
             });
 
-            ContentStore.SaveContainer(e.OriginOrganization, ContentContainerType.SurveyForm, e.AggregateIdentifier, e.Content);
+            _contentStore.SaveContainer(e.OriginOrganization, ContentContainerType.SurveyForm, e.AggregateIdentifier, e.Content);
         }
 
         public void UpdateSurvey(SurveyFormLanguagesChanged e)
@@ -464,7 +464,7 @@ namespace InSite.Persistence
 
             });
 
-            ContentStore.SaveContainer(e.OriginOrganization, ContentContainerType.SurveyOptionItem, e.Item, e.Content);
+            _contentStore.SaveContainer(e.OriginOrganization, ContentContainerType.SurveyOptionItem, e.Item, e.Content);
         }
 
         public void UpdateSurvey(SurveyOptionItemDeleted e)
@@ -562,7 +562,7 @@ namespace InSite.Persistence
 
             });
 
-            ContentStore.SaveContainer(e.OriginOrganization, ContentContainerType.SurveyOptionList, e.List, e.Content);
+            _contentStore.SaveContainer(e.OriginOrganization, ContentContainerType.SurveyOptionList, e.List, e.Content);
         }
 
         public void UpdateSurvey(SurveyOptionListDeleted e)
@@ -665,7 +665,7 @@ namespace InSite.Persistence
 
             });
 
-            ContentStore.SaveContainer(e.OriginOrganization, ContentContainerType.SurveyQuestion, e.Question, e.Content);
+            _contentStore.SaveContainer(e.OriginOrganization, ContentContainerType.SurveyQuestion, e.Question, e.Content);
         }
 
         public void UpdateSurvey(SurveyQuestionRecoded e)

@@ -136,7 +136,8 @@ public class FileAdapter : IEntityAdapter
             FileUploaded = entity.FileUploaded,
             UserId = entity.UserIdentifier,
             UserFullName = entity.User.FullName,
-            HasClaims = entity.Claims.Any()
+            FileTag = entity.FileTag,
+            HasClaims = entity.Claims.Count > 0
         };
 
         return match;

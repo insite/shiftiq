@@ -155,9 +155,11 @@ namespace InSite.Application.Banks.Read
             queue.Subscribe<SetsReordered>(Handle);
             queue.Subscribe<SetStandardChanged>(Handle);
             queue.Subscribe<CriterionAdded>(Handle);
+            queue.Subscribe<CriterionContentChanged>(Handle);
             queue.Subscribe<CriterionFilterChanged>(Handle);
             queue.Subscribe<CriterionFilterDeleted>(Handle);
             queue.Subscribe<CriterionDeleted>(Handle);
+            queue.Subscribe<CriterionTabReconfigured>(Handle);
             queue.Subscribe<SpecificationAdded>(Handle);
             queue.Subscribe<SpecificationCalculationChanged>(Handle);
             queue.Subscribe<SpecificationContentChanged>(Handle);
@@ -774,6 +776,11 @@ namespace InSite.Application.Banks.Read
             _store.Update(e);
         }
 
+        public void Handle(CriterionContentChanged e)
+        {
+            _store.Update(e);
+        }
+
         public void Handle(CriterionFilterChanged e)
         {
             _store.Update(e);
@@ -785,6 +792,11 @@ namespace InSite.Application.Banks.Read
         }
 
         public void Handle(CriterionDeleted e)
+        {
+            _store.Update(e);
+        }
+
+        public void Handle(CriterionTabReconfigured e)
         {
             _store.Update(e);
         }

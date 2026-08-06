@@ -28,7 +28,6 @@ namespace Shift.Common
         public string DataPath { get; set; }
         public string ToolPath { get; set; }
         public string StylePath { get; set; }
-        public string SecurityConfigurationPath { get; set; }
 
         public string FFmpegFolderPath => Path.Combine(ToolPath, "ffmpeg");
         public string PandocExePath => Path.Combine(ToolPath, "pandoc", "pandoc.exe");

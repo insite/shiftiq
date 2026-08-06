@@ -96,6 +96,13 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 var url = $"/ui/portal/integrations/scorm/launch/{activity.ActivityIdentifier}";
                 if (activity.ActivityUrl == null || !activity.ActivityUrl.StartsWith(url))
                     activity.ActivityUrl = url;
+
+                // Scoop always renders its own UI in-tab with a return-to-Shift button. Persist
+                // _self so the stored target reflects reality regardless of the "Open in a new
+                // window or tab" checkbox state.
+
+                if (activity.ActivityPlatform == "Scoop")
+                    activity.ActivityUrlTarget = "_self";
             }
 
             if (activity.ActivityUrlType == "External" &&
@@ -167,6 +174,11 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 ScoopLibraryUrl.Visible = true;
 
                 ScoopLibraryUrl.Target = "_blank";
+
+                // Hide-and-coerce: the Link Target combo above is hidden for Scoop, so pin its
+                // ViewState value to the same _self that BindControlsToModel persists.
+
+                LinkTarget.Value = "_self";
             }
 
             if (isCloud)

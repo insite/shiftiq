@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 
 using InSite.Application.Cases.Read;
 using InSite.Application.Contents.Read;
+using InSite.Application.Files.Read;
 using InSite.Application.Issues.Read;
 using InSite.Persistence.Foundation;
 
@@ -200,6 +201,9 @@ namespace InSite.Persistence
                 );
             }
 
+            if (filter.ExcludeIssueIdentifier.HasValue)
+                query = query.Where(x => x.IssueIdentifier != filter.ExcludeIssueIdentifier.Value);
+
             if (filter.IssueType.IsNotEmpty())
                 query = query.Where(x => x.IssueType == filter.IssueType);
 
@@ -325,12 +329,13 @@ namespace InSite.Persistence
             }
 
             query = ApplyFileRequirementFilter(filter, db, query);
-            query = ApplyAttachmentFilter(filter, db, query);
+            query = ApplyDocumentFilter(filter, db, query);
 
             return query;
         }
 
-        private static IQueryable<VIssue> ApplyFileRequirementFilter(QIssueFilter filter, InternalDbContext db, IQueryable<VIssue> query)
+        private static IQueryable<VIssue> ApplyFileRequirementFilter(
+            QIssueFilter filter, InternalDbContext db, IQueryable<VIssue> query)
         {
             if (!filter.OnlyRequestedFiles)
                 return query;
@@ -342,111 +347,221 @@ namespace InSite.Persistence
             return query;
         }
 
-        private static IQueryable<VIssue> ApplyAttachmentFilter(QIssueFilter filter, InternalDbContext db, IQueryable<VIssue> query)
+        private static IQueryable<VIssue> ApplyDocumentFilter(
+            QIssueFilter filter, InternalDbContext db, IQueryable<VIssue> query)
         {
             if (filter.OnlyRequestedFiles)
                 return query;
 
-            var fileQuery = db.TFiles.AsQueryable();
-            var hasFileFilter = false;
+            var hasAttachmentCriteria = true;
+            var hasRequirementCriteria = true;
 
-            if (!string.IsNullOrEmpty(filter.AttachmentFileStatus))
+            if (filter.DocumentFilter == DocumentFilterType.RequestedOnly)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileStatus == filter.AttachmentFileStatus);
+                hasAttachmentCriteria = false;
+
+                query = query.Where(x => x.IssueFileRequirements.Any());
+            }
+            else if (filter.DocumentFilter == DocumentFilterType.UploadedOnly)
+            {
+                hasRequirementCriteria = false;
+
+                query = query.Where(
+                    i => i.IssueAttachments.Any()
+                      || db.QResponseSessions
+                            .Any(r => r.SurveyForm.HasWorkflowConfiguration
+                                   && r.RespondentUserIdentifier == i.TopicUserIdentifier
+                                   && r.OrganizationIdentifier == i.OrganizationIdentifier
+                                   && db.TFiles.Any(f => f.ObjectIdentifier == r.ResponseSessionIdentifier)));
             }
 
-            if (!string.IsNullOrEmpty(filter.AttachmentFileCategory))
+            IQueryable<Guid> attachmentIssueIds = null;
+            IQueryable<RespondentKey> surveyRespondentKeys = null;
+            IQueryable<Guid> requestedIssueIds = null;
+
+            if (hasAttachmentCriteria)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileCategory == filter.AttachmentFileCategory);
+                attachmentIssueIds = BuildAttachmentMatchIds(filter, db, out var hasAttachment);
+                surveyRespondentKeys = BuildSurveyResponseMatchKeys(filter, db, out var hasSurvey);
+                hasAttachmentCriteria = hasAttachment || hasSurvey;
             }
 
-            if (!string.IsNullOrEmpty(filter.AttachmentDocumentName))
+            if (hasRequirementCriteria)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.DocumentName.Contains(filter.AttachmentDocumentName));
+                requestedIssueIds = BuildRequirementMatchIds(filter, db, out hasRequirementCriteria);
+            }
+
+            if (hasAttachmentCriteria && hasRequirementCriteria)
+            {
+                query = query.Where(x =>
+                    attachmentIssueIds.Any(id => id == x.IssueIdentifier)
+                    || surveyRespondentKeys.Any(r => r.RespondentUserIdentifier == x.TopicUserIdentifier
+                                               && r.OrganizationIdentifier == x.OrganizationIdentifier)
+                    || requestedIssueIds.Any(id => id == x.IssueIdentifier));
+            }
+            else if (hasAttachmentCriteria)
+            {
+                query = query.Where(x =>
+                    attachmentIssueIds.Any(id => id == x.IssueIdentifier)
+                    || surveyRespondentKeys.Any(r => r.RespondentUserIdentifier == x.TopicUserIdentifier
+                                               && r.OrganizationIdentifier == x.OrganizationIdentifier));
+            }
+            else if (hasRequirementCriteria)
+            {
+                query = query.Where(x => requestedIssueIds.Any(id => id == x.IssueIdentifier));
+            }
+
+            return query;
+        }
+
+        private static IQueryable<Guid> BuildRequirementMatchIds(
+            QIssueFilter filter, InternalDbContext db, out bool hasCriteria)
+        {
+            var query = db.QIssueFileRequirements.AsQueryable();
+            hasCriteria = false;
+
+            if (filter.AttachmentFileStatus.IsNotEmpty())
+            {
+                hasCriteria = true;
+                query = query.Where(x => x.RequestedFileStatus == filter.AttachmentFileStatus);
+            }
+
+            if (filter.AttachmentFileCategory.IsNotEmpty())
+            {
+                hasCriteria = true;
+                query = query.Where(x => x.RequestedFileCategory == filter.AttachmentFileCategory);
+            }
+
+            return query.Select(x => x.IssueIdentifier);
+        }
+
+        private static IQueryable<Guid> BuildAttachmentMatchIds(
+            QIssueFilter filter, InternalDbContext db, out bool hasCriteria)
+        {
+            var query = BuildFilesCriteriaQuery(filter, db, out hasCriteria);
+
+            return db.QIssueAttachments
+                .Join(query,
+                      a => a.FileIdentifier,
+                      f => f.FileIdentifier,
+                      (a, f) => a.IssueIdentifier);
+        }
+
+        private sealed class RespondentKey
+        {
+            public Guid RespondentUserIdentifier { get; set; }
+            public Guid OrganizationIdentifier { get; set; }
+        }
+
+        private static IQueryable<RespondentKey> BuildSurveyResponseMatchKeys(
+            QIssueFilter filter, InternalDbContext db, out bool hasCriteria)
+        {
+            var query = BuildFilesCriteriaQuery(filter, db, out hasCriteria);
+
+            return db.QResponseSessions
+                .Where(x => x.OrganizationIdentifier == filter.OrganizationIdentifier
+                         && x.SurveyForm.HasWorkflowConfiguration)
+                .Join(query,
+                      a => a.ResponseSessionIdentifier,
+                      f => f.ObjectIdentifier,
+                      (a, f) => new RespondentKey
+                      {
+                          RespondentUserIdentifier = a.RespondentUserIdentifier,
+                          OrganizationIdentifier = a.OrganizationIdentifier
+                      });
+        }
+
+        private static IQueryable<TFile> BuildFilesCriteriaQuery(
+            QIssueFilter filter, InternalDbContext db, out bool hasCriteria)
+        {
+            var query = db.TFiles.AsQueryable();
+            hasCriteria = false;
+
+            if (filter.AttachmentFileStatus.IsNotEmpty())
+            {
+                hasCriteria = true;
+                query = query.Where(x => x.FileStatus == filter.AttachmentFileStatus);
+            }
+
+            if (filter.AttachmentFileCategory.IsNotEmpty())
+            {
+                hasCriteria = true;
+                query = query.Where(x => x.FileCategory == filter.AttachmentFileCategory);
+            }
+
+            if (filter.AttachmentDocumentName.IsNotEmpty())
+            {
+                hasCriteria = true;
+                query = query.Where(x => x.DocumentName.Contains(filter.AttachmentDocumentName));
             }
 
             if (filter.AttachmentHasClaims.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = filter.AttachmentHasClaims.Value
-                    ? fileQuery.Where(x => x.FileClaims.Any())
-                    : fileQuery.Where(x => !x.FileClaims.Any());
+                hasCriteria = true;
+                query = filter.AttachmentHasClaims.Value
+                    ? query.Where(x => x.FileClaims.Any())
+                    : query.Where(x => !x.FileClaims.Any());
             }
 
             if (filter.AttachmentFileExpirySince.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileExpiry >= filter.AttachmentFileExpirySince.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.FileExpiry >= filter.AttachmentFileExpirySince.Value);
             }
 
             if (filter.AttachmentFileExpiryBefore.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileExpiry < filter.AttachmentFileExpiryBefore.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.FileExpiry < filter.AttachmentFileExpiryBefore.Value);
             }
 
             if (filter.AttachmentFileReceivedSince.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileReceived >= filter.AttachmentFileReceivedSince.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.FileReceived >= filter.AttachmentFileReceivedSince.Value);
             }
 
             if (filter.AttachmentFileReceivedBefore.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileReceived < filter.AttachmentFileReceivedBefore.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.FileReceived < filter.AttachmentFileReceivedBefore.Value);
             }
 
             if (filter.AttachmentFileAlternatedSince.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileAlternated >= filter.AttachmentFileAlternatedSince.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.FileAlternated >= filter.AttachmentFileAlternatedSince.Value);
             }
 
             if (filter.AttachmentFileAlternatedBefore.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileAlternated < filter.AttachmentFileAlternatedBefore.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.FileAlternated < filter.AttachmentFileAlternatedBefore.Value);
             }
 
             if (filter.AttachmentApprovedSince.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.ApprovedTime >= filter.AttachmentApprovedSince.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.ApprovedTime >= filter.AttachmentApprovedSince.Value);
             }
 
             if (filter.AttachmentApprovedBefore.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.ApprovedTime < filter.AttachmentApprovedBefore.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.ApprovedTime < filter.AttachmentApprovedBefore.Value);
             }
 
             if (filter.AttachmentUploadedSince.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileUploaded >= filter.AttachmentUploadedSince.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.FileUploaded >= filter.AttachmentUploadedSince.Value);
             }
 
             if (filter.AttachmentUploadedBefore.HasValue)
             {
-                hasFileFilter = true;
-                fileQuery = fileQuery.Where(x => x.FileUploaded < filter.AttachmentUploadedBefore.Value);
+                hasCriteria = true;
+                query = query.Where(x => x.FileUploaded < filter.AttachmentUploadedBefore.Value);
             }
-
-            if (!hasFileFilter)
-                return query;
-
-            var attachmentQuery = db.QIssueAttachments
-                .Join(fileQuery,
-                    attach => attach.FileIdentifier,
-                    file => file.FileIdentifier,
-                    (attach, file) => attach
-                );
-
-            query = query.Where(x => attachmentQuery.Where(y => y.IssueIdentifier == x.IssueIdentifier).Any());
 
             return query;
         }
@@ -631,6 +746,14 @@ namespace InSite.Persistence
             }
         }
 
+        public bool ExistsAttachment(QIssueAttachmentFilter filter)
+        {
+            using (var db = CreateContext())
+            {
+                return CreateQuery(filter, db).Any();
+            }
+        }
+
         private IQueryable<VIssueAttachment> CreateQuery(QIssueAttachmentFilter filter, InternalDbContext db)
         {
             var query = db.VIssueAttachments
@@ -650,6 +773,9 @@ namespace InSite.Persistence
 
             if (filter.TopicUserIdentifiers != null && filter.TopicUserIdentifiers.Length > 0)
                 query = query.Where(x => filter.TopicUserIdentifiers.Contains(x.TopicUserIdentifier));
+
+            if (filter.AttachmentIdentifiers.IsNotEmpty())
+                query = query.Where(x => filter.AttachmentIdentifiers.Contains(x.AttachmentIdentifier));
 
             return query;
         }

@@ -30,7 +30,7 @@ namespace InSite.Persistence
 
         public static DataTable Select(string schemaName, string tableName)
         {
-            var query = $"SELECT * FROM databases.VTable WHERE SchemaName = @SchemaName AND TableName = @TableName";
+            var query = $"SELECT * FROM schemas.VTable WHERE SchemaName = @SchemaName AND TableName = @TableName";
 
             var table = new DataTable();
 

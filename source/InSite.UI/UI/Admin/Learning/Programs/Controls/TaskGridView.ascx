@@ -29,7 +29,7 @@
                     <div class='<%# Container.ItemIndex % 2 != 0 ? "bg-secondary": "" %>'>
                         <div class="row p-2 ms-0 me-0 border-bottom">
                             <div class="col-4">
-                                <%# Eval("AchievementTitle") %>
+                                <%# Eval("AchievementTitle") %><%# GetInheritedBadge() %>
                             </div>
                             <div class="col-2 text-center">
                                 <%# GetBoolString("IsPlanned") %>

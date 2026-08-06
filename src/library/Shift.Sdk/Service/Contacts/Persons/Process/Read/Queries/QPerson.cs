@@ -97,6 +97,10 @@ namespace InSite.Application.Contacts.Read
         public DateTimeOffset? WhenUnarchived { get; set; }
         public DateTimeOffset? SinModified { get; set; }
 
+        public DateTimeOffset LastChangeTime { get; set; }
+        public string LastChangeType { get; set; }
+        public Guid LastChangeUser { get; set; }
+
         public DateTime? Birthdate { get; set; }
         public DateTime? ImmigrationLandingDate { get; set; }
         public DateTime? MemberEndDate { get; set; }

@@ -9,13 +9,15 @@ namespace InSite.Domain.Organizations
         public Guid? ProductCustomerGroup { get; set; }
         public Guid? ManagerGroup { get; set; }
         public Guid? LearnerGroup { get; set; }
+        public Guid? TransferGroup { get; set; }
 
         public bool IsEqual(SalesSettings other)
         {
             return ProductClassEventVenueGroup == other.ProductClassEventVenueGroup
                 && ProductCustomerGroup == other.ProductCustomerGroup
                 && ManagerGroup == other.ManagerGroup
-                && LearnerGroup == other.LearnerGroup;
+                && LearnerGroup == other.LearnerGroup
+                && TransferGroup == other.TransferGroup;
         }
     }
 }

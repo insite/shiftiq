@@ -105,6 +105,15 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.CheckBox ProgramType;
 
         /// <summary>
+        /// ParentPrograms control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindProgram ParentPrograms;
+
+        /// <summary>
         /// Step1NextButton control.
         /// </summary>
         /// <remarks>

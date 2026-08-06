@@ -19,9 +19,3 @@ WebForms pages (`.aspx`), user controls (`.ascx`), and master pages organized by
 ### Web
 
 Application-level web infrastructure: routing, HTTP modules, handlers.
-
-## Files
-
-### WebFormsIndex.csv
-
-Mapping of WebForms controller paths (e.g. `~/UI/Admin/Accounts/Departments/Forms/Create.aspx`) to the clean action URLs used by the routing layer.

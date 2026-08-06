@@ -412,27 +412,29 @@ namespace InSite.Admin.Assessments.Criteria.Controls
             SetInputValues((PivotTable)null);
         }
 
-        public void SetInputValues(Criterion sieve)
+        public void SetInputValues(Criterion criterion)
         {
-            if (!string.IsNullOrEmpty(sieve.TagFilter))
+            if (!string.IsNullOrEmpty(criterion.TagFilter))
                 CriterionTypeTag.Checked = true;
-            else if (sieve.PivotFilter != null && !sieve.PivotFilter.IsEmpty)
+            else if (criterion.PivotFilter != null && !criterion.PivotFilter.IsEmpty)
                 CriterionTypePivot.Checked = true;
             else
                 CriterionTypeNone.Checked = true;
 
             OnFilterTypeChanged();
 
-            SetWeight.ValueAsDecimal = sieve.SetWeight;
-            QuestionLimit.ValueAsInt = sieve.QuestionLimit;
-            CriterionTagFilter.Text = sieve.TagFilter;
+            SetWeight.ValueAsDecimal = criterion.SetWeight;
+            QuestionLimit.ValueAsInt = criterion.QuestionLimit;
+            CriterionTagFilter.Text = criterion.TagFilter;
+
+            TabConfig.SetValues(criterion.TabConfiguration, criterion.Specification.TabTimeLimit);
 
             // Pivot Table
 
-            if (sieve.Sets.IsNotEmpty())
-                SetInputValues(sieve.Sets);
+            if (criterion.Sets.IsNotEmpty())
+                SetInputValues(criterion.Sets);
 
-            SetInputValues(sieve.PivotFilter);
+            SetInputValues(criterion.PivotFilter);
         }
 
         private void SetInputValues(PivotTable table)
@@ -590,13 +592,15 @@ namespace InSite.Admin.Assessments.Criteria.Controls
             public decimal SetWeight { get; }
             public int QuestionLimit { get; }
             public string BasicFilter { get; }
+            public SectionTabConfiguration TabConfig { get; }
 
-            public OutputModel(CriterionFilterType filterType, decimal setWeight, int questionLimit, string basicFilter)
+            public OutputModel(CriterionFilterType filterType, decimal setWeight, int questionLimit, string basicFilter, SectionTabConfiguration tabConfig)
             {
                 FilterType = filterType;
                 SetWeight = setWeight;
                 QuestionLimit = questionLimit;
                 BasicFilter = basicFilter;
+                TabConfig = tabConfig;
             }
         }
 
@@ -624,11 +628,12 @@ namespace InSite.Admin.Assessments.Criteria.Controls
 
         #region Settings/getting input values
 
-        public void SetDefaultInputValues()
+        public void SetDefaultInputValues(Specification spec)
         {
             var sieve = new Criterion
             {
-                Sets = new List<Set>()
+                Sets = new List<Set>(),
+                Specification = spec
             };
 
             SetInputValues(sieve);
@@ -636,7 +641,16 @@ namespace InSite.Admin.Assessments.Criteria.Controls
 
         public OutputModel GetInputValues()
         {
-            return new OutputModel(FilterType, SetWeight.ValueAsDecimal.Value, QuestionLimit.ValueAsInt ?? 0, CriterionTagFilter.Text);
+            var tabConfig = new SectionTabConfiguration();
+
+            TabConfig.GetValues(tabConfig);
+
+            return new OutputModel(
+                FilterType,
+                SetWeight.ValueAsDecimal.Value,
+                QuestionLimit.ValueAsInt ?? 0,
+                CriterionTagFilter.Text,
+                tabConfig);
         }
 
         #endregion

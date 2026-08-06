@@ -24,7 +24,7 @@
     <div class="btn-toolbar mb-4" role="toolbar" aria-label="Shortcut toolbar">
         <div class="btn-group me-2 mb-2" role="group" aria-label="Shortcut buttons">
 
-            <a runat="server" id="ElearningLink" href="/ui/portal/learning/catalog" class="btn btn-success"><i class="fa-solid fa-books me-2"></i>eLearning</a>
+            <a runat="server" id="ElearningLink" href="/ui/portal/learning/catalogue" class="btn btn-success"><i class="fa-solid fa-books me-2"></i>eLearning</a>
             <a runat="server" id="CustomCatalogLink" href="#" class="btn btn-warning"></a>
             <a runat="server" id="OrientationAnchor" class="btn btn-primary"><i class="fa-solid fa-passport me-2"></i>Orientations</a>
 

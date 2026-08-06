@@ -458,7 +458,7 @@ namespace InSite
             SiteStore = new SiteStore();
 
             SurveySearch = new SurveySearch(AggregateSearch);
-            SurveyStore = new SurveyStore();
+            SurveyStore = new SurveyStore(ContentStore);
 
             UploadSearch = new UploadSearch2();
 
@@ -619,6 +619,9 @@ namespace InSite
 
             if (EmailOutbox is EmailOutbox eo)
                 eo.Init(MessageSearch);
+
+            if (PrometricApi is PrometricApi papi)
+                papi.Init(BankSearch);
         }
 
         public static void InitializeCustomProjectManagers()

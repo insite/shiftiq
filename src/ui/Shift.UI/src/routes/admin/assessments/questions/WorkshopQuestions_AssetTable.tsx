@@ -226,7 +226,7 @@ export default function WorkshopQuestions_AssetTable({
                         <td>Source</td>
                         <td>
                             <ActionLink
-                                href={`/ui/admin/assessments/questions/analysis?bank=${bankId}&question=${question.source.questionId}&${returnUrl}`}
+                                href={`/ui/admin/assessments/questions/analysis?bank=${question.source.bankId}&question=${question.source.questionId}&${returnUrl}`}
                             >
                                 {question.source.questionAssetNumber}
                             </ActionLink>

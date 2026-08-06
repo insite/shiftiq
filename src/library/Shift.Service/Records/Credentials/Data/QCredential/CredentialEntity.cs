@@ -1,8 +1,11 @@
+using Shift.Service.Security;
+
 namespace Shift.Service.Progress;
 
 public partial class CredentialEntity
 {
     public AchievementEntity? Achievement { get; set; }
+    public UserEntity? User { get; set; }
 
     public Guid AchievementIdentifier { get; set; }
     public Guid? AuthorityIdentifier { get; set; }
@@ -52,4 +55,5 @@ public partial class CredentialEntity
     public DateTimeOffset? CredentialGranted { get; set; }
     public DateTimeOffset? CredentialRevoked { get; set; }
     public DateTimeOffset? ExpirationFixedDate { get; set; }
+    public DateTimeOffset CredentialModified { get; set; }
 }

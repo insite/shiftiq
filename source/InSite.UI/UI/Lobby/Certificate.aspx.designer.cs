@@ -123,13 +123,13 @@ namespace InSite.UI.Lobby
         protected global::System.Web.UI.WebControls.HiddenField fingerPrint;
 
         /// <summary>
-        /// ControlPannel control.
+        /// SharePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ControlPannel;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SharePanel;
 
         /// <summary>
         /// FaceBook control.
@@ -166,6 +166,15 @@ namespace InSite.UI.Lobby
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HyperLink Mail;
+
+        /// <summary>
+        /// customCertificateImage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal customCertificateImage;
 
         /// <summary>
         /// certificateData control.

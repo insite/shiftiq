@@ -18,5 +18,8 @@ public class UserConnectionConfiguration : IEntityTypeConfiguration<UserConnecti
         builder.Property(x => x.ToUserIdentifier).HasColumnName("ToUserIdentifier").IsRequired();
         builder.Property(x => x.IsLeader).HasColumnName("IsLeader").IsRequired();
 
+        builder.Property(x => x.LastChangeTime).HasColumnName("LastChangeTime").IsRequired();
+        builder.Property(x => x.LastChangeType).HasColumnName("LastChangeType").IsRequired().IsUnicode(false).HasMaxLength(100);
+        builder.Property(x => x.LastChangeUser).HasColumnName("LastChangeUser").IsRequired();
     }
 }

@@ -192,9 +192,9 @@ public class PersonAdapter : IEntityAdapter
         return entity;
     }
 
-    public IEnumerable<PersonModel> ToModel(IEnumerable<PersonEntity> entities)
+    public PersonModel[] ToModel(IEnumerable<PersonEntity> entities)
     {
-        return entities.Select(ToModel);
+        return entities.Select(ToModel).ToArray();
     }
 
     public PersonModel ToModel(PersonEntity entity)
@@ -284,7 +284,10 @@ public class PersonAdapter : IEntityAdapter
             JobDivision = entity.JobDivision,
             PersonType = entity.PersonType,
             SinModified = entity.SinModified,
-            AgeGroup = entity.AgeGroup
+            AgeGroup = entity.AgeGroup,
+            LastChangeTime = entity.LastChangeTime,
+            LastChangeType = entity.LastChangeType,
+            LastChangeUser = entity.LastChangeUser
         };
 
         var user = entity.User;

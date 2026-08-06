@@ -76,6 +76,8 @@ namespace InSite.Application.Issues.Read
         public virtual VUser Topic { get; set; }
 
         public virtual ICollection<VIssueUser> VUsers { get; set; }
+        public virtual ICollection<VIssueFileRequirement> IssueFileRequirements { get; set; }
+        public virtual ICollection<VIssueAttachment> IssueAttachments { get; set; }
 
         public string IssueDescriptionHtml
         {

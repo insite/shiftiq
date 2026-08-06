@@ -18,6 +18,14 @@ namespace InSite.Application.Records.Read
         public string ProgramName { get; set; }
         public string ProgramTag { get; set; }
 
+        /// <summary>
+        /// Restricts the result to programs that can legally become a parent of the given program:
+        /// not the program itself, not already one of its parents, and not a program that has
+        /// parents of its own, because nesting is limited to one level. Pass Guid.Empty for a
+        /// program that does not exist yet, where only the nesting rule applies.
+        /// </summary>
+        public Guid? EligibleParentForProgramIdentifier { get; set; }
+
         public TProgramFilter Clone()
         {
             return (TProgramFilter)MemberwiseClone();

@@ -51,19 +51,7 @@
     </label>
     <div class="row">
         <div class="col-md-12">
-            <insite:ComboBox runat="server" ID="TriggerChange" Width="100%">
-                <Items>
-                    <insite:ComboBoxOption Value="None" Text="" Selected="true" />
-                    <insite:ComboBoxOption Value="ActivityCompleted" Text="Activity Completed" />
-                    <insite:ComboBoxOption Value="AssessmentPassed" Text="Assessment Passed" />
-                    <insite:ComboBoxOption Value="AssessmentFailed" Text="Assessment Failed" />
-                    <insite:ComboBoxOption Value="AssessmentScored" Text="Assessment Scored" />
-                    <insite:ComboBoxOption Value="QuestionAnsweredCorrectly" Text="Question Answered Correctly" />
-                    <insite:ComboBoxOption Value="QuestionAnsweredIncorrectly" Text="Question Answered Incorrectly" />
-                    <insite:ComboBoxOption Value="GradeItemPassed" Text="Grade Item Passed" />
-                    <insite:ComboBoxOption Value="GradeItemFailed" Text="Grade Item Failed" />
-                </Items>
-            </insite:ComboBox>
+            <insite:ComboBox runat="server" ID="TriggerChange" Width="100%" />
         </div>
     </div>
     <div class="row mt-1" runat="server" id="TriggerActivityField" Visible="false">

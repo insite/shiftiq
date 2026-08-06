@@ -267,14 +267,14 @@ namespace InSite.Persistence.Plugin.NCSHA
             Property(x => x.HC267).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HC268).IsUnicode(false).HasMaxLength(350);
             Property(x => x.HC269).IsUnicode(false).HasMaxLength(10);
-            Property(x => x.HC270).IsUnicode(false).HasMaxLength(3200);
+            Property(x => x.HC270).IsUnicode(false).HasMaxLength(4000);
             Property(x => x.HC271).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HC272).IsUnicode(false).HasMaxLength(1500);
             Property(x => x.HC273).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HC274).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HC275).IsUnicode(false).HasMaxLength(18);
             Property(x => x.HC276).IsUnicode(false).HasMaxLength(10);
-            Property(x => x.HC277).IsUnicode(false).HasMaxLength(1200);
+            Property(x => x.HC277).IsUnicode(false).HasMaxLength(4000);
             Property(x => x.HC278).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HC279).IsUnicode(false).HasMaxLength(2320);
             Property(x => x.HC280).IsUnicode(false).HasMaxLength(10);
@@ -284,7 +284,7 @@ namespace InSite.Persistence.Plugin.NCSHA
             Property(x => x.HC284).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HC285).IsUnicode(false).HasMaxLength(1000);
             Property(x => x.HC286).IsUnicode(false).HasMaxLength(10);
-            Property(x => x.HC287).IsUnicode(false).HasMaxLength(960);
+            Property(x => x.HC287).IsUnicode(false).HasMaxLength(4000);
             Property(x => x.HC288).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HC289).IsUnicode(false);
             Property(x => x.HC290).IsUnicode(false).HasMaxLength(10);

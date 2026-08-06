@@ -29,7 +29,7 @@ export default function AdminHome_Dashboard_Tile({
     buttonText,
 }: Props) {
     return (
-        <div className="col-6 col-lg-3 d-flex">
+        <div className="col-6 col-xl-3 d-flex">
             <div className="card border-1 shadow w-100 h-100">
                 <div className="card-body d-flex flex-column align-items-center">
                     <h3 className="text-center">

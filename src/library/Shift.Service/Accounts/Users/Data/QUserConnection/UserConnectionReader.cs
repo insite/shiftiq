@@ -133,6 +133,12 @@ public class UserConnectionReader : IEntityReader
         if (criteria.ConnectedBefore.HasValue)
             query = query.Where(x => x.Connected < criteria.ConnectedBefore);
 
+        if (criteria.LastChangeTimeSince.HasValue)
+            query = query.Where(x => criteria.LastChangeTimeSince.Value <= x.LastChangeTime);
+
+        if (criteria.LastChangeTimeBefore.HasValue)
+            query = query.Where(x => x.LastChangeTime < criteria.LastChangeTimeBefore.Value);
+
         return query;
     }
 

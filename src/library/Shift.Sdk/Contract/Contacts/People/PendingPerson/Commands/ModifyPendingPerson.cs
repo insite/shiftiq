@@ -4,9 +4,7 @@ namespace Shift.Contract
 {
     public class ModifyPendingPerson
     {
-        public Guid PendingId { get; set; }
-        public Guid? PersonId { get; set; }
-        public Guid? UserId { get; set; }
+        public Guid PendingPersonIdentifier { get; set; }
 
         public string PersonCode { get; set; }
         public string UserEmail { get; set; }

@@ -30,6 +30,7 @@ namespace Shift.Service.Content
                 (oldProps, newProps) => GetChange("Approved Date", oldProps.ApprovedTime, newProps.ApprovedTime),
                 (oldProps, newProps) => GetChange("Approved By", oldProps.ApprovedUserIdentifier, newProps.ApprovedUserIdentifier),
                 (oldProps, newProps) => GetChange("Allow Learner to Open File", oldProps.AllowLearnerToView, newProps.AllowLearnerToView),
+                (oldProps, newProps) => GetChange("Tag", oldProps.Tag?.ToString(), newProps.Tag?.ToString()),
             };
         }
 
@@ -60,7 +61,7 @@ namespace Shift.Service.Content
             return new FileChange(fieldName, oldUserName, newUserName);
         }
 
-        private static FileChange? GetChange(string fieldName, string oldValue, string newValue)
+        private static FileChange? GetChange(string fieldName, string? oldValue, string? newValue)
         {
             oldValue = oldValue.NullIfWhiteSpace();
             newValue = newValue.NullIfWhiteSpace();

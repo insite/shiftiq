@@ -6,7 +6,7 @@ using Shift.Sdk.Service.Platform.DashboardNotifications;
 namespace Shift.Api.Platform;
 
 [ApiController]
-[ApiExplorerSettings(GroupName = "Platform API: Dashboard")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class DashboardController(IDashboardNotificationManager notificationManager) : ShiftControllerBase
 {
     public class SearchResult

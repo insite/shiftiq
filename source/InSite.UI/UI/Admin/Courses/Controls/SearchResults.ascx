@@ -13,13 +13,31 @@
             </ItemTemplate>
         </asp:TemplateField>
 
-        <asp:BoundField HeaderText="Publication Status" DataField="PublicationStatus" />
-
-        <asp:TemplateField HeaderText="Publication Date">
+        <asp:TemplateField HeaderText="Catalogue">
             <ItemTemplate>
-                <insite:Container runat="server" Visible='<%# Eval("PublicationDate") != null %>'>
-                    <%# LocalizeTime(Eval("PublicationDate")) %>
-                    <div class="text-muted fs-sm">by <%# Eval("PublicationAuthor") %></div>
+                <%# GetCatalogueHtml((Shift.Contract.CourseMatch)Container.DataItem) %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="Group Permissions">
+            <ItemTemplate>
+                <%# GetGroupPermissionsHtml((Shift.Contract.CourseMatch)Container.DataItem) %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="Portal">
+            <ItemTemplate>
+                <insite:Container runat="server" Visible='<%# (string)Eval("PublicationStatus") == "Published" %>'>
+                    Published
+                    <insite:Container runat="server" Visible='<%# Eval("PublicationDate") != null %>'>
+                        <div class="text-muted fs-sm">
+                            <%# LocalizeDate(Eval("PublicationDate")) %>
+                            <div>by <%# Eval("PublicationAuthor") %></div>
+                        </div>
+                    </insite:Container>
+                </insite:Container>
+                <insite:Container runat="server" Visible='<%# (string)Eval("PublicationStatus") != "Published" %>'>
+                    <span class="text-muted">Unpublished</span>
                 </insite:Container>
             </ItemTemplate>
         </asp:TemplateField>
@@ -50,12 +68,6 @@
 
         <asp:BoundField HeaderText="Activities" DataField="ActivityCount" HeaderStyle-Wrap="false"
                         ItemStyle-Wrap="false" ItemStyle-HorizontalAlign="Center" ItemStyle-Width="15px" />
-
-        <asp:TemplateField HeaderText="Catalog">
-            <ItemTemplate>
-                <%# Eval("CatalogName") %>
-            </ItemTemplate>
-        </asp:TemplateField>
 
         <asp:TemplateField HeaderText="Gradebook">
             <ItemTemplate>

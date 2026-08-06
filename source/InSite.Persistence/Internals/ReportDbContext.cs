@@ -6,10 +6,8 @@ namespace InSite.Persistence
 {
     internal class ReportDbContext : DbContext
     {
-        // databases
-        public DbSet<TEntity> TEntities { get; set; }
+        // schemas
         public DbSet<VForeignKey> VForeignKeys { get; set; }
-        public DbSet<VForeignKeyConstraint> VForeignKeyConstraints { get; set; }
         public DbSet<VPrimaryKey> VPrimaryKeys { get; set; }
         public DbSet<VSchema> VSchemas { get; set; }
         public DbSet<VTable> VTables { get; set; }
@@ -31,10 +29,8 @@ namespace InSite.Persistence
 
         public static void AddConfigurations(DbModelBuilder builder)
         {
-            // databases
-            builder.Configurations.Add(new TEntityConfiguration());
+            // schemas
             builder.Configurations.Add(new VForeignKeyConfiguration());
-            builder.Configurations.Add(new VForeignKeyConstraintConfiguration());
             builder.Configurations.Add(new VPrimaryKeyConfiguration());
             builder.Configurations.Add(new VSchemaConfiguration());
             builder.Configurations.Add(new VTableColumnConfiguration());

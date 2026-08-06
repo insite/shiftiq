@@ -35,7 +35,7 @@ namespace InSite.Cmds.Controls.Reporting.Report
 
         public Guid[] LearnerValues => FindLearner.Values;
 
-        public Guid[] SelectedAchievements => AchievementSelector.GetSelectedAchievements();
+        public Guid[] SelectedAchievements => AchievementSelector.ResolveSelection().Achievements;
 
         public string[] MembershipFunctions
         {
@@ -51,6 +51,11 @@ namespace InSite.Cmds.Controls.Reporting.Report
         }
 
         public string CredentialStatusFilter => CredentialStatus.Value;
+
+        public string JobDivisionMode => JobDivisionPresence.Value;
+
+        public string JobDivisionFilter =>
+            JobDivisionMode == "Without" ? null : JobDivisionValue.Value.NullIfEmpty();
 
         public bool ExcludeSelfDeclared => ExcludeSelfDeclaredCredentials.Checked;
 
@@ -82,7 +87,13 @@ namespace InSite.Cmds.Controls.Reporting.Report
             IsRequired.AutoPostBack = true;
             IsRequired.SelectedIndexChanged += (s, a) => LoadAchievements();
 
-            AchievementSelectorValidator.ServerValidate += (s, a) => a.IsValid = AchievementSelector.HasValue();
+            AchievementSelectorValidator.ServerValidate += (s, a) =>
+            {
+                var selection = AchievementSelector.ResolveSelection();
+                a.IsValid = selection.HasSelection;
+            };
+
+            JobDivisionPresence.ValueChanged += (s, a) => UpdateJobDivisionValueVisibility();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -97,20 +108,27 @@ namespace InSite.Cmds.Controls.Reporting.Report
             if (!Identity.HasAccessToAllCompanies)
                 FindDepartment.Filter.UserIdentifier = User.UserIdentifier;
 
+            JobDivisionSection.Visible = ServiceLocator.PersonSearch.HasAccessGrantedJobDivisions(Organization.Identifier);
+            UpdateJobDivisionValueVisibility();
+
             OnDepartmentChanged();
+        }
+
+        private void UpdateJobDivisionValueVisibility()
+        {
+            JobDivisionValuePanel.Visible = JobDivisionMode != "Without";
         }
 
         public bool ValidateNarrowSelection(out string error)
         {
             var departmentTotal = FindDepartment.GetDataItems().Count();
             var isDepartmentWide = DepartmentValues.Length == 0 || DepartmentValues.Length >= departmentTotal;
-            var hasAchievement = AchievementSelector.HasValue();
-            var allAchievementsSelected = AchievementSelector.IsAllSelected();
-            var isAchievementWide = !hasAchievement || allAchievementsSelected;
+            var selection = AchievementSelector.ResolveSelection();
+            var isAchievementWide = selection.IsEveryTypeAll;
 
             if (isDepartmentWide && isAchievementWide)
             {
-                error = "Narrow your selection. Pick specific departments or achievements — you cannot run the report with both left wide open.";
+                error = "Narrow your selection. Pick specific departments or achievements - you cannot run the report with both left wide open.";
                 return false;
             }
 

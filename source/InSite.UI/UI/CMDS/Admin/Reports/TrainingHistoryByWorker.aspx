@@ -66,7 +66,9 @@
                                 <thead>
                                     <tr>
                                         <td colspan="5">
-                                            <h3><%# Eval("PersonFullName") %></h3>
+                                            <h3 class="mb-0"><%# Eval("PersonFullName") %></h3>
+                                            <div class="form-text"><%# Eval("PersonEmail") %></div>
+                                            <span class="form-text"><%# string.IsNullOrEmpty((string)Eval("JobDivision")) ? "" : "Job Division: " + Server.HtmlEncode((string)Eval("JobDivision")) %></span>
                                         </td>
                                     </tr>
                                     <th style="width: 40%;">Achievement Title</th>

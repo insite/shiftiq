@@ -16,7 +16,7 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label">
-                                Catalog
+                                Catalogue
                             </label>
                             <div>
                                 <insite:CatalogComboBox runat="server" ID="CatalogIdentifier" />
@@ -25,7 +25,7 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label">
-                                Sequence in Catalog
+                                Sequence in Catalogue
                             </label>
                             <div>
                                 <insite:NumericBox runat="server" ID="CatalogSequence" NumericMode="Integer" />

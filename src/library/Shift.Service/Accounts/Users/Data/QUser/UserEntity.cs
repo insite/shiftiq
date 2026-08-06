@@ -1,6 +1,7 @@
 using Shift.Service.Booking;
 using Shift.Service.Content;
 using Shift.Service.Directory;
+using Shift.Service.Progress;
 
 namespace Shift.Service.Security;
 
@@ -10,6 +11,7 @@ public partial class UserEntity
     public ICollection<MembershipEntity> Memberships { get; set; } = new List<MembershipEntity>();
     public ICollection<PersonEntity> People { get; set; } = new List<PersonEntity>();
     public ICollection<FileEntity> Files { get; set; } = new List<FileEntity>();
+    public ICollection<CredentialEntity> Credentials { get; set; } = new List<CredentialEntity>();
 
     public Guid UserIdentifier { get; set; }
 
@@ -48,4 +50,8 @@ public partial class UserEntity
     public DateTimeOffset UserPasswordExpired { get; set; }
     public DateTimeOffset? UtcArchived { get; set; }
     public DateTimeOffset? UtcUnarchived { get; set; }
+
+    public DateTimeOffset LastChangeTime { get; set; }
+    public string LastChangeType { get; set; } = null!;
+    public Guid LastChangeUser { get; set; }
 }

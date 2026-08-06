@@ -37,7 +37,7 @@ namespace InSite.UI.CMDS
             SearchOrganizationsLink.Visible = isGrantedAdministrators;
             OverrideCompetenciesLink.Visible = isGrantedAdministrators;
 
-            SearchAchievementsLink.Visible = isGrantedAdministrators;
+            SearchAchievementsLink.Visible = isGrantedAdministrators || isGrantedFields;
             SearchCompetenciesLink.Visible = isGrantedAdministrators;
             SearchProfilesLink.Visible = isGrantedAdministrators;
             SearchProgramsLink.Visible = isGrantedFields;

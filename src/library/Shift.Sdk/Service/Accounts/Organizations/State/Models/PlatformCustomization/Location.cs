@@ -25,6 +25,8 @@ namespace InSite.Domain.Organizations
         public string Mobile { get; set; }
         public string Fax { get; set; }
         public string Email { get; set; }
+        public string TaxNumberLabel { get; set; }
+        public string TaxNumberValue { get; set; }
 
         public bool IsEmpty => !(
                ShouldSerializeLocationType()
@@ -39,7 +41,9 @@ namespace InSite.Domain.Organizations
             || ShouldSerializeTollFree()
             || ShouldSerializeMobile()
             || ShouldSerializeFax()
-            || ShouldSerializeEmail());
+            || ShouldSerializeEmail()
+            || ShouldSerializeTaxNumberLabel()
+            || ShouldSerializeTaxNumberValue());
 
         public bool ShouldSerializeLocationType() => LocationType != LocationType.None;
         public bool ShouldSerializeDescription() => !string.IsNullOrEmpty(Description);
@@ -54,6 +58,8 @@ namespace InSite.Domain.Organizations
         public bool ShouldSerializeMobile() => !string.IsNullOrEmpty(Mobile);
         public bool ShouldSerializeFax() => !string.IsNullOrEmpty(Fax);
         public bool ShouldSerializeEmail() => !string.IsNullOrEmpty(Email);
+        public bool ShouldSerializeTaxNumberLabel() => !string.IsNullOrEmpty(TaxNumberLabel);
+        public bool ShouldSerializeTaxNumberValue() => !string.IsNullOrEmpty(TaxNumberValue);
 
         public override string ToString() =>
             LocationHelper.ToString(Street, null, City, Province, PostalCode, null, Phone, Fax);
@@ -72,7 +78,9 @@ namespace InSite.Domain.Organizations
                 && TollFree.NullIfEmpty() == other.TollFree.NullIfEmpty()
                 && Mobile.NullIfEmpty() == other.Mobile.NullIfEmpty()
                 && Fax.NullIfEmpty() == other.Fax.NullIfEmpty()
-                && Email.NullIfEmpty() == other.Email.NullIfEmpty();
+                && Email.NullIfEmpty() == other.Email.NullIfEmpty()
+                && TaxNumberLabel.NullIfEmpty() == other.TaxNumberLabel.NullIfEmpty()
+                && TaxNumberValue.NullIfEmpty() == other.TaxNumberValue.NullIfEmpty();
         }
     }
 }

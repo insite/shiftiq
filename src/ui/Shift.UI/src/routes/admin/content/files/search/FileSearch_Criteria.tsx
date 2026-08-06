@@ -10,6 +10,7 @@ import OrganizationFinder from "@/routes/_shared/finders/OrganizationFinder";
 import FileObjectTypeComboBox from "@/routes/_shared/comboboxes/FileObjectTypeComboBox";
 import FileVisibilityComboBox from "@/routes/_shared/comboboxes/FileVisibilityComboBox";
 import UserFinder from "@/routes/_shared/finders/UserFinder";
+import ControlledComboBox from "@/components/combobox/ControlledComboBox";
 
 export default function FileSearch_Criteria() {
     const { criteria, isLoading, setCriteria } = useSearch<FileCriteria, object>();
@@ -49,6 +50,14 @@ export default function FileSearch_Criteria() {
                         className="mb-2"
                         readOnly={isLoading}
                         maxLength={36}
+                    />
+                    <ControlledComboBox
+                        control={control}
+                        name="fileTag"
+                        placeholder={translate("Tag")}
+                        items={[{ value: "", text: "" }, { value: "PersonImport", text: "PersonImport" }]}
+                        className="mb-2"
+                        disabled={isLoading}
                     />
                 </div>
                 <div className="col-4">

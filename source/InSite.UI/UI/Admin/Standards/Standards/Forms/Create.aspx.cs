@@ -609,7 +609,7 @@ namespace InSite.Admin.Standards.Standards.Forms
                 var json = JsonInput.Text;
 
                 var publication = JsonConvert.DeserializeObject<StandardPublicationModel>(json);
-                if (publication.Asset != null && publication.Asset.Children.Count > 0)
+                if (publication.Asset != null)
                     JsonData = publication;
             }
 
@@ -1101,6 +1101,7 @@ namespace InSite.Admin.Standards.Standards.Forms
             entity.Code = model.Code;
             entity.StandardHook = model.Hook;
             entity.Icon = model.Icon;
+            entity.StandardLabel = model.Tag;
             entity.IsHidden = model.IsHidden;
             entity.IsPractical = model.IsPractical;
             entity.IsPublished = model.IsPublished;

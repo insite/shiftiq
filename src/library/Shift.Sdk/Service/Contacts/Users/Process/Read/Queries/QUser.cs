@@ -52,6 +52,10 @@ namespace InSite.Application.Contacts.Read
         public DateTimeOffset? UtcUnarchived { get; set; }
         public DateTimeOffset? EmailVerificationTokenIssued { get; set; }
 
+        public DateTimeOffset LastChangeTime { get; set; }
+        public string LastChangeType { get; set; }
+        public Guid LastChangeUser { get; set; }
+
         public virtual ICollection<ApiRequest> ApiRequests { get; set; } = new HashSet<ApiRequest>();
         public virtual ICollection<QCourseEnrollment> CourseEnrollments { get; set; } = new HashSet<QCourseEnrollment>();
         public virtual ICollection<TProgramEnrollment> ProgramEnrollments { get; set; } = new HashSet<TProgramEnrollment>();

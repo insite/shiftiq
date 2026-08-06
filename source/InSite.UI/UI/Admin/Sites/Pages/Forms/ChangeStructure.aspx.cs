@@ -100,7 +100,10 @@ namespace InSite.Admin.Sites.Pages
             {
                 Identifier = page.PageIdentifier,
                 ParentPage = page.ParentPageIdentifier,
-                Site = page.SiteIdentifier
+                Site = page.SiteIdentifier,
+                Slug = page.PageSlug.NullIfEmpty(),
+                NavigateUrl = page.NavigateUrl.NullIfEmpty(),
+                IsNewTab = page.IsNewTab
             };
         }
 
@@ -110,8 +113,8 @@ namespace InSite.Admin.Sites.Pages
             {
                 ParentPage = ParentPageId.Value,
                 Site = WebSiteSelector.ValueAsGuid,
-                Slug = SiteHelper.SanitizeSiteName(PageSlug.Text),
-                NavigateUrl = NavigateUrl.Text,
+                Slug = SiteHelper.SanitizeSiteName(PageSlug.Text).NullIfEmpty(),
+                NavigateUrl = NavigateUrl.Text.NullIfEmpty(),
                 IsNewTab = IsNavigateUrlToNewTab.Checked
             };
         }

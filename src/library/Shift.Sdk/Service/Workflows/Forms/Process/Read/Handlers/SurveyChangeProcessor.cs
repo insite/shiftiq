@@ -55,7 +55,7 @@ namespace InSite.Application.Surveys.Read
 
             bool GroupExists()
             {
-                var filter = new QGroupFilter { OrganizationIdentifier = e.OriginOrganization, GroupName = e.Category };
+                var filter = new QGroupFilter { OrganizationIdentifier = e.OriginOrganization, GroupNameExact = e.Category };
                 var groups = _groups.SearchGroups(filter);
                 return groups.Any();
             }

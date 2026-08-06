@@ -9,7 +9,7 @@
 
     <insite:Nav runat="server" ID="NavPanel">
 
-        <insite:NavItem runat="server" ID="Step1Section" Title="Catalog" Icon="far fa-pencil-ruler" IconPosition="BeforeText">
+        <insite:NavItem runat="server" ID="Step1Section" Title="Catalogue" Icon="far fa-pencil-ruler" IconPosition="BeforeText">
             <section>
                 
                 <div class="row mb-3">
@@ -26,7 +26,7 @@
 
                                 <div class="form-group mb-3">
                                     <label class="form-label">
-                                        Catalog Name
+                                        Catalogue Name
                                         <insite:RequiredValidator runat="server" ControlToValidate="CatalogName" FieldName="Name" />
                                     </label>
                                     <div>

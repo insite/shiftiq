@@ -30,6 +30,9 @@ namespace Shift.Sdk.UI
                 if (Action.StartsWith("Make unplanned"))
                     return $"<span class='badge bg-danger'><i class='fa-solid fa-times me-1'></i>Unassign</span>";
 
+                if (Action == "Protected")
+                    return "<span class='badge bg-secondary' title='Required or planned by another program the learner is enrolled in'><i class='fa-solid fa-lock me-1'></i>No change</span>";
+
                 return $"<span class='badge bg-danger'><i class='fa-solid fa-trash-alt me-1'></i>Delete</span>";
             }
         }

@@ -25,8 +25,8 @@
     </a>
 
     <a runat="server" id="MyCatalogs" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/home/catalogs">
-        <i class="fas fa-books fs-lg opacity-60 me-2 me-compact-0" title="Catalogs"></i>
-        <span class="hide-compact"><%= Translate("Catalogs") %></span>
+        <i class="fas fa-books fs-lg opacity-60 me-2 me-compact-0" title="Catalogues"></i>
+        <span class="hide-compact"><%= Translate("Catalogues") %></span>
     </a>
 
     <a runat="server" id="MyChats" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/home/chats">
@@ -103,8 +103,8 @@
         <span class="hide-compact"><%= Translate("Home") %></span>
     </a>
     <a runat="server" id="ManagerCatalog" class="d-flex align-items-center list-group-item list-group-item-action"  href="/ui/portal/management/dashboard/catalog">
-        <i class="fas fa-check fs-lg opacity-60 me-2 me-compact-0" title="SkillsCheck Catalog"></i>
-        <span class="hide-compact"><%= Translate("SkillsCheck Catalog") %> </span>
+        <i class="fas fa-check fs-lg opacity-60 me-2 me-compact-0" title="SkillsCheck Catalogue"></i>
+        <span class="hide-compact"><%= Translate("SkillsCheck Catalogue") %> </span>
     </a>	
     <a runat="server" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/management/dashboard/reports">
         <i class="fas fa-copy fs-lg opacity-60 me-2 me-compact-0" title="Reports"></i> 
@@ -123,8 +123,8 @@
         <span class="hide-compact"><%= Translate("My Badges") %></span>
     </a>
     <a runat="server" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/learning/dashboard/catalog">
-        <i class="fas fa-check fs-lg opacity-60 me-2 me-compact-0" title="SkillsCheck Catalog"></i>
-        <span class="hide-compact"><%= Translate("SkillsCheck Catalog") %></span>
+        <i class="fas fa-check fs-lg opacity-60 me-2 me-compact-0" title="SkillsCheck Catalogue"></i>
+        <span class="hide-compact"><%= Translate("SkillsCheck Catalogue") %></span>
     </a>
 </asp:Panel>
 

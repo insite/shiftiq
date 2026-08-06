@@ -390,8 +390,12 @@ namespace InSite.Admin.Issues.Forms
                 ServiceLocator.SendCommand(new AssignUser(issue, AdministratorIdentifier.Value.Value, "Administrator"));
                 ServiceLocator.SendCommand(new AssignUser(issue, TopicIdentifier.Value.Value, "Topic"));
 
-                if (IssueStatus.ValueAsGuid.HasValue)
-                    ServiceLocator.SendCommand(new ChangeIssueStatus(issue, IssueStatus.ValueAsGuid.Value, DateTimeOffset.UtcNow));
+                var statusId = IssueStatus.ValueAsGuid;
+                if (statusId.HasValue)
+                {
+                    var statusCategory = ServiceLocator.IssueSearch.GetStatus(statusId.Value)?.StatusCategory;
+                    ServiceLocator.SendCommand(new ChangeIssueStatus(issue, statusId.Value, DateTimeOffset.UtcNow, statusCategory));
+                }
 
                 if (OwnerIdentifier.Value.HasValue)
                     ServiceLocator.SendCommand(new AssignUser(issue, OwnerIdentifier.Value.Value, "Owner"));

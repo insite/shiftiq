@@ -375,6 +375,24 @@ namespace InSite.Admin.Issues.Controls
         protected global::InSite.Common.Web.UI.ComboBox AttachmentHasClaims;
 
         /// <summary>
+        /// RequestedDocumentsField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl RequestedDocumentsField;
+
+        /// <summary>
+        /// DocumentFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox DocumentFilter;
+
+        /// <summary>
         /// AttachmentFileExpirySinceField control.
         /// </summary>
         /// <remarks>

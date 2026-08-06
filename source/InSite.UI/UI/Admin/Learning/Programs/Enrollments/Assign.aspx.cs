@@ -59,13 +59,10 @@ namespace InSite.Cmds.Admin.Records.Programs
         {
             base.ApplyAccessControl();
 
-            var policy = $"{Request.RawUrl}/delete-all-previously-assigned-achievements";
-
-            // In the CMDS partition only System Administrators are permitted to delete previously assigned achievements.
-            // TODO: Rewrite this when we have a way to explicitly deny access to a resource through a negating policy.
+            // In the CMDS partition only operators may delete previously assigned achievements.
 
             if (ServiceLocator.Partition.IsE03())
-                AssignStrategy_Delete.Enabled = Identity.IsInRole(CmdsRole.SystemAdministrators);
+                AssignStrategy_Delete.Enabled = Identity.IsOperator;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -153,8 +150,21 @@ namespace InSite.Cmds.Admin.Records.Programs
             Step1NextButton.Visible = false;
         }
 
+        /// <summary>
+        /// Each learner renders as a checkbox, and every checked box posts a form field.
+        /// ASP.NET rejects requests above aspnet:MaxHttpCollectionKeys (20,000), so lists
+        /// anywhere near that size would kill the next postback. A bulk assignment to
+        /// thousands of learners is also not reviewable on this screen.
+        /// </summary>
+        private const int MaxLearnerSearchResults = 1000;
+
         private void OnSearchClick()
         {
+            Page.Validate("Search");
+
+            if (!Page.IsValid)
+                return;
+
             var departmentId = DepartmentIdentifier.Value;
             var hasValue = departmentId.HasValue;
 
@@ -164,29 +174,47 @@ namespace InSite.Cmds.Admin.Records.Programs
             if (!hasValue)
                 return;
 
+            var filter = new UserFilter
+            {
+                ContactName = LearnerName.Text,
+                Memberships = new[]
+                {
+                    new UserFilterMembership
+                    {
+                        MembershipGroupIdentifier = departmentId,
+                        MembershipType = "Department",
+                        MembershipTypeAnd = true,
+                    },
+                    new UserFilterMembership
+                    {
+                        MembershipGroupIdentifier = GroupIdentifier.Value
+                    }
+                }
+            };
+
+            var count = UserSearch.Count(filter);
+            if (count > MaxLearnerSearchResults)
+            {
+                EditorStatus.AddMessage(AlertType.Error,
+                    $"This search matches {count:n0} learners, which is too many to assign in one step (the limit is {MaxLearnerSearchResults:n0}). Narrow the search with the Learner Name or Group filter.");
+
+                LearnersRepeater.DataSource = null;
+                LearnersRepeater.DataBind();
+
+                LearnersPanel.Visible = false;
+                Step1NextButton.Visible = false;
+                NoLearnersPanel.Visible = false;
+
+                return;
+            }
+
             var persons = UserSearch.Bind(
                 x => new
                 {
                     x.UserIdentifier,
                     x.FullName,
                 },
-                new UserFilter
-                {
-                    ContactName = LearnerName.Text,
-                    Memberships = new[]
-                    {
-                        new UserFilterMembership
-                        {
-                            MembershipGroupIdentifier = departmentId,
-                            MembershipType = "Department",
-                            MembershipTypeAnd = true,
-                        },
-                        new UserFilterMembership
-                        {
-                            MembershipGroupIdentifier = GroupIdentifier.Value
-                        }
-                    }
-                },
+                filter,
                 "FullName"
             );
             var hasData = persons.Length > 0;
@@ -247,10 +275,32 @@ namespace InSite.Cmds.Admin.Records.Programs
             var credentials = VCmdsCredentialSearch.Select(x => contactIds.Contains(x.UserIdentifier) && achievementIds.Contains(x.AchievementIdentifier));
             var commands = new List<Command>();
 
+            // Recompute the protected sets server-side; do not trust the round-tripped
+            // repeater data. A protected achievement is required or planned by another
+            // program the learner is enrolled in, so it must not be downgraded or deleted.
+            var protectedByLearner = new Dictionary<Guid, HashSet<Guid>>();
+
+            HashSet<Guid> GetProtectedObjects(Guid learnerId)
+            {
+                if (!protectedByLearner.TryGetValue(learnerId, out var result))
+                    protectedByLearner.Add(learnerId, result = TaskSearch
+                        .SelectProtectedObjectIdentifiers(Organization.Identifier, learnerId, programIdentifier)
+                        .ToHashSet());
+
+                return result;
+            }
+
             foreach (var item in items)
             {
                 var achievement = item.AchievementIdentifier;
                 var learner = item.UserIdentifier;
+
+                if (item.Action == "Protected")
+                    continue;
+
+                var isDowngrade = item.Action == "Make unplanned and optional" || item.Action == "Delete from learner";
+                if (isDowngrade && GetProtectedObjects(learner).Contains(achievement))
+                    continue;
 
                 try
                 {
@@ -438,8 +488,32 @@ namespace InSite.Cmds.Admin.Records.Programs
                                  !achievementIds.Contains(x.AchievementIdentifier))
                     .OrderBy(x => x.AchievementTitle);
 
+                // Achievements still required or planned by another program the learner is
+                // enrolled in are protected from the downgrade and delete strategies.
+                var protectedObjects = TaskSearch
+                    .SelectProtectedObjectIdentifiers(Organization.Identifier, user.UserIdentifier, achievementListIdentifier)
+                    .ToHashSet();
+
                 foreach (var previous in previousCredentials)
                 {
+                    if (protectedObjects.Contains(previous.AchievementIdentifier))
+                    {
+                        changes.Add(new AssignLearnerItem
+                        {
+                            UserIdentifier = user.UserIdentifier,
+                            FullName = user.FullName,
+                            AchievementIdentifier = previous.AchievementIdentifier,
+                            AchievementTitle = previous.AchievementTitle,
+                            AchievementLabel = previous.AchievementLabel,
+                            LifetimeMonths = previous.CredentialExpirationLifetimeQuantity,
+                            Action = "Protected",
+                            IsRequired = previous.CredentialIsMandatory,
+                            IsPlanned = previous.IsInTrainingPlan
+                        });
+
+                        continue;
+                    }
+
                     var action = "Do nothing";
 
                     if (AssignStrategy_Unplan.Checked)

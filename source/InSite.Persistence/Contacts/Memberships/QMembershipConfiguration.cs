@@ -20,6 +20,10 @@ namespace InSite.Persistence
             Property(x => x.MembershipFunction).IsUnicode(false).HasMaxLength(20);
             Property(x => x.MembershipEffective).IsRequired();
 
+            Property(x => x.LastChangeTime).IsRequired();
+            Property(x => x.LastChangeType).IsRequired().IsUnicode(false).HasMaxLength(100);
+            Property(x => x.LastChangeUser).IsRequired();
+
             HasRequired(a => a.User).WithMany(b => b.Memberships).HasForeignKey(a => a.UserIdentifier).WillCascadeOnDelete(false);
             HasRequired(a => a.Group).WithMany(b => b.QMemberships).HasForeignKey(a => a.GroupIdentifier).WillCascadeOnDelete(false);
         }

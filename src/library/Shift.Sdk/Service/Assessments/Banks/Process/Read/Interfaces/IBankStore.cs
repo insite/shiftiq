@@ -43,9 +43,11 @@ namespace InSite.Application.Banks.Read
         void Update(BankCommentModified e);
         void Update(CommentVisibilityChanged e);
         void Update(CriterionAdded e);
+        void Update(CriterionContentChanged e);
         void Update(CriterionFilterChanged e);
         void Update(CriterionFilterDeleted e);
         void Update(CriterionDeleted e);
+        void Update(CriterionTabReconfigured e);
         void Update(FieldAdded e);
         void Update(FieldDeleted e);
         void Update(FieldsDeleted e);

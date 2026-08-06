@@ -70,7 +70,9 @@ namespace InSite.Admin.Events.Registrations.Controls
                     Department = string.Join(", ", x.DepartmentNames),
                     ExamFormTitle = x.ExamFormTitle,
                     ExamFormName = x.ExamFormName,
-                    ExamFormCode = x.ExamFormCode
+                    ExamFormCode = x.ExamFormCode,
+                    AccommodationsHtml = string.Join("<br/>", x.AccommodationNames),
+                    AccommodationsText = string.Join("; ", x.AccommodationNames)
                 })
                 .ToList()
                 .ToSearchResult();

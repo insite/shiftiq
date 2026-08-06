@@ -80,21 +80,18 @@ namespace InSite.Admin.Assessments.Sections.Models
             return filterHelper.GetResult()[0].Item2;
         }
 
-        public List<Tuple<Criterion, List<Question>>> GetResult()
+        public List<(Criterion Criterion, List<Question> Questions)> GetResult()
         {
-            var list = new List<Tuple<Criterion, List<Question>>>();
+            var list = new List<(Criterion Criterion, List<Question> Questions)>();
 
             foreach (var sieve in _criteria)
             {
                 var questions = GetResultQuestions(sieve);
 
-                var result = new Tuple<Criterion, List<Question>>(sieve, questions);
-
-                list.Add(result);
+                list.Add((sieve, questions));
             }
 
-            if (_ligsToExclude != null)
-                _ligsToExclude.Clear();
+            _ligsToExclude?.Clear();
 
             return list;
         }

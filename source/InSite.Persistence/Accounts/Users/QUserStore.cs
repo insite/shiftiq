@@ -83,6 +83,8 @@ delete from identities.QUserConnection where FromUserIdentifier = @User or ToUse
                 MultiFactorAuthentication = UserState.Defaults.MultiFactorAuthentication
             };
 
+            SetLastChange(entity, e);
+
             using (var db = new InternalDbContext())
             {
                 db.QUsers.Add(entity);
@@ -114,6 +116,8 @@ delete from identities.QUserConnection where FromUserIdentifier = @User or ToUse
                 entity.IsValidator = e.IsValidator;
                 entity.Connected = e.Connected;
 
+                SetLastChange(entity, e);
+
                 db.SaveChanges();
             }
         }
@@ -144,8 +148,24 @@ delete from identities.QUserConnection where FromUserIdentifier = @User or ToUse
 
                 action(entity);
 
+                SetLastChange(entity, e);
+
                 db.SaveChanges();
             }
+        }
+
+        private void SetLastChange(QUser user, IChange change)
+        {
+            user.LastChangeTime = change.ChangeTime;
+            user.LastChangeType = change.GetType().Name;
+            user.LastChangeUser = change.OriginUser;
+        }
+
+        private void SetLastChange(QUserConnection connection, IChange change)
+        {
+            connection.LastChangeTime = change.ChangeTime;
+            connection.LastChangeType = change.GetType().Name;
+            connection.LastChangeUser = change.OriginUser;
         }
     }
 }

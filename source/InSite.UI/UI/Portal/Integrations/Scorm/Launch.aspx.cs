@@ -71,13 +71,13 @@ namespace InSite.UI.Portal.Integrations.Scorm
             {
                 HideNavigation(); // Scoop has its own navigation bar
 
-                return GetScoopLaunchUrl(Request.Url.Host, package, courseId, activityId);
+                return GetScoopLaunchUrl(Request.Url.Host, package, courseId, activityId, organizationId);
             }
 
             return GetRusticiLaunchUrl(organizationId, activityId); // Default to Rustici SCORM Cloud
         }
 
-        public static string GetScoopLaunchUrl(string host, string package, Guid courseId, Guid activityId)
+        public static string GetScoopLaunchUrl(string host, string package, Guid courseId, Guid activityId, Guid organizationId)
         {
             var scoop = ServiceLocator.AppSettings.Engine.Api.Scoop;
 
@@ -98,7 +98,13 @@ namespace InSite.UI.Portal.Integrations.Scorm
 
             var linkGenerator = new ScoopLinkGenerator();
 
-            var scoopUrl = linkGenerator.GenerateCourseUrl(Identity, host, Organization.Code, package, encodedProgressUrl, encodedExitUrl);
+            // The account slug must identify the organization that hosts the SCORM package in
+            // OpenSCORM (e.g. the partition organization for global modules), which is not
+            // necessarily the organization the current user is signed in to.
+            var owner = OrganizationSearch.Select(organizationId);
+            var accountSlug = owner != null ? owner.Code : Organization.Code;
+
+            var scoopUrl = linkGenerator.GenerateCourseUrl(Identity, host, accountSlug, package, encodedProgressUrl, encodedExitUrl);
 
             return scoopUrl;
         }

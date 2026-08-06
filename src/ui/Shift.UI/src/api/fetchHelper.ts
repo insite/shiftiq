@@ -7,7 +7,6 @@ import { Param, requestHelper } from "./requestHelper";
 import { shiftConfig } from "@/helpers/shiftConfig";
 import { localStorageHelper } from "@/helpers/localStorageHelper";
 
-
 async function afterRequest(response: Response, asBlob: true, returnNullOn404: boolean, throwAuthError: boolean): Promise<Blob>;
 async function afterRequest<T>(response: Response, asBlob: false, returnNullOn404: boolean, throwAuthError: boolean): Promise<T>;
 async function afterRequest<T>(response: Response, asBlob: boolean, returnNullOn404: boolean, throwAuthError: boolean): Promise<T> {
@@ -185,6 +184,47 @@ export const fetchHelper = {
         });
 
         return await afterRequest(response, false, returnNullOn404, throwAuthError);
+    },
+
+    async *postStream<T>(relativeUrl: string, body: unknown, params?: Param[] | null, throwAuthError: boolean = false): AsyncGenerator<T> {
+        const url = requestHelper.beforeRequest(relativeUrl, params);
+        if (!url) {
+            return;
+        }
+
+        const response = await fetch(url, {
+            method: "POST",
+            body: body ? JSON.stringify(body) : undefined,
+            headers: {
+                "Accept": "*/*",
+                "Content-Type": "application/json",
+            },
+            credentials: "include"
+        });
+
+        requestHelper.afterRequest(response.ok, response.status, response.headers.get("X-Session-Refreshed"), {}, throwAuthError);
+
+        const decoder = new TextDecoder();
+        const reader = response.body!.getReader();
+
+        while (true) {
+            const { done, value } = await reader.read();
+             if (done) {
+                break;
+             }
+
+            const buffer = decoder.decode(value, { stream: true });
+
+            for (const line of buffer.split("\n")){
+                const trimmed = line.trim();
+                
+                if (!trimmed) {
+                    continue;
+                }
+
+                yield JSON.parse(trimmed);
+            }
+        }
     },
 
     async postForm<T>(relativeUrl: string, body: FormData, params?: Param[] | null): Promise<T> {

@@ -87,6 +87,12 @@ namespace InSite.UI.Layout.Lobby.Controls
             set => SetSessionValue(value);
         }
 
+        protected static string RegistrationGroup
+        {
+            get => ((string)GetSessionValue()).EmptyIfNull();
+            set => SetSessionValue(value);
+        }
+
         protected void ClearSessionCache()
         {
             MFA = null;
@@ -96,6 +102,7 @@ namespace InSite.UI.Layout.Lobby.Controls
             IsAuthentication = false;
             SuccessfulSignInHappened = false;
             RedirectURL = "";
+            RegistrationGroup = null;
         }
 
         #endregion
@@ -244,7 +251,7 @@ namespace InSite.UI.Layout.Lobby.Controls
             HttpResponseHelper.Redirect(MFAPageURL(userId, mfa), true);
         }
 
-        public static string SignInSucceedPageURL(bool isAuthentication, Guid userId, string message = "")
+        private static string SignInSucceedPageURL(bool isAuthentication, Guid userId, string message)
         {
             SuccessfulSignInHappened = true;
             UserId = userId;

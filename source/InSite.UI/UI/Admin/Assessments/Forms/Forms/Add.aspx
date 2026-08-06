@@ -3,9 +3,13 @@
 <%@ Register TagPrefix="uc" TagName="NameField" Src="../Controls/FormNameField.ascx" %>
 <%@ Register TagPrefix="uc" TagName="CodeField" Src="../Controls/FormCodeField.ascx" %>
 <%@ Register TagPrefix="uc" TagName="QuestionList" Src="../../Sections/Controls/QuestionList.ascx" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:Alert runat="server" ID="CreatorStatus" />
     <insite:ValidationSummary runat="server" ValidationGroup="Assessment" />
@@ -263,6 +267,7 @@
         </div>
     </div>
 
+    </asp:Panel>
 
 <insite:PageHeadContent runat="server">
     <style type="text/css">

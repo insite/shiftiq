@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Admin.Courses.Courses;
 using InSite.Admin.Courses.Outlines;
 using InSite.Admin.Courses.Outlines.Controls;
@@ -17,6 +15,7 @@ using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -36,6 +35,12 @@ namespace InSite.UI.Admin.Courses
                 Type = type;
                 ControlPath = controlPath;
             }
+        }
+
+        private class BreadcrumbDataItem
+        {
+            public string Text { get; set; }
+            public bool IsActive { get; set; }
         }
 
         #endregion
@@ -204,6 +209,8 @@ namespace InSite.UI.Admin.Courses
         {
             PageHelper.AutoBindHeader(this, null, _model.Course.Content.Title.GetText());
 
+            BindBreadcrumb(_model);
+
             CourseSetup.BindModelToControls(_model.Course);
             UnitSetup.BindModelToControls(_model.Unit);
             UnitPanel.Visible = _model.Course.AllowMultipleUnits;
@@ -213,6 +220,16 @@ namespace InSite.UI.Admin.Courses
             CreateGradebookLink.HRef = $"/ui/admin/courses/manage?course={_model.Course.Identifier}&activity={_model.Activity.ActivityIdentifier}&panel=course&tab=records";
             ActivitySetup.BindModelToControls(_model.Course, _model.Activity);
             NotificationSetup.BindModelToControls(_model.Course);
+        }
+
+        private void BindBreadcrumb(OutlineModel model)
+        {
+            ActivityBreadcrumb.DataSource = new[]
+            {
+                new BreadcrumbDataItem { Text = model.Module.ModuleName },
+                new BreadcrumbDataItem { Text = model.Activity.ActivityName, IsActive = true },
+            };
+            ActivityBreadcrumb.DataBind();
         }
 
         private System.Web.UI.Control LoadActivityEditor(QActivity activity)

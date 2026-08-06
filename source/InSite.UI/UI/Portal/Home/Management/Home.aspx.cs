@@ -39,12 +39,14 @@ namespace InSite.UI.Portal.Home.Management
             public Guid DistributionId { get; }
             public Guid? LearnerUserId { get; }
             public Guid? AttemptId { get; }
+            public Guid ManagerUserId { get; }
 
             public GridKey(CourseDistributionGridItem item)
             {
                 DistributionId = item.CourseDistributionIdentifier;
                 LearnerUserId = item.LearnerUserIdentifier;
                 AttemptId = item.AttemptIdentifier;
+                ManagerUserId = item.ManagerUserIdentifier;
             }
         }
 
@@ -65,6 +67,20 @@ namespace InSite.UI.Portal.Home.Management
         }
 
         private bool IsSkillsCheckAdded => Request.QueryString["added"] == "1";
+
+        protected bool AllowTransfer
+        {
+            get => (bool?)ViewState[nameof(AllowTransfer)] == true;
+            private set => ViewState[nameof(AllowTransfer)] = value;
+        }
+
+        protected const int DefaultTransferCount = 5;
+
+        private int AvailableTransferCount
+        {
+            get => (int?)ViewState[nameof(AvailableTransferCount)] ?? 0;
+            set => ViewState[nameof(AvailableTransferCount)] = value;
+        }
 
         #endregion
 
@@ -89,6 +105,10 @@ namespace InSite.UI.Portal.Home.Management
             AssignUserIdentifier.Filter.UpstreamUserIdentifiers = GetManagerContactBook();
             AssignUserIdentifier.AutoPostBack = true;
             AssignUserIdentifier.ValueChanged += (s, a) => OnAssignUser(AssignUserIdentifier.Value);
+
+            TransferUserIdentifier.Filter.UpstreamUserIdentifiers = GetManagerContactBook();
+            TransferUserIdentifier.AutoPostBack = true;
+            TransferUserIdentifier.ValueChanged += (s, a) => OnTransferUser();
 
             DistributionRepeater.DataBinding += DistributionRepeater_DataBinding;
             DistributionRepeater.ItemCommand += DistributionRepeater_ItemCommand;
@@ -125,6 +145,8 @@ namespace InSite.UI.Portal.Home.Management
 
             var site = GetCurrentSite();
             Page.Title = site?.SiteTitle ?? "Shift iQ";
+
+            AllowTransfer = Identity.IsGranted(PermissionNames.SkillsCheckTransfer);
 
             Open();
 
@@ -225,13 +247,6 @@ namespace InSite.UI.Portal.Home.Management
             AssignFormIdentifier.Value = null;
         }
 
-        private void RefreshView(CourseDistributionGridItem[] filteredData, CourseDistributionGridItem[] allData)
-        {
-            BindDistributionsGrid(filteredData);
-            BindStatusProgress(allData);
-            BindSkillsChecksProgress(allData);
-        }
-
         private void DistributionRepeater_DataBinding(object sender, EventArgs e)
         {
             GridKeys = new List<GridKey>();
@@ -250,12 +265,12 @@ namespace InSite.UI.Portal.Home.Management
         {
             var key = GridKeys[e.Item.ItemIndex];
 
-            if (e.CommandName == "Resend")
+            if (e.CommandName == "ResendLearner")
             {
                 if (key.LearnerUserId.HasValue)
                     SendWelcomeEmail(key.LearnerUserId.Value);
             }
-            else if (e.CommandName == "Cancel" && key.LearnerUserId.HasValue)
+            else if (e.CommandName == "CancelLearner" && key.LearnerUserId.HasValue)
             {
                 var distribution = ServiceLocator.CourseDistributionSearch.GetCourseDistribution(key.DistributionId);
 
@@ -266,6 +281,31 @@ namespace InSite.UI.Portal.Home.Management
                 RemoveLearnerFromDistribution(distribution, key.LearnerUserId.Value);
 
                 OnFilter();
+            }
+            else if (e.CommandName == "ResendTransfer")
+            {
+                if (SendManagementWelcomeEmail(key.ManagerUserId))
+                    HomeStatus.AddMessage(AlertType.Success, "Welcome email has been sent");
+                else
+                    HomeStatus.AddMessage(AlertType.Warning, "Welcome email was not sent");
+
+                HomeStatusUpdatePanel.Update();
+            }
+            else if (e.CommandName == "CancelTransfer")
+            {
+                if (CancelTransferDistributions(key.DistributionId))
+                {
+                    HomeStatus.AddMessage(AlertType.Success, "SkillsCheck transfer has been canceled.");
+
+                    OnFilter();
+                }
+                else
+                {
+                    HomeStatus.AddMessage(AlertType.Warning,
+                        "SkillsCheck transfer has not been canceled. Please refresh the page and try again.");
+                }
+
+                HomeStatusUpdatePanel.Update();
             }
         }
 
@@ -329,7 +369,7 @@ namespace InSite.UI.Portal.Home.Management
                 CourseDistributionGridItem.StatusType.Completed,
                 CourseDistributionGridItem.StatusType.InProgress,
                 CourseDistributionGridItem.StatusType.NotStarted,
-                CourseDistributionGridItem.StatusType.Unassigned,
+                CourseDistributionGridItem.StatusType.Unassigned
             };
 
             BindSkillsChecksComboBox(distributions);
@@ -342,7 +382,7 @@ namespace InSite.UI.Portal.Home.Management
         private CourseDistributionGridItem[] GetDistributions()
         {
             return ServiceLocator.CourseDistributionSearch
-                .GetCourseDistributionsByManager(Organization.Identifier, User.Identifier)
+                .GetCourseDistributionsByManager(Organization.Identifier, User.Identifier, true)
                 .ToArray();
         }
 
@@ -462,6 +502,14 @@ namespace InSite.UI.Portal.Home.Management
             ServiceLocator.SendCommand(new DeleteRegistration(registration.RegistrationIdentifier, false));
         }
 
+        private void RefreshView(CourseDistributionGridItem[] filteredData, CourseDistributionGridItem[] allData)
+        {
+            BindDistributionsGrid(filteredData);
+            BindStatusProgress(allData);
+            BindSkillsChecksProgress(allData);
+            BindTransferPanel(allData);
+        }
+
         private void BindStatusProgress(CourseDistributionGridItem[] distributions)
         {
             var counts = CalculateStatusCounts(distributions);
@@ -503,7 +551,7 @@ namespace InSite.UI.Portal.Home.Management
 
             foreach (var item in distributions)
             {
-                var status = item.GetStatus();
+                var status = GetFilterStatus(item);
                 switch (status)
                 {
                     case CourseDistributionGridItem.StatusType.Unassigned:
@@ -521,6 +569,8 @@ namespace InSite.UI.Portal.Home.Management
                     case CourseDistributionGridItem.StatusType.Completed:
                         completed++;
                         break;
+                    default:
+                        throw ApplicationError.Create("Unknown item status: {0}", status.GetName());
                 }
             }
 
@@ -538,7 +588,7 @@ namespace InSite.UI.Portal.Home.Management
         private CourseDistributionGridItem[] ApplyFilters(CourseDistributionGridItem[] distributions)
         {
             var distributionQuery = distributions
-                .Where(x => SelectedStatuses.Contains(x.GetStatus()));
+                .Where(x => SelectedStatuses.Contains(GetFilterStatus(x)));
 
             if (ProductFilter.HasValue)
             {
@@ -547,6 +597,15 @@ namespace InSite.UI.Portal.Home.Management
             }
 
             return distributionQuery.ToArray();
+        }
+
+        private CourseDistributionGridItem.StatusType GetFilterStatus(CourseDistributionGridItem item)
+        {
+            var status = item.GetStatus(User.UserIdentifier);
+
+            return status == CourseDistributionGridItem.StatusType.Transferred
+                ? CourseDistributionGridItem.StatusType.NotStarted
+                : status;
         }
 
         protected string GetProductName()
@@ -567,12 +626,14 @@ namespace InSite.UI.Portal.Home.Management
         protected string GetGridStatusHtml()
         {
             var item = (CourseDistributionGridItem)Page.GetDataItem();
-            var status = item.GetStatus();
+            var status = item.GetStatus(User.UserIdentifier);
 
             switch (status)
             {
                 case CourseDistributionGridItem.StatusType.Unassigned:
                     return "<i class=\"far fa-circle\"></i> Unassigned";
+                case CourseDistributionGridItem.StatusType.Transferred:
+                    return "<i class=\"fas fa-circle text-warning\"></i> Transferred";
                 case CourseDistributionGridItem.StatusType.NotStarted:
                 case CourseDistributionGridItem.StatusType.Assigned:
                     return "<i class=\"fas fa-circle text-primary\"></i> Not Started";
@@ -615,6 +676,151 @@ namespace InSite.UI.Portal.Home.Management
             return $"<div class=\"circular-progress skills-progress\" style=\"--ar-progress-value:{progressValue};\">"
                  + text
                  + $"</div>";
+        }
+
+        private static bool IsUnassignedPackage(CourseDistributionGridItem item) =>
+            IsUnassignedPackage(item.ProductType, item.LearnerUserIdentifier);
+
+        private static bool IsUnassignedPackage(string productType, Guid? learnerUserId) =>
+            string.Equals(productType, "Package", StringComparison.OrdinalIgnoreCase) && learnerUserId == null;
+
+        private static bool IsTransferable(CourseDistributionGridItem item)
+            => IsUnassignedPackage(item) && item.DistributionTransferred == null;
+
+        #endregion
+
+        #region Trasfer
+
+        private void BindTransferPanel(CourseDistributionGridItem[] allData)
+        {
+            if (!AllowTransfer)
+                return;
+
+            AvailableTransferCount = allData.Count(IsTransferable);
+
+            var initialValue = Math.Min(DefaultTransferCount, AvailableTransferCount);
+
+            TransferCount.Attributes["data-available"] = AvailableTransferCount.ToString();
+            TransferCount.Attributes["data-default"] = initialValue.ToString();
+            TransferCount.ValueAsInt = initialValue;
+
+            TransferCountUpdatePanel.Update();
+        }
+
+        private void OnTransferUser()
+        {
+            var userId = TransferUserIdentifier.Value;
+            if (!userId.HasValue)
+                return;
+
+            TransferUserIdentifier.Value = null;
+
+            var count = TransferCount.ValueAsInt ?? 0;
+
+            if (count <= 0)
+            {
+                HomeStatus.AddMessage(AlertType.Warning, "Please specify the number of SkillsCheck to transfer.");
+                return;
+            }
+
+            if (count > AvailableTransferCount)
+            {
+                HomeStatus.AddMessage(AlertType.Warning,
+                    $"You selected {count} SkillsCheck, but only {AvailableTransferCount} are available to choose from. " +
+                    $"Please adjust your selection to continue.");
+                return;
+            }
+
+            if (userId.Value == User.Identifier)
+            {
+                HomeStatus.AddMessage(AlertType.Warning, "You cannot transfer SkillsCheck to yourself.");
+                return;
+            }
+
+            var transferred = TransferDistributions(userId.Value, count);
+            if (transferred == 0)
+            {
+                HomeStatus.AddMessage(AlertType.Warning,
+                    "No SkillsCheck are available to transfer. Please refresh the page and try again.");
+                return;
+            }
+
+            EnsureSkillsCheckManager(userId.Value);
+            SendManagementWelcomeEmail(userId.Value);
+
+            OnFilter();
+
+            HomeStatus.AddMessage(AlertType.Success,
+                $"{transferred:n0} SkillsCheck {(transferred == 1 ? "has" : "have")} been transferred.");
+        }
+
+        private int TransferDistributions(Guid destUserId, int count)
+        {
+            var transferred = 0;
+
+            foreach (var item in GetDistributions().Where(IsTransferable))
+            {
+                var distribution = ServiceLocator.CourseDistributionSearch.GetCourseDistribution(item.CourseDistributionIdentifier);
+                if (distribution == null || distribution.TransferredFromUserIdentifier.HasValue || distribution.ManagerUserIdentifier == destUserId)
+                    continue;
+
+                distribution.Transferred = DateTimeOffset.UtcNow;
+                distribution.TransferredFromUserIdentifier = distribution.ManagerUserIdentifier;
+                distribution.TransferredByUserIdentifier = User.Identifier;
+                distribution.ManagerUserIdentifier = destUserId;
+
+                ServiceLocator.CourseDistributionStore.UpdateCourseDistribution(distribution);
+
+                transferred++;
+
+                if (transferred >= count)
+                    break;
+            }
+
+            return transferred;
+        }
+
+        private bool CancelTransferDistributions(Guid distributionId)
+        {
+            var distribution = ServiceLocator.CourseDistributionSearch
+                .GetCourseDistribution(distributionId, x => x.Product, x => x.CourseEnrollment);
+
+            if (distribution == null || !distribution.TransferredFromUserIdentifier.HasValue)
+                return false;
+
+            if (!IsUnassignedPackage(distribution.Product?.ProductType, distribution.CourseEnrollment?.LearnerUserIdentifier))
+                return false;
+
+            distribution.ManagerUserIdentifier = distribution.TransferredFromUserIdentifier.Value;
+            distribution.Transferred = null;
+            distribution.TransferredFromUserIdentifier = null;
+            distribution.TransferredByUserIdentifier = null;
+
+            ServiceLocator.CourseDistributionStore.UpdateCourseDistribution(distribution);
+
+            return true;
+        }
+
+        private static void EnsureSkillsCheckManager(Guid userId)
+        {
+            var groupId = Organization.Toolkits.Sales?.ManagerGroup;
+            if (groupId.HasValue)
+                MembershipHelper.Save(groupId.Value, userId, null);
+        }
+
+        private bool SendManagementWelcomeEmail(Guid userId)
+        {
+            var notification = PersonHelper.CreateWelcomeMessage(Organization.OrganizationIdentifier, userId, false);
+            var alert = new AlertManagementWelcomeEmail
+            {
+                UserEmail = notification.UserEmail,
+                UserFirstName = notification.UserFirstName,
+                Url = HttpRequestHelper.CurrentRootUrl,
+                WelcomeMsgDictionary = ServiceLocator.CoreProcessManager
+                    .GetWelcomeMsgPasswordInfo(notification.UserPassword, notification.UserPasswordHash),
+            };
+
+            return ServiceLocator.AlertMailer.Send(Organization.OrganizationIdentifier, userId, alert, null).IsNotEmpty();
         }
 
         #endregion

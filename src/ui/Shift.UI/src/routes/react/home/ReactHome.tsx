@@ -4,7 +4,9 @@ export default function ReactHome() {
     return (
         <>
             <ul>
-                <li className="mb-3"><ActionLink href="/client/test">/client/test</ActionLink></li>
+                <li><ActionLink href="/client/test">/client/test</ActionLink></li>
+                <li><ActionLink href="/client/test/reports/ce-performance">/client/test/reports/ce-performance</ActionLink></li>
+                <li className="mb-3"><ActionLink href="/client/test/reports/capability">/client/test/reports/capability</ActionLink></li>
                 <li><ActionLink href="/client/react/signin">/client/react/signin</ActionLink></li>
                 <li><ActionLink href="/client/admin/records/gradebooks/search">/client/admin/records/gradebooks/search</ActionLink></li>
                 <li><ActionLink href="/client/admin/content/files/search">/client/admin/content/files/search</ActionLink></li>
@@ -14,6 +16,8 @@ export default function ReactHome() {
                 <li><ActionLink href="/client/admin/assessment/specs/workshop/7f959c01-3d1e-7b76-be57-2fb8c82d5bfc">/client/admin/assessment/specs/workshop/7f959c01-3d1e-7b76-be57-2fb8c82d5bfc</ActionLink></li>
                 <li><ActionLink href="/client/admin/assessment/specs/workshop/6c160462-3041-4f65-b302-3a61e0ae977d">/client/admin/assessment/specs/workshop/6c160462-3041-4f65-b302-3a61e0ae977d</ActionLink></li>
                 <li><ActionLink href="/client/admin/platform/notifications/search">/client/admin/platform/notifications/search</ActionLink></li>
+                <li><ActionLink href="/client/admin/chatbot">/client/admin/chatbot</ActionLink></li>
+                <li><ActionLink href="/client/admin/contacts/people/integration">/client/admin/contacts/people/integration</ActionLink></li>
             </ul>
         </>
     );

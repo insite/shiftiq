@@ -1,5 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" AutoEventWireup="true" CodeBehind="Home.aspx.cs" Inherits="InSite.UI.Admin.Settings.Dashboard" %>
-<%@ Register Src="../Database/DatabaseObjectCounters.ascx" TagName="DatabaseObjectCounters" TagPrefix="uc" %>
+<%@ Register Src="../Schemas/DatabaseObjectCounters.ascx" TagName="DatabaseObjectCounters" TagPrefix="uc" %>
 
 <asp:Content ContentPlaceHolderID="BodyContent" runat="server">
 
@@ -37,6 +37,7 @@
 
                 <div class="mt-4">
                     <a class="me-3" href="/client/admin/platform/notifications/search"><i class="fas fa-message-exclamation me-1"></i>Dashboard Notifications</a>
+                    <a class="me-3" href="/client/admin/chatbot"><i class="fas fa-comment-lines me-1"></i>AI Assistant</a>
                 </div>
             </div>
         </div>

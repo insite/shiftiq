@@ -58,5 +58,10 @@ public class CredentialConfiguration : IEntityTypeConfiguration<CredentialEntity
             .WithMany(x => x.Credentials)
             .HasForeignKey(x => x.AchievementIdentifier)
             .HasPrincipalKey(x => x.AchievementIdentifier);
+
+        builder.HasOne(x => x.User)
+            .WithMany(x => x.Credentials)
+            .HasForeignKey(x => x.UserIdentifier)
+            .HasPrincipalKey(x => x.UserIdentifier);
     }
 }

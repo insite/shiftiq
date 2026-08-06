@@ -12,6 +12,7 @@ namespace InSite.Domain.Records
         public Guid User { get; set; }
 
         public DateTimeOffset? Assigned { get; set; }
+        public DateTimeOffset? Submitted { get; set; }
         public DateTimeOffset? Granted { get; set; }
         public DateTimeOffset? Expired { get; set; }
         public DateTimeOffset? Revoked { get; set; }
@@ -106,6 +107,12 @@ namespace InSite.Domain.Records
             Revoked = null;
             Status = CredentialStatus.Valid;
             Score = e.Score;
+        }
+
+        public void When(CredentialSubmitted e)
+        {
+            Submitted = e.Submitted;
+            Status = CredentialStatus.Submitted;
         }
 
         public void When(CredentialNotificationSent e)

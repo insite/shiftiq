@@ -11,7 +11,7 @@
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 
     <div class="float-end">
-        <a href="/ui/portal/learning/catalog" class="btn btn-primary"><i class="fas fa-books me-2"></i>Catalog</a>
+        <a href="/ui/portal/learning/catalogue" class="btn btn-primary"><i class="fas fa-books me-2"></i>Catalogue</a>
     </div>
 
     <style type="text/css">

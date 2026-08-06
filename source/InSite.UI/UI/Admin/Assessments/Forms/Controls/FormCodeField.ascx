@@ -9,7 +9,7 @@
         <insite:TextBox runat="server" ID="Code" Text="N/A" MaxLength="40" />
     </div>
     <div class="form-text">
-        This is the form's catalog code.
+        This is the form's catalogue code.
     </div>
 </div>
 

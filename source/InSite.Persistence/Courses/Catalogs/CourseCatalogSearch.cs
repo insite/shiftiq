@@ -279,7 +279,7 @@ namespace InSite.Persistence
             for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
-                var url = $"/ui/portal/learning/catalog?catalog={item.CatalogName}&category={HttpUtility.UrlEncode(item.CourseCategory)}";
+                var url = $"/ui/portal/learning/catalogue?catalog={item.CatalogName}&category={HttpUtility.UrlEncode(item.CourseCategory)}";
                 var link = $"<a class='meta-link' href='{url}'>{item.CourseCategory}</a>";
                 html.Append(link);
                 if (i < items.Count - 1)

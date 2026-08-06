@@ -21,7 +21,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
         private Guid BankID => Guid.TryParse(Request.QueryString["bank"], out var value) ? value : Guid.Empty;
 
-        private Guid FormID => Guid.Parse(Request.QueryString["form"]);
+        private Guid FormID => Guid.TryParse(Request.QueryString["form"], out var value) ? value : Guid.Empty;
 
         private Guid? SectionID => Guid.TryParse(Request.QueryString["section"], out var value) ? value : (Guid?)null;
 
@@ -41,7 +41,10 @@ namespace InSite.Admin.Assessments.Forms.Forms
             base.OnLoad(e);
 
             if (!CanEdit)
-                RedirectToSearch();
+            {
+                ShowAlert(a => a.ShowPermissionDenied("modify form addendums"));
+                return;
+            }
 
             if (!IsPostBack)
                 Open();
@@ -69,11 +72,30 @@ namespace InSite.Admin.Assessments.Forms.Forms
         {
             var bank = ServiceLocator.BankSearch.GetBankState(BankID);
             if (bank == null)
-                RedirectToSearch();
+            {
+                ShowAlert(a =>
+                {
+                    if (BankID == Guid.Empty)
+                        a.ShowBankMissing();
+                    else
+                        a.ShowBankNotFound(BankID);
+                });
+                return;
+            }
 
             var form = bank.FindForm(FormID);
             if (form == null)
-                RedirectToReader();
+            {
+                var bankName = bank.Name;
+                ShowAlert(a =>
+                {
+                    if (FormID == Guid.Empty)
+                        a.ShowFormMissing(BankID, bankName);
+                    else
+                        a.ShowFormNotFound(FormID, BankID, bankName);
+                });
+                return;
+            }
 
             SetInputValues(form);
         }
@@ -147,7 +169,11 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
         #region Methods (redirect)
 
-        private static void RedirectToSearch() => HttpResponseHelper.Redirect($"/ui/admin/assessments/banks/search", true);
+        private void ShowAlert(Action<InSite.Admin.Assessments.Forms.Controls.FormPageAlert> configure)
+        {
+            ContentPanel.Visible = false;
+            configure(PageAlert);
+        }
 
         private void RedirectToReader(Guid? formId = null, Guid? sectionId = null)
         {

@@ -11,7 +11,7 @@
                 <div class="col-6">
 
                     <div class="mb-2">
-                        <cmds:OrganizationScopeSelector runat="server" ID="ProfileScope" EmptyMessage="Profile Scope" />
+                        <cmds:OrganizationScopeSelector runat="server" ID="ProfileScope" EmptyMessage="Scope" />
                     </div>
 
                     <div class="mb-2">
@@ -29,7 +29,29 @@
                 </div>
                 <div class="col-6">
 
-                    <cmds:FindProfile runat="server" ID="ParentProfile" EmptyMessage="Parent Profile" />
+                    <div class="mb-2">
+                        <cmds:FindProfile runat="server" ID="ParentProfile" EmptyMessage="Parent" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:ComboBox runat="server" ID="HasParent" EmptyMessage="Hierarchy">
+                            <Items>
+                                <insite:ComboBoxOption Value="" />
+                                <insite:ComboBoxOption Value="False" Text="Top-level" />
+                                <insite:ComboBoxOption Value="True" Text="Child" />
+                            </Items>
+                        </insite:ComboBox>
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:ComboBox runat="server" ID="IsDiverged" EmptyMessage="Divergence">
+                            <Items>
+                                <insite:ComboBoxOption Value="" />
+                                <insite:ComboBoxOption Value="True" Text="Diverged" />
+                                <insite:ComboBoxOption Value="False" Text="Aligned" />
+                            </Items>
+                        </insite:ComboBox>
+                    </div>
 
                 </div>
             </div>

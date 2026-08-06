@@ -26,8 +26,9 @@ namespace Shift.Contract
 
         public class QuestionSource
         {
+            public Guid BankId { get; set; }
             public Guid QuestionId { get; set; }
-            public int QuestionAssetNumber { get; set; }
+            public string QuestionAssetNumber { get; set; }
         }
 
         public class QuestionReplaceButtons

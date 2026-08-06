@@ -17,6 +17,7 @@ namespace InSite.Application.Records.Read
 
         public bool TaskIsRequired { get; set; }
         public bool TaskIsPlanned { get; set; }
+        public bool TaskIsInherited { get; set; }
 
         public int? TaskLifetimeMonths { get; set; }
         public int TaskSequence { get; set; }

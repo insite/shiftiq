@@ -890,7 +890,8 @@ namespace InSite.UI.Portal.Learning
 
                 ScormStartUrl.HRef = scormPackageSlug.IsEmpty() || StringHelper.Equals(scormPackageSlug, activityId.ToString())
                     ? BlankHref
-                    : Launch.GetScoopLaunchUrl(Request.Url.Host, scormPackageSlug, courseId, activityId);
+                    : Launch.GetScoopLaunchUrl(Request.Url.Host, scormPackageSlug, courseId, activityId, Progress.Course.Organization);
+
                 ScormStartUrl.Target = link.Target.IsEmpty() ? "_self" : link.Target;
             }
             else if (link.Target == "_self" || link.Target == "_top" || link.Target == "_embed")
@@ -1215,7 +1216,7 @@ namespace InSite.UI.Portal.Learning
 
                 if (!ServiceLocator.PageSearch.Exists(x => x.ObjectType == "Course" && x.ObjectIdentifier == courseId))
                 {
-                    url = "/ui/portal/learning/catalog";
+                    url = "/ui/portal/learning/catalogue";
 
                     if (Page.Master is PortalMaster m)
                         m.OverrideHomeLink(url);

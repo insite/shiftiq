@@ -52,8 +52,9 @@ export interface WorkshopQuestion {
     };
 
     source: {
+        bankId: string;
         questionId: string;
-        questionAssetNumber: number;
+        questionAssetNumber: string;
     } | null;
 
     forms: {

@@ -5,7 +5,7 @@ import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
 export default function AdminHomeLayout_NavigationGroups() {
     const { siteSetting } = useSiteProvider();
     return (
-        siteSetting.NavigationGroups.map(group => (
+        siteSetting.AllApps.map(group => (
             <Fragment key={group.Title}>
                 <h3 className="h6 text-light pt-2 pb-2 border-bottom border-light compact-h3">
                     <span className="hide-compact">

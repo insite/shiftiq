@@ -58,6 +58,16 @@
                                 </div>
 
                                 <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        Parent Programs
+                                    </label>
+                                    <div>
+                                        <insite:FindProgram runat="server" ID="ParentPrograms" MaxSelectionCount="10" />
+                                    </div>
+                                    <div class="form-text">The new program inherits all tasks from its parent programs.</div>
+                                </div>
+
+                                <div class="form-group mb-3">
                                     <div>
                                         <insite:NextButton runat="server" ID="Step1NextButton" />
                                         <insite:SaveButton runat="server" ID="Step1SaveButton" />

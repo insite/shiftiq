@@ -48,24 +48,35 @@ namespace InSite.Persistence
             }
         }
 
-        public List<CourseDistributionGridItem> GetCourseDistributionsByManager(Guid organizationId, Guid managerUserId)
+        public List<CourseDistributionGridItem> GetCourseDistributionsByManager(Guid organizationId, Guid managerUserId, bool includeTransferred)
         {
-            return GetCourseDistributionGridItems(organizationId, managerUserId, null);
+            return GetCourseDistributionGridItems(organizationId, managerUserId, includeTransferred, null);
         }
 
         public List<CourseDistributionGridItem> GetCourseDistributionsByLearner(Guid organizationId, Guid learnerUserId)
         {
-            return GetCourseDistributionGridItems(organizationId, null, learnerUserId);
+            return GetCourseDistributionGridItems(organizationId, null, false, learnerUserId);
         }
 
-        private List<CourseDistributionGridItem> GetCourseDistributionGridItems(Guid organizationId, Guid? managerUserId, Guid? learnerUserId)
+        private List<CourseDistributionGridItem> GetCourseDistributionGridItems(Guid organizationId, Guid? managerUserId, bool includeTransferred, Guid? learnerUserId)
         {
             using (var db = new InternalDbContext())
             {
                 var distributionsQuery = db.TCourseDistributions.Where(x => x.Product.OrganizationIdentifier == organizationId);
 
                 if (managerUserId.HasValue)
-                    distributionsQuery = distributionsQuery.Where(x => x.ManagerUserIdentifier == managerUserId);
+                {
+                    if (includeTransferred)
+                    {
+                        distributionsQuery = distributionsQuery
+                            .Where(x => x.ManagerUserIdentifier == managerUserId
+                                     || x.TransferredFromUserIdentifier == managerUserId);
+                    }
+                    else
+                    {
+                        distributionsQuery = distributionsQuery.Where(x => x.ManagerUserIdentifier == managerUserId);
+                    }
+                }
 
                 if (learnerUserId.HasValue)
                     distributionsQuery = distributionsQuery.Where(x => x.CourseEnrollment.LearnerUserIdentifier == learnerUserId);
@@ -110,6 +121,7 @@ namespace InSite.Persistence
                         CourseIdentifier = x.Distribution.CourseIdentifier,
                         EventIdentifier = x.Distribution.EventIdentifier,
                         ManagerUserIdentifier = x.Distribution.ManagerUserIdentifier,
+                        ManagerUserName = x.Distribution.Manager.UserFullName,
                         Created = x.Distribution.Created,
                         Modified = x.Distribution.Modified,
                         CourseEnrollmentIdentifier = x.Distribution.CourseEnrollmentIdentifier,
@@ -120,7 +132,9 @@ namespace InSite.Persistence
                         DistributionComment = x.Distribution.DistributionComment,
                         ProductType = x.Distribution.SubProduct.ProductType ?? x.Distribution.Product.ProductType,
                         ProductName = x.Distribution.SubProduct.ProductName ?? x.Distribution.Product.ProductName,
-                        ProductImageUrl = x.Distribution.SubProduct.ProductImageUrl ?? x.Distribution.Product.ProductImageUrl
+                        ProductImageUrl = x.Distribution.SubProduct.ProductImageUrl ?? x.Distribution.Product.ProductImageUrl,
+                        DistributionTransferred = x.Distribution.Transferred,
+                        DistributionTransferredFromUserIdentifier = x.Distribution.TransferredFromUserIdentifier
                     }))
                     .OrderByDescending(x => x.Created)
                     .ThenBy(x => x.CourseDistributionIdentifier)
@@ -128,12 +142,13 @@ namespace InSite.Persistence
             }
         }
 
-        public TCourseDistribution GetCourseDistribution(Guid courseDistributionId)
+        public TCourseDistribution GetCourseDistribution(Guid courseDistributionId, params Expression<Func<TCourseDistribution, object>>[] includes)
         {
             using (var db = CreateContext())
             {
                 return db.TCourseDistributions
-                         .FirstOrDefault(x => x.CourseDistributionIdentifier == courseDistributionId);
+                    .ApplyIncludes(includes)
+                    .FirstOrDefault(x => x.CourseDistributionIdentifier == courseDistributionId);
             }
         }
 

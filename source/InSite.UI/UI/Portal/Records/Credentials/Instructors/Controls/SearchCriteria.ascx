@@ -41,8 +41,9 @@
                         <insite:ComboBox runat="server" ID="CredentialStatus" EnableTranslation="true" EmptyMessage="Credential Status">
                             <Items>
                                 <insite:ComboBoxOption />
-                                <insite:ComboBoxOption Text="Valid" Value="Valid" />
                                 <insite:ComboBoxOption Text="Pending" Value="Pending" />
+                                <insite:ComboBoxOption Text="Submitted" Value="Submitted" />
+                                <insite:ComboBoxOption Text="Valid" Value="Valid" />
                                 <insite:ComboBoxOption Text="Expired" Value="Expired" />
                             </Items>
                         </insite:ComboBox>

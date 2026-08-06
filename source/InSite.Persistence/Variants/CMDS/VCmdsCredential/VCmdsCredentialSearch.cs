@@ -162,7 +162,7 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
-        public static List<VCmdsAchievement> SelectAchievementsByDepartment(Guid[] departments, String[] achievementTypes, Boolean? isRequired)
+        public static List<VCmdsAchievement> SelectAchievementsByDepartment(Guid[] departments, string[] achievementTypes, bool? isRequired)
         {
             if (departments.IsEmpty())
                 departments = new Guid[] { Guid.Empty };
@@ -201,7 +201,43 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
-        public static List<VCmdsAchievement> SelectAchievementsByCompany(Guid organizationId, String[] achievementCategories, Boolean? isRequired)
+        public static List<VCmdsAchievement> SelectAchievementsByOrganization(Guid organizationId, string[] achievementTypes, bool? isRequired)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var credentials = db.Memberships
+                    .Where(
+                        x => x.Group.GroupType == GroupTypes.Department
+                          && x.Group.OrganizationIdentifier == organizationId)
+                    .Join(
+                        db.VCmdsAchievementDepartments,
+                        a => a.GroupIdentifier,
+                        b => b.DepartmentIdentifier,
+                        (a, b) => new { b.AchievementIdentifier, a.UserIdentifier }
+                    )
+                    .Join(
+                        db.VCmdsCredentials,
+                        a => new { a.AchievementIdentifier, a.UserIdentifier },
+                        b => new { b.AchievementIdentifier, b.UserIdentifier },
+                        (a, b) => b
+                    );
+
+                if (isRequired.HasValue)
+                    credentials = credentials.Where(x => x.CredentialIsMandatory == isRequired);
+
+                var query = db.VCmdsAchievements
+                    .Where(x => credentials.Any(y => y.AchievementIdentifier == x.AchievementIdentifier));
+
+                if (achievementTypes.IsNotEmpty())
+                    query = query.Where(x => achievementTypes.Contains(x.AchievementLabel));
+
+                return query
+                    .OrderBy(x => x.AchievementTitle)
+                    .ToList();
+            }
+        }
+
+        public static List<VCmdsAchievement> SelectAchievementsByCompany(Guid organizationId, string[] achievementTypes, bool? isRequired)
         {
             using (var db = new InternalDbContext())
             {
@@ -223,8 +259,8 @@ namespace InSite.Persistence.Plugin.CMDS
                     .Select(x => x.Achievement)
                     .Where(x => credentials.Any(y => y.AchievementIdentifier == x.AchievementIdentifier));
 
-                if (achievementCategories.IsNotEmpty())
-                    query = query.Where(x => achievementCategories.Contains(x.AchievementLabel));
+                if (achievementTypes.IsNotEmpty())
+                    query = query.Where(x => achievementTypes.Contains(x.AchievementLabel));
 
                 return query
                     .OrderBy(x => x.AchievementTitle)

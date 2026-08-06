@@ -74,7 +74,7 @@ public partial class CookieController : ShiftControllerBase
         if (token == null)
             return BadRequest("Failed to create the token");
 
-        _cookieService.AppendSecurityCookie(token);
+        _cookieService.AppendSecurityCookie(token, true);
 
         return Ok(token);
     }
@@ -332,7 +332,7 @@ public partial class CookieController : ShiftControllerBase
         token.OrganizationCode = principal.Organization.Slug;
         token.OrganizationIdentifier = principal.OrganizationId;
 
-        _cookieService.AppendSecurityCookie(token);
+        _cookieService.AppendSecurityCookie(token, true);
 
         return Ok();
     }
@@ -380,7 +380,7 @@ public partial class CookieController : ShiftControllerBase
             token.OrganizationCode = principal.Organization.Slug;
             token.OrganizationIdentifier = principal.OrganizationId;
 
-            _cookieService.AppendSecurityCookie(token);
+            _cookieService.AppendSecurityCookie(token, false);
         }
 
         return Ok();

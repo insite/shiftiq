@@ -219,6 +219,39 @@ namespace InSite.Domain.Banks
             }
         }
 
+        public bool IsTabTimeLimitEnabledForAll() =>
+            Specification.IsTabTimeLimitAllowed && Specification.TabTimeLimit == SpecificationTabTimeLimit.AllTabs;
+
+        public int CalculateFormTimeLimit(bool includeBreakTimers = false)
+        {
+            if (!IsTabTimeLimitEnabledForAll())
+                return Invigilation.TimeLimit;
+
+            var result = 0;
+            var spec = Specification;
+            var configs = spec.Type == SpecificationType.Static
+                ? Sections.Select(x => x.TabConfiguration)
+                : spec.Type == SpecificationType.Dynamic
+                    ? spec.Criteria.Select(x => x.TabConfiguration)
+                    : throw new ApplicationError($"Unknown specification type: {spec.Type}");
+
+            foreach (var config in configs)
+            {
+                if (config.BreakTimerEnabled && !includeBreakTimers)
+                    continue;
+
+                if (config.TimeLimit <= 0)
+                {
+                    result = -1;
+                    break;
+                }
+
+                result += config.TimeLimit;
+            }
+
+            return result;
+        }
+
         /// <remarks>
         /// The documentation for SelectMany does not explicitly guarantee the order of the elements in the result, 
         /// therefore we build the array explicitly to ensure the order is preserved.

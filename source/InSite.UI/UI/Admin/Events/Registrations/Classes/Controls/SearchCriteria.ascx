@@ -128,6 +128,11 @@
                     <div class="mb-2">
                         <insite:FindBankForm runat="server" ID="ExamFormIdentifier" EmptyMessage="Assessment Form Name" />
                     </div>
+
+                    <div class="mb-2">
+                        <insite:AccommodationTypeMultiComboBox runat="server" ID="AccommodationType"
+                            EmptyMessage="Accommodations" EnableSearch="true" Multiple-ActionsBox="true" />
+                    </div>
                 </div>
             </div> 
         </div>

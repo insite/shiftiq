@@ -6,6 +6,8 @@ namespace InSite.Application.Cases.Write
 {
     public class CloseIssue : Command
     {
+        public DateTimeOffset? Closed { get; set; }
+
         public CloseIssue(Guid aggregate)
         {
             AggregateIdentifier = aggregate;

@@ -9,11 +9,13 @@ using Shift.Service.Timeline;
 using Shift.Service.Utility;
 using Shift.Service.Evaluation.Workshops.Creators;
 using InSite.Application.Files.Read;
+using Shift.Service.Assessment;
 
 namespace Shift.Service.Evaluation.Workshops;
 
 public class FormWorkshopRetrieveService(
     ITimelineQuery timelineQuery,
+    BankQuestionReader questionReader,
     StandardReader standardReader,
     UserReader userReader,
     UploadReader uploadReader,
@@ -47,7 +49,9 @@ public class FormWorkshopRetrieveService(
         result.Comments = await commentCreator.CreateAsync(comments, true);
         result.Attachments = await new WorkshopAttachmentCreator(userReader, uploadReader, fileReader, changeReader, storageService).CreateAsync(bank);
         result.ProblemQuestions = WorkshopProblemQuestionCreator.Create(form.GetQuestions());
-        result.QuestionData = await new WorkshopQuestionCreator(bank, standardReader, collectionItemReader).CreateInitDataAsync(form, sectionId, questionId, commentCreator);
+        
+        result.QuestionData = await new WorkshopQuestionCreator(bank, standardReader, questionReader, collectionItemReader)
+            .CreateInitDataAsync(form, sectionId, questionId, commentCreator);
 
         return result;
     }
@@ -61,7 +65,7 @@ public class FormWorkshopRetrieveService(
 
         var commentCreator = new WorkshopCommentCreator(bank, timeZone, userReader);
 
-        return await new WorkshopQuestionCreator(bank, standardReader, collectionItemReader).CreateSectionDataAsync(section, commentCreator);
+        return await new WorkshopQuestionCreator(bank, standardReader, questionReader, collectionItemReader).CreateSectionDataAsync(section, commentCreator);
     }
 
     public async Task<FormWorkshop.Questions> RetrieveVerifiedQuestionsAsync(Guid bankId, Guid formId)

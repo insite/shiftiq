@@ -15,9 +15,7 @@
         <insite:NavItem runat="server" ID="ProfileTab" Title="Profile" Icon="far fa-ruler-triangle" IconPosition="BeforeText">
 
             <section>
-            
-                <h2 class="h4 mt-4 mb-3">Profile</h2>   
-    
+
                 <div class="mb-3">
                     <insite:Button runat="server" ID="LockButton" ButtonStyle="Default" Text="Lock" Icon="far fa-lock"
                         ConfirmText="Are you sure you want to lock this profile?" />
@@ -26,7 +24,6 @@
                     <insite:ButtonSpacer runat="server" ID="LockButtonSpacer" />
                     <insite:Button runat="server" ID="CopyButton" ButtonStyle="Default" Text="Copy" Icon="far fa-copy"
                         ConfirmText="Are you sure you want to copy this profile?" />
-                    <insite:Button runat="server" ID="MoveButton" ButtonStyle="Default" Text="Move" Icon="fa-regular fa-briefcase-arrow-right" />
                     <insite:ButtonSpacer runat="server" ID="CopyButtonSpacer" />
                     <insite:Button runat="server" ID="EditCertificateButton" ButtonStyle="Default" Text="Edit College Certificate" Icon="far fa-pencil" />
                     <insite:Button runat="server" ID="ViewDifferencesButton" ButtonStyle="Default" Text="View Differences" Icon="far fa-chart-bar" NavigateTarget="_blank" />
@@ -122,14 +119,13 @@
                             </div>
                             <div class="col-lg-6">
 
-                                <h3 runat="server" id="ProfileOwnerHeading">Profile Owner</h3>
+                                <h3>Profile Owner</h3>
 
                                 <uc:ProfileOwner runat="server" ID="ProfileOwnership" AllowThisOrganizationAndGlobal="true" />
 
-                                <div runat="server" id="ProfileOwnerConfirm" visible="false" class="alert alert-danger" role="alert">
-                                    <p>Are you sure you want to move this profile to a different organization?</p>
-                                    <insite:Button runat="server" ID="ConfirmMoveButton" 
-                                        Text="Confirm" ButtonStyle="Danger" />
+                                <div runat="server" id="DivergenceAlert" visible="false" class="alert alert-info d-flex align-items-start" role="alert">
+                                    <i class="fas fa-info-circle flex-shrink-0 me-2 mt-1"></i>
+                                    <div><asp:Literal runat="server" ID="DivergenceAlertText" /></div>
                                 </div>
 
                             </div>

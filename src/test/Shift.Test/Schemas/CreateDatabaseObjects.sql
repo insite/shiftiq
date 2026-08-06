@@ -795,6 +795,7 @@ CREATE TABLE [events].[QEvent](
 	[BillingCodeEnabled] [bit] NOT NULL,
 	[WhenEventReminderRequestedNotifyLearnerMessageIdentifier] [uniqueidentifier] NULL,
 	[WhenEventReminderRequestedNotifyInstructorMessageIdentifier] [uniqueidentifier] NULL,
+    [WhenEventCompletedNotifyLearnerMessageIdentifier] [uniqueidentifier] NULL,
 	[ReminderMessageSent] [datetimeoffset](7) NULL,
 	[SendReminderBeforeDays] [int] NULL,
  CONSTRAINT [PK_QEvent] PRIMARY KEY CLUSTERED 
@@ -841,7 +842,10 @@ CREATE TABLE [identities].[QUser](
 	[LoginOrganizationCode] [varchar](30) NULL,
 	[OldUserPasswordHash] [varchar](70) NULL,
 	[UserPasswordChangeRequested] [int] NULL,
- CONSTRAINT [PK_QUser] PRIMARY KEY CLUSTERED 
+	[LastChangeTime] [datetimeoffset](7) NOT NULL,
+	[LastChangeType] [varchar](100) NOT NULL,
+	[LastChangeUser] [uniqueidentifier] NOT NULL,
+ CONSTRAINT [PK_QUser] PRIMARY KEY CLUSTERED
 (
 	[UserIdentifier] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
@@ -980,7 +984,10 @@ CREATE TABLE [contacts].[QPerson](
 	[PersonType] [varchar](20) NULL,
 	[SinModified] [datetimeoffset](7) NULL,
 	[AgeGroup] [varchar](20) NULL,
- CONSTRAINT [PK_QPerson] PRIMARY KEY CLUSTERED 
+	[LastChangeTime] [datetimeoffset](7) NOT NULL,
+	[LastChangeType] [varchar](100) NOT NULL,
+	[LastChangeUser] [uniqueidentifier] NOT NULL,
+ CONSTRAINT [PK_QPerson] PRIMARY KEY CLUSTERED
 (
 	[PersonIdentifier] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
@@ -1650,7 +1657,10 @@ CREATE TABLE [contacts].[QMembership](
 	[MembershipExpiry] [datetimeoffset](7) NULL,
 	[Modified] [datetimeoffset](7) NOT NULL,
 	[ModifiedBy] [uniqueidentifier] NOT NULL,
- CONSTRAINT [PK_QMembership] PRIMARY KEY CLUSTERED 
+	[LastChangeTime] [datetimeoffset](7) NOT NULL,
+	[LastChangeType] [varchar](100) NOT NULL,
+	[LastChangeUser] [uniqueidentifier] NOT NULL,
+ CONSTRAINT [PK_QMembership] PRIMARY KEY CLUSTERED
 (
 	[MembershipIdentifier] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
@@ -7906,9 +7916,11 @@ SELECT
    ,QCourse.CourseHook
    ,QCourse.CourseLabel
    ,QCourse.CourseName
+   ,QCourse.CourseIsHidden
    ,QGradebook.GradebookIdentifier
    ,QGradebook.GradebookTitle
    ,TCatalog.CatalogName
+   ,TCatalog.IsHidden AS CatalogIsHidden
    ,ISNULL(HierarchyHelper.UnitCount, 0) AS UnitCount
    ,ISNULL(HierarchyHelper.ModuleCount, 0) AS ModuleCount
    ,ISNULL(HierarchyHelper.ActivityCount, 0) AS ActivityCount
@@ -10993,7 +11005,10 @@ CREATE TABLE [identities].[QUserConnection](
 	[FromUserIdentifier] [uniqueidentifier] NOT NULL,
 	[ToUserIdentifier] [uniqueidentifier] NOT NULL,
 	[IsLeader] [bit] NOT NULL,
- CONSTRAINT [PK_QUserConnection] PRIMARY KEY CLUSTERED 
+	[LastChangeTime] [datetimeoffset](7) NOT NULL,
+	[LastChangeType] [varchar](100) NOT NULL,
+	[LastChangeUser] [uniqueidentifier] NOT NULL,
+ CONSTRAINT [PK_QUserConnection] PRIMARY KEY CLUSTERED
 (
 	[FromUserIdentifier] ASC,
 	[ToUserIdentifier] ASC

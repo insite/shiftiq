@@ -31,6 +31,12 @@ namespace InSite.Admin.Records.Programs.Controls
             FolderRepeater.DataBind();
         }
 
+        public void BindModelToControls(IEnumerable<Guid> achievementIds, Guid[] parentProgramIds)
+        {
+            FolderRepeater.DataSource = GetDataSource(achievementIds, parentProgramIds);
+            FolderRepeater.DataBind();
+        }
+
         public List<AchievementItem> GetAchievements()
         {
             var achievements = new List<AchievementItem>();

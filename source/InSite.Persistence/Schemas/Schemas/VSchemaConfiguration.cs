@@ -4,7 +4,7 @@ namespace InSite.Persistence
 {
     public class VSchemaConfiguration : EntityTypeConfiguration<VSchema>
     {
-        public VSchemaConfiguration() : this("databases") { }
+        public VSchemaConfiguration() : this("schemas") { }
 
         public VSchemaConfiguration(string schema)
         {

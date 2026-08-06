@@ -21,8 +21,6 @@ namespace Shift.Hub.Partitions
         {
             try
             {
-                await _store.EnsureSchemaAsync();
-
                 await _store.UpsertAsync(partition);
 
                 return Ok();
@@ -40,8 +38,6 @@ namespace Shift.Hub.Partitions
         [ProducesResponseType<PartitionRegistration[]>(StatusCodes.Status200OK, "application/json")]
         public async Task<ActionResult<List<PartitionRegistration>>> GetAsync()
         {
-            await _store.EnsureSchemaAsync();
-
             return await _store.GetAllAsync();
         }
     }

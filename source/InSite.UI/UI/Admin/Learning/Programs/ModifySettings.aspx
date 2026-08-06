@@ -18,6 +18,14 @@
         </div>
     </section>
 
+    <div class="form-group mt-3">
+        <insite:CheckBox runat="server" ID="CascadeToLearners" Checked="true"
+            Text="Apply these settings to learners already enrolled in this program" />
+        <div class="form-text">
+            Clear this only when enrolled learners must keep the training plan they already have.
+        </div>
+    </div>
+
     <div class="mt-3">
         <insite:SaveButton runat="server" ID="SaveButton" ValidationGroup="Settings" />
         <insite:CancelButton runat="server" ID="CancelButton" CausesValidation="false" />

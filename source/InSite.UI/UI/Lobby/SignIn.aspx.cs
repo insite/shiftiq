@@ -22,8 +22,7 @@ namespace InSite.UI.Lobby
 
         #region Properties
 
-        private string RegistrationGroup => Page.Request.QueryString["group"]?.ToString();
-        private string ReturnVerifiedUrl => Page.Request.QueryString["returnVerified"]?.ToString();
+        private string ReturnVerifiedUrl => Page.Request.QueryString["returnVerified"];
         private bool AntiForgeryValidationFailed => Page.Request.QueryString["afv_failed"] == "1";
 
         #endregion
@@ -35,6 +34,8 @@ namespace InSite.UI.Lobby
             base.OnInit(e);
 
             ClearSessionCache();
+
+            RegistrationGroup = Page.Request.QueryString["group"];
 
             if (!IsPostBack)
                 RemoveSsrsReportsFromSession();
@@ -76,6 +77,9 @@ namespace InSite.UI.Lobby
                 SetupCustomContent();
 
                 PasswordExpiredToast.Visible = Request.QueryString["password-expired"] == "1";
+
+                if (Request.QueryString["register"] == "already-registered")
+                    SignInStatus.AddMessage(AlertType.Information, "An account with this email address already exists. Please sign in to continue.");
             }
 
             if (string.IsNullOrWhiteSpace(RedirectURL))
@@ -125,7 +129,7 @@ namespace InSite.UI.Lobby
 
             if (Organization != null)
             {
-                showRegistration = Register.IsRegistrationEnabled(Organization, RegistrationGroup);
+                showRegistration = Register.IsRegistrationEnabled(RegistrationGroup);
                 allowGoogleSignIn = Organization.PlatformCustomization.SignIn.AllowGoogleSignIn;
                 allowMicrosoftSignIn = Organization.PlatformCustomization.SignIn.AllowMicrosoftSignIn;
             }
@@ -290,7 +294,7 @@ namespace InSite.UI.Lobby
         {
             var baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
             var organizationId = Organization.OrganizationIdentifier;
-            var link = Global.AzureAD.CreateAuthorizationRequest(organizationId, Page.Request.Url.Host, baseUrl);
+            var link = Global.MicrosoftEntra.CreateAuthorizationRequest(organizationId, baseUrl);
             HttpResponseHelper.Redirect(link, true);
         }
 

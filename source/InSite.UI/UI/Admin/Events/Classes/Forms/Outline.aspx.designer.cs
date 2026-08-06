@@ -456,6 +456,15 @@ namespace InSite.Admin.Events.Classes.Forms
         protected global::InSite.Common.Web.UI.UpdatePanel ContentSurveyUpdatePanel;
 
         /// <summary>
+        /// EditMandatorySurveyFormLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink EditMandatorySurveyFormLink;
+
+        /// <summary>
         /// MandatorySurveyFormIdentifier control.
         /// </summary>
         /// <remarks>
@@ -463,6 +472,15 @@ namespace InSite.Admin.Events.Classes.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.FindWorkflowForm MandatorySurveyFormIdentifier;
+
+        /// <summary>
+        /// MandatorySurveyFormStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal MandatorySurveyFormStatus;
 
         /// <summary>
         /// CommentTab control.

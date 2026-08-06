@@ -68,12 +68,19 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             return _solutions ?? (_solutions = ServiceLocator.AttemptSearch.GetAttemptSolutions(_attempt.AttemptIdentifier, null));
         }
 
-
         public IEnumerable<AttemptSectionInfo> GetSections()
         {
-            if (_bankForm.Specification.Type == SpecificationType.Dynamic)
-                return null;
+            if (_bankForm.Specification.Type == SpecificationType.Static)
+                return GetStaticSections();
 
+            if (_bankForm.Specification.Type == SpecificationType.Dynamic && _attempt.CriteriaAsSectionsEnabled)
+                return GetDynamicSections();
+
+            return null;
+        }
+
+        private IEnumerable<AttemptSectionInfo> GetStaticSections()
+        {
             var result = new List<AttemptSectionInfo>();
             var sections = GetAllSections();
             var questions = GetQuestions();
@@ -92,7 +99,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 
                     if (sectionItem == null || prevSectionId != sectionId)
                     {
-                        result.Add(sectionItem = new AttemptSectionInfo { BankSection = section });
+                        result.Add(sectionItem = new AttemptSectionInfo(section));
                         prevSectionId = sectionId;
                     }
 
@@ -108,11 +115,73 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                     if (section.SectionIdentifier.HasValue)
                     {
                         var sectionId = section.SectionIdentifier.Value;
-                        item.BankSection = _bankForm.Sections.FirstOrDefault(y => y.Identifier == sectionId);
+                        var bankSection = _bankForm.Sections.FirstOrDefault(y => y.Identifier == sectionId);
+                        item.Set(bankSection);
                     }
                     else if (section.SectionIndex < _bankForm.Sections.Count)
                     {
-                        item.BankSection = _bankForm.Sections[section.SectionIndex];
+                        var bankSection = _bankForm.Sections[section.SectionIndex];
+                        item.Set(bankSection);
+                    }
+
+                    foreach (var question in questions)
+                    {
+                        if (question.SectionIndex.Value == section.SectionIndex)
+                            item.Questions.Add(question);
+                    }
+
+                    result.Add(item);
+                }
+            }
+
+            return result;
+        }
+
+        private IEnumerable<AttemptSectionInfo> GetDynamicSections()
+        {
+            var result = new List<AttemptSectionInfo>();
+            var sections = GetAllSections();
+            var questions = GetQuestions();
+
+            if (sections.IsEmpty())
+            {
+                var criteriaMapping = _bankForm.Specification.Criteria
+                    .SelectMany(c => c.Sets.SelectMany(s => s.Questions.Select(q => (QuestionId: q.Identifier, Criterion: c))))
+                    .ToDictionary(x => x.QuestionId, x => x.Criterion);
+                var prevCriterionId = Guid.Empty;
+                AttemptSectionInfo sectionItem = null;
+
+                foreach (var question in questions)
+                {
+                    var criterion = criteriaMapping.GetOrDefault(question.QuestionIdentifier);
+                    var criterionFound = criterion != null;
+                    var criterionId = criterionFound ? criterion.Identifier : Guid.Empty;
+
+                    if (sectionItem == null || prevCriterionId != criterionId)
+                    {
+                        result.Add(sectionItem = new AttemptSectionInfo(criterion));
+                        prevCriterionId = criterionId;
+                    }
+
+                    sectionItem.Questions.Add(question);
+                }
+            }
+            else
+            {
+                foreach (var section in sections)
+                {
+                    var item = new AttemptSectionInfo { AttemptSection = section };
+
+                    if (section.SectionIdentifier.HasValue)
+                    {
+                        var criterionId = section.SectionIdentifier.Value;
+                        var criterion = _bankForm.Specification.Criteria.FirstOrDefault(y => y.Identifier == criterionId);
+                        item.Set(criterion);
+                    }
+                    else if (section.SectionIndex < _bankForm.Specification.Criteria.Count)
+                    {
+                        var criterion = _bankForm.Specification.Criteria[section.SectionIndex];
+                        item.Set(criterion);
                     }
 
                     foreach (var question in questions)

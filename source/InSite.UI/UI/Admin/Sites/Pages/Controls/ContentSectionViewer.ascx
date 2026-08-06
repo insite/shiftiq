@@ -4,8 +4,7 @@
     <div class="float-end" style="margin-left:20px">
         <div class="content-cmds" style="position:inherit;">
             <div>
-                <insite:Button runat="server" id="EditLink2" ToolTip="Revise" ButtonStyle="Default" Text="Edit" Icon="far fa-pencil" />
-                <insite:Button runat="server" id="EditLink" ToolTip="Revise" ButtonStyle="Default" Text="Edit (React)" Icon="far fa-pencil" />
+                <insite:Button runat="server" id="EditLink" ToolTip="Revise" ButtonStyle="Default" Text="Edit" Icon="far fa-pencil" />
             </div>
         </div>
     </div>

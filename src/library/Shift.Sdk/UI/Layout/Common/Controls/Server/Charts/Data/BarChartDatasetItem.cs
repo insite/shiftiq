@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Shift.Sdk.UI
 {
-    public class BarChartDatasetItem
+    public class BarChartDatasetItem : IChartDatasetColoredItem
     {
         #region Properties
 

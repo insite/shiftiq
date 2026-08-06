@@ -15,6 +15,6 @@ export const _organizationController = {
     },
 
     async retrieve(organizationId: string) {
-        return await fetchHelper.get<ApiOrganizationModel>(`/api/accounts/organizations/${organizationId}`);
+        return await fetchHelper.get<ApiOrganizationModel>(`/api/accounts/organizations/${organizationId}`, null, true);
     }
 }

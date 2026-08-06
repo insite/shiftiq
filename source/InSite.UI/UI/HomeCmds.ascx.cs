@@ -161,7 +161,7 @@ namespace InSite.UI
 
             if (catalog != null)
             {
-                CustomCatalogLink.HRef = $"/ui/portal/learning/catalog?catalog={CustomCatalogId}&view=1";
+                CustomCatalogLink.HRef = $"/ui/portal/learning/catalogue?catalog={CustomCatalogId}&view=1";
                 CustomCatalogLink.InnerHtml = "<i class='fa-solid fa-books me-2'></i>" + catalog.CatalogName;
             }
 

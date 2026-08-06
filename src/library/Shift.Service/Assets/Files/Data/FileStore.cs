@@ -221,6 +221,7 @@ namespace Shift.Service.Content
             file.ApprovedTime = properties?.ApprovedTime;
             file.ApprovedUserIdentifier = properties?.ApprovedUserIdentifier;
             file.AllowLearnerToView = properties?.AllowLearnerToView ?? true;
+            file.FileTag = properties?.Tag?.ToString();
 
             file.LastActivityTime = DateTimeOffset.UtcNow;
             file.LastActivityUserIdentifier = userIdentifier;

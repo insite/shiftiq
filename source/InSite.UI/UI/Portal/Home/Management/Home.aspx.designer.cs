@@ -24,6 +24,15 @@ namespace InSite.UI.Portal.Home.Management
         protected global::InSite.UI.Portal.Home.Management.Controls.DashboardNavigation DashboardNavigation;
 
         /// <summary>
+        /// HomeStatusUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel HomeStatusUpdatePanel;
+
+        /// <summary>
         /// HomeStatus control.
         /// </summary>
         /// <remarks>
@@ -175,6 +184,42 @@ namespace InSite.UI.Portal.Home.Management
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField AssignFormIdentifier;
+
+        /// <summary>
+        /// TransferUserIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindPerson TransferUserIdentifier;
+
+        /// <summary>
+        /// TransferCountUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel TransferCountUpdatePanel;
+
+        /// <summary>
+        /// TransferCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NumericBox TransferCount;
+
+        /// <summary>
+        /// TransferCountWarning control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TransferCountWarning;
 
         /// <summary>
         /// AddContactWindow control.

@@ -24,16 +24,16 @@ namespace InSite.Admin.Assessments.Forms.Controls
 
         public void SetInputValues(Form form, Guid? bankID, bool canWrite)
         {
-            ContentTitle.Text = (form.Content.Title?.Default).IfNullOrEmpty("None");
-            ContentSummary.Text = (form.Content.Summary?.Default).IfNullOrEmpty("None");
+            ContentTitle.Text = (form.Content.Title?.Get(CurrentLanguage)).IfNullOrEmpty("None");
+            ContentSummary.Text = (form.Content.Summary?.Get(CurrentLanguage)).IfNullOrEmpty("None");
             HasDiagrams.Text = form.HasDiagrams ? "Yes" : "No";
             HasReferenceMaterials.Text = form.HasReferenceMaterials != ReferenceMaterialType.None
                 ? form.HasReferenceMaterials.GetDescription()
                 : "No";
-            MaterialsForDistribution.Text = Markdown.ToHtml(form.Content.MaterialsForDistribution.Default.IfNullOrEmpty("None"));
-            MaterialsForParticipation.Text = Markdown.ToHtml(form.Content.MaterialsForParticipation.Default.IfNullOrEmpty("None"));
-            InstructionsForOnline.Text = Markdown.ToHtml(form.Content.InstructionsForOnline.Default.IfNullOrEmpty("None"));
-            InstructionsForPaper.Text = Markdown.ToHtml(form.Content.InstructionsForPaper.Default.IfNullOrEmpty("None"));
+            MaterialsForDistribution.Text = Markdown.ToHtml(form.Content.MaterialsForDistribution.Get(CurrentLanguage).IfNullOrEmpty("None"));
+            MaterialsForParticipation.Text = Markdown.ToHtml(form.Content.MaterialsForParticipation.Get(CurrentLanguage).IfNullOrEmpty("None"));
+            InstructionsForOnline.Text = Markdown.ToHtml(form.Content.InstructionsForOnline.Get(CurrentLanguage).IfNullOrEmpty("None"));
+            InstructionsForPaper.Text = Markdown.ToHtml(form.Content.InstructionsForPaper.Get(CurrentLanguage).IfNullOrEmpty("None"));
 
             SetupEditLinks(form, canWrite);
 

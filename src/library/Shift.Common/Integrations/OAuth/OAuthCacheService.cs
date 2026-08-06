@@ -9,7 +9,7 @@ namespace Shift.Common
         public static Guid Add(OAuthCacheEntry entry)
         {
             var key = Guid.NewGuid();
-            Cache.Add(key, entry, 5 * 50);
+            Cache.Add(key, entry, OAuthCacheEntry.LifetimeSeconds);
             return key;
         }
 

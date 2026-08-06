@@ -77,8 +77,10 @@ await HubApplication.StartupAsync(app, config, async app =>
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<DatabaseMigrator>();
-
         await db.MigrateAsync();
+
+        var partitionStore = scope.ServiceProvider.GetRequiredService<Shift.Hub.Partitions.PartitionStore>();
+        await partitionStore.EnsureSchemaAsync();
     }
 });
 

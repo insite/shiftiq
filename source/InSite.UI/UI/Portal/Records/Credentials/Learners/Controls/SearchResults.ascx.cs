@@ -160,19 +160,25 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
         }
 
         private string GetStatusHtml(CredentialStatus status, bool isSelfDeclared)
+            => GetStatusHtml(status, Translate);
+
+        public static string GetStatusHtml(CredentialStatus status, Func<string, string> translate)
         {
             var html = string.Empty;
 
             switch (status)
             {
                 case CredentialStatus.Valid:
-                    html = $"<span class='text-success'><i class='fas fa-flag-checkered me-2'></i></span>{Translate("Valid")}";
+                    html = $"<span class='text-success'><i class='fas fa-flag-checkered me-2'></i></span>{translate("Valid")}";
                     break;
                 case CredentialStatus.Pending:
-                    html = $"<span class='text-warning'><i class='fas fa-hourglass me-2'></i></span>{Translate("Pending")}";
+                    html = $"<span class='text-warning'><i class='fas fa-hourglass me-2'></i></span>{translate("Pending")}";
+                    break;
+                case CredentialStatus.Submitted:
+                    html = $"<span class='text-info'><i class='fas fa-hourglass-half me-2'></i></span>{translate("Submitted")}";
                     break;
                 case CredentialStatus.Expired:
-                    html = $"<span class='text-danger'><i class='fas fa-brake-warning me-2'></i></span>{Translate("Expired")}";
+                    html = $"<span class='text-danger'><i class='fas fa-brake-warning me-2'></i></span>{translate("Expired")}";
                     break;
             }
 
@@ -184,6 +190,9 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             if (!item.IsSelfDeclared)
                 return string.Empty;
 
+            if (Identity.IsAdministrator)
+                return string.Empty;
+
             var html = $"<a title='Delete Certificate' class='text-danger' href='/ui/portal/record/credentials/learners/delete?credential={item.CredentialIdentifier}'><i class='fa-solid fa-trash-alt'></i></a>";
 
             return html;
@@ -191,6 +200,12 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
         private string GetStatusMessageHtml(CredentialStatus status, bool achievementAllowSelfDeclared, Guid achievementId, Guid? singleCourseId, int courseCount)
         {
+            if (status == CredentialStatus.Submitted)
+            {
+                var pending = System.Web.HttpUtility.HtmlEncode(Translate("Waiting for an administrator to review your certificate"));
+                return $"<div class='form-text'>{pending}</div>";
+            }
+
             if (status != CredentialStatus.Expired || achievementAllowSelfDeclared)
                 return string.Empty;
 
@@ -203,7 +218,7 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             if (courseCount > 1)
             {
                 var label = System.Web.HttpUtility.HtmlEncode(Translate("Take a course"));
-                return $"<div class='form-text'><a href='/ui/portal/learning/catalog?achievement={achievementId}'>{label}</a></div>";
+                return $"<div class='form-text'><a href='/ui/portal/learning/catalogue?achievement={achievementId}'>{label}</a></div>";
             }
 
             var text = System.Web.HttpUtility.HtmlEncode(Translate("Please contact your administrator with a copy of your renewed certificate"));
@@ -212,6 +227,16 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
         public static string GetDownloadLink(Guid id, CredentialStatus status, string downloadUrl, string badgeUrl, string layout)
         {
+            // A submitted credential is not verified yet, so only the uploaded file is offered.
+            // The badge and certificate-layout fallbacks below would render a system-issued
+            // certificate for a credential nobody has reviewed.
+            if (status == CredentialStatus.Submitted)
+            {
+                return downloadUrl.IsNotEmpty()
+                    ? $"<a title='Download Certificate' target='_blank' href='{downloadUrl}'><i class='fa-solid fa-download'></i></a>"
+                    : null;
+            }
+
             if (status != CredentialStatus.Valid)
                 return null;
 

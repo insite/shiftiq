@@ -38,8 +38,8 @@ namespace InSite.Admin.Assessments.Questions.Utilities
                 return new QuestionFilter
                 {
                     StandardIdentifier = filter.CompetencyId,
-                    Flag = new HashSet<FlagType>(filter.Flags),
-                    Condition = new HashSet<string>(filter.Conditions),
+                    Flag = filter.Flags != null && filter.Flags.Length > 0 ? new HashSet<FlagType>(filter.Flags) : null,
+                    Condition = filter.Conditions != null && filter.Conditions.Length > 0 ? new HashSet<string>(filter.Conditions) : null,
                     Taxonomy = filter.Taxonomy,
                     HasLig = filter.HasLig,
                     HasReference = filter.HasReference

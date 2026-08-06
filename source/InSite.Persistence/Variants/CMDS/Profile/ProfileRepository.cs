@@ -31,6 +31,25 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
+        public class CompetencyVariance
+        {
+            public int Missing { get; set; }
+            public int Extra { get; set; }
+        }
+
+        public static CompetencyVariance GetCompetencyVariance(Guid profileStandardIdentifier)
+        {
+            const string query = @"
+SELECT Missing, Extra
+  FROM custom_cmds.VCmdsProfileCompetencyVariance
+ WHERE ProfileStandardIdentifier = @ProfileStandardIdentifier;
+";
+
+            using (var db = new InternalDbContext())
+                return db.Database.SqlQuery<CompetencyVariance>(query, new SqlParameter("ProfileStandardIdentifier", profileStandardIdentifier)).FirstOrDefault()
+                    ?? new CompetencyVariance();
+        }
+
         public static DataTable SelectProfilesForDepartment(Guid department, Guid competencyStandardIdentifier)
         {
             const string query = @"
@@ -445,18 +464,45 @@ ORDER BY SortOrder, Initials, [Text]
                       WHERE ProfileStandardIdentifier = p.ProfileStandardIdentifier
                 )";
 
+            var childCountField = @"
+                (
+                    SELECT COUNT(*)
+                      FROM custom_cmds.[Profile]
+                      WHERE ParentProfileStandardIdentifier = p.ProfileStandardIdentifier
+                )";
+
+            var isDivergedField = $@"
+                CASE
+                    WHEN p.ParentProfileStandardIdentifier IS NULL THEN 0
+                    WHEN {DivergencePredicate} THEN 1
+                    ELSE 0
+                END";
+
             var withSortExpression = sortExpression
                 .Replace("CompetencyCount", competencyCountField)
                 .Replace("AcquiredCount", acquiredCountField)
+                .Replace("ChildCount", childCountField)
+                .Replace("IsDiverged", isDivergedField)
                 ;
 
             var query = string.Format(@"
                 WITH OrderedProfiles AS
                 (
                   SELECT
-                        *,
+                        p.*,
+                        (SELECT ProfileTitle FROM custom_cmds.[Profile] WHERE ProfileStandardIdentifier = p.ParentProfileStandardIdentifier) AS ParentProfileTitle,
+                        (SELECT ProfileNumber FROM custom_cmds.[Profile] WHERE ProfileStandardIdentifier = p.ParentProfileStandardIdentifier) AS ParentProfileNumber,
+                        (SELECT
+                            CASE
+                                WHEN ProfileNumber IS NULL OR LTRIM(RTRIM(ProfileNumber)) = '' THEN ProfileTitle
+                                ELSE ProfileNumber + ' - ' + ProfileTitle
+                            END
+                            FROM custom_cmds.[Profile]
+                            WHERE ProfileStandardIdentifier = p.ParentProfileStandardIdentifier) AS ParentProfileLabel,
                         {3} AS CompetencyCount,
                         {4} AS AcquiredCount,
+                        {5} AS ChildCount,
+                        {6} AS IsDiverged,
                         ROW_NUMBER() OVER(ORDER BY {2}) AS RowNumber
                     FROM custom_cmds.[Profile] p
                     {0}
@@ -464,7 +510,7 @@ ORDER BY SortOrder, Initials, [Text]
                 SELECT * FROM OrderedProfiles
                 WHERE RowNumber BETWEEN @StartRow AND @EndRow
                 ORDER BY {1}
-                ", where, sortExpression, withSortExpression, competencyCountField, acquiredCountField);
+                ", where, sortExpression, withSortExpression, competencyCountField, acquiredCountField, childCountField, isDivergedField);
 
             var (startRow, endRow) = filter.Paging != null ? filter.Paging.ToStartEnd() : (0, int.MaxValue);
 
@@ -481,7 +527,7 @@ ORDER BY SortOrder, Initials, [Text]
 
             string query = string.Format(@"
                   SELECT COUNT(*)
-                    FROM custom_cmds.[Profile]
+                    FROM custom_cmds.[Profile] p
                     {0}
                 ", where);
 
@@ -492,6 +538,14 @@ ORDER BY SortOrder, Initials, [Text]
         #endregion
 
         #region Create where for filter
+
+        private const string DivergencePredicate = @"
+            EXISTS (
+                SELECT 1
+                  FROM custom_cmds.VCmdsProfileCompetencyVariance v
+                  WHERE v.ProfileStandardIdentifier = p.ProfileStandardIdentifier
+                    AND (v.Missing > 0 OR v.Extra > 0)
+            )";
 
         private static string CreateWhereForFilter(ProfileFilter filter, string searchText)
         {
@@ -520,6 +574,16 @@ ORDER BY SortOrder, Initials, [Text]
 
                 if (filter.ParentProfileStandardIdentifier.HasValue)
                     where.Append(" AND ParentProfileStandardIdentifier = @ParentProfileStandardIdentifier");
+
+                if (filter.HasParent.HasValue)
+                    where.Append(filter.HasParent.Value
+                        ? " AND ParentProfileStandardIdentifier IS NOT NULL"
+                        : " AND ParentProfileStandardIdentifier IS NULL");
+
+                if (filter.IsDiverged.HasValue)
+                    where.Append(filter.IsDiverged.Value
+                        ? $" AND p.ParentProfileStandardIdentifier IS NOT NULL AND ({DivergencePredicate})"
+                        : $" AND (p.ParentProfileStandardIdentifier IS NULL OR NOT ({DivergencePredicate}))");
             }
 
             if (filter.AddProfilesFromOrganizationIdentifier.HasValue)

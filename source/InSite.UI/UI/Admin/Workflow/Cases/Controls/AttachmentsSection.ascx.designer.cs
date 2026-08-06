@@ -33,6 +33,15 @@ namespace InSite.Admin.Issues.Outlines.Controls
         protected global::InSite.Common.Web.UI.Button AddRequestButton;
 
         /// <summary>
+        /// CopyDocumentsButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button CopyDocumentsButton;
+
+        /// <summary>
         /// RequestsSection control.
         /// </summary>
         /// <remarks>
@@ -58,5 +67,14 @@ namespace InSite.Admin.Issues.Outlines.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Admin.Issues.Outlines.Controls.CaseDocumentList CaseDocumentList;
+
+        /// <summary>
+        /// CopyDocumentsCaseSelector control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindCase CopyDocumentsCaseSelector;
     }
 }

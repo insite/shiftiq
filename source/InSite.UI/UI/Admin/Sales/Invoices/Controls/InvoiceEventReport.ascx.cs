@@ -182,6 +182,9 @@ namespace InSite.Admin.Invoices.Controls
             issuedBy.Append($"<br>{location.Street}");
             issuedBy.Append($"<br>{location.City}, {location.Province} {location.PostalCode}");
 
+            if (location.TaxNumberLabel.IsNotEmpty() && location.TaxNumberValue.IsNotEmpty())
+                issuedBy.Append($"<br>{location.TaxNumberLabel}: {location.TaxNumberValue}");
+
             IssuedBy.Text = issuedBy.ToString();
         }
 

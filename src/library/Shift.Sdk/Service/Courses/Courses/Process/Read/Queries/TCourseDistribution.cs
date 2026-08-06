@@ -21,6 +21,9 @@ namespace InSite.Application.Courses.Read
         public DateTimeOffset? DistributionRedeemed { get; set; }
         public DateTimeOffset? DistributionExpiry { get; set; }
         public string DistributionComment { get; set; }
+        public Guid? TransferredFromUserIdentifier { get; set; }
+        public Guid? TransferredByUserIdentifier { get; set; }
+        public DateTimeOffset? Transferred { get; set; }
 
         public virtual TProduct Product { get; set; }
         public virtual TProduct SubProduct { get; set; }

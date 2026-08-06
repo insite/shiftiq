@@ -38,6 +38,11 @@
                             <div class="form-text"></div>
                         </div>
 
+                        <div runat="server" ID="LinkParentsField" class="form-group mb-3" visible="false">
+                            <insite:CheckBox runat="server" ID="LinkParents" Text="Link the copy to the same parent programs" Checked="true" />
+                            <div class="form-text">The copy inherits its tasks from the same parent programs as the original. If unchecked, inherited tasks are copied as local tasks with no link.</div>
+                        </div>
+
                     </div>
                 </div>
             </div>

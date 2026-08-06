@@ -20,6 +20,12 @@ namespace InSite.Cmds.Actions.Reports
 {
     public partial class ActiveUsers : AdminBasePage, ICmdsUserControl
     {
+        /// <summary>
+        /// The largest number of rows we are willing to render into the on-screen grids. The Excel download has no
+        /// such limit.
+        /// </summary>
+        private const int MaximumRenderedRows = 200;
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -46,7 +52,10 @@ namespace InSite.Cmds.Actions.Reports
 
             PageHelper.AutoBindHeader(this);
 
-            BindModelToControls();
+            // The report is not run until the user clicks Search: the default criteria match most of the
+            // organization, and rendering that on the initial GET produced a multi-megabyte page.
+            HelpSeparator.Visible = false;
+            DepartmentsHelp.Visible = false;
         }
 
         private void BindMembershipFunctions(bool showAdmin, bool isOrganizationChecked)
@@ -78,12 +87,18 @@ namespace InSite.Cmds.Actions.Reports
         private void BindModelToControls()
         {
             DepartmentsHelp.Visible = ddlGroupBy.Value != "Department";
+            HelpSeparator.Visible = DepartmentsHelp.Visible;
 
             var dict = CreateGroups();
 
             var totalPeople = dict.Values.SelectMany(v => v).Select(e => e.Identifier).Distinct().Count();
             ResultCount.InnerText = totalPeople == 1 ? "1 result" : $"{totalPeople:N0} results";
             var keys = dict.Keys.OrderBy(k => k).ToArray();
+
+            // The grids render every row as table markup, so a broad search produces a multi-megabyte page. Rendering
+            // stops at the cap; the warning below points the user at the criteria and the Excel download for the rest.
+            var totalRows = keys.Sum(k => dict[k].Count);
+            var remainingRows = MaximumRenderedRows;
 
             switch (ddlGroupBy.Value)
             {
@@ -99,7 +114,9 @@ namespace InSite.Cmds.Actions.Reports
                         dt.Columns.Add("Roles");
                         dt.Columns.Add("OrganizationCount", typeof(int));
 
-                        var employees = dict[group].OrderBy(ce => ce.Name).ToList();
+                        var employees = dict[group].OrderBy(ce => ce.Name).Take(remainingRows).ToList();
+                        remainingRows -= employees.Count;
+
                         foreach (var employee in employees)
                         {
                             var row = dt.NewRow();
@@ -147,6 +164,9 @@ namespace InSite.Cmds.Actions.Reports
                 case "Department":
                     foreach (var group in keys)
                     {
+                        if (remainingRows == 0)
+                            break;
+
                         var header = new HtmlGenericControl
                         {
                             TagName = "h3",
@@ -163,7 +183,9 @@ namespace InSite.Cmds.Actions.Reports
                         dt.Columns.Add("Roles");
                         dt.Columns.Add("OrganizationCount", typeof(int));
 
-                        var employees = dict[group].OrderBy(ce => ce.Name).ToList();
+                        var employees = dict[group].OrderBy(ce => ce.Name).Take(remainingRows).ToList();
+                        remainingRows -= employees.Count;
+
                         foreach (var employee in employees)
                         {
                             var row = dt.NewRow();
@@ -210,6 +232,9 @@ namespace InSite.Cmds.Actions.Reports
                 case "Role":
                     foreach (var group in keys)
                     {
+                        if (remainingRows == 0)
+                            break;
+
                         var header = new HtmlGenericControl
                         {
                             TagName = "h3",
@@ -226,7 +251,9 @@ namespace InSite.Cmds.Actions.Reports
                         dt.Columns.Add("LastLogin", typeof(DateTimeOffset));
                         dt.Columns.Add("OrganizationCount", typeof(int));
 
-                        var employees = dict[group].OrderBy(ce => ce.Name).ToList();
+                        var employees = dict[group].OrderBy(ce => ce.Name).Take(remainingRows).ToList();
+                        remainingRows -= employees.Count;
+
                         foreach (var employee in employees)
                         {
                             var row = dt.NewRow();
@@ -277,7 +304,12 @@ namespace InSite.Cmds.Actions.Reports
                     break;
             }
 
-
+            if (totalRows > MaximumRenderedRows)
+            {
+                ScreenStatus.AddMessage(
+                    AlertType.Warning,
+                    $"Showing the first {MaximumRenderedRows:N0} of {totalRows:N0} rows. Refine the search criteria or download the full report.");
+            }
         }
 
         private IDictionary<string, IList<ContactRepository2.CompanyEmployee>> CreateGroups()
@@ -377,7 +409,7 @@ namespace InSite.Cmds.Actions.Reports
                 var departments = employments
                     .Where(e => string.Equals(e.EmploymentType, type, StringComparison.OrdinalIgnoreCase))
                     .Select(e => html
-                        ? $"{e.Department} <small class=\"text-body-secondary\">[{e.Profiles}]</small>"
+                        ? $"{e.Department} <small class=\"text-info\">[{e.Profiles}]</small>"
                         : $"{e.Department} [{e.Profiles}]")
                     .Distinct()
                     .OrderBy(e => e)

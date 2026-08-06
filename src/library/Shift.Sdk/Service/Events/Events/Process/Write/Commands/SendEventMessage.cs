@@ -17,6 +17,7 @@ namespace InSite.Application.Events.Write
             AggregateIdentifier = eventId;
             MessageId = messageId;
             Recipients = recipients;
+            MessageType = messageType;
         }
     }
 }

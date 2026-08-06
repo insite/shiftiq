@@ -184,7 +184,7 @@ namespace InSite.Admin.Messages.Outlines.Forms
             // ContentTab
 
             MessageContent.Visible = message.ContentText.IsNotEmpty();
-            MessageContent.Value = MessageHelper.BuildPreviewHtml(Organization.OrganizationIdentifier, message.SenderIdentifier, GetSurveyFormAsset(message.SurveyFormIdentifier), message.ContentText);
+            MessageContent.Value = MessageHelper.BuildPreviewHtml(Organization.OrganizationIdentifier, message.SenderIdentifier, GetSurveyFormAsset(message.SurveyFormIdentifier), message.ContentText, false);
 
             if (message.ContentText.IsEmpty())
                 ContentEmpty.AddMessage(AlertType.Warning, "Please click <b>Edit</b> to create content for this message.");

@@ -11,5 +11,6 @@ namespace Shift.Sdk.UI
         public string TaskTitle { get; set; }
         public string DisplayTitle { get; set; }
         public int Sequence { get; set; }
+        public bool IsInherited { get; set; }
     }
 }

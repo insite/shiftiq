@@ -66,8 +66,7 @@ namespace InSite.UI.Portal.Learning.Organizations
             var traineeGroupName = GroupNames.Trainee + " Users";
 
             var group = ServiceLocator.GroupSearch
-                .GetGroups(new QGroupFilter { GroupName = traineeGroupName, OrganizationIdentifier = OrganizationIdentifiers.CMDS })
-                .FirstOrDefault();
+                .GetFirstGroup(new QGroupFilter { GroupNameExact = traineeGroupName, OrganizationIdentifier = OrganizationIdentifiers.CMDS });
 
             if (MembershipPermissionHelper.CanModifyMembership(group.GroupIdentifier))
             {

@@ -153,6 +153,9 @@ public class FileReader : IEntityReader
                 query = query.Where(x => !x.Claims.Any());
         }
 
+        if (criteria.FileTag != null)
+            query = query.Where(x => x.FileTag == criteria.FileTag.ToString());
+
         return query;
     }
 
@@ -180,6 +183,7 @@ public class FileReader : IEntityReader
                 FileUploaded = entity.FileUploaded,
                 UserId = entity.UserIdentifier,
                 UserFullName = entity.User.FullName,
+                FileTag = entity.FileTag,
                 HasClaims = entity.Claims.Any()
             })
             .ToListAsync(cancellation);

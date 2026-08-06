@@ -127,6 +127,8 @@ namespace InSite.Admin.Records.Programs
                 DepartmentIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
                 DepartmentIdentifier.Value = null;
 
+                LinkParentsField.Visible = ProgramContainmentSearch.GetParentIdentifiers(SourceTemplate.ProgramIdentifier).Length > 0;
+
                 OnDepartmentSelected();
             }
         }
@@ -144,6 +146,10 @@ namespace InSite.Admin.Records.Programs
                 .Select(x => x.ProgramIdentifier == SourceTemplate.ProgramIdentifier)
                 .ToDictionary(x => x.ObjectIdentifier);
 
+            var parentIds = LinkParents.Checked && LinkParentsField.Visible
+                ? ProgramContainmentSearch.GetParentIdentifiers(SourceTemplate.ProgramIdentifier)
+                : new Guid[0];
+
             var listIdentifier = UniqueIdentifier.Create();
             var list = new TProgram
             {
@@ -160,6 +166,13 @@ namespace InSite.Admin.Records.Programs
                 if (!achievement.IsValid)
                     continue;
 
+                departmentTemplates.TryGetValue(achievement.AchievementIdentifier, out var source);
+
+                // When the copy is linked to the same parent programs, inherited tasks
+                // are re-derived by the containment cascade; copy only local tasks.
+                if (parentIds.Length > 0 && source != null && source.TaskIsInherited)
+                    continue;
+
                 var copy = new TTask
                 {
                     ObjectType = "Achievement",
@@ -173,7 +186,7 @@ namespace InSite.Admin.Records.Programs
                     TaskLifetimeMonths = 0
                 };
 
-                if (departmentTemplates.TryGetValue(achievement.AchievementIdentifier, out var source))
+                if (source != null)
                 {
                     copy.TaskLifetimeMonths = source.TaskLifetimeMonths;
                     copy.TaskIsPlanned = source.TaskIsPlanned;
@@ -184,6 +197,9 @@ namespace InSite.Admin.Records.Programs
             }
 
             ProgramStore.Insert(list, User.Identifier);
+
+            if (parentIds.Length > 0)
+                ProgramContainmentStore.Insert(parentIds, listIdentifier, Organization.Identifier, User.Identifier);
 
             Outline.Redirect(listIdentifier, status: "saved");
         }

@@ -35,7 +35,7 @@ namespace InSite.Persistence.Plugin.NCSHA
             Property(x => x.HI015).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HI016).IsUnicode(false).HasMaxLength(10);
             Property(x => x.HI017).IsUnicode(false).HasMaxLength(10);
-            Property(x => x.HI018).IsUnicode(false).HasMaxLength(500);
+            Property(x => x.HI018).IsUnicode(false).HasMaxLength(4000);
             Property(x => x.HI019).IsUnicode(false).HasMaxLength(1);
             Property(x => x.HI020).IsUnicode(false).HasMaxLength(20);
             Property(x => x.HI021).IsUnicode(false).HasMaxLength(10);

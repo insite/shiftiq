@@ -66,6 +66,7 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
             DetailPlatform.SetInputValues(organization);
             DetailLocationDescription.SetInputValues(organization);
             DetailLocationAddress.SetInputValues(organization);
+            DetailLocationTaxNumber.SetInputValues(organization);
             DetailCustomizationUrl.SetInputValues(organization);
             DetailBambora.SetInputValues(organization);
             DetailUpload.SetInputValues(organization);
@@ -117,6 +118,7 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
             DetailPlatform.GetInputValues(organization);
             DetailLocationDescription.GetInputValues(organization);
             DetailLocationAddress.GetInputValues(organization);
+            DetailLocationTaxNumber.GetInputValues(organization);
             DetailCustomizationUrl.GetInputValues(organization);
             DetailBambora.GetInputValues(organization);
             DetailUpload.GetInputValues(organization);

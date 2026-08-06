@@ -169,7 +169,10 @@ namespace InSite.Admin.Assessments.Forms.Forms
         protected override void OnLoad(EventArgs e)
         {
             if (!CanEdit)
-                RedirectToSearch();
+            {
+                ShowAlert(a => a.ShowPermissionDenied("use the form workshop"));
+                return;
+            }
 
             HandleAjaxRequest();
 
@@ -179,10 +182,29 @@ namespace InSite.Admin.Assessments.Forms.Forms
                 return;
 
             if (Bank == null || Bank.Tenant != Organization.OrganizationIdentifier)
-                RedirectToSearch();
+            {
+                ShowAlert(a =>
+                {
+                    if (BankID == Guid.Empty)
+                        a.ShowBankMissing();
+                    else
+                        a.ShowBankNotFound(BankID);
+                });
+                return;
+            }
 
             if (BankForm == null || !FormDetails.SetInputValues(BankForm, new ReturnUrl()))
-                RedirectToOutline();
+            {
+                var bankName = Bank.Name;
+                ShowAlert(a =>
+                {
+                    if (FormID == Guid.Empty)
+                        a.ShowFormMissing(BankID, bankName);
+                    else
+                        a.ShowFormNotFound(FormID, BankID, bankName);
+                });
+                return;
+            }
 
             PageHelper.AutoBindHeader(
                 this,
@@ -693,7 +715,11 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
         #region Methods (redirect)
 
-        private static void RedirectToSearch() => HttpResponseHelper.Redirect($"/ui/admin/assessments/banks/search", true);
+        private void ShowAlert(Action<InSite.Admin.Assessments.Forms.Controls.FormPageAlert> configure)
+        {
+            ContentPanel.Visible = false;
+            configure(PageAlert);
+        }
 
         private void RedirectToOutline(Guid? formId = null, Guid? sectionId = null)
         {

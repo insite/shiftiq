@@ -15,8 +15,10 @@ namespace InSite.Application.Contacts.Read
         string GetGroupName(Guid groupId);
 
         bool GroupExists(QGroupFilter filter);
+        bool GroupExists(Guid groupId);
         int CountGroups(QGroupFilter filter);
         List<QGroup> GetGroups(QGroupFilter filter, params Expression<Func<QGroup, object>>[] includes);
+        QGroup GetFirstGroup(QGroupFilter filter, params Expression<Func<QGroup, object>>[] includes);
         List<GroupSearchResult> SearchGroups(QGroupFilter filter);
         List<GroupExportResult> ExportGroups(QGroupFilter filter, bool empty);
         List<GroupDetail> SearchGroupDetails(QGroupFilter filter);

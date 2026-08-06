@@ -33,6 +33,15 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.Admin.Records.Programs.Controls.TaskGridEdit TaskGrid;
 
         /// <summary>
+        /// CascadeToLearners control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox CascadeToLearners;
+
+        /// <summary>
         /// SaveButton control.
         /// </summary>
         /// <remarks>

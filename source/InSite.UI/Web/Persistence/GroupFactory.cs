@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 using InSite.Application.Contacts.Read;
 using InSite.Persistence;
@@ -37,11 +36,11 @@ namespace InSite.Web.Data
             var filter = new QGroupFilter
             {
                 OrganizationIdentifier = organizationId,
-                GroupName = groupName,
+                GroupNameExact = groupName,
                 GroupType = groupType
             };
 
-            var group = ServiceLocator.GroupSearch.GetGroups(filter).FirstOrDefault();
+            var group = ServiceLocator.GroupSearch.GetFirstGroup(filter);
             if (group == null || !MembershipPermissionHelper.CanModifyMembership(group))
                 return;
 

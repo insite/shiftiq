@@ -57,6 +57,10 @@
         </div>
     </div>
 
+    <div class="my-2">
+        <asp:CheckBox runat="server" ID="ShowMetadata1" Text="Show Details" />
+    </div>
+
     <div runat="server" id="UnitComboBoxWrapper" class="mb-2">
         <insite:UnitComboBox runat="server" ID="UnitComboBox" AllowBlank="False" />
     </div>
@@ -200,7 +204,7 @@
     </ul>
 
     <div class="mb-3" style="margin-top:-10px;">
-        <asp:CheckBox runat="server" ID="ShowMetadata" Text="Show Details" />
+        <asp:CheckBox runat="server" ID="ShowMetadata2" Text="Show Details" />
     </div>
 
 </insite:Container>
@@ -486,6 +490,21 @@
 
                 return items;
             }
+        })();
+
+        (function () {
+            const chk1 = document.getElementById('<%= ShowMetadata1.ClientID %>');
+            const chk2 = document.getElementById('<%= ShowMetadata2.ClientID %>');
+
+            if (!chk1 || !chk2)
+                return;
+
+            chk1.addEventListener('change', function (e) {
+                chk2.checked = chk1.checked;
+            });
+            chk2.addEventListener('change', function (e) {
+                chk1.checked = chk2.checked;
+            });
         })();
     </script>
 </insite:PageFooterContent>

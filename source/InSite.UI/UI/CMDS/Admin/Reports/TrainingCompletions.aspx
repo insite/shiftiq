@@ -49,7 +49,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <td colspan="10" class="fw-bold text-white" style="background-color: #2c2d3f;">
+                                <td colspan="11" class="fw-bold text-white" style="background-color: #2c2d3f;">
                                     Training Completions for <asp:Literal runat="server" ID="CompanyName" /> :: <asp:Literal runat="server" ID="DepartmentsList" />
                                 </td>
                             </tr>
@@ -57,6 +57,7 @@
                                 <th class="align-middle">Person</th>
                                 <th class="align-middle">Organization</th>
                                 <th class="align-middle">Department</th>
+                                <th class="align-middle">Job Division</th>
                                 <th class="align-middle">Achievement</th>
                                 <th class="align-middle">Achievement Type</th>
                                 <th class="text-center align-middle">Completed</th>
@@ -70,9 +71,10 @@
                             <asp:Repeater runat="server" ID="DataRepeater">
                                 <ItemTemplate>
                                     <tr>
-                                        <td><%# Eval("FullName") %></td>
+                                        <td><%# Eval("FullName") %><br /><small class="text-body-secondary"><%# Eval("Email") %></small></td>
                                         <td><%# Eval("CompanyName") %></td>
                                         <td><%# Eval("DepartmentName") %></td>
+                                        <td><%# Eval("JobDivision") %></td>
                                         <td><%# Eval("AchievementTitle") %></td>
                                         <td><%# Eval("AchievementLabel") %></td>
                                         <td class="text-center text-nowrap"><%# Eval("DateCompleted", "{0:MMM d, yyy}") %></td>

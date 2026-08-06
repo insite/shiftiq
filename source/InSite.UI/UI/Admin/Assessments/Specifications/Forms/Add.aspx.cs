@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Banks.Write;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
@@ -13,6 +11,7 @@ using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -102,6 +101,9 @@ namespace InSite.Admin.Assessments.Specifications.Forms
 
                     if (spec.SingleQuestionPerTabEnabled)
                         commands.Add(new EnableSingleQuestionPerTab(BankID, spec.Identifier));
+
+                    if (spec.TabTimeLimit != SpecificationTabTimeLimit.Disabled)
+                        commands.Add(new ChangeSpecificationTabTimeLimit(BankID, spec.Identifier, spec.TabTimeLimit));
                 }
             }
 

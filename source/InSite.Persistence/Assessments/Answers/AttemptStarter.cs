@@ -341,26 +341,34 @@ namespace InSite.Persistence
 
         public static AttemptSection[] CreateSections(BankForm bankForm)
         {
-            if (bankForm.Specification.Type != SpecificationType.Static)
-                return new AttemptSection[0];
-
-            var result = new List<AttemptSection>();
-
-            for (var i = 0; i < bankForm.Sections.Count; i++)
+            if (bankForm.Specification.Type == SpecificationType.Static)
             {
-                var section = bankForm.Sections[i];
-
-                result.Add(new AttemptSection
-                {
-                    Identifier = section.Identifier,
-                    ShowWarningNextTab = section.WarningOnNextTabEnabled,
-                    IsBreakTimer = section.BreakTimerEnabled,
-                    TimeLimit = section.TimeLimit,
-                    TimerType = section.TimerType
-                });
+                return bankForm.Sections
+                    .Select(x => new AttemptSection
+                    {
+                        Identifier = x.Identifier,
+                        ShowWarningNextTab = x.TabConfiguration.WarningOnNextTabEnabled,
+                        IsBreakTimer = x.TabConfiguration.BreakTimerEnabled,
+                        TimeLimit = x.TabConfiguration.TimeLimit,
+                        TimerType = x.TabConfiguration.TimerType
+                    })
+                    .ToArray();
+            }
+            else if (bankForm.Specification.Type == SpecificationType.Dynamic)
+            {
+                return bankForm.Specification.Criteria
+                    .Select(x => new AttemptSection
+                    {
+                        Identifier = x.Identifier,
+                        ShowWarningNextTab = x.TabConfiguration.WarningOnNextTabEnabled,
+                        IsBreakTimer = x.TabConfiguration.BreakTimerEnabled,
+                        TimeLimit = x.TabConfiguration.TimeLimit,
+                        TimerType = x.TabConfiguration.TimerType
+                    })
+                    .ToArray();
             }
 
-            return result.ToArray();
+            return new AttemptSection[0];
         }
 
         #endregion

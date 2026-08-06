@@ -131,7 +131,10 @@ public class UserAdapter : IEntityAdapter
             OAuthProviderUserId = entity.OAuthProviderUserId,
             LoginOrganizationCode = entity.LoginOrganizationCode,
             OldUserPasswordHash = entity.OldUserPasswordHash,
-            UserPasswordChangeRequested = entity.UserPasswordChangeRequested
+            UserPasswordChangeRequested = entity.UserPasswordChangeRequested,
+            LastChangeTime = entity.LastChangeTime,
+            LastChangeType = entity.LastChangeType,
+            LastChangeUser = entity.LastChangeUser
         };
 
         return model;

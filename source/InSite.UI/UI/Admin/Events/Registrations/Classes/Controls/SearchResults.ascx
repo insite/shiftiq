@@ -95,6 +95,12 @@
             </ItemTemplate>
         </asp:TemplateField>
 
+        <asp:TemplateField HeaderText="Accommodations">
+            <ItemTemplate>
+                <%# Eval("AccommodationsHtml") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
         <asp:BoundField HeaderText="Assessment Form Name" DataField="ExamFormName" />
 
         <asp:BoundField HeaderText="Include in T2202" DataField="IncludeInT2202" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" />

@@ -22,6 +22,7 @@ namespace InSite.Persistence
             Property(x => x.FileCategory).IsOptional().IsUnicode(false).HasMaxLength(120);
             Property(x => x.FileSubcategory).IsOptional().IsUnicode(false).HasMaxLength(120);
             Property(x => x.FileStatus).IsOptional().IsUnicode(false).HasMaxLength(20);
+            Property(x => x.FileTag).IsOptional().IsUnicode(false).HasMaxLength(20);
         }
     }
 }

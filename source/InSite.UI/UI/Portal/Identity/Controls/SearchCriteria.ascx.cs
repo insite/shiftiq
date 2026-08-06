@@ -14,7 +14,7 @@ namespace InSite.UI.Desktops.Design.Users.Controls
                 var filter = new PersonFilter
                 {
                     OrganizationIdentifier = Organization.Key,
-                    IsApproved = true,
+                    IsApproved = ApprovalFilter.Value == "Approved" ? true : (bool?)null,
                     NameFilterType = MatchNamesWith.Value,
                     FullName = Name.Text,
                     EmailContains = Email.Text,
@@ -35,6 +35,7 @@ namespace InSite.UI.Desktops.Design.Users.Controls
                 SessionCount.ValueAsInt = value.SessionCount;
                 LastAuthenticatedSince.Value = value.LastAuthenticatedSince?.DateTime;
                 LastAuthenticatedBefore.Value = value.LastAuthenticatedBefore?.DateTime;
+                ApprovalFilter.Value = value.IsApproved == true ? "Approved" : "All";
             }
         }
 
@@ -46,6 +47,7 @@ namespace InSite.UI.Desktops.Design.Users.Controls
             SessionCount.ValueAsInt = null;
             LastAuthenticatedSince.Value = null;
             LastAuthenticatedBefore.Value = null;
+            ApprovalFilter.Value = "Approved";
         }
 
         protected override void OnLoad(EventArgs e)

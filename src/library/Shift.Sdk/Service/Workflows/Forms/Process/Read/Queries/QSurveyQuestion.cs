@@ -13,7 +13,7 @@ namespace InSite.Application.Surveys.Read
         public string SurveyQuestionIndicator { get; set; }
         public string SurveyQuestionSource { get; set; }
         public string SurveyQuestionType { get; set; }
-        
+
         public bool SurveyQuestionIsRequired { get; set; }
         public bool SurveyQuestionIsNested { get; set; }
         public bool SurveyQuestionListEnableBranch { get; set; }

@@ -63,11 +63,10 @@ namespace Shift.Common.Integration.Google
             var content = new StringContent(JsonConvert.SerializeObject(inputs), Encoding.UTF8, "application/json");
 
             var postResult = await StaticHttpClient.Client.PostAsync(url, content);
+            var apiResponseContent = await postResult.Content.ReadAsStringAsync();
 
             if (HttpStatusCode.OK != postResult.StatusCode)
-                throw new InvalidOperationException($"Translation Failed: The Engine API returned HTTP {postResult.StatusCode}. {postResult.ReasonPhrase}");
-
-            var apiResponseContent = await postResult.Content.ReadAsStringAsync();
+                throw new InvalidOperationException($"Translation Failed: The Engine API returned HTTP {postResult.StatusCode}. {postResult.ReasonPhrase}. Response: {apiResponseContent}");
 
             var outputs = JsonConvert.DeserializeObject<string[]>(apiResponseContent);
 

@@ -15,7 +15,7 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label">
-                                Catalog Name
+                                Catalogue Name
                                 <insite:RequiredValidator runat="server" ControlToValidate="CatalogName" ValidationGroup="Catalog" />
                             </label>
                             <div>

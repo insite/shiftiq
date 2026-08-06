@@ -267,6 +267,7 @@ namespace InSite.Domain.Attempts
             else
             {
                 sections = new AttemptSection[0];
+
                 foreach (var q in questions)
                     q.Section = null;
             }

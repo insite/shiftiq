@@ -583,6 +583,9 @@ namespace InSite.Admin.Events.Classes.Forms
             if (@event.WhenEventReminderRequestedNotifyInstructorMessageIdentifier.HasValue)
                 commands.Add(new ConnectEventMessage(id, EventMessageType.ReminderInstructor, @event.WhenEventReminderRequestedNotifyInstructorMessageIdentifier));
 
+            if (@event.WhenEventCompletedNotifyLearnerMessageIdentifier.HasValue)
+                commands.Add(new ConnectEventMessage(id, EventMessageType.CompletedLearner, @event.WhenEventCompletedNotifyLearnerMessageIdentifier));
+
             if (@event.SendReminderBeforeDays.HasValue)
                 commands.Add(new ModifyEventMessagePeriod(id, @event.SendReminderBeforeDays));
         }

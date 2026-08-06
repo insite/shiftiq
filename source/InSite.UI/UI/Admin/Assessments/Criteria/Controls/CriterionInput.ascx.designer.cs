@@ -69,6 +69,15 @@ namespace InSite.Admin.Assessments.Criteria.Controls
         protected global::InSite.Common.Web.UI.NumericBox QuestionLimit;
 
         /// <summary>
+        /// TabConfig control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.UI.Admin.Assessments.Sections.Controls.TabConfigurationDetails TabConfig;
+
+        /// <summary>
         /// FilterPanel control.
         /// </summary>
         /// <remarks>

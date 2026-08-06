@@ -89,10 +89,69 @@ namespace InSite.Persistence
                             LifetimeMonths = a.TaskLifetimeMonths,
                             IsRequired = a.TaskIsRequired,
                             IsPlanned = a.TaskIsPlanned,
+                            IsInherited = a.TaskIsInherited,
                             AchievementLabel = b.AchievementLabel,
                             AchievementTitle = b.AchievementTitle
                         }
                     ).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Achievements the learner cannot safely have downgraded: any task that is
+        /// required or planned in another program the learner is enrolled in.
+        /// </summary>
+        public static Guid[] SelectProtectedObjectIdentifiers(Guid organizationIdentifier, Guid learnerUserIdentifier, Guid excludeProgramIdentifier)
+        {
+            using (var db = new InternalDbContext())
+            {
+                return db.TTasks.AsNoTracking()
+                    .Where(t => t.OrganizationIdentifier == organizationIdentifier
+                        && t.ProgramIdentifier != excludeProgramIdentifier
+                        && (t.TaskIsRequired || t.TaskIsPlanned)
+                        && db.TProgramEnrollments.Any(e =>
+                            e.ProgramIdentifier == t.ProgramIdentifier
+                            && e.LearnerUserIdentifier == learnerUserIdentifier))
+                    .Select(t => t.ObjectIdentifier)
+                    .Distinct()
+                    .ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Every claim on the given achievements held by any program the learners of
+        /// programIdentifier are enrolled in, including that program itself. The learner set is
+        /// resolved inside the query, so a program with thousands of enrollments still costs one
+        /// round trip and no large parameter list.
+        /// </summary>
+        public static List<LearnerTaskDemand> SelectLearnerDemands(Guid organizationIdentifier, Guid programIdentifier, Guid[] objectIdentifiers)
+        {
+            if (objectIdentifiers.Length == 0)
+                return new List<LearnerTaskDemand>();
+
+            using (var db = new InternalDbContext())
+            {
+                return db.TProgramEnrollments.AsNoTracking()
+                    .Where(e => e.ProgramIdentifier == programIdentifier)
+                    .Join(db.TProgramEnrollments.AsNoTracking(),
+                        e => e.LearnerUserIdentifier,
+                        o => o.LearnerUserIdentifier,
+                        (e, o) => o)
+                    .Join(db.TTasks.AsNoTracking()
+                            .Where(t => t.OrganizationIdentifier == organizationIdentifier
+                                && objectIdentifiers.Contains(t.ObjectIdentifier)),
+                        o => o.ProgramIdentifier,
+                        t => t.ProgramIdentifier,
+                        (o, t) => new LearnerTaskDemand
+                        {
+                            LearnerUserIdentifier = o.LearnerUserIdentifier,
+                            ObjectIdentifier = t.ObjectIdentifier,
+                            ProgramIdentifier = t.ProgramIdentifier,
+                            IsRequired = t.TaskIsRequired,
+                            IsPlanned = t.TaskIsPlanned,
+                            LifetimeMonths = t.TaskLifetimeMonths
+                        })
+                    .ToList();
             }
         }
 

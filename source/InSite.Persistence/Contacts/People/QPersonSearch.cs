@@ -195,6 +195,17 @@ namespace InSite.Persistence
             }
         }
 
+        public bool HasAccessGrantedJobDivisions(Guid organizationId)
+        {
+            using (var db = CreateContext())
+            {
+                return db.QPersons
+                    .Any(x => x.OrganizationIdentifier == organizationId
+                           && x.JobDivision != null
+                           && x.UserAccessGranted != null);
+            }
+        }
+
         public List<string> GetPersonCodes(Guid organizationId, string[] codes = null)
         {
             using (var db = CreateContext())

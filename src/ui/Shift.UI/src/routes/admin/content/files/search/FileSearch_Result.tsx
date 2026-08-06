@@ -32,6 +32,9 @@ export default function FileSearch_Result() {
                         <Icon style="regular" name="download" className="me-1" />
                         <a target="_blank" href={urlHelper.getFileUrl(row.fileId, row.fileName)}>{row.documentName}</a>
                         <span className="ms-2 badge bg-info float-end">{row.fileLocation}</span>
+                        {row.fileTag && (
+                            <span className="ms-2 badge bg-primary float-end">{row.fileTag}</span>
+                        )}
                         <div className="form-text text-body-secondary">
                             {row.fileName}
                             <span className="ms-2 float-end">{numberHelper.formatBytes(row.fileSize)}</span>

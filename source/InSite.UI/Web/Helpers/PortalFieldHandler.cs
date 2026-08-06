@@ -67,6 +67,7 @@ namespace InSite.Web.Helpers
             new PortalFieldInfo("Personal", "TimeZone", "Time Zone",                     isVisible: true, isRequired: true, isMasked: false, canChangeRequired: false, canChangeMasked: false),
             new PortalFieldInfo("Personal", "FirstLanguage", "English Language Learner", isVisible: true, isRequired: false, isMasked: false, canChangeRequired: false, canChangeMasked: false),
             new PortalFieldInfo("Employment", "EmployerGroupIdentifier", "Employer",     isVisible: true, isRequired: false, isMasked: false, canChangeMasked: false),
+            new PortalFieldInfo("Employment", "JobDivision", "Job Division",             isVisible: true, isRequired: false, isMasked: false, canChangeMasked: false),
             new PortalFieldInfo("Employment", "JobTitle", "Job Title",                   isVisible: true, isRequired: false, isMasked: false),
             new PortalFieldInfo("Employment", "PersonCode", "Person Code",               isVisible: false, isRequired: false, isMasked: false, titleIsLabel: true),
             new PortalFieldInfo("Employment", "UnionInfo", "Union Info",                 isVisible: true, isRequired: false, isMasked: false),

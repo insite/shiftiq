@@ -265,15 +265,24 @@ namespace InSite.Persistence
             return result;
         }
 
-        public static string BuildPreviewHtml(Guid organizationId, Guid senderId, int? surveyFormAsset, string text)
+        public static string BuildPreviewHtml(Guid organizationId, Guid senderId, int? surveyFormAsset, string text, bool replaceVariables = true)
         {
             var variables = new MessageVariableList().ToDictionary();
 
-            var html = ReplaceVariables(variables, text);
+            var html = text;
+
+            if (replaceVariables)
+                ReplaceVariables(variables, text);
+
             html = CreateHtmlBody(null, html, false);
             html = ReplaceTemplates(html, MultilingualString.DefaultLanguage);
-            html = ReplacePlaceholdersForMailgun(organizationId, senderId, surveyFormAsset, html, new EmailVariables());
-            html = ReplaceVariables(variables, html);
+
+            if (replaceVariables)
+            {
+                html = ReplacePlaceholdersForMailgun(organizationId, senderId, surveyFormAsset, html, new EmailVariables());
+                html = ReplaceVariables(variables, html);
+            }
+
             html = HtmlBuilder.MoveCssInline(html);
             return html;
         }
@@ -727,7 +736,7 @@ namespace InSite.Persistence
                 content.Body.Text.Default = "This is a system entity. Content is not needed.";
 
                 var commands = MessageHelper.CreateMessage(message, content, false);
-                foreach(var cmd in commands)
+                foreach (var cmd in commands)
                 {
                     if (cmd is CreateMessage create)
                         message.MessageIdentifier = create.AggregateIdentifier;

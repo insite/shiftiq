@@ -29,6 +29,7 @@
                                 <insite:ComboBoxOption />
                                 <insite:ComboBoxOption Text="Undefined" Value="Undefined" />
                                 <insite:ComboBoxOption Text="Pending" Value="Pending" />
+                                <insite:ComboBoxOption Text="Submitted" Value="Submitted" />
                                 <insite:ComboBoxOption Text="Valid" Value="Valid" />
                                 <insite:ComboBoxOption Text="Expired" Value="Expired" />
                                 <insite:ComboBoxOption Text="Revoked" Value="Revoked" />

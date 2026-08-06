@@ -480,6 +480,14 @@ namespace InSite.Persistence
                 }
             }
 
+            if (filter.PersonOnlyOrganizationIdentifier != null)
+            {
+                query = query.Where(x =>
+                    db.QPersons.Count(y => y.UserIdentifier == x.UserIdentifier) == 1
+                    && db.QPersons.Any(y => y.UserIdentifier == x.UserIdentifier && y.OrganizationIdentifier == filter.PersonOnlyOrganizationIdentifier)
+                );
+            }
+
             if (filter.IsCmds.HasValue)
                 query = query.Where(x => x.AccessGrantedToCmds == filter.IsCmds);
 

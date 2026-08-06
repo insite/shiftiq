@@ -12,6 +12,8 @@ namespace InSite.Persistence
         {
             ToTable(schema + ".VIssueFileRequirement");
             HasKey(x => new { x.IssueIdentifier, x.RequestedFileCategory });
+
+            HasRequired(a => a.Issue).WithMany(b => b.IssueFileRequirements).HasForeignKey(c => c.IssueIdentifier).WillCascadeOnDelete(false);
         }
     }
 }

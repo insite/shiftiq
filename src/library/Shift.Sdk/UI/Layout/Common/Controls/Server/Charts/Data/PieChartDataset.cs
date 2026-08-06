@@ -44,6 +44,8 @@ namespace Shift.Sdk.UI
 
         #region Methods
 
+        IChartDatasetItem IChartDataset.NewItem() => NewItem();
+
         public PieChartDatasetItem NewItem()
         {
             _dataset.Add();

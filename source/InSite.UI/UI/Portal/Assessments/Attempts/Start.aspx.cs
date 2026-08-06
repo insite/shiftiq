@@ -42,6 +42,12 @@ namespace InSite.Portal.Assessments.Attempts
             set => ViewState[nameof(TimeLimit)] = value;
         }
 
+        private int TimeExtension
+        {
+            get => (int?)ViewState[nameof(TimeExtension)] ?? 0;
+            set => ViewState[nameof(TimeExtension)] = value;
+        }
+
         private string Language => CurrentSessionState.Identity.Language ?? Shift.Common.Language.Default;
 
         #endregion
@@ -58,7 +64,7 @@ namespace InSite.Portal.Assessments.Attempts
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
-            
+
             ConfirmLearnerButton.Click += ConfirmLearnerButton_Click;
             LearnerSelector.AutoPostBack = true;
             LearnerSelector.ValueChanged += LearnerSelector_ValueChanged;
@@ -85,7 +91,6 @@ namespace InSite.Portal.Assessments.Attempts
                 AlertMessage.AddMessage(AlertType.Error, "Please select a learner.");
 
             LearnerSelector.Value = null;
-
         }
 
         private void StartButton_Click(object sender, EventArgs e)
@@ -101,6 +106,7 @@ namespace InSite.Portal.Assessments.Attempts
                     _bankForm,
                     RegistrationIdentifier,
                     TimeLimit,
+                    TimeExtension,
                     Language);
 
                 var redirectUrl = AttemptUrl.GetAnswerUrl(attemptId);
@@ -225,7 +231,13 @@ namespace InSite.Portal.Assessments.Attempts
                     RegistrationIdentifier = registration.RegistrationIdentifier;
 
                     if (registration.ExamTimeLimit.HasValue)
+                    {
                         TimeLimit = registration.ExamTimeLimit.Value;
+
+                        var accommodations = ServiceLocator.RegistrationSearch.GetAccommodations(registration.RegistrationIdentifier);
+
+                        TimeExtension = accommodations.Count > 0 ? accommodations.Sum(x => x.TimeExtension ?? 0) : 0;
+                    }
                 }
             }
 
@@ -289,10 +301,15 @@ namespace InSite.Portal.Assessments.Attempts
             if (spec.IsTabTimeLimitAllowed && spec.TabTimeLimit == SpecificationTabTimeLimit.AllTabs)
             {
                 var timeSum = 0;
+                var timeLimits = spec.Type == SpecificationType.Static
+                    ? bankForm.Sections.Select(x => x.TabConfiguration.TimeLimit)
+                    : spec.Type == SpecificationType.Dynamic
+                        ? bankForm.Specification.Criteria.Select(x => x.TabConfiguration.TimeLimit)
+                        : throw new ApplicationError($"Unknown specification type: {spec.Type}");
 
-                foreach (var section in bankForm.Sections)
+                foreach (var timeLimit in timeLimits)
                 {
-                    if (section.TimeLimit <= 0)
+                    if (timeLimit <= 0)
                     {
                         timeSum = 0;
                         _canStart = false;
@@ -305,7 +322,7 @@ namespace InSite.Portal.Assessments.Attempts
                         break;
                     }
 
-                    timeSum += section.TimeLimit;
+                    timeSum += timeLimit;
                 }
 
                 TimeLimit = timeSum;
@@ -369,6 +386,10 @@ namespace InSite.Portal.Assessments.Attempts
             if (hasTimeLimit)
             {
                 var timeLimit = new TimeSpan(0, TimeLimit, 0);
+
+                if (TimeExtension > 0 && bankForm.IsTabTimeLimitEnabledForAll())
+                    timeLimit += new TimeSpan(0, TimeExtension, 0);
+
                 TimerLiteral.Text = Translate("You have a time limit of {0} to complete the exam.").Format(timeLimit.ToString("hh':'mm':'ss"));
             }
         }

@@ -44,6 +44,7 @@ namespace InSite.UI.Admin.Events.Registrations
         {
             return new[]
             {
+                new DownloadColumn("AccommodationsText", "Accommodations"),
                 new DownloadColumn("ExamFormName", "Assessment Form Name"),
                 new DownloadColumn("ExamFormCode", "Assessment Form Code"),
                 new DownloadColumn("EventScheduledStart", "Event Start", "MMM dd, yyyy", 15),

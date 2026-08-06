@@ -22,7 +22,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
     {
         private Guid BankID => Guid.TryParse(Request.QueryString["bank"], out var value) ? value : Guid.Empty;
 
-        private Guid FormID => Guid.Parse(Request["form"]);
+        private Guid FormID => Guid.TryParse(Request["form"], out var value) ? value : Guid.Empty;
 
         private bool _allowPreview;
 
@@ -35,11 +35,30 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
             var bank = ServiceLocator.BankSearch.GetBankState(BankID);
             if (bank == null)
-                RedirectToSearch();
+            {
+                ShowAlert(a =>
+                {
+                    if (BankID == Guid.Empty)
+                        a.ShowBankMissing();
+                    else
+                        a.ShowBankNotFound(BankID);
+                });
+                return;
+            }
 
             var form = bank.FindForm(FormID);
             if (form == null)
-                RedirectToOutline(null);
+            {
+                var bankName = bank.Name;
+                ShowAlert(a =>
+                {
+                    if (FormID == Guid.Empty)
+                        a.ShowFormMissing(BankID, bankName);
+                    else
+                        a.ShowFormNotFound(FormID, BankID, bankName);
+                });
+                return;
+            }
 
             _allowPreview = AllowPreview(form);
 
@@ -101,8 +120,11 @@ namespace InSite.Admin.Assessments.Forms.Forms
             return ServiceLocator.PageSearch.BindFirst(x => x, x => x.ObjectType == "Assessment" && x.ObjectIdentifier == FormID);
         }
 
-        private void RedirectToSearch()
-            => HttpResponseHelper.Redirect($"/ui/admin/assessments/banks/search", true);
+        private void ShowAlert(Action<InSite.Admin.Assessments.Forms.Controls.FormPageAlert> configure)
+        {
+            ContentPanel.Visible = false;
+            configure(PageAlert);
+        }
 
         private void RedirectToOutline(Guid? form)
             => HttpResponseHelper.Redirect(GetOutlineUrl(form), true);

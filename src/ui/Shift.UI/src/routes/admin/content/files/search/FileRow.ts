@@ -13,5 +13,6 @@ export interface FileRow {
     fileUploaded: DateTimeParts;
     userId: string;
     userName: string;
+    fileTag: string | null;
     visibility: string;
 }

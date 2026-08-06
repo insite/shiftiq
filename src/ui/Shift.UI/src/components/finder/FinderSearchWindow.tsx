@@ -1,8 +1,8 @@
-import { MouseEvent, useEffect, useRef, useState } from "react";
+import { MouseEvent, useRef, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import FinderSearchGrid from "./FinderSearchGrid";
 import LoadingPanel from "../LoadingPanel";
-import FinderSearchInput, { FinderSearchInputType } from "./FinderSearchInput";
+import FinderSearchInput from "./FinderSearchInput";
 import { ListItem } from "@/models/listItem";
 import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import LoadingOverlay from "@/components/LoadingOverlay";
@@ -27,10 +27,12 @@ interface Props {
     show: boolean;
     windowTitle: string;
     columnHeaderTitle: string;
+    hideClearButton?: boolean;
+    reloadOnShow?: boolean;
     onLoad: (pageIndex: number, keyword: string) => Promise<FinderSearchWindowData>;
     onChange: (item: ListItem) => void;
     onClose: () => void;
-}    
+}
 
 interface ButtonProps {
     disabled?: boolean;
@@ -38,67 +40,84 @@ interface ButtonProps {
     onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
+const defaultContext: ContextData = {
+    isLoading: false,
+    pageIndex: -1,
+    criteria: { keyword: "" },
+    items: null,
+    totalItemCount: 0,
+    itemsPerPage: 0,
+}
+
 export default function FinderSearchWindow({
     value,
     show,
     windowTitle,
     columnHeaderTitle,
+    hideClearButton = false,
+    reloadOnShow = false,
     onLoad,
     onChange,
     onClose
 }: Props) {
-    const [contextData, setContextData] = useState<ContextData>({
-        isLoading: false,
-        pageIndex: -1,
-        criteria: { keyword: "" },
-        items: null,
-        totalItemCount: 0,
-        itemsPerPage: 0,
-    });
-
+    const [contextData, setContextData] = useState<ContextData>(defaultContext);
     const [pageIndex, setPageIndex] = useState(0);
     const [criteria, setCriteria] = useState<Criteria>({ keyword: "" });
 
-    const filterRef = useRef<FinderSearchInputType | null>(null);
-
     const { addError, removeError } = useStatusProvider();
 
-    useEffect(() => {
-        if (!show
-            || contextData.isLoading
-            || pageIndex === contextData.pageIndex && criteria === contextData.criteria
-        ) {
-            return;
-        }
+    const prevShowRef = useRef(false);
 
-        const newPageIndex = criteria === contextData.criteria ? pageIndex : 0;
+    if (show
+        && !contextData.isLoading
+        && (pageIndex !== contextData.pageIndex || criteria !== contextData.criteria)
+    ) {
+        prevShowRef.current = true;
 
         setContextData(prev => ({
             ...prev,
             isLoading: true
         }));
 
-        run();
+        const newPageIndex = criteria === contextData.criteria ? pageIndex : 0;
 
-        async function run() {
-            try {
-                const data = await onLoad(newPageIndex, criteria.keyword);
-                setContextData({
-                    isLoading: false,
-                    pageIndex: data.pageIndex,
-                    criteria,
-                    items: data.items,
-                    totalItemCount: data.totalItemCount,
-                    itemsPerPage: data.itemsPerPage,
-                });
-                setPageIndex(newPageIndex);
-                removeError();
-            } catch (err) {
-                addError(err, "Loading error");
-                onClose();
-            }
+        load(newPageIndex , criteria);
+    } else if (show
+        && !contextData.isLoading
+        && reloadOnShow
+        && !prevShowRef.current
+    ) {
+        prevShowRef.current = true;
+
+        setContextData(prev => ({
+            ...prev,
+            isLoading: true
+        }));
+
+        load(0, defaultContext.criteria);
+    } else if (show !== prevShowRef.current) {
+        prevShowRef.current = show;
+    }
+
+    async function load(newPageIndex: number, newCriteria: Criteria) {
+        try {
+            const data = await onLoad(newPageIndex, newCriteria.keyword);
+            setContextData({
+                isLoading: false,
+                pageIndex: data.pageIndex,
+                criteria: newCriteria,
+                items: data.items,
+                totalItemCount: data.totalItemCount,
+                itemsPerPage: data.itemsPerPage,
+            });
+            setCriteria(newCriteria);
+            setPageIndex(newPageIndex);
+            removeError();
+        } catch (err) {
+            addError(err, "Loading error");
+            onClose();
         }
-    }, [addError, removeError, onLoad, onClose, show, contextData, pageIndex, criteria]);
+    }
 
     return (
         <Modal
@@ -111,7 +130,6 @@ export default function FinderSearchWindow({
             </Modal.Header>
             <Modal.Body>
                 <FinderSearchInput
-                    ref={filterRef}
                     disabled={contextData.isLoading || !contextData.items}
                     keyword={contextData.criteria.keyword}
                     onFilter={(keyword) => setCriteria({ keyword })}
@@ -136,7 +154,9 @@ export default function FinderSearchWindow({
                 )}
             </Modal.Body>
             <Modal.Footer>
-                <FinderClearButton onClick={() => onChange({ value: "", text: "" })} className="me-2" disabled={contextData.isLoading || !contextData.items} />
+                {!hideClearButton && (
+                    <FinderClearButton onClick={() => onChange({ value: "", text: "" })} className="me-2" disabled={contextData.isLoading || !contextData.items} />
+                )}
                 <FinderCancelButton onClick={() => onClose()} />
             </Modal.Footer>
         </Modal>

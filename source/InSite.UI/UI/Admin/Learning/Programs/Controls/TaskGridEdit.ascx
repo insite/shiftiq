@@ -39,13 +39,13 @@
                         <div class="row p-2 ms-0 me-0 border-bottom">
                             <div class="col-4">
                                 <asp:Literal ID="AchievementIdentifier" runat="server" Text='<%# Eval("AchievementIdentifier") %>' Visible="false" />
-                                <%# Eval("AchievementTitle") %>
+                                <%# Eval("AchievementTitle") %><%# GetInheritedBadge() %>
                             </div>
                             <div class="col-2 text-center">
-                                <insite:CheckBox runat="server" ID="IsPlanned" CssClass="IsPlanned" Checked='<%# Eval("IsPlanned") %>' RenderMode="Input" />
+                                <insite:CheckBox runat="server" ID="IsPlanned" CssClass="IsPlanned" Checked='<%# Eval("IsPlanned") %>' Enabled='<%# !(bool)Eval("IsInherited") %>' RenderMode="Input" />
                             </div>
                             <div class="col-2 text-center">
-                                <insite:CheckBox runat="server" ID="IsRequired" CssClass="IsRequired" Checked='<%# Eval("IsRequired") %>' RenderMode="Input" />
+                                <insite:CheckBox runat="server" ID="IsRequired" CssClass="IsRequired" Checked='<%# Eval("IsRequired") %>' Enabled='<%# !(bool)Eval("IsInherited") %>' RenderMode="Input" />
                             </div>
                             <div class="col-2 text-center IsTimeSensitive">
                                 <insite:CheckBox runat="server" Enabled="false" CssClass="IsTimeSensitive" Checked='<%# Eval("IsTimeSensitive") %>' RenderMode="Input" />
@@ -56,6 +56,7 @@
                                     CssClass="text-end"
                                     Text='<%# Eval("LifetimeMonths") %>'
                                     data-value='<%# Eval("LifetimeMonths") %>'
+                                    Enabled='<%# !(bool)Eval("IsInherited") %>'
                                     ClientEvents-OnBlur="lifetimeMonths_blur(this);"
                                 />
                             </div>

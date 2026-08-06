@@ -9,6 +9,7 @@ using Shift.Service.Security;
 
 using TimeZones = Shift.Common.TimeZones;
 using PlatformData = Shift.Common.Platform;
+using Shift.Service.Reports;
 
 namespace Shift.Service.Presentation;
 
@@ -27,6 +28,7 @@ public class ReactService : IReactService
     private readonly ILabelService _labelService;
     private readonly IPageService _pageService;
     private readonly TInputReader _inputReader;
+    private readonly ToolkitUsageService _toolkitUsageService;
 
     public ReactService(
         AppSettings appSettings,
@@ -41,7 +43,8 @@ public class ReactService : IReactService
         INavigationService navigationService,
         ILabelService labelService,
         IPageService pageService,
-        TInputReader inputReader
+        TInputReader inputReader,
+        ToolkitUsageService toolkitUsageService
         )
     {
         _appSettings = appSettings;
@@ -57,6 +60,7 @@ public class ReactService : IReactService
         _labelService = labelService;
         _pageService = pageService;
         _inputReader = inputReader;
+        _toolkitUsageService = toolkitUsageService;
     }
 
     private static MemoryCache<(Guid OrgId, Guid UserId), (Guid Id, SiteSettings Settings)> SiteSettingsCache = new();
@@ -76,7 +80,8 @@ public class ReactService : IReactService
 
         var settings = new SiteSettings();
 
-        var navigationMenus = SiteSettings.FromNavigationLists(_navigationService.SearchMenus(principal, isCmds));
+        var allApps = SiteSettings.FromNavigationLists(_navigationService.SearchMenus(principal, isCmds));
+        var frequentlyUsedApps = await GetFrequentlyUsedAppsAsync(principal.OrganizationId, principal.UserId, allApps);
         var navigationShortcuts = SiteSettings.FromNavigationItems(await _navigationService.SearchShortcutsAsync(principal));
         var adminNavigationMenus = SiteSettings.FromNavigationLists(_navigationService.SearchAdminMenus(principal, isCmds));
 
@@ -136,7 +141,8 @@ public class ReactService : IReactService
         settings.AdminNavigationLogo = _startupOptions.AdminLogoUrl;
         settings.UserHostAddress = principal.IPAddress;
         settings.SessionTimeoutMinutes = _startupOptions.SessionTimeoutMinutes;
-        settings.NavigationGroups = navigationMenus;
+        settings.AllApps = allApps;
+        settings.FrequentlyUsedApps = frequentlyUsedApps;
         settings.ShortcutGroups = navigationShortcuts;
         settings.AdminNavigationGroups = adminNavigationMenus;
 
@@ -149,6 +155,29 @@ public class ReactService : IReactService
         SiteSettingsCache.Add(identityKey, (principal.CookieId, settings));
 
         return settings;
+    }
+
+    private async Task<List<SiteSettings.MenuLinkModel>> GetFrequentlyUsedAppsAsync(Guid organizationId, Guid userId, List<SiteSettings.MenuModel> allApps)
+    {
+        var items = allApps.SelectMany(x => x.MenuItems).ToList();
+
+        var toolkits = await _toolkitUsageService.CollectAsync(organizationId, userId);
+        
+        var sorted = toolkits
+            .OrderByDescending(x => x.UsageScore)
+            .ThenBy(x => x.ToolkitName)
+            .ToList();
+
+        var result = new List<SiteSettings.MenuLinkModel>();
+
+        foreach (var toolkit in sorted)
+        {
+            var app = items.Find(x => string.Equals(x.Text, toolkit.ToolkitName.ToString(), StringComparison.OrdinalIgnoreCase));
+            if (app != null)
+                result.Add(app);
+        }
+
+        return result;
     }
 
     private async Task<string?> GetImpersonatorNameAsync(IPrincipal principal)

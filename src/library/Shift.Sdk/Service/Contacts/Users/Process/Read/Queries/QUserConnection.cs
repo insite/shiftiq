@@ -14,6 +14,10 @@ namespace InSite.Application.Contacts.Read
 
         public DateTimeOffset Connected { get; set; }
 
+        public DateTimeOffset LastChangeTime { get; set; }
+        public string LastChangeType { get; set; }
+        public Guid LastChangeUser { get; set; }
+
         public virtual QUser ToUser { get; set; }
         public virtual QUser FromUser { get; set; }
     }

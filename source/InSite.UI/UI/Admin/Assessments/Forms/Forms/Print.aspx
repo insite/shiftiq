@@ -1,9 +1,13 @@
 <%@ Page Language="C#" CodeBehind="Print.aspx.cs" Inherits="InSite.Admin.Assessments.Forms.Forms.Print" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormInfo.ascx" TagName="FormDetails" TagPrefix="uc" %>
+<%@ Register Src="~/UI/Admin/Assessments/Forms/Controls/FormPageAlert.ascx" TagName="FormPageAlert" TagPrefix="uc" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
+
+    <uc:FormPageAlert runat="server" ID="PageAlert" Visible="false" />
+    <asp:Panel runat="server" ID="ContentPanel">
 
     <insite:Alert runat="server" ID="PrintStatus" />
 
@@ -181,6 +185,8 @@
         </script>
     </insite:Container>
 
+
+    </asp:Panel>
 
     <insite:PageFooterContent runat="server">
         <script type="text/javascript">

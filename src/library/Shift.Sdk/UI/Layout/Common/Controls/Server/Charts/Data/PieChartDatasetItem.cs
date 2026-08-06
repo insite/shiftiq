@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Shift.Sdk.UI
 {
-    public class PieChartDatasetItem
+    public class PieChartDatasetItem : IChartDatasetColoredItem
     {
         #region Properties
 

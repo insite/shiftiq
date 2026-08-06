@@ -87,11 +87,11 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
 
                 string title = null, summary = null;
 
-                if (item.Section.BankSection != null)
+                if (item.Section.BankSectionContent != null)
                 {
-                    var content = item.Section.BankSection.Content;
-                    title = content.Title.Get(lang);
-                    summary = content.Summary.Get(lang);
+                    var content = item.Section.BankSectionContent;
+                    title = content["Title"]?.Get(lang);
+                    summary = content["Summary"]?.Get(lang);
 
                     if (summary.IsNotEmpty())
                         summary = attempt.GetHtml(item.Section.Questions.FirstOrDefault(), summary);

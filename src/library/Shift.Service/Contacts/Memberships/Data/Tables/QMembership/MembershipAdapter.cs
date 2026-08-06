@@ -59,7 +59,10 @@ public class MembershipAdapter : IEntityAdapter
             UserId = entity.UserIdentifier,
             MembershipExpiry = entity.MembershipExpiry,
             Modified = entity.Modified,
-            ModifiedBy = entity.ModifiedBy
+            ModifiedBy = entity.ModifiedBy,
+            LastChangeTime = entity.LastChangeTime,
+            LastChangeType = entity.LastChangeType,
+            LastChangeUser = entity.LastChangeUser
         };
 
         return model;

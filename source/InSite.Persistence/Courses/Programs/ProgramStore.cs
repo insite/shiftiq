@@ -39,6 +39,8 @@ namespace InSite.Persistence
 
         public static void Delete(Guid programIdentifier)
         {
+            ProgramContainmentStore.DeleteAllForProgram(programIdentifier);
+
             using (var db = new InternalDbContext())
             {
                 var program = db.TPrograms.FirstOrDefault(x => x.ProgramIdentifier == programIdentifier);

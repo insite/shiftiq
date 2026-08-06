@@ -131,7 +131,7 @@
         <insite:TextBox runat="server" ID="ProductUrl" MaxLength="2048" />
     </div>
     <div class="mt-2">
-        <insite:CheckBox runat="server" ID="IsFeatured" Text="Display as a feature on the Catalog" RenderMode="Inline" />
+        <insite:CheckBox runat="server" ID="IsFeatured" Text="Display as a feature on the Catalogue" RenderMode="Inline" />
         <insite:CheckBox runat="server" ID="IsTaxable" Text="Product is taxable" RenderMode="Inline" />
     </div>
 </div>

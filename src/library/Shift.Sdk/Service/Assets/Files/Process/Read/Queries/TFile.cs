@@ -22,6 +22,7 @@ namespace InSite.Application.Files.Read
         public string FileCategory { get; set; }
         public string FileSubcategory { get; set; }
         public string FileStatus { get; set; }
+        public string FileTag { get; set; }
         public DateTimeOffset? FileExpiry { get; set; }
         public DateTimeOffset? FileReceived { get; set; }
         public DateTimeOffset? FileAlternated { get; set; }

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Domain.Attempts
@@ -60,7 +59,7 @@ namespace InSite.Domain.Attempts
 
             TimeIntervals = new List<AttemptTimeInterval>
             {
-                new AttemptTimeInterval(e.ChangeTime, ActiveSectionIndex)
+                new AttemptTimeInterval(e.ChangeTime, ActiveSectionIndex, ActiveQuestionIndex)
             };
 
             OnTimeIntervalChanged();
@@ -82,10 +81,15 @@ namespace InSite.Domain.Attempts
 
             interval.Pinged = Pinged = e.ChangeTime;
 
-            if (ActiveSectionIndex.HasValue && ActiveSectionIndex.Value > interval.SectionIndex.Value)
+            var sectionChanged = ActiveSectionIndex.HasValue
+                && ActiveSectionIndex.Value > interval.SectionIndex.Value;
+            var questionChanged = ActiveQuestionIndex.HasValue
+                && ActiveQuestionIndex.Value > interval.QuestionIndex.Value;
+
+            if (sectionChanged || questionChanged)
             {
                 interval.Ended = e.ChangeTime;
-                TimeIntervals.Add(new AttemptTimeInterval(e.ChangeTime, ActiveSectionIndex));
+                TimeIntervals.Add(new AttemptTimeInterval(e.ChangeTime, ActiveSectionIndex, ActiveQuestionIndex));
             }
 
             OnTimeIntervalChanged();
@@ -101,7 +105,7 @@ namespace InSite.Domain.Attempts
 
             Pinged = e.ChangeTime;
 
-            TimeIntervals.Add(new AttemptTimeInterval(e.ChangeTime, ActiveSectionIndex));
+            TimeIntervals.Add(new AttemptTimeInterval(e.ChangeTime, ActiveSectionIndex, ActiveQuestionIndex));
 
             OnTimeIntervalChanged();
         }
@@ -132,53 +136,94 @@ namespace InSite.Domain.Attempts
 
         private void OnTimeIntervalChanged()
         {
-            if (Sections.IsNotEmpty())
+            CalculateSectionsDuration();
+            CalculateQuestionsDuration();
+        }
+
+        private void CalculateSectionsDuration()
+        {
+            if (Sections.IsEmpty())
             {
-                var sectionsData = new IntervalCalculationItem[Sections.Length];
-
-                for (var i = 0; i < TimeIntervals.Count; i++)
-                {
-                    var interval = TimeIntervals[i];
-                    var sectionIndex = interval.SectionIndex.Value;
-                    var section = sectionsData[sectionIndex]
-                        ?? (sectionsData[sectionIndex] = new IntervalCalculationItem { Started = interval.Started });
-
-                    if (interval.Ended.HasValue)
-                        section.Ended = interval.Ended;
-
-                    section.Duration += interval.Duration;
-                }
-
-                var totalDuration = 0d;
-
-                for (var i = 0; i < Sections.Length; i++)
-                {
-                    var info = sectionsData[i] ?? new IntervalCalculationItem();
-                    var section = Sections[i];
-
-                    section.Started = info.Started;
-                    section.Completed = info.Ended;
-
-                    if (info.Duration > 0)
-                    {
-                        section.Duration = (int?)Math.Round(info.Duration, MidpointRounding.AwayFromZero);
-
-                        if (!section.IsBreakTimer)
-                            totalDuration += info.Duration;
-                    }
-                    else
-                    {
-                        section.Duration = null;
-                    }
-                }
-
-                Duration = (decimal)totalDuration;
+                Duration = TimeIntervals.IsNotEmpty() ? (decimal)TimeIntervals.Sum(x => x.Duration) : 0;
+                return;
             }
-            else
+
+            var sectionsData = new IntervalCalculationItem[Sections.Length];
+
+            for (var i = 0; i < TimeIntervals.Count; i++)
             {
-                Duration = TimeIntervals.IsNotEmpty()
-                    ? (decimal)TimeIntervals.Sum(x => x.Duration)
-                    : 0;
+                var interval = TimeIntervals[i];
+                var sectionIndex = interval.SectionIndex.Value;
+                var section = sectionsData[sectionIndex]
+                    ?? (sectionsData[sectionIndex] = new IntervalCalculationItem { Started = interval.Started });
+
+                if (interval.Ended.HasValue)
+                    section.Ended = interval.Ended;
+
+                section.Duration += interval.Duration;
+            }
+
+            var totalDuration = 0d;
+
+            for (var i = 0; i < Sections.Length; i++)
+            {
+                var info = sectionsData[i] ?? new IntervalCalculationItem();
+                var section = Sections[i];
+
+                section.Started = info.Started;
+                section.Completed = info.Ended;
+
+                if (info.Duration > 0)
+                {
+                    section.Duration = (int?)Math.Round(info.Duration, MidpointRounding.AwayFromZero);
+
+                    if (!section.IsBreakTimer)
+                        totalDuration += info.Duration;
+                }
+                else
+                {
+                    section.Duration = null;
+                }
+            }
+
+            Duration = (decimal)totalDuration;
+        }
+
+        private void CalculateQuestionsDuration()
+        {
+            if (Questions.IsEmpty() || TimeIntervals.IsEmpty())
+                return;
+
+            var questionDurations = new Dictionary<int, double>();
+            var incompleteQuestions = new HashSet<int>();
+
+            foreach (var interval in TimeIntervals)
+            {
+                if (!interval.QuestionIndex.HasValue)
+                    continue;
+
+                var section = interval.SectionIndex.Value;
+                if (section < Sections.Length && Sections[section].IsBreakTimer)
+                    continue;
+
+                var question = interval.QuestionIndex.Value;
+                var duration = questionDurations.GetOrDefault(question) + interval.Duration;
+
+                questionDurations[question] = duration;
+
+                if (!interval.Ended.HasValue)
+                    incompleteQuestions.Add(question);
+            }
+
+            foreach (var q in Questions)
+            {
+                q.Duration = null;
+
+                if (incompleteQuestions.Contains(q.QuestionIndex))
+                    continue;
+
+                if (questionDurations.TryGetValue(q.QuestionIndex, out var duration) && duration > 0)
+                    q.Duration = (int?)Math.Round(duration, MidpointRounding.AwayFromZero);
             }
         }
 

@@ -160,7 +160,12 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
         private static string GetLogoUrl()
         {
             var request = HttpContext.Current.Request;
-            return $"{request.Url.Scheme}://{request.Url.Host}{CurrentSessionState.Identity.Organization.PlatformCustomization.PlatformUrl.Logo}";
+            var serverUrl = $"{request.Url.Scheme}://{request.Url.Host}";
+            var logo = CurrentSessionState.Identity.Organization.PlatformCustomization.PlatformUrl.Logo;
+
+            // The logo is open text: a site-relative path in some organizations, a fully-qualified
+            // URL in others. GetAbsoluteUrl handles both.
+            return UrlHelper.GetAbsoluteUrl(serverUrl, "/", logo);
         }
 
         private static List<AttemptItem> GetAttempts(Guid userId, Guid[] attemptIds, Language language)

@@ -4,7 +4,7 @@ namespace InSite.Persistence
 {
     public class VPrimaryKeyConfiguration : EntityTypeConfiguration<VPrimaryKey>
     {
-        public VPrimaryKeyConfiguration() : this("databases") { }
+        public VPrimaryKeyConfiguration() : this("schemas") { }
 
         public VPrimaryKeyConfiguration(string schema)
         {

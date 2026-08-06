@@ -33,13 +33,13 @@ namespace InSite.Admin.Assessments.Criteria.Controls
         protected global::System.Web.UI.WebControls.Literal CriterionNumber;
 
         /// <summary>
-        /// EditSetFilter1 control.
+        /// EditCriterionLink1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.IconLink EditSetFilter1;
+        protected global::InSite.Common.Web.UI.IconLink EditCriterionLink1;
 
         /// <summary>
         /// SetWeight control.
@@ -60,13 +60,13 @@ namespace InSite.Admin.Assessments.Criteria.Controls
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl QuestionLimitField;
 
         /// <summary>
-        /// EditSetFilter2 control.
+        /// EditCriterionLink2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.IconLink EditSetFilter2;
+        protected global::InSite.Common.Web.UI.IconLink EditCriterionLink2;
 
         /// <summary>
         /// QuestionLimit control.
@@ -78,13 +78,13 @@ namespace InSite.Admin.Assessments.Criteria.Controls
         protected global::System.Web.UI.WebControls.Literal QuestionLimit;
 
         /// <summary>
-        /// EditSetFilter3 control.
+        /// EditCriterionLink3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.IconLink EditSetFilter3;
+        protected global::InSite.Common.Web.UI.IconLink EditCriterionLink3;
 
         /// <summary>
         /// FilterType control.
@@ -112,6 +112,114 @@ namespace InSite.Admin.Assessments.Criteria.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl BasicFilterOutput;
+
+        /// <summary>
+        /// TabConfigContainer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Container TabConfigContainer;
+
+        /// <summary>
+        /// EditCriterionLink4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink EditCriterionLink4;
+
+        /// <summary>
+        /// WarningOnNextTabEnabled control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal WarningOnNextTabEnabled;
+
+        /// <summary>
+        /// BreakTimerEnabledField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl BreakTimerEnabledField;
+
+        /// <summary>
+        /// EditCriterionLink5 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink EditCriterionLink5;
+
+        /// <summary>
+        /// BreakTimerEnabled control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal BreakTimerEnabled;
+
+        /// <summary>
+        /// TimeLimitField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TimeLimitField;
+
+        /// <summary>
+        /// EditCriterionLink6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink EditCriterionLink6;
+
+        /// <summary>
+        /// TimeLimit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal TimeLimit;
+
+        /// <summary>
+        /// TimerTypeField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TimerTypeField;
+
+        /// <summary>
+        /// EditCriterionLink7 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink EditCriterionLink7;
+
+        /// <summary>
+        /// TimerType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal TimerType;
 
         /// <summary>
         /// SetRepeater control.
@@ -148,6 +256,51 @@ namespace InSite.Admin.Assessments.Criteria.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater SectionsRepeater;
+
+        /// <summary>
+        /// ContentContainer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Container ContentContainer;
+
+        /// <summary>
+        /// EditContentTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink EditContentTitle;
+
+        /// <summary>
+        /// OutputContentTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl OutputContentTitle;
+
+        /// <summary>
+        /// EditContentSummary control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink EditContentSummary;
+
+        /// <summary>
+        /// OutputContentSummary control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl OutputContentSummary;
 
         /// <summary>
         /// AdvancedFilterContainer control.

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Web.UI;
 
 using InSite.Persistence;
 
@@ -11,35 +13,19 @@ namespace InSite.Common.Web.UI
 {
     public class AccommodationTypeComboBox : ComboBox
     {
-        #region Classes
+        [PersistenceMode(PersistenceMode.InnerProperty), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public AccommodationTypeComboBoxSettings Settings { get; }
 
-        private class GroupItem : ListItem
+        public AccommodationTypeComboBox()
         {
-            public List<ListItem> Items { get; } = new List<ListItem>();
+            Settings = new AccommodationTypeComboBoxSettings(nameof(Settings), ViewState);
         }
 
-        #endregion
-
-        #region Properties
-
-        public IEnumerable<string> AdditionalOptions
-        {
-            get => (string[])ViewState[nameof(AdditionalOptions)];
-            set
-            {
-                var array = value?.Where(x => x.HasValue()).Distinct().OrderBy(x => x).ToArray();
-
-                ViewState[nameof(AdditionalOptions)] = array.IsEmpty() ? null : array;
-            }
-        }
-
-        #endregion
-
-        #region Data binding
+        protected override ListItemArray CreateDataSource() => Settings.CreateDataSource();
 
         protected override ComboBoxItem LoadItem(ListItem item)
         {
-            if (item is GroupItem group)
+            if (item is AccommodationTypeComboBoxSettings.GroupItem group)
             {
                 var optionGroup = new ComboBoxOptionGroup(group.Text);
 
@@ -51,8 +37,74 @@ namespace InSite.Common.Web.UI
             else
                 return base.LoadItem(item);
         }
+    }
 
-        protected override ListItemArray CreateDataSource()
+    public class AccommodationTypeMultiComboBox : MultiComboBox
+    {
+        [PersistenceMode(PersistenceMode.InnerProperty), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public AccommodationTypeComboBoxSettings Settings { get; }
+
+        public AccommodationTypeMultiComboBox()
+        {
+            Settings = new AccommodationTypeComboBoxSettings(nameof(Settings), ViewState);
+        }
+
+        protected override ListItemArray CreateDataSource() => Settings.CreateDataSource();
+
+        protected override ComboBoxItem LoadItem(ListItem item)
+        {
+            if (item is AccommodationTypeComboBoxSettings.GroupItem group)
+            {
+                var optionGroup = new ComboBoxOptionGroup(group.Text);
+
+                foreach (var gi in group.Items)
+                    optionGroup.Items.Add((ComboBoxOption)base.LoadItem(gi));
+
+                return optionGroup;
+            }
+            else
+                return base.LoadItem(item);
+        }
+    }
+
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class AccommodationTypeComboBoxSettings : StateBagProxy
+    {
+        #region Classes
+
+        internal class GroupItem : ListItem
+        {
+            public List<ListItem> Items { get; } = new List<ListItem>();
+        }
+
+        #endregion
+
+        #region Properties
+
+        public IEnumerable<string> AdditionalOptions
+        {
+            get => (string[])GetValue();
+            set
+            {
+                var array = value?.Where(x => x.HasValue()).Distinct().OrderBy(x => x).ToArray();
+                SetValue(array.IsEmpty() ? null : array);
+            }
+        }
+
+        #endregion
+
+        #region Construction
+
+        public AccommodationTypeComboBoxSettings(string prefix, StateBag viewState)
+            : base(prefix, viewState)
+        {
+        }
+
+        #endregion
+
+        #region Methods
+
+        public ListItemArray CreateDataSource()
         {
             var list = new ListItemArray();
             var data = TCollectionItemCache.Select(new TCollectionItemFilter

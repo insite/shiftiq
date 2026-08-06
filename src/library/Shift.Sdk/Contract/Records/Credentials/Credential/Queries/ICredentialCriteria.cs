@@ -10,5 +10,8 @@ namespace Shift.Contract
 
         Guid? AchievementId { get; set; }
         Guid? UserId { get; set; }
+        DateTimeOffset? ModifiedFrom { get; set; }
+        DateTimeOffset? ModifiedBefore { get; set; }
+        string PersonCode { get; set; }
     }
 }

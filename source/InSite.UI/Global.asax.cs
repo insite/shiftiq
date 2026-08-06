@@ -60,7 +60,7 @@ namespace InSite
             return LabelSearch.GetTranslation(label, token.Language, organization);
         }
 
-        public static AzureAD AzureAD { get; set; }
+        public static MicrosoftEntra MicrosoftEntra { get; set; }
 
         public static GoogleLogin GoogleLogin { get; set; }
 
@@ -79,7 +79,7 @@ namespace InSite
             var domain = appSettings.Partition.Domain;
             var oAuthRedirectUrl = new OAuthRedirectUrl(appSettings.Environment, ServiceLocator.Partition.Slug, domain, appSettings.Integration.OAuthSecret.AzureADSecret.RedirectUrl);
 
-            AzureAD = new AzureAD(appSettings.Integration.OAuthSecret.AzureADSecret, oAuthRedirectUrl);
+            MicrosoftEntra = new MicrosoftEntra(appSettings.Integration.OAuthSecret.AzureADSecret, oAuthRedirectUrl);
 
             GoogleLogin = new GoogleLogin(appSettings.Integration.OAuthSecret.Google, oAuthRedirectUrl);
 
@@ -100,8 +100,16 @@ namespace InSite
             // Configure JSON serialization.
             Shift.Common.Json.JsonSettings.Register();
 
-            // Register this partition and its organizations with the Hub.
-            RegisterPartition();
+            // Register this partition and its organizations with the Hub. Best-effort at
+            // startup so a Hub outage never blocks the app from coming up.
+            try
+            {
+                RegisterPartition();
+            }
+            catch (Exception ex)
+            {
+                AppSentry.SentryError(ex);
+            }
 
             // Initialize integrations to third-party API services.
             InitIntegrations();
@@ -202,59 +210,55 @@ namespace InSite
                 .ToList();
         }
 
-        private static void RegisterPartition()
+        public static void RegisterPartition()
         {
-            try
-            {
-                var partition = ServiceLocator.AppSettings.Partition;
+            var partition = ServiceLocator.AppSettings.Partition;
 
-                var environment = ServiceLocator.AppSettings.Environment;
+            var environment = ServiceLocator.AppSettings.Environment;
 
-                var organizations = OrganizationSearch.SelectProjections()
-                    .Select(x => new Shift.Common.Integration.Partitions.OrganizationRegistration
-                    {
-                        Slug = x.OrganizationCode,
-                        Name = x.CompanyName,
-                        Identifier = x.OrganizationIdentifier,
-                        WebsiteUrl = x.CompanyWebSiteUrl,
-                        LogoUrl = UrlHelper.GetAbsoluteUrl(partition.Domain, environment.Name, x.OrganizationLogoUrl, partition.Slug),
-                        Account = new Shift.Common.Integration.Partitions.AccountRegistration
-                        {
-                            Name = x.CompanyTitle,
-                            Status = x.AccountStatus,
-                            Code = x.CustomerCode,
-                            Number = x.CustomerNumber,
-                            OpenedAt = x.AccountOpened,
-                            ClosedAt = x.AccountClosed
-                        }
-                    })
-                    .ToList();
-
-                var registration = new Shift.Common.Integration.Partitions.PartitionRegistration
+            var organizations = OrganizationSearch.SelectProjections()
+                .Select(x => new Shift.Common.Integration.Partitions.OrganizationRegistration
                 {
-                    Number = partition.Number,
-                    Name = partition.Name,
-                    Brand = partition.Brand,
-                    Theme = partition.Style,
-                    Domain = partition.Domain,
-                    Email = partition.Email,
-                    Slug = partition.Slug,
-                    Identifier = partition.Identifier,
-                    Whitelist = SplitCsv(partition.WhitelistDomains),
-                    HelpUrl = partition.HelpUrl,
-                    LogoUrl = UrlHelper.GetAbsoluteUrl(partition.Domain, environment.Name, partition.LogoUrl, partition.Slug),
-                    Organizations = organizations
-                };
+                    Slug = x.OrganizationCode,
+                    Name = x.CompanyName,
+                    Identifier = x.OrganizationIdentifier,
+                    WebsiteUrl = x.CompanyWebSiteUrl,
 
-                var client = new Shift.Common.Integration.Partitions.PartitionClient(ServiceLocator.AppSettings.Engine);
+                    // A relative logo path resolves against the organization's own subdomain, not
+                    // the partition's, because the file lives in that organization's storage.
+                    LogoUrl = UrlHelper.GetAbsoluteUrl(partition.Domain, environment.Name, x.OrganizationLogoUrl, x.OrganizationCode),
 
-                client.Register(registration);
-            }
-            catch (Exception ex)
+                    Account = new Shift.Common.Integration.Partitions.AccountRegistration
+                    {
+                        Name = x.CompanyTitle,
+                        Status = x.AccountStatus,
+                        Code = x.CustomerCode,
+                        Number = x.CustomerNumber,
+                        OpenedAt = x.AccountOpened,
+                        ClosedAt = x.AccountClosed
+                    }
+                })
+                .ToList();
+
+            var registration = new Shift.Common.Integration.Partitions.PartitionRegistration
             {
-                // Registration is best-effort; never block application startup.
-                AppSentry.SentryError(ex);
-            }
+                Number = partition.Number,
+                Name = partition.Name,
+                Brand = partition.Brand,
+                Theme = partition.Style,
+                Domain = partition.Domain,
+                Email = partition.Email,
+                Slug = partition.Slug,
+                Identifier = partition.Identifier,
+                Whitelist = SplitCsv(partition.WhitelistDomains),
+                HelpUrl = partition.HelpUrl,
+                LogoUrl = UrlHelper.GetAbsoluteUrl(partition.Domain, environment.Name, partition.LogoUrl, partition.Slug),
+                Organizations = organizations
+            };
+
+            var client = new Shift.Common.Integration.Partitions.PartitionClient(ServiceLocator.AppSettings.Engine);
+
+            client.Register(registration);
         }
 
         protected void Application_BeginRequest()

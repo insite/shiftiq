@@ -15,6 +15,7 @@ namespace InSite.Domain.Attempts
         public bool SectionsAsTabs { get; set; }
         public bool TabNavigation { get; set; }
         public bool SingleQuestionPerTab { get; set; }
+        public bool CriteriaAsSections { get; set; }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
         public SpecificationTabTimeLimit TabTimeLimit { get; set; }

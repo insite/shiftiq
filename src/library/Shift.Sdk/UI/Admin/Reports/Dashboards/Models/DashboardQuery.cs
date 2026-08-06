@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
+using Newtonsoft.Json;
 
 namespace Shift.Sdk.UI
 {
@@ -11,19 +12,13 @@ namespace Shift.Sdk.UI
         public string FileRaw { get; set; }
         public string Sql { get; set; }
         public string SqlRaw { get; set; }
-        public DashboardQueryColumn[] Columns { get; set; }
-        public Dictionary<string, string> Parameters { get; set; }
+
+        [JsonProperty, JsonConverter(typeof(JsonCaseInsensitiveDictionaryConverter<string>))]
+        public Dictionary<string, string> Parameters { get; private set; }
 
         public DashboardQuery()
         {
-            Parameters = new Dictionary<string, string>();
-        }
-
-        public DashboardQueryColumn FindColumn(string name)
-        {
-            if (Columns == null)
-                return null;
-            return Columns.FirstOrDefault(c => c.Name == name);
+            Parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
     }
 }

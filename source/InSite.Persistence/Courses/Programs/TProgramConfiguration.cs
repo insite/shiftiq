@@ -17,7 +17,7 @@ namespace InSite.Persistence
             Property(x => x.OrganizationIdentifier).IsRequired();
             Property(x => x.ProgramCode).IsOptional().IsUnicode(false).HasMaxLength(100);
             Property(x => x.ProgramTag).IsOptional().IsUnicode(false).HasMaxLength(40);
-            Property(x => x.ProgramDescription).IsOptional().IsUnicode(false).HasMaxLength(500);
+            Property(x => x.ProgramDescription).IsOptional().IsUnicode(false).HasMaxLength(700);
             Property(x => x.ProgramIdentifier).IsRequired();
             Property(x => x.ProgramName).IsRequired().IsUnicode(false).HasMaxLength(500);
             Property(x => x.NotificationStalledAdministratorMessageIdentifier).IsOptional();

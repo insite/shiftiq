@@ -17,10 +17,6 @@ public class PendingPersonWriter : IEntityWriter
     {
         using var db = _context.CreateDbContext();
 
-        var exists = await AssertAsync(entity.PendingId, cancellation, db);
-        if (exists)
-            return false;
-                
         await db.PendingPerson.AddAsync(entity, cancellation);
         return await db.SaveChangesAsync(cancellation) > 0;
     }
@@ -29,7 +25,7 @@ public class PendingPersonWriter : IEntityWriter
     {
         using var db = _context.CreateDbContext();
 
-        var entity = await db.PendingPerson.SingleOrDefaultAsync(x => x.PendingId == pending, cancellation);
+        var entity = await db.PendingPerson.SingleOrDefaultAsync(x => x.PendingPersonIdentifier == pending, cancellation);
         if (entity == null)
             return false;
 
@@ -41,7 +37,7 @@ public class PendingPersonWriter : IEntityWriter
     {
         using var db = _context.CreateDbContext();
 
-        var exists = await AssertAsync(entity.PendingId, cancellation, db);
+        var exists = await AssertAsync(entity.PendingPersonIdentifier, cancellation, db);
         if (!exists)
             return false;
 
@@ -50,5 +46,5 @@ public class PendingPersonWriter : IEntityWriter
     }
 
     private async Task<bool> AssertAsync(Guid pending, CancellationToken cancellation, TableDbContext db)
-		=> await db.PendingPerson.AsNoTracking().AnyAsync(x => x.PendingId == pending, cancellation);
+		=> await db.PendingPerson.AsNoTracking().AnyAsync(x => x.PendingPersonIdentifier == pending, cancellation);
 }

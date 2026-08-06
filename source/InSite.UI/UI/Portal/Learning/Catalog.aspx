@@ -59,7 +59,7 @@
                 <div class="d-flex justify-content-between align-items-center py-3 mb-3">
 
                     <div class="d-flex justify-content-center align-items-center">
-                        <insite:InputFilter runat="server" ID="SearchText" EmptyMessage="Search catalog" CssClass="me-2" Width="500" />
+                        <insite:InputFilter runat="server" ID="SearchText" EmptyMessage="Search catalogue" CssClass="me-2" Width="500" />
 
                         <insite:ComboBox runat="server" ID="SortBySelect" CssClass="me-2" Width="200" >
                             <Items>

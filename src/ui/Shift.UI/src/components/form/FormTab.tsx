@@ -3,6 +3,7 @@ import { Tab } from "react-bootstrap";
 import { IconName } from "../icon/IconName";
 import Icon from "../icon/Icon";
 import { IconStyle } from "../icon/IconStyle";
+import { numberHelper } from "@/helpers/numberHelper";
 
 interface Props {
     tab: string;
@@ -12,6 +13,7 @@ interface Props {
     };
     title: ReactNode;
     subtitle?: string;
+    count?: number;
     children?: ReactNode;
 }
 
@@ -20,6 +22,7 @@ export default function FormTab({
     icon,
     title,
     subtitle,
+    count,
     children
 }: Props) {
     return (
@@ -29,11 +32,15 @@ export default function FormTab({
                 <>
                     {icon && <Icon style={icon.style} name={icon.name} className="me-2" />}
                     {title}
-                    {subtitle && (
+                    {subtitle ? (
                         <small className="text-body-secondary ms-1">
                             {subtitle}
                         </small>
-                    )}
+                    ) : count !== undefined ? (
+                        <small className="text-body-secondary ms-1">
+                            {`(${numberHelper.formatInt(count)})`}
+                        </small>
+                    ) : null}
                 </>
             )}
         >

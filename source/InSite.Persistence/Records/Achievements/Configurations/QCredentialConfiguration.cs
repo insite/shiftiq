@@ -37,6 +37,7 @@ namespace InSite.Persistence
             Property(x => x.CredentialReminderType).IsOptional().IsUnicode(false).HasMaxLength(20);
             Property(x => x.CredentialRevoked).IsOptional();
             Property(x => x.CredentialStatus).IsOptional().IsUnicode(false).HasMaxLength(10);
+            Property(x => x.CredentialSubmitted).IsOptional();
             Property(x => x.ExpirationFixedDate).IsOptional();
             Property(x => x.ExpirationLifetimeQuantity).IsOptional();
             Property(x => x.ExpirationLifetimeUnit).IsOptional().IsUnicode(false).HasMaxLength(6);

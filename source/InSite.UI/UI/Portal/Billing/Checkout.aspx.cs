@@ -69,15 +69,18 @@ namespace InSite.UI.Portal.Billing
             PageHeader.Visible = IsNewUser;
             AccountInfo.Visible = IsNewUser;
 
+            var cart = CartStorage.Get();
+
+            AssignToSkillsCheckTransferField.Visible = cart.Mode == PriceSelectionMode.Subscribe
+                && Organization.Toolkits.Sales?.TransferGroup.HasValue == true;
+
             ContinueShopping.HRef = Identity.IsAuthenticated
                 ? "/ui/portal/management/dashboard/catalog"
                 : "/ui/portal/billing/catalog";
 
-            var cart = CartStorage.Get();
-
             SubmitButton.Visible = IsCartNotEmpty();
 
-            BindSummary();
+            BindSummary(cart);
             PortalMaster.ShowAvatar();
             PageHelper.AutoBindHeader(this, null, "Checkout");
             PortalMaster.HideBreadcrumbsOnly();
@@ -114,7 +117,7 @@ namespace InSite.UI.Portal.Billing
         }
 
         private void BillState_ValueChanged(object sender, ComboBoxValueChangedEventArgs e)
-            => BindSummary();
+            => BindSummary(CartStorage.Get());
 
         private void ValidCart_ServerValidate(object source, ServerValidateEventArgs args)
         {
@@ -259,8 +262,15 @@ namespace InSite.UI.Portal.Billing
             if (newPerson.EmployerGroupIdentifier.HasValue)
                 MembershipHelper.Save(newPerson.EmployerGroupIdentifier.Value, userId, MembershipType.Employee);
 
-            if (Identity?.Organization?.Toolkits?.Sales?.ManagerGroup.HasValue == true)
-                MembershipHelper.Save(Identity.Organization.Toolkits.Sales.ManagerGroup.Value, userId, null);
+            var salesSettings = Organization.Toolkits.Sales;
+            if (salesSettings != null)
+            {
+                if (salesSettings.ManagerGroup.HasValue)
+                    MembershipHelper.Save(salesSettings.ManagerGroup.Value, userId, null);
+
+                if (IsNewUser && AssignToSkillsCheckTransfer.Checked && salesSettings.TransferGroup.HasValue)
+                    MembershipHelper.Save(salesSettings.TransferGroup.Value, userId, null);
+            }
 
             PersonHelper.SendAccountCreated(Organization.OrganizationIdentifier, Organization.LegalName, person.User, person);
         }
@@ -279,11 +289,11 @@ namespace InSite.UI.Portal.Billing
             var filter = new QGroupFilter
             {
                 OrganizationIdentifier = Organization.Identifier,
-                GroupName = groupName,
+                GroupNameExact = groupName,
                 GroupType = GroupTypes.Employer
             };
 
-            var groupId = ServiceLocator.GroupSearch.GetGroups(filter).FirstOrDefault()?.GroupIdentifier;
+            var groupId = ServiceLocator.GroupSearch.GetFirstGroup(filter)?.GroupIdentifier;
             if (groupId == null)
             {
                 groupId = UniqueIdentifier.Create();
@@ -297,10 +307,8 @@ namespace InSite.UI.Portal.Billing
 
         #region Data operations
 
-        private void BindSummary()
+        private void BindSummary(CartState cart)
         {
-            var cart = CartStorage.Get();
-
             if (cart.Items.Count == 0)
             {
                 EmptyState.Visible = true;

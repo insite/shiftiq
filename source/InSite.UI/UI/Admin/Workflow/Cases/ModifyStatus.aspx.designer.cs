@@ -11,7 +11,7 @@ namespace InSite.Admin.Issues.Forms
 {
 
 
-    public partial class ChangeStatus
+    public partial class ModifyStatus
     {
 
         /// <summary>

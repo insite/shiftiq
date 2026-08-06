@@ -18,6 +18,10 @@ namespace InSite.Persistence
             Property(x => x.IsValidator).IsRequired();
             Property(x => x.Connected).IsRequired();
 
+            Property(x => x.LastChangeTime).IsRequired();
+            Property(x => x.LastChangeType).IsRequired().IsUnicode(false).HasMaxLength(100);
+            Property(x => x.LastChangeUser).IsRequired();
+
             HasRequired(a => a.ToUser).WithMany(b => b.ToConnections).HasForeignKey(a => a.ToUserIdentifier).WillCascadeOnDelete(false);
             HasRequired(a => a.FromUser).WithMany(b => b.FromConnections).HasForeignKey(a => a.FromUserIdentifier).WillCascadeOnDelete(false);
         }

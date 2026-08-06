@@ -10,7 +10,7 @@ using Shift.Service.Evaluation;
 namespace Shift.Api.Assessments.Workshops;
 
 [ApiController]
-[ApiExplorerSettings(GroupName = "Assessments API: Workshops")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class FormWorkshopController(
     IPrincipalProvider principalProvider,
     AssessmentService assessmentService,

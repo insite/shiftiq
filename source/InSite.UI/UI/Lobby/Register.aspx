@@ -11,7 +11,7 @@
             <table class="login-toggle mb-4">
                 <tr>
                     <td class="unselected">
-                        <a href="/ui/lobby/signin">
+                        <a runat="server" id="ReturningUsersLink" href="/ui/lobby/signin">
                             <insite:Literal runat="server" Text="Returning Users" />
                         </a>
                     </td>

@@ -185,7 +185,7 @@
 
         </insite:NavItem>
 
-        <insite:NavItem runat="server" ID="CatalogTab" Title="Catalog" Icon="far fa-books" IconPosition="BeforeText">
+        <insite:NavItem runat="server" ID="CatalogTab" Title="Catalogue" Icon="far fa-books" IconPosition="BeforeText">
 
             <div class="row">
                 <div class="col-6">
@@ -194,9 +194,9 @@
 
                             <div class="form-group mb-3">
                                 <div class="float-end">
-                                    <insite:IconLink runat="server" ID="ModifyCatalogLink" CssClass="p-2" ToolTip="Modify catalog" Name="pencil" />
+                                    <insite:IconLink runat="server" ID="ModifyCatalogLink" CssClass="p-2" ToolTip="Modify catalogue" Name="pencil" />
                                 </div>
-                                <asp:Label runat="server" Text="Catalog" CssClass="form-label" />
+                                <asp:Label runat="server" Text="Catalogue" CssClass="form-label" />
                                 <div>
                                     <asp:Literal runat="server" ID="CatalogName" />
                                 </div>
@@ -227,10 +227,87 @@
                                         </ItemTemplate>
                                     </asp:Repeater>
                                     <asp:Panel runat="server" ID="NoCatalogCategories" CssClass="alert alert-info" Visible="false">
-                                        There are no selected catalog categories.
+                                        There are no selected catalogue categories.
                                     </asp:Panel>
                                 </div>
                             </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </insite:NavItem>
+
+        <insite:NavItem runat="server" ID="HierarchyTab" Title="Hierarchy" Icon="far fa-sitemap" IconPosition="BeforeText">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-lg h-100">
+                        <div class="card-body">
+
+                            <h3>Parent Programs</h3>
+
+                            <asp:Panel runat="server" ID="NoParentsMessage" CssClass="alert alert-info" Visible="false">
+                                This program has no parent programs.
+                            </asp:Panel>
+
+                            <asp:Repeater runat="server" ID="ParentRepeater">
+                                <ItemTemplate>
+                                    <div class="row p-2 ms-0 me-0 border-bottom">
+                                        <div class="col-9">
+                                            <a href='<%# Eval("OutlineUrl") %>'><%# Eval("ProgramName") %></a>
+                                            <div class="text-muted fs-sm"><%# Eval("TaskSummary") %></div>
+                                        </div>
+                                        <div class="col-3 text-end">
+                                            <asp:LinkButton runat="server" CommandName="RemoveParent"
+                                                CommandArgument='<%# Eval("ProgramIdentifier") %>'
+                                                OnClientClick='<%# Eval("ConfirmScript") %>'
+                                                CssClass="btn btn-sm btn-outline-danger" Text="Remove" />
+                                        </div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+
+                            <div runat="server" id="AddParentsField" class="form-group mt-3">
+                                <label class="form-label">
+                                    Add Parent Programs
+                                </label>
+                                <div>
+                                    <insite:FindProgram runat="server" ID="AddParentPrograms" MaxSelectionCount="10" />
+                                </div>
+                                <div class="form-text">This program inherits all tasks from its parent programs.</div>
+                                <div class="mt-2">
+                                    <insite:Button runat="server" ID="AddParentsButton" Text="Add" Icon="fas fa-plus" ButtonStyle="Success" />
+                                </div>
+                            </div>
+
+                            <asp:Panel runat="server" ID="IsParentMessage" CssClass="alert alert-info mt-3" Visible="false">
+                                This program is a parent of other programs, so it cannot have parent programs of its own. Program nesting is limited to one level.
+                            </asp:Panel>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-lg h-100">
+                        <div class="card-body">
+
+                            <h3>Child Programs</h3>
+
+                            <asp:Panel runat="server" ID="NoChildrenMessage" CssClass="alert alert-info" Visible="false">
+                                This program has no child programs.
+                            </asp:Panel>
+
+                            <asp:Repeater runat="server" ID="ChildRepeater">
+                                <ItemTemplate>
+                                    <div class="row p-2 ms-0 me-0 border-bottom">
+                                        <div class="col-12">
+                                            <a href='<%# Eval("OutlineUrl") %>'><%# Eval("ProgramName") %></a>
+                                        </div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
 
                         </div>
                     </div>
@@ -273,6 +350,14 @@
 
                 <div class="card border-0 shadow-lg">
                     <div class="card-body">
+                        <div class="form-group mb-3">
+                            <insite:CheckBox runat="server" ID="CascadeToLearners" Checked="true"
+                                Text="Apply achievement changes to learners already enrolled in this program" />
+                            <div class="form-text">
+                                Clear this only when enrolled learners must keep the training plan they already have.
+                            </div>
+                        </div>
+
                         <uc:achievementlisteditor id="AchievementListEditor" runat="server" />
                     </div>
                 </div>

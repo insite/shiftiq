@@ -231,6 +231,15 @@ namespace InSite.Admin.Events.Registrations.Controls
         protected global::InSite.Common.Web.UI.FindBankForm ExamFormIdentifier;
 
         /// <summary>
+        /// AccommodationType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.AccommodationTypeMultiComboBox AccommodationType;
+
+        /// <summary>
         /// ShowColumns control.
         /// </summary>
         /// <remarks>

@@ -12,5 +12,6 @@ namespace InSite.Application.Issues.Read
         public Guid? IssueIdentifier { get; set; }
         public Guid? TopicUserIdentifier { get; set; }
         public Guid[] TopicUserIdentifiers { get; set; }
+        public Guid[] AttachmentIdentifiers { get; set; }
     }
 }

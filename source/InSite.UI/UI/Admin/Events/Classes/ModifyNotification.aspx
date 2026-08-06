@@ -68,6 +68,30 @@
         </div>
     </section>
 
+    <section class="mb-3">
+        <div class="row">
+            <div class="col-md-6">
+
+                <div class="card border-0 shadow-lg h-100">
+                    <div class="card-body">
+
+                        <h4 class="card-title mb-3">
+                            Class Completed Notification
+                        </h4>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">To Learner</label>
+                            <div>
+                                <insite:FindMessage runat="server" ID="CompletedLearnerMessage" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
 
     <section>
         <insite:SaveButton runat="server" ID="SaveButton" ValidationGroup="Class" />

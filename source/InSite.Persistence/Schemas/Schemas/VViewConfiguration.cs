@@ -4,7 +4,7 @@ namespace InSite.Persistence
 {
     public class VViewConfiguration : EntityTypeConfiguration<VView>
     {
-        public VViewConfiguration() : this("databases") { }
+        public VViewConfiguration() : this("schemas") { }
 
         public VViewConfiguration(string schema)
         {

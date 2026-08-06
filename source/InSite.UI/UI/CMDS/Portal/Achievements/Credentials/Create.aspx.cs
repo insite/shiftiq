@@ -32,7 +32,10 @@ namespace InSite.Custom.CMDS.User.Progressions.Forms
             base.ApplyAccessControlForCmds();
 
             if (!Access.Configure && !Access.Administrate)
-                HttpResponseHelper.Redirect(SearchUrl);
+            {
+                CreateAccessDeniedException();
+                return;
+            }
 
             var hasValidationAccess = Access.Configure || Access.Administrate;
             var canEditGrades = Access.Configure;
@@ -84,6 +87,12 @@ namespace InSite.Custom.CMDS.User.Progressions.Forms
             if (item.Completed.HasValue && item.Status == "Pending")
             {
                 EditorStatus.AddMessage(AlertType.Error, "If this training is not yet Completed then please clear the Completed field. If it is Completed then please select Valid for the current Status.");
+                return;
+            }
+
+            if (item.Completed.HasValue && item.Completed.Value > DateTime.UtcNow)
+            {
+                EditorStatus.AddMessage(AlertType.Error, "Please select a date before today. You can add future achievements after they are completed.");
                 return;
             }
 

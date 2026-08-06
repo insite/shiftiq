@@ -7,6 +7,7 @@ using InSite.Application.Banks.Write;
 using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
 using InSite.Persistence;
+using InSite.UI.Admin.Assessments.Forms.Utilities;
 
 using Shift.Common;
 using Shift.Constant;
@@ -163,11 +164,17 @@ namespace InSite.Admin.Assessments.Forms.Controls
 
             // Invigilation
 
+            var formTimeLimit = form.CalculateFormTimeLimit();
+            var isCalculatedTimeLimit = form.IsTabTimeLimitEnabledForAll();
+
+            TimeLimitHelpDefault.Visible = !isCalculatedTimeLimit;
+            TimeLimitHelpCalculated.Visible = isCalculatedTimeLimit;
+
             SafeExamBrowserState.Text = form.Invigilation.IsSafeExamBrowserRequired ? "Required" : "Optional";
             KioskModeState.Text = form.Invigilation.IsKioskModeRequired ? "Required" : "Disabled";
             ScheduleOpenDate.Text = form.Invigilation.Opened.Format(User.TimeZone, nullValue: "N/A");
             ScheduleCloseDate.Text = form.Invigilation.Closed.Format(User.TimeZone, nullValue: "N/A");
-            TimeLimit.Text = form.Invigilation.TimeLimit.ToString("n0");
+            TimeLimit.Text = formTimeLimit < 0 ? "N/A" : formTimeLimit.ToString("n0") + " minute(s)";
             AttemptLimit.Text = form.Invigilation.AttemptLimit.ToString("n0"); ;
             AttemptLimitPerSession.Text = form.Invigilation.AttemptLimitPerSession.ToString();
             TimeLimitPerSession.Text = form.Invigilation.TimeLimitPerSession.ToString();

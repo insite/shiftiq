@@ -54,9 +54,20 @@ namespace InSite.Domain.Issues
             Apply(new UserAssigned(user, role));
         }
 
-        public void ChangeIssueStatus(Guid status, DateTimeOffset effective)
+        public void ChangeIssueStatus(Guid status, DateTimeOffset effective, string category)
         {
-            Apply(new CaseStatusChanged(status, effective));
+            Apply(new CaseStatusChanged(status, effective, category));
+
+            if (Data.Closed.HasValue)
+            {
+                if (string.Equals(category, "Open", StringComparison.OrdinalIgnoreCase))
+                    Apply(new CaseReopened());
+            }
+            else
+            {
+                if (string.Equals(category, "Closed", StringComparison.OrdinalIgnoreCase))
+                    Apply(new CaseClosed(null));
+            }
         }
 
         public void ChangeIssueTitle(string issueTitle)
@@ -69,9 +80,9 @@ namespace InSite.Domain.Issues
             Apply(new CaseTypeChanged(issueType));
         }
 
-        public void CloseIssue()
+        public void CloseIssue(DateTimeOffset? closed)
         {
-            Apply(new CaseClosed());
+            Apply(new CaseClosed(closed));
         }
 
         public void ConnectIssueToSurveyResponse(Guid response)

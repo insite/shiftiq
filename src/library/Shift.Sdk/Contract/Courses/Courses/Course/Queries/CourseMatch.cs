@@ -12,9 +12,11 @@ namespace Shift.Contract
         public string CourseCode { get; set; }
         public string CourseLabel { get; set; }
         public string CourseHook { get; set; }
+        public bool CourseIsHidden { get; set; }
 
         public Guid? CatalogId { get; set; }
         public string CatalogName { get; set; }
+        public bool? CatalogIsHidden { get; set; }
 
         public string PublicationStatus { get; set; }
         public DateTimeOffset? PublicationDate { get; set; }

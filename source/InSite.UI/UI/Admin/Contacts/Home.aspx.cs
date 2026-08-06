@@ -38,6 +38,7 @@ namespace InSite.UI.Admin.Contacts
         private void SetControlsVisibility()
         {
             DownloadXLSXSection.Visible = Identity.IsGranted(ActionName.Admin_Contacts_People_Edit_SocialInsuranceNumber);
+            IntegrationPortalLink.Visible = Organization.Toolkits.Contacts.DisplayIntegrationPortalLink;
         }
 
         protected void BindModelToControls()

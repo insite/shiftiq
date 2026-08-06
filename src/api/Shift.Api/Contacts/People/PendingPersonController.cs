@@ -44,7 +44,7 @@ public class PendingPersonController : ShiftControllerBase
     [HttpPost("api/contacts/pending-people/collect")]
     [HybridPermission("directory/pending-people", DataAccess.Read)]
     [EndpointName("collectPendingPeople")]
-    public async Task<ActionResult<IEnumerable<PendingPersonModel>>> PostCollectAsync([FromBody] CollectPendingPeople query, CancellationToken cancellation = default)
+    public async Task<ActionResult<PendingPersonModel[]>> PostCollectAsync([FromBody] CollectPendingPeople query, CancellationToken cancellation = default)
     {
         return await CollectAsync(query, cancellation);
     }
@@ -54,12 +54,12 @@ public class PendingPersonController : ShiftControllerBase
     [EndpointName("collectPendingPeople_get")]
     [AliasFor("collectPendingPeople")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<IEnumerable<PendingPersonModel>>> GetCollectAsync([FromQuery] CollectPendingPeople query, CancellationToken cancellation = default)
+    public async Task<ActionResult<PendingPersonModel[]>> GetCollectAsync([FromQuery] CollectPendingPeople query, CancellationToken cancellation = default)
     {
         return await CollectAsync(query, cancellation);
     }
 
-    private async Task<ActionResult<IEnumerable<PendingPersonModel>>> CollectAsync(CollectPendingPeople query, CancellationToken cancellation)
+    private async Task<ActionResult<PendingPersonModel[]>> CollectAsync(CollectPendingPeople query, CancellationToken cancellation)
     {
         var principal = _principalProvider.GetPrincipal();
 
@@ -68,13 +68,13 @@ public class PendingPersonController : ShiftControllerBase
 
         _principalProvider.ValidateOrganizationId(principal, query);
 
-        var models = await _pendingPersonService.CollectAsync(query, principal.TimeZone, cancellation);
+        var models = await _pendingPersonService.CollectAsync(query, cancellation);
 
         var count = await _pendingPersonService.CountAsync(query, cancellation);
 
         Response.AddPagination(query.Filter, count);
 
-        return Ok(models);
+        return models;
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class PendingPersonController : ShiftControllerBase
 
         var count = await _pendingPersonService.CountAsync(query, cancellation);
 
-        return Ok(new CountResult(count));
+        return new CountResult(count);
     }
 
     /// <summary>
@@ -143,7 +143,7 @@ public class PendingPersonController : ShiftControllerBase
         var exporter = new ExportHelper("Directory", "PendingPeople", query.Filter.Format, User);
 
         var models = await _pendingPersonService
-            .DownloadAsync(query, principal.TimeZone, cancellation)
+            .DownloadAsync(query, cancellation)
             .ToListAsync(cancellation);
 
         var content = _pendingPersonService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
@@ -169,15 +169,15 @@ public class PendingPersonController : ShiftControllerBase
     {
         var principal = _principalProvider.GetPrincipal();
 
-        var model = await _pendingPersonService.RetrieveAsync(pending, principal.TimeZone, cancellation);
+        var model = await _pendingPersonService.RetrieveAsync(pending, cancellation);
 
         if (model == null)
             return NotFound();
 
-        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
+        if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationIdentifier))
             return NotFound();
 
-        return Ok(model);
+        return model;
     }
 
     /// <summary>
@@ -186,7 +186,7 @@ public class PendingPersonController : ShiftControllerBase
     [HttpPost("api/contacts/pending-people/search")]
     [HybridPermission("directory/pending-people", DataAccess.Read)]
     [EndpointName("searchPendingPeople")]
-    public async Task<ActionResult<IEnumerable<PendingPersonMatch>>> PostSearchAsync([FromBody] SearchPendingPeople query, CancellationToken cancellation = default)
+    public async Task<ActionResult<PendingPersonModel[]>> PostSearchAsync([FromBody] CollectPendingPeople query, CancellationToken cancellation = default)
     {
         return await SearchAsync(query, cancellation);
     }
@@ -196,12 +196,12 @@ public class PendingPersonController : ShiftControllerBase
     [EndpointName("searchPendingPeople_get")]
     [AliasFor("searchPendingPeople")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<ActionResult<IEnumerable<PendingPersonMatch>>> GetSearchAsync([FromQuery] SearchPendingPeople query, CancellationToken cancellation = default)
+    public async Task<ActionResult<PendingPersonModel[]>> GetSearchAsync([FromQuery] CollectPendingPeople query, CancellationToken cancellation = default)
     {
         return await SearchAsync(query, cancellation);
     }
 
-    private async Task<ActionResult<IEnumerable<PendingPersonMatch>>> SearchAsync(SearchPendingPeople query, CancellationToken cancellation)
+    private async Task<PendingPersonModel[]> SearchAsync(CollectPendingPeople query, CancellationToken cancellation)
     {
         var principal = _principalProvider.GetPrincipal();
 
@@ -210,13 +210,13 @@ public class PendingPersonController : ShiftControllerBase
 
         _principalProvider.ValidateOrganizationId(principal, query);
 
-        var matches = await _pendingPersonService.SearchAsync(query, principal.TimeZone, cancellation);
+        var matches = await _pendingPersonService.CollectAsync(query, cancellation);
 
         var count = await _pendingPersonService.CountAsync(query, cancellation);
 
         Response.AddPagination(query.Filter, count);
 
-        return Ok(matches);
+        return matches;
     }
 
     #endregion Queries
@@ -232,14 +232,14 @@ public class PendingPersonController : ShiftControllerBase
     {
         var principal = _principalProvider.GetPrincipal();
 
-        var created = await _pendingPersonService.CreateAsync(create, principal, cancellation);
+        var id = await _pendingPersonService.CreateAsync(create, principal, cancellation);
 
-        if (!created)
-            return BadRequest($"Duplicate not permitted: PendingId {create.PendingId}. You cannot insert a duplicate object with the same primary key.");
+        if (id == null)
+            return BadRequest($"Failed to create.");
 
-        var model = await _pendingPersonService.RetrieveAsync(create.PendingId, principal.TimeZone, cancellation);
+        var model = await _pendingPersonService.RetrieveAsync(id.Value, cancellation);
 
-        return Created($"api/contacts/pending-people/{create.PendingId}", model);
+        return Created($"api/contacts/pending-people/{id.Value}", model);
     }
 
     [HttpDelete("api/contacts/pending-people/{pending:guid}")]
@@ -267,10 +267,10 @@ public class PendingPersonController : ShiftControllerBase
     {
         var principal = _principalProvider.GetPrincipal();
 
-        var model = await _pendingPersonService.RetrieveAsync(pending, principal.TimeZone, cancellation);
+        var model = await _pendingPersonService.RetrieveAsync(pending, cancellation);
 
         if (model is null)
-            return NotFound($"PendingPerson not found: PendingId {modify.PendingId}. You cannot modify an object that is not in the database.");
+            return NotFound($"PendingPerson not found: PendingId {modify.PendingPersonIdentifier}. You cannot modify an object that is not in the database.");
 
         var modified = await _pendingPersonService.ModifyAsync(modify, cancellation);
 
@@ -281,4 +281,87 @@ public class PendingPersonController : ShiftControllerBase
     }
 
     #endregion Commands
+
+    #region Import
+
+    public class SearchImports : Query<IEnumerable<PendingPersonImportModel>>
+    {
+    }
+
+    [HttpPost("api/contacts/pending-people/search-import")]
+    [HybridPermission("directory/pending-people", DataAccess.Read)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<ActionResult<PendingPersonImportModel[]>> SearchImportAsync(SearchImports criteria, CancellationToken cancellation = default)
+    {
+        var principal = _principalProvider.GetPrincipal();
+
+        var collectPeople = new CollectPendingPeople { OrganizationId = principal.OrganizationId };
+        collectPeople.Filter.Page = criteria.Filter.Page;
+        collectPeople.Filter.Sort = nameof(PendingPersonEntity.PersonCode);
+
+        var matches = await _pendingPersonService.CollectImportAsync(collectPeople, cancellation);
+        var count = await _pendingPersonService.CountAsync(collectPeople, cancellation);
+
+        Response.AddPagination(collectPeople.Filter, count);
+
+        return matches;
+    }
+
+    public class ImportResultItem
+    {
+        public required string PersonCode { get; init; }
+        public required ImportPersonResult.StatusEnum Status { get; init; }
+        public Guid PendingPersonId { get; init; }
+        public Guid? UserId { get; init; }
+        public ValidationFailure? Failure { get; init; }
+    }
+
+    public class ImportResult
+    {
+        public required Guid? ReportFileId { get; init; }
+        public required string? ReportFileName { get; init; }
+        public required ImportResultItem[] ImportedPeople { get; init; }
+    }
+
+    [HttpPost("api/contacts/pending-people/import")]
+    [HybridPermission("directory/pending-people", DataAccess.Update)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<ActionResult<ImportResult>> ImportAsync(
+        IPersonImporter importer,
+        IPersonImportReporter reporter,
+        OrganizationService organizationService,
+        OrganizationAdapter organizationAdapter,
+        ImportPendingPerson[] imports
+        )
+    {
+        var principal = _principalProvider.GetPrincipal();
+        var submittedBy = principal.UserId;
+        var submittedByName = principal.Name;
+
+        var organizationId = principal.Organization.Identifier;
+        var organization = await organizationService.RetrieveAsync(organizationId) ?? throw new ArgumentNullException($"Organization {organizationId} is not found");
+        var organizationData = organizationAdapter.ToData(organization);
+        var fullNamePolicy = organizationData.Toolkits?.Contacts?.FullNamePolicy;
+        var timeZone = organizationData.TimeZone.Id;
+
+        var result = await importer.ImportPendingPeopleAsync(organizationId, fullNamePolicy, timeZone, submittedByName, imports);
+        var file = await reporter.SaveReportAsync(organizationId, submittedBy, timeZone, result, false);
+
+        return new ImportResult
+        {
+            ReportFileId = file?.FileIdentifier,
+            ReportFileName = file?.FileName,
+            ImportedPeople = result.Select(x => new ImportResultItem
+            {
+                PersonCode = x.Input.PersonCode,
+                Status = x.Status,
+                PendingPersonId = x.PendingPersonId!.Value,
+                UserId = x.UserId,
+                Failure = x.Failure
+            })
+            .ToArray(),
+        };
+    }
+
+    #endregion
 }

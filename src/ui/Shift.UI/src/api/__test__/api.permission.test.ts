@@ -18,7 +18,7 @@ test("/api/me/context for regular user1", async () => {
     expect(result.Permissions.Integrations).toBe(false);
     expect(result.Permissions.Settings).toBe(false);
     expect(result.SupportedLanguages.length).toBeGreaterThanOrEqual(1);
-    expect(result.NavigationGroups.length).toBe(0);
+    expect(result.AllApps.length).toBe(0);
     expect(result.StylePath).toBeTypeOf("string");
 });
 

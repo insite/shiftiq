@@ -524,9 +524,9 @@ namespace InSite.Common.Web.UI
         /// Adjusts the uploaded image and saves it as a new stored file under the given object,
         /// returning the created FileStorageModel. Returns null if there is no file.
         /// </summary>
-        public FileStorageModel AdjustImageAndSave(Guid objectIdentifier, FileObjectType objectType, int width, int height)
+        public FileStorageModel AdjustImageAndSave(Guid objectIdentifier, FileObjectType objectType, int width, int height, IEnumerable<FileClaim> claims = null)
         {
-            return AdjustImageAndSave(objectIdentifier, objectType, width, height, ImageType.Jpeg, true, null, out _);
+            return AdjustImageAndSave(objectIdentifier, objectType, width, height, ImageType.Jpeg, true, null, claims, out _);
         }
 
         /// <summary>
@@ -540,6 +540,32 @@ namespace InSite.Common.Web.UI
             ImageType format,
             bool keepAspectRatio,
             string overrideFileName,
+            out List<string> messagesOut)
+        {
+            return AdjustImageAndSave(
+                objectIdentifier,
+                objectType,
+                width,
+                height,
+                format,
+                keepAspectRatio,
+                overrideFileName,
+                null,
+                out messagesOut);
+        }
+
+        /// <summary>
+        /// If file is missing or something fails early, returns null.
+        /// </summary>
+        public FileStorageModel AdjustImageAndSave(
+            Guid objectIdentifier,
+            FileObjectType objectType,
+            int width,
+            int height,
+            ImageType format,
+            bool keepAspectRatio,
+            string overrideFileName,
+            IEnumerable<FileClaim> claims,
             out List<string> messagesOut)
         {
             messagesOut = null;
@@ -588,7 +614,7 @@ namespace InSite.Common.Web.UI
                         objectIdentifier,
                         objectType,
                         new FileProperties { DocumentName = fileName },
-                        new List<FileClaim>());
+                        claims.EmptyIfNull());
 
                     messagesOut = messages;
 
@@ -617,9 +643,9 @@ namespace InSite.Common.Web.UI
         /// <summary>
         /// Processes and returns the final public URL or null.
         /// </summary>
-        public string AdjustImageSaveAndGetUrl(Guid objectIdentifier, FileObjectType objectType, int width, int height)
+        public string AdjustImageSaveAndGetUrl(Guid objectIdentifier, FileObjectType objectType, int width, int height, IEnumerable<FileClaim> claims = null)
         {
-            var model = AdjustImageAndSave(objectIdentifier, objectType, width, height);
+            var model = AdjustImageAndSave(objectIdentifier, objectType, width, height, claims);
             return model != null
                 ? ServiceLocator.StorageService.GetFileUrl(model.FileIdentifier, model.FileName)
                 : null;

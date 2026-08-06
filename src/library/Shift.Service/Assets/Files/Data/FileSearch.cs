@@ -184,7 +184,8 @@ namespace Shift.Service.Content
                 ReviewedUserIdentifier = file.ReviewedUserIdentifier,
                 ApprovedTime = file.ApprovedTime,
                 ApprovedUserIdentifier = file.ApprovedUserIdentifier,
-                AllowLearnerToView = file.AllowLearnerToView
+                AllowLearnerToView = file.AllowLearnerToView,
+                Tag = file.FileTag?.ToEnum<FileTag>(),
             };
 
             model.Properties = properties;

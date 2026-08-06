@@ -1,4 +1,5 @@
 ﻿using System;
+using System.EnterpriseServices;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace InSite.UI.Admin.Reports.Dashboards
     {
         private DashboardParser _parser;
         private DashboardModel _model;
-        private DashboardBuilder _builder;
+        private Utilities.DashboardBuilder _builder;
 
         private string _folderPath;
         private int _selectedIndex;
@@ -63,7 +64,7 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
         private void CreateDashboardPanels()
         {
-            _builder = new DashboardBuilder(Page);
+            _builder = new Utilities.DashboardBuilder(Page);
 
             foreach (var panel in _model.Panels)
             {
@@ -100,17 +101,22 @@ namespace InSite.UI.Admin.Reports.Dashboards
                 return;
 
             if (_model != null)
+            {
                 foreach (var panel in _model.Panels)
                     foreach (var widget in panel.Widgets)
                     {
-                        widget.Query.Parameters.Add("@OrganizationIdentifier", Organization.Identifier.ToString());
-                        widget.Query.Parameters.Add("@UserIdentifier", User.Identifier.ToString());
-                        _builder.BindWidget(widget, DashboardPanels.FindControl(widget.Id));
+                        widget.QueryParameters.Add("@OrganizationIdentifier", Organization.Identifier.ToString());
+                        widget.QueryParameters.Add("@UserIdentifier", User.Identifier.ToString());
+
+                        _builder.BindWidget(widget, DashboardPanels);
                     }
+            }
 
             if (_builder != null)
+            {
                 foreach (var error in _builder.Errors)
                     DashboardStatus.AddMessage(AlertType.Error, error);
+            }
         }
 
         public void DownloadModel()

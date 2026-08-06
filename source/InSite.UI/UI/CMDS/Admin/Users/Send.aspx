@@ -2,6 +2,8 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 
+    <insite:Alert runat="server" ID="OutboxWarning" />
+
     <insite:Alert runat="server" ID="SendStatus" />
 
         <h2 class="h4 mb-3"><i class="far fa-paper-plane me-2"></i>Email</h2>

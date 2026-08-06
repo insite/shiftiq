@@ -10,6 +10,7 @@ namespace InSite.Persistence
         public int? LifetimeMonths { get; set; }
         public bool IsRequired { get; set; }
         public bool IsPlanned { get; set; }
+        public bool IsInherited { get; set; }
         public string AchievementLabel { get; set; }
         public string AchievementTitle { get; set; }
     }

@@ -49,11 +49,14 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
             public string AchievementLabel { get; set; }
             public string AchievementTitle { get; set; }
             public string CredentialStatus { get; set; }
+            public string CredentialStatusHtml { get; set; }
 
             public string AchievementCertificateLayoutCode { get; set; }
+            public string AuthorityType { get; set; }
             public string BadgeImageUrl { get; set; }
             public string DownloadLink { get; set; }
             public bool HasBadgeImage { get; set; }
+            public bool IsSelfDeclared { get; set; }
 
             public decimal? CredentialGrantedScore { get; set; }
 
@@ -145,6 +148,7 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
                     CredentialIdentifier = x.CredentialIdentifier,
 
                     AchievementCertificateLayoutCode = x.AchievementCertificateLayoutCode,
+                    AuthorityType = x.AuthorityType,
                     BadgeImageUrl = x.BadgeImageUrl,
                     HasBadgeImage = x.HasBadgeImage ?? false
 
@@ -156,6 +160,15 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
             foreach (var item in items)
             {
                 var status = item.CredentialStatus.ToEnum(CredentialStatus.Undefined);
+
+                item.IsSelfDeclared = item.AuthorityType == "Self";
+
+                // The shared renderer covers Valid, Pending, Submitted, and Expired. Anything
+                // else (Revoked, Undefined) keeps the plain translated status shown until now.
+                var statusHtml = Learners.Controls.SearchResults.GetStatusHtml(status, Translate);
+                item.CredentialStatusHtml = statusHtml.IsNotEmpty()
+                    ? statusHtml
+                    : Translate(item.CredentialStatus);
 
                 string fileUrl = null;
                 var file = files.FirstOrDefault(x => x.ObjectIdentifier == item.CredentialIdentifier);

@@ -63,6 +63,7 @@ namespace InSite.Web.Routing
             Register($"Portal/Course", "ui/portal/learning/course/{course}", $"~/UI/Portal/Learning/Course.aspx");
             Register($"Portal/Course/Scorm", "ui/portal/integrations/scorm/launch/{activity}", $"~/UI/Portal/integrations/scorm/launch.aspx");
             Register($"Lobby/Scorm/Exit", "ui/lobby/scorm/{activity}/{registration}/exit", $"~/UI/Lobby/ScormExit.aspx");
+            Register("Portal/Catalogue (Legacy Redirect)", "ui/portal/learning/catalog", "~/UI/Portal/Learning/CatalogRedirect.aspx");
         }
 
         private static void RegisterPrograms()

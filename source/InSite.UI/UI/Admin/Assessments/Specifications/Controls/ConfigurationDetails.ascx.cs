@@ -10,6 +10,12 @@ namespace InSite.Admin.Assessments.Specifications.Controls
 {
     public partial class ConfigurationDetails : BaseUserControl
     {
+        private SpecificationType SpecificationType
+        {
+            get => (SpecificationType)ViewState[nameof(SpecificationType)];
+            set => ViewState[nameof(SpecificationType)] = value;
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -67,27 +73,21 @@ namespace InSite.Admin.Assessments.Specifications.Controls
 
         public void SetInputValues(Specification spec)
         {
+            SpecificationType = spec.Type;
             ConsequenceType.SelectedValue = spec.Consequence.GetName();
             FormLimit.ValueAsInt = spec.FormLimit;
             QuestionLimit.ValueAsInt = spec.QuestionLimit;
 
-            var isStaticSpec = spec.Type == SpecificationType.Static;
+            SectionsAsTabsEnabled.ValueAsBoolean = spec.SectionsAsTabsEnabled;
 
-            ScenarioFields.Visible = isStaticSpec;
+            OnSectionsAsTabsEnabledChanged();
 
-            if (isStaticSpec)
-            {
-                SectionsAsTabsEnabled.ValueAsBoolean = spec.SectionsAsTabsEnabled;
+            TabNavigationEnabled.ValueAsBoolean = spec.TabNavigationEnabled;
 
-                OnSectionsAsTabsEnabledChanged();
+            OnTabNavigationEnabledChanged();
 
-                TabNavigationEnabled.ValueAsBoolean = spec.TabNavigationEnabled;
-
-                OnTabNavigationEnabledChanged();
-
-                SingleQuestionPerTabEnabled.ValueAsBoolean = spec.SingleQuestionPerTabEnabled;
-                TabTimeLimit.Value = spec.TabTimeLimit.GetName();
-            }
+            SingleQuestionPerTabEnabled.ValueAsBoolean = spec.SingleQuestionPerTabEnabled;
+            TabTimeLimit.Value = spec.TabTimeLimit.GetName();
         }
 
         public void GetInputValues(Specification spec)
@@ -97,7 +97,7 @@ namespace InSite.Admin.Assessments.Specifications.Controls
             spec.QuestionLimit = QuestionLimit.ValueAsInt.Value;
         }
 
-        public bool? GetScenarioEnabled() => ScenarioFields.Visible ? SectionsAsTabsEnabled.ValueAsBoolean.Value : (bool?)null;
+        public bool? GetScenarioEnabled() => SectionsAsTabsEnabled.ValueAsBoolean.Value;
 
         public bool? GetTabNavigationEnabled() => TabNavigationField.Visible ? TabNavigationEnabled.ValueAsBoolean.Value : (bool?)null;
 

@@ -19,6 +19,9 @@ using Shift.Sdk.Service;
 using Shift.Sdk.Service.Platform;
 using Shift.Sdk.Service.Platform.DashboardNotifications;
 using Shift.Sdk.Service.Security.Cookies;
+using Shift.Service.Chatbot;
+using Shift.Service.Chatbot.OpenAI;
+using Shift.Service.Chatbot.ShiftTools;
 using Shift.Service.Content;
 using Shift.Service.Content.PageContents;
 using Shift.Service.Directory;
@@ -28,6 +31,7 @@ using Shift.Service.Metadata.Sequences.Data;
 using Shift.Service.Orchestration;
 using Shift.Service.Platform.Dashboard;
 using Shift.Service.Presentation;
+using Shift.Service.Reports;
 using Shift.Service.Workspace;
 using Shift.Toolbox;
 
@@ -171,6 +175,8 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
     services.AddSingleton<IStorageServiceAsync, StorageService>();
     services.AddSingleton<IDashboardNotificationManager, DashboardNotificationManager>();
     services.AddSingleton<IDashboardService, DashboardService>();
+    services.AddSingleton<IChatbotToolService, ShiftChatbotToolService>();
+    services.AddSingleton<IChatbotService, OpenAiChatbotService>();
 
     services.AddScoped<ISequence, Sequence>();
     services.AddScoped<ICommanderAsync, TimelineService>();
@@ -295,10 +301,7 @@ WebApplication BuildApplication(WebApplicationBuilder builder, AppSettings setti
 
     var host = builder.Build();
 
-    if (telemetry.Monitoring.Enabled)
-        host.UseMiddleware<ExceptionHandlingMiddleware>();
-    else
-        host.UseDeveloperExceptionPage();
+    host.UseMiddleware<ExceptionHandlingMiddleware>();
 
     host.UseDocumentation(settings);
 
@@ -389,7 +392,9 @@ void AddEntities(IServiceCollection services)
         }
     }
 
-    services.AddSingleton<IPersonValidator, PersonValidator>();
+    services.AddSingleton<IPersonImporter, PersonImporter>();
+    services.AddSingleton<IPersonImportReporter, PersonImportReporter>();
+    services.AddSingleton<ToolkitUsageService>();
 }
 
 async Task Startup(WebApplication host)

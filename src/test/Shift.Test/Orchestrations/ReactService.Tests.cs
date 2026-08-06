@@ -7,6 +7,7 @@ using Shift.Service;
 using Shift.Service.Content;
 using Shift.Service.Directory;
 using Shift.Service.Presentation;
+using Shift.Service.Reports;
 using Shift.Service.Security;
 
 namespace Shift.Test.Me
@@ -31,6 +32,7 @@ namespace Shift.Test.Me
         private readonly ILabelService _labelService;
         private readonly IPageService _pageService;
         private readonly TInputReader _inputReader;
+        private readonly ToolkitUsageService _toolkitUsageService;
 
         private readonly PermissionCache _permissions;
 
@@ -53,6 +55,7 @@ namespace Shift.Test.Me
             _labelService = fixture.ServiceProvider.GetRequiredService<ILabelService>();
             _pageService = fixture.ServiceProvider.GetRequiredService<IPageService>();
             _inputReader = fixture.ServiceProvider.GetRequiredService<TInputReader>();
+            _toolkitUsageService = fixture.ServiceProvider.GetRequiredService<ToolkitUsageService>();
 
             _permissions = fixture.ServiceProvider.GetRequiredService<PermissionCache>();
         }
@@ -73,7 +76,8 @@ namespace Shift.Test.Me
                 _navigationService,
                 _labelService,
                 _pageService,
-                _inputReader
+                _inputReader,
+                _toolkitUsageService
                 );
 
             var testPrincipal = new TestPrincipal();

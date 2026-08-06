@@ -18,4 +18,8 @@ public partial class MembershipEntity
     public DateTimeOffset MembershipEffective { get; set; }
     public DateTimeOffset? MembershipExpiry { get; set; }
     public DateTimeOffset Modified { get; set; }
+
+    public DateTimeOffset LastChangeTime { get; set; }
+    public string LastChangeType { get; set; } = null!;
+    public Guid LastChangeUser { get; set; }
 }

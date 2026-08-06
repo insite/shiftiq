@@ -234,7 +234,7 @@ namespace InSite.Persistence
                         TriggerType = prerequisite.TriggerType,
                         TriggerIdentifier = prerequisite.TriggerIdentifier,
                         TriggerChange = Shift.Common.Humanizer.TitleCase(prerequisite.TriggerChange),
-                        TriggerDescription = GetTriggerDescription(prerequisite.TriggerType, prerequisite.TriggerIdentifier)
+                        TriggerDescription = GetPrerequisiteTriggerDescription(prerequisite.TriggerType, prerequisite.TriggerIdentifier)
                     };
 
                     if (prerequisite.TriggerConditionScoreFrom.HasValue && prerequisite.TriggerConditionScoreThru.HasValue)
@@ -247,42 +247,42 @@ namespace InSite.Persistence
                 .OrderBy(x => x.TriggerChange)
                 .ThenBy(x => x.TriggerDescription)
                 .ToArray();
+        }
 
-            string GetTriggerDescription(string type, Guid id)
+        public static string GetPrerequisiteTriggerDescription(string type, Guid id)
+        {
+            if (!Enum.TryParse<TriggerType>(type, true, out var triggerType))
+                throw new ArgumentException($"Unknown trigger type: ${type}");
+
+            if (triggerType == TriggerType.Activity)
             {
-                if (!Enum.TryParse<TriggerType>(type, true, out var triggerType))
-                    throw new ArgumentException($"Unknown trigger type: ${type}");
-
-                if (triggerType == TriggerType.Activity)
-                {
-                    var activity = SelectActivity(id);
-                    if (activity != null)
-                        return $"{activity.ActivityName}";
-                }
-
-                if (triggerType == TriggerType.AssessmentForm)
-                {
-                    var form = new BankSearch(null).GetForm(id);
-                    if (form != null)
-                        return form.FormName;
-                }
-
-                if (triggerType == TriggerType.AssessmentQuestion)
-                {
-                    var question = new BankSearch(null).GetQuestion(id);
-                    if (question != null)
-                        return $"{question.QuestionText}";
-                }
-
-                if (triggerType == TriggerType.GradeItem)
-                {
-                    var gradeitem = new RecordSearch(null).GetGradeItem(id);
-                    if (gradeitem != null)
-                        return $"{gradeitem.GradeItemName}";
-                }
-
-                return "Unknown";
+                var activity = SelectActivity(id);
+                if (activity != null)
+                    return $"{activity.ActivityName}";
             }
+
+            if (triggerType == TriggerType.AssessmentForm)
+            {
+                var form = new BankSearch(null).GetForm(id);
+                if (form != null)
+                    return form.FormName;
+            }
+
+            if (triggerType == TriggerType.AssessmentQuestion)
+            {
+                var question = new BankSearch(null).GetQuestion(id);
+                if (question != null)
+                    return $"{question.QuestionText}";
+            }
+
+            if (triggerType == TriggerType.GradeItem)
+            {
+                var gradeitem = new RecordSearch(null).GetGradeItem(id);
+                if (gradeitem != null)
+                    return $"{gradeitem.GradeItemName}";
+            }
+
+            return "Unknown";
         }
 
         #endregion
@@ -618,6 +618,39 @@ namespace InSite.Persistence
                         }).ToList();
 
                 return course;
+            }
+        }
+
+        public static Guid? GetPrecedingLesson(Guid activityId)
+        {
+            using (var db = new InternalDbContext(proxy: false, lazy: true))
+            {
+                var activity = db.QActivities
+                    .Include(x => x.Module.Unit)
+                    .FirstOrDefault(x => x.ActivityIdentifier == activityId);
+                if (activity == null)
+                    return null;
+
+                var courseId = activity.Module.Unit.CourseIdentifier;
+                var unitSequence = activity.Module.Unit.UnitSequence;
+                var moduleSequence = activity.Module.ModuleSequence;
+                var activitySequence = activity.ActivitySequence;
+
+                return db.QActivities
+                    .Where(x => x.Module.Unit.CourseIdentifier == courseId
+                        && (
+                            x.Module.Unit.UnitSequence < unitSequence
+                            || (x.Module.Unit.UnitSequence == unitSequence
+                                && x.Module.ModuleSequence < moduleSequence)
+                            || (x.Module.Unit.UnitSequence == unitSequence
+                                && x.Module.ModuleSequence == moduleSequence
+                                && x.ActivitySequence < activitySequence)
+                           ))
+                    .OrderByDescending(x => x.Module.Unit.UnitSequence)
+                    .ThenByDescending(x => x.Module.ModuleSequence)
+                    .ThenByDescending(x => x.ActivitySequence)
+                    .Select(x => (Guid?)x.ActivityIdentifier)
+                    .FirstOrDefault();
             }
         }
 

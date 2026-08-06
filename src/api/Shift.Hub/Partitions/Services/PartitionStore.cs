@@ -29,13 +29,22 @@ IF OBJECT_ID('partition', 'U') IS NULL
         partition_slug      VARCHAR(100)     NOT NULL,
         partition_id        UNIQUEIDENTIFIER NOT NULL,
         partition_whitelist VARCHAR(MAX),
-        partition_help_url  VARCHAR(254),
-        partition_logo_url  VARCHAR(254)
+        partition_help_url  VARCHAR(500),
+        partition_logo_url  VARCHAR(500)
     );
 
--- Additively add the logo column to partition tables created before it existed.
+-- Add the logo column to partition table if it's still missing
+
 IF COL_LENGTH('partition', 'partition_logo_url') IS NULL
-    ALTER TABLE [partition] ADD partition_logo_url VARCHAR(254);
+    ALTER TABLE [partition] ADD partition_logo_url VARCHAR(500);
+
+-- Every URL column is the same size so no one of them is the first to overflow
+
+IF COL_LENGTH('partition', 'partition_help_url') < 500
+    ALTER TABLE [partition] ALTER COLUMN partition_help_url VARCHAR(500) NULL;
+
+IF COL_LENGTH('partition', 'partition_logo_url') < 500
+    ALTER TABLE [partition] ALTER COLUMN partition_logo_url VARCHAR(500) NULL;
 
 IF OBJECT_ID('organization', 'U') IS NULL
     CREATE TABLE organization (
@@ -49,9 +58,18 @@ IF OBJECT_ID('organization', 'U') IS NULL
         account_number       VARCHAR(50),
         account_opened_at    DATETIMEOFFSET,
         account_closed_at    DATETIMEOFFSET,
-        organization_website VARCHAR(254),
-        organization_logo    VARCHAR(254)
+        organization_website VARCHAR(500),
+        organization_logo    VARCHAR(500)
     );
+
+-- Widen the URL columns on organization tables. Source columns are VARCHAR(500) and SQL Server
+-- throws an exception rather than truncating, so one long URL aborts the sync.
+
+IF COL_LENGTH('organization', 'organization_website') < 500
+    ALTER TABLE organization ALTER COLUMN organization_website VARCHAR(500) NULL;
+
+IF COL_LENGTH('organization', 'organization_logo') < 500
+    ALTER TABLE organization ALTER COLUMN organization_logo VARCHAR(500) NULL;
 ";
 
             await _db.ExecuteQueryAsync(query, null);
@@ -74,7 +92,7 @@ IF OBJECT_ID('organization', 'U') IS NULL
                 { "@LogoUrl", partition.LogoUrl }
             };
 
-            var partitionQuery = @"
+            const string partitionQuery = @"
 UPDATE [partition]
    SET partition_number = @Number, partition_name = @Name, partition_brand = @Brand, partition_theme = @Theme,
        partition_domain = @Domain, partition_email = @Email, partition_slug = @Slug,
@@ -86,7 +104,7 @@ IF @@ROWCOUNT = 0
     VALUES (@Number, @Name, @Brand, @Theme, @Domain, @Email, @Slug, @Identifier, @Whitelist, @HelpUrl, @LogoUrl);
 ";
 
-            var organizationQuery = @"
+            const string organizationQuery = @"
 UPDATE organization
    SET partition_number = @PartitionNumber, organization_slug = @Slug, organization_name = @Name,
        account_name = @AccountName, account_status = @AccountStatus, account_code = @AccountCode,
@@ -100,9 +118,20 @@ IF @@ROWCOUNT = 0
         @AccountStatus, @AccountCode, @AccountNumber, @OpenedAt, @ClosedAt, @Website, @Logo);
 ";
 
+            const string acquireLockQuery = @"
+DECLARE @result INT;
+EXEC @result = sp_getapplock
+    @Resource    = 'partition-registration',
+    @LockMode    = 'Exclusive',
+    @LockOwner   = 'Transaction',
+    @LockTimeout = 15000;
+IF @result < 0
+    THROW 51000, 'Could not acquire the partition-registration lock.', 1;";
+
             // Upsert the partition and all of its organizations atomically.
             var statements = new List<(string Query, object? Parameters)>
             {
+                (acquireLockQuery, null),
                 (partitionQuery, partitionParameters)
             };
 

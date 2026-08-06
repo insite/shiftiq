@@ -24,13 +24,13 @@ namespace InSite.UI.Admin.Events.Classes.Controls
         protected global::InSite.Common.Web.UI.Alert TriggerAlert;
 
         /// <summary>
-        /// ToLearnerLink control.
+        /// ReminderToLearnerLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.IconLink ToLearnerLink;
+        protected global::InSite.Common.Web.UI.IconLink ReminderToLearnerLink;
 
         /// <summary>
         /// ReminderLearnerMessage control.
@@ -42,13 +42,13 @@ namespace InSite.UI.Admin.Events.Classes.Controls
         protected global::System.Web.UI.WebControls.Literal ReminderLearnerMessage;
 
         /// <summary>
-        /// ToInstructorsLink control.
+        /// ReminderToInstructorsLink control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.IconLink ToInstructorsLink;
+        protected global::InSite.Common.Web.UI.IconLink ReminderToInstructorsLink;
 
         /// <summary>
         /// ReminderInstructorMessage control.
@@ -96,13 +96,22 @@ namespace InSite.UI.Admin.Events.Classes.Controls
         protected global::System.Web.UI.WebControls.Literal ReminderMessageSent;
 
         /// <summary>
-        /// IgnoreScheduleStart control.
+        /// CompletedMessageSent control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList IgnoreScheduleStart;
+        protected global::System.Web.UI.WebControls.Literal CompletedMessageSent;
+
+        /// <summary>
+        /// IgnoreSchedule control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButtonList IgnoreSchedule;
 
         /// <summary>
         /// TriggerButton control.
@@ -112,5 +121,23 @@ namespace InSite.UI.Admin.Events.Classes.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Button TriggerButton;
+
+        /// <summary>
+        /// CompletedToLearnerLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink CompletedToLearnerLink;
+
+        /// <summary>
+        /// CompletedLearnerMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal CompletedLearnerMessage;
     }
 }

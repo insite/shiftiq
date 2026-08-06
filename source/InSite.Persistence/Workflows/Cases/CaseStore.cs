@@ -2,13 +2,12 @@
 using System.Data.SqlClient;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Contents.Read;
 using InSite.Application.Issues.Read;
 using InSite.Domain.Issues;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Persistence
 {
@@ -329,7 +328,7 @@ delete from assets.QComment where IssueIdentifier is not null;
         {
             UpdateCursor(e, (db, state, query) =>
             {
-                query.IssueClosed = e.ChangeTime;
+                query.IssueClosed = e.Closed ?? e.ChangeTime;
                 query.IssueStatusCategory = "Closed";
             });
         }

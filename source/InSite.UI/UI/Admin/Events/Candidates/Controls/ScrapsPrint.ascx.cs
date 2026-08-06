@@ -36,7 +36,7 @@ namespace InSite.Admin.Events.Candidates.Controls
 
         private void LoadData(OrganizationState organization, CandidateInfo[] candidates)
         {
-            var styleUrl = PathHelper.ToAbsoluteUrl("/library/fonts/font-awesome/7.1.0/css/all.min.css");
+            var styleUrl = PathHelper.ToAbsoluteUrl("/library/fonts/font-awesome-6.5.1/css/all.min.css");
             StyleLink.Text = $"<link href='{styleUrl}' rel='stylesheet' type='text/css' media='all' />";
 
             Logo = PathHelper.ToAbsoluteUrl(organization.PlatformCustomization?.PlatformUrl?.Logo);

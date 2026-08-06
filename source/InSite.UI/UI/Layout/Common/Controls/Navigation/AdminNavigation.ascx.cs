@@ -104,6 +104,9 @@ namespace InSite.UI.Layout.Admin
 
         protected string GetRecentLinksKey()
         {
+            if (ServiceLocator.AppSettings?.Environment == null || Organization == null || User == null)
+                return string.Empty;
+
             return RecentLinksHelper.CreateRecentLinksKey(ServiceLocator.AppSettings.Environment.Name, Organization.Identifier, User.Identifier);
         }
 

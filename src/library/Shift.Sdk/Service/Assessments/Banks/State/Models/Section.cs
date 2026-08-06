@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 using Newtonsoft.Json;
 
 using Shift.Common;
-using Shift.Constant;
 
 namespace InSite.Domain.Banks
 {
@@ -50,27 +48,9 @@ namespace InSite.Domain.Banks
         public List<Field> Fields { get; set; }
 
         /// <summary>
-        /// 
+        /// Configuration for this section's behavior when presented as a tab.
         /// </summary>
-        [DefaultValue(true)]
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool WarningOnNextTabEnabled { get; set; } = true;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool BreakTimerEnabled { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int TimeLimit { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
-        public FormSectionTimeType TimerType { get; set; } = FormSectionTimeType.Optional;
+        public SectionTabConfiguration TabConfiguration { get; set; }
 
         /// <summary>
         /// The form that contains the section.
@@ -91,6 +71,7 @@ namespace InSite.Domain.Banks
         {
             Content = new ContentExamSection();
             Fields = new List<Field>();
+            TabConfiguration = new SectionTabConfiguration();
         }
 
         protected Section(Section source)
@@ -100,6 +81,7 @@ namespace InSite.Domain.Banks
 
             Content = source.Content?.Clone();
             Fields = source.Fields.EmptyIfNull().Select(x => x.Clone()).ToList();
+            TabConfiguration = source.TabConfiguration.Clone();
         }
 
         public Section Clone() => new Section(this);

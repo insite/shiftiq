@@ -54,6 +54,7 @@ namespace InSite.Domain.Events
 
         public Guid? WhenEventReminderRequestedNotifyLearnerMessageIdentifier { get; set; }
         public Guid? WhenEventReminderRequestedNotifyInstructorMessageIdentifier { get; set; }
+        public Guid? WhenEventCompletedNotifyLearnerMessageIdentifier { get; set; }
         public int? SendReminderBeforeDays { get; set; }
 
         public List<Guid> Candidates { get; set; }
@@ -310,6 +311,9 @@ namespace InSite.Domain.Events
                     break;
                 case EventMessageType.ReminderInstructor:
                     WhenEventReminderRequestedNotifyInstructorMessageIdentifier = e.MessageId;
+                    break;
+                case EventMessageType.CompletedLearner:
+                    WhenEventCompletedNotifyLearnerMessageIdentifier = e.MessageId;
                     break;
                 default:
                     throw new ArgumentException($"Unsupported message: {e.MessageType}");

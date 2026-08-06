@@ -26,13 +26,14 @@
                 <ItemTemplate>
                     <%# Eval("AchievementTitle") %>
                     <div class="form-text no-wrap">
+                        <%# ( (bool)Eval("IsSelfDeclared") ? "<span class='badge bg-info'>Self-Declared</span>" : "" ) %>
                         <%# Eval("AchievementLabel") %>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Status">
                 <ItemTemplate>
-                    <%# Translate((string)Eval("CredentialStatus")) %>
+                    <%# Eval("CredentialStatusHtml") %>
                     <div class="form-text no-wrap">
                         <%# Eval("CredentialGrantedScore", "{0:p0}") %>
                     </div>

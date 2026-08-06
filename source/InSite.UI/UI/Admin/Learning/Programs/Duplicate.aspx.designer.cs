@@ -42,6 +42,24 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.TextBox ProgramName;
 
         /// <summary>
+        /// LinkParentsField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl LinkParentsField;
+
+        /// <summary>
+        /// LinkParents control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox LinkParents;
+
+        /// <summary>
         /// AchievementsSection control.
         /// </summary>
         /// <remarks>

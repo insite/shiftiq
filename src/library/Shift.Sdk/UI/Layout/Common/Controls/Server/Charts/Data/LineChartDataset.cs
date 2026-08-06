@@ -74,6 +74,8 @@ namespace Shift.Sdk.UI
 
         #region Methods
 
+        IChartDatasetItem IChartDataset.NewItem() => NewItem();
+
         public LineChartDatasetItem NewItem()
         {
             _dataset.Add();

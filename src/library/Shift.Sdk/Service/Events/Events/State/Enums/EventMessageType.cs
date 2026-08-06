@@ -4,5 +4,6 @@
     {
         ReminderLearner,
         ReminderInstructor,
+        CompletedLearner,
     }
 }

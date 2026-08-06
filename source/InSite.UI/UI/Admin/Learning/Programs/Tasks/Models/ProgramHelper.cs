@@ -44,7 +44,8 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
                 DisplayTitle = $"[{task.ObjectType}] {taskObject.ObjectTitle}",
                 Type = task.ObjectType,
                 TaskIdentifier = task.TaskIdentifier,
-                Sequence = task.TaskSequence
+                Sequence = task.TaskSequence,
+                IsInherited = task.TaskIsInherited
             };
         }
 
@@ -205,7 +206,8 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
                     TaskIdentifier = task.TaskIdentifier,
                     TaskCompletionRequirement = task.TaskCompletionRequirement,
                     ProgramIdentifier = programId.Value,
-                    IsSelected = true
+                    IsSelected = true,
+                    IsInherited = task.TaskIsInherited
                 };
 
                 items.Add(item);

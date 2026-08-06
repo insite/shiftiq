@@ -13,6 +13,7 @@ export interface FileCriteria extends BaseCriteria {
     fileUploadedBefore: DateTimeParts | DateTimeInvalid | null;
     fileUploadedBy: string;
     visibility: "public" | "private" | "";
+    fileTag: string;
 }
 
 export function toApiSearchFiles(criteria: FileCriteria): ApiSearchFiles {
@@ -26,6 +27,7 @@ export function toApiSearchFiles(criteria: FileCriteria): ApiSearchFiles {
         FileUploadedSince: dateTimeHelper.formatServerDateTime(criteria.fileUploadedSince),
         FileUploadedBefore: dateTimeHelper.formatServerDateTime(criteria.fileUploadedBefore),
         UserId: criteria.fileUploadedBy,
+        FileTag: criteria.fileTag,
         HasClaims: criteria.visibility === "public" ? false : (criteria.visibility === "private" ? true : null),
     }
 }

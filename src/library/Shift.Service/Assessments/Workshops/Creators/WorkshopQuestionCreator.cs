@@ -5,13 +5,14 @@ using Shift.Contract;
 using Shift.Common;
 using Shift.Service.Competency;
 using Shift.Service.Utility;
-using Shift.Service.Evaluation.Workshops.Creators;
+using Shift.Service.Assessment;
 
 namespace Shift.Service.Evaluation.Workshops.Creators;
 
 internal class WorkshopQuestionCreator(
     BankState bank,
     StandardReader standardReader,
+    BankQuestionReader questionReader,
     CollectionItemReader collectionItemReader
 )
 {
@@ -27,6 +28,7 @@ internal class WorkshopQuestionCreator(
     };
 
     private Dictionary<Guid, WorkshopComment[]> _commentsPerQuestion = default!;
+    private Dictionary<Guid, BankQuestionEntity> _questionSources = default!;
 
     public async Task<WorkshopQuestionData> CreateInitDataAsync(Form form, Guid? sectionId, Guid? questionId, WorkshopCommentCreator commentCreator)
     {
@@ -40,7 +42,7 @@ internal class WorkshopQuestionCreator(
                 : form.Sections[0];
 
         var questions = section.Fields.Select(x => x.Question).ToArray();
-        await CreateCommentsAsync(questions, commentCreator);
+        await CollectQuestiondetails(questions, commentCreator);
 
         return new WorkshopQuestionData
         {
@@ -73,7 +75,7 @@ internal class WorkshopQuestionCreator(
                 : sets[0];
 
         var questions = set.Questions.ToArray();
-        await CreateCommentsAsync(questions, commentCreator);
+        await CollectQuestiondetails(questions, commentCreator);
 
         return new WorkshopQuestionData
         {
@@ -96,7 +98,7 @@ internal class WorkshopQuestionCreator(
     public async Task<FormWorkshop.Section> CreateSectionDataAsync(Section section, WorkshopCommentCreator commentCreator)
     {
         var questions = section.Fields.Select(x => x.Question).ToArray();
-        await CreateCommentsAsync(questions, commentCreator);
+        await CollectQuestiondetails(questions, commentCreator);
 
         return new FormWorkshop.Section
         {
@@ -108,7 +110,7 @@ internal class WorkshopQuestionCreator(
     public async Task<SpecWorkshop.Set> CreateSetDataAsync(Set set, WorkshopCommentCreator commentCreator)
     {
         var questions = set.Questions.ToArray();
-        await CreateCommentsAsync(questions, commentCreator);
+        await CollectQuestiondetails(questions, commentCreator);
 
         return new SpecWorkshop.Set
         {
@@ -151,17 +153,18 @@ internal class WorkshopQuestionCreator(
     private WorkshopQuestion[] CreateSectionQuestions(Section section)
     {
         return section.Fields
-            .Select(f => CreateQuestion(f.Question, f, _commentsPerQuestion))
+            .Select(f => CreateQuestion(f.Question, f, _commentsPerQuestion, _questionSources))
             .ToArray();
     }
 
     private WorkshopQuestion[] CreateSetQuestions(Set set)
     {
         return set
-            .Questions.Select(q => CreateQuestion(q, null, _commentsPerQuestion))
+            .Questions.Select(q => CreateQuestion(q, null, _commentsPerQuestion, _questionSources))
             .ToArray();
     }
-    public static WorkshopQuestion CreateQuestion(Question q, Field? f, Dictionary<Guid, WorkshopComment[]>? commentsPerQuestion)
+
+    private static WorkshopQuestion CreateQuestion(Question q, Field? f, Dictionary<Guid, WorkshopComment[]>? commentsPerQuestion, Dictionary<Guid, BankQuestionEntity> sources)
     {
         var table = q.Layout.Type == OptionLayoutType.Table
             ? BankQuestionTable.Build(q.Layout.Columns, q.Options.Select(x => x.Content.Title.Default))
@@ -203,7 +206,7 @@ internal class WorkshopQuestionCreator(
             CanNavigateToChangePage = q.FirstPublished == null,
             CanCopyField = f == null,
             ReplaceButtons = CreateReplaceButtons(q, f),
-            Source = CreateSource(q),
+            Source = CreateSource(q, sources),
             Forms = CreateForms(q),
             Comments = commentsPerQuestion != null && commentsPerQuestion.TryGetValue(q.Identifier, out var comments) ? comments : [],
             Options = CreateOptions(q, table),
@@ -241,18 +244,17 @@ internal class WorkshopQuestionCreator(
         };
     }
 
-    private static WorkshopQuestion.QuestionSource? CreateSource(Question q)
+    private static WorkshopQuestion.QuestionSource? CreateSource(Question q, Dictionary<Guid, BankQuestionEntity> sources)
     {
-        if (q.Source == null)
+        if (q.Source == null || !sources.TryGetValue(q.Source.Value, out var s))
             return null;
 
-        var s = q.Set.Bank.FindQuestion(q.Source.Value);
-        return s != null
-            ? new WorkshopQuestion.QuestionSource
-            {
-                QuestionId = s.Identifier,
-                QuestionAssetNumber = s.Asset
-            } : null;
+        return new WorkshopQuestion.QuestionSource
+        {
+            BankId = s.BankIdentifier,
+            QuestionId = s.QuestionIdentifier,
+            QuestionAssetNumber = s.QuestionAssetNumber
+        };
     }
 
     private static WorkshopQuestion.QuestionForm[]? CreateForms(Question q)
@@ -362,6 +364,12 @@ internal class WorkshopQuestionCreator(
         return standards.ToArray();
     }
 
+    private async Task CollectQuestiondetails(Question[] questions, WorkshopCommentCreator commentCreator)
+    {
+        await CreateCommentsAsync(questions, commentCreator);
+        await CreateQuestionSourcesAsync(questions);
+    }
+
     private async Task CreateCommentsAsync(Question[] questions, WorkshopCommentCreator commentCreator)
     {
         var inputComments = questions
@@ -381,5 +389,17 @@ internal class WorkshopQuestionCreator(
         _commentsPerQuestion = outputComments
             .GroupBy(x => x.EntityId)
             .ToDictionary(x => x.Key, x => x.ToArray());
+    }
+
+    private async Task CreateQuestionSourcesAsync(Question[] questions)
+    {
+        var ids = questions
+            .Where(x => x.Source != null)
+            .Select(x => x.Source!.Value)
+            .ToArray();
+
+        var sourceQuestions = await questionReader.CollectByIdsAsync(ids);
+
+        _questionSources = sourceQuestions.ToDictionary(x => x.QuestionIdentifier);
     }
 }

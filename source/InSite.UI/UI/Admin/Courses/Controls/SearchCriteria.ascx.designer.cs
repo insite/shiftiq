@@ -105,6 +105,33 @@ namespace InSite.Admin.Courses
         protected global::InSite.Common.Web.UI.TextBox GradebookTitle;
 
         /// <summary>
+        /// CatalogVisibility control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox CatalogVisibility;
+
+        /// <summary>
+        /// CatalogAccess control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox CatalogAccess;
+
+        /// <summary>
+        /// PermissionGroupIdentifiers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindGroup PermissionGroupIdentifiers;
+
+        /// <summary>
         /// ShowColumns control.
         /// </summary>
         /// <remarks>

@@ -48,7 +48,7 @@ namespace InSite.Application.Messages.Write
         void Send(Guid organization, Guid author, Notification_PersonCommentFlagged alert);
         void Send(Guid organizationId, Guid userId, AlertUnsubscribeSuccess alert);
         void Send(Guid organizationId, Guid userId, AlertWelcomeLearner alert);
-        void Send(Guid organizationId, Guid userId, AlertManagementWelcomeEmail alert, string[] attachments = null);
+        Guid[] Send(Guid organizationId, Guid userId, AlertManagementWelcomeEmail alert, string[] attachments = null);
         void Send(Guid organizationId, Guid userId, AlertLearningWelcomeEmail alert);
         void Send(Guid organizationId, Guid userId, Guid? administratorUserId, AlertWorkflowAttachmentUpload alert);
     }

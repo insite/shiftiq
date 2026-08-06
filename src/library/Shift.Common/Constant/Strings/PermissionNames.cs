@@ -4,6 +4,7 @@
     {
         public const string Admin_Accounts = "Admin/Accounts";
         public const string Admin_Assessment_Quizzes = "Admin/Assessment/Quizzes";
+        public const string Admin_Contacts = "Admin/Contacts";
         public const string Admin_Courses = "Admin/Courses";
         public const string Admin_Integrations = "Admin/Integrations";
         public const string Admin_Polaris = "Admin/Polaris";
@@ -22,5 +23,7 @@
         public const string Custom_CMDS_Workers = "Custom/CMDS/Workers";
 
         public const string Design_Grading_Assessors = "Design/GradingAssessors";
+
+        public const string SkillsCheckTransfer = "SkillsCheck/Transfer";
     }
 }

@@ -546,6 +546,24 @@ namespace InSite.Admin.Assessments.Forms.Controls
         protected global::System.Web.UI.WebControls.Literal TimeLimit;
 
         /// <summary>
+        /// TimeLimitHelpDefault control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TimeLimitHelpDefault;
+
+        /// <summary>
+        /// TimeLimitHelpCalculated control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TimeLimitHelpCalculated;
+
+        /// <summary>
         /// AttemptLimitField control.
         /// </summary>
         /// <remarks>

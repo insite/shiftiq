@@ -45,7 +45,8 @@ export interface ApiSiteSetting {
     AdminNavigationLogo: string;
     UserHostAddress: string;
     SessionTimeoutMinutes: number;
-    NavigationGroups: NavigationGroup[];
+    AllApps: NavigationGroup[];
+    FrequentlyUsedApps: NavigationGroup["MenuItems"];
     ShortcutGroups?: {
             Url: string;
             Text: string;

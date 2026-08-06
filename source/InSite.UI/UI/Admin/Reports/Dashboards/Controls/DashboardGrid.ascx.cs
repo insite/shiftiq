@@ -11,11 +11,15 @@ using Humanizer;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
+using InSite.UI.Admin.Reports.Dashboards.Utilities;
 
 using Shift.Common;
 using Shift.Constant;
 using Shift.Sdk.UI;
 using Shift.Toolbox;
+
+using AspLiteral = System.Web.UI.WebControls.Literal;
+using AspTemplateField = System.Web.UI.WebControls.TemplateField;
 
 namespace InSite.UI.Admin.Reports.Dashboards
 {
@@ -25,31 +29,20 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
         public bool HasData
         {
-            get
-            {
-                if (ViewState[nameof(HasData)] == null)
-                {
-                    return false;
-                }
-
-                return (bool)ViewState[nameof(HasData)];
-            }
-            set
-            {
-                ViewState[nameof(HasData)] = value;
-            }
+            get => (bool?)ViewState[nameof(HasData)] == true;
+            set => ViewState[nameof(HasData)] = value;
         }
 
-        private DashboardQuery Query
+        private DashboardTableQuery Query
         {
-            get
-            {
-                return (DashboardQuery)ViewState[nameof(Query)];
-            }
-            set
-            {
-                ViewState[nameof(Query)] = value;
-            }
+            get => (DashboardTableQuery)ViewState[nameof(Query)];
+            set => ViewState[nameof(Query)] = value;
+        }
+
+        private Dictionary<string, string> WidgetQueryParameters
+        {
+            get => (Dictionary<string, string>)ViewState[nameof(WidgetQueryParameters)];
+            set => ViewState[nameof(WidgetQueryParameters)] = value;
         }
 
         #region Criteria
@@ -104,6 +97,186 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
         #endregion
 
+        #region Columns
+
+        private class CheckBoxColumnTemplate : ITemplate
+        {
+            private readonly string _columnName;
+
+            public CheckBoxColumnTemplate(string columnName) => _columnName = columnName;
+
+            public void InstantiateIn(Control container)
+            {
+                var checkbox = new InSite.Common.Web.UI.CheckBox
+                {
+                    RenderMode = CheckBoxRenderMode.Input,
+                    CssClass = "pe-none"
+                };
+
+                checkbox.DataBinding += (sender, e) =>
+                {
+                    var box = (InSite.Common.Web.UI.CheckBox)sender;
+                    var row = (GridViewRow)box.NamingContainer;
+                    box.Checked = (bool)DataBinder.Eval(row.DataItem, _columnName);
+                };
+
+                container.Controls.Add(checkbox);
+            }
+        }
+
+        private class EmailColumnTemplate : ITemplate
+        {
+            private readonly string _columnName;
+
+            public EmailColumnTemplate(string columnName) => _columnName = columnName;
+
+            public void InstantiateIn(Control container)
+            {
+                var literal = new LiteralControl();
+
+                literal.DataBinding += Literal_DataBinding;
+
+                container.Controls.Add(literal);
+            }
+
+            private void Literal_DataBinding(object sender, EventArgs e)
+            {
+                var lit = (AspLiteral)sender;
+                var row = (GridViewRow)lit.NamingContainer;
+                var email = (string)DataBinder.Eval(row.DataItem, _columnName);
+                var encoded = System.Web.HttpUtility.HtmlEncode(email);
+                lit.Text = email.IsEmpty() ? string.Empty : $"<a href='mailto:{encoded}'>{encoded}</a>";
+            }
+        }
+
+        private static class ColumnType
+        {
+            public static readonly HashSet<string> RightAligned =
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Integer", "Decimal", "Percent" };
+
+            public static readonly HashSet<string> NoFilter =
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Date", "Decimal", "Percent" };
+
+            public static readonly Dictionary<string, ColumnFormatInfo> Format =
+                new Dictionary<string, ColumnFormatInfo>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["Date"] = new ColumnFormatInfo("{0:MMM d, yyyy}", wrap: false),
+                    ["Integer"] = new ColumnFormatInfo("{0:n0}"),
+                    ["Decimal"] = new ColumnFormatInfo("{0:n2}"),
+                    ["Percent"] = new ColumnFormatInfo("{0:p0}"),
+                };
+        }
+
+        private class ColumnFormatInfo
+        {
+            public string FormatString { get; }
+            public bool Wrap { get; }
+
+            public ColumnFormatInfo(string formatString, bool wrap = true)
+            {
+                FormatString = formatString;
+                Wrap = wrap;
+            }
+        }
+
+        private void CreateColumns()
+        {
+            MyGrid.Columns.Clear();
+
+            var query = Query;
+            if (query.Columns == null || query.Columns.Length == 0)
+            {
+                MyGrid.AutoGenerateColumns = true;
+                return;
+            }
+
+            MyGrid.AutoGenerateColumns = false;
+
+            foreach (var column in query.Columns)
+            {
+                var field = CreateField(column);
+                ApplySortExpression(field, column);
+                ApplyAlignment(field, column);
+                MyGrid.Columns.Add(field);
+            }
+        }
+
+        private static DataControlField CreateField(DashboardTableQueryColumn column)
+        {
+            if (column.Type == "Checkbox")
+                return CreateCheckboxField(column);
+
+            if (column.Type == "Email")
+                return CreateEmailField(column);
+
+            if (column.Link != null)
+                return CreateHyperLinkField(column);
+
+            return CreateBoundField(column);
+        }
+
+        private static AspTemplateField CreateCheckboxField(DashboardTableQueryColumn column)
+        {
+            var field = new AspTemplateField();
+            field.HeaderText = column.Label ?? column.Name;
+            field.ItemTemplate = new CheckBoxColumnTemplate(column.Name);
+            field.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
+            return field;
+        }
+
+        private static AspTemplateField CreateEmailField(DashboardTableQueryColumn column)
+        {
+            var field = new AspTemplateField();
+            field.HeaderText = column.Label ?? column.Name;
+            field.ItemTemplate = new EmailColumnTemplate(column.Name);
+            field.ItemStyle.Wrap = false;
+            return field;
+        }
+
+        private static HyperLinkField CreateHyperLinkField(DashboardTableQueryColumn column)
+        {
+            var field = new HyperLinkField();
+            field.DataTextField = column.Name;
+            field.HeaderText = column.Label ?? column.Name;
+            field.DataNavigateUrlFields = new[] { column.Link.Value };
+            field.DataNavigateUrlFormatString = column.Link.Url;
+
+            if (ColumnType.Format.TryGetValue(column.Type.EmptyIfNull(), out var format))
+                field.ItemStyle.Wrap = format.Wrap;
+
+            return field;
+        }
+
+        private static System.Web.UI.WebControls.BoundField CreateBoundField(DashboardTableQueryColumn column)
+        {
+            var field = new System.Web.UI.WebControls.BoundField();
+            field.DataField = column.Name;
+            field.HeaderText = column.Label ?? column.Name;
+            field.HtmlEncode = true;
+
+            if (ColumnType.Format.TryGetValue(column.Type.EmptyIfNull(), out var format))
+            {
+                field.DataFormatString = format.FormatString;
+                field.ItemStyle.Wrap = format.Wrap;
+            }
+
+            return field;
+        }
+
+        private static void ApplySortExpression(DataControlField field, DashboardTableQueryColumn column)
+        {
+            if (column.Sort != null)
+                field.SortExpression = column.Sort;
+        }
+
+        private static void ApplyAlignment(DataControlField field, DashboardTableQueryColumn column)
+        {
+            if (ColumnType.RightAligned.Contains(column.Type.EmptyIfNull()))
+                field.ItemStyle.HorizontalAlign = HorizontalAlign.Right;
+        }
+
+        #endregion
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -123,83 +296,20 @@ namespace InSite.UI.Admin.Reports.Dashboards
             MyGrid.ShowHeaderWhenEmpty = true;
         }
 
-        public void BindModel(DashboardQuery query)
+        protected override void OnLoad(EventArgs e)
         {
-            Query = query;
+            base.OnLoad(e);
 
-            if (query.Columns == null || query.Columns.Length == 0)
-            {
-                MyGrid.AutoGenerateColumns = true;
-            }
-            else
-            {
-                foreach (var column in query.Columns)
-                {
-                    if (column.Link != null)
-                    {
-                        var field = new HyperLinkField
-                        {
-                            DataTextField = column.Name,
-                            HeaderText = column.Label ?? column.Name,
-                            DataNavigateUrlFields = new[] { column.Link.Value },
-                            DataNavigateUrlFormatString = column.Link.Url
-                        };
+            if (IsPostBack && Query != null)
+                CreateColumns();
+        }
 
-                        if (column.Sort != null)
-                            field.SortExpression = column.Sort;
+        public void BindModel(DashboardWidget widget)
+        {
+            Query = widget.Query;
+            WidgetQueryParameters = widget.QueryParameters;
 
-                        if (column.Type == "Integer")
-                            field.ItemStyle.HorizontalAlign = HorizontalAlign.Right;
-
-                        MyGrid.Columns.Add(field);
-                    }
-                    else
-                    {
-                        var field = new System.Web.UI.WebControls.BoundField
-                        {
-                            DataField = column.Name,
-                            HeaderText = column.Label ?? column.Name,
-                            HtmlEncode = false
-                        };
-
-                        if (column.Type == "Date")
-                        {
-                            field.DataFormatString = "{0:MMM d, yyyy}";
-                            field.ItemStyle.Wrap = false;
-                        }
-
-                        if (column.Type == "Integer")
-                        {
-                            field.DataFormatString = "{0:n0}";
-                            field.ItemStyle.HorizontalAlign = HorizontalAlign.Right;
-                        }
-
-                        if (column.Type == "Decimal")
-                        {
-                            field.DataFormatString = "{0:n2}";
-                            field.ItemStyle.HorizontalAlign = HorizontalAlign.Right;
-                        }
-
-                        if (column.Type == "Percent")
-                        {
-                            field.DataFormatString = "{0:p0}";
-                            field.ItemStyle.HorizontalAlign = HorizontalAlign.Right;
-                        }
-
-                        if (column.Type == "Email")
-                        {
-                            field.DataFormatString = "<a href='mailto:{0}'>{0}</a>";
-                            field.ItemStyle.Wrap = false;
-                        }
-
-                        if (column.Sort != null)
-                            field.SortExpression = column.Sort;
-
-                        MyGrid.Columns.Add(field);
-                    }
-                }
-            }
-
+            CreateColumns();
             BindModelToControls();
         }
 
@@ -228,15 +338,11 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
         private DataTable CreateDataSource(string sql)
         {
-            var sqlParameters = new List<SqlParameter>();
-            foreach (var parameter in Query.Parameters)
-                sqlParameters.Add(new SqlParameter(parameter.Key, parameter.Value));
-
-            var table = DatabaseHelper.CreateDataTable(sql, sqlParameters.ToArray());
-
+            var sqlParameters = DashboardBuilder.BuildQueryParameters(WidgetQueryParameters, Query.Parameters);
+            var table = DatabaseHelper.CreateDataTable(sql, sqlParameters);
             var sort = (string)ViewState[$"{ID}Sort"];
 
-            string where = "1=1";
+            var where = "1=1";
             foreach (var key in Criteria.Keys)
             {
                 var criterion = Criteria[key];
@@ -349,68 +455,49 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
                 DataControlField field = ((DataControlFieldCell)cell).ContainingField;
 
-                var bound = field as System.Web.UI.WebControls.BoundField;
-                var hyperlink = field as HyperLinkField;
-
-                if (bound == null && hyperlink == null)
-                    continue;
-
-                string name = null;
-                if (bound != null)
-                    name = bound.DataField;
-                else if (hyperlink != null)
-                    name = hyperlink.DataTextField;
-
-                if (string.IsNullOrEmpty(name))
+                var name = GetFieldDataName(field);
+                if (name.IsEmpty())
                     continue;
 
                 var column = Query.FindColumn(name);
-
                 if (column == null)
                     continue;
 
+                if (ColumnType.RightAligned.Contains(column.Type.EmptyIfNull()))
+                    field.HeaderStyle.CssClass = "text-end";
+
+                if (ColumnType.NoFilter.Contains(column.Type.EmptyIfNull()))
+                    continue;
+
                 var panel = new Panel { CssClass = "mt-2" };
-                var input = new System.Web.UI.WebControls.TextBox { AutoPostBack = true, CssClass = "form-control" };
+                var input = new System.Web.UI.WebControls.TextBox
+                {
+                    ID = name,
+                    AutoPostBack = true,
+                    CssClass = "form-control"
+                };
                 input.TextChanged += Input_TextChanged;
 
-                if (column.Type == "Date")
-                    continue;
-
                 if (column.Type == "Integer")
-                {
-                    field.HeaderStyle.CssClass = "text-end";
                     input.Width = Unit.Pixel(80);
-                }
 
-                if (column.Type == "Decimal")
-                {
-                    field.HeaderStyle.CssClass = "text-end";
-                    continue;
-                }
+                if (Criteria.ContainsKey(name))
+                    input.Text = Criteria[name].Value;
 
-                if (column.Type == "Percent")
-                {
-                    field.HeaderStyle.CssClass = "text-end";
-                    continue;
-                }
-
-                if (bound != null)
-                {
-                    input.ID = bound.DataField;
-                    if (Criteria.ContainsKey(input.ID))
-                        input.Text = Criteria[input.ID].Value;
-                    panel.Controls.Add(input);
-                }
-                else if (hyperlink != null)
-                {
-                    input.ID = hyperlink.DataTextField;
-                    if (Criteria.ContainsKey(input.ID))
-                        input.Text = Criteria[input.ID].Value;
-                    panel.Controls.Add(input);
-                }
-
+                panel.Controls.Add(input);
                 cell.Controls.Add(panel);
             }
+        }
+
+        private static string GetFieldDataName(DataControlField field)
+        {
+            if (field is System.Web.UI.WebControls.BoundField bound)
+                return bound.DataField;
+
+            if (field is HyperLinkField hyperlink)
+                return hyperlink.DataTextField;
+
+            return null;
         }
 
         private void Input_TextChanged(object sender, EventArgs e)

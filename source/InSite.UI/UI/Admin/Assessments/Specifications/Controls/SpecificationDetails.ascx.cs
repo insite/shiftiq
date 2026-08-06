@@ -12,6 +12,21 @@ namespace InSite.Admin.Assessments.Specifications.Controls
 {
     public partial class SpecificationDetails : BaseUserControl
     {
+        public event EventHandler<SpecificationArgs> SpecificationModified;
+
+        public class SpecificationArgs : EventArgs
+        {
+            public Specification Specification { get; }
+
+            public SpecificationArgs(Specification specification)
+            {
+                Specification = specification;
+            }
+        }
+
+        private void OnSpecificationModified(Specification spec) =>
+            SpecificationModified?.Invoke(this, new SpecificationArgs(spec));
+
         private Guid BankIdentifier
         {
             get => (Guid)ViewState[nameof(BankIdentifier)];
@@ -77,7 +92,6 @@ namespace InSite.Admin.Assessments.Specifications.Controls
 
         private void SetScenarioFields(Specification spec)
         {
-            ScenarioFields.Visible = spec.Type == Shift.Constant.SpecificationType.Static;
             SectionsAsTabsOutput.Text = spec.SectionsAsTabsEnabled ? "Enabled" : "Disabled";
             DisableSectionsAsTabsButton.Visible = spec.SectionsAsTabsEnabled;
             EnableSectionsAsTabsButton.Visible = !spec.SectionsAsTabsEnabled;
@@ -94,11 +108,14 @@ namespace InSite.Admin.Assessments.Specifications.Controls
 
             TabTimeLimitField.Visible = spec.SectionsAsTabsEnabled && !spec.TabNavigationEnabled;
             TabTimeLimitOutput.Text = spec.TabTimeLimit.GetDescription();
+
+            if (Page.IsPostBack)
+                OnSpecificationModified(spec);
         }
 
-        private void ChangeSectionsAsTabs(bool enable)
+        private void ChangeSectionsAsTabs(bool enabled)
         {
-            if (enable)
+            if (enabled)
                 ServiceLocator.SendCommand(new EnableSectionsAsTabs(BankIdentifier, SpecificationIdentifier));
             else
                 ServiceLocator.SendCommand(new DisableSectionsAsTabs(BankIdentifier, SpecificationIdentifier));

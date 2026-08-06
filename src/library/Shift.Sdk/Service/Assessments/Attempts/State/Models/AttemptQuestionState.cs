@@ -24,6 +24,8 @@ namespace InSite.Domain.Attempts
         [JsonProperty]
         public AttemptQuestionRubric Rubric { get; private set; }
 
+        public int? Duration { get; set; }
+
         [JsonConstructor]
         private AttemptQuestionState()
         {
