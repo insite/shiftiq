@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.Linq;
 
 using InSite.Application.Records.Read;
 using InSite.Domain.Records;
 
+using Shift.Common;
 using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
@@ -274,7 +276,23 @@ DELETE FROM achievements.QAchievement WHERE AchievementIdentifier = @Achievement
                 credential.CredentialStatus = status.ToString();
                 credential.CredentialModified = e.ChangeTime;
 
-                db.SaveChanges();
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (DbUpdateException ex) when (IsSqlDuplicateKey(ex))
+                {
+                    throw new DuplicateCredentialException(ex.Message, ex);
+                }
+            }
+
+            bool IsSqlDuplicateKey(Exception ex)
+            {
+                for (var sqlEx = ex.Find<SqlException>(); sqlEx != null; sqlEx = sqlEx.Find<SqlException>())
+                    if (sqlEx.Errors.Cast<SqlError>().Any(x => x.Number == 2601))
+                        return true;
+
+                return false;
             }
         }
 

@@ -5,9 +5,9 @@ using Shift.Contract;
 
 namespace Shift.Service.Content.PageContents;
 
-internal class ContentImageProcessor(IStorageServiceAsync storageService, FileReader fileReader)
+internal class ContentImageProcessor(IStorageServiceAsync storageService, FileReader fileReader, FileValidatorService fileValidatorService)
 {
-    public async Task SaveImages(Guid pageId, List<ContentContainer> contents)
+    public async Task SaveImages(Guid organizationId, Guid pageId, List<ContentContainer> contents)
     {
         var ids = new HashSet<Guid>();
         foreach (var content in contents)
@@ -24,6 +24,8 @@ internal class ContentImageProcessor(IStorageServiceAsync storageService, FileRe
         criteria.DisablePaging();
 
         var files = await fileReader.CollectAsync(criteria);
+
+        await fileValidatorService.ValidateAsync(organizationId, files);
 
         foreach (var file in files)
             await storageService.ChangeObjectAsync(file.FileIdentifier, pageId, FileObjectType.Page);

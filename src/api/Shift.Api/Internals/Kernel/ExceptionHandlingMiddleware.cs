@@ -2,6 +2,9 @@
 
 using Microsoft.AspNetCore.Http.Extensions;
 
+using Shift.Common.Exceptions;
+using Shift.Common.Linq;
+
 namespace Shift.Api;
 
 public class ExceptionHandlingMiddleware
@@ -17,9 +20,15 @@ public class ExceptionHandlingMiddleware
 
     public static Problem ReportUnexpectedProblem(Exception ex, string? doingWhat, HttpContext context, IMonitor monitor)
     {
-        var uri = monitor?.Error(ex);
+        var uri = ex is not InvalidOrderByException && ex is not ClientErrorException
+            ? monitor?.Error(ex)
+            : null;
 
-        var problem = ProblemFactory.InternalServerError("Unexpected error. Our team is looking into the problem for you.", uri);
+        var problem = ex is InvalidOrderByException oex
+            ? ProblemFactory.ValidationError(oex.InnerException?.Message)
+            : ex is ClientErrorException cee
+                ? ProblemFactory.ValidationError(cee.Message)
+                : ProblemFactory.InternalServerError("Unexpected error. Our team is looking into the problem for you.", uri);
 
         return problem;
     }

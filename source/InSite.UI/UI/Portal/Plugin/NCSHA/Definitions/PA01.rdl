@@ -159,7 +159,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>="Note: " &amp; Parameters!Year.Value &amp; " caps were calculated using IRS Notice " &amp; "2022-38, " &amp; Parameters!Year.Value &amp; " Calendar Year Resident Population Estimates."</Value>
+                                  <Value>="Note: " &amp; Parameters!Year.Value &amp; " caps were calculated using IRS Notice " &amp; "2024-40, " &amp; Parameters!Year.Value &amp; " Calendar Year Resident Population Estimates."</Value>
                                   <Style>
                                     <FontFamily>tahoma</FontFamily>
                                     <FontSize>8pt</FontSize>

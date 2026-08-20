@@ -92,6 +92,7 @@ export default function PageContent_Editor_ImageList({ block, fieldName }: Props
                                     maxLength={512}
                                     defaultValue={v?.url ?? ""}
                                     readOnly={readOnly}
+                                    validateAndAdjust
                                     onBlur={value => handleModifyUrl(index, value)}
                                     onFileUploaded={value => handleModifyUrl(index, value)}
                                 />

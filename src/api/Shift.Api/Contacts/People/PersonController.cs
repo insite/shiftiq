@@ -284,10 +284,11 @@ public class PersonController : ShiftControllerBase
         var organization = await organizationService.RetrieveAsync(organizationId) ?? throw new ArgumentNullException($"Organization {organizationId} is not found");
         var organizationData = organizationAdapter.ToData(organization);
         var fullNamePolicy = organizationData.Toolkits?.Contacts?.FullNamePolicy;
+        var claimGroupNames = organizationData.Toolkits?.Contacts?.ImportReportGroupNames;
         var timeZone = organizationData.TimeZone.Id;
 
         var result = await importer.ImportAsync(organizationId, fullNamePolicy, timeZone, submittedBy, submittedByName, imports);
-        var file = await reporter.SaveReportAsync(organizationId, submittedBy, timeZone, result, true);
+        var file = await reporter.SaveReportAsync(organizationId, submittedBy, timeZone, claimGroupNames, result, true);
 
         return new ImportResult
         {

@@ -39,8 +39,9 @@
                 <insite:Button runat="server" 
                     CommandName="DownloadBadge" 
                     ButtonStyle="Info" 
-                    Visible='<%# IsBadgeConfigured() %>' 
-                    Text="<i class='far fa-award me-2'></i> Download" />
+                    Visible='<%# IsBadgeConfigured() %>'
+                    Icon="far fa-award"
+                    Text="Download"  />
             </td>
         </tr>
     </ItemTemplate>

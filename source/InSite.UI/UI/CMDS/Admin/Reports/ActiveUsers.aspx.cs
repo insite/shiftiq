@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Web.UI.HtmlControls;
@@ -30,13 +31,13 @@ namespace InSite.Cmds.Actions.Reports
         {
             base.OnInit(e);
 
-            DownloadButton.Click += (x, y) =>
+            DownloadButton.Click += (x, y) => RunReport(() =>
             {
                 var excel = new ActiveUsersExcel(ddlGroupBy.Value, CreateCsv, DescribeDepartments);
                 excel.ExportSearchResultsToXlsx(CreateGroups());
-            };
+            });
 
-            ReportButton.Click += (x, y) => BindModelToControls();
+            ReportButton.Click += (x, y) => RunReport(BindModelToControls);
 
             BindMembershipFunctions(true, true);
         }
@@ -56,6 +57,30 @@ namespace InSite.Cmds.Actions.Reports
             // organization, and rendering that on the initial GET produced a multi-megabyte page.
             HelpSeparator.Visible = false;
             DepartmentsHelp.Visible = false;
+        }
+
+        /// <summary>
+        /// Both buttons read every user in the organization, so a broad search on a large tenant can
+        /// still run past the command timeout. Point the user at the criteria instead of letting the
+        /// timeout surface as the unhandled exception page.
+        /// </summary>
+        private void RunReport(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (SqlException exception)
+            {
+                var isTimeout = exception.Number == -2;
+
+                if (!isTimeout)
+                    throw;
+
+                ScreenStatus.AddMessage(
+                    AlertType.Error,
+                    "The report took too long to complete. Please narrow the search criteria and try again.");
+            }
         }
 
         private void BindMembershipFunctions(bool showAdmin, bool isOrganizationChecked)

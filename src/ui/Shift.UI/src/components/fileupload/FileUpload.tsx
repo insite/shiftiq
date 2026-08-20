@@ -28,6 +28,7 @@ export interface FileUploadProps {
     maxFileSize?: number;
     maxFileNameLength?: number;
     allowedExtensions?: string[]; // [".jpg", ".png"]
+    validateAndAdjust?: boolean;
     error?: FieldError;
     onUploadSucceed?: (files: ApiUploadFileInfo[]) => void;
     onUploadFailed?: () => void;
@@ -55,6 +56,7 @@ export default function FileUpload({
     maxFileSize,
     maxFileNameLength,
     allowedExtensions,
+    validateAndAdjust = false,
     error,
     onUploadSucceed,
     onUploadFailed,
@@ -139,7 +141,7 @@ export default function FileUpload({
         let uploadedFiles: ApiUploadFileInfo[] | null;
 
         try {
-            uploadedFiles = await shiftClient.file.uploadTempFile(files, responseId, (percent) => {
+            uploadedFiles = await shiftClient.file.uploadTempFile(files, responseId, validateAndAdjust, (percent) => {
                 setProgress({
                     value: percent,
                     indicator: ProgressBarIndicator.default

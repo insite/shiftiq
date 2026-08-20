@@ -57,6 +57,15 @@ namespace Shift.Common.Integration.Partitions
 
     public class PartitionClient : IPartitionClient
     {
+        // Registration is idempotent, so a 503 from the Hub is safe to repeat. The Hub answers 503
+        // only when another registration for the same partition holds the lock, which clears in
+        // well under a second. Attempts and delays are kept small on purpose: Register() runs
+        // synchronously inside Application_Start, so every retry holds up the app coming online.
+
+        private const int MaxAttempts = 3;
+
+        private static readonly int[] RetryDelaysMilliseconds = { 500, 1500 };
+
         private readonly EngineApiSettings _api;
 
         public PartitionClient(EngineSettings engine)
@@ -71,23 +80,34 @@ namespace Shift.Common.Integration.Partitions
 
         public async Task RegisterAsync(PartitionRegistration partition)
         {
-            var url = $"{GetHubRoot()}api/partitions";
+            var url = $"{GetApiRoot()}partitions";
 
             var json = JsonConvert.SerializeObject(partition);
 
-            using (var request = new HttpRequestMessage(HttpMethod.Post, url))
+            for (var attempt = 1; ; attempt++)
             {
-                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                AddApiKey(request);
-
-                var result = await StaticHttpClient.Client.SendAsync(request);
-
-                if (HttpStatusCode.OK != result.StatusCode)
+                using (var request = new HttpRequestMessage(HttpMethod.Post, url))
                 {
+                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    AddApiKey(request);
+
+                    var result = await StaticHttpClient.Client.SendAsync(request);
+
+                    if (HttpStatusCode.OK == result.StatusCode)
+                        return;
+
                     var body = await ReadBodyAsync(result);
-                    throw new InvalidOperationException(
-                        $"Partition registration failed: the Hub API returned HTTP {(int)result.StatusCode} {result.StatusCode} ({result.ReasonPhrase}). {body}");
+
+                    var busy = HttpStatusCode.ServiceUnavailable == result.StatusCode;
+
+                    var retryable = busy && attempt < MaxAttempts;
+
+                    if (!retryable)
+                        throw new InvalidOperationException(
+                            $"Partition registration failed after {attempt} of {MaxAttempts} attempts: the Hub API returned HTTP {(int)result.StatusCode} {result.StatusCode} ({result.ReasonPhrase}). {body}");
                 }
+
+                await Task.Delay(RetryDelaysMilliseconds[attempt - 1]);
             }
         }
 
@@ -114,7 +134,7 @@ namespace Shift.Common.Integration.Partitions
 
         public async Task<List<PartitionRegistration>> GetPartitionsAsync()
         {
-            var url = $"{GetHubRoot()}api/partitions";
+            var url = $"{GetApiRoot()}partitions";
 
             using (var request = new HttpRequestMessage(HttpMethod.Get, url))
             {
@@ -142,10 +162,14 @@ namespace Shift.Common.Integration.Partitions
                 request.Headers.Add("X-Api-Key", apiKey);
         }
 
-        // The API endpoints to create and query partitions lives at the Engine (Hub) root, which is
-        // exactly the single configured Engine API base URL.
+        // Engine:Api:BaseUrl is the API root shared by every Engine client (Google, Premailer,
+        // ImageMagick, partitions), and each client appends only its own segment. The mount point
+        // belongs to the URL, not the client: https://dev-hub.shiftiq.com/ for a hub at a host
+        // root, https://test.cmds.app/api/ for one mounted as an IIS child application. This
+        // client used to append an extra api/ segment of its own, which forced the servers to
+        // answer at api/partitions and (behind an /api mount) api/api/partitions.
 
-        private string GetHubRoot()
+        private string GetApiRoot()
         {
             var baseUrl = _api?.BaseUrl;
 

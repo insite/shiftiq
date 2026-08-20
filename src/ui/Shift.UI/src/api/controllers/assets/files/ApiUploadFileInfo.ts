@@ -3,4 +3,5 @@ export interface ApiUploadFileInfo {
     DocumentName: string;
     FileName: string;
     FileSize: number;
+    Messages: string[] | null | undefined
 }

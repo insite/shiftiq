@@ -9,6 +9,7 @@ namespace Shift.Contract
         QueryFilter Filter { get; set; }
 
         string GroupCode { get; set; }
+        string[] GroupNames { get; set; }
         DateTimeOffset? GroupCreatedSince { get; set; }
         DateTimeOffset? GroupCreatedBefore { get; set; }
         DateTimeOffset? GroupExpirySince { get; set; }

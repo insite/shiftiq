@@ -9,5 +9,6 @@ namespace Shift.Common.File
         public string DocumentName { get; set; }
         public string FileName { get; set; }
         public int FileSize { get; set; }
+        public string[] Messages { get; set; }
     }
 }

@@ -278,13 +278,37 @@ namespace InSite.Cmds.Admin.Departments.Forms
 
             foreach (var achievementID in achievements)
             {
-                if (!TAchievementDepartmentSearch.Exists(x => x.DepartmentIdentifier == DepartmentIdentifier && x.AchievementIdentifier == achievementID))
+                var assigned = TAchievementDepartmentSearch.Exists(x => x.DepartmentIdentifier == DepartmentIdentifier && x.AchievementIdentifier == achievementID);
+
+                if (!assigned)
                     list.Add(new TAchievementDepartment { DepartmentIdentifier = DepartmentIdentifier, AchievementIdentifier = achievementID });
             }
 
             TAchievementDepartmentStore.Insert(list);
 
+            InsertAchievementOrganizations(list);
+
             return list.Count;
+        }
+
+        /// <summary>
+        /// An achievement assigned to a department must also be assigned to the department's
+        /// organization; otherwise it does not appear in the selector used to create credentials
+        /// for people in the department.
+        /// </summary>
+        private void InsertAchievementOrganizations(IList<TAchievementDepartment> achievements)
+        {
+            if (achievements.Count == 0)
+                return;
+
+            var department = DepartmentSearch.Select(DepartmentIdentifier);
+            if (department == null)
+                return;
+
+            var organizationId = department.OrganizationIdentifier;
+
+            foreach (var achievement in achievements)
+                TAchievementOrganizationStore.InsertOrganizationAchievement(organizationId, achievement.AchievementIdentifier);
         }
 
         #endregion

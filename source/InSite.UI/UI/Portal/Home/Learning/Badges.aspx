@@ -64,7 +64,8 @@
                             CommandName="DownloadBadge"
                             CommandArgument='<%# Eval("CredentialIdentifier") + ";" + Eval("BadgeImageUrl") %>'
                             ButtonStyle="Success"
-                            Text="<i class='far fa-award me-2'></i> Download Badge"
+                            Icon="far fa-award"
+                            Text="Download Badge"
                         />
 
                         <%# GetShareHtml() %>

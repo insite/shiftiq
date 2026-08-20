@@ -89,7 +89,7 @@ namespace InSite.Admin.Utilities.Labels.Controls
 
             LabelTranslation.ShowExcludedLanguage = true;
             LabelName.Text = contents[0].ContentLabel;
-            LabelTranslation.SetTranslation(translation, null);
+            LabelTranslation.SetTranslation(translation, allowHtml: true);
 
             LabelName.Enabled = false;
         }

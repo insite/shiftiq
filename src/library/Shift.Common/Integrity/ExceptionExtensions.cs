@@ -32,6 +32,17 @@ namespace Shift.Common
             return FromHierarchy(source, nextItem, s => s != null);
         }
 
+        public static T Find<T>(this Exception ex) where T : Exception
+        {
+            for (var x = ex; x != null; x = x.InnerException)
+            {
+                if (x is T typed)
+                    return typed;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Gets all exception messages concatenated with newlines.
         /// </summary>

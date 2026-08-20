@@ -17,6 +17,7 @@ public class FileController : ShiftControllerBase
     private readonly IPrincipalProvider _identityService;
     private readonly IStorageServiceAsync _storageService;
     private readonly ResponseService _responseService;
+    private readonly FileValidatorService _fileValidatorService;
 
     private static readonly TimeSpan PublicFileMaxAge = TimeSpan.FromHours(1);
 
@@ -25,7 +26,8 @@ public class FileController : ShiftControllerBase
         FileService fileService,
         IPrincipalProvider identityService,
         IStorageServiceAsync storageService,
-        ResponseService responseService
+        ResponseService responseService,
+        FileValidatorService fileValidatorService
         )
     {
         _monitor = monitor;
@@ -33,6 +35,7 @@ public class FileController : ShiftControllerBase
         _identityService = identityService;
         _storageService = storageService;
         _responseService = responseService;
+        _fileValidatorService = fileValidatorService;
     }
 
     #region Queries
@@ -299,20 +302,21 @@ public class FileController : ShiftControllerBase
     /// Uploads one or more files to temporary storage for authenticated users or valid survey response sessions.
     /// </remarks>
     /// <param name="responseId">Optional survey response identifier for unauthenticated respondents</param>
+    /// <param name="validate"></param>
     /// <returns>
     /// Returns a list of <see cref="UploadFileInfo"/> objects containing file identifiers, names, and sizes, or:
     /// - 401 Unauthorized if user is not authenticated and survey session is invalid
     /// - 400 Bad Request if no files are provided in the request
+    /// - 422 Bad Request if invalid information is provided
     /// </returns>
     [HttpPost("api/assets/files/temp")]
-    public async Task<IActionResult> UploadTempFileAsync(string? responseId = null)
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> UploadTempFileAsync(string? responseId, bool? validate)
     {
         var principal = _identityService.GetPrincipal();
 
         if (principal.OrganizationId == Guid.Empty || (!principal.IsAuthenticated && !ValidateSurveyResponse()))
-        {
             return Unauthorized();
-        }
 
         var files = Request.Form.Files;
         if (files.Count == 0)
@@ -324,28 +328,9 @@ public class FileController : ShiftControllerBase
 
         for (int i = 0; i < files.Count; i++)
         {
-            var file = files[i];
+            var info = await UploadTempFileAsync(organizationId, userId, files[i], validate ?? false);
 
-            using var stream = file.OpenReadStream();
-
-            var model = await _storageService.CreateAsync(
-                stream,
-                file.FileName,
-                organizationId,
-                userId,
-                ObjectIdentifiers.Temporary,
-                FileObjectType.Temporary,
-                new FileProperties { DocumentName = file.FileName },
-                null
-            );
-
-            result.Add(new UploadFileInfo
-            {
-                FileId = model.FileIdentifier,
-                DocumentName = model.Properties.DocumentName,
-                FileName = model.FileName,
-                FileSize = model.FileSize
-            });
+            result.Add(info);
         }
 
         return Ok(result);
@@ -356,6 +341,65 @@ public class FileController : ShiftControllerBase
                 return false;
 
             return _responseService.Assert(id) && _responseService.IsIncomplete(id);
+        }
+    }
+
+    private async Task<UploadFileInfo> UploadTempFileAsync(Guid organizationId, Guid userId, IFormFile file, bool validate)
+    {
+        var (fileName, stream, messages) = await ValidateAndAjustFileAsync(organizationId, file, validate);
+
+        try
+        {
+            var model = await _storageService.CreateAsync(
+                stream,
+                fileName,
+                organizationId,
+                userId,
+                ObjectIdentifiers.Temporary,
+                FileObjectType.Temporary,
+                new FileProperties { DocumentName = fileName },
+                null
+            );
+
+            return new UploadFileInfo
+            {
+                FileId = model.FileIdentifier,
+                DocumentName = model.Properties.DocumentName,
+                FileName = model.FileName,
+                FileSize = model.FileSize,
+                Messages = messages.Length > 0 ? messages : null
+            };
+        }
+        finally
+        {
+            stream.Dispose();
+        }
+    }
+
+    private async Task<(string, Stream, string[])> ValidateAndAjustFileAsync(Guid organizationId, IFormFile file, bool validate)
+    {
+        var stream = file.OpenReadStream();
+
+        if (!validate)
+            return (file.FileName, stream, []);
+
+        try
+        {
+            var result = await _fileValidatorService.ValidateAndAdjustAsync(organizationId, file.FileName, stream);
+            
+            var fileName = !string.IsNullOrEmpty(result.NewFileExtension)
+                ? file.FileName.Substring(0, file.FileName.LastIndexOf('.')) + result.NewFileExtension
+                : file.FileName;
+
+            if (result.Stream != stream)
+                stream.Dispose();
+
+            return (fileName, result.Stream, result.Messages);
+        }
+        catch
+        {
+            stream.Dispose();
+            throw;
         }
     }
 

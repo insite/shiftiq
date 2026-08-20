@@ -166,7 +166,7 @@
             <div runat="server" id="NoAccessPanel" class="card mb-4" visible="false">
                 <div class="card-body">
                     <div class="card-text">
-                        Access Denied
+                        <insite:Literal runat="server" Text="Access Denied" />
                     </div>
                 </div>
             </div>
@@ -195,7 +195,7 @@
                     <div class="card-text text-body-secondary mt-3">
                         <div class="d-flex">
                         <div class="flex-grow-1">
-                            <a runat="server" id="QuizLaunch" href="#" class="btn btn-primary"><i class="far fa-rocket me-2"></i>Launch</a>
+                            <a runat="server" id="QuizLaunch" href="#" class="btn btn-primary"><i class="far fa-rocket me-2"></i><insite:Literal runat="server" Text="Launch" /></a>
                         </div>
                         </div>
                     </div>

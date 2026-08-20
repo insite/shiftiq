@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
@@ -180,12 +181,16 @@ WHERE (GroupName = @RoleName OR GroupName = @RoleName) AND UserIdentifier = @Use
 
             using (var db = new InternalDbContext())
             {
+                // The three procedures read the whole organization. Two minutes matches the other
+                // report searches; the default of thirty seconds is not enough for the largest tenants.
+                db.Database.CommandTimeout = 2 * 60;
+
                 var sw = Stopwatch.StartNew();
                 var userRows = db.Database.SqlQuery<ActiveUserRow>(
                         "EXEC contacts.GetActiveUsers @Organization, @NameFilter, @EmploymentTypes, @IncludeNoMemberships",
                         new SqlParameter("@Organization", organization),
-                        new SqlParameter("@NameFilter", nameFilterPattern),
-                        new SqlParameter("@EmploymentTypes", (object)employmentTypesCsv),
+                        VarCharParameter("@NameFilter", 400, nameFilterPattern),
+                        VarCharParameter("@EmploymentTypes", -1, employmentTypesCsv),
                         new SqlParameter("@IncludeNoMemberships", includeNoMemberships))
                     .ToList();
                 sw.Stop();
@@ -215,8 +220,8 @@ WHERE (GroupName = @RoleName OR GroupName = @RoleName) AND UserIdentifier = @Use
                 var employments = db.Database.SqlQuery<ActiveUserEmploymentRow>(
                     "EXEC contacts.GetActiveUserEmployments @Organization, @ExcludeGroupPattern, @EmploymentTypes",
                     new SqlParameter("@Organization", organization),
-                    new SqlParameter("@ExcludeGroupPattern", excludeGroupPattern),
-                    new SqlParameter("@EmploymentTypes", employmentTypesCsv)).ToList();
+                    VarCharParameter("@ExcludeGroupPattern", 400, excludeGroupPattern),
+                    VarCharParameter("@EmploymentTypes", -1, employmentTypesCsv)).ToList();
                 sw.Stop();
                 InSite.ServiceLocator.Logger?.Information(
                     "SelectActiveUsers Q2(employments) org={Org} rows={Rows} elapsed={Ms}ms",
@@ -241,7 +246,7 @@ WHERE (GroupName = @RoleName OR GroupName = @RoleName) AND UserIdentifier = @Use
                 var roles = db.Database.SqlQuery<ActiveUserRoleRow>(
                     "EXEC contacts.GetActiveUserRoles @Organization, @ExcludeGroupPattern",
                     new SqlParameter("@Organization", organization),
-                    new SqlParameter("@ExcludeGroupPattern", excludeGroupPattern)).ToList();
+                    VarCharParameter("@ExcludeGroupPattern", 400, excludeGroupPattern)).ToList();
                 sw.Stop();
                 InSite.ServiceLocator.Logger?.Information(
                     "SelectActiveUsers Q3(roles) org={Org} rows={Rows} elapsed={Ms}ms",
@@ -257,6 +262,17 @@ WHERE (GroupName = @RoleName OR GroupName = @RoleName) AND UserIdentifier = @Use
 
                 return dict.Values.ToList();
             }
+        }
+
+        /// <summary>
+        /// The columns behind these procedures are varchar, so the parameters have to be varchar as
+        /// well. A string handed to SqlParameter is inferred as nvarchar, and because nvarchar wins
+        /// data type precedence SQL Server then converts the *column* on every comparison, which
+        /// disables the indexes on QMembership and QUser. Pass -1 as the size for varchar(max).
+        /// </summary>
+        private static SqlParameter VarCharParameter(string name, int size, object value)
+        {
+            return new SqlParameter(name, SqlDbType.VarChar, size) { Value = value ?? DBNull.Value };
         }
 
         private static string EscapeLikePattern(string input)

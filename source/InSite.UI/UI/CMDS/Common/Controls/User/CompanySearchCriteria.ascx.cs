@@ -34,7 +34,12 @@ namespace InSite.Cmds.Controls.Contacts.Companies
         public override void Clear()
         {
             Name.Text = null;
-            Archived.ClearSelection();
+
+            // Admins are almost always looking for organizations that are still open, so the
+            // cleared state selects Open/Active rather than the blank any-status option. This
+            // matches the default CompanyFilter already carries in its own constructor.
+
+            Archived.Value = InclusionType.Exclude.GetName();
         }
     }
 }

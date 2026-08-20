@@ -21,6 +21,7 @@
     </insite:Nav>
 
     <insite:SaveButton runat="server" ID="SaveButton" ValidationGroup="File" DisableAfterClick="true" />
+    <insite:DeleteButton runat="server" ID="DeleteButton" ConfirmText="Are you sure to delete this file? The file will be deleted permanently." />
     <insite:CancelButton runat="server" ID="CancelButton" />
 
 </asp:Content>

@@ -8,6 +8,13 @@ namespace Shift.Contract
 {
     public interface IPersonImportReporter
     {
-        Task<FileStorageModel> SaveReportAsync(Guid organizationId, Guid userId, string timeZone, IEnumerable<ImportPersonResult> imports, bool isAutoImport);
+        Task<FileStorageModel> SaveReportAsync(
+            Guid organizationId,
+            Guid userId,
+            string timeZone,
+            string[] claimGroupNames,
+            IEnumerable<ImportPersonResult> imports,
+            bool isAutoImport
+        );
     }
 }

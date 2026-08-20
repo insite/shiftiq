@@ -163,7 +163,7 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
 
             var credential = ServiceLocator.AchievementSearch.GetCredential(objectIdentifier, programUser.UserIdentifier);
             if (credential != null)
-                TaskStore.CompleteTaskEnrollementFoLearner(programId.Value, taskId, objectIdentifier, programUser.UserIdentifier);
+                TaskStore.CompleteTaskEnrollementForLearner(taskId, objectIdentifier, programUser.UserIdentifier);
         }
 
         public static IEnumerable<Shift.Common.ListItem> GetTaskObjects(string objectType, Guid organizationId, bool includePartitionItems = false)

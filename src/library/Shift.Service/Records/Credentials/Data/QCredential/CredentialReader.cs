@@ -84,14 +84,44 @@ public class CredentialReader : IEntityReader
     {
         return ExecuteAsync(db =>
         {
+            var now = DateTimeOffset.UtcNow;
             var query = BuildQueryable(db, criteria);
 
-            query = query
+            return query
+                .GroupJoin(db.QPerson,
+                    credential => new { credential.OrganizationIdentifier, credential.UserIdentifier },
+                    person => new { person.OrganizationIdentifier, person.UserIdentifier },
+                    (credential, people) => new { Credential = credential, People = people }
+                )
+                .SelectMany(
+                    x => x.People.DefaultIfEmpty(),
+                    (x, person) => new CredentialMatch
+                    {
+                        AchievementId = x.Credential.AchievementIdentifier,
+                        AchievementLabel = x.Credential.Achievement!.AchievementLabel,
+                        AchievementTitle = x.Credential.Achievement.AchievementTitle,
+
+                        AchievementEffectiveDate = x.Credential.CredentialGranted,
+                        AchievementExpiryDate = x.Credential.CredentialExpirationExpected,
+                        AchievementValid =
+                            x.Credential.CredentialGranted != null
+                            && x.Credential.CredentialRevoked == null
+                            && (x.Credential.CredentialExpirationExpected == null
+                                || x.Credential.CredentialExpirationExpected >= now),
+
+                        CredentialId = x.Credential.CredentialIdentifier,
+                        CredentialIssued = x.Credential.CredentialGranted,
+                        CredentialStatus = x.Credential.CredentialStatus,
+                        CredentialNecessity = x.Credential.CredentialNecessity,
+                        CredentialIsRequired = x.Credential.CredentialNecessity == "Mandatory",
+
+                        UserId = x.Credential.UserIdentifier,
+                        PersonCode = person!.PersonCode
+                    }
+                )
                 .OrderBy(criteria.Filter.Sort ?? DefaultSort)
-                .ApplyPaging(criteria.Filter);
-
-            return ToMatchesAsync(query, DateTimeOffset.UtcNow, cancellation);
-
+                .ApplyPaging(criteria.Filter)
+                .ToListAsync(cancellation);
         }, cancellation);
     }
 
@@ -144,39 +174,5 @@ public class CredentialReader : IEntityReader
         using var db = _context.CreateDbContext();
 
         return await query(db);
-    }
-
-    public static async Task<List<CredentialMatch>> ToMatchesAsync(IQueryable<CredentialEntity> queryable, DateTimeOffset now, CancellationToken cancellation = default)
-    {
-        var matches = await queryable
-            .Select(entity => new CredentialMatch
-            {
-                AchievementId = entity.AchievementIdentifier,
-                AchievementLabel = entity.Achievement!.AchievementLabel,
-                AchievementTitle = entity.Achievement.AchievementTitle,
-
-                AchievementEffectiveDate = entity.CredentialGranted,
-                AchievementExpiryDate = entity.CredentialExpirationExpected,
-                AchievementValid =
-                    entity.CredentialGranted != null
-                    && entity.CredentialRevoked == null
-                    && (entity.CredentialExpirationExpected == null
-                        || entity.CredentialExpirationExpected >= now),
-
-                CredentialId = entity.CredentialIdentifier,
-                CredentialIssued = entity.CredentialGranted,
-                CredentialStatus = entity.CredentialStatus,
-                CredentialNecessity = entity.CredentialNecessity,
-                CredentialIsRequired = entity.CredentialNecessity == "Mandatory",
-
-                UserId = entity.UserIdentifier,
-                PersonCode = entity.User!.People
-                    .Where(p => p.OrganizationIdentifier == entity.OrganizationIdentifier)
-                    .Select(p => p.PersonCode)
-                    .FirstOrDefault()
-            })
-            .ToListAsync(cancellation);
-
-        return matches;
     }
 }

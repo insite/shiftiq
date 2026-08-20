@@ -5,10 +5,26 @@ import DateTimeField from "@/components/DateTimeField";
 import { numberHelper } from "@/helpers/numberHelper";
 import { urlHelper } from "@/helpers/urlHelper";
 import Icon from "@/components/icon/Icon";
+import IconButton from "@/components/iconbutton/IconButton";
 
 export default function FileSearch_Result() {
     return (
         <SearchResult<FileRow> columns={[
+            {
+                key: "edit",
+                title: "",
+                itemClassName: "text-nowrap",
+                item: row => (
+                    <>
+                        <IconButton
+                            iconStyle="solid"
+                            iconName="pencil"
+                            title="Edit File"
+                            href={`/ui/admin/assets/files/edit?file=${row.fileId}${row.objectType === "Issue" ? "&case=" + row.objectId : ""}`}
+                        />
+                    </>
+                )
+            },
             {
                 key: "organizationCode",
                 title: translate("Organization Code"),

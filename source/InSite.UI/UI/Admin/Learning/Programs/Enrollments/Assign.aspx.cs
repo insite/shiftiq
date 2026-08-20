@@ -344,6 +344,9 @@ namespace InSite.Cmds.Admin.Records.Programs
                             commands.Add(new ChangeCredentialExpiration(credential.CredentialIdentifier, expiration));
                             commands.Add(new TagCredential(credential.CredentialIdentifier, necessity, priority));
                         }
+
+                        TaskStore.EnrollUserToProgramTasks(Organization.Identifier, programIdentifier, learner);
+                        ProgramStore1.CompleteProgramWhenAllTasksCompleted(programIdentifier, learner);
                     }
                 }
                 catch (Exception ex)
@@ -359,7 +362,7 @@ namespace InSite.Cmds.Admin.Records.Programs
                 {
                     ServiceLocator.SendCommand(command);
                 }
-                catch (DuplicateCredentialException)
+                catch (Exception ex) when (ex.Find<DuplicateCredentialException>() != null)
                 {
                     // Ignore if the credential already exists.
                 }

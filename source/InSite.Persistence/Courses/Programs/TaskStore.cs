@@ -421,7 +421,7 @@ namespace InSite.Persistence
             }
         }
 
-        public static void CompleteTaskEnrollementFoLearner(Guid value, Guid taskId, Guid objectIdentifier, Guid userIdentifier)
+        public static void CompleteTaskEnrollementForLearner(Guid taskId, Guid objectIdentifier, Guid userIdentifier)
         {
             using (var db = CreateContext())
             {

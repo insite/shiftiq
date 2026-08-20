@@ -3,20 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 namespace Shift.Hub.Partitions
 {
     [ApiController]
+    [Route("partitions")]
+    // Temporary alias. PartitionClient appended its own api/ segment until 2026-08-18; every
+    // partition deployed before then still registers at this spelling. Remove once no deployed
+    // partition runs the old client.
     [Route("api/partitions")]
     [ApiExplorerSettings(GroupName = "Partitions")]
     public class PartitionController : ControllerBase
     {
         private readonly PartitionStore _store;
+        private readonly IMonitor _monitor;
 
-        public PartitionController(PartitionStore store)
+        public PartitionController(PartitionStore store, IMonitor monitor)
         {
             _store = store;
+            _monitor = monitor;
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> RegisterAsync([FromBody] PartitionRegistration partition)
         {
             try
@@ -25,10 +32,27 @@ namespace Shift.Hub.Partitions
 
                 return Ok();
             }
+            catch (PartitionLockException ex) when (ex.Retryable)
+            {
+                _monitor.Warning($"Partition {partition.Number} registration lost the race for the registration lock. {ex.Message}");
+
+                Response.Headers.RetryAfter = "1";
+
+                return Problem(
+                    detail: $"Another registration for partition {partition.Number} is in progress. Retry the request.",
+                    title: "Partition registration is temporarily unavailable.",
+                    statusCode: StatusCodes.Status503ServiceUnavailable);
+            }
             catch (Exception ex)
             {
+                // The full exception goes to the log, not over the wire. This response used to carry
+                // ex.ToString(), which handed every caller the SQL stack trace, the source file
+                // paths, and the client connection id.
+
+                _monitor.Error(ex);
+
                 return Problem(
-                    detail: ex.ToString(),
+                    detail: $"The Hub could not complete the registration for partition {partition.Number}. The correlated error is in the Hub log.",
                     title: "Partition registration failed.",
                     statusCode: StatusCodes.Status500InternalServerError);
             }

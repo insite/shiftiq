@@ -20,7 +20,8 @@ public class ContentModifyService(
     PageReader pageReader,
     FileReader fileReader,
     ICommanderAsync commander,
-    IStorageServiceAsync storageService
+    IStorageServiceAsync storageService,
+    FileValidatorService fileValidatorService
 ) : IContentModifyService
 {
     private static readonly HashSet<string> _blockTypes = new()
@@ -57,7 +58,7 @@ public class ContentModifyService(
             await AddBlockCommands(pageModel, modifyModel, userFullName, commands, contents, replacedBlockIds);
         }
 
-        await new ContentImageProcessor(storageService, fileReader).SaveImages(pageModel.PageId, contents);
+        await new ContentImageProcessor(storageService, fileReader, fileValidatorService).SaveImages(pageModel.OrganizationId, pageModel.PageId, contents);
 
         await commander.SendCommandsAsync(commands);
 

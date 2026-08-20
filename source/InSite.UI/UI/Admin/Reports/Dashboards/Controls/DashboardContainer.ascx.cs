@@ -1,5 +1,4 @@
 ﻿using System;
-using System.EnterpriseServices;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -133,7 +132,9 @@ namespace InSite.UI.Admin.Reports.Dashboards
                     {
                         foreach (var widget in panel.Widgets)
                         {
-                            archive.CreateEntryFromFile(widget.Query.File, Path.GetFileName(widget.Query.File), CompressionLevel.Optimal);
+                            var files = new[] { widget.Query?.File, widget.Chart?.Query?.File };
+                            foreach (var file in files.Where(x => x.IsNotEmpty()).Distinct(StringComparer.OrdinalIgnoreCase))
+                                archive.CreateEntryFromFile(file, Path.GetFileName(file), CompressionLevel.Optimal);
                         }
                     }
                 }

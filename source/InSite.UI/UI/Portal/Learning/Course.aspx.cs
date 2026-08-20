@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.UI.WebControls;
 
 using Humanizer;
@@ -222,7 +223,12 @@ namespace InSite.UI.Portal.Learning
             }
 
             if ((PortalPage.Page.IsHidden && model.Course.Closed.HasValue) || (!PortalPage.Page.IsHidden && model.Course.Closed.HasValue && model.Course.Closed.Value <= DateTimeOffset.Now))
-                ErrorAlert.AddMessage(AlertType.Error, $"{Translate($"This Course closed on {model.Course.Closed.Format(User.TimeZone, isHtml: true, nullValue: string.Empty)}")}.");
+            {
+                var message = Translate("This Course closed on {0}.");
+                var closed = model.Course.Closed.Format(User.TimeZone, isHtml: true, nullValue: string.Empty);
+
+                ErrorAlert.AddMessage(AlertType.Error, message.Format(closed));
+            }
 
             AddBreadcrumb(Translate("Home"), GetHomeUrl(model.Course.Identifier));
             AddBreadcrumb(model.Course.Content.Title.GetText(CurrentLanguage), null);
@@ -248,7 +254,7 @@ namespace InSite.UI.Portal.Learning
             UnitRepeater.BindModelToControls(model, AreModulesUnlocked, AreActivitiesUnlocked);
 
             if (model.CurrentPage == 0)
-                NextButton.Text = Translate("Start");
+                NextButton.Text = "Start";
             else
                 LoadCurrentPage();
         }
@@ -261,7 +267,9 @@ namespace InSite.UI.Portal.Learning
                 AreActivitiesUnlocked = false;
             }
 
-            RestartCourseButton.OnClientClick = $"return confirm('Are you sure you want to restart this course? Your progress will be reset.');";
+            var restartCourseConfirm = Translate("Are you sure you want to restart this course? Your progress will be reset.");
+
+            RestartCourseButton.OnClientClick = $"return confirm({HttpUtility.JavaScriptStringEncode(restartCourseConfirm, true)});";
             RestartCourseButton.Visible = ServiceLocator.Partition.IsE03() || (Identity.IsAdministrator && !Identity.IsImpersonating) || _hasExpiredItems == true;
 
             UnlockActivitiesButton.Visible = Identity.IsAdministrator;
@@ -304,7 +312,7 @@ namespace InSite.UI.Portal.Learning
 
             if (Progress.IsCourseHidden)
             {
-                ShowCriticalError("Your account is not granted permission to access this course.");
+                ShowCriticalError(GetDisplayText("Your account is not granted permission to access this course."));
                 return false;
             }
 
@@ -699,7 +707,7 @@ namespace InSite.UI.Portal.Learning
                 if (!string.IsNullOrWhiteSpace(body))
                     AssessmentBody.InnerHtml = _glossaryHelper.Process(activity.Identifier, ContentLabel.Body, body);
                 else
-                    AssessmentBody.InnerHtml = $"<h2>{activity.Content.Title.Text[CurrentLanguage]}</h2>Please assess your knowledge with this quiz.";
+                    AssessmentBody.InnerHtml = $"<h2>{activity.Content.Title.Text[CurrentLanguage]}</h2>{Translate("Please assess your knowledge with this quiz.")}";
 
                 if (hasActiveAttempt)
                     SetAssessmentLink(StartAssessmentLink, "Resume", "play", "Resume");
@@ -713,7 +721,7 @@ namespace InSite.UI.Portal.Learning
                 SetRestartButton();
             }
 
-            AssessmentBody.InnerHtml = "<div class='alert alert-success' role='alert'>Your assessment submission is completed.</div>";
+            AssessmentBody.InnerHtml = $"<div class='alert alert-success' role='alert'>{Translate("Your assessment submission is completed.")}</div>";
 
             var disclosure = activity.Assessment.Disclosure.ToEnum(DisclosureType.None);
 
@@ -949,7 +957,7 @@ namespace InSite.UI.Portal.Learning
             if (!string.IsNullOrWhiteSpace(body))
                 SurveyBody.InnerHtml = _glossaryHelper.Process(activity.Identifier, ContentLabel.Body, body);
             else
-                SurveyBody.InnerHtml = $"<h2>{activity.Content.Title.Text[CurrentLanguage]}</h2>Please take the form.";
+                SurveyBody.InnerHtml = $"<h2>{activity.Content.Title.Text[CurrentLanguage]}</h2>" + Translate("Please take the form.");
 
             var survey = activity.Survey != null
                 ? ServiceLocator.SurveySearch.GetSurveyForm(activity.Survey.Identifier)

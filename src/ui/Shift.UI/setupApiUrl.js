@@ -32,6 +32,7 @@ switch (partition) {
     case "e05":
     case "e07":
     case "e08":
+    case "e09":
     case "e99":
         domain = "shiftiq.com";
         break;

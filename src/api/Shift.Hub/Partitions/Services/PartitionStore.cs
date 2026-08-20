@@ -1,7 +1,21 @@
+using System.Text;
+
+using Microsoft.Data.SqlClient;
+
 namespace Shift.Hub.Partitions
 {
     public class PartitionStore
     {
+        // SQL Server caps a command at 2100 parameters and each organization contributes twelve of
+        // them, so a batch of a hundred leaves plenty of headroom. Batching matters because every
+        // round trip is made while the registration lock is held.
+        private const int OrganizationBatchSize = 100;
+
+        // Five seconds is generous now that the lock is scoped to a single partition: the only
+        // contention left is two instances of the same app registering at the same moment, and
+        // each holder finishes in a handful of round trips.
+        private const int LockTimeoutMilliseconds = 5000;
+
         private readonly ISqlDatabase _db;
 
         public PartitionStore(ISqlDatabase db)
@@ -104,61 +118,122 @@ IF @@ROWCOUNT = 0
     VALUES (@Number, @Name, @Brand, @Theme, @Domain, @Email, @Slug, @Identifier, @Whitelist, @HelpUrl, @LogoUrl);
 ";
 
-            const string organizationQuery = @"
-UPDATE organization
-   SET partition_number = @PartitionNumber, organization_slug = @Slug, organization_name = @Name,
-       account_name = @AccountName, account_status = @AccountStatus, account_code = @AccountCode,
-       account_number = @AccountNumber, account_opened_at = @OpenedAt, account_closed_at = @ClosedAt,
-       organization_website = @Website, organization_logo = @Logo
- WHERE organization_id = @Identifier;
-IF @@ROWCOUNT = 0
-    INSERT INTO organization (organization_id, partition_number, organization_slug, organization_name, account_name,
-        account_status, account_code, account_number, account_opened_at, account_closed_at, organization_website, organization_logo)
-    VALUES (@Identifier, @PartitionNumber, @Slug, @Name, @AccountName,
-        @AccountStatus, @AccountCode, @AccountNumber, @OpenedAt, @ClosedAt, @Website, @Logo);
-";
+            // The lock guards the update-then-insert race for one partition_number, so the resource
+            // name carries that number. A single global resource would serialize every partition
+            // against every other one even though they write disjoint rows, and a deploy restarts
+            // all of the app pools at once.
+
+            var lockParameters = new Dictionary<string, object?>
+            {
+                { "@LockResource", $"partition-registration-{partition.Number}" },
+                { "@LockTimeoutMs", LockTimeoutMilliseconds }
+            };
 
             const string acquireLockQuery = @"
 DECLARE @result INT;
+DECLARE @message NVARCHAR(200);
+
 EXEC @result = sp_getapplock
-    @Resource    = 'partition-registration',
+    @Resource    = @LockResource,
     @LockMode    = 'Exclusive',
     @LockOwner   = 'Transaction',
-    @LockTimeout = 15000;
+    @LockTimeout = @LockTimeoutMs;
+
 IF @result < 0
-    THROW 51000, 'Could not acquire the partition-registration lock.', 1;";
+BEGIN
+    SET @message = CONCAT('Could not acquire the ', @LockResource, ' lock: sp_getapplock returned ', @result, '.');
+
+    -- 51001 is contention (-1 timeout, -3 deadlock victim) and is worth retrying.
+    -- 51002 is a broken call (-2 canceled, -999 parameter error) and is not.
+
+    IF @result IN (-1, -3)
+        THROW 51001, @message, 1;
+
+    THROW 51002, @message, 1;
+END;";
 
             // Upsert the partition and all of its organizations atomically.
             var statements = new List<(string Query, object? Parameters)>
             {
-                (acquireLockQuery, null),
+                (acquireLockQuery, lockParameters),
                 (partitionQuery, partitionParameters)
             };
 
-            foreach (var organization in partition.Organizations)
+            var organizations = partition.Organizations ?? new List<OrganizationRegistration>();
+
+            for (var index = 0; index < organizations.Count; index += OrganizationBatchSize)
             {
-                var account = organization.Account ?? new AccountRegistration();
+                var size = Math.Min(OrganizationBatchSize, organizations.Count - index);
 
-                var organizationParameters = new Dictionary<string, object?>
-                {
-                    { "@PartitionNumber", partition.Number },
-                    { "@Identifier", organization.Identifier },
-                    { "@Slug", organization.Slug },
-                    { "@Name", organization.Name },
-                    { "@AccountName", account.Name },
-                    { "@AccountStatus", account.Status },
-                    { "@AccountCode", account.Code },
-                    { "@AccountNumber", account.Number },
-                    { "@OpenedAt", account.OpenedAt },
-                    { "@ClosedAt", account.ClosedAt },
-                    { "@Website", organization.WebsiteUrl },
-                    { "@Logo", organization.LogoUrl }
-                };
+                var batch = organizations.GetRange(index, size);
 
-                statements.Add((organizationQuery, organizationParameters));
+                statements.Add(BuildOrganizationBatch(partition.Number, batch));
             }
 
-            await _db.ExecuteInTransactionAsync(statements);
+            try
+            {
+                await _db.ExecuteInTransactionAsync(statements);
+            }
+            catch (SqlException ex) when (ex.Number == PartitionLockException.RetryableErrorNumber)
+            {
+                throw new PartitionLockException(ex.Message, true, ex);
+            }
+            catch (SqlException ex) when (ex.Number == PartitionLockException.FatalErrorNumber)
+            {
+                throw new PartitionLockException(ex.Message, false, ex);
+            }
+        }
+
+        // One statement per organization meant one network round trip per organization, all of them
+        // taken while the registration lock was held. Suffixed parameter names let a whole batch of
+        // upserts travel in a single command instead.
+
+        private static (string Query, object? Parameters) BuildOrganizationBatch(int partitionNumber, List<OrganizationRegistration> organizations)
+        {
+            var builder = new StringBuilder();
+
+            var parameters = new Dictionary<string, object?>
+            {
+                { "@PartitionNumber", partitionNumber }
+            };
+
+            for (var i = 0; i < organizations.Count; i++)
+            {
+                var organization = organizations[i];
+
+                var account = organization.Account ?? new AccountRegistration();
+
+                parameters.Add($"@Identifier{i}", organization.Identifier);
+                parameters.Add($"@Slug{i}", organization.Slug);
+                parameters.Add($"@Name{i}", organization.Name);
+                parameters.Add($"@AccountName{i}", account.Name);
+                parameters.Add($"@AccountStatus{i}", account.Status);
+                parameters.Add($"@AccountCode{i}", account.Code);
+                parameters.Add($"@AccountNumber{i}", account.Number);
+                parameters.Add($"@OpenedAt{i}", account.OpenedAt);
+                parameters.Add($"@ClosedAt{i}", account.ClosedAt);
+                parameters.Add($"@Website{i}", organization.WebsiteUrl);
+                parameters.Add($"@Logo{i}", organization.LogoUrl);
+
+                // @@ROWCOUNT reads the UPDATE immediately above it, so the pairs stay independent
+                // no matter how many of them are concatenated into one batch.
+
+                builder.Append($@"
+UPDATE organization
+   SET partition_number = @PartitionNumber, organization_slug = @Slug{i}, organization_name = @Name{i},
+       account_name = @AccountName{i}, account_status = @AccountStatus{i}, account_code = @AccountCode{i},
+       account_number = @AccountNumber{i}, account_opened_at = @OpenedAt{i}, account_closed_at = @ClosedAt{i},
+       organization_website = @Website{i}, organization_logo = @Logo{i}
+ WHERE organization_id = @Identifier{i};
+IF @@ROWCOUNT = 0
+    INSERT INTO organization (organization_id, partition_number, organization_slug, organization_name, account_name,
+        account_status, account_code, account_number, account_opened_at, account_closed_at, organization_website, organization_logo)
+    VALUES (@Identifier{i}, @PartitionNumber, @Slug{i}, @Name{i}, @AccountName{i},
+        @AccountStatus{i}, @AccountCode{i}, @AccountNumber{i}, @OpenedAt{i}, @ClosedAt{i}, @Website{i}, @Logo{i});
+");
+            }
+
+            return (builder.ToString(), parameters);
         }
 
         public async Task<List<PartitionRegistration>> GetAllAsync()

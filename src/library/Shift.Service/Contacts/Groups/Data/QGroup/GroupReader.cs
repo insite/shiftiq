@@ -121,6 +121,9 @@ public class GroupReader : IEntityReader
         if (!string.IsNullOrEmpty(criteria.GroupCode))
             query = query.Where(x => x.GroupCode == criteria.GroupCode);
 
+        if (criteria.GroupNames != null && criteria.GroupNames.Length > 0)
+            query = query.Where(x => criteria.GroupNames.Contains(x.GroupName));
+
         if (criteria.GroupCreatedSince.HasValue)
             query = query.Where(x => x.GroupCreated >= criteria.GroupCreatedSince);
 

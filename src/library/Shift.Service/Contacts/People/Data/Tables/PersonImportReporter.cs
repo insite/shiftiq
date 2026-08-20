@@ -6,11 +6,18 @@ using Shift.Service.Content;
 
 namespace Shift.Service.Directory;
 
-public class PersonImportReporter(FileReader fileReader, IStorageServiceAsync storageService) : IPersonImportReporter
+public class PersonImportReporter(GroupReader groupReader, FileReader fileReader, IStorageServiceAsync storageService) : IPersonImportReporter
 {
     private const string Section4Name = "Section 4";
 
-    public async Task<FileStorageModel?> SaveReportAsync(Guid organizationId, Guid userId, string timeZone, IEnumerable<ImportPersonResult> imports, bool isAutoImport)
+    public async Task<FileStorageModel?> SaveReportAsync(
+        Guid organizationId,
+        Guid userId,
+        string timeZone,
+        string[]? claimGroupNames,
+        IEnumerable<ImportPersonResult> imports,
+        bool isAutoImport
+        )
     {
         var sections = imports
             .Where(x => x.Status != ImportPersonResult.StatusEnum.Error)
@@ -36,6 +43,7 @@ public class PersonImportReporter(FileReader fileReader, IStorageServiceAsync st
         stream.Position = 0;
 
         var documentName = await CreateDocumentNameAsync(organizationId, timeZone);
+        var fileClaims = await CreateFileClaimsAsync(organizationId, claimGroupNames);
 
         var file = await storageService.CreateAsync(
             stream,
@@ -45,10 +53,32 @@ public class PersonImportReporter(FileReader fileReader, IStorageServiceAsync st
             organizationId,
             FileObjectType.Organization,
             new FileProperties { DocumentName = documentName, Tag = FileTag.PersonImport },
-            null
+            fileClaims
         );
 
         return file;
+    }
+
+    private async Task<FileClaim[]?> CreateFileClaimsAsync(Guid organizationId, string[]? claimGroupNames)
+    {
+        if (claimGroupNames == null || claimGroupNames.Length == 0)
+            return null;
+
+        var groups = await groupReader.SearchAsync(new SearchGroups
+        {
+            OrganizationId = organizationId,
+            GroupNames = claimGroupNames
+        });
+
+        return groups.Count > 0
+            ? groups
+                .Select(x => new FileClaim
+                {
+                    ObjectIdentifier = x.GroupId,
+                    ObjectType = FileClaimObjectType.Group
+                })
+                .ToArray()
+            : null;
     }
 
     private async Task<string> CreateDocumentNameAsync(Guid organizationId, string timeZone)

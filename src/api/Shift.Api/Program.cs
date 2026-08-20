@@ -173,6 +173,7 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
     services.AddSingleton<IFileStoreAsync, FileStore>();
     services.AddSingleton<IFileManagerServiceAsync, FileManagerService>();
     services.AddSingleton<IStorageServiceAsync, StorageService>();
+    services.AddSingleton<FileValidatorService>();
     services.AddSingleton<IDashboardNotificationManager, DashboardNotificationManager>();
     services.AddSingleton<IDashboardService, DashboardService>();
     services.AddSingleton<IChatbotToolService, ShiftChatbotToolService>();

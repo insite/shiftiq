@@ -136,8 +136,16 @@ namespace Shift.Common.Linq
             MemberExpression result = null;
 
             var parts = propertyName.Split('.');
-            for (var i = 0; i < parts.Length; i++)
-                result = Expression.PropertyOrField((Expression)result ?? parameterExpr, parts[i]);
+
+            try
+            {
+                for (var i = 0; i < parts.Length; i++)
+                    result = Expression.PropertyOrField((Expression)result ?? parameterExpr, parts[i]);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new InvalidOrderByException(ex);
+            }
 
             return result;
         }

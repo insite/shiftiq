@@ -267,9 +267,9 @@ translationControl.initEditor('{TranslatedText.ClientID}');",
             return Translations.Serialize();
         }
 
-        public void SetDefault() => SetTranslation(string.Empty, null);
+        public void SetDefault() => SetTranslation(string.Empty);
 
-        public void SetTranslation(string translation, string language, bool allowHtml = false)
+        public void SetTranslation(string translation, string language = null, bool allowHtml = false)
         {
             Translations = MultilingualString.Deserialize(translation);
 

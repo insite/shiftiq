@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 
 using InSite.Application.Records.Read;
@@ -11,14 +12,14 @@ namespace InSite.Persistence
     {
         internal InternalDbContext CreateContext() => new InternalDbContext(true) { EnablePrepareToSaveChanges = false };
 
-        public List<TaskEnrollment> TaskCompleted(Guid LearnerIdentifier, Guid OrganizationIdentifier, Guid ObjectIdentifier)
+        public List<TaskEnrollment> TaskCompleted(Guid learnerIdentifier, Guid organizationIdentifier, Guid objectIdentifier)
         {
             using (var db = new InternalDbContext())
             {
-                var entities = GetTaskEnrollments(LearnerIdentifier, OrganizationIdentifier, ObjectIdentifier, db);
+                var entities = GetTaskEnrollments(learnerIdentifier, organizationIdentifier, objectIdentifier, db);
 
                 if (entities == null)
-                    GetTaskBasedOnAchievement(LearnerIdentifier, OrganizationIdentifier, ObjectIdentifier);
+                    GetTaskBasedOnAchievement(learnerIdentifier, organizationIdentifier, objectIdentifier);
 
                 UpdateTaskEnrollments(db, entities);
 
@@ -81,10 +82,13 @@ namespace InSite.Persistence
 
         private static List<TTaskEnrollment> GetTaskEnrollments(Guid LearnerIdentifier, Guid OrganizationIdentifier, Guid ObjectIdentifier, InternalDbContext db)
         {
-            return db.TTaskEnrollments.AsQueryable().Include(x=>x.Task)
+            return db.TTaskEnrollments
+                .AsQueryable()
+                .Include(x => x.Task)
                 .Where(x => x.OrganizationIdentifier == OrganizationIdentifier &&
                             x.LearnerUserIdentifier == LearnerIdentifier &&
-                            x.ObjectIdentifier == ObjectIdentifier).ToList();
+                            x.ObjectIdentifier == ObjectIdentifier
+                ).ToList();
         }
 
         private static void UpdateTaskEnrollment(InternalDbContext db, TTaskEnrollment entity)
@@ -98,11 +102,33 @@ namespace InSite.Persistence
 
         private static void UpdateTaskEnrollments(InternalDbContext db, List<TTaskEnrollment> entities)
         {
-            if (entities == null && entities.Count == 0)
+            if (entities == null || entities.Count == 0)
                 return;
 
             foreach (TTaskEnrollment entity in entities)
                 UpdateTaskEnrollment(db, entity);
+
+            var learnerUserId = entities[0].LearnerUserIdentifier;
+
+            var programIds = entities.Select(x => x.Task.ProgramIdentifier).Distinct();
+            foreach (var programId in programIds)
+            {
+                db.Database.ExecuteSqlCommand("exec records.CompleteProgramWhenAllTasksCompleted @ProgramId, @LearnerUserId",
+                    new SqlParameter("ProgramId", programId),
+                    new SqlParameter("LearnerUserId", learnerUserId)
+                );
+            }
+        }
+
+        public static void CompleteProgramWhenAllTasksCompleted(Guid programId, Guid learnerUserId)
+        {
+            using (var db = new InternalDbContext())
+            {
+                db.Database.ExecuteSqlCommand("exec records.CompleteProgramWhenAllTasksCompleted @ProgramId, @LearnerUserId",
+                    new SqlParameter("ProgramId", programId),
+                    new SqlParameter("LearnerUserId", learnerUserId)
+                );
+            }
         }
 
         private static void GetTaskBasedOnAchievement(Guid LearnerIdentifier, Guid OrganizationIdentifier, Guid ObjectIdentifier)

@@ -163,7 +163,7 @@ export default function RichTextEditor_Markdown({
                     listsPlugin(),
                     quotePlugin(),
                     thematicBreakPlugin(),
-                    linkPlugin(),
+                    linkPlugin({ disableAutoLink: true }),
                     linkDialogPlugin(),
                     imagePlugin({
                         imageUploadHandler: disableUploadFile ? null : uploadFile,

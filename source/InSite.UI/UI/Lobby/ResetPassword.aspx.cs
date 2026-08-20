@@ -152,32 +152,33 @@ namespace InSite.UI.Lobby
             }
 
             var person = PersonSearch.Select(Organization.Identifier, user.UserIdentifier);
-            if (person != null && !person.EmailEnabled)
+
+            if (person == null)
+            {
+                ShowStatus(AlertType.Error, "ResetPassword.InvalidEmail");
+                return;
+            }
+
+            if (!person.EmailEnabled)
                 ServiceLocator.SendCommand(new ModifyPersonFieldBool(person.PersonIdentifier, PersonField.EmailEnabled, true));
 
             var tokenId = ResetTokenFile.GetOrCreateToken(user);
 
             try
             {
-                var url = $"{HttpRequestHelper.CurrentRootUrl}{GetUrl()}?token={tokenId}";
-                var userOrganizationIdentifier = user.Persons.Count > 0
-                    ? user.Persons.Select(y => y.OrganizationIdentifier).First()
-                    : OrganizationIdentifiers.Global;
-
                 var alert = new AlertPasswordResetRequested()
                 {
-                    ResetUrl = url,
+                    ResetUrl = $"{HttpRequestHelper.CurrentRootUrl}{GetUrl()}?token={tokenId}",
                     Type = NotificationType.PasswordResetRequested
                 };
 
                 var ids = ServiceLocator.AlertMailer.Send(Organization.Identifier, user.UserIdentifier, alert);
-
-                var status = ids.IsNotEmpty()
-                    ? TEmailSearch.Select(ids[0])
-                    : null;
+                if (ids.IsEmpty())
+                    throw new InvalidOperationException($"No reset email was sent to user {user.UserIdentifier}");
 
                 var html = LabelHelper.GetTranslation("ResetPassword.CheckMailbox", true);
 
+                var status = TEmailSearch.Select(ids[0]);
                 if (status != null)
                     html = html.Replace("$FromEmail", $"{status.SenderName} &#60;{status.SenderEmail}&#62;");
 

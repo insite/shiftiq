@@ -10,7 +10,7 @@
         </h2>
         <div class="form-group mb-3">
             <div>
-                <insite:TextBox runat="server" ID="LabelName" MaxLength="128" />
+                <insite:TextBox runat="server" ID="LabelName" MaxLength="128" AllowHtml="true" />
             </div>
         </div>
 

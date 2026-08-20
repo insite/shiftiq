@@ -81,7 +81,7 @@ namespace InSite.UI.Portal.Learning.Controls
             var dataItem = (CertificateRepeaterItem)Page.GetDataItem();
 
             return dataItem.CredentialStatus == Shift.Constant.CredentialStatus.Valid.ToString() && (ServiceLocator.Partition.IsE03() || dataItem.CertificationLayoutCode.IsNotEmpty())
-                ? $"<a class='btn btn-sm btn-success' href=\"/ui/portal/records/credentials/certificate?credential={dataItem.CredentialIdentifier}&course-name={dataItem.AchievementTitle}\"><i class='far fa-award me-2'></i> Download</a>"
+                ? $"<a class='btn btn-sm btn-success' href=\"/ui/portal/records/credentials/certificate?credential={dataItem.CredentialIdentifier}&course-name={dataItem.AchievementTitle}\"><i class='far fa-award me-2'></i> {Translate("Download")}</a>"
                 : null;
         }
 

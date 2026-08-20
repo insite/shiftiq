@@ -148,7 +148,9 @@ namespace InSite.UI.Admin.Assessments.Attempts.Utilities.TakerReport
 
                 if (person.Frameworks.Count == 0
                     || person.Frameworks.Count != frameworkCount
-                    || person.Frameworks.Any(x => !string.IsNullOrEmpty(x.Status) && !string.Equals(x.Status, "Pass") && !string.Equals(x.Status, "Fail"))
+                    || person.Frameworks.Any(x => !string.IsNullOrEmpty(x.Status)
+                        && !string.Equals(x.Status, "Pass", StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(x.Status, "Fail", StringComparison.OrdinalIgnoreCase))
                     )
                 {
                     errors.Add($"Line {i + 2}: Framework status is invalid");

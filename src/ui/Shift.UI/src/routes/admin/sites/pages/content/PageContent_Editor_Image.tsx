@@ -39,6 +39,7 @@ export default function PageContent_Editor_Image({ block, fieldName }: Props) {
                     maxLength={512}
                     defaultValue={fieldValue?.url ?? ""}
                     readOnly={readOnly}
+                    validateAndAdjust
                     onBlur={value => modifyBlockField(block.blockId, fieldName, {
                         key: 0,
                         url: value,

@@ -94,7 +94,7 @@ namespace InSite.Persistence
 
                     if (credential == null)
                         AddCreateCommands(commands, organizationIdentifier, learner, achievement, target, labels);
-                    else
+                    else if (credential.OrganizationIdentifier == organizationIdentifier)
                         AddUpdateCommands(commands, credential, target);
                 }
 
@@ -104,7 +104,7 @@ namespace InSite.Persistence
                 {
                     ServiceLocator.SendCommand(command);
                 }
-                catch (DuplicateCredentialException)
+                catch (Exception ex) when (ex.Find<DuplicateCredentialException>() != null)
                 {
                     // Ignore if the credential already exists.
                 }
@@ -268,11 +268,11 @@ namespace InSite.Persistence
             using (var db = new InternalDbContext())
             {
                 var rows = db.QCredentials.AsNoTracking()
-                    .Where(c => c.OrganizationIdentifier == organizationIdentifier
-                        && objects.Contains(c.AchievementIdentifier)
+                    .Where(c => objects.Contains(c.AchievementIdentifier)
                         && db.TProgramEnrollments.Any(e =>
                             e.ProgramIdentifier == programIdentifier
-                            && e.LearnerUserIdentifier == c.UserIdentifier))
+                            && e.LearnerUserIdentifier == c.UserIdentifier
+                            && e.LearnerUser.Persons.Any(p => p.OrganizationIdentifier == organizationIdentifier)))
                     .ToList();
 
                 var result = new Dictionary<Tuple<Guid, Guid>, QCredential>();

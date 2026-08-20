@@ -24,6 +24,7 @@ interface Props {
     value?: string;
     defaultValue?: string;
     supportedFileTypes?: string[];
+    validateAndAdjust?: boolean;
     error?: FieldError;
     onBlur?: (value: string) => void;
     onChange?: (value: string) => void;
@@ -42,6 +43,7 @@ export default function FileTextBox({
     value,
     defaultValue,
     supportedFileTypes,
+    validateAndAdjust = false,
     error,
     onBlur,
     onChange,
@@ -83,7 +85,7 @@ export default function FileTextBox({
         setIsLoading(true);
 
         try {
-            result = await shiftClient.file.uploadTempFile(files[0]);
+            result = await shiftClient.file.uploadTempFile(files[0], null, validateAndAdjust);
             removeError();
         } catch (err) {
             addError(err, "Failed to upload file");
@@ -94,6 +96,10 @@ export default function FileTextBox({
 
         if (!result || result.length === 0) {
             return;
+        }
+
+        if (result[0].Messages && result[0].Messages.length > 0) {
+            window.alert(result[0].Messages.join("\n"));
         }
 
         const url = urlHelper.getFileUrl(result[0].FileId, result[0].FileName);

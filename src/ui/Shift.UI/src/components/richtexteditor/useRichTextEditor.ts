@@ -130,7 +130,7 @@ export function useRichTextEditor(
         let result: ApiUploadFileInfo[] | null;
 
         try {
-            result = await shiftClient.file.uploadTempFile(file, null, progressCallback);
+            result = await shiftClient.file.uploadTempFile(file, null, true, progressCallback);
             removeError();
         } catch (err) {
             addError(err, "Failed to upload file");
@@ -139,6 +139,10 @@ export function useRichTextEditor(
 
         if (!result || result.length === 0) {
             return null;
+        }
+
+        if (result[0].Messages && result[0].Messages.length > 0) {
+            window.alert(result[0].Messages.join("\n"));
         }
 
         return result[0];

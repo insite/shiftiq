@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
@@ -90,9 +91,9 @@ namespace InSite.Admin.Messages.Deliveries.Forms
                 if (message != null)
                 {
                     var sender = TSenderSearch.Select(message.SenderIdentifier);
-                    var email = sender.SenderEmail.ToLower();
+                    var senderEmail = sender.SenderEmail.ToLower();
 
-                    MessageSenderOutput.InnerHtml = $"<a href=\"/ui/admin/contacts/people/edit?contact={message.SenderIdentifier}\">{sender.SenderName}</a> <<a href =\"mailto:{HttpUtility.HtmlEncode(email)}\">{HttpUtility.HtmlEncode(email)}</a>>";
+                    MessageSenderOutput.InnerHtml = $"<a href=\"/ui/admin/contacts/people/edit?contact={message.SenderIdentifier}\">{sender.SenderName}</a> <<a href =\"mailto:{HttpUtility.HtmlEncode(senderEmail)}\">{HttpUtility.HtmlEncode(senderEmail)}</a>>";
                     MessageSubjectOutput.InnerText = compiledMessage.Subject;
                     MessageNameOutput.InnerHtml = $"<a href=\"/ui/admin/messages/outline?message={message.MessageIdentifier}\">{HttpUtility.HtmlEncode(message.MessageName)}</a>";
                 }
@@ -113,9 +114,25 @@ namespace InSite.Admin.Messages.Deliveries.Forms
             DeliveryStartedOutput.InnerText = delivery.DeliveryStarted.Format(timezone);
             DeliveryCompletedOutput.InnerText = delivery.DeliveryCompleted.Format(timezone);
 
-            var recipientData = DeliveryAdapter.ToDataTable(Organization.Identifier, job.Email.Recipients);
+            SetEmailOutput(job.Email);
+        }
 
-            var (subject, body) = EmailOutbox.ReplaceSmarterMailVariables(recipientData, 0, compiledMessage.Subject, compiledMessage.Body);
+        private void SetEmailOutput(EmailDraft email)
+        {
+            var recipient = email.Recipients.FirstOrDefault();
+
+            var variables = new Dictionary<string, string>(email.ContentVariables);
+            foreach (var kv in recipient.Variables)
+                variables[kv.Key] = kv.Value;
+
+            var envelope = new EmailVariables(recipient.Identifier.Value, recipient.Address, email.OrganizationIdentifier, variables);
+
+            var subject = email.ContentSubject.Default;
+            subject = MessageHelper.ReplacePlaceholdersForMailgun(email.OrganizationIdentifier, email.SenderIdentifier, email.SurveyNumber, subject, envelope);
+
+            var body = email.ContentBody.Default;
+            body = MessageHelper.ReplacePlaceholdersForMailgun(email.OrganizationIdentifier, email.SenderIdentifier, email.SurveyNumber, body, envelope);
+            body = MessageHelper.CreateHtmlBody(subject, body, false);
 
             ContentSubjectOutput.InnerText = subject;
             DeliveryContent = body;

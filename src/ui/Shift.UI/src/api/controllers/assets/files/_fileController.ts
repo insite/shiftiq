@@ -25,7 +25,15 @@ export const _fileController = {
         return await fetchHelper.get<ApiFileModel>(`/api/assets/files/${fileId}`);
     },
 
-    async uploadTempFile(files: FileList | File, responseId?: string | null, progressCallback?: (percent: number) => void): Promise<ApiUploadFileInfo[] | null> {
-        return await fileUploadHelper.post(`/api/assets/files/temp`, [{ name: "responseId", value: responseId }], files, progressCallback);
+    async uploadTempFile(files: FileList | File, responseId?: string | null, validate?: boolean | null, progressCallback?: (percent: number) => void): Promise<ApiUploadFileInfo[] | null> {
+        return await fileUploadHelper.post(
+            `/api/assets/files/temp`,
+            [
+                { name: "responseId", value: responseId },
+                { name: "validate", value: validate ? "true" : undefined },
+            ],
+            files,
+            progressCallback
+        );
     }
 }

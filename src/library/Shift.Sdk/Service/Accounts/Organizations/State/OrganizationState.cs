@@ -185,6 +185,7 @@ namespace InSite.Domain.Organizations
             contacts.PortalSearchRequiresReferral = e.Contacts.PortalSearchRequiresReferral;
             contacts.ProfileSecurityGroupId = e.Contacts.ProfileSecurityGroupId;
             contacts.DisplayIntegrationPortalLink = e.Contacts.DisplayIntegrationPortalLink;
+            contacts.ImportReportGroupNames = e.Contacts.ImportReportGroupNames;
         }
 
         public void When(OrganizationCreated e)

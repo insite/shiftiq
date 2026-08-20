@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using Shift.Common;
 
@@ -18,10 +19,11 @@ namespace InSite.Domain.Organizations
         public bool PortalSearchRequiresReferral { get; set; }
         public Guid? ProfileSecurityGroupId { get; set; }
         public bool DisplayIntegrationPortalLink { get; set; }
+        public string[] ImportReportGroupNames { get; set; }
 
         public bool IsEqual(ContactSettings other)
         {
-            return
+            var isEqual =
                 FullNamePolicy.NullIfEmpty() == other.FullNamePolicy.NullIfEmpty() &&
                 DefaultMFA == other.DefaultMFA &&
                 PortalSearchActiveMembershipReasons == other.PortalSearchActiveMembershipReasons &&
@@ -33,6 +35,14 @@ namespace InSite.Domain.Organizations
                 ProfileSecurityGroupId == other.ProfileSecurityGroupId &&
                 DisplayIntegrationPortalLink == other.DisplayIntegrationPortalLink
                 ;
+
+            if (!isEqual)
+                return false;
+
+            var groups1 = ImportReportGroupNames.EmptyIfNull();
+            var groups2 = other.ImportReportGroupNames.EmptyIfNull();
+            return groups1.Length == groups2.Length
+                && groups1.Zip(groups2, (a, b) => string.Equals(a, b)).All(x => x);
         }
     }
 }

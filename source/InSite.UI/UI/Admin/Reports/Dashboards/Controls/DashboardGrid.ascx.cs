@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -117,7 +116,7 @@ namespace InSite.UI.Admin.Reports.Dashboards
                 {
                     var box = (InSite.Common.Web.UI.CheckBox)sender;
                     var row = (GridViewRow)box.NamingContainer;
-                    box.Checked = (bool)DataBinder.Eval(row.DataItem, _columnName);
+                    box.Checked = DataBinder.Eval(row.DataItem, _columnName) as bool? == true;
                 };
 
                 container.Controls.Add(checkbox);
@@ -141,11 +140,36 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
             private void Literal_DataBinding(object sender, EventArgs e)
             {
-                var lit = (AspLiteral)sender;
+                var lit = (LiteralControl)sender;
                 var row = (GridViewRow)lit.NamingContainer;
-                var email = (string)DataBinder.Eval(row.DataItem, _columnName);
+                var email = DataBinder.Eval(row.DataItem, _columnName) as string;
                 var encoded = System.Web.HttpUtility.HtmlEncode(email);
                 lit.Text = email.IsEmpty() ? string.Empty : $"<a href='mailto:{encoded}'>{encoded}</a>";
+            }
+        }
+
+        private class MarkdownColumnTemplate : ITemplate
+        {
+            private readonly string _columnName;
+
+            public MarkdownColumnTemplate(string columnName) => _columnName = columnName;
+
+            public void InstantiateIn(Control container)
+            {
+                var literal = new LiteralControl();
+
+                literal.DataBinding += Literal_DataBinding;
+
+                container.Controls.Add(literal);
+            }
+
+            private void Literal_DataBinding(object sender, EventArgs e)
+            {
+                var lit = (LiteralControl)sender;
+                var row = (GridViewRow)lit.NamingContainer;
+                var value = DataBinder.Eval(row.DataItem, _columnName) as string;
+
+                lit.Text = Markdown.ToHtml(value);
             }
         }
 
@@ -203,14 +227,17 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
         private static DataControlField CreateField(DashboardTableQueryColumn column)
         {
-            if (column.Type == "Checkbox")
+            if (string.Equals(column.Type, "Checkbox", StringComparison.OrdinalIgnoreCase))
                 return CreateCheckboxField(column);
 
-            if (column.Type == "Email")
+            if (string.Equals(column.Type, "Email", StringComparison.OrdinalIgnoreCase))
                 return CreateEmailField(column);
 
             if (column.Link != null)
                 return CreateHyperLinkField(column);
+
+            if (string.Equals(column.Type, "Markdown", StringComparison.OrdinalIgnoreCase))
+                return CreateMarkdownField(column);
 
             return CreateBoundField(column);
         }
@@ -233,6 +260,14 @@ namespace InSite.UI.Admin.Reports.Dashboards
             return field;
         }
 
+        private static AspTemplateField CreateMarkdownField(DashboardTableQueryColumn column)
+        {
+            var field = new AspTemplateField();
+            field.HeaderText = column.Label ?? column.Name;
+            field.ItemTemplate = new MarkdownColumnTemplate(column.Name);
+            return field;
+        }
+
         private static HyperLinkField CreateHyperLinkField(DashboardTableQueryColumn column)
         {
             var field = new HyperLinkField();
@@ -252,7 +287,7 @@ namespace InSite.UI.Admin.Reports.Dashboards
             var field = new System.Web.UI.WebControls.BoundField();
             field.DataField = column.Name;
             field.HeaderText = column.Label ?? column.Name;
-            field.HtmlEncode = true;
+            field.HtmlEncode = !string.Equals(column.Type, "Html", StringComparison.OrdinalIgnoreCase);
 
             if (ColumnType.Format.TryGetValue(column.Type.EmptyIfNull(), out var format))
             {
@@ -478,7 +513,7 @@ namespace InSite.UI.Admin.Reports.Dashboards
                 };
                 input.TextChanged += Input_TextChanged;
 
-                if (column.Type == "Integer")
+                if (string.Equals(column.Type, "Integer", StringComparison.OrdinalIgnoreCase))
                     input.Width = Unit.Pixel(80);
 
                 if (Criteria.ContainsKey(name))

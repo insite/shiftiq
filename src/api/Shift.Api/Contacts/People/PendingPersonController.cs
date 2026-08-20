@@ -221,67 +221,6 @@ public class PendingPersonController : ShiftControllerBase
 
     #endregion Queries
 
-    #region Commands
-
-    [HttpPost("api/contacts/pending-people")]
-    [HybridPermission("directory/people", DataAccess.Create)]
-    [ProducesResponseType<PendingPersonModel>(StatusCodes.Status201Created, "application/json")]
-    [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
-    [EndpointName("createPendingPerson")]
-    public async Task<IActionResult> CreateAsync([FromBody] CreatePendingPerson create, CancellationToken cancellation = default)
-    {
-        var principal = _principalProvider.GetPrincipal();
-
-        var id = await _pendingPersonService.CreateAsync(create, principal, cancellation);
-
-        if (id == null)
-            return BadRequest($"Failed to create.");
-
-        var model = await _pendingPersonService.RetrieveAsync(id.Value, cancellation);
-
-        return Created($"api/contacts/pending-people/{id.Value}", model);
-    }
-
-    [HttpDelete("api/contacts/pending-people/{pending:guid}")]
-    [HybridPermission("directory/people", DataAccess.Delete)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [EndpointName("deletePendingPerson")]
-    public async Task<IActionResult> DeleteAsync([FromRoute] Guid pending, CancellationToken cancellation = default)
-    {
-        var deleted = await _pendingPersonService.DeleteAsync(pending, cancellation);
-
-        if (!deleted)
-            return NotFound();
-
-        return Ok();
-    }
-
-    [HttpPut("api/contacts/pending-people/{pending:guid}")]
-    [HybridPermission("directory/people", DataAccess.Update)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType<ValidationFailure>(StatusCodes.Status400BadRequest, "application/json")]
-    [EndpointName("modifyPendingPerson")]
-    public async Task<IActionResult> ModifyAsync([FromRoute] Guid pending, [FromBody] ModifyPendingPerson modify, CancellationToken cancellation = default)
-    {
-        var principal = _principalProvider.GetPrincipal();
-
-        var model = await _pendingPersonService.RetrieveAsync(pending, cancellation);
-
-        if (model is null)
-            return NotFound($"PendingPerson not found: PendingId {modify.PendingPersonIdentifier}. You cannot modify an object that is not in the database.");
-
-        var modified = await _pendingPersonService.ModifyAsync(modify, cancellation);
-
-        if (!modified)
-            return NotFound();
-
-        return Ok();
-    }
-
-    #endregion Commands
-
     #region Import
 
     public class SearchImports : Query<IEnumerable<PendingPersonImportModel>>
@@ -342,10 +281,11 @@ public class PendingPersonController : ShiftControllerBase
         var organization = await organizationService.RetrieveAsync(organizationId) ?? throw new ArgumentNullException($"Organization {organizationId} is not found");
         var organizationData = organizationAdapter.ToData(organization);
         var fullNamePolicy = organizationData.Toolkits?.Contacts?.FullNamePolicy;
+        var claimGroupNames = organizationData.Toolkits?.Contacts?.ImportReportGroupNames;
         var timeZone = organizationData.TimeZone.Id;
 
         var result = await importer.ImportPendingPeopleAsync(organizationId, fullNamePolicy, timeZone, submittedByName, imports);
-        var file = await reporter.SaveReportAsync(organizationId, submittedBy, timeZone, result, false);
+        var file = await reporter.SaveReportAsync(organizationId, submittedBy, timeZone, claimGroupNames, result, false);
 
         return new ImportResult
         {

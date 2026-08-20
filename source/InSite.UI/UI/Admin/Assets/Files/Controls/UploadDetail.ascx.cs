@@ -104,7 +104,7 @@ namespace InSite.UI.Admin.Assets.Files.Controls
 
         public (bool IsValid, string Title) BindDefaultsToControls(FileObjectType objectType, Guid objectIdentifier)
         {
-            var (isValid, title) = Validate(objectType, objectIdentifier);
+            var (isValid, title, _) = Validate(objectType, objectIdentifier);
             if (!isValid)
                 return (isValid, title);
 
@@ -123,11 +123,11 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             return (isValid, title);
         }
 
-        public (bool IsValid, string Title) BindModelToControls(FileStorageModel model, Guid? caseId)
+        public (bool IsValid, string Title, bool CanDelete) BindModelToControls(FileStorageModel model, Guid? caseId)
         {
-            var (isValid, title) = Validate(model.ObjectType, model.ObjectIdentifier);
+            var (isValid, title, canDelete) = Validate(model.ObjectType, model.ObjectIdentifier);
             if (!isValid)
-                return (isValid, title);
+                return (isValid, title, canDelete);
 
             ObjectIdentifier = model.ObjectIdentifier;
             ObjectType = model.ObjectType;
@@ -171,7 +171,7 @@ namespace InSite.UI.Admin.Assets.Files.Controls
 
             BindAllowLearnerSettings(model.ObjectIdentifier, model.ObjectType, model.Claims, properties.AllowLearnerToView);
 
-            return (isValid, title);
+            return (isValid, title, canDelete);
         }
 
         private void BindAllowLearnerSettings(Guid objectId, FileObjectType objectType, IEnumerable<FileClaim> fileClaims, bool? allowLearnerToView)
@@ -355,21 +355,29 @@ namespace InSite.UI.Admin.Assets.Files.Controls
             return (null, null);
         }
 
-        private (bool, string) Validate(FileObjectType objectType, Guid objectIdentifier)
+        private (bool, string, bool) Validate(FileObjectType objectType, Guid objectIdentifier)
         {
+            (bool isValid, string title) result;
+
             switch (objectType)
             {
                 case FileObjectType.User:
-                    return ValidateUser(objectIdentifier);
+                    result = ValidateUser(objectIdentifier);
+                    break;
                 case FileObjectType.Issue:
-                    return ValidateIssue(objectIdentifier);
+                    result = ValidateIssue(objectIdentifier);
+                    break;
                 case FileObjectType.Response:
-                    return ValidateResponse(objectIdentifier);
+                    result = ValidateResponse(objectIdentifier);
+                    break;
                 case FileObjectType.Standard:
-                    return ValidateStandard(objectIdentifier);
+                    result = ValidateStandard(objectIdentifier);
+                    break;
                 default:
-                    return (false, null);
+                    return (Identity.IsOperator, null, Identity.IsOperator);
             }
+
+            return (result.isValid, result.title, false);
         }
 
         private (bool, string) ValidateUser(Guid objectIdentifier)

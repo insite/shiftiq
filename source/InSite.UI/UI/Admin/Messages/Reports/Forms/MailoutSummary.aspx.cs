@@ -90,7 +90,7 @@ namespace InSite.Admin.Messages.Reports.Forms
             SuccessfulDeliveriesSection.Visible = successDeliveriesCount > 0;
 
             var body = mailout.ContentBodyText ?? mailout.ContentBodyHtml;
-            MailoutContentOutput.InnerText = MessageHelper.BuildPreviewHtml(Organization.OrganizationIdentifier, mailout.SenderIdentifier, Outlines.Forms.Outline.GetSurveyFormAsset(mailout.SurveyIdentifier), body);
+            MailoutContentOutput.InnerText = MessageHelper.BuildPreviewHtml(Organization.OrganizationIdentifier, mailout.SenderIdentifier, Outlines.Forms.Outline.GetSurveyFormAsset(mailout.SurveyIdentifier), body, false);
         }
 
         private void LoadRecipients(Guid deliveryThumbprint)

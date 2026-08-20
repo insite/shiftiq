@@ -10,6 +10,7 @@ namespace Shift.Contract
         public Guid? OrganizationId { get; set; }
 
         public string GroupCode { get; set; }
+        public string[] GroupNames { get; set; }
         public DateTimeOffset? GroupCreatedSince { get; set; }
         public DateTimeOffset? GroupCreatedBefore { get; set; }
         public DateTimeOffset? GroupExpirySince { get; set; }

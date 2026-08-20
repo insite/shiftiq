@@ -51,6 +51,15 @@ namespace InSite.UI.Admin.Assets.Files
         protected global::InSite.Common.Web.UI.SaveButton SaveButton;
 
         /// <summary>
+        /// DeleteButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DeleteButton DeleteButton;
+
+        /// <summary>
         /// CancelButton control.
         /// </summary>
         /// <remarks>

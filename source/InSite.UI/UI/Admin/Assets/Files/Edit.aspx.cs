@@ -6,7 +6,6 @@ using InSite.Common.Web.UI;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
-using Shift.Constant;
 
 namespace InSite.UI.Admin.Assets.Files
 {
@@ -70,13 +69,15 @@ namespace InSite.UI.Admin.Assets.Files
                 if (Model == null)
                     HttpResponseHelper.Redirect("/");
 
-                var (isValid, title) = Detail.BindModelToControls(Model, BackToCase);
+                var (isValid, title, canDelete) = Detail.BindModelToControls(Model, BackToCase);
                 if (!isValid)
                     HttpResponseHelper.Redirect("/");
 
                 HistoryList.BindModelToControls(Model);
 
                 PageHelper.AutoBindHeader(this, null, title);
+
+                DeleteButton.Visible = canDelete;
 
                 CancelButton.NavigateUrl = GetReturnUrl();
             }
@@ -87,6 +88,7 @@ namespace InSite.UI.Admin.Assets.Files
             base.OnInit(e);
 
             SaveButton.Click += SaveButton_Click;
+            DeleteButton.Click += DeleteButton_Click;
         }
 
         public override void ApplyAccessControl()
@@ -108,6 +110,15 @@ namespace InSite.UI.Admin.Assets.Files
             Detail.UpdateFile(FileIdentifier);
 
             HttpResponseHelper.Redirect(GetReturnUrl());
+        }
+
+        private void DeleteButton_Click(object sender, EventArgs e)
+        {
+            var returnUrl = GetReturnUrl();
+
+            ServiceLocator.StorageService.Delete(FileIdentifier);
+
+            HttpResponseHelper.Redirect(returnUrl);
         }
 
         public string GetParentLinkParameters(IWebRoute parent)
@@ -132,7 +143,7 @@ namespace InSite.UI.Admin.Assets.Files
                     var issue = ServiceLocator.IssueSearch.GetIssue(ObjectIdentifier);
                     return $"contact={issue?.TopicUserIdentifier}&panel=attachments#issue-attachments";
                 default:
-                    throw new NotImplementedException($"Support for {ObjectType} is not implemented");
+                    return null;
             }
         }
 
@@ -157,7 +168,7 @@ namespace InSite.UI.Admin.Assets.Files
                 case FileObjectType.Issue:
                     return WebRoute.GetWebRoute("ui/admin/contacts/people/edit");
                 default:
-                    throw new NotImplementedException($"Support for {ObjectType} is not implemented");
+                    return WebRoute.GetWebRoute("client/admin/content/files/search");
             }
         }
 
@@ -166,7 +177,7 @@ namespace InSite.UI.Admin.Assets.Files
             var parent = GetParent();
             var parameters = GetParentLinkParameters(parent);
 
-            return $"/{parent.Name}?{parameters}";
+            return !string.IsNullOrEmpty(parameters) ? $"/{parent.Name}?{parameters}" : $"/{parent.Name}";
         }
     }
 }

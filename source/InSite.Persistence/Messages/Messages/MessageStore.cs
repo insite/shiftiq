@@ -399,7 +399,7 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
             {
                 db.Configuration.ValidateOnSaveEnabled = false;
 
-                var message = db.Messages.FirstOrDefault(x => x.MessageIdentifier == e.AggregateIdentifier)
+                var message = db.Messages.AsNoTracking().FirstOrDefault(x => x.MessageIdentifier == e.AggregateIdentifier)
                     ?? throw new ArgumentException($"Message {e.AggregateIdentifier} does not exist");
 
                 var mailout = new QMailout
@@ -450,10 +450,12 @@ DELETE [messages].QSubscriberUser  WHERE [MessageIdentifier] = @Aggregate;
                             cc.Add(item.Identifier, item);
                 }
 
-                var users = db.Persons.Where(x => x.OrganizationIdentifier == message.OrganizationIdentifier)
+                var users = db.Persons.AsNoTracking()
+                    .Where(x => x.OrganizationIdentifier == message.OrganizationIdentifier)
                     .Select(x => new { x.UserIdentifier, x.User.Email, x.FullName, x.Language, x.PersonCode })
-                    .Distinct()
-                    .ToDictionary(x => x.UserIdentifier, x => x);
+                    .AsEnumerable()
+                    .GroupBy(x => x.UserIdentifier)
+                    .ToDictionary(x => x.Key, x => x.First());
 
                 foreach (var itemTo in to)
                 {
