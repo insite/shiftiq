@@ -38,12 +38,27 @@ namespace InSite.UI.Portal.Records.Credentials.Learners
         {
             base.OnLoad(e);
 
+            // TEC-1116: the portal self-service delete is restricted to administrators only.
+            // Learners have no delete icon; if one reaches this URL directly, send them back to
+            // search without deleting anything.
+            if (!Identity.IsAdministrator)
+            {
+                RedirectToSearch();
+                return;
+            }
+
             if (!IsPostBack)
                 LoadData();
         }
 
         private void DeleteButton_Click(object sender, EventArgs e)
         {
+            if (!Identity.IsAdministrator)
+            {
+                RedirectToSearch();
+                return;
+            }
+
             if (!Page.IsValid)
                 return;
 

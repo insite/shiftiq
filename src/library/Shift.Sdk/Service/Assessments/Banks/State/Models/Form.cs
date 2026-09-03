@@ -210,7 +210,7 @@ namespace InSite.Domain.Banks
             else if (Specification.Type == SpecificationType.Dynamic)
             {
                 return Specification.Criteria.Count > 0
-                    ? Specification.Criteria.SelectMany(x => x.Sets.SelectMany(y => y.Questions)).ToList()
+                    ? Specification.Criteria.SelectMany(x => x.Sets).Distinct().SelectMany(y => y.Questions).ToList()
                     : Specification.Bank.Sets.SelectMany(x => x.Questions).ToList();
             }
             else

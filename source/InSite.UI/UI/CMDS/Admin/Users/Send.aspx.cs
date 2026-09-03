@@ -114,6 +114,9 @@ namespace InSite.Cmds.Admin.People.Forms
 
         private Guid[] CarbonCopy(string text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+                return null;
+
             var thumbprint = UserSearch.BindFirst(x => x.UserIdentifier, new UserFilter
             {
                 EmailExact = text,

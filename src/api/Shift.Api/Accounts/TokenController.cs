@@ -25,6 +25,15 @@ public class TokenController : ShiftControllerBase
         _claimConverter = claimConverter;
     }
 
+    /// <summary>
+    /// Generates a new token based on the client's secret.
+    /// </summary>
+    /// <param name="request">
+    /// In the field Lifetime you can provide the number of seconds until the token expires.
+    /// - Minimum: 1 Second
+    /// - Maximum: 31,536,000 Seconds (365 Days)
+    /// - Default (if omitted): 60 Seconds
+    /// </param>
     [HttpPost("api/accounts/tokens/generate")]
     [HttpPost("api/security/tokens/generate")]
     [ProducesResponseType(typeof(JwtResponse), StatusCodes.Status200OK)]

@@ -210,6 +210,11 @@ export default function ContentEdior({
                                         name={`editors.${index}.value`}
                                         options={v.options}
                                         defaultLanguage={language}
+                                        defaultMode={
+                                            v.options.type === "html" || v.options.type === "markdownAndHtml" && !v.value.markdown && v.value.html
+                                                ? "html"
+                                                : "markdown"
+                                        }
                                         disabled={isSavingOrRedirecting}
                                     />
                                 )}

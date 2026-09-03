@@ -20,7 +20,7 @@ export default function AdminHomeLayout_Navigation_HelpMenu() {
                             <h6 className="dropdown-header pb-1">Get Help</h6>
                         </li>
                         <li><a className="dropdown-item ms-2" href="/ui/portal/support">Submit a support request</a></li>
-                        <li><a className="dropdown-item ms-2" target="_blank" href="https://www.keyeracmds.com/blog">Blog posts, news, and updates</a></li>
+                        <li><a className="dropdown-item ms-2" target="_blank" href="https://www.keyeracmds.com/tag/blog">Blog posts, news, and updates</a></li>
                         <li><a className="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/terminology.pdf">Terminology</a></li>
                         <li>
                             <h6 className="dropdown-header pb-1">CMDS Guides</h6>

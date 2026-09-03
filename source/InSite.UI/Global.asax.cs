@@ -212,6 +212,9 @@ namespace InSite
 
         public static void RegisterPartition()
         {
+            if (!ServiceLocator.AppSettings.Engine.Api.PartitionRegistration.Enabled)
+                return;
+
             var partition = ServiceLocator.AppSettings.Partition;
 
             var environment = ServiceLocator.AppSettings.Environment;

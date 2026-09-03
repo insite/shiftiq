@@ -238,6 +238,10 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
             SaveV2Image(course);
 
+            var overrideUrl = CourseImageUrl.Text?.Trim();
+            if (!string.IsNullOrWhiteSpace(overrideUrl))
+                course.CourseImage = overrideUrl;
+
             course.CatalogIdentifier = CatalogIdentifier.ValueAsGuid;
             course.CourseSequence = CatalogSequence.ValueAsInt ?? 0;
             course.CourseIsHidden = CourseIsHidden.Checked;

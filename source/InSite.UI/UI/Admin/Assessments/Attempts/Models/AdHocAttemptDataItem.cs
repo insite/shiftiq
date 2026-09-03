@@ -1,5 +1,8 @@
 ﻿using System;
 
+using Humanizer;
+using Humanizer.Localisation;
+
 using InSite.Admin.Assessments.Attempts.Forms;
 using InSite.Application.Banks.Read;
 using InSite.Application.Contacts.Read;
@@ -46,7 +49,9 @@ namespace InSite.Admin.Assessments.Attempts.Models
             AttemptTag = entity.AttemptTag;
             AttemptStartedValue = entity.AttemptStarted;
             AttemptCompletedValue = entity.AttemptGraded;
-            AttemptDuration = entity.AttemptDuration.HasValue ? $"{entity.AttemptDuration} minutes" : string.Empty;
+            AttemptDuration = entity.AttemptDuration.HasValue
+                ? ((double)entity.AttemptDuration).Seconds().Humanize(2, minUnit: TimeUnit.Second)
+                : string.Empty;
             AttemptScore = entity.AttemptScore;
             AttemptGrade = entity.AttemptGrade;
         }

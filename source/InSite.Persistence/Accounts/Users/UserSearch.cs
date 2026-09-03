@@ -339,8 +339,17 @@ namespace InSite.Persistence
             if (filter.EmailContains.IsNotEmpty())
                 query = query.Where(x => x.Email.Contains(filter.EmailContains) || (x.EmailAlternate != null && x.EmailAlternate.Contains(filter.EmailContains)));
 
-            if (filter.EmailExact.IsNotEmpty())
-                query = query.Where(x => x.Email == filter.EmailExact);
+            if (filter.EmailExact != null)
+            {
+                // TEC-1115: If this criteria is specified then it must match a real address.
+                // Previously, an empty string skipped the filter, so a blank value returned every
+                // user and callers that select the first row from the result set get an arbitrary
+                // person. This ensures a blank value matches nobody. Note that null still means "no
+                // email filter".
+                query = string.IsNullOrWhiteSpace(filter.EmailExact)
+                    ? query.Where(x => false)
+                    : query.Where(x => x.Email == filter.EmailExact);
+            }
 
             if (filter.EmailAlternateExact.IsNotEmpty())
                 query = query.Where(x => x.EmailAlternate == filter.EmailAlternateExact);

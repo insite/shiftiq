@@ -104,42 +104,87 @@ namespace InSite.Admin.Assessments.Sections.Models
             switch (criterion.FilterType)
             {
                 case CriterionFilterType.All:
-                    {
-                        for (var i = 0; i < availableQuestions.Count; i++)
-                        {
-                            if (criterion.QuestionLimit == 0 || i < criterion.QuestionLimit)
-                            {
-                                var question = availableQuestions[i];
-                                TryAdd(satisfies, question);
-                            }
-                        }
-                        break;
-                    }
+                    AddAllQuestions(criterion, availableQuestions, satisfies);
+                    break;
 
                 case CriterionFilterType.Tag:
-                    {
-                        var filter = QuestionDisplayFilter.Parse(criterion.TagFilter);
-
-                        foreach (var question in availableQuestions)
-                        {
-                            var tag = filter[question.Classification.Tag];
-                            if (tag != null && tag.Allows && TryAdd(satisfies, question))
-                                tag.Increment();
-                        }
-                        break;
-                    }
+                    AddTagQuestions(criterion, availableQuestions, satisfies);
+                    break;
 
                 case CriterionFilterType.Pivot:
-                    {
-                        AddPivotQuestions(criterion, availableQuestions, satisfies);
-                        break;
-                    }
+                    AddPivotQuestions(criterion, availableQuestions, satisfies);
+                    break;
             }
 
             // Randomized questions should not be sorted!
             // satisfies.Sort((x1, x2) => x1.BankIndex.CompareTo(x2.BankIndex));
 
             return satisfies;
+        }
+
+        private void AddAllQuestions(Criterion criterion, List<Question> availableQuestions, List<Question> satisfies)
+        {
+            var result = satisfies;
+            var query = availableQuestions.AsEnumerable();
+
+            if (_mutuallyExclusiveLigs)
+            {
+                result = new List<Question>();
+                query = query.OrderByDescending(q => q.Classification.LikeItemGroup != null);
+            }
+
+            var limit = criterion.QuestionLimit;
+            var hasLimit = limit > 0;
+            var count = 0;
+
+            foreach (var question in query)
+            {
+                if (!TryAdd(result, question))
+                    continue;
+
+                if (hasLimit)
+                {
+                    count++;
+
+                    if (count >= limit)
+                        break;
+                }
+            }
+
+            if (_mutuallyExclusiveLigs)
+                RestoreOriginalOrder(availableQuestions, result, satisfies);
+        }
+
+        private void AddTagQuestions(Criterion criterion, List<Question> availableQuestions, List<Question> satisfies)
+        {
+            var result = satisfies;
+            var filter = QuestionDisplayFilter.Parse(criterion.TagFilter);
+            var query = availableQuestions.AsEnumerable();
+
+            if (_mutuallyExclusiveLigs)
+            {
+                result = new List<Question>();
+                query = query.OrderByDescending(q => q.Classification.LikeItemGroup != null);
+            }
+
+            foreach (var question in query)
+            {
+                var tag = filter[question.Classification.Tag];
+                if (tag != null && tag.Allows && TryAdd(result, question))
+                    tag.Increment();
+            }
+
+            if (_mutuallyExclusiveLigs)
+                RestoreOriginalOrder(availableQuestions, result, satisfies);
+        }
+
+        private static void RestoreOriginalOrder(List<Question> source, List<Question> filtered, List<Question> destination)
+        {
+            var order = source
+                .Select((x, i) => (Id: x.Identifier, Index: i))
+                .ToDictionary(x => x.Id, x => x.Index);
+
+            destination.AddRange(filtered.OrderBy(x => order[x.Identifier]));
         }
 
         private void AddPivotQuestions(Criterion criterion, List<Question> availableQuestions, List<Question> satisfies)
@@ -188,17 +233,20 @@ namespace InSite.Admin.Assessments.Sections.Models
 
             if (_mutuallyExclusiveLigs)
             {
-                if (_questionsToExclude.Contains(question.Identifier))
+                var questionId = question.Identifier;
+                if (_questionsToExclude.Contains(questionId))
                     return false;
 
-                var hasLig = question.Classification.LikeItemGroup != null;
-                if (hasLig && _ligsToExclude.Contains(question.Classification.LikeItemGroup))
+                var lig = question.Classification.LikeItemGroup;
+                var hasLig = lig != null;
+
+                if (hasLig && _ligsToExclude.Contains(lig))
                     return false;
 
-                _questionsToExclude.Add(question.Identifier);
+                _questionsToExclude.Add(questionId);
 
                 if (hasLig)
-                    _ligsToExclude.Add(question.Classification.LikeItemGroup);
+                    _ligsToExclude.Add(lig);
             }
 
             satisfies.Add(question);

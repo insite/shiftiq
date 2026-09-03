@@ -19,7 +19,7 @@ public class ContentRetrieveService(
             .OrderBy(x => x.Sequence)
             .ToList();
 
-        var containerIds = blockPages.Select(x => x.PageIdentifier).Union(new[] { pageModel.PageId }).ToArray();
+        var containerIds = blockPages.Select(x => x.PageIdentifier).Union([ pageModel.PageId ]).ToArray();
         var contents = await CollectContentsAsync(containerIds);
 
         var (contentFields, content) = GetPageDetails(pageModel, contents);
@@ -84,6 +84,18 @@ public class ContentRetrieveService(
         return (contentFields, content);
     }
 
+    private static string[] _blockTypes = [
+        "HeadingAndParagraphs",
+        "HeadingAndParagraphsWithImage",
+        "ImageGallery",
+        "TwoColumns",
+        "LinkToAchievement",
+        "LinkToAssessment",
+        "LinkToCourse",
+        "LinkToForm",
+        "CourseSummary"
+    ];
+
     private static BlockContentModel[] GetBlocks(List<PageEntity> blockPages, Dictionary<Guid, ContentContainer> contents)
     {
         return blockPages
@@ -95,6 +107,7 @@ public class ContentRetrieveService(
                 BlockType = x.ContentControl != null ? x.ContentControl.Split(".").Last() : "Unknown",
                 Content = contents.TryGetValue(x.PageIdentifier, out var content) ? content : new ContentContainer()
             })
+            .Where(x => _blockTypes.Contains(x.BlockType))
             .ToArray();
     }
 }

@@ -353,62 +353,37 @@ namespace InSite.Persistence
             if (filter.OnlyRequestedFiles)
                 return query;
 
-            var hasAttachmentCriteria = true;
-            var hasRequirementCriteria = true;
+            var checkAttachments = filter.DocumentFilter != DocumentFilterType.RequestedOnly;
+            var checkRequirements = filter.DocumentFilter != DocumentFilterType.UploadedOnly;
 
-            if (filter.DocumentFilter == DocumentFilterType.RequestedOnly)
+            IQueryable<Guid> matchingIds = null;
+
+            if (checkAttachments)
             {
-                hasAttachmentCriteria = false;
+                var attachmentIds = BuildAttachmentMatchIds(filter, db, out var hasAttachmentCriteria);
+                var surveyIds = BuildSurveyResponseMatchIds(filter, db, out var hasSurveyCriteria);
 
-                query = query.Where(x => x.IssueFileRequirements.Any());
-            }
-            else if (filter.DocumentFilter == DocumentFilterType.UploadedOnly)
-            {
-                hasRequirementCriteria = false;
-
-                query = query.Where(
-                    i => i.IssueAttachments.Any()
-                      || db.QResponseSessions
-                            .Any(r => r.SurveyForm.HasWorkflowConfiguration
-                                   && r.RespondentUserIdentifier == i.TopicUserIdentifier
-                                   && r.OrganizationIdentifier == i.OrganizationIdentifier
-                                   && db.TFiles.Any(f => f.ObjectIdentifier == r.ResponseSessionIdentifier)));
+                if (hasAttachmentCriteria || hasSurveyCriteria || filter.DocumentFilter == DocumentFilterType.UploadedOnly)
+                    matchingIds = attachmentIds.Union(surveyIds);
             }
 
-            IQueryable<Guid> attachmentIssueIds = null;
-            IQueryable<RespondentKey> surveyRespondentKeys = null;
-            IQueryable<Guid> requestedIssueIds = null;
-
-            if (hasAttachmentCriteria)
+            if (checkRequirements)
             {
-                attachmentIssueIds = BuildAttachmentMatchIds(filter, db, out var hasAttachment);
-                surveyRespondentKeys = BuildSurveyResponseMatchKeys(filter, db, out var hasSurvey);
-                hasAttachmentCriteria = hasAttachment || hasSurvey;
+                var requirementIds = BuildRequirementMatchIds(filter, db, out var hasRequirementCriteria);
+
+                if (hasRequirementCriteria || filter.DocumentFilter == DocumentFilterType.RequestedOnly)
+                    matchingIds = matchingIds != null ? matchingIds.Union(requirementIds) : requirementIds;
             }
 
-            if (hasRequirementCriteria)
+            if (matchingIds != null)
             {
-                requestedIssueIds = BuildRequirementMatchIds(filter, db, out hasRequirementCriteria);
-            }
+                var distinctIds = matchingIds.Distinct();
 
-            if (hasAttachmentCriteria && hasRequirementCriteria)
-            {
-                query = query.Where(x =>
-                    attachmentIssueIds.Any(id => id == x.IssueIdentifier)
-                    || surveyRespondentKeys.Any(r => r.RespondentUserIdentifier == x.TopicUserIdentifier
-                                               && r.OrganizationIdentifier == x.OrganizationIdentifier)
-                    || requestedIssueIds.Any(id => id == x.IssueIdentifier));
-            }
-            else if (hasAttachmentCriteria)
-            {
-                query = query.Where(x =>
-                    attachmentIssueIds.Any(id => id == x.IssueIdentifier)
-                    || surveyRespondentKeys.Any(r => r.RespondentUserIdentifier == x.TopicUserIdentifier
-                                               && r.OrganizationIdentifier == x.OrganizationIdentifier));
-            }
-            else if (hasRequirementCriteria)
-            {
-                query = query.Where(x => requestedIssueIds.Any(id => id == x.IssueIdentifier));
+                query = query.Join(
+                    distinctIds,
+                    issue => issue.IssueIdentifier,
+                    id => id,
+                    (issue, id) => issue);
             }
 
             return query;
@@ -447,34 +422,35 @@ namespace InSite.Persistence
                       (a, f) => a.IssueIdentifier);
         }
 
-        private sealed class RespondentKey
-        {
-            public Guid RespondentUserIdentifier { get; set; }
-            public Guid OrganizationIdentifier { get; set; }
-        }
-
-        private static IQueryable<RespondentKey> BuildSurveyResponseMatchKeys(
+        private static IQueryable<Guid> BuildSurveyResponseMatchIds(
             QIssueFilter filter, InternalDbContext db, out bool hasCriteria)
         {
-            var query = BuildFilesCriteriaQuery(filter, db, out hasCriteria);
+            var fileQuery = BuildFilesCriteriaQuery(filter, db, out hasCriteria);
 
-            return db.QResponseSessions
-                .Where(x => x.OrganizationIdentifier == filter.OrganizationIdentifier
-                         && x.SurveyForm.HasWorkflowConfiguration)
-                .Join(query,
-                      a => a.ResponseSessionIdentifier,
-                      f => f.ObjectIdentifier,
-                      (a, f) => new RespondentKey
-                      {
-                          RespondentUserIdentifier = a.RespondentUserIdentifier,
-                          OrganizationIdentifier = a.OrganizationIdentifier
-                      });
+            return db.QSurveyForms
+                .Where(f => f.HasWorkflowConfiguration)
+                .Join(
+                    db.QResponseSessions,
+                    f => f.SurveyFormIdentifier,
+                    s => s.SurveyFormIdentifier,
+                    (f, s) => s)
+                .Where(s => s.OrganizationIdentifier == filter.OrganizationIdentifier)
+                .Join(
+                    fileQuery,
+                    s => s.ResponseSessionIdentifier,
+                    f => f.ObjectIdentifier,
+                    (s, f) => s)
+                .Join(
+                    db.QIssues,
+                    s => new { User = (Guid?)s.RespondentUserIdentifier, Org = s.OrganizationIdentifier },
+                    i => new { User = i.TopicUserIdentifier, Org = i.OrganizationIdentifier },
+                    (s, i) => i.IssueIdentifier);
         }
 
         private static IQueryable<TFile> BuildFilesCriteriaQuery(
             QIssueFilter filter, InternalDbContext db, out bool hasCriteria)
         {
-            var query = db.TFiles.AsQueryable();
+            var query = db.TFiles.AsQueryable().Where(x => x.OrganizationIdentifier == filter.OrganizationIdentifier);
             hasCriteria = false;
 
             if (filter.AttachmentFileStatus.IsNotEmpty())

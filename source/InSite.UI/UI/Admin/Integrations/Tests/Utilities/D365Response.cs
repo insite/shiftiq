@@ -14,25 +14,21 @@ namespace InSite.UI.Admin.Integrations.Tests.Utilities
         public string Status { get; private set; }
         public string Body { get; private set; }
 
+        private static readonly int RequestTimeout = (int)TimeSpan.FromMinutes(2).TotalMilliseconds;
+
         private static string GetApiClientSecret()
         {
             var identity = CurrentSessionState.Identity;
-
             var userId = identity.User.Identifier;
-
             var organizationId = identity.Organization.Identifier;
 
-            var person = ServiceLocator.PersonSearch.GetPerson(userId, organizationId);
-
-            if (person == null)
-                throw new InvalidOperationException($"Person not found for user {userId} in organization {organizationId}");
+            var person = ServiceLocator.PersonSearch.GetPerson(userId, organizationId)
+                ?? throw new InvalidOperationException($"Person not found for user {userId} in organization {organizationId}");
 
             var personId = person.PersonIdentifier;
 
-            var secret = ServiceLocator.PersonSecretSearch.GetByPerson(personId, SecretName.ShiftClientSecret)?.SecretValue;
-
-            if (secret == null)
-                throw new InvalidOperationException($"API Client Secret not found for person {personId}");
+            var secret = ServiceLocator.PersonSecretSearch.GetByPerson(personId, SecretName.ShiftClientSecret)?.SecretValue
+                ?? throw new InvalidOperationException($"API Client Secret not found for person {personId}");
 
             return secret;
         }
@@ -48,26 +44,26 @@ namespace InSite.UI.Admin.Integrations.Tests.Utilities
                     Body = "N/A"
                 };
 
-            var secret = GetApiClientSecret();
-
-            url = "https://" + HttpContext.Current.Request.Url.Host + url;
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.Timeout = 60 * 1000;
-            request.Method = method;
-            request.ContentType = contentType;
-            request.Headers.Add("Authorization", $"Bearer {secret}");
-
-            if (body.IsNotEmpty())
-            {
-                var bytes = Encoding.UTF8.GetBytes(body);
-                request.ContentLength = bytes.Length;
-                using (var requestStream = request.GetRequestStream())
-                    requestStream.Write(bytes, 0, bytes.Length);
-            }
-
             try
             {
+                var secret = GetApiClientSecret();
+
+                url = "https://" + HttpContext.Current.Request.Url.Host + url;
+
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                request.Timeout = RequestTimeout;
+                request.Method = method;
+                request.ContentType = contentType;
+                request.Headers.Add("Authorization", $"Bearer {secret}");
+
+                if (body.IsNotEmpty())
+                {
+                    var bytes = Encoding.UTF8.GetBytes(body);
+                    request.ContentLength = bytes.Length;
+                    using (var requestStream = request.GetRequestStream())
+                        requestStream.Write(bytes, 0, bytes.Length);
+                }
+
                 using (var response = request.GetResponseNoException())
                 {
                     var result = new D365Response

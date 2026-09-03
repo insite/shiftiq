@@ -150,6 +150,10 @@ namespace InSite.UI.Layout.Admin
             if (Page is LobbyBasePage lobbyPage && lobbyPage.ActionModel != null)
                 ActionHelpAnchor.InnerText = lobbyPage.ActionModel.ActionName;
 
+            // Hide the per-page help item until this is ready with context-specific links to docs
+            // hosted in Gitbook.
+            ActionHelpItem.Visible = false;
+
             ShiftContainer.Visible = Request.IsAuthenticated && !ServiceLocator.Partition.IsE03();
             CmdsContainer.Visible = Request.IsAuthenticated && ServiceLocator.Partition.IsE03();
         }

@@ -184,13 +184,27 @@
 
     function onFrameLoaded() {
         setTimeout(function ($frame) {
+            var $modal = $frame.closest('div.modal.insite-modal');
             var $body = null;
 
             try {
+                var frameWindow = $frame[0].contentWindow;
+                var currentUrl = (frameWindow.location.pathname || '').toLowerCase();
+
+                if (currentUrl.indexOf('ui/lobby/signin') !== -1 || currentUrl.indexOf('ui/lobby/signout') !== -1) {
+                    $modal.modal('hide');
+                    window.top.location.reload();
+                    return;
+                }
+
                 $body = $frame.contents().find('body');
             } catch (ex) {
-
+                $modal.modal('hide');
+                window.top.location.reload();
+                return;
             }
+
+            $modal.removeClass('loading');
 
             if ($body != null) {
                 $frame.height('');
@@ -203,10 +217,7 @@
                 });
             }
 
-            var $modal = $frame
-                .closest('div.modal.insite-modal')
-                .removeClass('loading')
-                .modal('handleUpdate');
+            $modal.modal('handleUpdate');
             $modal.trigger('loaded.modal.insite', [$modal[0], null]);
         }, 100, $(this));
     }

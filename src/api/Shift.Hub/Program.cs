@@ -5,6 +5,7 @@ using Microsoft.Extensions.FileProviders;
 
 using Shift.Hub;
 using Shift.Hub.Google;
+using Shift.Hub.Partitions;
 using Shift.Hub.ScormCloud;
 
 var config = HubApplication.LoadConfiguration<EngineSettings>(
@@ -35,10 +36,11 @@ var app = HubApplication.BuildWebApp(
         services.AddScoped<ISqlDatabase, SqlDatabase>();
         services.AddScoped<DatabaseMigrator>();
 
-        services.AddScoped<Shift.Hub.Google.LocationSearch>();
+        services.AddScoped<LocationSearch>();
         services.AddScoped<ITranslationService, TranslationService>();
 
-        services.AddScoped<Shift.Hub.Partitions.PartitionStore>();
+        services.AddScoped<PartitionRepository>();
+        services.AddScoped<PartitionService>();
 
         services.AddRateLimiter(RateLimiterHelper.ConfigureRateLimiter);
     },
@@ -79,7 +81,7 @@ await HubApplication.StartupAsync(app, config, async app =>
         var db = scope.ServiceProvider.GetRequiredService<DatabaseMigrator>();
         await db.MigrateAsync();
 
-        var partitionStore = scope.ServiceProvider.GetRequiredService<Shift.Hub.Partitions.PartitionStore>();
+        var partitionStore = scope.ServiceProvider.GetRequiredService<Shift.Hub.Partitions.PartitionRepository>();
         await partitionStore.EnsureSchemaAsync();
     }
 });

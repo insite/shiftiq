@@ -1,24 +1,17 @@
 using System.Text;
 
-using Microsoft.Data.SqlClient;
-
 namespace Shift.Hub.Partitions
 {
-    public class PartitionStore
+    public class PartitionRepository
     {
         // SQL Server caps a command at 2100 parameters and each organization contributes twelve of
         // them, so a batch of a hundred leaves plenty of headroom. Batching matters because every
         // round trip is made while the registration lock is held.
         private const int OrganizationBatchSize = 100;
 
-        // Five seconds is generous now that the lock is scoped to a single partition: the only
-        // contention left is two instances of the same app registering at the same moment, and
-        // each holder finishes in a handful of round trips.
-        private const int LockTimeoutMilliseconds = 5000;
-
         private readonly ISqlDatabase _db;
 
-        public PartitionStore(ISqlDatabase db)
+        public PartitionRepository(ISqlDatabase db)
         {
             _db = db;
         }
@@ -118,44 +111,9 @@ IF @@ROWCOUNT = 0
     VALUES (@Number, @Name, @Brand, @Theme, @Domain, @Email, @Slug, @Identifier, @Whitelist, @HelpUrl, @LogoUrl);
 ";
 
-            // The lock guards the update-then-insert race for one partition_number, so the resource
-            // name carries that number. A single global resource would serialize every partition
-            // against every other one even though they write disjoint rows, and a deploy restarts
-            // all of the app pools at once.
-
-            var lockParameters = new Dictionary<string, object?>
-            {
-                { "@LockResource", $"partition-registration-{partition.Number}" },
-                { "@LockTimeoutMs", LockTimeoutMilliseconds }
-            };
-
-            const string acquireLockQuery = @"
-DECLARE @result INT;
-DECLARE @message NVARCHAR(200);
-
-EXEC @result = sp_getapplock
-    @Resource    = @LockResource,
-    @LockMode    = 'Exclusive',
-    @LockOwner   = 'Transaction',
-    @LockTimeout = @LockTimeoutMs;
-
-IF @result < 0
-BEGIN
-    SET @message = CONCAT('Could not acquire the ', @LockResource, ' lock: sp_getapplock returned ', @result, '.');
-
-    -- 51001 is contention (-1 timeout, -3 deadlock victim) and is worth retrying.
-    -- 51002 is a broken call (-2 canceled, -999 parameter error) and is not.
-
-    IF @result IN (-1, -3)
-        THROW 51001, @message, 1;
-
-    THROW 51002, @message, 1;
-END;";
-
             // Upsert the partition and all of its organizations atomically.
             var statements = new List<(string Query, object? Parameters)>
             {
-                (acquireLockQuery, lockParameters),
                 (partitionQuery, partitionParameters)
             };
 
@@ -170,18 +128,7 @@ END;";
                 statements.Add(BuildOrganizationBatch(partition.Number, batch));
             }
 
-            try
-            {
-                await _db.ExecuteInTransactionAsync(statements);
-            }
-            catch (SqlException ex) when (ex.Number == PartitionLockException.RetryableErrorNumber)
-            {
-                throw new PartitionLockException(ex.Message, true, ex);
-            }
-            catch (SqlException ex) when (ex.Number == PartitionLockException.FatalErrorNumber)
-            {
-                throw new PartitionLockException(ex.Message, false, ex);
-            }
+            await _db.ExecuteInTransactionAsync(statements);
         }
 
         // One statement per organization meant one network round trip per organization, all of them

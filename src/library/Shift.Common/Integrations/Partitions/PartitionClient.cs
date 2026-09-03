@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
@@ -57,15 +58,6 @@ namespace Shift.Common.Integration.Partitions
 
     public class PartitionClient : IPartitionClient
     {
-        // Registration is idempotent, so a 503 from the Hub is safe to repeat. The Hub answers 503
-        // only when another registration for the same partition holds the lock, which clears in
-        // well under a second. Attempts and delays are kept small on purpose: Register() runs
-        // synchronously inside Application_Start, so every retry holds up the app coming online.
-
-        private const int MaxAttempts = 3;
-
-        private static readonly int[] RetryDelaysMilliseconds = { 500, 1500 };
-
         private readonly EngineApiSettings _api;
 
         public PartitionClient(EngineSettings engine)
@@ -84,30 +76,25 @@ namespace Shift.Common.Integration.Partitions
 
             var json = JsonConvert.SerializeObject(partition);
 
-            for (var attempt = 1; ; attempt++)
+            using (var request = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                using (var request = new HttpRequestMessage(HttpMethod.Post, url))
-                {
-                    request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                    AddApiKey(request);
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                AddApiKey(request);
 
-                    var result = await StaticHttpClient.Client.SendAsync(request);
+                using (var timeoutCts = new CancellationTokenSource())
+                {
+                    timeoutCts.CancelAfter(TimeSpan.FromMinutes(Math.Max(_api.PartitionRegistration.TimeoutMinutes, 1)));
+
+                    var result = await StaticHttpClient.ClientNoTimeout.SendAsync(request, timeoutCts.Token);
 
                     if (HttpStatusCode.OK == result.StatusCode)
                         return;
 
                     var body = await ReadBodyAsync(result);
 
-                    var busy = HttpStatusCode.ServiceUnavailable == result.StatusCode;
-
-                    var retryable = busy && attempt < MaxAttempts;
-
-                    if (!retryable)
-                        throw new InvalidOperationException(
-                            $"Partition registration failed after {attempt} of {MaxAttempts} attempts: the Hub API returned HTTP {(int)result.StatusCode} {result.StatusCode} ({result.ReasonPhrase}). {body}");
+                    throw new InvalidOperationException(
+                        $"Partition registration failed: the Hub API returned HTTP {(int)result.StatusCode} {result.StatusCode} ({result.ReasonPhrase}). {body}");
                 }
-
-                await Task.Delay(RetryDelaysMilliseconds[attempt - 1]);
             }
         }
 

@@ -187,15 +187,11 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
         private string GetDeleteLink(SearchResultItem item)
         {
-            if (!item.IsSelfDeclared)
-                return string.Empty;
-
-            if (Identity.IsAdministrator)
-                return string.Empty;
-
-            var html = $"<a title='Delete Certificate' class='text-danger' href='/ui/portal/record/credentials/learners/delete?credential={item.CredentialIdentifier}'><i class='fa-solid fa-trash-alt'></i></a>";
-
-            return html;
+            // TEC-1116: self-service certificate deletion is removed from the portal for all roles.
+            // Deleting a self-declared credential here purged the linked Training Plan records.
+            // Administrators manage deletions from the admin Edit Education & Training screen
+            // instead.
+            return string.Empty;
         }
 
         private string GetStatusMessageHtml(CredentialStatus status, bool achievementAllowSelfDeclared, Guid achievementId, Guid? singleCourseId, int courseCount)

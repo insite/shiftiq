@@ -29,7 +29,12 @@ public class SecretController : ShiftControllerBase
     /// <summary>
     /// Generates a new client secret for the authenticated user, replacing any existing secret.
     /// </summary>
-    /// <param name="expiry">The number of days until the secret expires. If omitted, the default is assumed (90 days).</param>
+    /// <param name="expiry">
+    /// The number of days until the secret expires.
+    /// - Minimum: 1 Day
+    /// - Maximum: 365 Days
+    /// - Default (if omitted): 90 Days
+    /// </param>
     [HttpPost("api/accounts/secrets/generate")]
     [EndpointName("generateSecret")]
     [HybridAuthorize]
@@ -125,7 +130,7 @@ public class SecretController : ShiftControllerBase
     private int ValidateLifetimeInMinutes(int minutes)
     {
         var minimum = 1;
-        var maximum = 365 * 24 * 60; // 365 days × 24 hours × 60 minutes = 525,600 minutes
+        var maximum = 365 * 24 * 60; // 365 days x 24 hours x 60 minutes = 525,600 minutes
 
         if (minutes < minimum || maximum < minutes)
             return maximum;

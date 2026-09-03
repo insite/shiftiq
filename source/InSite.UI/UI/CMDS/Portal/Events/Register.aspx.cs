@@ -47,7 +47,7 @@ namespace InSite.Custom.CMDS.User.Events.Forms
 
             if (Request["status"] == "registered")
             {
-                ScreenStatus.AddMessage(AlertType.Success, $"Validator training session registration completed successfully.");
+                ScreenStatus.AddMessage(AlertType.Success, "Registration completed successfully.");
                 return;
             }
 
@@ -133,7 +133,7 @@ namespace InSite.Custom.CMDS.User.Events.Forms
 
             ServiceLocator.ChangeQueue.Publish(change);
 
-            ScreenStatus.AddMessage(AlertType.Success, $"Validator training session registration completed successfully for {candidate.FullName} ({candidate.Email}).");
+            ScreenStatus.AddMessage(AlertType.Success, $"{upcomingEvent.Title} registration completed successfully for {candidate.FullName} ({candidate.Email}).");
 
             RegisterAnotherUserLink.Visible = IsAdministrator;
             RegistrationSection.Visible = false;

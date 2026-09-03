@@ -76,7 +76,7 @@
                                 <h6 class="dropdown-header pb-1">Get Help</h6>
                             </li>
                             <li><a class="dropdown-item ms-2" href="/ui/portal/support">Submit a support request</a></li>
-                            <li><a class="dropdown-item ms-2" target="_blank" href="https://www.keyeracmds.com/blog">Blog posts, news, and updates</a></li>
+                            <li><a class="dropdown-item ms-2" target="_blank" href="https://www.keyeracmds.com/tag/blog/">Blog posts, news, and updates</a></li>
                             <li><a class="dropdown-item ms-2" target="_blank" href="https://docs.cmds.app/guides/terminology.pdf">Terminology</a></li>
                             <li>
                                 <h6 class="dropdown-header pb-1">CMDS Guides</h6>
@@ -95,7 +95,7 @@
                         </insite:Container>
 
                         <li><h6 class="dropdown-header pt-2 pb-1">Resources</h6></li>
-                        <li><a runat="server" id="ActionHelpAnchor" class="dropdown-item ms-2" href="#" data-bs-toggle="modal" data-bs-target="#modal-help">Help</a></li>
+                        <li runat="server" id="ActionHelpItem"><a runat="server" id="ActionHelpAnchor" class="dropdown-item ms-2" href="#" data-bs-toggle="modal" data-bs-target="#modal-help">Help</a></li>
                         <li><a runat="server" id="HelpCenterAnchor" class="dropdown-item ms-2" href="#">Help center</a></li>
                         <li><a runat="server" id="DocumentationAnchor" class="dropdown-item ms-2" href="#">Documentation</a></li>
 

@@ -9,17 +9,8 @@ namespace Shift.Hub.Partitions
     // partition runs the old client.
     [Route("api/partitions")]
     [ApiExplorerSettings(GroupName = "Partitions")]
-    public class PartitionController : ControllerBase
+    public class PartitionController(PartitionService service, IMonitor monitor) : ControllerBase
     {
-        private readonly PartitionStore _store;
-        private readonly IMonitor _monitor;
-
-        public PartitionController(PartitionStore store, IMonitor monitor)
-        {
-            _store = store;
-            _monitor = monitor;
-        }
-
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -28,20 +19,9 @@ namespace Shift.Hub.Partitions
         {
             try
             {
-                await _store.UpsertAsync(partition);
+                await service.RegisterAsync(partition);
 
                 return Ok();
-            }
-            catch (PartitionLockException ex) when (ex.Retryable)
-            {
-                _monitor.Warning($"Partition {partition.Number} registration lost the race for the registration lock. {ex.Message}");
-
-                Response.Headers.RetryAfter = "1";
-
-                return Problem(
-                    detail: $"Another registration for partition {partition.Number} is in progress. Retry the request.",
-                    title: "Partition registration is temporarily unavailable.",
-                    statusCode: StatusCodes.Status503ServiceUnavailable);
             }
             catch (Exception ex)
             {
@@ -49,7 +29,7 @@ namespace Shift.Hub.Partitions
                 // ex.ToString(), which handed every caller the SQL stack trace, the source file
                 // paths, and the client connection id.
 
-                _monitor.Error(ex);
+                monitor.Error(ex);
 
                 return Problem(
                     detail: $"The Hub could not complete the registration for partition {partition.Number}. The correlated error is in the Hub log.",
@@ -62,7 +42,7 @@ namespace Shift.Hub.Partitions
         [ProducesResponseType<PartitionRegistration[]>(StatusCodes.Status200OK, "application/json")]
         public async Task<ActionResult<List<PartitionRegistration>>> GetAsync()
         {
-            return await _store.GetAllAsync();
+            return await service.GetAllAsync();
         }
     }
 }

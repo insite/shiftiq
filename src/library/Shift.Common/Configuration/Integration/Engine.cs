@@ -17,6 +17,12 @@ namespace Shift.Common
         public IntegrationSettings Integration { get; set; }
     }
 
+    public class PartitionRegistrationSettings
+    {
+        public bool Enabled { get; set; }
+        public int TimeoutMinutes { get; set; }
+    }
+
     public class EngineApiSettings
     {
         // Single root for all Engine (Hub) API libraries and third-party integrations.
@@ -25,6 +31,8 @@ namespace Shift.Common
         // segment, so configuration needs only one key.
 
         public string BaseUrl { get; set; }
+
+        public PartitionRegistrationSettings PartitionRegistration { get; set; }
 
         // Shared service key sent as X-Api-Key on Engine (Hub) calls that run server-side.
 

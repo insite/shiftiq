@@ -220,13 +220,22 @@ namespace InSite.Custom.CMDS.Admin.Standards.Profiles
             var competencyCount = CompetencyList.LoadData(info);
             CompetencyTab.SetTitle("Competencies", competencyCount);
 
-            LoadDivergenceAlert();
+            LoadDivergenceAlert(info);
 
             LoadPersons();
         }
 
-        private void LoadDivergenceAlert()
+        private void LoadDivergenceAlert(Standard info)
         {
+            // Divergence is only meaningful against a parent. Top-level (parentless)
+            // profiles have nothing to diverge from, so suppress the alert entirely -
+            // without this check every competency reads as "not in the parent profile".
+            if (info.ParentStandardIdentifier == null)
+            {
+                DivergenceAlert.Visible = false;
+                return;
+            }
+
             var variance = ProfileRepository.GetCompetencyVariance(StandardIdentifier);
 
             if (variance.Missing == 0 && variance.Extra == 0)
