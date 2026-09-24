@@ -14,7 +14,6 @@ using InSite.Application.Attempts.Read;
 using InSite.Application.Attempts.Write;
 using InSite.Application.Contents.Read;
 using InSite.Application.Courses.Read;
-using InSite.Application.Gradebooks.Write;
 using InSite.Application.Progresses.Write;
 using InSite.Application.Surveys.Read;
 using InSite.Common;
@@ -206,14 +205,6 @@ namespace InSite.UI.Portal.Learning
                 SidebarWidth = (Progress.Course.OutlineWidth ?? 4) * 105;
             }
 
-            if (model.Course.Gradebook != null && ServiceLocator.RecordSearch.GetGradebook(model.Course.Gradebook.Identifier) == null)
-            {
-                ControlButtons.Visible = false;
-                OutlineList.Visible = false;
-                ErrorAlert.AddMessage(AlertType.Error, $"{Translate("This gradebook for this course was deleted. Please contact your Administrator")}.");
-                return;
-            }
-
             if (model.Course.Gradebook?.IsLocked == true)
             {
                 ControlButtons.Visible = false;
@@ -308,6 +299,8 @@ namespace InSite.UI.Portal.Learning
                 return false;
             }
 
+            SyncGradebook();
+
             _state.LoadModelProgress();
 
             if (Progress.IsCourseHidden)
@@ -317,6 +310,22 @@ namespace InSite.UI.Portal.Learning
             }
 
             return true;
+        }
+
+        private void SyncGradebook()
+        {
+            var gradebook = Progress.Course.Gradebook;
+            if (gradebook == null)
+                return;
+
+            var gradebookEntity = ServiceLocator.RecordSearch.GetGradebook(gradebook.Identifier);
+            if (gradebookEntity != null && gradebookEntity.IsLocked == gradebook.IsLocked)
+                return;
+
+            DomainCache.Instance.RemoveCourse(Progress.Course.Identifier);
+
+            if (!_state.LoadModel())
+                HttpResponseHelper.Redirect(GetHomeUrl(Guid.Empty), true);
         }
 
         private void ShowCriticalError(string error)
@@ -346,12 +355,6 @@ namespace InSite.UI.Portal.Learning
 
             if (gradebook == null)
                 return;
-
-            if (gradebook.IsLocked)
-            {
-                ServiceLocator.SendCommand(new UnlockGradebook(gradebook.Identifier));
-                gradebook.IsLocked = false;
-            }
 
             if (model.CurrentPage <= 0 || activity.GradeItem == null)
                 return;

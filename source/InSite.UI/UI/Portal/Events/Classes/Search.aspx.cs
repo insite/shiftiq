@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web.UI.WebControls;
 
@@ -41,13 +42,13 @@ namespace InSite.UI.Portal.Events.Classes
             {
                 get
                 {
+                    var culture = CultureInfo.GetCultureInfo(CurrentSessionState.Identity.Language ?? "en");
+
                     return EventScheduledEnd == null || EventScheduledEnd.Value.Date == EventScheduledStart.Date
-                        ? $"{EventScheduledStart.Format(User.TimeZone, true)}"
-                        : $"{EventScheduledStart.Format(User.TimeZone, true)} to {EventScheduledEnd.Format(User.TimeZone, true)}";
+                        ? $"{TimeZones.Format(EventScheduledStart, User.TimeZone, true, false, false, culture)}"
+                        : $"{TimeZones.Format(EventScheduledStart, User.TimeZone, true, false, false, culture)} to {TimeZones.Format(EventScheduledEnd.Value, User.TimeZone, true, false, false, culture)}";
                 }
             }
-
-            
         }
 
         private class SummaryItem
@@ -162,7 +163,7 @@ namespace InSite.UI.Portal.Events.Classes
             return true;
         }
 
-        private static List<ClassItem> GetClasses(string eventTitle, bool hideFullWithNoWaitlist, bool hideFullClasses)
+        private List<ClassItem> GetClasses(string eventTitle, bool hideFullWithNoWaitlist, bool hideFullClasses)
         {
             var events = GetAccessibleEvents(eventTitle);
             var registrations = ServiceLocator.RegistrationSearch.GetRegistrationsByCandidate(User.UserIdentifier);
@@ -184,12 +185,17 @@ namespace InSite.UI.Portal.Events.Classes
             return classes;
         }
 
-        private static ClassItem GetClassItem(List<QRegistration> registrations, QEvent ev)
+        private ClassItem GetClassItem(List<QRegistration> registrations, QEvent ev)
         {
+            var content = ContentEventClass.Deserialize(ev.Content);
+
+            var title = content.Title.Get(CurrentLanguage).IfNullOrEmpty(ev.EventTitle);
+            var summary = Markdown.ToHtml(content.Summary.Get(CurrentLanguage)).IfNullOrEmpty(content.Summary.Default);
+
             var item = new ClassItem
             {
                 EventIdentifier = ev.EventIdentifier,
-                EventTitle = ev.EventTitle,
+                EventTitle = title,
                 AchievementIdentifier = ev.AchievementIdentifier,
                 AchievementTitle = ev.Achievement?.AchievementTitle,
                 AchievementType = ev.Achievement?.AchievementType,
@@ -197,7 +203,7 @@ namespace InSite.UI.Portal.Events.Classes
                 EventScheduledEnd = ev.EventScheduledEnd,
                 VenueLocationName = ev.VenueLocationName,
                 VenueAddress = GetVenueAddress(ev),
-                Summary = GetSummary(ev),
+                Summary = summary,
                 IsFull = ev.Availability == EventAvailabilityType.Full || ev.Availability == EventAvailabilityType.Over,
                 IsLocked = ev.RegistrationLocked.HasValue
             };
@@ -295,11 +301,6 @@ namespace InSite.UI.Portal.Events.Classes
                 })
                 .OrderBy(x => x.Title)
                 .ToList();
-        }
-
-        private static string GetSummary(QEvent @event)
-        {
-            return Markdown.ToHtml(ContentEventClass.Deserialize(@event.Content).Summary.Default);
         }
 
         private static string GetVenueAddress(QEvent @event)

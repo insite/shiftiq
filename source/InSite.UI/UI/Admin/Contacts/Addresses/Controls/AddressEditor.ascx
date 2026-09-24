@@ -22,7 +22,7 @@
                         <insite:Literal runat="server" Text="Address 1" />
                         <insite:RequiredValidator runat="server" ID="Street1Required" Visible="false" ControlToValidate="Street1" FieldName="Address 1" Display="Dynamic" />
                     </label>
-                    <insite:TextBox ID="Street1" runat="server" MaxLength="128" />
+                    <insite:TextBox ID="Street1" runat="server" MaxLength="200" />
                     <div class="form-text">
                     </div>
                 </div>
@@ -32,7 +32,7 @@
                         <insite:Literal runat="server" Text="Address 2" />
                         <insite:RequiredValidator runat="server" ID="Street2Required" Visible="false" ControlToValidate="Street2" FieldName="Address 2" Display="Dynamic" />
                     </label>
-                    <insite:TextBox ID="Street2" runat="server" MaxLength="128" />
+                    <insite:TextBox ID="Street2" runat="server" MaxLength="200" />
                     <div class="form-text">
                     </div>
                 </div>
@@ -51,7 +51,7 @@
                     <label runat="server" id="ProvinceFieldLabel" class="form-label">
                         State/Province
                     </label>
-                    <insite:TextBox ID="Province" runat="server" MaxLength="128" />
+                    <insite:TextBox ID="Province" runat="server" MaxLength="64" />
                     <div class="form-text">
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                         <insite:Literal runat="server" Text="Postal Code" />
                         <insite:RequiredValidator runat="server" ID="PostalCodeRequired" Visible="false" ControlToValidate="PostalCode" FieldName="Postal Code" Display="Dynamic" />
                     </label>
-                    <insite:TextBox ID="PostalCode" runat="server" MaxLength="16" />
+                    <insite:TextBox ID="PostalCode" runat="server" MaxLength="20" />
                     <div class="form-text">
                     </div>
                 </div>

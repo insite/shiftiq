@@ -196,9 +196,11 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls
                     PersonCode = person.PersonCode,
                     FullName = person.User.FullName,
                     Language = language,
-                    Birthdate = person.Birthdate.HasValue
-                        ? TimeZones.FormatDateOnly(person.Birthdate.Value, User.TimeZone, culture, "{0:MMMM d, yyyy}")
-                        : na,
+                    Birthdate = !person.Birthdate.HasValue
+                        ? na
+                        : culture != null
+                            ? person.Birthdate.Value.ToString("MMMM d, yyyy", culture)
+                            : person.Birthdate.Value.ToString("MMMM d, yyyy"),
                     ExamDate = attempt.AttemptStarted.HasValue
                         ? TimeZones.FormatDateOnly(attempt.AttemptStarted.Value, User.TimeZone, culture, "{0:MMMM d, yyyy}")
                         : na,

@@ -43,6 +43,9 @@ namespace Shift.Common.Integration.Google
 
         public string Translate(string from, string to, string value)
         {
+            if (string.IsNullOrWhiteSpace(value))
+                return value;
+
             return Translate(from, to, new[] { value })[0];
         }
 

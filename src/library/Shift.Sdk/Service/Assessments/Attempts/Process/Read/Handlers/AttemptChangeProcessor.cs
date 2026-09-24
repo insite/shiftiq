@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -92,19 +92,22 @@ namespace InSite.Application.Attempts.Read
             if (e.RegistrationIdentifier.HasValue)
                 _commander.Send(new AssignAttempt(e.RegistrationIdentifier.Value, e.AggregateIdentifier));
 
-            try
+            if (form?.WhenAttemptStartedNotifyAdminMessageIdentifier == null)
             {
-                _mailer.Send(new AssessmentAttemptStartedNotification
+                try
                 {
-                    OriginOrganization = attempt.OrganizationIdentifier,
-                    OriginUser = e.OriginUser,
+                    _mailer.Send(new AssessmentAttemptStartedNotification
+                    {
+                        OriginOrganization = attempt.OrganizationIdentifier,
+                        OriginUser = e.OriginUser,
 
-                    LearnerEmail = userEmail,
-                    LearnerName = userName,
-                    AssessmentFormName = formName,
-                });
+                        LearnerEmail = userEmail,
+                        LearnerName = userName,
+                        AssessmentFormName = formName,
+                    });
+                }
+                catch { }
             }
-            catch { }
         }
 
         public void Handle(AttemptFixed e)
@@ -263,6 +266,9 @@ namespace InSite.Application.Attempts.Read
 
         private void SendEmailNotification(QAttempt attempt, decimal score, Guid user, QBankForm form)
         {
+            if (form?.WhenAttemptCompletedNotifyAdminMessageIdentifier != null)
+                return;
+
             try
             {
                 var learner = _contacts.GetUser(attempt.LearnerUserIdentifier);

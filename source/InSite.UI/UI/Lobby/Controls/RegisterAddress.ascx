@@ -51,7 +51,7 @@
         <insite:Literal runat="server" Text="City" />
         <insite:RequiredValidator runat="server" Display="None" ControlToValidate="City" ValidationGroup="Register" />
     </label>
-    <insite:TextBox runat="server" ID="City" MaxLength="256" />
+    <insite:TextBox runat="server" ID="City" MaxLength="128" />
 </div>
 
 <div runat="server" id="CountryField">
@@ -75,5 +75,5 @@
         <insite:Literal runat="server" Text="Postal Code" />
         <insite:RequiredValidator runat="server" Display="None" ControlToValidate="PostalCode" ValidationGroup="Register" />
     </label>
-    <insite:TextBox runat="server" ID="PostalCode" MaxLength="64" />
+    <insite:TextBox runat="server" ID="PostalCode" MaxLength="20" />
 </div>

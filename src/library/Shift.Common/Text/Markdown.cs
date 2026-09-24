@@ -152,5 +152,93 @@ namespace Shift.Common
 
             return true;
         }
+
+        #region Escape methods
+
+        private static readonly bool[] InlineMarkupTable = CreateCharTable("\\`*_+~^=[]<>|&");
+
+        private enum LineState { Indent, Digits, Text }
+
+        public static string Escape(string text)
+        {
+            if (text.IsEmpty())
+                return text;
+
+            StringBuilder sb = null;
+            var copied = 0;
+            var state = LineState.Indent;
+
+            for (var i = 0; i < text.Length; i++)
+            {
+                var c = text[i];
+                var escape = IsInlineMarkup(c);
+
+                switch (state)
+                {
+                    case LineState.Indent when c == ' ' || c == '\t':
+                        break;
+
+                    case LineState.Indent:
+                        if (c == '-' || c == '#')
+                            escape = true;
+                        state = IsAsciiDigit(c) ? LineState.Digits : LineState.Text;
+                        break;
+
+                    case LineState.Digits when IsAsciiDigit(c):
+                        break;
+
+                    case LineState.Digits:
+                        if (c == '.' || c == ')')
+                            escape = true;
+                        state = LineState.Text;
+                        break;
+                }
+
+                if (c == '\n' || c == '\r')
+                    state = LineState.Indent;
+
+                if (!escape)
+                    continue;
+
+                if (sb == null)
+                    sb = new StringBuilder(text.Length + 16);
+
+                sb.Append(text, copied, i - copied).Append('\\');
+                copied = i;
+            }
+
+            if (sb == null)
+                return text;
+
+            return sb.Append(text, copied, text.Length - copied).ToString();
+        }
+
+        public static string EscapeTableCell(string text)
+        {
+            if (text.IsEmpty())
+                return text;
+
+            var value = text
+                .Replace("\r\n", " ")
+                .Replace('\r', ' ')
+                .Replace('\n', ' ')
+                .Trim();
+
+            return Escape(value);
+        }
+
+        private static bool IsInlineMarkup(char c) => c < InlineMarkupTable.Length && InlineMarkupTable[c];
+
+        private static bool IsAsciiDigit(char c) => c >= '0' && c <= '9';
+
+        private static bool[] CreateCharTable(string chars)
+        {
+            var table = new bool[128];
+            foreach (var ch in chars)
+                table[ch] = true;
+            return table;
+        }
+
+        #endregion
     }
 }

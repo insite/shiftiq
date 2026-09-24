@@ -214,15 +214,19 @@ namespace InSite.Api.Controllers
         {
             var organization = GetOrganization();
 
-            var filter = new VCredentialFilter { OrganizationIdentifier = organization.Identifier };
-            if (achievement.HasValue)
-                filter.AchievementIdentifier = achievement;
-            if (learner.HasValue)
-                filter.UserIdentifier = learner;
-
-            var credentials = ServiceLocator.AchievementSearch.GetCredentials(filter);
-            return credentials.Select(
-                x => new Models.Cmds.Documents.Achievement
+            // Scoped to this organization's learners and projected in the database. The score is
+            // scaled here so the projection stays a plain column list.
+            return ServiceLocator.AchievementSearch
+                .BindLearnerCredentials(organization.Identifier, achievement, learner, x => new
+                {
+                    x.AchievementIdentifier,
+                    x.UserIdentifier,
+                    x.CredentialStatus,
+                    x.CredentialGranted,
+                    x.CredentialGrantedScore,
+                    x.CredentialExpirationExpected
+                })
+                .Select(x => new Models.Cmds.Documents.Achievement
                 {
                     AchievementIdentifier = x.AchievementIdentifier,
                     Learner = x.UserIdentifier,
@@ -230,7 +234,8 @@ namespace InSite.Api.Controllers
                     Granted = x.CredentialGranted,
                     Score = (int?)(x.CredentialGrantedScore * 100),
                     Expiry = x.CredentialExpirationExpected
-                }).ToArray();
+                })
+                .ToArray();
         }
 
         private Models.Cmds.Documents.Competency[] GetCompetencyList(Guid? competency, Guid? learner)

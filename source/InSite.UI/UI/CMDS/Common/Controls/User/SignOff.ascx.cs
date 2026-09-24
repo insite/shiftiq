@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Humanizer;
@@ -32,6 +32,7 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
             AchievementSummary.SignedOff += AchievementSummary_SignedOff;
         }
 
@@ -40,15 +41,31 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
             SignedOff?.Invoke(this, new EventArgs());
         }
 
+        public void LoadData(VCmdsCredentialAndExperience credential, bool isProgram)
+        {
+            CredentialId = credential?.CredentialIdentifier;
+
+            SelectedAchievement.Visible = credential != null;
+
+            if (credential != null)
+                LoadAchievementInfo(credential, isProgram);
+
+            AfterLoadData();
+        }
+
         public void LoadData(Guid userId, Guid? credentialId, bool isProgram)
         {
             CredentialId = credentialId;
 
-            SelectedAchievement.Visible = credentialId.HasValue;
+            var isLoaded = credentialId.HasValue && LoadAchievementInfo(userId, isProgram);
 
-            if (credentialId.HasValue)
-                LoadAchievementInfo(userId, isProgram);
+            SelectedAchievement.Visible = isLoaded;
 
+            AfterLoadData();
+        }
+
+        public void AfterLoadData()
+        {
             if (CurrentSessionState.Identity.IsImpersonating)
                 AchievementSummary.DisableSignOffButton();
         }
@@ -118,7 +135,7 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
 
             LoadAchievementInfo(credential, isProgram);
 
-            return false;
+            return true;
         }
 
         private static string TryGetProgramDescription(VCmdsCredentialAndExperience credential, string language)

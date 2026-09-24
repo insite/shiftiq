@@ -168,6 +168,12 @@ Contact Phone: {1}";
             return contacts;
         }
 
+        private static void AppendMdCells(StringBuilder sb, params string[] values) =>
+            sb.AppendLine(BuildMdCells(values));
+
+        private static string BuildMdCells(params string[] values) =>
+            string.Join(" | ", values.Select(Markdown.EscapeTableCell));
+
         public void CandidateRegistrationTable(MessageVariableList list, QRegistration[] registrations)
         {
             { // CandidateRegistrationTable
@@ -179,8 +185,14 @@ Contact Phone: {1}";
                     var accommodations = GetAccommodations(registration, true);
                     var materials = registration.MaterialsPermittedToCandidates;
                     var reason = StringHelper.Equals(registration.ApprovalStatus, "Eligible")
-                        ? string.Empty : registration.ApprovalReason;
-                    md.AppendLine($"{registration.Candidate.UserFullName} | {registration.Candidate.PersonCode} | {registration.Form?.FormTitle} | {registration.ApprovalStatus} {(reason != null ? ": " + reason : "")} | {accommodations} | {materials}");
+                        ? null: registration.ApprovalReason.NullIfEmpty();
+
+                    AppendMdCells(md,
+                        registration.Candidate.UserFullName,
+                        registration.Candidate.PersonCode,
+                        registration.Form?.FormTitle,
+                        registration.ApprovalStatus + (reason != null ? ": " + reason : string.Empty),
+                        accommodations, materials);
                 }
                 list.AddValue("CandidateRegistrationTable", md.ToString());
             }
@@ -200,7 +212,15 @@ Contact Phone: {1}";
                     ? "No"
                     : registration.Form.FormHasReferenceMaterials;
 
-                md.AppendLine($"{registration.Candidate.UserFullName} | {registration.Candidate.PersonCode} | {registration.Form?.FormTitle} | {registration.RegistrationPassword} | {registration.ApprovalStatus} | {accommodations} | {materials} | {referenceMaterials}");
+                AppendMdCells(md,
+                    registration.Candidate.UserFullName,
+                    registration.Candidate.PersonCode,
+                    registration.Form?.FormTitle,
+                    registration.RegistrationPassword,
+                    registration.ApprovalStatus,
+                    accommodations,
+                    materials,
+                    referenceMaterials);
             }
             list.AddValue("CandidateAuthenticationTable", md.ToString());
         }
@@ -254,7 +274,10 @@ Contact Phone: {1}";
                     ? string.Empty
                     : accommodation.TimeExtension.Value.Minutes().Humanize(2, minUnit: TimeUnit.Minute);
 
-                md.AppendLine($"{accommodation.AccommodationType} | {accommodation.AccommodationName} | {timeExtension}");
+                AppendMdCells(md,
+                    accommodation.AccommodationType,
+                    accommodation.AccommodationName,
+                    timeExtension);
             }
 
             return md.ToString();
@@ -269,13 +292,16 @@ Contact Phone: {1}";
             var md = StartCandidateSubmissionTable(isSingleForm);
             foreach (var registration in registrations.Where(x => x != null && x.IsPresent))
             {
-                WriteLearnerToCandidateSubmissionTable(md, registration, isSingleForm);
-
                 var attempt = registration.AttemptIdentifier.HasValue
                     ? attempts.FirstOrDefault(x => x != null && x.AttemptIdentifier == registration.AttemptIdentifier)
                     : null;
+                var score = (attempt?.AttemptScore ?? 0).ToString("p0");
+                var grade = attempt != null ? (attempt.AttemptIsPassing ? "Pass" : "Fail") : string.Empty;
 
-                WriteScoreToCandidateSubmissionTable(md, attempt);
+                if (isSingleForm)
+                    AppendMdCells(md, registration.Candidate?.UserFullName, registration.Candidate?.PersonCode, score, grade);
+                else
+                    AppendMdCells(md, registration.Candidate?.UserFullName, registration.Candidate?.PersonCode, registration.Form?.FormTitle, score, grade);
             }
             list.AddValue("CandidateSubmissionTable", md.ToString());
         }
@@ -296,32 +322,21 @@ Contact Phone: {1}";
             return md;
         }
 
-        private void WriteLearnerToCandidateSubmissionTable(StringBuilder md, QRegistration registration, bool isSingleForm)
-        {
-            md.Append($"{registration.Candidate?.UserFullName} | {registration.Candidate?.PersonCode}");
-            if (!isSingleForm)
-                md.Append($" | {registration.Form?.FormTitle}");
-        }
-
-        private void WriteScoreToCandidateSubmissionTable(StringBuilder md, QAttempt attempt)
-        {
-            var score = (attempt?.AttemptScore) ?? 0;
-            var grade = string.Empty;
-            if (attempt != null)
-                grade = attempt.AttemptIsPassing ? "Pass" : "Fail";
-
-            md.AppendLine($" | {score:p0} | {grade}");
-        }
-
         public void CandidatePublicationTable(MessageVariableList list, QRegistration[] registrations, QAttempt[] attempts)
         {
             var md = new StringBuilder();
             md.AppendLine("Name | Code | Form | Score | Grade Status");
-            md.AppendLine("-- | -- | --");
+            md.AppendLine(":-- |:-- |:-- |:-- |:--");
             foreach (var registration in registrations)
             {
                 var attempt = registration.AttemptIdentifier.HasValue ? attempts.FirstOrDefault(x => x != null && x.AttemptIdentifier == registration.AttemptIdentifier) : null;
-                md.AppendLine($"{registration.Candidate?.UserFullName} | {registration.Candidate?.PersonCode} | {registration.Form?.FormTitle} ({registration.Form?.FormAsset}.{registration.Form?.FormAssetVersion}) | {((attempt?.AttemptScore) ?? 0):p0} | {registration.GradingStatus}");
+                AppendMdCells(md,
+                    registration.Candidate?.UserFullName,
+                    registration.Candidate?.PersonCode,
+                    $"{registration.Form?.FormTitle} ({registration.Form?.FormAsset}.{registration.Form?.FormAssetVersion})",
+                    (attempt?.AttemptScore ?? 0).ToString("p0"),
+                    registration.GradingStatus
+                );
             }
             list.AddValue("CandidatePublicationTable", md.ToString());
         }
@@ -342,12 +357,12 @@ Contact Phone: {1}";
                 var competencies = GetCompetencyList(questions);
 
                 if (!isSingleForm)
-                    md.AppendLine($"## {form.Title}");
+                    md.AppendLine($"## {Markdown.Escape(form.Title)}");
 
                 md.AppendLine("Code | Title");
                 md.AppendLine(":-- |:--");
                 foreach (var item in competencies)
-                    md.AppendLine($"{item.Code} | {item.Title}");
+                    AppendMdCells(md, item.Code, item.Title);
             }
             list.AddValue("FolderCompetencyTable", md.ToString());
         }
@@ -384,7 +399,7 @@ Contact Phone: {1}";
                 foreach (var form in forms)
                 {
                     if (!isSingleForm)
-                        md.AppendLine($"## {form.Title}");
+                        md.AppendLine($"## {Markdown.Escape(form.Title)}");
 
                     var reports = registrations
                         .Where(x => x.IsPresent && x.ExamFormIdentifier == form.Identifier)
@@ -395,7 +410,7 @@ Contact Phone: {1}";
                             return new
                             {
                                 x.CandidateIdentifier,
-                                CandidateColumnName = $"**{x.Candidate.UserFullName}** ({x.Candidate.PersonCode})",
+                                CandidateColumnName = $"**{Markdown.EscapeTableCell(x.Candidate.UserFullName)}** ({Markdown.EscapeTableCell(x.Candidate.PersonCode)})",
                                 CompetencyReport = new CompetencyReport(attempt?.Questions)
                             };
                         }).ToArray();
@@ -418,7 +433,7 @@ Contact Phone: {1}";
 
                     md.Append("Candidate / Topic");
                     foreach (var folder in folders)
-                        md.Append(" | ").Append(folder.Code);
+                        md.Append(" | ").Append(Markdown.EscapeTableCell(folder.Code));
                     md.AppendLine(" | Total");
 
                     md.Append(":--");

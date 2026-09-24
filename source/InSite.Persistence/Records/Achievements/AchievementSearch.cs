@@ -442,6 +442,46 @@ namespace InSite.Persistence
             }
         }
 
+        // The credentials held by one organization's learners on achievements that organization
+        // or the partition owns, projected before they leave the database. The VCredential view
+        // scopes by the achievement's owner alone, so an organization-wide read through it returns
+        // every credential in the partition on a shared achievement, joined and sorted by name;
+        // that is what timed out the documents API (Sentry Error SHIFT-3FH). Identifier order is
+        // served by the unique index to ensure a deterministic sequence of rows in the result.
+        public T[] BindLearnerCredentials<T>(
+            Guid organization,
+            Guid? achievement,
+            Guid? learner,
+            Expression<Func<QCredential, T>> binder)
+        {
+            using (var db = CreateContext())
+            {
+                var owners = new List<Guid> { organization };
+                if (organization != _partition.Identifier)
+                    owners.Add(_partition.Identifier);
+
+                var learners = db.QPersons
+                    .Where(x => x.OrganizationIdentifier == organization && x.IsLearner)
+                    .Select(x => x.UserIdentifier);
+
+                var query = db.QCredentials.Where(x =>
+                    owners.Contains(x.Achievement.OrganizationIdentifier)
+                    && learners.Contains(x.UserIdentifier));
+
+                if (achievement.HasValue)
+                    query = query.Where(x => x.AchievementIdentifier == achievement.Value);
+
+                if (learner.HasValue)
+                    query = query.Where(x => x.UserIdentifier == learner.Value);
+
+                return query
+                    .OrderBy(x => x.UserIdentifier)
+                    .ThenBy(x => x.AchievementIdentifier)
+                    .Select(binder)
+                    .ToArray();
+            }
+        }
+
         public List<VCredentialSearchResultsItem> GetCredentialSearchResults(VCredentialFilter filter)
         {
             using (var db = CreateContext())
@@ -466,7 +506,7 @@ namespace InSite.Persistence
                                                   && m.UserIdentifier == c.UserIdentifier)
                                   )
                             .Select(y => y.Department.GroupName),
-                        Groups  = db.QMemberships
+                        Groups = db.QMemberships
                             .Where(m => m.UserIdentifier == c.UserIdentifier && m.Group.OrganizationIdentifier == c.OrganizationIdentifier)
                             .Select(m => new VCredentialSearchResultsItem.Group
                             {

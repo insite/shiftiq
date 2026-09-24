@@ -15,7 +15,7 @@
     <label class="form-label">
         Address 1
     </label>
-    <insite:TextBox ID="Street1" runat="server" MaxLength="128" />
+    <insite:TextBox ID="Street1" runat="server" MaxLength="200" />
     <div class="form-text">
     </div>
 </div>
@@ -24,7 +24,7 @@
     <label class="form-label">
         Address 2
     </label>
-    <insite:TextBox ID="Street2" runat="server" MaxLength="128" />
+    <insite:TextBox ID="Street2" runat="server" MaxLength="200" />
     <div class="form-text">
     </div>
 </div>
@@ -42,7 +42,7 @@
     <label class="form-label">
         State/Province
     </label>
-    <insite:TextBox ID="Province" runat="server" MaxLength="128" />
+    <insite:TextBox ID="Province" runat="server" MaxLength="64" />
     <div class="form-text">
     </div>
 </div>
@@ -51,7 +51,7 @@
     <label class="form-label">
         Postal Code
     </label>
-    <insite:TextBox ID="PostalCode" runat="server" MaxLength="16" />
+    <insite:TextBox ID="PostalCode" runat="server" MaxLength="20" />
     <div class="form-text">
     </div>
 </div>

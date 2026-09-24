@@ -90,7 +90,7 @@ namespace InSite.UI.Admin.Contacts.People.Controls
                 personCode.Text = person.PersonCode.IfNullOrEmpty("None");
 
             if (birthdate != null)
-                birthdate.Text = person.Birthdate.HasValue ? GetLocalTime(person.Birthdate, tz) : "N/A";
+                birthdate.Text = person.Birthdate.HasValue ? $"{person.Birthdate:MMM d, yyyy}" : "N/A";
 
             if (employer != null)
             {
@@ -102,11 +102,6 @@ namespace InSite.UI.Admin.Contacts.People.Controls
                     ? $"<a href=\"/ui/admin/contacts/groups/edit?contact={employerGroup.GroupIdentifier}\">{employerGroup.GroupName}</a>"
                     : "None";
             }
-        }
-
-        private static string GetLocalTime(DateTimeOffset? item, TimeZoneInfo tz)
-        {
-            return item.FormatDateOnly(tz, nullValue: "None");
         }
     }
 }

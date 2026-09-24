@@ -9,6 +9,6 @@ namespace Shift.Hub
         Task ExecuteQueryAsync(string query, object? o);
 
         // Runs the statements in order within a single transaction, rolling back on failure.
-        Task ExecuteInTransactionAsync(IEnumerable<(string Query, object? Parameters)> statements);
+        Task ExecuteInTransactionAsync(IEnumerable<(string Query, object? Parameters)> statements, int? commandTimeoutInSeconds = null);
     }
 }

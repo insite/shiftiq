@@ -24,11 +24,14 @@ namespace Shift.Hub.Google
         [HttpPost(Endpoints.Translation.Translate)]
         [ProducesResponseType<string[]>(StatusCodes.Status200OK, "application/json")]
         [ProducesResponseType<string>(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<string>>> TranslateAsync(string from, string to, [FromBody] string[] contents)
+        public async Task<ActionResult<List<string?>>> TranslateAsync(string from, string to, [FromBody] string?[] contents)
         {
             try
             {
-                var translations = new List<string>();
+                if (contents.IsEmpty())
+                    return new List<string?>();
+
+                var translations = new List<string?>();
 
                 foreach (var content in contents)
                     translations.Add(await _translator.TranslateAsync(content, from, to));
@@ -44,7 +47,7 @@ namespace Shift.Hub.Google
                 if (ex.Message.Contains(GoogleApiErrorEffect, StringComparison.CurrentCultureIgnoreCase))
                     _monitor.Warning(GoogleApiErrorCause);
 
-                _monitor.Error(ex.Message);
+                _monitor.Error(ex);
 
                 return Problem(ex.Message);
             }
@@ -53,7 +56,7 @@ namespace Shift.Hub.Google
         [HttpPost("content/translations/translate")] // Deprecated URL
         [ProducesResponseType<string[]>(StatusCodes.Status200OK, "application/json")]
         [ProducesResponseType<string>(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<string>>> TranslateDeprecateAsync(string from, string to, [FromBody] string[] contents) =>
+        public async Task<ActionResult<List<string?>>> TranslateDeprecateAsync(string from, string to, [FromBody] string?[] contents) =>
             await TranslateAsync(from, to, contents);
     }
 }

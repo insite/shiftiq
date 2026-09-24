@@ -44,6 +44,9 @@ namespace InSite.Persistence
             using (var db = new InternalDbContext())
             {
                 var program = db.TPrograms.FirstOrDefault(x => x.ProgramIdentifier == programIdentifier);
+                if (program == null)
+                    return;
+
                 var programEnrollments = db.TProgramEnrollments.Where(x => x.ProgramIdentifier == programIdentifier).ToList();
                 var programTasks = db.TTasks.Where(x => x.ProgramIdentifier == programIdentifier).ToList();
 

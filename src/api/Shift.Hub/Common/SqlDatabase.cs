@@ -27,7 +27,7 @@ namespace Shift.Hub
             await _connection.ExecuteAsync(query, o);
         }
 
-        public async Task ExecuteInTransactionAsync(IEnumerable<(string Query, object? Parameters)> statements)
+        public async Task ExecuteInTransactionAsync(IEnumerable<(string Query, object? Parameters)> statements, int? commandTimeoutInSeconds = null)
         {
             var wasClosed = _connection.State != ConnectionState.Open;
             if (wasClosed)
@@ -37,7 +37,7 @@ namespace Shift.Hub
             try
             {
                 foreach (var (query, parameters) in statements)
-                    await _connection.ExecuteAsync(query, parameters, transaction);
+                    await _connection.ExecuteAsync(query, parameters, transaction, commandTimeoutInSeconds);
 
                 await transaction.CommitAsync();
             }

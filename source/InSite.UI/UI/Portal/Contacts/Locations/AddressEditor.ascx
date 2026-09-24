@@ -20,7 +20,7 @@
                         <insite:Literal runat="server" Text="Address 1" />
                     </label>
                     <div>
-                        <insite:TextBox ID="Street1" runat="server" MaxLength="128" />
+                        <insite:TextBox ID="Street1" runat="server" MaxLength="200" />
                     </div>
                 </div>
 
@@ -29,7 +29,7 @@
                         <insite:Literal runat="server" Text="Address 2" />
                     </label>
                     <div>
-                        <insite:TextBox ID="Street2" runat="server" MaxLength="128" />
+                        <insite:TextBox ID="Street2" runat="server" MaxLength="200" />
                     </div>
                 </div>
 
@@ -47,7 +47,7 @@
                         <insite:Literal runat="server" Text="State/Province" />
                     </label>
                     <div>
-                        <insite:TextBox ID="Province" runat="server" MaxLength="128" />
+                        <insite:TextBox ID="Province" runat="server" MaxLength="64" />
                     </div>
                 </div>
 
@@ -56,7 +56,7 @@
                         <insite:Literal runat="server" Text="Postal Code" />
                     </label>
                     <div>
-                        <insite:TextBox ID="PostalCode" runat="server" MaxLength="16" />
+                        <insite:TextBox ID="PostalCode" runat="server" MaxLength="20" />
                     </div>
                 </div>
 

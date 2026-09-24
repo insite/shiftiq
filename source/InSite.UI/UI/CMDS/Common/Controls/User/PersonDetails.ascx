@@ -118,7 +118,7 @@
                             <label class="form-label">
                                 City
                             </label>
-                            <insite:TextBox runat="server" ID="City" MaxLength="256" />
+                            <insite:TextBox runat="server" ID="City" MaxLength="128" />
                         </div>
 
                         <div runat="server" id="CountryField" class="form-group mb-3">
@@ -157,7 +157,7 @@
                             <label class="form-label">
                                 Postal Code
                             </label>
-                            <insite:TextBox runat="server" ID="PostalCode" MaxLength="64" />
+                            <insite:TextBox runat="server" ID="PostalCode" MaxLength="20" />
                         </div>
 
                         <div runat="server" id="PhoneWorkField" class="form-group mb-3">

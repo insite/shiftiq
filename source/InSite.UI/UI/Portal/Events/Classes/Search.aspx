@@ -90,10 +90,10 @@
                                                 <table class="table table-striped events">
                                                     <thead>
                                                         <tr>
-                                                            <th>Event Date</th>
-                                                            <th>Event</th>
-                                                            <th>Venue</th>
-                                                            <th>Status</th>
+                                                            <th><%# Translate("Event Date") %></th>
+                                                            <th><%# Translate("Event") %></th>
+                                                            <th><%# Translate("Venue") %></th>
+                                                            <th><%# Translate("Status") %></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>

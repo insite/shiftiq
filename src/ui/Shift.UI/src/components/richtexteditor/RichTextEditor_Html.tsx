@@ -144,6 +144,7 @@ export default function RichTextEditor_Html({
                     },
                 },
                 content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                convert_urls: false,
                 images_reuse_filename: true,
                 images_file_types: supportedImageFileTypes.map(x => x.substring(1)).join(","),
                 images_upload_handler: disableUploadFile ? undefined : handleImageUpload,

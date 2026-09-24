@@ -109,7 +109,7 @@ namespace InSite.Admin.Messages.Deliveries.Forms
             MailoutCancelledField.Visible = mailout.MailoutCancelled.HasValue;
 
             DeliveryRecipientAddressOutput.InnerHtml = $"<a href=\"mailto:{HttpUtility.HtmlEncode(delivery.UserEmail.ToLower())}\">{HttpUtility.HtmlEncode(delivery.UserEmail.ToLower())}</a>";
-            DeliveryRecipientNameOutput.InnerHtml = $"<a href=\"/ui/admin/contacts/people/edit?contact={delivery.RecipientIdentifier}\">{HttpUtility.HtmlEncode(delivery.PersonName)}</a>";
+            DeliveryRecipientNameOutput.InnerHtml = $"<a href=\"/ui/admin/contacts/people/edit?contact={delivery.UserIdentifier}\">{HttpUtility.HtmlEncode(delivery.PersonName)}</a>";
             DeliveryStatusOutput.InnerText = delivery.DeliveryStatus;
             DeliveryStartedOutput.InnerText = delivery.DeliveryStarted.Format(timezone);
             DeliveryCompletedOutput.InnerText = delivery.DeliveryCompleted.Format(timezone);

@@ -7,8 +7,8 @@ namespace Shift.Hub.Google
 {
     public interface ITranslationService
     {
-        Task<string> TranslateAsync(string fromText, string fromLanguage, string toLanguage);
-        Task<string> TranslateAsync(string fromText, string fromLanguage, string toLanguage, Guid id);
+        Task<string?> TranslateAsync(string? fromText, string fromLanguage, string toLanguage);
+        Task<string?> TranslateAsync(string? fromText, string fromLanguage, string toLanguage, Guid id);
     }
 
     public class TranslationService : ITranslationService
@@ -31,11 +31,14 @@ namespace Shift.Hub.Google
         public bool IsLanguageSupported(string language) =>
             _languagesSupported.Contains(language);
 
-        public async Task<string> TranslateAsync(string fromText, string fromLanguage, string toLanguage)
+        public async Task<string?> TranslateAsync(string? fromText, string fromLanguage, string toLanguage)
             => await TranslateAsync(fromText, fromLanguage, toLanguage, Guid.NewGuid());
 
-        public async Task<string> TranslateAsync(string fromText, string fromLanguage, string toLanguage, Guid id)
+        public async Task<string?> TranslateAsync(string? fromText, string fromLanguage, string toLanguage, Guid id)
         {
+            if (string.IsNullOrWhiteSpace(fromText))
+                return fromText;
+
             if (!IsLanguageSupported(toLanguage))
                 throw new LanguageNotSupportedException(toLanguage);
 

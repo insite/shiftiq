@@ -28,6 +28,11 @@ namespace InSite.Application.Records.Read
 
         int CountCredentials(VCredentialFilter filter);
         List<VCredential> GetCredentials(VCredentialFilter filter);
+        T[] BindLearnerCredentials<T>(
+            Guid organization,
+            Guid? achievement,
+            Guid? learner,
+            Expression<Func<QCredential, T>> binder);
         List<VCredential> GetRecentCredentials(VCredentialFilter filter, int count);
         List<VCredentialSearchResultsItem> GetCredentialSearchResults(VCredentialFilter filter);
         Dictionary<Guid, int> CountGradebookCredentials(Guid[] gradebookIds);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.UI;
 
 using InSite.Common.Web.Cmds;
@@ -26,14 +26,14 @@ namespace InSite.Cmds.Controls.Training.EmployeeAchievements
 
         private Guid UserIdentifier
         {
-            get { return (Guid)ViewState[nameof(UserIdentifier)]; }
-            set { ViewState[nameof(UserIdentifier)] = value; }
+            get => (Guid?)ViewState[nameof(UserIdentifier)] ?? Guid.Empty;
+            set => ViewState[nameof(UserIdentifier)] = value;
         }
 
         private Guid AchievementIdentifier
         {
-            get { return (Guid)ViewState[nameof(AchievementIdentifier)]; }
-            set { ViewState[nameof(AchievementIdentifier)] = value; }
+            get => (Guid?)ViewState[nameof(AchievementIdentifier)] ?? Guid.Empty;
+            set => ViewState[nameof(AchievementIdentifier)] = value;
         }
 
         #endregion
@@ -54,12 +54,18 @@ namespace InSite.Cmds.Controls.Training.EmployeeAchievements
 
         private void SignOffButton_Click(object sender, EventArgs e)
         {
+            if (UserIdentifier == Guid.Empty || AchievementIdentifier == Guid.Empty)
+                return;
+
             SignOffAchievement();
             OnSignedOff();
         }
 
         private void RenewSignOffButton_Click(object sender, EventArgs e)
         {
+            if (UserIdentifier == Guid.Empty || AchievementIdentifier == Guid.Empty)
+                return;
+
             SignOffAchievement();
             OnSignedOff();
         }
@@ -77,6 +83,9 @@ namespace InSite.Cmds.Controls.Training.EmployeeAchievements
 
         private void SignOffAchievement()
         {
+            if (UserIdentifier == Guid.Empty || AchievementIdentifier == Guid.Empty)
+                return;
+
             EmployeeAchievementHelper.SignOff(UserIdentifier, AchievementIdentifier);
 
             var progression = VCmdsCredentialSearch.SelectFirst(x => x.UserIdentifier == UserIdentifier && x.AchievementIdentifier == AchievementIdentifier);
@@ -140,6 +149,7 @@ namespace InSite.Cmds.Controls.Training.EmployeeAchievements
 
                 SignOffPanel.Visible = allowSignOff && !isIssued && isMyCredential;
 
+                RenewSignOffPanel.Visible = allowSignOff && isIssued && isMyCredential;
                 RenewSignOffButton.Visible = allowSignOff && isIssued && isMyCredential;
 
                 if (employeeAchievement.CredentialGranted.HasValue)

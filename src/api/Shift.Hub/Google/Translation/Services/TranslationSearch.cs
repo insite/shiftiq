@@ -45,8 +45,11 @@ namespace Shift.Hub.Google
             }
         }
 
-        public async Task<string?> GetAsync(string fromText, string fromLanguage, string toLanguage)
+        public async Task<string?> GetAsync(string? fromText, string fromLanguage, string toLanguage)
         {
+            if (string.IsNullOrWhiteSpace(fromText))
+                return null;
+
             try
             {
                 var parameters = new Dictionary<string, object>

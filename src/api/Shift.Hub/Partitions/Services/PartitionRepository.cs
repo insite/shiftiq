@@ -128,7 +128,7 @@ IF @@ROWCOUNT = 0
                 statements.Add(BuildOrganizationBatch(partition.Number, batch));
             }
 
-            await _db.ExecuteInTransactionAsync(statements);
+            await _db.ExecuteInTransactionAsync(statements, 2 * 60); // 2 mins timeout
         }
 
         // One statement per organization meant one network round trip per organization, all of them

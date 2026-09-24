@@ -162,7 +162,19 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
-        public static List<VCmdsAchievement> SelectAchievementsByDepartment(Guid[] departments, string[] achievementTypes, bool? isRequired)
+        // The value VCmdsCredential.CredentialIsMandatory tests CredentialNecessity against.
+        private const string Mandatory = "Mandatory";
+
+        // The three achievement lists below feed the training report criteria. Each one asks, per
+        // achievement, whether any member of the chosen departments holds a credential for it. They
+        // used to ask that of VCmdsCredential, a view over six joins, so on a large organization
+        // the page ran past the command timeout (Sentry Error SHIFT-30B). Existence and the
+        // mandatory flag are both on achievements.QCredential, which has a unique index on the
+        // achievement and user pair, so the base table answers the same question directly.
+        public static List<VCmdsAchievement> SelectAchievementsByDepartment(
+            Guid[] departments,
+            string[] achievementTypes,
+            bool? isRequired)
         {
             if (departments.IsEmpty())
                 departments = new Guid[] { Guid.Empty };
@@ -174,20 +186,22 @@ namespace InSite.Persistence.Plugin.CMDS
                         x => departments.Contains(x.GroupIdentifier)
                           && x.MembershipType == "Department")
                     .Join(
-                        db.VCmdsAchievementDepartments,
+                        db.TAchievementDepartments,
                         a => a.GroupIdentifier,
                         b => b.DepartmentIdentifier,
                         (a, b) => new { b.AchievementIdentifier, a.UserIdentifier }
                     )
                     .Join(
-                        db.VCmdsCredentials,
+                        db.QCredentials,
                         a => new { a.AchievementIdentifier, a.UserIdentifier },
                         b => new { b.AchievementIdentifier, b.UserIdentifier },
                         (a, b) => b
                     );
 
-                if (isRequired.HasValue)
-                    credentials = credentials.Where(x => x.CredentialIsMandatory == isRequired);
+                if (isRequired == true)
+                    credentials = credentials.Where(x => x.CredentialNecessity == Mandatory);
+                else if (isRequired == false)
+                    credentials = credentials.Where(x => x.CredentialNecessity != Mandatory);
 
                 var query = db.VCmdsAchievements
                     .Where(x => credentials.Any(y => y.AchievementIdentifier == x.AchievementIdentifier));
@@ -210,20 +224,22 @@ namespace InSite.Persistence.Plugin.CMDS
                         x => x.Group.GroupType == GroupTypes.Department
                           && x.Group.OrganizationIdentifier == organizationId)
                     .Join(
-                        db.VCmdsAchievementDepartments,
+                        db.TAchievementDepartments,
                         a => a.GroupIdentifier,
                         b => b.DepartmentIdentifier,
                         (a, b) => new { b.AchievementIdentifier, a.UserIdentifier }
                     )
                     .Join(
-                        db.VCmdsCredentials,
+                        db.QCredentials,
                         a => new { a.AchievementIdentifier, a.UserIdentifier },
                         b => new { b.AchievementIdentifier, b.UserIdentifier },
                         (a, b) => b
                     );
 
-                if (isRequired.HasValue)
-                    credentials = credentials.Where(x => x.CredentialIsMandatory == isRequired);
+                if (isRequired == true)
+                    credentials = credentials.Where(x => x.CredentialNecessity == Mandatory);
+                else if (isRequired == false)
+                    credentials = credentials.Where(x => x.CredentialNecessity != Mandatory);
 
                 var query = db.VCmdsAchievements
                     .Where(x => credentials.Any(y => y.AchievementIdentifier == x.AchievementIdentifier));
@@ -246,14 +262,16 @@ namespace InSite.Persistence.Plugin.CMDS
                         x => x.Group.GroupType == GroupTypes.Department
                           && x.Group.OrganizationIdentifier == organizationId)
                     .Join(
-                        db.VCmdsCredentials,
+                        db.QCredentials,
                         a => a.UserIdentifier,
                         b => b.UserIdentifier,
                         (a, b) => b
                     );
 
-                if (isRequired.HasValue)
-                    credentials = credentials.Where(x => x.CredentialIsMandatory == isRequired);
+                if (isRequired == true)
+                    credentials = credentials.Where(x => x.CredentialNecessity == Mandatory);
+                else if (isRequired == false)
+                    credentials = credentials.Where(x => x.CredentialNecessity != Mandatory);
 
                 var query = db.VCmdsAchievementOrganizations.Where(x => x.OrganizationIdentifier == organizationId)
                     .Select(x => x.Achievement)

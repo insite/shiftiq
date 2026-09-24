@@ -59,7 +59,7 @@ namespace Shift.Common
             var request = requestTuple.Item1;
             var requestContentToSave = postDataToSave ?? requestTuple.Item2;
 
-            var requestKey = _logger.Insert(_userIdentifier, _organizationIdentifier, request, requestContentToSave);
+            var requestKey = LogRequest(request, requestContentToSave);
 
             IntegrationResponse integrationResponse;
 
@@ -82,16 +82,59 @@ namespace Shift.Common
             catch (Exception ex)
             {
                 var destination = GetEndpointPath(request.RequestUri);
-                _logger.Update(requestKey, destination, ex);
+                LogFailure(requestKey, destination, ex);
                 throw;
             }
 
-            _logger.Update(requestKey, integrationResponse);
+            LogResponse(requestKey, integrationResponse);
 
             if (string.IsNullOrEmpty(integrationResponse.Content))
                 throw new WebException("Failed to get a response for the HTTP request");
 
             return integrationResponse;
+        }
+
+        // The audit row must never decide the outcome of the integration call. A failed insert
+        // leaves no key, so the response and failure updates are skipped for it, and a failed
+        // update is dropped. DirectAccessClient guards its logger the same way.
+        private Guid LogRequest(HttpWebRequest request, string content)
+        {
+            try
+            {
+                return _logger.Insert(_userIdentifier, _organizationIdentifier, request, content);
+            }
+            catch
+            {
+                return Guid.Empty;
+            }
+        }
+
+        private void LogResponse(Guid requestKey, IntegrationResponse response)
+        {
+            if (requestKey == Guid.Empty)
+                return;
+
+            try
+            {
+                _logger.Update(requestKey, response);
+            }
+            catch
+            {
+            }
+        }
+
+        private void LogFailure(Guid requestKey, string destination, Exception ex)
+        {
+            if (requestKey == Guid.Empty)
+                return;
+
+            try
+            {
+                _logger.Update(requestKey, destination, ex);
+            }
+            catch
+            {
+            }
         }
 
         public string RequestString(string appUrl, string postData = null)

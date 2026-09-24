@@ -110,7 +110,7 @@
                     <insite:Literal runat="server" Text="Home Address" />
                 </label>
                 <div>
-                    <insite:TextBox ID="Street1" runat="server" MaxLength="128" />
+                    <insite:TextBox ID="Street1" runat="server" MaxLength="200" />
                 </div>
             </div>
         </div>
@@ -139,7 +139,7 @@
                     <insite:Literal runat="server" ID="PostalCodeLabel" Text="Postal Code" />
                 </label>
                 <div>
-                    <insite:TextBox ID="PostalCode" runat="server" MaxLength="128" />
+                    <insite:TextBox ID="PostalCode" runat="server" MaxLength="20" />
                 </div>
             </div>
         </div>

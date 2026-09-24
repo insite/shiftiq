@@ -50,7 +50,7 @@ namespace InSite.UI.Portal.Learning
 
             var person = UserSearch.Select(EmployeeID);
 
-            PageHelper.AutoBindHeader(this, null, $"Training Plan for {person.FullName}");
+            PageHelper.AutoBindHeader(this, null, $"Training Plan for {(person?.FullName ?? "Unknown User")}");
 
             LoadData();
         }
@@ -58,8 +58,6 @@ namespace InSite.UI.Portal.Learning
         private void LoadData()
         {
             var credentialId = CredentialIdentifier;
-
-            SignOff.LoadData(EmployeeID, credentialId, false);
 
             var credentials = VCmdsCredentialSearch.SelectForTrainingPlan(
                 EmployeeID,
@@ -70,9 +68,20 @@ namespace InSite.UI.Portal.Learning
             AchievementTypes.SelectedCredentialId = credentialId;
             AchievementTypes.LoadData(dataSource.Items, GetUrl);
 
-            var selectedCredential = credentials.FirstOrDefault(x => x.CredentialIdentifier == credentialId);
-            if (selectedCredential != null)
-                SignOff.LoadAchievementInfo(selectedCredential, false);
+            VCmdsCredentialAndExperience selectedCredential = null;
+
+            if (credentialId.HasValue)
+            {
+                selectedCredential = credentials.FirstOrDefault(x => x.CredentialIdentifier == credentialId);
+
+                if (selectedCredential == null)
+                    selectedCredential = VCmdsCredentialSearch.SelectForTrainingPlan(credentialId.Value, Organization.Identifier);
+
+                if (selectedCredential != null && selectedCredential.UserIdentifier != EmployeeID)
+                    selectedCredential = null;
+            }
+
+            SignOff.LoadData(selectedCredential, false);
 
             var hasCredentials = credentials.Count > 0;
 

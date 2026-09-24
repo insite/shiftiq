@@ -74,14 +74,14 @@
                         <label class="form-label">
                             Address 1
                         </label>
-                        <insite:TextBox ID="Street1" runat="server" MaxLength="128" />
+                        <insite:TextBox ID="Street1" runat="server" MaxLength="200" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label class="form-label">
                             Address 2
                         </label>
-                        <insite:TextBox ID="Street2" runat="server" MaxLength="128" />
+                        <insite:TextBox ID="Street2" runat="server" MaxLength="200" />
                     </div>
 
                     <div class="form-group mb-3">
@@ -95,21 +95,21 @@
                         <label class="form-label">
                             State/Province
                         </label>
-                        <insite:TextBox ID="Province" runat="server" MaxLength="128" />
+                        <insite:TextBox ID="Province" runat="server" MaxLength="64" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label class="form-label">
                             Postal Code
                         </label>
-                        <insite:TextBox ID="PostalCode" runat="server" MaxLength="16" />
+                        <insite:TextBox ID="PostalCode" runat="server" MaxLength="20" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label class="form-label">
                             Country
                         </label>
-                        <insite:TextBox ID="Country" runat="server" MaxLength="128" Text="Canada" />
+                        <insite:TextBox ID="Country" runat="server" MaxLength="32" Text="Canada" />
                     </div>
 
 
