@@ -75,7 +75,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList MembershipType;
+        protected global::InSite.Common.Web.UI.CheckBoxList MembershipType;
 
         /// <summary>
         /// MembershipTypeChanged control.
@@ -105,58 +105,13 @@ namespace InSite.Cmds.Admin.Reports.Forms
         protected global::InSite.Common.Web.UI.MultiComboBox AchievementType;
 
         /// <summary>
-        /// ReportTypeField control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ReportTypeField;
-
-        /// <summary>
-        /// ReportType control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList ReportType;
-
-        /// <summary>
-        /// HistoryPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.Container HistoryPanel;
-
-        /// <summary>
-        /// StartDate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.DateSelector StartDate;
-
-        /// <summary>
-        /// EndDate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.DateSelector EndDate;
-
-        /// <summary>
         /// DisplayMode control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList DisplayMode;
+        protected global::InSite.Common.Web.UI.RadioButtonList DisplayMode;
 
         /// <summary>
         /// IsShowStatus control.
@@ -165,7 +120,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox IsShowStatus;
+        protected global::InSite.Common.Web.UI.CheckBox IsShowStatus;
 
         /// <summary>
         /// IsShowChart control.
@@ -174,7 +129,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox IsShowChart;
+        protected global::InSite.Common.Web.UI.CheckBox IsShowChart;
 
         /// <summary>
         /// IsIncludeUsersWithoutProfile control.
@@ -183,7 +138,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox IsIncludeUsersWithoutProfile;
+        protected global::InSite.Common.Web.UI.CheckBox IsIncludeUsersWithoutProfile;
 
         /// <summary>
         /// Option control.
@@ -192,7 +147,7 @@ namespace InSite.Cmds.Admin.Reports.Forms
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList Option;
+        protected global::InSite.Common.Web.UI.RadioButtonList Option;
 
         /// <summary>
         /// ReportButton control.
@@ -211,6 +166,15 @@ namespace InSite.Cmds.Admin.Reports.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.DownloadButton PreDownloadXlsx1;
+
+        /// <summary>
+        /// PreDownloadCompanyXlsx control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DownloadButton PreDownloadCompanyXlsx;
 
         /// <summary>
         /// ReportTab control.
@@ -292,24 +256,6 @@ namespace InSite.Cmds.Admin.Reports.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater CurrentDepartmentRepeaterWithStatuses;
-
-        /// <summary>
-        /// HistoryDepartmentRepeaterWithoutStatuses control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater HistoryDepartmentRepeaterWithoutStatuses;
-
-        /// <summary>
-        /// HistoryDepartmentRepeaterWithStatuses control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater HistoryDepartmentRepeaterWithStatuses;
 
         /// <summary>
         /// DownloadXlsx control.

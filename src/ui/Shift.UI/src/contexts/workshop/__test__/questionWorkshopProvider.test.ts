@@ -29,11 +29,13 @@ test("modifyQuestionOptionPoints updates option points", () => {
         type: "modifyQuestionOptionPoints",
         questionId: "q1",
         optionNumber: 1,
-        points: 8.5,
+        optionPoints: 85000,
+        questionPoints: 90000
     });
 
-    expect(result.sectionQuestions![0].options![0].points).toEqual(8.5);
-    expect(result.sections![0].questions![0].options![0].points).toEqual(8.5);
+    expect(result.sectionQuestions![0].options![0].points).toEqual(85000);
+    expect(result.sections![0].questions![0].options![0].points).toEqual(85000);
+    expect(result.sections![0].questions![0].questionPoints).toEqual(90000);
 });
 
 test("modifyQuestionOptionColumnTitle updates option column markdown and html", () => {

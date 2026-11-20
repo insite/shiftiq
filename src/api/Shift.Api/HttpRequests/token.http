@@ -1,0 +1,6 @@
+POST {{host}}/api/accounts/tokens/generate
+
+{
+    "Secret": "{{secret}}",
+    "Lifetime": 31536000
+}

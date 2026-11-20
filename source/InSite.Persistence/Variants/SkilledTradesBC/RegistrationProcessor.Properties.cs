@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application;
 using InSite.Application.Banks.Read;
 using InSite.Application.Contacts.Read;
@@ -13,6 +11,7 @@ using InSite.Domain.Registrations;
 using InSite.Persistence.Integration.DirectAccess;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 using Shift.Toolbox.Integrations.DirectAccess;
 
@@ -63,6 +62,8 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
             publisher.Extend<GradingChanged>(Handle, ita);
             publisher.Extend<RegistrationCancelled>(Handle, ita, true);
             publisher.Extend<RegistrationDeleted>(Handle, ita, true);
+            publisher.Extend<EventChanged>(HandleBefore, ita, true);
+            publisher.Extend<EventChanged>(HandleAfter, ita, false);
 
             _broker = new CommandBroker(commander);
 

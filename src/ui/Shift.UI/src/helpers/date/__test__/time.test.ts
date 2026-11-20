@@ -42,12 +42,12 @@ test("dateHelper.formatDateTime", () => {
     expect(dateTimeHelper.formatDateTime({
         date: { day: 15, month: 4, year: 2025 },
         time: { hour: 15, minute: 45, timeZoneId: "America/Edmonton" }
-    }, "mmm d, yyyy")).toEqual("Apr 15, 2025 3:45 PM MDT");
+    }, "mmm d, yyyy")).toEqual("Apr 15, 2025 3:45 PM MT");
 
     expect(dateTimeHelper.formatDateTime({
         date: { day: 15, month: 12, year: 2025 },
         time: { hour: 12, minute: 45, timeZoneId: "America/Edmonton" }
-    }, "mmm d, yyyy")).toEqual("Dec 15, 2025 12:45 PM MST");
+    }, "mmm d, yyyy")).toEqual("Dec 15, 2025 12:45 PM MT");
 
     expect(dateTimeHelper.formatDateTime({
         date: { day: 15, month: 12, year: 2025 },
@@ -57,7 +57,7 @@ test("dateHelper.formatDateTime", () => {
     expect(dateTimeHelper.formatDateTime({
         date: { day: 15, month: 12, year: 2025 },
         time: { hour: 5, minute: 55, timeZoneId: "America/Vancouver" }
-    }, "mmm d, yyyy")).toEqual("Dec 15, 2025 5:55 AM PST");
+    }, "mmm d, yyyy")).toEqual("Dec 15, 2025 5:55 AM PT");
 
     expect(dateTimeHelper.formatDateTime({
         date: { day: 0, month: 12, year: 2025 },

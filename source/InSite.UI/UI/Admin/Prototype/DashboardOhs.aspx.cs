@@ -5,6 +5,8 @@ using InSite.Application.Issues.Read;
 using InSite.Application.Registrations.Read;
 using InSite.UI.Layout.Admin;
 
+using Shift.Common;
+
 namespace InSite.UI.Admin.Prototype
 {
     public partial class DashboardOhs : AdminBasePage
@@ -14,7 +16,7 @@ namespace InSite.UI.Admin.Prototype
             get
             {
                 if (!DateTime.TryParse(Request.QueryString["date"], out var date))
-                    date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, User.TimeZone);
+                    date = TimeZones.ConvertTimeFromUtc(DateTime.UtcNow, User.TimeZone);
 
                 return date.ToShortDateString();
             }

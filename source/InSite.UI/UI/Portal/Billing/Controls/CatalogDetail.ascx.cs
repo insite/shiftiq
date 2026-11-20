@@ -45,7 +45,24 @@ namespace InSite.UI.Portal.Billing.Controls
         {
             base.OnPreRender(e);
 
-            SubscribeBanner.Visible = (PriceSelector.Mode == PriceSelectionMode.Subscribe);
+            var isSubscribe = PriceSelector.Mode == PriceSelectionMode.Subscribe;
+
+            SubscribeBanner.Visible = isSubscribe;
+            FilterPanel.Visible = !isSubscribe;
+
+            if (isSubscribe)
+            {
+                if (PriceSelector.IsTransfer)
+                {
+                    SubscribeBannerTitle.Text = "Subscribe &amp; Transfer to Member Organizations";
+                    SubscribeBannerText.Text = "Select a Package below. After checkout you can transfer the purchased SkillsCheck to your member organizations from your Management Dashboard.";
+                }
+                else
+                {
+                    SubscribeBannerTitle.Text = "Subscribe &amp; Choose Later";
+                    SubscribeBannerText.Text = "Select a Package below to be added to your SkillsCheck account upon checkout. There's no expiry date to make your selection.";
+                }
+            }
         }
 
         protected override void OnInit(EventArgs e)
@@ -72,7 +89,7 @@ namespace InSite.UI.Portal.Billing.Controls
                 return;
 
             CurrentPackageProductId = e.PackageProductIdentifier;
-            CatalogGrid.LoadData(e.Mode);
+            CatalogGrid.LoadData(e.Mode, PriceSelector.IsTransfer);
         }
 
         private void CatalogGrid_AddItem(object sender, CatalogGrid.ItemEventArgs e)
@@ -115,7 +132,7 @@ namespace InSite.UI.Portal.Billing.Controls
 
             CurrentPackageProductId = PriceSelector.SelectedProductIdentifier;
 
-            CatalogGrid.LoadData(CreditCount == 0 ? PriceSelector.Mode : PriceSelectionMode.Select);
+            CatalogGrid.LoadData(CreditCount == 0 ? PriceSelector.Mode : PriceSelectionMode.Select, CreditCount == 0 && PriceSelector.IsTransfer);
 
             PriceSelector.Visible = CreditCount == 0;
             SelectBanner.Visible = CreditCount > 0;
@@ -163,6 +180,7 @@ namespace InSite.UI.Portal.Billing.Controls
         {
             var cart = CartStorage.Get();
             var newPkgId = PriceSelector.SelectedProductIdentifier;
+            var isTransfer = CurrentMode == PriceSelectionMode.Subscribe && PriceSelector.IsTransfer;
 
             int? pkgQty = null;
             if (CurrentMode == PriceSelectionMode.Package && newPkgId.HasValue)
@@ -171,8 +189,8 @@ namespace InSite.UI.Portal.Billing.Controls
                 pkgQty = pkg?.ProductQuantity ?? 0;
             }
 
-            if (cart.Mode != CurrentMode || cart.PackageProductId != newPkgId || cart.PackageQuantity != pkgQty)
-                cart.Reset(CurrentMode, newPkgId, pkgQty);
+            if (cart.Mode != CurrentMode || cart.PackageProductId != newPkgId || cart.PackageQuantity != pkgQty || cart.IsTransfer != isTransfer)
+                cart.Reset(CurrentMode, newPkgId, pkgQty, isTransfer);
 
             SyncSelectorUi();
         }

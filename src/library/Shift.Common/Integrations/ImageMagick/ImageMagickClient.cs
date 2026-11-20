@@ -6,8 +6,6 @@ using Newtonsoft.Json;
 
 using Shift.Constant;
 
-using Shift.Common;
-
 namespace Shift.Common.Integration.ImageMagick
 {
     public class ImageMagickClient
@@ -27,8 +25,8 @@ namespace Shift.Common.Integration.ImageMagick
             if (data.IsEmpty())
                 throw new ArgumentNullException(nameof(data));
 
-            var content = new ByteArrayContent(data);
-            using (var postResult = TaskRunner.RunSync(StaticHttpClient.Client.PostAsync, GetEndpointUrl(Endpoints.GetImageInfo), content))
+            var request = CreateRequest(Endpoints.GetImageInfo, new ByteArrayContent(data));
+            using (var postResult = TaskRunner.RunSync(() => StaticHttpClient.Client.SendAsync(request)))
             {
                 postResult.EnsureSuccessStatusCode();
 
@@ -57,10 +55,11 @@ namespace Shift.Common.Integration.ImageMagick
                 { new StringContent(settings.OutputType.GetName()), "Settings.OutputType" }
             };
 
-            using (var postResult = TaskRunner.RunSync(StaticHttpClient.Client.PostAsync, GetEndpointUrl(Endpoints.AdjustImage), content))
+            var request = CreateRequest(Endpoints.AdjustImage, content);
+            using (var postResult = TaskRunner.RunSync(() => StaticHttpClient.Client.SendAsync(request)))
             {
                 postResult.EnsureSuccessStatusCode();
-                
+
                 byte[] imageData;
                 string[] messages;
 
@@ -84,6 +83,15 @@ namespace Shift.Common.Integration.ImageMagick
 
                 return (imageData, messages);
             }
+        }
+
+        private HttpRequestMessage CreateRequest(string endpoint, HttpContent content)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, GetEndpointUrl(endpoint)) { Content = content };
+
+            HubApiKey.Apply(request, _settings.ApiKey);
+
+            return request;
         }
 
         private string GetEndpointUrl(string endpoint)

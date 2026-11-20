@@ -22,8 +22,8 @@ namespace InSite.Persistence.Plugin.CMDS
         public string DepartmentName { get; set; }
         public string DepartmentRole { get; set; }
         public string DepartmentLabel { get; set; }
-        public DateTimeOffsetRange AsAtRange { get; set; } = new DateTimeOffsetRange();
-        public DateTimeOffset? AsAt { get; set; }
+        public DateTimeRange AsAtRange { get; set; } = new DateTimeRange();
+        public DateTime? AsAt { get; set; }
 
         public TUserStatusFilter Clone()
         {

@@ -30,6 +30,7 @@ public class FormWorkshopController(
         var model = await assessmentService.RetrieveAsync(formId);
 
         if (model == null
+            || model.OrganizationIdentifier != principal.OrganizationId
             || !principalProvider.AllowOrganizationAccess(principal, model.OrganizationIdentifier)
             )
         {
@@ -38,7 +39,7 @@ public class FormWorkshopController(
 
         var organization = await organizationService.RetrieveAsync(model.OrganizationIdentifier) ?? throw new ArgumentNullException("organization");
         var organizationData = organizationAdapter.ToData(organization);
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
 
         var formWorkshop = await retrieveService.RetrieveAsync(
             model.BankIdentifier,
@@ -61,14 +62,10 @@ public class FormWorkshopController(
         var principal = principalProvider.GetPrincipal();
         var model = await assessmentService.RetrieveAsync(formId);
 
-        if (model == null
-            || !principalProvider.AllowOrganizationAccess(principal, model.OrganizationIdentifier)
-            )
-        {
+        if (model == null || model.OrganizationIdentifier != principal.OrganizationId)
             return NotFound();
-        }
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
 
         var formWorkshopSection = await retrieveService.RetrieveSectionAsync(
             model.BankIdentifier,
@@ -88,12 +85,8 @@ public class FormWorkshopController(
         var principal = principalProvider.GetPrincipal();
         var model = await assessmentService.RetrieveAsync(formId);
 
-        if (model == null
-            || !principalProvider.AllowOrganizationAccess(principal, model.OrganizationIdentifier)
-            )
-        {
+        if (model == null || model.OrganizationIdentifier != principal.OrganizationId)
             return NotFound();
-        }
 
         if (enabled)
             await commander.SendCommandsAsync([new EnableThirdPartyAssessment(model.BankIdentifier, model.FormIdentifier)]);
@@ -111,12 +104,8 @@ public class FormWorkshopController(
         var principal = principalProvider.GetPrincipal();
         var model = await assessmentService.RetrieveAsync(formId);
 
-        if (model == null
-            || !principalProvider.AllowOrganizationAccess(principal, model.OrganizationIdentifier)
-            )
-        {
+        if (model == null || model.OrganizationIdentifier != principal.OrganizationId)
             return NotFound();
-        }
 
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(model.BankIdentifier);
         var form = bank.FindForm(formId);

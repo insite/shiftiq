@@ -51,6 +51,15 @@ namespace InSite.UI.Portal.Home.Learning
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl NoCoursesPanel;
 
         /// <summary>
+        /// SkillsCheckLiteral control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal SkillsCheckLiteral;
+
+        /// <summary>
         /// DashboardPanel control.
         /// </summary>
         /// <remarks>

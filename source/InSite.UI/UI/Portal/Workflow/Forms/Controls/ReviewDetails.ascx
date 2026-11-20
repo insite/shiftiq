@@ -35,13 +35,13 @@
     <asp:Repeater runat="server" ID="CardRepeater">
         <ItemTemplate>
             <div class="mt-5 mb-5" style="page-break-inside:avoid !important;">
-                <div class="card card-hover shadow bg-secondary">
+                <div class="card card-hover shadow<%# string.IsNullOrEmpty((string)Eval("Title")) ? string.Empty : " bg-secondary" %>">
 
                     <div class="card-header border-bottom-0<%# string.IsNullOrEmpty((string)Eval("Title")) ? " d-none" : string.Empty %>">
-                        <h2 class="mb-0"><%# Eval("Title") %></h2>        
+                        <h2 class="mb-0"><%# Eval("Title") %></h2>
                     </div>
 
-                    <div class="card-body bg-white">
+                    <div class="card-body<%# string.IsNullOrEmpty((string)Eval("Title")) ? string.Empty : " bg-white" %>">
 
                         <asp:Repeater runat="server" ID="QuestionRepeater">
                             <ItemTemplate>
@@ -104,7 +104,7 @@
                                                 </asp:Repeater>
 
                                                 <div runat="server" class='fs-ms text-body-secondary float-end' visible='<%# Eval("Answer.LikertScale.HighestPoints") != null %>'>
-                                                    <%# Eval("Answer.LikertScale.HighestPoints", "{0:n2}") %> Points (Highest)
+                                                    <%# Eval("Answer.LikertScale.HighestPoints", "{0:n2}") %> <%# Translate("Points (Highest)") %>
                                                 </div>
                                             </insite:Container>
 

@@ -77,7 +77,7 @@ namespace InSite.Admin.Workflow.Forms.Controls
 
             #region Construction
 
-            public SummaryEnumerator(IEnumerable<IDataItem> data, TimeZoneInfo timezone)
+            public SummaryEnumerator(IEnumerable<IDataItem> data)
             {
                 if (data.Any())
                 {
@@ -209,7 +209,7 @@ namespace InSite.Admin.Workflow.Forms.Controls
         {
             SurveyID = surveyId;
 
-            var summary = new SummaryEnumerator(data, CurrentSessionState.Identity.User.TimeZone);
+            var summary = new SummaryEnumerator(data);
 
             LoadData(summary);
         }

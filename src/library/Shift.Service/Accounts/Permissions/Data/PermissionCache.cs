@@ -73,14 +73,29 @@ namespace Shift.Service
 
         private void LoadPermissionMatrix(Guid? organizationId)
         {
-            if (organizationId != null && organizationId != Guid.Empty)
+            // The partition's permissions are merged into every other organization, and the merge
+            // only adds. Reloading the partition alone would leave a revoked grant in every other
+            // organization until the next full load, so a partition refresh reloads everything.
+            var id = organizationId ?? Guid.Empty;
+
+            var isPartialLoad = id != Guid.Empty;
+
+            if (isPartialLoad && Partition.HasValue())
+            {
+                var organizationCode = _loader.GetOrganizationCode(id);
+
+                if (StringHelper.Equals(organizationCode, Partition))
+                    isPartialLoad = false;
+            }
+
+            if (isPartialLoad)
             {
                 if (_matrix == null)
                 {
                     _matrix = new PermissionMatrix();
                 }
 
-                _loader.Load(_matrix, organizationId.Value);
+                _loader.Load(_matrix, id);
             }
             else
             {

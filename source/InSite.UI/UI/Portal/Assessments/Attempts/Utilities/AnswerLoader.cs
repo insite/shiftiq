@@ -2,6 +2,7 @@
 using System.Web;
 using System.Web.UI;
 
+using Shift.Common.Attempts;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Assessments.Attempts.Utilities
@@ -83,7 +84,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             if (actionResult != null)
                 return actionResult;
 
-            actionResult = AttemptHelper.LoadAttemptAnswer(form, url, out var attemptModel);
+            actionResult = AttemptHelper.LoadAttemptAnswer(_page, form, url, out var attemptModel);
             if (actionResult != null)
                 return actionResult;
 
@@ -118,7 +119,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             if (actionResult != null)
                 return actionResult;
 
-            actionResult = AttemptHelper.LoadAttemptAnswer(form, url, out var attemptModel);
+            actionResult = AttemptHelper.LoadAttemptAnswer(_page, form, url, out var attemptModel);
             if (actionResult != null)
                 return actionResult;
 

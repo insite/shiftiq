@@ -8,7 +8,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
 {
     public partial class CredentialDetails : System.Web.UI.UserControl
     {
-        public void BindCredential(VCredential credential, TimeZoneInfo tz, bool showGranted = true, bool showRevoked = true)
+        public void BindCredential(VCredential credential, string tz, bool showGranted = true, bool showRevoked = true)
         {
             var achievement = ServiceLocator.AchievementSearch.GetAchievement(credential.AchievementIdentifier);
             AchievementDetail.BindAchievement(achievement, tz);
@@ -38,7 +38,7 @@ namespace InSite.Admin.Achievements.Credentials.Controls
                 ExpiredDiv.Visible = false;
         }
 
-        private string GetLocalTime(DateTimeOffset? item, TimeZoneInfo tz)
+        private string GetLocalTime(DateTimeOffset? item, string tz)
         {
             return item.Format(tz, nullValue: "None");
         }

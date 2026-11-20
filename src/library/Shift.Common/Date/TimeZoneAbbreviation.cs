@@ -6,40 +6,45 @@ namespace Shift.Common
     {
         #region Properties
 
+        public string TimeZoneId { get; }
+
+        public string DisplayName { get; }
+
+        public string DisplayNameWithoutOffset { get; }
+
         public string Generic { get; }
 
         public string Standard { get; }
 
         public string Daylight { get; }
 
-        public string Moment { get; }
-
-        #endregion
-
-        #region Fields
-
-        private readonly TimeZoneInfo _zone;
+        public bool IsIANACompatible { get; }
 
         #endregion
 
         #region Construction
 
-        public TimeZoneAbbreviation(TimeZoneInfo zone, string generic, string standard, string daylight, string moment)
+        public TimeZoneAbbreviation(string timeZoneId, string offset, string name, string generic, string standard, string daylight, bool isIANACompatible)
         {
-            _zone = zone;
-
+            TimeZoneId = timeZoneId;
+            DisplayName = $"({offset}) {name}";
+            DisplayNameWithoutOffset = name;
             Generic = generic;
             Standard = standard;
             Daylight = daylight;
-            Moment = moment;
+            IsIANACompatible = isIANACompatible;
         }
 
         #endregion
 
         #region Methods
 
-        public string GetAbbreviation(DateTimeOffset time) =>
-            _zone.IsDaylightSavingTime(time) ? Daylight : Standard;
+        public string GetAbbreviation(DateTimeOffset time)
+        {
+            return IsIANACompatible
+                ? TimeZones.IsDaylightSavingTime(time, TimeZoneId) ? Daylight : Standard
+                : Generic;
+        }
 
         #endregion
     }

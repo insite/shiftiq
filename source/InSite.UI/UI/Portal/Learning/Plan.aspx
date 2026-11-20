@@ -21,6 +21,11 @@
 
                 <insite:Alert runat="server" ID="PlanAlert" />
 
+                <div runat="server" id="ProgramFilterPanel" class="mb-3">
+                    <label class="me-2 fw-semibold">Program</label>
+                    <asp:DropDownList runat="server" ID="ProgramFilter" AutoPostBack="true" CssClass="form-select d-inline-block w-auto" />
+                </div>
+
                 <div runat="server" id="DisplayTogglePanel" class="mb-3">
                     <insite:Toggle runat="server" ID="DisplayToggle" Size="Mini" TextOn="Show" TextOff="Hide" />
                     the completed achievements in my training plan. 

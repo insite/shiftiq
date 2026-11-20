@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -64,7 +64,14 @@ namespace InSite.Persistence
                                   && m.MembershipFunction == "Department"
                                   && m.Group.GroupType == "Department"
                                   && m.Group.OrganizationIdentifier == filter.OrganizationIdentifier)
+                            .Select(m => m.Group.GroupName),
+                        TopicUserDistricts = db.QMemberships
+                            .Where(
+                                m => m.UserIdentifier == x.TopicUserIdentifier
+                                  && m.Group.GroupType == "District"
+                                  && m.Group.OrganizationIdentifier == filter.OrganizationIdentifier)
                             .Select(m => m.Group.GroupName)
+                            .Distinct()
                     })
                     .AsEnumerable()
                     .Select(x => new ExportCase
@@ -74,6 +81,7 @@ namespace InSite.Persistence
                         IssueOpenedBy = x.Issue.IssueOpenedBy,
                         TopicUserIdentifier = x.Issue.TopicUserIdentifier,
                         TopicUserDepartment = string.Join(", ", x.TopicUserDepartments),
+                        TopicUserDistrict = string.Join(", ", x.TopicUserDistricts),
                         AdministratorUserName = x.Issue.AdministratorUserName,
                         IssueDescription = x.Issue.IssueDescription,
                         IssueEmployerGroupName = x.Issue.IssueEmployerGroupName,
@@ -326,6 +334,15 @@ namespace InSite.Persistence
                         m => m.UserIdentifier == x.TopicUserIdentifier
                           && m.GroupIdentifier == filter.TopicDepartmentIdentifier.Value
                           && m.MembershipFunction == "Department"));
+            }
+
+            if (filter.TopicDistrictIdentifier.HasValue)
+            {
+                query = query.Where(
+                    x => db.QMemberships.Any(
+                        m => m.UserIdentifier == x.TopicUserIdentifier
+                          && m.GroupIdentifier == filter.TopicDistrictIdentifier.Value
+                          && m.Group.GroupType == "District"));
             }
 
             query = ApplyFileRequirementFilter(filter, db, query);

@@ -23,6 +23,7 @@ public class AchievementConfiguration : IEntityTypeConfiguration<AchievementEnti
         builder.Property(x => x.CertificateLayoutCode).HasColumnName("CertificateLayoutCode").IsUnicode(false).HasMaxLength(100);
         builder.Property(x => x.AchievementType).HasColumnName("AchievementType").IsUnicode(false).HasMaxLength(100);
         builder.Property(x => x.AchievementReportingDisabled).HasColumnName("AchievementReportingDisabled").IsRequired();
+        builder.Property(x => x.AchievementIssuesCertificate).HasColumnName("AchievementIssuesCertificate").IsRequired();
         builder.Property(x => x.BadgeImageUrl).HasColumnName("BadgeImageUrl").IsUnicode(false).HasMaxLength(500);
         builder.Property(x => x.HasBadgeImage).HasColumnName("HasBadgeImage");
         builder.Property(x => x.AchievementAllowSelfDeclared).HasColumnName("AchievementAllowSelfDeclared").IsRequired();

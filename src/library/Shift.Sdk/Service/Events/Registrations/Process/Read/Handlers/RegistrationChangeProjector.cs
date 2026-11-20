@@ -27,7 +27,11 @@ namespace InSite.Application.Registrations.Read
             publisher.Subscribe<CustomerAssigned>(Handle);
             publisher.Subscribe<EligibilityChanged>(Handle);
             publisher.Subscribe<EmployerAssigned>(Handle);
+            publisher.Subscribe<ExamFormAdded>(Handle);
             publisher.Subscribe<ExamFormAssigned>(Handle);
+            publisher.Subscribe<ExamFormChanged>(Handle);
+            publisher.Subscribe<ExamFormPasswordChanged>(Handle);
+            publisher.Subscribe<ExamFormRemoved>(Handle);
             publisher.Subscribe<ExamFormUnassigned>(Handle);
             publisher.Subscribe<ExamTimeLimited>(Handle);
             publisher.Subscribe<EventChanged>(Handle);
@@ -88,7 +92,19 @@ namespace InSite.Application.Registrations.Read
         public void Handle(EmployerAssigned e)
             => _store.UpdateRegistration(e);
 
+        public void Handle(ExamFormAdded e)
+            => _store.UpdateRegistration(e);
+
         public void Handle(ExamFormAssigned e)
+            => _store.UpdateRegistration(e);
+
+        public void Handle(ExamFormChanged e)
+            => _store.UpdateRegistration(e);
+
+        public void Handle(ExamFormPasswordChanged e)
+            => _store.UpdateRegistration(e);
+
+        public void Handle(ExamFormRemoved e)
             => _store.UpdateRegistration(e);
 
         public void Handle(ExamFormUnassigned e)

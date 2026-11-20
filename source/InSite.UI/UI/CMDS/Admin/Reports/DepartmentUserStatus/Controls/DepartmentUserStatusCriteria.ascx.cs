@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -65,7 +66,7 @@ namespace InSite.Custom.CMDS.Reports.Controls
                 }
                 else if (!string.IsNullOrEmpty(SnapshotDate.Value))
                 {
-                    var date = DateTimeOffsetFromString(SnapshotDate.Value);
+                    var date = SnapshotDateFromString(SnapshotDate.Value);
                     filter.AsAt = date;
                 }
 
@@ -99,8 +100,8 @@ namespace InSite.Custom.CMDS.Reports.Controls
 
                     if (filter.AsAt != null)
                     {
-                        var dtoStr = DateTimeOffsetToString(filter.AsAt.Value);
-                        var option = SnapshotDate.FindOptionByValue(dtoStr);
+                        var dateStr = SnapshotDateToString(filter.AsAt.Value);
+                        var option = SnapshotDate.FindOptionByValue(dateStr);
                         if (option != null)
                             option.Selected = true;
                     }
@@ -274,8 +275,8 @@ namespace InSite.Custom.CMDS.Reports.Controls
             {
                 SnapshotDate.Items.Add(new ComboBoxOption
                 {
-                    Text = item.AsAt.Format(User.TimeZone),
-                    Value = DateTimeOffsetToString(item.AsAt)
+                    Text = SnapshotDateToString(item.AsAt),
+                    Value = SnapshotDateToString(item.AsAt)
                 });
             }
         }
@@ -359,18 +360,14 @@ namespace InSite.Custom.CMDS.Reports.Controls
 
         #region Methods (helpers)
 
-        private static string DateTimeOffsetToString(DateTimeOffset value)
+        private static string SnapshotDateToString(DateTime value)
         {
-            return $"{value.DateTime.Ticks}:{(int)value.Offset.TotalMinutes}";
+            return value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
 
-        private static DateTimeOffset DateTimeOffsetFromString(string value)
+        private static DateTime SnapshotDateFromString(string value)
         {
-            var parts = value.Split(':');
-            var ticks = long.Parse(parts[0]);
-            var offset = int.Parse(parts[1]);
-
-            return new DateTimeOffset(ticks, TimeSpan.FromMinutes(offset));
+            return DateTime.ParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
 
         #endregion

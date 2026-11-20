@@ -92,6 +92,7 @@ namespace InSite.Application.Events.Read
             publisher.Subscribe<EventRegistrationLocked>(Handle);
             publisher.Subscribe<EventRegistrationUnlocked>(Handle);
             publisher.Subscribe<EventAllowMultipleRegistrationsModified>(Handle);
+            publisher.Subscribe<EventFormAttachmentLimitModified>(Handle);
             publisher.Subscribe<EventPersonCodeIsRequiredModified>(Handle);
             publisher.Subscribe<EventMessageConnected>(Handle);
             publisher.Subscribe<EventMessagePeriodModified>(Handle);
@@ -434,6 +435,11 @@ namespace InSite.Application.Events.Read
         public void Handle(EventAllowMultipleRegistrationsModified e)
         {
             _eventStore.UpdateEvent(e, x => x.AllowMultipleRegistrations = e.Value);
+        }
+
+        public void Handle(EventFormAttachmentLimitModified e)
+        {
+            _eventStore.UpdateEvent(e, x => x.FormAttachmentLimit = e.Limit);
         }
 
         public void Handle(EventPersonCodeIsRequiredModified e)

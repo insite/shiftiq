@@ -22,5 +22,11 @@ namespace Shift.Sdk.UI
         }
 
         public int TableColumns => 12 - ChartColumns;
+
+        public DashboardChartLayout Clone() => new DashboardChartLayout
+        {
+            Position = Position,
+            Size = Size
+        };
     }
 }

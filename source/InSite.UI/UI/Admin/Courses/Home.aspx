@@ -58,7 +58,6 @@
                 <div class="row mt-4">
                     <div class="col-lg-12">
                         <a class="me-3" href="#recent-changes"><i class="fas fa-history me-1"></i>Recent Changes</a>
-                        <a class="me-3" href="/ui/admin/courses/scorm/upload"><i class="fas fa-upload me-1"></i>Upload SCORM Package</a>
                     </div>
                 </div>
 

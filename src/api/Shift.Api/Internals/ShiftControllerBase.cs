@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using Shift.Common;
-
 namespace Shift.Api
 {
     public class ShiftControllerBase : ControllerBase

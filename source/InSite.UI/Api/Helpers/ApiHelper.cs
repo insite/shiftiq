@@ -146,7 +146,7 @@ namespace InSite.Api.Settings
                 FirstName = userEntity.FirstName,
                 LastName = userEntity.LastName,
                 FullName = userEntity.FullName,
-                TimeZone = TimeZoneInfo.FindSystemTimeZoneById(userEntity.TimeZone)
+                TimeZone = TimeZones.ValidateZone(userEntity.TimeZone)
             };
 
             var isAdministrator = PersonCriteria.BindFirst(

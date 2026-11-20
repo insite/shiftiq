@@ -109,7 +109,8 @@ interface ModifyQuestionOptionPointsAction {
     type: "modifyQuestionOptionPoints";
     questionId: string;
     optionNumber: number;
-    points: number;
+    optionPoints: number;
+    questionPoints: number;
 }
 
 interface ModifyQuestionOptionColumnTitleAction {
@@ -212,6 +213,32 @@ function modifyOption(
         const options: WorkshopQuestionOption[] = q.options!.map(o => o.number === optionNumber ? action(o) : o);
         return {
             ...q,
+            options,
+        }
+    });
+}
+
+function modifyOptionPoints(
+    state: WorkshopQuestionState,
+    questionId: string,
+    optionNumber: number,
+    optionPoints: number,
+    questionPoints: number
+): WorkshopQuestionState
+{
+    return modifyQuestion(state, questionId, q => {
+        const option = q.options?.find(x => x.number === optionNumber);
+        if (!option) {
+            throw new Error(`Question ${questionId} does not exist`);
+        }
+        const options: WorkshopQuestionOption[] = q.options!.map(o => o.number === optionNumber
+            ? {
+                ...o,
+                points: optionPoints,
+            } : o);
+        return {
+            ...q,
+            questionPoints,
             options,
         }
     });
@@ -350,10 +377,7 @@ function reducer(state: WorkshopQuestionState, action: Action): WorkshopQuestion
             }));
 
         case "modifyQuestionOptionPoints":
-            return modifyOption(state, action.questionId, action.optionNumber, o => ({
-                ...o,
-                points: action.points,
-            }));
+            return modifyOptionPoints(state, action.questionId, action.optionNumber, action.optionPoints, action.questionPoints);
 
         case "modifyQuestionOptionColumnTitle":
             return modifyOption(state, action.questionId, action.optionNumber, o => {
@@ -452,8 +476,8 @@ export default function WorkshopQuestionProvider({ children }: Props) {
         modifyQuestionOptionTitle(questionId: string, optionNumber: number, titleMarkdown: string | null, titleHtml: string | null): void {
             dispatch({ type: "modifyQuestionOptionTitle", questionId, optionNumber, titleMarkdown, titleHtml });
         },
-        modifyQuestionOptionPoints(questionId: string, optionNumber: number, points: number): void {
-            dispatch({ type: "modifyQuestionOptionPoints", questionId, optionNumber, points });
+        modifyQuestionOptionPoints(questionId: string, optionNumber: number, optionPoints: number, questionPoints: number): void {
+            dispatch({ type: "modifyQuestionOptionPoints", questionId, optionNumber, optionPoints, questionPoints });
         },
         modifyQuestionOptionColumnTitle(questionId: string, optionNumber: number, columnIndex: number, textMarkdown: string | null, textHtml: string | null): void {
             dispatch({ type: "modifyQuestionOptionColumnTitle", questionId, optionNumber, columnIndex, textMarkdown, textHtml });

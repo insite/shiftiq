@@ -51,6 +51,15 @@ namespace InSite.UI.Admin.Learning.Catalogs
         protected global::InSite.Common.Web.UI.CheckBox CatalogIsHidden;
 
         /// <summary>
+        /// CatalogDescription control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.MarkdownEditor CatalogDescription;
+
+        /// <summary>
         /// CourseRepeater control.
         /// </summary>
         /// <remarks>

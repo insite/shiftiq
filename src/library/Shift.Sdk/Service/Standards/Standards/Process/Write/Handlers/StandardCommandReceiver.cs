@@ -1,10 +1,12 @@
 ﻿using System;
 
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-
+using InSite.Application.Assets.Read;
 using InSite.Application.Standards.Read;
 using InSite.Domain.Standards;
+
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
+using Shift.Contract;
 
 namespace InSite.Application.Standards.Write
 {
@@ -13,18 +15,21 @@ namespace InSite.Application.Standards.Write
         private readonly IChangeQueue _publisher;
         private readonly IChangeRepository _repository;
         private readonly IStandardSearch _standardSearch;
+        private readonly ISearchStore _searchStore;
         private bool _isDbValidationEnabled;
 
         public StandardCommandReceiver(
             ICommandQueue commander,
             IChangeQueue publisher,
             IChangeRepository repository,
-            IStandardSearch standardSearch
+            IStandardSearch standardSearch,
+            ISearchStore searchStore
             )
         {
             _publisher = publisher;
             _repository = repository;
             _standardSearch = standardSearch;
+            _searchStore = searchStore;
             _isDbValidationEnabled = true;
 
             commander.Subscribe<CreateStandard>(Handle);
@@ -108,14 +113,23 @@ namespace InSite.Application.Standards.Write
                 aggregate.CreateStandard(c.StandardType, c.AssetNumber, c.Sequence, c.Content);
             });
             Commit(aggregate);
+
+            _searchStore.EnqueueSearchObject(c.OriginOrganization, c.AggregateIdentifier, SearchObjectType.Standard);
         }
 
         public void Handle(RemoveStandard c)
         {
+            Guid? organizationId = null;
+
             HandleCommand(c, aggregate =>
             {
+                organizationId = aggregate.Data.GetGuidValue(StandardField.OrganizationIdentifier);
+
                 aggregate.RemoveStandard();
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Standard);
         }
 
         public void Handle(ModifyStandardTimestamps c)
@@ -232,18 +246,39 @@ namespace InSite.Application.Standards.Write
 
         public void Handle(ModifyStandardContent c)
         {
+            Guid? organizationId = null;
+
             HandleCommand(c, aggregate =>
             {
+                organizationId = aggregate.Data.GetGuidValue(StandardField.OrganizationIdentifier);
+
                 aggregate.ModifyStandardContent(c.Content);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Standard);
         }
 
         public void Handle(ModifyStandardFieldText c)
         {
+            Guid? organizationId = null;
+
             HandleCommand(c, aggregate =>
             {
-                aggregate.ModifyStandardFieldText(c.Field, c.Value);
+                if (aggregate.ModifyStandardFieldText(c.Field, c.Value)
+                    && (
+                        c.Field == StandardField.ContentName
+                        || c.Field == StandardField.StandardType
+                        || c.Field == StandardField.DocumentType
+                    )
+                )
+                {
+                    organizationId = aggregate.Data.GetGuidValue(StandardField.OrganizationIdentifier);
+                }
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Standard);
         }
 
         public void Handle(ModifyStandardFieldDateOffset c)

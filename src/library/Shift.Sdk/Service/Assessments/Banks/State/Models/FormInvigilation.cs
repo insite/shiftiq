@@ -2,6 +2,7 @@
 using System.ComponentModel;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.Domain.Banks
 {
@@ -11,6 +12,7 @@ namespace InSite.Domain.Banks
     [Serializable]
     public class FormInvigilation
     {
+        public AIProctoringProvider? AIProctoringProvider { get; set; }
         public bool IsSafeExamBrowserRequired { get; set; }
         public bool IsKioskModeRequired { get; set; }
         public DateTimeOffset? Opened { get; set; }
@@ -40,6 +42,7 @@ namespace InSite.Domain.Banks
         public bool Equals(FormInvigilation invigilation)
         {
             return invigilation != null
+                && this.AIProctoringProvider == invigilation.AIProctoringProvider
                 && this.IsSafeExamBrowserRequired == invigilation.IsSafeExamBrowserRequired
                 && this.IsKioskModeRequired == invigilation.IsKioskModeRequired
                 && this.Opened == invigilation.Opened

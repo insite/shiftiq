@@ -72,6 +72,14 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
 
         public DataItem[] GetDataItems() => Select(GetFilter((string)null));
 
+        // Every person this control would offer if the given departments were selected, keeping its other criteria.
+        public DataItem[] GetDataItems(Guid[] departments)
+        {
+            var filter = GetFilter((string)null);
+            filter.Filter.Departments = departments;
+            return Select(filter);
+        }
+
         public int GetCount() => Count(GetFilter((string)null));
 
     }

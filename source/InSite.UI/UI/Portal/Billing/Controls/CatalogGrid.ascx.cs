@@ -45,6 +45,12 @@ namespace InSite.UI.Portal.Billing.Controls
             private set => ViewState[nameof(CurrentMode)] = value;
         }
 
+        public bool IsTransfer
+        {
+            get => (bool)(ViewState[nameof(IsTransfer)] ?? false);
+            private set => ViewState[nameof(IsTransfer)] = value;
+        }
+
         #endregion
 
         #region Initialization and Loading
@@ -69,6 +75,7 @@ namespace InSite.UI.Portal.Billing.Controls
             var product = (TProduct)e.Item.DataItem;
             var defaultTitle = (PlaceHolder)e.Item.FindControl("DefaultTitle");
             var subscribeTitle = (PlaceHolder)e.Item.FindControl("SubscribeTitle");
+            var subTitle = (Literal)e.Item.FindControl("SubTitle");
             var subName = (Literal)e.Item.FindControl("SubName");
             var subPack = (Literal)e.Item.FindControl("SubPack");
             var qtyPh = (PlaceHolder)e.Item.FindControl("QtyContainer");
@@ -89,7 +96,12 @@ namespace InSite.UI.Portal.Billing.Controls
             qtyInput.Text = CurrentMode == PriceSelectionMode.Select ? "0" : "1";
 
             if (isSubscribe)
+            {
+                if (subTitle != null)
+                    subTitle.Text = IsTransfer ? "Subscribe &amp; Transfer to Member Organizations" : "Subscribe &amp; Choose Later";
+
                 SetSubscribeModeText(product, subName, subPack);
+            }
 
             if (addBtn == null)
                 return;
@@ -126,9 +138,10 @@ namespace InSite.UI.Portal.Billing.Controls
 
         #region Data operations
 
-        public void LoadData(PriceSelectionMode mode)
+        public void LoadData(PriceSelectionMode mode, bool isTransfer = false)
         {
             CurrentMode = mode;
+            IsTransfer = mode == PriceSelectionMode.Subscribe && isTransfer;
 
             var orgId = CurrentSessionState.Identity.Organization.OrganizationIdentifier;
 

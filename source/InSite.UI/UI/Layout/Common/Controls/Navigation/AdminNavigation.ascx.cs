@@ -70,6 +70,15 @@ namespace InSite.UI.Layout.Admin
             if (IsPostBack)
                 return;
 
+            // Global search needs extensive QA by the CMDS team to ensure search results align to
+            // their permission matrix, so it needs to be hidden for E03 in v26.5. If the team has
+            // time for this QA in October then we can make this feature available to users in the
+            // next v26.6 release.
+
+            var isCMDS = ServiceLocator.AppSettings.Partition.IsE03();
+
+            AdminNavigationSearch.Visible = !isCMDS;
+
             ImpersonatorAnchor.HRef = Urls.StopImpersonation;
 
             HelpCenterAnchor.HRef = ServiceLocator.AppSettings.HelpUrl + "/help";

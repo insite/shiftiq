@@ -156,9 +156,7 @@ namespace InSite.Admin.Events.Timers.Controls
         private void BindRegistrationCombo(ComboBox combo)
         {
             combo.LoadItems(
-                ServiceLocator.RegistrationSearch.GetRegistrationsByEvent(
-                    Properties.EventIdentifier,
-                    null, null, null, false, false, true, false),
+                ServiceLocator.RegistrationSearch.GetRegistrationsByEvent(Properties.EventIdentifier, includeCandidate: true),
                 "RegistrationIdentifier", "Candidate.UserFullName"
             );
         }

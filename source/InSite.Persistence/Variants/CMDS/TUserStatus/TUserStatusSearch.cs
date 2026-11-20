@@ -139,7 +139,7 @@ namespace InSite.Persistence.Plugin.CMDS
 
         #endregion
 
-        public void GetAsAt(Guid organization, out DateTimeOffset? from, out DateTimeOffset? thru)
+        public void GetAsAt(Guid organization, out DateTime? from, out DateTime? thru)
         {
             using (var db = new InternalDbContext())
             {
@@ -158,7 +158,7 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
-        public DateTimeOffset? GetMostRecentSnapshotDate(Guid organization, int year, int month)
+        public DateTime? GetMostRecentSnapshotDate(Guid organization, int year, int month)
         {
             using (var db = new InternalDbContext())
             {
@@ -168,7 +168,7 @@ namespace InSite.Persistence.Plugin.CMDS
                     .DefaultIfEmpty()
                     .Max();
 
-                if (mostRecent == DateTimeOffset.MinValue)
+                if (mostRecent == DateTime.MinValue)
                     return null;
 
                 return mostRecent;
@@ -177,7 +177,7 @@ namespace InSite.Persistence.Plugin.CMDS
 
         public class OrganizationSnapshotInfo
         {
-            public DateTimeOffset AsAt { get; set; }
+            public DateTime AsAt { get; set; }
         }
 
         public IEnumerable<OrganizationSnapshotInfo> GetOrganizationSnapshots(Guid organization)
@@ -195,7 +195,7 @@ namespace InSite.Persistence.Plugin.CMDS
 
         public class ChartDataItem
         {
-            public DateTimeOffset AsAt { get; set; }
+            public DateTime AsAt { get; set; }
             public string StatisticName { get; set; }
             public decimal ComplianceScore { get; set; }
         }

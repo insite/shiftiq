@@ -1,7 +1,14 @@
+using Shift.Service.Security;
+
 namespace Shift.Service.Booking;
 
 public partial class RegistrationEntity
 {
+    public EventEntity? Event { get; set; }
+    public UserEntity? CandidateUser { get; set; }
+
+    public ICollection<AccommodationEntity> Accommodations { get; set; } = new List<AccommodationEntity>();
+
     public Guid? AttemptIdentifier { get; set; }
     public Guid CandidateIdentifier { get; set; }
     public Guid? CustomerIdentifier { get; set; }

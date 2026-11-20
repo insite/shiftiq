@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Text;
 using System.Web.UI.WebControls;
@@ -11,9 +11,9 @@ using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Layout.Portal.Controls;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Common.Linq;
 using Shift.Constant;
 

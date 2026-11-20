@@ -146,17 +146,17 @@ namespace InSite.Admin.Contacts.People.Utilities
             return email;
         }
 
-        public void CmdsUnarchive(QUser user)
+        public void CmdsUnarchive(QUser user, Guid organizationId)
         {
-            user.UtcArchived = null;
-            user.UtcUnarchived = DateTimeOffset.UtcNow;
-            user.Email = user.Email;
-            user.UserPasswordExpired = DateTimeOffset.UtcNow;
+            // Both the admin Unarchive button and the Workday reactivation run the unarchive through
+            // one command, so the person re-establish and Archive-org cleanup live in a single place
+            // (CmdsUserCommandReceiver). The person id is minted here for the same reason the archive
+            // mints one in MoveUserToArchiveOrganization, unless the user already holds a person in
+            // the organization: the receiver refuses a command that names a different one.
+            var person = ServiceLocator.PersonSearch.GetPerson(user.UserIdentifier, organizationId);
+            var personId = person?.PersonIdentifier ?? UniqueIdentifier.Create();
 
-            user.SetDefaultPassword(Default.CmdsPassword);
-
-            UserStore.Update(user, null);
-            PersonStore.Delete(user.UserIdentifier, OrganizationIdentifiers.Archive);
+            ServiceLocator.SendCommand(new UnarchiveCmdsUser(user.UserIdentifier, organizationId, personId));
         }
 
         private void VoidCredentials(Guid user)

@@ -356,6 +356,11 @@ where form.OrganizationIdentifier = @OrganizationIdentifier";
                     person => person.UserIdentifier == attempt.LearnerUserIdentifier
                            && person.OrganizationIdentifier == filter.LearnerOrganizationIdentifier.Value));
 
+            if (filter.LearnerEmployerId.HasValue)
+                query = query.Where(attempt => db.QPersons.Any(
+                    person => person.UserIdentifier == attempt.LearnerUserIdentifier
+                           && person.EmployerGroupIdentifier == filter.LearnerEmployerId));
+
             if (filter.GradingAssessorIdentifier.HasValue)
                 query = query.Where(x => x.GradingAssessorUserIdentifier == filter.GradingAssessorIdentifier);
 

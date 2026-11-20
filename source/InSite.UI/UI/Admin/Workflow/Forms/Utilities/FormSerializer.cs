@@ -185,7 +185,8 @@ namespace InSite.Admin.Workflow.Forms.Utilities
                 results.Add(new ScaleSerialized
                 {
                     Category = scale.Category,
-                    Items = GetScaleItems(scale.Items)
+                    Items = GetScaleItems(scale.Items),
+                    Content = GetContent(scale.Content)
                 });
             }
             return results;

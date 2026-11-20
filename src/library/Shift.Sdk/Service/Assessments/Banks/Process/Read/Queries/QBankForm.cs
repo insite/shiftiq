@@ -37,6 +37,7 @@ namespace InSite.Application.Banks.Read
         public string FormType { get; set; }
         public string FormHasReferenceMaterials { get; set; }
         public bool FormThirdPartyAssessmentIsEnabled { get; set; }
+        public string AIProctoringProvider { get; set; }
 
         public int AttemptSubmittedCount { get; set; }
         public int AttemptGradedCount { get; set; }
@@ -59,6 +60,7 @@ namespace InSite.Application.Banks.Read
         public virtual ICollection<QAttempt> Attempts { get; set; } = new HashSet<QAttempt>();
         public virtual ICollection<QEventAssessmentForm> EventAssessmentForms { get; set; } = new HashSet<QEventAssessmentForm>();
         public virtual ICollection<QRegistration> Registrations { get; set; } = new HashSet<QRegistration>();
+        public virtual ICollection<QRegistrationExamForm> RegistrationExamForms { get; set; } = new HashSet<QRegistrationExamForm>();
         public virtual ICollection<QBankQuestionGradeItem> GradeItems { get; set; } = new HashSet<QBankQuestionGradeItem>();
     }
 }

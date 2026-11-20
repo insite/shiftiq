@@ -500,6 +500,13 @@ namespace InSite.Persistence.Plugin.CMDS
             if (filter.ExcludeAchievementIdentifier.HasValue)
                 query = query.Where(x => x.AchievementIdentifier != filter.ExcludeAchievementIdentifier);
 
+            // Opt-in: a page that assigns achievements by hand hides the ones that belong to a paid
+            // program, since those reach a learner only through the program's enrollment path.
+            if (filter.ExcludePaidProgramAchievements)
+                query = query.Where(x => !db.TTasks.Any(t => t.ObjectType == ProgramTaskDefaults.AchievementObjectType
+                    && t.ObjectIdentifier == x.AchievementIdentifier
+                    && t.Program.ProgramFee > 0));
+
             if (!string.IsNullOrEmpty(filter.Title))
                 query = query.Where(x => x.AchievementTitle.Contains(filter.Title));
 
@@ -511,6 +518,9 @@ namespace InSite.Persistence.Plugin.CMDS
 
             if (filter.AllowSelfDeclared != null)
                 query = query.Where(x => x.AchievementAllowSelfDeclared == filter.AllowSelfDeclared);
+
+            if (filter.IssuesCertificate != null)
+                query = query.Where(x => x.AchievementIssuesCertificate == filter.IssuesCertificate);
 
             if (filter.IsTimeSensitive.HasValue)
             {
@@ -1081,23 +1091,46 @@ namespace InSite.Persistence.Plugin.CMDS
                 if (!string.IsNullOrEmpty(keyword))
                     items = items.Where(x => x.AchievementTitle.Contains(keyword));
 
-                var list = items
-                    .Select(x => new AchievementListGridItem
-                    {
-                        OrganizationIdentifier = x.OrganizationIdentifier,
-                        AchievementIdentifier = x.AchievementIdentifier,
-                        AchievementTitle = x.AchievementTitle,
-                        AchievementLabel = x.AchievementLabel,
-                        Visibility = x.Visibility,
-                        CategoryName = x.Categories.Any()
-                            ? x.Categories.FirstOrDefault().CategoryName
-                            : "No Category"
-                    })
-                    .OrderBy(x => x.AchievementTitle)
-                    .ToList();
-
-                return list;
+                return SelectListGridItems(items);
             }
+        }
+
+        /// <summary>
+        /// Selects the achievements a program's tasks point at, whoever owns them and whatever
+        /// department they are linked to, so an assigned achievement stays visible (and removable)
+        /// even after it falls outside scope.
+        /// </summary>
+        public static List<AchievementListGridItem> SelectProgramAchievements(Guid programId, string keyword)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var items = db.VCmdsAchievements
+                    .AsNoTracking()
+                    .Where(x => db.TTasks.Any(t => t.ProgramIdentifier == programId && t.ObjectIdentifier == x.AchievementIdentifier));
+
+                if (!string.IsNullOrEmpty(keyword))
+                    items = items.Where(x => x.AchievementTitle.Contains(keyword));
+
+                return SelectListGridItems(items);
+            }
+        }
+
+        private static List<AchievementListGridItem> SelectListGridItems(IQueryable<VCmdsAchievement> items)
+        {
+            return items
+                .Select(x => new AchievementListGridItem
+                {
+                    OrganizationIdentifier = x.OrganizationIdentifier,
+                    AchievementIdentifier = x.AchievementIdentifier,
+                    AchievementTitle = x.AchievementTitle,
+                    AchievementLabel = x.AchievementLabel,
+                    Visibility = x.Visibility,
+                    CategoryName = x.Categories.Any()
+                        ? x.Categories.FirstOrDefault().CategoryName
+                        : "No Category"
+                })
+                .OrderBy(x => x.AchievementTitle)
+                .ToList();
         }
 
         public static List<AchievementListGridItem> SelectNewUploadAchievements(Guid? organizationId, Guid uploadId, string searchText)

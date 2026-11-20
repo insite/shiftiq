@@ -10,7 +10,7 @@ using Shift.Common;
 
 namespace InSite.Application.Courses.Write
 {
-    public class ModifyCourseFieldText : Command, IHasRun
+    public class ModifyCourseFieldText : Command, IHasRun, IGlobalSearchUpdater
     {
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public CourseField CourseField { get; set; }
@@ -23,6 +23,8 @@ namespace InSite.Application.Courses.Write
             CourseField = courseField;
             Value = value;
         }
+
+        bool IGlobalSearchUpdater.IsUpdater() => CourseField == CourseField.CourseName;
 
         bool IHasRun.Run(CourseAggregate course)
         {

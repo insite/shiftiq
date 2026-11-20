@@ -258,6 +258,33 @@ namespace InSite.UI.Admin.Events.Classes.Controls
         protected global::System.Web.UI.WebControls.Literal AchievementTitle;
 
         /// <summary>
+        /// FormAttachmentLimitField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl FormAttachmentLimitField;
+
+        /// <summary>
+        /// FormAttachmentLimitLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink FormAttachmentLimitLink;
+
+        /// <summary>
+        /// FormAttachmentLimit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal FormAttachmentLimit;
+
+        /// <summary>
         /// AssessmentList control.
         /// </summary>
         /// <remarks>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 
 using Newtonsoft.Json;
@@ -8,6 +9,13 @@ namespace Shift.Common.Integration.Google
 {
     public class LocationClient
     {
+        private readonly string _apiKey;
+
+        public LocationClient(string apiKey = null)
+        {
+            _apiKey = apiKey;
+        }
+
         public Country[] CollectCountries(string host)
         {
             return GetData<Country>(host, Endpoints.Location.Countries);
@@ -45,7 +53,12 @@ namespace Shift.Common.Integration.Google
             {
                 try
                 {
-                    var response = Shift.Common.TaskRunner.RunSync(StaticHttpClient.Client.GetAsync, url);
+                    // A request message cannot be sent twice, so each attempt builds its own.
+                    var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                    HubApiKey.Apply(request, _apiKey);
+
+                    var response = Shift.Common.TaskRunner.RunSync(() => StaticHttpClient.Client.SendAsync(request));
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {

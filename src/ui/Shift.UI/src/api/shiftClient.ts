@@ -22,6 +22,9 @@ import { _maintenanceController } from "./controllers/platform/maintenance/_main
 import { _chatbotController } from "./controllers/chatbot/_chatbotController";
 import { _pendingPeopleController } from "./controllers/pending-people/_pendingPeopleController";
 import { _toolkitUsageController } from "./controllers/reports/_toolkitUsageController";
+import { _searchController } from "./controllers/searches/_searchController";
+import { _proviewController } from "./controllers/integrations/_proviewController";
+import { _attemptController } from "./controllers/assessments/attempts/_attemptController";
 
 export const shiftClient = {
     me: {
@@ -33,6 +36,10 @@ export const shiftClient = {
                 }
             }
             return result;
+        },
+
+        async permissions(): Promise<string | null> {
+            return await fetchHelper.get<string>("/api/me/permissions");
         },
     },
 
@@ -55,6 +62,9 @@ export const shiftClient = {
     maintenance: _maintenanceController,
     chatbot: _chatbotController,
     toolkitUsage: _toolkitUsageController,
+    search: _searchController,
+    proview: _proviewController,
+    attempt: _attemptController,
 
     command: _commandController,
     timeline: _timelineController,

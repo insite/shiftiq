@@ -10,7 +10,7 @@ namespace Shift.Service;
 public class PrincipalSearch : IPrincipalSearch
 {
     private const string DefaultLanguage = "en";
-    private const string DefaultTimeZone = "Mountain Standard Time";
+    private static string DefaultTimeZone = TimeZones.Ids.Mountain;
 
     private readonly AppSettings _appSettings;
     private readonly IClaimConverter _converter;
@@ -170,27 +170,32 @@ public class PrincipalSearch : IPrincipalSearch
         if (person.IsAdministrator)
         {
             access |= AuthorityAccess.Administrator;
-            roles.Add(new Role(SystemRole.Administrator));
+            roles.Add(GetSystemRole(SystemRole.Administrator));
         }
 
         if (person.IsDeveloper)
         {
             access |= AuthorityAccess.Developer;
-            roles.Add(new Role(SystemRole.Developer));
+            roles.Add(GetSystemRole(SystemRole.Developer));
         }
 
         if (person.IsLearner)
         {
             access |= AuthorityAccess.Learner;
-            roles.Add(new Role(SystemRole.Learner));
+            roles.Add(GetSystemRole(SystemRole.Learner));
         }
 
         if (person.IsOperator)
         {
             access |= AuthorityAccess.Operator;
-            roles.Add(new Role(SystemRole.Operator));
+            roles.Add(GetSystemRole(SystemRole.Operator));
         }
 
         return (access, roles);
+
+        Role GetSystemRole(string name)
+        {
+            return new Role(name, SystemRole.GetSystemRoleId(name));
+        }
     }
 }

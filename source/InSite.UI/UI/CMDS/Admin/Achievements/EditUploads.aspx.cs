@@ -170,7 +170,7 @@ namespace InSite.Cmds.Admin.Achievements.Forms
 
             foreach (var source in files)
             {
-                var filename = Path.GetFileName(source);
+                var filename = CmdsUploadProvider.AdjustFileName(Path.GetFileName(source));
 
                 try
                 {

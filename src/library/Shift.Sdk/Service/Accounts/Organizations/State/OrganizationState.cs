@@ -41,8 +41,7 @@ namespace InSite.Domain.Organizations
 
         public CultureInfo[] Languages { get; set; }
 
-        [JsonConverter(typeof(JsonTimeZoneConverter))]
-        public TimeZoneInfo TimeZone { get; set; }
+        public string TimeZone { get; set; }
 
         public AccountStatus AccountStatus { get; set; }
         public CompanyDescription CompanyDescription { get; set; }
@@ -56,7 +55,7 @@ namespace InSite.Domain.Organizations
         {
             CompanyDescription = new CompanyDescription();
             Languages = new[] { new CultureInfo("en") };
-            TimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            TimeZone = TimeZones.Ids.Utc;
             PlatformCustomization = new PlatformCustomization();
             Fields = new OrganizationFields();
             Integrations = new OrganizationIntegrations();
@@ -96,6 +95,8 @@ namespace InSite.Domain.Organizations
             accounts.AutomaticGroupJoin = e.Accounts.AutomaticGroupJoin;
             accounts.DisplayDashboardPrototype = e.Accounts.DisplayDashboardPrototype;
             accounts.HideAdminMyDashboard = e.Accounts.HideAdminMyDashboard;
+            accounts.OtherEnvironments = e.Accounts.OtherEnvironments;
+            accounts.AHRIFeatures = e.Accounts.AHRIFeatures;
 
             if (e.Accounts.PersonCodeAutoincrement != null)
             {
@@ -142,6 +143,7 @@ namespace InSite.Domain.Organizations
             assessments.RequireAutoStart = e.Assessments.RequireAutoStart;
             assessments.LockPublishedStandards = e.Assessments.LockPublishedStandards;
             assessments.TakerReport = e.Assessments.TakerReport;
+            assessments.AIProctoringEnabled = e.Assessments.AIProctoringEnabled;
 
             if (e.Assessments.PerformanceReport != null)
             {
@@ -186,6 +188,8 @@ namespace InSite.Domain.Organizations
             contacts.ProfileSecurityGroupId = e.Contacts.ProfileSecurityGroupId;
             contacts.DisplayIntegrationPortalLink = e.Contacts.DisplayIntegrationPortalLink;
             contacts.ImportReportGroupNames = e.Contacts.ImportReportGroupNames;
+            contacts.IntegrationPortalGroupNames = e.Contacts.IntegrationPortalGroupNames;
+            contacts.IntegrationPortalEmployerGroupName = e.Contacts.IntegrationPortalEmployerGroupName;
         }
 
         public void When(OrganizationCreated e)
@@ -247,6 +251,7 @@ namespace InSite.Domain.Organizations
             var logbooks = Toolkits.Logbooks;
             logbooks.DisplayTotalLogbookHours = e.Logbooks.DisplayTotalLogbookHours;
             logbooks.LogbookBulkEntry = e.Logbooks.LogbookBulkEntry;
+            logbooks.SupervisorGroupIdentifier = e.Logbooks.SupervisorGroupIdentifier;
         }
 
         public void When(OrganizationIdentificationModified e)
@@ -272,9 +277,6 @@ namespace InSite.Domain.Organizations
 
             if (e.Integrations.Prometric != null)
                 integrations.Prometric = e.Integrations.Prometric.Clone();
-
-            if (e.Integrations.ScormCloud != null)
-                integrations.ScormCloud = e.Integrations.ScormCloud.Clone();
         }
 
         public void When(OrganizationIssueSettingsModified e)
@@ -292,7 +294,7 @@ namespace InSite.Domain.Organizations
         public void When(OrganizationLocalizationModified e)
         {
             Languages = e.Languages.Select(x => new CultureInfo(x)).ToArray();
-            TimeZone = TimeZoneInfo.FindSystemTimeZoneById(e.TimeZone);
+            TimeZone = e.TimeZone;
         }
 
         public void When(OrganizationLocationModified e)

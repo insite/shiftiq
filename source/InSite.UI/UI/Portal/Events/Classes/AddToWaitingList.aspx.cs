@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI.HtmlControls;
@@ -112,11 +112,13 @@ namespace InSite.UI.Portal.Events.Classes
             if (!IsValid)
                 return;
 
+            var @event = ServiceLocator.EventSearch.GetEvent(EventIdentifier.Value, x => x.Registrations);
+            if (IsCandidateWaitlistedOrRegistered(@event))
+                HttpResponseHelper.Redirect(GetOutlineLink());
+
             var (person, user) = SavePerson();
 
             SaveRegistration(person);
-
-            var @event = ServiceLocator.EventSearch.GetEvent(EventIdentifier.Value, x => x.Registrations);
 
             var statusId = Outline.SetStatus(
                 AlertType.Success,
@@ -178,17 +180,8 @@ namespace InSite.UI.Portal.Events.Classes
                     NavigateToSearch();
             }
 
-            var registration = CandidateIdentifier.HasValue
-                ? @event.Registrations.FirstOrDefault(x => x.CandidateIdentifier == CandidateIdentifier)
-                : null;
-            if (registration != null
-                && (
-                    string.Equals(registration.ApprovalStatus, "Waitlisted", StringComparison.OrdinalIgnoreCase)
-                    || string.Equals(registration.ApprovalStatus, "Registered", StringComparison.OrdinalIgnoreCase)
-                ))
-            {
+            if (IsCandidateWaitlistedOrRegistered(@event))
                 HttpResponseHelper.Redirect(GetOutlineLink());
-            }
 
             var classDataFields = @event.GetRegistrationFields().ToList();
             var organizationDataFields = Organization.Fields.ClassRegistration.ToList();
@@ -260,6 +253,17 @@ namespace InSite.UI.Portal.Events.Classes
 
             var employerPanelField = regFields.FirstOrDefault(x => x.FieldName == RegistrationFieldName.EmployerPanel);
             EmployerField.Visible = employerPanelField == null || employerPanelField.IsVisible;
+        }
+
+        private bool IsCandidateWaitlistedOrRegistered(QEvent @event)
+        {
+            var registration = CandidateIdentifier.HasValue
+                ? @event.Registrations.FirstOrDefault(x => x.CandidateIdentifier == CandidateIdentifier)
+                : null;
+
+            return registration != null && (
+                   string.Equals(registration.ApprovalStatus, "Waitlisted", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(registration.ApprovalStatus, "Registered", StringComparison.OrdinalIgnoreCase));
         }
 
         private void SetTextInputEnabled(InSite.Common.Web.UI.TextBox textBox)

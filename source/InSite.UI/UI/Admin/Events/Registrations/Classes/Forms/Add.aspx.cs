@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -268,8 +268,8 @@ namespace InSite.Admin.Events.Registrations.Forms
 
             if (@event.EventScheduledEnd.HasValue)
             {
-                var start = TimeZoneInfo.ConvertTime(@event.EventScheduledStart, Identity.User.TimeZone);
-                var end = TimeZoneInfo.ConvertTime(@event.EventScheduledEnd.Value, Identity.User.TimeZone);
+                var start = TimeZones.ConvertTime(@event.EventScheduledStart, Identity.User.TimeZone);
+                var end = TimeZones.ConvertTime(@event.EventScheduledEnd.Value, Identity.User.TimeZone);
 
                 if (start.Year == end.Year && start.Month == end.Month && start.Day == end.Day)
                     isOneDay = true;

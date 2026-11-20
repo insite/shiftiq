@@ -282,9 +282,11 @@ public class PendingPersonController : ShiftControllerBase
         var organizationData = organizationAdapter.ToData(organization);
         var fullNamePolicy = organizationData.Toolkits?.Contacts?.FullNamePolicy;
         var claimGroupNames = organizationData.Toolkits?.Contacts?.ImportReportGroupNames;
-        var timeZone = organizationData.TimeZone.Id;
+        var employerGroupName = organizationData.Toolkits?.Contacts?.IntegrationPortalEmployerGroupName;
+        var groupNames = organizationData.Toolkits?.Contacts?.IntegrationPortalGroupNames;
+        var timeZone = organizationData.TimeZone;
 
-        var result = await importer.ImportPendingPeopleAsync(organizationId, fullNamePolicy, timeZone, submittedByName, imports);
+        var result = await importer.ImportPendingPeopleAsync(organizationId, fullNamePolicy, timeZone, employerGroupName, groupNames, submittedByName, imports);
         var file = await reporter.SaveReportAsync(organizationId, submittedBy, timeZone, claimGroupNames, result, false);
 
         return new ImportResult

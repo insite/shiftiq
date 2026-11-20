@@ -154,6 +154,12 @@ namespace InSite.Persistence
             if (filter.ProductIdentifier.HasValue)
                 query = query.Where(x => x.CreatedInvoice.InvoiceItems.Any(ii => ii.ProductIdentifier == filter.ProductIdentifier.Value));
 
+            if (filter.TaxCountry.IsNotEmpty())
+                query = query.Where(x => x.CreatedInvoice.InvoiceItems.Any(ii => ii.TaxRate > 0 && ii.TaxCountry == filter.TaxCountry));
+
+            if (filter.TaxRegion.IsNotEmpty())
+                query = query.Where(x => x.CreatedInvoice.InvoiceItems.Any(ii => ii.TaxRate > 0 && ii.TaxRegion == filter.TaxRegion));
+
             return query;
         }
 

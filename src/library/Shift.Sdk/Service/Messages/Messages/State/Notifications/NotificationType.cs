@@ -10,6 +10,7 @@
         AssessmentAttemptCompleted,
         AssessmentAttemptStarted,
         AuthenticationAlarmTriggered,
+        CaseManagerAssigned,
         CmdsBlogSubscriptionRequested,
         CmdsCollegeCertificationRequested,
         CmdsCompetenciesExpired,
@@ -65,6 +66,7 @@
 
         LogbookModified,
         LogbookJoined,
+        LogbookSupervisorAssigned,
         MembershipEnded,
         MembershipStarted,
         PasswordChanged,
@@ -74,6 +76,9 @@
 
         ProgramCompleted,
         ProgramStalled,
+        ProgramEnrollmentRequested,
+        ProgramEnrollmentApproved,
+        ProgramEnrollmentRejected,
 
         ProgressCompleted,
         RegistrantContactInformationChanged,

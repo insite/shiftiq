@@ -13,7 +13,7 @@ namespace InSite.Admin.Records.Gradebooks.Controls
 {
     public partial class GradebookInfo : UserControl
     {
-        public void BindGradebook(QGradebook gradebook, TimeZoneInfo tz)
+        public void BindGradebook(QGradebook gradebook, string tz)
         {
             GradebookLink.HRef = $"/ui/admin/records/gradebooks/outline?id={gradebook.GradebookIdentifier}";
             GradebookTitle.Text = gradebook.GradebookTitle;
@@ -54,7 +54,7 @@ namespace InSite.Admin.Records.Gradebooks.Controls
             ClassInstructors.DataBind();
         }
 
-        private static string GetLocalTime(DateTimeOffset? item, TimeZoneInfo tz)
+        private static string GetLocalTime(DateTimeOffset? item, string tz)
         {
             return item.FormatDateOnly(tz, nullValue: string.Empty);
         }

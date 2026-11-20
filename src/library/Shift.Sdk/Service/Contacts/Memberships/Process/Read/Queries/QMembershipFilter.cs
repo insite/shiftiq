@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Shift.Common;
 
@@ -9,6 +9,7 @@ namespace InSite.Application.Contacts.Read
     {
         public Guid? GroupOrganizationIdentifier { get; set; }
         public string MembershipFunction { get; set; }
+        public string GroupType { get; set; }
 
         public Guid[] GroupIdentifiers { get; set; }
         public Guid? GroupIdentifier

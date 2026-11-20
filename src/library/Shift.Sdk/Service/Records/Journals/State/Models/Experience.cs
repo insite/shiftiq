@@ -10,7 +10,7 @@ namespace InSite.Domain.Records
         public Guid? Validator { get; set; }
         public int Sequence { get; set; }
         public string Employer { get; set; }
-        public string Supervisor { get; set; }
+        public Guid? Supervisor { get; set; }
         public string Instructor { get; set; }
         public DateTime? Started { get; set; }
         public DateTime? Stopped { get; set; }

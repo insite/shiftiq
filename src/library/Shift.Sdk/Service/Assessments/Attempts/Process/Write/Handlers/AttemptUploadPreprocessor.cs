@@ -30,7 +30,7 @@ namespace InSite.Application.Attempts.Write
             _getUserIdentifier = getUserIdentifier;
         }
 
-        public AttemptUploadAnswer[] Process(AttemptUploadFileLine[] lines, TimeZoneInfo defaultTimeZone, Guid? defaultEvent, Guid? defaultForm)
+        public AttemptUploadAnswer[] Process(AttemptUploadFileLine[] lines, string defaultTimeZoneId, Guid? defaultEvent, Guid? defaultForm)
         {
             Warnings = new List<string>();
             Summaries = new ListItemArray();
@@ -75,7 +75,7 @@ namespace InSite.Application.Attempts.Write
                         LearnerName = line.LearnerName,
                         LearnerUserIdentifier = userId,
                         AttemptGraded = line.AttemptDate.HasValue
-                            ? new DateTimeOffset(line.AttemptDate.Value, defaultTimeZone.GetUtcOffset(line.AttemptDate.Value))
+                            ? new DateTimeOffset(line.AttemptDate.Value, TimeZones.GetUtcOffset(line.AttemptDate.Value, defaultTimeZoneId))
                             : (DateTimeOffset?)null,
                         Tag = line.Instructor,
                         HasEventRegistration = userRegistration != null,

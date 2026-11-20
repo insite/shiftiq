@@ -34,8 +34,7 @@
                 <div>
                     <insite:ComboBox runat="server" ID="ActivityPlatform">
                         <Items>
-                            <insite:ComboBoxOption Value="SCORM Cloud" Text="SCORM Cloud" />
-                            <insite:ComboBoxOption Value="Scoop" Text="OpenSCORM (Scoop)" />                            
+                            <insite:ComboBoxOption Value="Scoop" Text="OpenSCORM (Scoop)" />
                         </Items>
                     </insite:ComboBox>
                 </div>
@@ -49,12 +48,10 @@
                     SCORM Package ID
                 </label>
                 <div>
-                    <insite:TextBox runat="server" ID="ActivityHook" MaxLength="100" />
+                    <insite:TextBox runat="server" ID="ActivityHook" MaxLength="500" />
                 </div>
                 <div class="mt-2">
                     <div><asp:CheckBox runat="server" ID="LinkIsMultilingual" Text="Append a language code to SCORM Package ID" /></div>
-                    <div><asp:CheckBox runat="server" ID="LinkIsPreview" Text="Launch SCORM content in Preview mode" /></div>
-                    <div><asp:CheckBox runat="server" ID="LinkIsDispatch" Text="SCORM content is a dispatch package" /></div>
                     <div><asp:HyperLink runat="server" ID="ScoopLibraryUrl" Text="SCO Library" NavigateUrl="#" Visible="false" /></div>
                 </div>
             </div>
@@ -69,7 +66,7 @@
                 <div><insite:TextBox runat="server" ID="LinkUrl" MaxLength="500" /></div>
             </div>
 
-            <div runat="server" id="LinkTargetField" class="form-group mb-3">
+            <div runat="server" id="LinkTargetField" class="form-group mb-3" visible="false">
                 <label class="form-label">
                     Link Target
                 </label>

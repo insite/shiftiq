@@ -105,6 +105,15 @@ namespace InSite.Admin.Records.Logbooks
         protected global::InSite.Common.Web.UI.FindMessage LearnerAddedMessageIdentifier;
 
         /// <summary>
+        /// SupervisorMessageIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindMessage SupervisorMessageIdentifier;
+
+        /// <summary>
         /// SaveButton control.
         /// </summary>
         /// <remarks>

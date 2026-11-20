@@ -28,6 +28,7 @@ namespace InSite.Application.Records.Read
         public bool AchievementIsEnabled { get; set; }
         public bool AchievementAllowSelfDeclared { get; set; }
         public bool AchievementReportingDisabled { get; set; }
+        public bool AchievementIssuesCertificate { get; set; }
         public int? ExpirationLifetimeQuantity { get; set; }
         public DateTimeOffset? ExpirationFixedDate { get; set; }
         public string AchievementType { get; set; }
@@ -46,9 +47,9 @@ namespace InSite.Application.Records.Read
         public virtual ICollection<TAchievementDepartment> Departments { get; set; } = new HashSet<TAchievementDepartment>();
 
         public string ExpirationToString()
-            => ExpirationToString(TimeZones.Pacific);
+            => ExpirationToString(TimeZones.Ids.Pacific);
 
-        public string ExpirationToString(TimeZoneInfo tz)
+        public string ExpirationToString(string tz)
         {
             var s = ExpirationType;
 

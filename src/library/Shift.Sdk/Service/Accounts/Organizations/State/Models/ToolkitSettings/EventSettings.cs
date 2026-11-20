@@ -17,6 +17,7 @@ namespace InSite.Domain.Organizations
         public bool AllowClassRegistrationFields { get; set; }
         public RegisterEmployeesSearchRequirement RegisterEmployeesSearchRequirement { get; set; }
         public bool SendRegistrationInvitationToRequestedBy { get; set; }
+        public bool AllowMultipleAssessmentForms { get; set; }
 
         [DefaultValue(24), JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public int OnlineEventAutomationWindowHours { get; set; } = 24;
@@ -36,7 +37,8 @@ namespace InSite.Domain.Organizations
                 && RegisterEmployeesSearchRequirement == other.RegisterEmployeesSearchRequirement
                 && OnlineEventAutomationWindowHours == other.OnlineEventAutomationWindowHours
                 && PaperEventAutomationWindowMonths == other.PaperEventAutomationWindowMonths
-                && SendRegistrationInvitationToRequestedBy == other.SendRegistrationInvitationToRequestedBy;
+                && SendRegistrationInvitationToRequestedBy == other.SendRegistrationInvitationToRequestedBy
+                && AllowMultipleAssessmentForms == other.AllowMultipleAssessmentForms;
         }
 
         public void Set(EventSettings value)
@@ -52,6 +54,7 @@ namespace InSite.Domain.Organizations
             OnlineEventAutomationWindowHours = value.OnlineEventAutomationWindowHours;
             PaperEventAutomationWindowMonths = value.PaperEventAutomationWindowMonths;
             SendRegistrationInvitationToRequestedBy = value.SendRegistrationInvitationToRequestedBy;
+            AllowMultipleAssessmentForms = value.AllowMultipleAssessmentForms;
         }
     }
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web;
 
 using InSite.Application.Banks.Read;
@@ -65,8 +64,8 @@ namespace InSite.Persistence.Integration.Prometric
         public bool EligibilityExists(SaveEligibilityInput input)
             => GetEligibility(CreateGetEligibilityInput(input)).Success;
 
-        public bool EligibilityExists(QRegistration registration)
-            => GetEligibility(registration).Success;
+        public bool EligibilityExists(QRegistration registration, QRegistrationExamForm examForm)
+            => GetEligibility(registration, examForm).Success;
 
         public PrometricEndpoint GetPrometricEndpoint()
         {
@@ -162,31 +161,16 @@ namespace InSite.Persistence.Integration.Prometric
             return _parser.ParseSaveEligibilityOutput(xml);
         }
 
-        public GetEligibilityOutput GetEligibility(QRegistration registration)
-            => GetEligibility(CreateGetEligibilityInput(registration));
+        public GetEligibilityOutput GetEligibility(QRegistration registration, QRegistrationExamForm examFrom)
+            => GetEligibility(CreateGetEligibilityInput(registration, examFrom));
 
-        public SaveEligibilityOutput SaveEligibility(QRegistration registration)
-            => SaveEligibility(CreateSaveEligibilityInput(registration));
+        public SaveEligibilityOutput SaveEligibility(QRegistration registration, QRegistrationExamForm examFrom)
+            => SaveEligibility(CreateSaveEligibilityInput(registration, examFrom));
 
-        public SaveEligibilityOutput DeleteEligibility(QRegistration registration)
-            => DeleteEligibility(CreateSaveEligibilityInput(registration));
+        public SaveEligibilityOutput DeleteEligibility(QRegistration registration, QRegistrationExamForm examFrom)
+            => DeleteEligibility(CreateSaveEligibilityInput(registration, examFrom));
 
         #region API Helpers
-
-        async Task<GeeResponse> HttpPostAsync(Guid user, Guid organization, string apiUrl, Dictionary<string, string> data)
-        {
-            var json = JsonConvert.SerializeObject(data);
-            var key = LogRequest(user, organization, "POST", apiUrl, json);
-
-            var content = new FormUrlEncodedContent(data);
-            var http = await StaticHttpClient.Client.PostAsync(apiUrl, content);
-            var result = await http.Content.ReadAsStringAsync();
-            var status = (int)http.StatusCode;
-
-            LogResponse(key, http, result);
-
-            return new GeeResponse(status, result);
-        }
 
         GeeResponse HttpPost(Guid user, Guid organization, string apiUrl, Dictionary<string, string> data)
         {
@@ -232,14 +216,14 @@ namespace InSite.Persistence.Integration.Prometric
             get.SRProgramCode = prometric.ClientCode;
 
             get.ClientEligibilityCode = save.LearnerCode;
-            get.SRExamCode = $"{save.AssessmentFormCode}";
+            get.SRExamCode = save.AssessmentFormCode;
 
             return get;
         }
 
         private static readonly Regex AccommodationTypePattern = new Regex("(?<Name>.+?)(?<Note>\\(.+?\\))?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private SaveEligibilityInput CreateSaveEligibilityInput(QRegistration registration)
+        private SaveEligibilityInput CreateSaveEligibilityInput(QRegistration registration, QRegistrationExamForm examFrom)
         {
             if (registration == null)
                 throw new ArgumentNullException(nameof(registration));
@@ -249,8 +233,11 @@ namespace InSite.Persistence.Integration.Prometric
             if (registration.Candidate?.User == null)
                 throw new InvalidOperationException($"Registration {registrationId} is not assigned to a learner.");
 
-            if (registration.ExamFormIdentifier == null)
+            if (examFrom == null || examFrom.ExamFormIdentifier == Guid.Empty)
                 throw new InvalidOperationException($"Registration {registrationId} is not assigned to an assessment form.");
+
+            if (examFrom.Form == null)
+                throw new InvalidOperationException($"Assessment form {examFrom.ExamFormIdentifier} of registration {registrationId} is not loaded.");
 
             var prometric = GetPrometricEndpoint();
 
@@ -267,15 +254,15 @@ namespace InSite.Persistence.Integration.Prometric
 
                 LearnerIdentifier = registration.Candidate.User.UserIdentifier,
 
-                ExamEventPassword = registration.RegistrationPassword,
+                ExamEventPassword = examFrom.Password,
 
-                AssessmentFormCode = registration.Form?.FormCode,
-                AssessmentFormIdentifier = registration.ExamFormIdentifier.Value
+                AssessmentFormCode = examFrom.Form.FormCode,
+                AssessmentFormIdentifier = examFrom.ExamFormIdentifier
             };
 
-            var timeLimit = (decimal?)registration.Form.FormTimeLimit;
+            var timeLimit = (decimal?)examFrom.Form.FormTimeLimit;
 
-            var formState = _bankSearch?.GetBankState(registration.Form.BankIdentifier)?.FindForm(registration.Form.FormIdentifier);
+            var formState = _bankSearch?.GetBankState(examFrom.Form.BankIdentifier)?.FindForm(examFrom.Form.FormIdentifier);
             if (formState != null)
                 timeLimit = formState.CalculateFormTimeLimit();
 
@@ -304,7 +291,7 @@ namespace InSite.Persistence.Integration.Prometric
             return input;
         }
 
-        private GetEligibilityInput CreateGetEligibilityInput(QRegistration registration)
+        private GetEligibilityInput CreateGetEligibilityInput(QRegistration registration, QRegistrationExamForm examFrom)
         {
             if (registration == null)
                 throw new ArgumentNullException(nameof(registration));
@@ -314,20 +301,22 @@ namespace InSite.Persistence.Integration.Prometric
             if (registration.Candidate?.User == null)
                 throw new InvalidOperationException($"Registration {registrationId} is not assigned to a learner.");
 
-            if (registration.ExamFormIdentifier == null)
+            if (examFrom == null || examFrom.ExamFormIdentifier == Guid.Empty)
                 throw new InvalidOperationException($"Registration {registrationId} is not assigned to an assessment form.");
+
+            if (examFrom.Form == null)
+                throw new InvalidOperationException($"Assessment form {examFrom.ExamFormIdentifier} of registration {registrationId} is not loaded.");
 
             var prometric = GetPrometricEndpoint();
 
-            var input = new GetEligibilityInput();
+            return new GetEligibilityInput
+            {
+                SRClientCode = prometric.ClientCode,
+                SRProgramCode = prometric.ClientCode,
 
-            input.SRClientCode = prometric.ClientCode;
-            input.SRProgramCode = prometric.ClientCode;
-
-            input.ClientEligibilityCode = registration.Candidate.PersonCode;
-            input.SRExamCode = $"{registration.Form.FormCode}";
-
-            return input;
+                ClientEligibilityCode = registration.Candidate.PersonCode,
+                SRExamCode = examFrom.Form.FormCode
+            };
         }
 
         #endregion

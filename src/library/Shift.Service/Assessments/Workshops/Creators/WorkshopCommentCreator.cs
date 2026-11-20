@@ -9,9 +9,11 @@ using Shift.Service.Security;
 
 namespace Shift.Service.Evaluation.Workshops.Creators;
 
-internal class WorkshopCommentCreator(BankState bank, TimeZoneInfo timeZone, UserReader userReader)
+internal class WorkshopCommentCreator(BankState bank, string timeZoneId, UserReader userReader)
 {
-    public async Task<WorkshopComment[]> CreateAsync(Comment[] comments, bool showSubject)
+    public enum SortOrder { OldestToNewest, NewestToOldest }
+
+    public async Task<WorkshopComment[]> CreateAsync(Comment[] comments, bool showSubject, SortOrder sortOrder)
     {
         var criteria = new SearchUsers
         {
@@ -21,14 +23,17 @@ internal class WorkshopCommentCreator(BankState bank, TimeZoneInfo timeZone, Use
 
         var users = (await userReader.SearchAsync(criteria)).ToDictionary(x => x.UserId);
 
-        var result = comments
-            .OrderByDescending(x => x.Posted)
+        var sortedComments = sortOrder == SortOrder.NewestToOldest
+            ? comments.OrderByDescending(x => x.Posted)
+            : comments.OrderBy(x => x.Posted);
+
+        var result = sortedComments
             .Select(comment => new WorkshopComment
             {
                 CommentId = comment.Identifier,
                 EntityId = comment.Subject,
                 AuthorName = users.TryGetValue(comment.Author, out var author) ? author.FullName : "Unknown",
-                PostedOn = TimeZoneInfo.ConvertTime(comment.Posted, timeZone).Humanize(),
+                PostedOn = TimeZones.ConvertTime(comment.Posted, timeZoneId).Humanize(),
                 Subject = showSubject ? comment.GetSubjectTitle(bank) : null,
                 Text = Markdown.ToHtml(comment.Text),
                 Category = comment.Category,

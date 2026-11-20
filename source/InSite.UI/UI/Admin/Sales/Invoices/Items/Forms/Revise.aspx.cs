@@ -28,40 +28,50 @@ namespace InSite.Admin.Invoices.Items.Forms
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
+            if (IsPostBack)
+                return;
+
+            var invoice = InvoiceID.HasValue ? ServiceLocator.InvoiceSearch.GetInvoice(InvoiceID.Value) : null;
+            if (invoice == null || invoice.OrganizationIdentifier != Organization.OrganizationIdentifier)
             {
-                var invoice = InvoiceID.HasValue ? ServiceLocator.InvoiceSearch.GetInvoice(InvoiceID.Value) : null;
-                if (invoice == null || invoice.OrganizationIdentifier != Organization.OrganizationIdentifier)
-                {
-                    HttpResponseHelper.Redirect("/ui/admin/sales/invoices/search");
-                    return;
-                }
-
-                var invoiceItem = ItemID.HasValue ? ServiceLocator.InvoiceSearch.GetInvoiceItem(InvoiceID.Value, ItemID.Value) : null;
-                if (invoiceItem == null)
-                {
-                    HttpResponseHelper.Redirect($"/ui/admin/sales/invoices/outline?id={InvoiceID.Value}");
-                    return;
-                }
-
-                PageHelper.AutoBindHeader(
-                    this, 
-                    qualifier: $"Invoice to {invoice.CustomerFullName} <span class='form-text'>Revise Invoice Item #{invoiceItem.ItemSequence}</span>");
-
-                ItemDescription.Text = invoiceItem.ItemDescription;
-                ItemPrice.ValueAsDecimal = invoiceItem.ItemPrice;
-                ItemQuantity.ValueAsInt = invoiceItem.ItemQuantity;
-
-                ProductID.EnsureDataBound();
-                ProductID.ValueAsGuid = invoiceItem.ProductIdentifier;
-
-                CancelButton.NavigateUrl = $"/ui/admin/sales/invoices/outline?id={InvoiceID}";
+                RedirectToSearch();
+                return;
             }
+
+            var invoiceItem = ItemID.HasValue ? ServiceLocator.InvoiceSearch.GetInvoiceItem(InvoiceID.Value, ItemID.Value) : null;
+            if (invoiceItem == null)
+            {
+                RedirectToOutline();
+                return;
+            }
+
+            PageHelper.AutoBindHeader(
+                this,
+                qualifier: $"Invoice to {invoice.CustomerFullName} <span class='form-text'>Revise Invoice Item #{invoiceItem.ItemSequence}</span>");
+
+            ItemDescription.Text = invoiceItem.ItemDescription;
+            ItemPrice.ValueAsDecimal = invoiceItem.ItemPrice;
+            ItemQuantity.ValueAsInt = invoiceItem.ItemQuantity;
+
+            ProductID.EnsureDataBound();
+            ProductID.ValueAsGuid = invoiceItem.ProductIdentifier;
+
+            CancelButton.NavigateUrl = GetOutlineUrl();
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
             if (!Page.IsValid)
+                return;
+
+            Save();
+            RedirectToOutline();
+        }
+
+        private void Save()
+        {
+            var currentItem = ServiceLocator.InvoiceSearch.GetInvoiceItem(InvoiceID.Value, ItemID.Value);
+            if (currentItem == null)
                 return;
 
             var command = new ChangeInvoiceItem(
@@ -72,14 +82,24 @@ namespace InSite.Admin.Invoices.Items.Forms
                     Product = ProductID.ValueAsGuid.Value,
                     Quantity = ItemQuantity.ValueAsInt.Value,
                     Price = ItemPrice.ValueAsDecimal.Value,
-                    Description = ItemDescription.Text
+                    Description = ItemDescription.Text,
+                    TaxRate = currentItem.TaxRate,
+                    TaxCountry = currentItem.TaxCountry,
+                    TaxRegion = currentItem.TaxRegion
                 }
             );
 
             ServiceLocator.SendCommand(command);
-
-            HttpResponseHelper.Redirect($"/ui/admin/sales/invoices/outline?id={InvoiceID}");
         }
+
+        private void RedirectToSearch() =>
+            HttpResponseHelper.Redirect("/ui/admin/sales/invoices/search");
+
+        private void RedirectToOutline() =>
+            HttpResponseHelper.Redirect(GetOutlineUrl());
+
+        private string GetOutlineUrl() =>
+            $"/ui/admin/sales/invoices/outline?id={InvoiceID}";
 
         public string GetParentLinkParameters(IWebRoute parent)
         {

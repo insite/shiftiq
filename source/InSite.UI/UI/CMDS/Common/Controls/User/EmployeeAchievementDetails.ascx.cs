@@ -114,6 +114,15 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
 
         #region Properties
 
+        // Opt-in: the page that assigns a new credential hides paid-program achievements from the
+        // selector, since those reach a learner only through the program's enrollment path. The edit
+        // pages leave it off so an existing credential's achievement still shows.
+        public bool ExcludePaidProgramAchievements
+        {
+            get => (bool)(ViewState[nameof(ExcludePaidProgramAchievements)] ?? false);
+            set => ViewState[nameof(ExcludePaidProgramAchievements)] = value;
+        }
+
         private Guid? EmployeeID
         {
             get => ViewState[nameof(EmployeeID)] as Guid?;
@@ -285,6 +294,7 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
             AchievementSelector.Filter.AchievementType = SubType.Value;
             AchievementSelector.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementSelector.Filter.GlobalOrCompanySpecific = SubType.Value == "Module";
+            AchievementSelector.Filter.ExcludePaidProgramAchievements = ExcludePaidProgramAchievements;
             AchievementSelector.Value = null;
 
             DownloadGrid.LoadData(containerGuid, "None");
@@ -335,7 +345,7 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
             GradePercent.ValueAsDecimal = item.ContactExperienceScore * 100m;
             IsSuccess.Checked = item.ContactExperienceIsSuccess;
 
-            DateAssigned.Text = item.CredentialAssigned.HasValue ? TimeZones.FormatDateOnly(item.CredentialAssigned.Value, user.TimeZone) : "N/A";
+            DateAssigned.Text = item.CredentialAssigned.HasValue ? TimeZones.FormatDateOnly(item.CredentialAssigned.Value, User.TimeZone) : "N/A";
 
             Number.Text = item.CredentialAuthorityReference;
             IsRequired.Checked = item.CredentialIsRequired;
@@ -411,6 +421,7 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
             AchievementSelector.Filter.AchievementType = SubType.Value;
             AchievementSelector.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementSelector.Filter.GlobalOrCompanySpecific = SubType.Value == "Module" || (achievementOrganizationId == OrganizationIdentifiers.CMDS);
+            AchievementSelector.Filter.ExcludePaidProgramAchievements = ExcludePaidProgramAchievements;
             AchievementSelector.Value = null;
 
             AchievementRow.Visible = !isOther;

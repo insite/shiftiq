@@ -134,15 +134,15 @@ namespace InSite.Admin.Assessments.Attempts.Controls
 
             #region Methods
 
-            public void GetPageDateRange(TimeZoneInfo timezone, out DateTimeOffset startDate, out DateTimeOffset endDate)
+            public void GetPageDateRange(string timezoneId, out DateTimeOffset startDate, out DateTimeOffset endDate)
             {
                 GetPageDayRange(out var startDay, out var endDay);
 
-                startDate = GetDate(startDay, timezone);
-                endDate = GetDate(endDay, timezone);
+                startDate = GetDate(startDay, timezoneId);
+                endDate = GetDate(endDay, timezoneId);
             }
 
-            public IEnumerable<IDateItem> EnumeratePageItems(TimeZoneInfo timezone)
+            public IEnumerable<IDateItem> EnumeratePageItems(string timezoneId)
             {
                 int index = -1;
                 DataItem item = null;
@@ -160,7 +160,7 @@ namespace InSite.Admin.Assessments.Attempts.Controls
 
                 while (!result.IsLastItem)
                 {
-                    result.Date = GetDate(startDay, timezone);
+                    result.Date = GetDate(startDay, timezoneId);
 
                     if (item != null && item.Day == startDay)
                     {
@@ -210,11 +210,11 @@ namespace InSite.Admin.Assessments.Attempts.Controls
                 }
             }
 
-            private DateTimeOffset GetDate(int day, TimeZoneInfo timezone)
+            private DateTimeOffset GetDate(int day, string timezoneId)
             {
                 var date = _startDate.AddDays(day);
 
-                return TimeZoneInfo.ConvertTime(date, timezone);
+                return TimeZones.ConvertTime(date, timezoneId);
             }
 
             #endregion
@@ -268,7 +268,7 @@ namespace InSite.Admin.Assessments.Attempts.Controls
         {
             var attempts = analysis.Attempts.OrderBy(x => x.AttemptGraded ?? x.AttemptSubmitted.Value).ToArray();
 
-            var startNowDay = TimeZoneInfo.ConvertTime(DateTimeOffset.Now, CurrentSessionState.Identity.User.TimeZone).FromDay();
+            var startNowDay = TimeZones.ConvertTime(DateTimeOffset.Now, CurrentSessionState.Identity.User.TimeZone).FromDay();
             var endNowDay = startNowDay.ThruDay();
             var startOfThisWeek = startNowDay.AddDays(-(int)startNowDay.DayOfWeek);
             var startOfLastWeek = startOfThisWeek.AddDays(-7);
@@ -361,7 +361,7 @@ namespace InSite.Admin.Assessments.Attempts.Controls
 
             var currentCulture = CultureInfo.CurrentCulture;
             var barColor = ColorTranslator.FromHtml("#86c557");
-            var timeZone = CurrentSessionState.Identity.User.TimeZone;
+            var timeZoneId = CurrentSessionState.Identity.User.TimeZone;
 
             var dailyDataset = jsonData.DailyData.CreateDataset("daily");
             dailyDataset.Label = "Responses";
@@ -375,7 +375,7 @@ namespace InSite.Admin.Assessments.Attempts.Controls
             monthlyDataset.Label = "Responses";
             monthlyDataset.BackgroundColor = barColor;
 
-            DataSource.GetPageDateRange(timeZone, out var startDate, out var endDate);
+            DataSource.GetPageDateRange(timeZoneId, out var startDate, out var endDate);
 
             var prevWeek = GetWeekNumber(startDate, currentCulture);
             var prevWeekYear = startDate.Year;
@@ -384,7 +384,7 @@ namespace InSite.Admin.Assessments.Attempts.Controls
             var prevMonth = startDate;
             var monthlyValue = 0;
 
-            foreach (var item in DataSource.EnumeratePageItems(timeZone))
+            foreach (var item in DataSource.EnumeratePageItems(timeZoneId))
             {
                 // daily
 

@@ -34,6 +34,8 @@ namespace InSite.Application.Records.Read
         public string ProgramFlagColor { get; set; }
         public string ProgramFlagText { get; set; }
 
+        public decimal? ProgramFee { get; set; }
+
         public int? CatalogSequence { get; set; }
         public int? NotificationStalledReminderLimit { get; set; }
         public int? NotificationStalledTriggerDay { get; set; }

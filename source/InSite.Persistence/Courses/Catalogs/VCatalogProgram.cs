@@ -21,6 +21,9 @@ namespace InSite.Persistence
         public string OrganizationName { get; set; }
 
         public bool CatalogIsHidden { get; set; }
+        public bool ProgramIsHidden { get; set; }
+
+        public decimal? ProgramFee { get; set; }
 
         public DateTimeOffset ProgramCreated { get; set; }
         public DateTimeOffset ProgramModified { get; set; }

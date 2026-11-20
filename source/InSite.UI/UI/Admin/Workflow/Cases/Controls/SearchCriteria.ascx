@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchCriteria.ascx.cs" Inherits="InSite.Admin.Issues.Controls.SearchCriteria" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchCriteria.ascx.cs" Inherits="InSite.Admin.Issues.Controls.SearchCriteria" %>
 <%@ Register TagPrefix="uc" TagName="FilterManager" Src="~/UI/Layout/Common/Controls/SearchCriteriaFilterManager.ascx" %>
 
 <div class="row">
@@ -111,6 +111,10 @@
 
                     <div class="mb-2">
                         <insite:FindDepartment runat="server" ID="TopicDepartmentIdentifier" EmptyMessage="Department" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:FindGroup runat="server" ID="TopicDistrictIdentifier" EmptyMessage="District" />
                     </div>
 
                     <div class="mb-2">

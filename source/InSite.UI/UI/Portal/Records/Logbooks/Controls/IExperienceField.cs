@@ -43,6 +43,15 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
         DateTime? Value2 { get; set; }
     }
 
+    interface IExperienceUserField : IExperienceField
+    {
+        Guid? Value { get; set; }
+
+        void RestrictToGroup(Guid? groupId);
+
+        void RestrictToUsers(Guid[] userIds);
+    }
+
     interface IExperienceDecimalField : IExperienceField
     {
         decimal? Value { get; set; }

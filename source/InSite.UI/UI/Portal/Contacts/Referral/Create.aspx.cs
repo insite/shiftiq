@@ -1,9 +1,11 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Web.UI;
 
 using InSite.Admin.Contacts.People.Utilities;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Memberships.Write;
+using InSite.Common;
 using InSite.Common.Web;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
@@ -30,6 +32,13 @@ namespace InSite.UI.Portal.Contacts.Referral
             ReferrerIdentifier.ListFilter.OrganizationIdentifier = CurrentSessionState.Identity.Organization.Identifier;
             ReferrerIdentifier.ListFilter.CollectionName = CollectionName.Contacts_Settings_Referrers_Name;
             ReferrerIdentifier.RefreshData();
+
+            PersonLanguage.Settings.IncludeLanguage = CurrentSessionState.Identity.Organization.Languages
+                .Select(x => x.TwoLetterISOLanguageName)
+                .Append(MultilingualString.DefaultLanguage)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            PersonLanguage.RefreshData();
 
             SaveButton.Click += SaveButton_Click;
         }
@@ -134,7 +143,7 @@ namespace InSite.UI.Portal.Contacts.Referral
                 user.Email = PersonEmail.Text;
 
             if (user.TimeZone.IsEmpty())
-                user.TimeZone = Organization.TimeZone.Id;
+                user.TimeZone = Organization.TimeZone;
         }
 
         private void GetPersonInputValues(QPerson person)
@@ -144,6 +153,7 @@ namespace InSite.UI.Portal.Contacts.Referral
             person.Phone = PersonPhone.Text;
             person.HomeAddress = GetAddress();
             person.Referrer = ReferrerIdentifier.GetSelectedOption()?.Text;
+            person.Language = PersonLanguage.Value;
         }
 
         private void AddMembership(Guid userId, Guid? group)

@@ -25,6 +25,7 @@ namespace InSite.Application.Attempts.Read
         }
         public Guid? FormOrganizationIdentifier { get; set; }
         public Guid? LearnerOrganizationIdentifier { get; set; }
+        public Guid? LearnerEmployerId { get; set; }
         public Guid? FrameworkIdentifier { get; set; }
         public Guid? OccupationIdentifier { get; set; }
         public Guid? QuestionIdentifier { get; set; }

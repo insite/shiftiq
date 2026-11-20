@@ -57,7 +57,7 @@ namespace InSite.Custom.CMDS.Admin.Reports.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.DateTimeOffsetSelector SnapshotDateSince;
+        protected global::InSite.Common.Web.UI.DateSelector SnapshotDateSince;
 
         /// <summary>
         /// SnapshotDateBeforeField control.
@@ -75,7 +75,7 @@ namespace InSite.Custom.CMDS.Admin.Reports.Controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.DateTimeOffsetSelector SnapshotDateBefore;
+        protected global::InSite.Common.Web.UI.DateSelector SnapshotDateBefore;
 
         /// <summary>
         /// DepartmentIdentifier control.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.SqlServer;
@@ -444,8 +444,18 @@ ORDER BY
             if (filter.ExcludeFormStatus.IsNotEmpty())
                 query = query.Where(x => x.FormPublicationStatus != filter.ExcludeFormStatus);
 
-            if (filter.IncludeFormStatus.IsNotEmpty())
-                query = query.Where(x => x.FormPublicationStatus == filter.IncludeFormStatus);
+            if (filter.IncludeFormStatuses.IsNotEmpty())
+            {
+                if (filter.IncludeFormStatuses.Length == 1)
+                {
+                    var status = filter.IncludeFormStatuses[0];
+                    query = query.Where(x => x.FormPublicationStatus == status);
+                }
+                else
+                {
+                    query = query.Where(x => filter.IncludeFormStatuses.Contains(x.FormPublicationStatus));
+                }
+            }
 
             if (filter.OrganizationIdentifiers.IsNotEmpty())
                 query = query.Where(x => filter.OrganizationIdentifiers.Contains(x.OrganizationIdentifier));
@@ -458,6 +468,9 @@ ORDER BY
 
             if (filter.FormIdentifiers.IsNotEmpty())
                 query = query.Where(x => filter.FormIdentifiers.Contains(x.FormIdentifier));
+
+            if (filter.ExcludeFormIdentifiers.IsNotEmpty())
+                query = query.Where(x => !filter.ExcludeFormIdentifiers.Contains(x.FormIdentifier));
 
             if (filter.GradeItemIdentifier.HasValue)
                 query = query.Where(x => db.QActivities.Any(a => a.AssessmentFormIdentifier == x.FormIdentifier && a.GradeItemIdentifier == filter.GradeItemIdentifier.Value));
@@ -643,7 +656,18 @@ ORDER BY
                 query = query.Where(x => x.QuestionReference.Contains(filter.QuestionReference));
 
             if (filter.QuestionText.IsNotEmpty())
-                query = query.Where(x => x.QuestionText.Contains(filter.QuestionText));
+            {
+                var keyword = filter.QuestionText;
+
+                query = query.Where(
+                    x => x.QuestionText.Contains(keyword)
+                      || db.TContents.Any(
+                            y => y.OrganizationIdentifier == filter.OrganizationIdentifier
+                              && y.ContainerType == ContentContainerType.ExamQuestion
+                              && y.ContentLabel == ContentLabel.Title
+                              && y.ContainerIdentifier == x.QuestionIdentifier
+                              && y.ContentText.Contains(keyword)));
+            }
 
             if (filter.QuestionDifficulty.HasValue)
                 query = query.Where(x => x.QuestionDifficulty == filter.QuestionDifficulty);

@@ -51,7 +51,7 @@ namespace InSite.Admin.Issues.Forms
             OwnerUserIdentifier.Filter.GroupIdentifier = Organization.AdministratorGroupIdentifier;
             OwnerUserIdentifier.Filter.IsAdministrator = true;
 
-            CaseInfo.BindIssue(issue, User.TimeZone);
+            CaseInfo.BindIssue(issue);
             SetInputValues(issue);
 
             SetupHelps();
@@ -109,13 +109,13 @@ namespace InSite.Admin.Issues.Forms
             var issue = ServiceLocator.IssueSearch.GetIssue(CaseIdentifier.Value);
 
             {
-                var command = GetChangeUserCommand(issue.AdministratorUserIdentifier, ManagerIdentifier.Value, CaseIdentifier.Value, "Administrator");
+                var command = GetChangeUserCommand(issue.TopicUserIdentifier, AssigneeID.Value, CaseIdentifier.Value, "Topic");
 
                 if (command != null) ServiceLocator.SendCommand(command);
             }
 
             {
-                var command = GetChangeUserCommand(issue.TopicUserIdentifier, AssigneeID.Value, CaseIdentifier.Value, "Topic");
+                var command = GetChangeUserCommand(issue.AdministratorUserIdentifier, ManagerIdentifier.Value, CaseIdentifier.Value, "Administrator");
 
                 if (command != null) ServiceLocator.SendCommand(command);
             }

@@ -1,4 +1,4 @@
-﻿using InSite.Common.Web.UI;
+using InSite.Common.Web.UI;
 using InSite.Persistence;
 
 using Shift.Common;

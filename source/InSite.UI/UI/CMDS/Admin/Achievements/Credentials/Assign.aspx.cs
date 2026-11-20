@@ -605,6 +605,15 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
                 return false;
             }
 
+            // The list hides paid-program achievements; this catches a stale list or a forged post.
+            var paidAchievements = PaidProgramAchievementSearch.SelectPaidAchievementIdentifiers();
+            var hasPaidAchievement = SelectedAchievements.Any(x => paidAchievements.Contains(x));
+            if (hasPaidAchievement)
+            {
+                EditorStatus.AddMessage(AlertType.Error, PaidProgramAchievementSearch.AssignmentRefusedMessage);
+                return false;
+            }
+
             return true;
         }
 
@@ -687,6 +696,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
             filter.OrganizationCode = Organization.Code;
             filter.ExcludeHidden = true;
+            filter.ExcludePaidProgramAchievements = true;
 
             var table = VCmdsAchievementSearch.SelectForSelector(filter, false);
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Admin.Records.Logbooks;
 using InSite.Application.Journals.Write;
@@ -85,8 +85,8 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries
         private void DeleteButton_Click(object sender, EventArgs e)
         {
             var experience = ServiceLocator.JournalSearch.GetExperience(ExperienceIdentifier);
-
-            ServiceLocator.SendCommand(new DeleteExperience(experience.JournalIdentifier, experience.ExperienceIdentifier));
+            if (experience != null)
+                ServiceLocator.SendCommand(new DeleteExperience(experience.JournalIdentifier, experience.ExperienceIdentifier));
 
             HttpResponseHelper.Redirect(GetParentUrl(DefaultParameters));
         }

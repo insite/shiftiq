@@ -24,6 +24,51 @@ namespace InSite.UI.Portal.Billing.Controls
         protected global::InSite.UI.Portal.Billing.PriceSelector PriceSelector;
 
         /// <summary>
+        /// FilterPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl FilterPanel;
+
+        /// <summary>
+        /// IndustryFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ItemIdComboBox IndustryFilter;
+
+        /// <summary>
+        /// OccupationFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ItemIdComboBox OccupationFilter;
+
+        /// <summary>
+        /// LevelFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ItemIdComboBox LevelFilter;
+
+        /// <summary>
+        /// ClearFiltersButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button ClearFiltersButton;
+
+        /// <summary>
         /// CartWarning control.
         /// </summary>
         /// <remarks>
@@ -40,6 +85,24 @@ namespace InSite.UI.Portal.Billing.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel SubscribeBanner;
+
+        /// <summary>
+        /// SubscribeBannerTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal SubscribeBannerTitle;
+
+        /// <summary>
+        /// SubscribeBannerText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal SubscribeBannerText;
 
         /// <summary>
         /// SelectBanner control.
@@ -85,5 +148,14 @@ namespace InSite.UI.Portal.Billing.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Portal.Billing.Controls.CatalogGrid CatalogGrid;
+
+        /// <summary>
+        /// FilterScript control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.PageFooterContent FilterScript;
     }
 }

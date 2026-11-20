@@ -74,6 +74,7 @@ namespace InSite.Application.Events.Read
         public int? DurationQuantity { get; set; }
         public int? ExamDurationInMinutes { get; set; }
         public int? InvigilatorMinimum { get; set; }
+        public int? FormAttachmentLimit { get; set; }
         public int? SendReminderBeforeDays { get; set; }
 
         public decimal? CreditHours { get; set; }

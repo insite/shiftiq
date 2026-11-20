@@ -95,6 +95,8 @@
     <Compile Include="Assessments\Questions\TQuizConfiguration.cs" />
     <Compile Include="Assessments\Questions\TQuizSearch.cs" />
     <Compile Include="Assessments\Questions\TQuizStore.cs" />
+    <Compile Include="Events\Registrations\QRegistrationExamFormConfiguration.cs" />
+    <Compile Include="Assets\Searches\SearchStore.cs" />
     <Compile Include="Reports\Reports\ReportHelper.cs" />
     <Compile Include="Reports\ToolkitUsages\TToolkitUsageStore.cs" />
     <Compile Include="Reports\ToolkitVisits\TToolkitVisit.cs" />
@@ -152,6 +154,7 @@
     <Compile Include="Contacts\People\PersonAdapter.cs" />
     <Compile Include="Contacts\People\PersonExamRegistrationItem.cs" />
     <Compile Include="Contacts\People\PersonSearchResultItem.cs" />
+    <Compile Include="Contacts\People\PersonSearchGate.cs" />
     <Compile Include="Contacts\People\PersonCriteria.cs" />
     <Compile Include="Contacts\People\PersonExamRegistrationFilter.cs" />
     <Compile Include="Records\Progressions\VStatementConfiguration.cs" />
@@ -169,6 +172,7 @@
     <Compile Include="Accounts\Users\UserFilterMembership.cs" />
     <Compile Include="Settings\Routes\RoleRouteAccess.cs" />
     <Compile Include="Settings\Routes\RouteNode.cs" />
+    <Compile Include="Variants\CMDS\CmdsUserCommandReceiver.cs" />
     <Compile Include="Variants\CMDS\VCmdsAchievement\AchievementListGridItem.cs" />
     <Compile Include="Workflows\Cases\TCaseStatusConfiguration.cs" />
     <Compile Include="Sites\Pages\PortalPageList.cs" />
@@ -194,8 +198,6 @@
     <Compile Include="Accounts\Users\UserSearchResultItem.cs" />
     <Compile Include="Integrations\BCMail\Domain\ExamDistributionRequestConfiguration.cs" />
     <Compile Include="Courses\Catalogs\CatalogSearchResult.cs" />
-    <Compile Include="Integrations\Scorm\TScormRegistrationActivity.cs" />
-    <Compile Include="Integrations\Scorm\TScormRegistrationActivityConfiguration.cs" />
     <Compile Include="Integrations\Xapi\xApiCondition.cs" />
     <Compile Include="Courses\Catalogs\TCatalogFilter.cs" />
     <Compile Include="Internals\CreateAssetNodeComparer.cs" />
@@ -237,6 +239,8 @@
     <Compile Include="Courses\Enrollments\QEnrollmentHistoryConfiguration.cs" />
     <Compile Include="Courses\Prerequisites\TPrerequisiteConfiguration.cs" />
     <Compile Include="Courses\Enrollments\TProgramEnrollmentConfiguration.cs" />
+    <Compile Include="Courses\Enrollments\TProgramEnrollmentRequestConfiguration.cs" />
+    <Compile Include="Courses\Enrollments\TProgramEnrollmentRequestStore.cs" />
     <Compile Include="Courses\Programs\TTaskConfiguration.cs" />
     <Compile Include="Courses\Enrollments\TTaskEnrollmentConfiguration.cs" />
     <Compile Include="Courses\Programs\VProgramConfiguration.cs" />
@@ -381,6 +385,7 @@
     <Compile Include="Courses\Programs\ProgramStore1.cs" />
     <Compile Include="Courses\Programs\ProgramEnrollmentTaskCompletionCounterForUsers.cs" />
     <Compile Include="Courses\Programs\ProgramService.cs" />
+    <Compile Include="Courses\Programs\PaidProgramAchievementSearch.cs" />
     <Compile Include="Courses\Programs\ProgramTaskDefaults.cs" />
     <Compile Include="Courses\Programs\TaskSearch.cs" />
     <Compile Include="Courses\Programs\TaskStore.cs" />
@@ -491,6 +496,7 @@
     <Compile Include="Contacts\People\TPersonFieldStore.cs" />
     <Compile Include="Assets\Inputs\TContentFilter.cs" />
     <Compile Include="Courses\Courses\CourseStore.cs" />
+    <Compile Include="Courses\Courses\CourseLearnerProgress.cs" />
     <Compile Include="Courses\Courses\CourseSearch.cs" />
     <Compile Include="Courses\Courses\CoursePublicationModel.cs" />
     <Compile Include="Events\Events\QEventTimerConfiguration.cs" />
@@ -600,11 +606,6 @@
     <Compile Include="Reports\Reports\TReportFilter.cs" />
     <Compile Include="Reports\Reports\TReportSearch.cs" />
     <Compile Include="Reports\Reports\TReportStore.cs" />
-    <Compile Include="Integrations\Scorm\ScormRegistration.cs" />
-    <Compile Include="Integrations\Scorm\TScormRegistrationConfiguration.cs" />
-    <Compile Include="Integrations\Scorm\ScormRegistrationFilter.cs" />
-    <Compile Include="Integrations\Scorm\ScormRegistrationSearch.cs" />
-    <Compile Include="Integrations\Scorm\ScormRegistrationStore.cs" />
     <Compile Include="Integrations\Scorm\ScormStatementConfiguration.cs" />
     <Compile Include="Integrations\Scorm\ScormStatementFilter.cs" />
     <Compile Include="Integrations\Scorm\ScormStatementSearch.cs" />
@@ -726,6 +727,7 @@
     <Compile Include="Variants\CMDS\Site\SiteSearch.cs" />
     <Compile Include="Variants\CMDS\TUserStatus\ExecutiveSummaryOnCompetencyStatusFilter.cs" />
     <Compile Include="Variants\CMDS\TUserStatus\ExecutiveSummaryOnAchievementStatusFilter.cs" />
+    <Compile Include="Variants\CMDS\TUserStatus\SnapshotDateConverter.cs" />
     <Compile Include="Variants\CMDS\TUserStatus\TUserStatus.cs" />
     <Compile Include="Variants\CMDS\TUserStatus\TUserStatusConfiguration.cs" />
     <Compile Include="Variants\CMDS\TUserStatus\TUserStatusFilter.cs" />

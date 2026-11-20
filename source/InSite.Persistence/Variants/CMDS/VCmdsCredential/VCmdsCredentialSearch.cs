@@ -314,7 +314,7 @@ namespace InSite.Persistence.Plugin.CMDS
             return SelectForTrainingPlan(employeeId, organizationIdentifier, null, achievementIds);
         }
 
-        private static List<VCmdsCredentialAndExperience> SelectForTrainingPlan(Guid employeeId, Guid organizationIdentifier, string achievementType, Guid[] achievementIds)
+        public static List<VCmdsCredentialAndExperience> SelectForTrainingPlan(Guid employeeId, Guid organizationIdentifier, string achievementType, Guid[] achievementIds)
         {
             using (var db = new InternalDbContext())
             {

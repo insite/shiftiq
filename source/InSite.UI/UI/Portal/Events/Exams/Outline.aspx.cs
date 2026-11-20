@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 
 using InSite.Application.Events.Read;
@@ -61,7 +61,7 @@ namespace InSite.UI.Portal.Events.Exams
 
             Date.Text = GetEventDateAndTimeText(@event.EventScheduledStart, @event.EventScheduledEnd);
 
-            var localeDate = TimeZoneInfo.ConvertTime(@event.EventScheduledStart, User.TimeZone).Date;
+            var localeDate = TimeZones.ConvertTime(@event.EventScheduledStart, User.TimeZone).Date;
             ReturnToCalendar.NavigateUrl = $"/ui/portal/events/calendar?date={localeDate.ToShortDateString()}";
             ReturnToCalendar.Visible = !(Identity.Organization.Toolkits.Events?.HideReturnToCalendar ?? false);
 

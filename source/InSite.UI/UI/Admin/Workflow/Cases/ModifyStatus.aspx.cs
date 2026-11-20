@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -55,7 +55,7 @@ namespace InSite.Admin.Issues.Forms
 
             PageHelper.AutoBindHeader(this, qualifier: $"{issue.IssueTitle} <span class='fw-normal fs-md text-body-secondary'>Case #{issue.IssueNumber} - {issue.IssueType}</span>");
 
-            CaseInfo.BindIssue(_issue, User.TimeZone, true, false);
+            CaseInfo.BindIssue(_issue, true, false);
 
             var statusCategory = Request.QueryString["category"];
             if (_validCategories.Contains(statusCategory))
@@ -63,7 +63,7 @@ namespace InSite.Admin.Issues.Forms
 
             IssueStatus.IssueType = _issue.IssueType;
 
-            IssueStatusEffective.Value = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, User.TimeZone);
+            IssueStatusEffective.Value = TimeZones.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
 
             CancelButton.NavigateUrl = GetOutlineUrl(CaseIdentifier);
         }

@@ -83,7 +83,7 @@ public class PersonImportReporter(GroupReader groupReader, FileReader fileReader
 
     private async Task<string> CreateDocumentNameAsync(Guid organizationId, string timeZone)
     {
-        var now = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, TimeZones.GetInfo(timeZone));
+        var now = TimeZones.ConvertTime(DateTimeOffset.UtcNow, timeZone);
         var documentNameStart = $"Import Report {now.Year} {now.Month.ToString().PadLeft(2, '0')} {now.Day.ToString().PadLeft(2, '0')}";
         var documentName = (string?)null;
         var fileIndex = 0;

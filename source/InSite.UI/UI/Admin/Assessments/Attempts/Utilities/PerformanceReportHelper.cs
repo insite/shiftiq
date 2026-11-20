@@ -85,7 +85,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Utilities
 
             var organizationId = CurrentSessionState.Identity.Organization.Identifier;
             var person = ServiceLocator.PersonSearch.GetPerson(filter.LearnerUserIdentifier, organizationId, x => x.User);
-            var date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, CurrentSessionState.Identity.User.TimeZone);
+            var date = TimeZones.ConvertTime(DateTime.UtcNow, TimeZones.Ids.Utc, CurrentSessionState.Identity.User.TimeZone);
             var documentName = $"{date:yyyyMMdd} {reportConfig.FileSuffix} PR for {person.PersonCode} {person.User.FullName}";
 
             documentName = useAlternateFramework ? documentName + " (Alternate).pdf" : documentName + ".pdf";
@@ -244,7 +244,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Utilities
                     Roles = roles,
                     MaxScore = item.MaxPoints,
                     Score = item.Points,
-                    Graded = TimeZoneInfo.ConvertTime(item.AttemptStarted ?? item.AttemptGraded, CurrentSessionState.Identity.User.TimeZone).DateTime
+                    Graded = TimeZones.ConvertTime(item.AttemptStarted ?? item.AttemptGraded, CurrentSessionState.Identity.User.TimeZone).DateTime
                 };
 
                 scores.Add(new ScoreDetail(item, score));

@@ -81,7 +81,7 @@ export default function TestAggregate() {
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const result = await shiftClient.workshop.modifyOption(aggregateId, questionId, parseInt(optionNumber), optionField as any, columnIndex, optionValue);
-            setOptionResult(result ?? "");
+            setOptionResult(result?.Html ?? "");
 
             removeError();
         } catch (err) {

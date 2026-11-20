@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using Newtonsoft.Json;
 
@@ -15,6 +16,9 @@ namespace Shift.Sdk.UI
         public string Title { get; set; }
         public DashboardWidgetType Type { get; set; }
 
+        [DefaultValue(true)]
+        public bool AllowDownload { get; set; }
+
         public DashboardTableQuery Query { get; set; }
         public DashboardChartSettings Chart { get; set; }
 
@@ -26,6 +30,7 @@ namespace Shift.Sdk.UI
         public DashboardWidget()
         {
             Code = _generator.Next();
+            AllowDownload = true;
             QueryParameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 

@@ -43,7 +43,7 @@ namespace InSite.Admin.Issues.Forms
 
             PageHelper.AutoBindHeader(this, qualifier: $"{issue.IssueTitle} <span class='fw-normal fs-md text-body-secondary'>Case #{issue.IssueNumber} - {issue.IssueType}</span>");
 
-            CaseInfo.BindIssue(issue, User.TimeZone, true, true, false);
+            CaseInfo.BindIssue(issue, true, true, false);
             SetInputValues(issue);
 
             CancelButton.NavigateUrl = GetOutlineUrl(CaseIdentifier.Value);

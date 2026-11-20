@@ -1,5 +1,5 @@
 import { DateParts, DateFormatType, months, TimeParts, TimeFormatType } from "./dateTimeTypes";
-import { TimeZoneId, timeZones } from "./timeZones";
+import { TimeZoneId, getTimeZones } from "./timeZones";
 
 interface SplitText {
     date: string[];
@@ -183,7 +183,7 @@ const _timeParsers = {
 
 function getTimeZoneId(timeZoneCode: string): TimeZoneId | null {
     timeZoneCode = timeZoneCode.toLowerCase();
-    return timeZones.find(x =>
+    return getTimeZones().find(x =>
         x.abbrev.toLowerCase() === timeZoneCode
         || x.standardCode?.toLowerCase() === timeZoneCode
         || x.daylightCode?.toLowerCase() === timeZoneCode

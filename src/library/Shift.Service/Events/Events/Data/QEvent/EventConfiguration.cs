@@ -55,6 +55,7 @@ public class EventConfiguration : IEntityTypeConfiguration<EventEntity>
         builder.Property(x => x.RegistrationStart).HasColumnName("RegistrationStart");
         builder.Property(x => x.EventRequisitionStatus).HasColumnName("EventRequisitionStatus").IsUnicode(false).HasMaxLength(50);
         builder.Property(x => x.InvigilatorMinimum).HasColumnName("InvigilatorMinimum");
+        builder.Property(x => x.FormAttachmentLimit).HasColumnName("FormAttachmentLimit");
         builder.Property(x => x.ExamMaterialReturnShipmentCode).HasColumnName("ExamMaterialReturnShipmentCode").IsUnicode(false).HasMaxLength(30);
         builder.Property(x => x.ExamMaterialReturnShipmentReceived).HasColumnName("ExamMaterialReturnShipmentReceived");
         builder.Property(x => x.ExamMaterialReturnShipmentCondition).HasColumnName("ExamMaterialReturnShipmentCondition").IsUnicode(false).HasMaxLength(10);
@@ -71,5 +72,9 @@ public class EventConfiguration : IEntityTypeConfiguration<EventEntity>
         builder.Property(x => x.RegistrationFields).HasColumnName("RegistrationFields").IsUnicode(false);
         builder.Property(x => x.MandatorySurveyFormIdentifier).HasColumnName("MandatorySurveyFormIdentifier");
 
+        builder.HasOne(x => x.VenueLocation)
+            .WithMany()
+            .HasForeignKey(x => x.VenueLocationIdentifier)
+            .HasPrincipalKey(x => x.GroupIdentifier);
     }
 }

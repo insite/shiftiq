@@ -51,6 +51,15 @@ namespace InSite.Cmds.Portal.Validations.CollegeCertificates
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl NoCertifications;
 
         /// <summary>
+        /// SupportEmail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal SupportEmail;
+
+        /// <summary>
         /// Certifications control.
         /// </summary>
         /// <remarks>

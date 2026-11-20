@@ -215,12 +215,14 @@ namespace InSite.Api.Controllers
                 InvoiceStatus = invoice.InvoiceStatus,
                 InvoiceSubmitted = invoice.InvoiceSubmitted,
                 OrganizationIdentifier = invoice.OrganizationIdentifier,
-                InvoiceItems = invoiceItems.Select(x => new InvoiceItem()
+                InvoiceItems = invoiceItems.Select(x => new InvoiceItem
                 {
                     Description = x.ItemDescription,
                     Identifier = x.ItemIdentifier,
                     Price = x.ItemPrice,
                     TaxRate = x.TaxRate,
+                    TaxCountry = x.TaxCountry,
+                    TaxRegion = x.TaxRegion,
                     Product = x.ProductIdentifier,
                     Quantity = x.ItemQuantity,
                 }).ToList(),

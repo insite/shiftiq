@@ -3,6 +3,7 @@ import { SpecWorkshopCriterion } from "./models/SpecWorkshopCriterion";
 import { SpecWorkshopCriterionCompetency } from "./models/SpecWorkshopCriterionCompetency";
 import { SpecWorkshopState } from "./states/SpecWorkshopState";
 import { SpecWorkshopProviderContext } from "./SpecWorkshopProviderContext";
+import { SpecWorkshopDetails } from "./models/SpecWorkshopDetails";
 
 interface InitStateAction {
     type: "initState";
@@ -46,7 +47,20 @@ interface ModifyTax3CountAction {
     tax3Count: number | null;
 }
 
-type Action = InitStateAction | ModifyFormLimitAction | ModifyQuestionLimitAction | ModifyCriterionWeightAction | ModifyTax1CountAction | ModifyTax2CountAction | ModifyTax3CountAction;
+interface ModifyDetailsAction {
+    type: "modifyDetails";
+    details: SpecWorkshopDetails;
+}
+
+type Action = InitStateAction
+    | ModifyFormLimitAction
+    | ModifyQuestionLimitAction
+    | ModifyCriterionWeightAction
+    | ModifyTax1CountAction
+    | ModifyTax2CountAction
+    | ModifyTax3CountAction
+    | ModifyDetailsAction
+    ;
 
 const _initialState: SpecWorkshopState = {
     bankId: "empty",
@@ -135,6 +149,12 @@ function reducer(state: SpecWorkshopState, action: Action): SpecWorkshopState {
         case "modifyTax3Count":
             return modifyCompetency(state, action.criterionId, action.standardId, competency => ({...competency, tax3Count: action.tax3Count}));
 
+        case "modifyDetails":
+            return {
+                ...state,
+                details: action.details,
+            }
+
         default:
             throw new Error(`Unknown action: ${type}`);
     }
@@ -168,6 +188,9 @@ export default function SpecWorkshopProvider({ children }: Props) {
         },
         modifyTax3Count(criterionId: string, standardId: string, tax3Count: number | null): void {
             dispatch({ type: "modifyTax3Count", criterionId, standardId, tax3Count });
+        },
+        modifyDetails(details: SpecWorkshopDetails): void {
+            dispatch({ type: "modifyDetails", details });
         },
     }), [dispatch]);
 

@@ -68,14 +68,15 @@
                                         <td colspan="5">
                                             <h3 class="mb-0"><%# Eval("PersonFullName") %></h3>
                                             <div class="form-text"><%# Eval("PersonEmail") %></div>
+                                            <div runat="server" visible='<%# ShowDivision %>' class="form-text"><%# Eval("DivisionName") %></div>
                                             <span class="form-text"><%# string.IsNullOrEmpty((string)Eval("JobDivision")) ? "" : "Job Division: " + Server.HtmlEncode((string)Eval("JobDivision")) %></span>
                                         </td>
                                     </tr>
                                     <th style="width: 40%;">Achievement Title</th>
                                     <th style="width: 30%;">Provider</th>
-                                    <th class="text-center" style="width: 10%;">Completion</th>
-                                    <th class="text-center" style="width: 10%;">Renewal</th>
-                                    <th class="text-center" style="width: 10%;">Valid</th>
+                                    <th class="text-center" style="width: 10%;">Completed</th>
+                                    <th class="text-center" style="width: 10%;">Expiry</th>
+                                    <th class="text-center" style="width: 10%;">Status</th>
                                 </thead>
                                 <tbody>
                                     <asp:Repeater runat="server" ID="AchievementRepeater">
@@ -86,7 +87,7 @@
                                                 <td class="text-center"><%# LocalizeDate(Eval("DateCompleted")) %></td>
                                                 <td class="text-center"><%# LocalizeDate(Eval("ExpirationDate")) %></td>
                                                 <td class="text-center">
-                                                    <%# Convert.ToBoolean(Eval("IsCompetent")) ? "Yes" : "No" %>
+                                                    <%# Eval("CredentialStatus") %>
                                                     <span class="form-text">
                                                         <%# Eval("Score","({0:p0})") %>
                                                     </span>

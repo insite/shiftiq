@@ -12,8 +12,8 @@ namespace InSite.Admin.Events.Appointments.Controls
         {
             EventTitle.Text = $"<a href=\"/ui/admin/events/appointments/outline?event={ev.EventIdentifier}\">{ev.EventTitle}</a>";
             AppointmentType.Text = ev.AppointmentType.IfNullOrEmpty("N/A");
-            EventScheduledStart.Text = ev.EventScheduledStart.Format(null, true);
-            EventScheduledEnd.Text = ev.EventScheduledEnd.Format(null, true, nullValue: "None");
+            EventScheduledStart.Text = ev.EventScheduledStart.Format((string)null, true);
+            EventScheduledEnd.Text = ev.EventScheduledEnd.Format((string)null, true, nullValue: "None");
 
             EventScheduledStartLabel.Visible =
             EventScheduledStartValue.Visible =

@@ -51,12 +51,12 @@ public class GradebookAdapter : IEntityAdapter
         return entity;
     }
 
-    public IEnumerable<GradebookModel> ToModel(IEnumerable<GradebookEntity> entities, TimeZoneInfo? timezone)
+    public IEnumerable<GradebookModel> ToModel(IEnumerable<GradebookEntity> entities, string? timezone)
     {
         return entities.Select(e => ToModel(e, timezone));
     }
 
-    public GradebookModel ToModel(GradebookEntity entity, TimeZoneInfo? timezone)
+    public GradebookModel ToModel(GradebookEntity entity, string? timezone)
     {
         var model = new GradebookModel
         {
@@ -86,9 +86,9 @@ public class GradebookAdapter : IEntityAdapter
             model.ClassInstructors = null;
 
             if (entity.Event.EventScheduledEnd != null)
-                model.ClassScheduledEndDate = Common.TimeZones.FormatDateOnly(entity.Event.EventScheduledEnd.Value, timezone);
+                model.ClassScheduledEndDate = TimeZones.FormatDateOnly(entity.Event.EventScheduledEnd.Value, timezone);
 
-            model.ClassScheduledStartDate = Common.TimeZones.FormatDateOnly(entity.Event.EventScheduledStart, timezone);
+            model.ClassScheduledStartDate = TimeZones.FormatDateOnly(entity.Event.EventScheduledStart, timezone);
 
             model.ClassTitle = entity.Event.EventTitle;
         }

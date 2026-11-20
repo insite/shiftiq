@@ -24,6 +24,7 @@ namespace InSite.Persistence
             Property(x => x.FormCode).IsUnicode(false).HasMaxLength(40);
             Property(x => x.BankLevelType).IsUnicode(false).HasMaxLength(20);
             Property(x => x.FormHasReferenceMaterials).IsUnicode(false).HasMaxLength(21);
+            Property(x => x.AIProctoringProvider).IsUnicode(false).HasMaxLength(50);
             Property(x => x.FormPassingScore).IsOptional().HasPrecision(3, 2);
             Property(x => x.WhenAttemptCompletedNotifyAdminMessageIdentifier).IsOptional();
             Property(x => x.WhenAttemptStartedNotifyAdminMessageIdentifier).IsOptional();

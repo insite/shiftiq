@@ -32,7 +32,7 @@ namespace InSite.Application.Organizations.Write
             result.Add(new ModifyOrganizationIdentification(state.OrganizationIdentifier, state.OrganizationCode, state.CompanyName, state.CustomerCode, state.CustomerNumber));
             result.Add(new ModifyOrganizationIntegrationSettings(state.OrganizationIdentifier, state.Integrations));
             result.Add(new ModifyOrganizationIssueSettings(state.OrganizationIdentifier, state.Toolkits.Issues));
-            result.Add(new ModifyOrganizationLocalization(state.OrganizationIdentifier, state.Languages.Select(x => x.TwoLetterISOLanguageName).ToArray(), state.TimeZone.Id));
+            result.Add(new ModifyOrganizationLocalization(state.OrganizationIdentifier, state.Languages.Select(x => x.TwoLetterISOLanguageName).ToArray(), state.TimeZone));
             result.Add(new ModifyOrganizationLocation(state.OrganizationIdentifier, state.PlatformCustomization.TenantLocation));
             result.Add(new ModifyOrganizationNCSHASettings(state.OrganizationIdentifier, state.Toolkits.NCSHA));
             result.Add(new ModifyOrganizationPlatformSettings(

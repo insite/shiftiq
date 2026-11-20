@@ -35,6 +35,7 @@ namespace Shift.Common
 
         public string EncryptionKey { get; set; }
         public Organizations Organizations { get; set; }
+        public Catalogues Catalogues { get; set; }
         public string HelpUrl { get; set; }
         public int TempFileExpirationInMinutes { get; set; }
         public bool AntiForgeryTokenValidationEnabled { get; set; }

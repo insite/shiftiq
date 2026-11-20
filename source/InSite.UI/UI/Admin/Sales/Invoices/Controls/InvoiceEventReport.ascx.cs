@@ -32,7 +32,7 @@ namespace InSite.Admin.Invoices.Controls
             public string BillingInfo { get; set; }
         }
 
-        private static TimeZoneInfo TimeZone
+        private static string TimeZone
         {
             get
             {
@@ -145,7 +145,7 @@ namespace InSite.Admin.Invoices.Controls
                 : invoice.InvoiceIdentifier.ToString();
 
             var filePrefix = reportType == InvoiceEventReportType.Receipt ? "receipt" : "invoice";
-            var date = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, TimeZone);
+            var date = TimeZones.ConvertTime(DateTimeOffset.UtcNow, TimeZone);
             return $"{filePrefix}-{invoiceNumber}-{date:yyyy}-{date:MM}-{date:dd}-{date:HH}-{date:mm}";
         }
 

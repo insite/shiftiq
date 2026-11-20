@@ -1408,10 +1408,13 @@ namespace InSite.Domain.Banks
                 return;
 
             var tabConfig = crierion.TabConfiguration;
-            var isChanged = tabConfig.WarningOnNextTabEnabled != warningOnNextTabEnabled
-                || tabConfig.BreakTimerEnabled != breakTimerEnabled
-                || tabConfig.TimeLimit != timeLimit
-                || tabConfig.TimerType != timerType;
+            var isChanged = !tabConfig.IsEqual(new SectionTabConfiguration
+            {
+                WarningOnNextTabEnabled = warningOnNextTabEnabled,
+                BreakTimerEnabled = breakTimerEnabled,
+                TimeLimit = timeLimit,
+                TimerType = timerType
+            });
 
             if (!isChanged)
                 return;
@@ -1435,10 +1438,13 @@ namespace InSite.Domain.Banks
                 return;
 
             var tabConfig = section.TabConfiguration;
-            var isChanged = tabConfig.WarningOnNextTabEnabled != warningOnNextTabEnabled
-                || tabConfig.BreakTimerEnabled != breakTimerEnabled
-                || tabConfig.TimeLimit != timeLimit
-                || tabConfig.TimerType != timerType;
+            var isChanged = !tabConfig.IsEqual(new SectionTabConfiguration
+            {
+                WarningOnNextTabEnabled = warningOnNextTabEnabled,
+                BreakTimerEnabled = breakTimerEnabled,
+                TimeLimit = timeLimit,
+                TimerType = timerType
+            });
 
             if (!isChanged)
                 return;
@@ -1696,19 +1702,21 @@ namespace InSite.Domain.Banks
             Apply(e);
         }
 
-        public void RenameBank(string name)
+        public bool RenameBank(string name)
         {
             // Ignore the command if there is no name.
             if (string.IsNullOrEmpty(name))
-                return;
+                return false;
 
             // Ignore the command if the name is not actually being changed.
             if (StringHelper.Equals(name, Data.Name))
-                return;
+                return false;
 
             var e = new BankRenamed(name);
 
             Apply(e);
+
+            return true;
         }
 
         public void RenameSet(Guid set, string name)
@@ -2115,16 +2123,25 @@ namespace InSite.Domain.Banks
 
             foreach (var srcSection in srcForm.Sections)
             {
-                var dstSection = UuidFactory.Create();
+                var dstSectionId = UuidFactory.Create();
 
-                Apply(new SectionAdded(destination, dstSection, srcSection.CriterionIdentifier));
+                Apply(new SectionAdded(destination, dstSectionId, srcSection.CriterionIdentifier));
 
                 foreach (var srcField in srcSection.Fields)
                 {
                     var dstField = UuidFactory.Create();
 
-                    Apply(new FieldAdded(dstField, dstSection, srcField.QuestionIdentifier, -1));
+                    Apply(new FieldAdded(dstField, dstSectionId, srcField.QuestionIdentifier, -1));
                 }
+
+                if (srcSection.Content != null && !srcSection.Content.IsEmpty)
+                    Apply(new SectionContentChanged(dstSectionId, srcSection.Content.Clone()));
+
+                var srcTab = srcSection.TabConfiguration;
+                var dstTab = Data.FindSection(dstSectionId).TabConfiguration;
+
+                if (!srcTab.IsEqual(dstTab))
+                    Apply(new SectionReconfigured(dstSectionId, srcTab.WarningOnNextTabEnabled, srcTab.BreakTimerEnabled, srcTab.TimeLimit, srcTab.TimerType));
             }
         }
 

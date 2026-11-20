@@ -85,8 +85,6 @@ public class ReactService : IReactService
         var navigationShortcuts = SiteSettings.FromNavigationItems(await _navigationService.SearchShortcutsAsync(principal));
         var adminNavigationMenus = SiteSettings.FromNavigationLists(_navigationService.SearchAdminMenus(principal, isCmds));
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
-
         var organization = await _organizationService.RetrieveAsync(principal.Organization.Identifier);
         var organizationData = organization != null ? _organizationAdapter.ToData(organization) : null;
         var userFirstName = (await _userService.RetrieveAsync(principal.User.Identifier))?.FirstName;
@@ -100,7 +98,7 @@ public class ReactService : IReactService
             Url = home?.Href ?? "/client/admin/home"
         };
 
-        settings.TimeZoneId = TimeZones.GetAbbreviation(timeZone).Moment;
+        settings.TimeZoneId = principal.User.TimeZone ?? TimeZones.Ids.Utc;
         settings.OrganizationCode = organizationData?.OrganizationCode;
         settings.DomainName = _appSettings.Partition.Domain;
         settings.CompanyName = organizationData?.CompanyName;
@@ -151,10 +149,32 @@ public class ReactService : IReactService
         settings.CurrentLanguage = principal.User.Language;
         settings.SupportedLanguages = organizationData != null ? [.. organizationData.Languages.Select(x => x.TwoLetterISOLanguageName)] : ["en"];
         settings.RecentLinksKey = RecentLinksHelper.CreateRecentLinksKey(environment.Name, principal.Organization.Identifier, principal.UserId);
+        settings.TimeZones = GetTimeZones();
 
         SiteSettingsCache.Add(identityKey, (principal.CookieId, settings));
 
         return settings;
+    }
+
+    private static List<ReactTimeZoneInfo> GetTimeZones()
+    {
+        var result = new List<ReactTimeZoneInfo>();
+
+        foreach (var timeZoneId in TimeZones.Supported)
+        {
+            var abbrev = TimeZones.GetAbbreviation(timeZoneId);
+            result.Add(new ReactTimeZoneInfo
+            {
+                TimeZoneId = abbrev.TimeZoneId,
+                Title = abbrev.DisplayName,
+                Abbrev = abbrev.Generic,
+                StandardCode = abbrev.Standard,
+                DaylightCode = abbrev.Daylight,
+                IsIANACompatible = abbrev.IsIANACompatible
+            });
+        }
+
+        return result;
     }
 
     private async Task<List<SiteSettings.MenuLinkModel>> GetFrequentlyUsedAppsAsync(Guid organizationId, Guid userId, List<SiteSettings.MenuModel> allApps)

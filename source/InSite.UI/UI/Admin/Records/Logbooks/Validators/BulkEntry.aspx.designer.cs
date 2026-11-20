@@ -195,22 +195,22 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         protected global::InSite.Common.Web.UI.Container SearchNoResultContainer;
 
         /// <summary>
-        /// NextButton control.
+        /// SearchNextButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.NextButton NextButton;
+        protected global::InSite.Common.Web.UI.NextButton SearchNextButton;
 
         /// <summary>
-        /// CloseButton control.
+        /// SearchCloseButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.CloseButton CloseButton;
+        protected global::InSite.Common.Web.UI.CloseButton SearchCloseButton;
 
         /// <summary>
         /// FieldsTab control.
@@ -231,21 +231,57 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
         protected global::InSite.UI.Portal.Records.Logbooks.Controls.FieldList Fields;
 
         /// <summary>
-        /// SaveButton control.
+        /// FieldsNextButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.SaveButton SaveButton;
+        protected global::InSite.Common.Web.UI.NextButton FieldsNextButton;
 
         /// <summary>
-        /// CancelButton control.
+        /// FieldsCancelButton control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.CancelButton CancelButton;
+        protected global::InSite.Common.Web.UI.CancelButton FieldsCancelButton;
+
+        /// <summary>
+        /// ValidateTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NavItem ValidateTab;
+
+        /// <summary>
+        /// SkillRating control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox SkillRating;
+
+        /// <summary>
+        /// ValidateSaveButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.SaveButton ValidateSaveButton;
+
+        /// <summary>
+        /// ValidateCancelButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CancelButton ValidateCancelButton;
     }
 }

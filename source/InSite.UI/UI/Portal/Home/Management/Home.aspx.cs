@@ -138,7 +138,7 @@ namespace InSite.UI.Portal.Home.Management
                 return;
 
             PortalMaster.ShowAvatar(dashboardUrl: "/ui/portal/profile");
-            PortalMaster.RenderHelpContent(null);
+            PortalMaster.RenderHelpContent(ActionModel, true);
             PortalMaster.HideBreadcrumbsOnly();
 
             PageHelper.AutoBindHeader(this);
@@ -155,6 +155,12 @@ namespace InSite.UI.Portal.Home.Management
             {
                 BannerPanel.Visible = true;
                 BannerMessage.InnerText = $"{purchasedCount:n0} SkillsCheck have been added to your account.";
+            }
+
+            if (Organization.Toolkits.Accounts.AHRIFeatures)
+            {
+                SkillsCheckLiteral.Text = "Capability Assessments";
+                ProductFilterPanel.Visible = false;
             }
         }
 

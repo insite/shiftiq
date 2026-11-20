@@ -10,5 +10,7 @@ namespace Shift.Sdk.UI
         public string Description { get; set; }
         public decimal Price { get; set; }
         public decimal? TaxRate { get; set; }
+        public string TaxCountry { get; set; }
+        public string TaxRegion { get; set; }
     }
 }

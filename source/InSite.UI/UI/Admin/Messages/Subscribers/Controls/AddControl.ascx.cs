@@ -58,6 +58,21 @@ namespace InSite.UI.Admin.Messages.Subscribers.Controls
 
         public Func<ContactForSave, bool> SaveContact;
 
+        // The organization whose people the search returns, when the hosting page needs one other
+        // than the current organization. Returning null keeps the current organization, which is
+        // what every caller but the paid-program page wants. Evaluated on each search rather than
+        // captured once, so a page whose answer depends on what the admin has selected stays right.
+        public Func<Guid?> PersonOrganizationScope;
+
+        // The prompt the admin must accept before the Add button saves. Empty means no prompt, which
+        // is what every caller but the paid-program page wants. The button keeps it in view state,
+        // so a hosting page sets it again only when what it depends on changes.
+        public string SaveConfirmText
+        {
+            get => SearchResultSaveButton.ConfirmText;
+            set => SearchResultSaveButton.ConfirmText = value;
+        }
+
         private string ParentUrl
         {
             get => (string)ViewState[nameof(ParentUrl)];
@@ -225,6 +240,19 @@ namespace InSite.UI.Admin.Messages.Subscribers.Controls
             Search();
 
             SearchResultCloseButton.NavigateUrl = initData.ParentUrl;
+        }
+
+        // Redraws the results after the hosting page changes something the filter depends on, such
+        // as the organization the people are drawn from. Selections are cleared first, because they
+        // are identifiers from the previous search and Save takes the set exactly as given - keeping
+        // them would add contacts the admin can no longer see, and cannot uncheck. Safe to call from
+        // a changed event: OnLoad has already harvested the posted checkboxes by then, so this
+        // discards that harvest rather than racing it.
+        public void RefreshSearch()
+        {
+            SearchSelectedEntities = new HashSet<Guid>();
+
+            Search();
         }
 
         private void LoadDataFromUserCreated()
@@ -495,9 +523,12 @@ namespace InSite.UI.Admin.Messages.Subscribers.Controls
 
         private QPersonFilter GetPersonFilter()
         {
+            var scope = PersonOrganizationScope?.Invoke();
+            var organizationId = scope ?? Organization.OrganizationIdentifier;
+
             return new QPersonFilter
             {
-                OrganizationIdentifier = Organization.OrganizationIdentifier,
+                OrganizationIdentifier = organizationId,
                 UserIdentifiers = SavedIdentifiers,
                 UserNameContains = CriteriaContactName.Text,
                 UserEmailContains = CriteriaEmail.Text,

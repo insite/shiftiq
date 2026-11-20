@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Create.aspx.cs" Inherits="InSite.UI.Portal.Contacts.Referral.Create" MasterPageFile="~/UI/Layout/Portal/Portal.master" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Create.aspx.cs" Inherits="InSite.UI.Portal.Contacts.Referral.Create" MasterPageFile="~/UI/Layout/Portal/Portal.master" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
@@ -63,6 +63,19 @@
                                 <insite:DateSelector ID="PersonBirthdate" runat="server" Width="200px" />
                                 <div class="form-text">
                                     Date of birth for this contact person.
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    <insite:ContentTextLiteral runat="server" ID="PersonLanguageLabel" ContentLabel="Preferred Language"/>
+                                    <insite:RequiredValidator runat="server" ControlToValidate="PersonLanguage" FieldNameControl="PersonLanguageLabel" ValidationGroup="Person" />
+                                </label>
+                                <div>
+                                    <insite:LanguageComboBox runat="server" ID="PersonLanguage" />
+                                </div>
+                                <div class="form-text">
+                                    This is the language the assessment should be completed in.
                                 </div>
                             </div>
 

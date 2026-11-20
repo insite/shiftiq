@@ -14,6 +14,7 @@
                     <div class="card-body text-center">
                         <asp:Literal runat="server" ID="Icon" />
                         <h3 runat="server" id="Title" class="h5 nav-heading mb-2"></h3>
+                        <div runat="server" id="InlineFlag" class="mb-2" visible="false"></div>
                         <div runat="server" id="Summary" class="fs-sm text-body-secondary mb-2"></div>
                         <div runat="server" id="Progress" />
                     </div>

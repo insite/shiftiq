@@ -25,7 +25,7 @@
                                 <div>
                                     <insite:TextBox runat="server" ID="Name" MaxLength="90" />
                                 </div>
-                                <div class="form-text">The name of the division, district, or business unit.</div>
+                                <div class="form-text">The name of the division or business unit.</div>
                             </div>
                         </div>
                     </div>

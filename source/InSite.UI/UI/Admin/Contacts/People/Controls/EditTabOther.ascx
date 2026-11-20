@@ -14,7 +14,7 @@
                         
                         <div class="form-group mb-3">
                             <label class="form-label">
-                                Preferred Language
+                                <insite:ContentTextLiteral runat="server" ContentLabel="Preferred Language"/>
                             </label>
                             <insite:LanguageComboBox runat="server" ID="Language" AllowBlank="false" />
                             <div class="form-text">

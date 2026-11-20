@@ -10,6 +10,7 @@ using InSite.Application.Registrations.Read;
 using InSite.Application.Standards.Read;
 
 using Shift.Common;
+using Shift.Constant;
 using Shift.Toolbox.Integrations.DirectAccess;
 
 namespace InSite.Persistence.Integration.DirectAccess
@@ -37,7 +38,7 @@ namespace InSite.Persistence.Integration.DirectAccess
             };
 
             // Assume an exam candidate is eligible if the status does not explicitly indicate otherwise.
-            input.Eligible = registration.EligibilityStatus != "Not Eligible" ? "Y" : "N";
+            input.Eligible = registration.EligibilityStatus != RegistrationEligibility.NotEligible ? "Y" : "N";
 
             // Convert the duration from minutes (InSite) to hours (Direct Access)
             input.Duration = (@event.ExamDurationInMinutes ?? 0) / 60;
@@ -146,7 +147,7 @@ namespace InSite.Persistence.Integration.DirectAccess
                             if (attempt.AttemptImported.HasValue)
                             {
                                 var pacific = TimeZones.FormatDateOnly(attempt.AttemptImported.Value,
-                                    TimeZones.Pacific, CultureInfo.CurrentCulture, "{0:yyyy-MM-dd}");
+                                    TimeZones.Ids.Pacific, CultureInfo.CurrentCulture, "{0:yyyy-MM-dd}");
 
                                 person.SetVariable("AttemptImportDate", pacific);
                             }
@@ -154,7 +155,7 @@ namespace InSite.Persistence.Integration.DirectAccess
                             if (attempt.AttemptGraded.HasValue)
                             {
                                 var pacific = TimeZones.FormatDateOnly(attempt.AttemptGraded.Value,
-                                    TimeZones.Pacific, CultureInfo.CurrentCulture, "{0:yyyy-MM-dd}");
+                                    TimeZones.Ids.Pacific, CultureInfo.CurrentCulture, "{0:yyyy-MM-dd}");
 
                                 person.SetVariable("AttemptGradeDate", pacific);
                             }
@@ -167,8 +168,7 @@ namespace InSite.Persistence.Integration.DirectAccess
                 if (!date.HasValue)
                     date = @event.EventScheduledStart;
 
-                var zone = TimeZones.Pacific;
-                var time = TimeZoneInfo.ConvertTime(date.Value, zone);
+                var time = TimeZones.ConvertTime(date.Value, TimeZones.Ids.Pacific);
                 session.ExamCompletedDate = $"{time:yyyy-MM-dd}";
 
                 session.SetVariable("EventExamType", @event.ExamType);

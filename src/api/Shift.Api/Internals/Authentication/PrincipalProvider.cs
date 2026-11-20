@@ -8,7 +8,7 @@ namespace Shift.Api
 
         private readonly IClaimConverter _claimConverter;
 
-        private readonly IGroupLookupService _groupLookupService;
+        private readonly GroupService _groupService;
 
         private readonly PersonReader _personReader;
 
@@ -17,7 +17,7 @@ namespace Shift.Api
         public PrincipalProvider(
             IHttpContextAccessor httpContextAccessor,
             IClaimConverter claimConverter,
-            IGroupLookupService groupLookupService,
+            GroupService groupService,
             PersonReader personReader,
             QPersonSecretReader personSecretReader
         )
@@ -26,7 +26,7 @@ namespace Shift.Api
 
             _claimConverter = claimConverter;
 
-            _groupLookupService = groupLookupService;
+            _groupService = groupService;
 
             _personReader = personReader;
 
@@ -96,58 +96,53 @@ namespace Shift.Api
 
         private async Task<IPrincipal> RehydrateAsync(IPrincipal principal, string? authenticationType)
         {
-            if (!await IsUserValidAsync(principal, authenticationType))
+            var person = await ValidatePersonAsync(principal, authenticationType);
+            if (person == null)
                 return _claimConverter.ToPrincipal(Array.Empty<System.Security.Claims.Claim>());
 
-            var names = await _groupLookupService.GetGroupNamesAsync(principal.RoleIds);
+            principal.Roles.Clear();
 
-            foreach (var role in principal.Roles)
-            {
-                if (names.TryGetValue(role.Identifier, out var name))
-                    role.Name = name;
-            }
+            var roles = await _groupService.SearchUserRolesAsync(principal.Partition.Identifier, principal.OrganizationId, principal.UserId);
+            foreach (var role in roles)
+                principal.Roles.Add(new Role(role.GroupName, role.GroupId));
+
+            var (authority, systemRoles) = PrincipalSearch.GetAuthority(person);
+
+            principal.Authority = authority;
+            principal.Roles.AddRange(systemRoles);
 
             return principal;
         }
 
-        private async Task<bool> IsUserValidAsync(IPrincipal principal, string? autheticationType)
+        private async Task<PersonMatch?> ValidatePersonAsync(IPrincipal principal, string? authenticationType)
         {
-            if (autheticationType != AuthenticationSchemeNames.Bearer)
-                return true;
+            if (principal.UserId == Guid.Empty || principal.OrganizationId == Guid.Empty)
+                return null;
 
-            var person = await _personReader.RetrieveAsync(principal.Person.Identifier);
-
-            if (person == null
-                || person.UserIdentifier != principal.UserId
-                || person.OrganizationIdentifier != principal.OrganizationId
-                || !person.IsDeveloper
-            )
+            var people = await _personReader.SearchAsync(new SearchPeople
             {
-                return false;
-            }
+                UserId = principal.UserId,
+                OrganizationId = principal.OrganizationId
+            });
+
+            if (people.Length != 1)
+                return null;
+
+            var person = people[0];
+
+            if (authenticationType != AuthenticationSchemeNames.Bearer)
+                return person;
+
+            if (!person.IsDeveloper)
+                return null;
 
             var personSecret = await _personSecretReader.RetrieveAsync(principal.SecretId);
 
             return personSecret != null
-                && personSecret.PersonIdentifier == principal.Person.Identifier
-                && personSecret.SecretExpiry > DateTimeOffset.UtcNow
-                ;
-        }
-
-        public TimeZoneInfo GetTimeZone()
-        {
-            try
-            {
-                var id = GetPrincipal().User.TimeZone;
-
-                var tz = Shift.Common.Base.TimeZones.GetZone(id);
-
-                return tz;
-            }
-            catch
-            {
-                return TimeZoneInfo.Utc;
-            }
+                    && personSecret.PersonIdentifier == principal.Person.Identifier
+                    && personSecret.SecretExpiry > DateTimeOffset.UtcNow
+                ? person
+                : null;
         }
 
         private static Guid GetUserIdFromClaims(HttpContext context) => GetIdFromClaims(context, ClaimName.UserId);
@@ -172,8 +167,13 @@ namespace Shift.Api
             // If the caller is not permitted to query for data owned by other organizations, then force the principal's
             // organization identifier into the query.
 
-            if (!AllowPartitionAccess(principal))
-                query.OrganizationId = principal.OrganizationId;
+            if (AllowPartitionAccess(principal))
+                return;
+
+            query.OrganizationId = principal.OrganizationId;
+
+            if (query is IQuery q && q.Filter != null && q.Filter.PageSize > QueryFilter.MaxPageSize)
+                q.Filter.PageSize = QueryFilter.MaxPageSize;
         }
 
         private bool AllowPartitionAccess(IPrincipal principal)

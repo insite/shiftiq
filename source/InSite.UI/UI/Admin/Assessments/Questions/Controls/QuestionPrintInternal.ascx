@@ -405,8 +405,8 @@
                             <asp:View runat="server" ID="SingleCorrectItemsView">
                                 <asp:Repeater runat="server" ID="SingleCorrectItemRepeater">
                                     <HeaderTemplate>
-                                        <table class="table table-option">
-                                            <%# GetOptionRepeaterTableHead("<th></th><th></th>", "<th></th>") %>
+                                        <table class="table table-option" data-docx-option-layout="true">
+                                            <%# GetOptionRepeaterTableHead("<th class='oicon'></th><th class='onum'></th>", "<th class='opoints'></th>") %>
                                             <tbody>
                                     </HeaderTemplate>
                                     <ItemTemplate>
@@ -447,8 +447,8 @@
                             <asp:View runat="server" ID="MultipleCorrectItemsView">
                                 <asp:Repeater runat="server" ID="MultipleCorrectItemRepeater">
                                     <HeaderTemplate>
-                                        <table class="table-option">
-                                            <%# GetOptionRepeaterTableHead("<th></th><th></th>", null) %>
+                                        <table class="table-option" data-docx-option-layout="true">
+                                            <%# GetOptionRepeaterTableHead("<th class='oicon'></th><th class='onum'></th>", "<th class='opoints'></th>") %>
                                             <tbody>
                                     </HeaderTemplate>
                                     <ItemTemplate>
@@ -517,7 +517,6 @@
                                                 <th colspan="3"><%# CustomTranslate("Matching Distractors") %></th>
                                             </tr>
                                         </HeaderTemplate>
-                                        <FooterTemplate></tbody></table></FooterTemplate>
                                         <ItemTemplate>
                                             <tr>
                                                 <td colspan="3" class="mdistractor"><%# Shift.Common.Markdown.ToHtml((string)Container.DataItem) %></td>

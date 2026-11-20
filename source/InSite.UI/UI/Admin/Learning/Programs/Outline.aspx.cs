@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -69,17 +69,14 @@ namespace InSite.Admin.Records.Programs
             InitTab();
         }
 
+        /// <summary>
+        /// Lists every achievement on the program, not only those the department and scope
+        /// currently offer, so a task whose achievement has left the department (or was inherited
+        /// from a parent) is still visible.
+        /// </summary>
         private List<AchievementListGridItem> GetAssignedAchievements(List<AchievementListGridItem> list)
         {
-            var programId = ProgramID.Value;
-
-            var programTaskIds = TaskSearch.SelectByProgram(programId);
-
-            var assignedAchievementIds = programTaskIds.Select(x => x.AchievementIdentifier).ToList();
-
-            return list
-                .Where(x => assignedAchievementIds.Contains(x.AchievementIdentifier))
-                .ToList();
+            return VCmdsAchievementSearch.SelectProgramAchievements(ProgramID.Value, AchievementListEditor.Keyword);
         }
 
         private void InitTab()

@@ -32,13 +32,20 @@ namespace InSite.UI.Portal.Billing
 
             PageHelper.AutoBindHeader(this, null, "Cart");
 
-            PortalMaster.ShowAvatar();
-            PortalMaster.HideBreadcrumbsOnly();
+            DashboardNavigation.Visible = PortalMaster.IsSalesReady;
 
-            if (Identity.IsAuthenticated)
-                OverrideHomeLink("/ui/portal/management/dashboard/home");
+            if (PortalMaster.IsSalesReady)
+            {
+                PortalMaster.ShowAvatar();
+                PortalMaster.HideBreadcrumbsOnly();
+
+                if (Identity.IsAuthenticated)
+                    OverrideHomeLink("/ui/portal/management/dashboard/home");
+                else
+                    OverrideHomeLink("/ui/portal/billing/catalog");
+            }
             else
-                OverrideHomeLink("/ui/portal/billing/catalog");
+                PortalMaster.SidebarVisible(false);
         }
 
         private void SetCheckoutEnabled(bool enabled)

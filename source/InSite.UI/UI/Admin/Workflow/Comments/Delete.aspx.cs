@@ -89,7 +89,7 @@ namespace InSite.Admin.Issues.Comments.Forms
             CancelButton.NavigateUrl = GetReaderUrl();
         }
 
-        private string GetLocalTime(DateTimeOffset? item, TimeZoneInfo tz)
+        private string GetLocalTime(DateTimeOffset? item, string tz)
         {
             return item.Format(tz, nullValue: "None");
         }

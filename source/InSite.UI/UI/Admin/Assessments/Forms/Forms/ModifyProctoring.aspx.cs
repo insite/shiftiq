@@ -5,10 +5,10 @@ using InSite.Application.Banks.Write;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
-using InSite.UI.Admin.Assessments.Forms.Utilities;
 using InSite.UI.Layout.Admin;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.Admin.Assessments.Forms.Forms
 {
@@ -115,6 +115,9 @@ namespace InSite.Admin.Assessments.Forms.Forms
                 AttemptLimitPerSession = AttemptLimitPerSession.ValueAsInt.Value,
                 TimeLimitPerSession = TimeLimitPerSession.ValueAsInt.Value,
                 TimeLimitPerLockout = TimeLimitPerLockout.ValueAsInt.Value,
+                AIProctoringProvider = AIProctoringEnabled.Checked && Organization.Toolkits.Assessments.AIProctoringEnabled
+                    ? AIProctoringProvider.Proview
+                    : (AIProctoringProvider?)null,
                 IsSafeExamBrowserRequired = IsSafeExamBrowserRequired.Checked,
                 IsKioskModeRequired = IsKioskModeRequired.Checked
             };
@@ -131,6 +134,9 @@ namespace InSite.Admin.Assessments.Forms.Forms
             PageHelper.AutoBindHeader(
                 this,
                 qualifier: $"{(form.Content.Title?.Default).IfNullOrEmpty(form.Name)} <span class=\"form-text\">Asset #{form.Asset}</span>");
+
+            AIProctoringEnabled.Visible = Organization.Toolkits.Assessments.AIProctoringEnabled;
+            AIProctoringEnabled.Checked = form.Invigilation.AIProctoringProvider == AIProctoringProvider.Proview;
 
             IsSafeExamBrowserRequired.Checked = form.Invigilation.IsSafeExamBrowserRequired;
             IsKioskModeRequired.Checked = form.Invigilation.IsKioskModeRequired;

@@ -1,10 +1,10 @@
 ﻿using System;
 
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Journals.Write;
 using InSite.Domain.Records;
+
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
 
 namespace InSite.Application.Records.Write
 {
@@ -181,11 +181,15 @@ namespace InSite.Application.Records.Write
 
         public void Handle(DeleteExperienceCompetency c)
         {
-            ChangeExperience(c, c.Experience, (aggregate, experience) =>
+            _repository.LockAndRun<JournalAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
+                var experience = aggregate.Data.FindExperience(c.Experience);
+                if (experience == null)
+                    return;
+
                 var competency = experience.FindExperienceCompetency(c.Competency);
                 if (competency == null)
-                    throw new JournalException($"Competency {c.Competency} is not found in experience {c.Experience}");
+                    return;
 
                 aggregate.DeleteExperienceCompetency(c.Experience, c.Competency);
 
@@ -195,8 +199,11 @@ namespace InSite.Application.Records.Write
 
         public void Handle(DeleteExperience c)
         {
-            ChangeExperience(c, c.Experience, (aggregate, experience) =>
+            _repository.LockAndRun<JournalAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
+                if (aggregate.Data.FindExperience(c.Experience) == null)
+                    return;
+
                 aggregate.DeleteExperience(c.Experience);
 
                 Commit(aggregate, c);
@@ -272,7 +279,7 @@ namespace InSite.Application.Records.Write
         {
             ChangeExperience(c, c.Experience, (aggregate, experience) =>
             {
-                if (string.Equals(experience.Supervisor, c.Supervisor))
+                if (experience.Supervisor == c.Supervisor)
                     return;
 
                 aggregate.ChangeExperienceSupervisor(c.Experience, c.Supervisor);
@@ -366,9 +373,8 @@ namespace InSite.Application.Records.Write
         {
             _repository.LockAndRun<JournalAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
-                var experience = aggregate.Data.FindExperience(experienceIdentifier);
-                if (experience == null)
-                    throw new JournalException($"Experience {experienceIdentifier} is not found in journal {c.AggregateIdentifier}");
+                var experience = aggregate.Data.FindExperience(experienceIdentifier)
+                    ?? throw new JournalException($"Experience {experienceIdentifier} is not found in journal {c.AggregateIdentifier}");
 
                 action(aggregate, experience);
             });

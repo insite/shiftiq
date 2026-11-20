@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
-using InSite.Application.Events.Read;
 using InSite.Application.Messages.Write;
 using InSite.Application.Registrations.Read;
 using InSite.Application.Registrations.Write;
@@ -19,13 +19,23 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
 {
     public partial class RegistrationProcessor
     {
-        private void CancelRegistrationNotificationTimer(IChange cause, Guid registration, NotificationType notification)
+        private void CancelRegistrationNotificationTimer(IChange cause, Guid registration, NotificationType? notification = null)
         {
-            var timers = _registrations.GetTimers(new QRegistrationTimerFilter { RegistrationIdentifier = registration, TriggerTimeSince = DateTimeOffset.UtcNow });
+            var timers = _registrations.GetTimers(new QRegistrationTimerFilter
+            {
+                RegistrationIdentifier = registration,
+                TriggerTimeSince = DateTimeOffset.UtcNow
+            });
+
+            var hasNotification = notification.HasValue;
+            var notificationName = hasNotification ? notification.GetName() : null;
+
             foreach (var timer in timers)
             {
-                var trigger = _commands.GetCommand(timer.TriggerCommand) as TriggerNotification;
-                if (trigger?.Name == notification.ToString())
+                if (!(_commands.GetCommand(timer.TriggerCommand) is TriggerNotification trigger))
+                    continue;
+
+                if (!hasNotification || trigger?.Name == notificationName)
                     _broker.Send(cause, new CancelRegistrationTimer(registration, timer.TriggerCommand));
             }
         }
@@ -63,13 +73,12 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
             return false;
         }
 
-        private void ExecuteMailout(IChange e, string notificationName)
+        private void ExecuteMailout(IChange e, string notificationName, Guid? eventId = null)
         {
             try
             {
                 var registration = _registrations.GetRegistration(
                     e.AggregateIdentifier,
-                    x => x.Event,
                     x => x.Candidate,
                     x => x.Attempt.Questions,
                     x => x.Form,
@@ -77,21 +86,27 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                     x => x.RegistrationInstructors
                 );
 
-                if (registration == null || registration.EventIdentifier == Guid.Empty)
+                if (registration == null)
+                    return;
+
+                if (eventId.HasValue)
+                    registration.EventIdentifier = eventId.Value;
+
+                if (registration.EventIdentifier == Guid.Empty)
                     return;
 
                 var alert = Notifications.Select(notificationName);
                 if (alert.Type == NotificationType.ITA016 && registration.Attempt == null)
                     return;
 
-                QEvent @event = _events.GetEvent(
+                var @event = registration.Event = _events.GetEvent(
                     registration.EventIdentifier,
                     x => x.Attendees,
                     x => x.Attendees.Select(y => y.Person.User),
                     x => x.VenueCoordinator,
                     x => x.VenueLocation,
                     x => x.VenueOffice
-                    );
+                );
 
                 if (@event == null || @event.ExamType == EventExamType.Test.Value || !registration.ExamFormIdentifier.HasValue)
                     return;
@@ -208,11 +223,28 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
             return null;
         }
 
-        private RegistrationPacket GetRegistrationPacket(Guid id)
+        private RegistrationPacket GetRegistrationPacket(Guid id, Guid? eventId = null)
         {
+            var includes = new List<Expression<Func<QRegistration, object>>>
+            {
+                x => x.Candidate,
+                x => x.Form
+            };
+
+            if (!eventId.HasValue)
+                includes.Add(x => x.Event);
+
+            var registration = _registrations.GetRegistration(id, includes.ToArray());
+
+            if (eventId.HasValue && registration != null)
+            {
+                registration.EventIdentifier = eventId.Value;
+                registration.Event = _events.GetEvent(registration.EventIdentifier);
+            }
+
             return new RegistrationPacket(id)
             {
-                Registration = _registrations.GetRegistration(id, x => x.Event, x => x.Candidate, x => x.Form)
+                Registration = registration
             };
         }
 

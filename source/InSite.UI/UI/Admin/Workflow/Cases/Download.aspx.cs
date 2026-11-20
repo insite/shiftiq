@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
@@ -36,7 +36,7 @@ namespace InSite.UI.Admin.Issues.Issues.Forms
 
             PageHelper.AutoBindHeader(this, qualifier: $"{issue.IssueTitle} <span class='fw-normal fs-md text-body-secondary'>Case #{issue.IssueNumber} - {issue.IssueType}</span>");
 
-            CaseInfo.BindIssue(issue, User.TimeZone);
+            CaseInfo.BindIssue(issue);
 
             SetupDownloadSection();
 

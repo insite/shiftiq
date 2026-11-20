@@ -8,15 +8,15 @@ namespace InSite.Persistence
 {
     public class ProvinceSearch
     {
-        private readonly string _googleApiUrl;
+        private readonly ApiSettings _googleApi;
 
         private readonly CountrySearch _countrySearch;
 
         private Province[] _provinces;
 
-        public ProvinceSearch(string engineApiUrl, CountrySearch countrySearch)
+        public ProvinceSearch(ApiSettings googleApi, CountrySearch countrySearch)
         {
-            _googleApiUrl = engineApiUrl;
+            _googleApi = googleApi;
 
             _countrySearch = countrySearch;
         }
@@ -33,11 +33,11 @@ namespace InSite.Persistence
             if (_provinces != null)
                 return;
 
-            var client = new LocationClient();
+            var client = new LocationClient(_googleApi.ApiKey);
 
-            var ca = client.CollectProvinces(_googleApiUrl, "ca");
+            var ca = client.CollectProvinces(_googleApi.BaseUrl, "ca");
 
-            var us = client.CollectProvinces(_googleApiUrl, "us");
+            var us = client.CollectProvinces(_googleApi.BaseUrl, "us");
 
             _provinces = ca.Union(us)
                 .OrderBy(x => x.Country)

@@ -30,6 +30,7 @@
                                 <div class="form-group mb-3">
                                     <label class="form-label">Status</label>
                                     <div>
+                                        <insite:CheckBox ID="AIProctoringEnabled" runat="server" Text="AI Proctoring Enabled" />
                                         <insite:CheckBox ID="IsSafeExamBrowserRequired" runat="server" Text="Safe Exam Browser Required" />
                                         <insite:CheckBox ID="IsKioskModeRequired" runat="server" Text="Kiosk Mode Required" />
                                     </div>

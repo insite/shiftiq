@@ -11,8 +11,10 @@ namespace InSite.Persistence.Plugin.CMDS
 
         public bool? AllowSelfDeclared { get; set; }
         public bool? ExcludeHidden { get; set; }
+        public bool ExcludePaidProgramAchievements { get; set; }
         public bool GlobalOrCompanySpecific { get; set; }
         public bool? IsTimeSensitive { get; set; }
+        public bool? IssuesCertificate { get; set; }
 
         public Guid? DepartmentIdentifier { get; set; }
         public Guid? ExcludeAchievementIdentifier { get; set; }

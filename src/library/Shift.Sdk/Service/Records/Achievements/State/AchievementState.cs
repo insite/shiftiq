@@ -16,6 +16,7 @@ namespace InSite.Domain.Records
         public string Title { get; set; }
         public bool Enabled { get; set; }
         public bool ReportingDisabled { get; set; }
+        public bool IssuesCertificate { get; set; }
         public Expiration Expiration { get; set; }
         public string Type { get; set; }
         public bool? HasBadgeImage { get; set; }
@@ -49,7 +50,7 @@ namespace InSite.Domain.Records
 
         public void When(AchievementCreated c)
         {
-            Tenant = c.OriginOrganization;
+            Tenant = c.Tenant;
 
             Label = c.Label;
             Title = c.Title;
@@ -146,6 +147,11 @@ namespace InSite.Domain.Records
         public void When(AchievementReportingEnabled _)
         {
             ReportingDisabled = false;
+        }
+
+        public void When(AchievementCertificateIssuanceChanged c)
+        {
+            IssuesCertificate = c.IssuesCertificate;
         }
 
         public void When(SerializedChange _)

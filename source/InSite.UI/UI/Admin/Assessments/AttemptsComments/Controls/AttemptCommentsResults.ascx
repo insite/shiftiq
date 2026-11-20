@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="AttemptCommentsResults.ascx.cs" Inherits="InSite.Admin.Assessments.Reports.Controls.SubmissionCommentaryResults" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="AttemptCommentsResults.ascx.cs" Inherits="InSite.Admin.Assessments.Reports.Controls.SubmissionCommentaryResults" %>
 
 <insite:PageHeadContent runat="server">
     <style type="text/css">

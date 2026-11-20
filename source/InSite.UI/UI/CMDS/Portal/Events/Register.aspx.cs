@@ -89,7 +89,13 @@ namespace InSite.Custom.CMDS.User.Events.Forms
 
         private void SubmitButton_Click(object sender, EventArgs e)
         {
-            if (!Page.IsValid || !RegistrationSection.Visible)
+            if (!RegistrationSection.Visible)
+            {
+                ScreenStatus.AddMessage(AlertType.Information, "This registration has already been submitted.");
+                return;
+            }
+
+            if (!Page.IsValid)
                 return;
 
             var eventId = SelectedEventID.ValueAsGuid;

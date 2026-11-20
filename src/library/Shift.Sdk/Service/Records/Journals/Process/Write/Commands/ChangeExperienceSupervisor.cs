@@ -7,9 +7,9 @@ namespace InSite.Application.Journals.Write
     public class ChangeExperienceSupervisor : Command
     {
         public Guid Experience { get; }
-        public string Supervisor { get; }
+        public Guid? Supervisor { get; }
 
-        public ChangeExperienceSupervisor(Guid journal, Guid experience, string supervisor)
+        public ChangeExperienceSupervisor(Guid journal, Guid experience, Guid? supervisor)
         {
             AggregateIdentifier = journal;
             Experience = experience;

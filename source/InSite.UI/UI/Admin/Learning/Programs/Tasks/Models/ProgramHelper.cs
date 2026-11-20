@@ -5,11 +5,14 @@ using System.Linq;
 using Humanizer;
 
 using InSite.Application.Banks.Read;
+using InSite.Application.Credentials.Write;
 using InSite.Application.Gradebooks.Write;
 using InSite.Application.JournalSetups.Write;
 using InSite.Application.Records.Read;
 using InSite.Application.Records.Write;
 using InSite.Application.Surveys.Read;
+using InSite.Common.Web.Cmds;
+using InSite.Domain.Records;
 using InSite.Persistence;
 
 using Shift.Common;
@@ -98,6 +101,9 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
 
             if (tasks != null && tasks.Length > 0)
             {
+                foreach (var task in tasks.Where(x => x.ObjectType == "Achievement"))
+                    EnsureAchievementCredential(organizationId, userId, task);
+
                 foreach (var task in tasks.Where(x => x.ObjectType == "Course"))
                     EnsureCourseEnrollment(userId, task.ObjectIdentifier);
 
@@ -106,6 +112,64 @@ namespace InSite.UI.Admin.Records.Programs.Utilities
             }
 
             ServiceLocator.ProgramService.CompletionOfProgramAchievement(programId, userId, organizationId);
+        }
+
+        // Enrolling a learner in a program puts the program's achievements on their training plan,
+        // carrying the settings the program defines for each one. EnrollUserToProgramTasks records
+        // the task enrollment, but the plan reads credentials, so the credential must exist too.
+        // Assign Program to Learners does this same work inline; the other enrollment routes come
+        // through here, so it belongs here too.
+        public static void EnsureAchievementCredential(Guid organizationId, Guid userId, TTask task)
+        {
+            var achievementId = task.ObjectIdentifier;
+
+            if (ServiceLocator.AchievementSearch.GetCredential(achievementId, userId) != null)
+                return;
+
+            var achievement = ServiceLocator.AchievementSearch.GetAchievement(achievementId);
+            if (achievement == null)
+                return;
+
+            var credentialId = ServiceLocator.AchievementSearch
+                .GetCredentialIdentifier(null, achievementId, userId);
+
+            var expiration = task.TaskLifetimeMonths.HasValue
+                ? new Expiration
+                {
+                    Type = ExpirationType.Relative,
+                    Lifetime = new Lifetime
+                    {
+                        Quantity = task.TaskLifetimeMonths.Value,
+                        Unit = "Month"
+                    }
+                }
+                : null;
+
+            var necessity = task.TaskIsRequired ? "Mandatory" : "Optional";
+            var priority = task.TaskIsPlanned ? "Planned" : "Unplanned";
+            var authority = EmployeeAchievementHelper.AllowSignOff(achievement.AchievementLabel)
+                ? "Self"
+                : null;
+
+            var commands = new List<Command>
+            {
+                new CreateCredential(credentialId, organizationId, achievementId, userId, DateTimeOffset.Now),
+                new ChangeCredentialExpiration(credentialId, expiration),
+                new TagCredential(credentialId, necessity, priority),
+                new ChangeCredentialAuthority(credentialId, null, null, authority, null, null, null)
+            };
+
+            foreach (var command in commands)
+            {
+                try
+                {
+                    ServiceLocator.SendCommand(command);
+                }
+                catch (Exception ex) when (ex.Find<DuplicateCredentialException>() != null)
+                {
+                    // Another route created the credential first; the later commands still apply.
+                }
+            }
         }
 
         public static void EnsureLogbookEnrollment(Guid userIdentifier, Guid taskObjectIdentifier)

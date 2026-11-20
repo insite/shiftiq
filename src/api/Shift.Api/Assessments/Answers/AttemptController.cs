@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common.Integrations.Proview;
+using Shift.Constant;
+
 using Shift.Service.Assessment;
 
 namespace Shift.Api;
@@ -214,4 +217,44 @@ public class AttemptController : ShiftControllerBase
     }
 
     #endregion Queries
+
+    #region Custom queries
+
+    public record AIProctoringSession(string Title, string ViewUrl);
+
+    [ApiExplorerSettings(IgnoreApi = true)]
+    [HybridPermission("evaluation/attempts/view", DataAccess.Read)]
+    [HttpGet("api/assessments/attempts/{attemptId}/proctoring-status")]
+    public async Task<ActionResult<AIProctoringSession>> RetrieveSessionAsync(
+        ProviewClient proviewClient,
+        UserReader userReader,
+        Guid attemptId,
+        CancellationToken ct
+        )
+    {
+        var principal = _principalProvider.GetPrincipal();
+
+        var attempt = await _attemptService.RetrieveAsync(attemptId, ct);
+
+        if (attempt == null || attempt.OrganizationId != principal.OrganizationId)
+            return NotFound();
+
+        if (!Enum.TryParse<AIProctoringProvider>(attempt.AIProctoringProvider, out var provider)
+            || provider != AIProctoringProvider.Proview
+            || string.IsNullOrEmpty(attempt.AIProctoringSessionId)
+        )
+        {
+            return NotFound();
+        }
+
+        var user = await userReader.RetrieveAsync(attempt.LearnerUserId, null, ct);
+
+        var playbackToken = await proviewClient.GetPlaybackTokenAsync(attempt.AIProctoringSessionId, ct);
+        var viewUrl = $"https://console.eu.proview.io/embedded/{attempt.AIProctoringSessionId}?token={playbackToken}";
+        var title = user?.FullName ?? "Unknown User";
+
+        return new AIProctoringSession(title, viewUrl);
+    }
+
+    #endregion
 }

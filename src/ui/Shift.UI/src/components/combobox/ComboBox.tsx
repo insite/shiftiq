@@ -1,6 +1,6 @@
 import { ButtonGroup, Dropdown } from "react-bootstrap";
 import { detectOverflow } from "@popperjs/core/lib/popper";
-import { ForwardedRef, ReactNode, useRef, useState } from "react";
+import { ForwardedRef, ReactNode, useEffect, useRef, useState } from "react";
 import { ListItem } from "@/models/listItem";
 import { translate } from "@/helpers/translate";
 import { useComboBox } from "./useComboBox";
@@ -20,9 +20,11 @@ export interface ComboBoxProps {
     maxHeight?: number;
     placeholder?: string;
     disabled?: boolean;
+    autoFocus?: boolean;
     error?: FieldError;
     onChange?: (value: string | null) => void;
     onBlur?: () => void;
+    onKeyDown?: (e:React.KeyboardEvent) => void;
 }
 
 export default function ComboBox({
@@ -37,11 +39,14 @@ export default function ComboBox({
     maxHeight,
     placeholder,
     disabled,
+    autoFocus = false,
     error,
     onChange,
     onBlur,
+    onKeyDown,
 }: ComboBoxProps) {
     const menuRef = useRef<HTMLDivElement>(null);
+    const focusActiveItem = useRef(false);
 
     const [opened, setOpened] = useState(false);
 
@@ -54,41 +59,70 @@ export default function ComboBox({
 
     const errorTooltip = errorHelper.getErrorTooltip(error) ?? "";
 
+    useEffect(() => {
+        if (!menuRef.current || !opened || !focusActiveItem.current) {
+            return;
+        }
+
+        focusActiveItem.current = false;
+
+        const item = menuRef.current.querySelector("a.active.dropdown-item") as HTMLElement
+            ?? menuRef.current.querySelector("a.dropdown-item") as HTMLElement;
+
+        if (!item) {
+            return;
+        }
+
+        const menuRect = menuRef.current.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+
+        if (itemRect.top < menuRect.top) {
+            menuRef.current.scrollTop -= menuRect.top - itemRect.top;
+        } else if (itemRect.bottom > menuRect.bottom) {
+            menuRef.current.scrollTop += itemRect.bottom - menuRect.bottom;
+        }
+
+        try {
+            item.focus({ preventScroll: true });
+        } catch {
+            item.focus();
+        }
+    }, [opened]);
+
     function handleChange(eventKey: string | null): void {
         setCurrentValue(eventKey);        
         onChange?.(eventKey ?? null);
     }
 
     function handleToggle(nextShow: boolean) {
-        if (nextShow) {
-            focusActiveItem();
-        }
+        focusActiveItem.current = nextShow;
         setOpened(nextShow);
     }
 
-    function focusActiveItem() {
-        setTimeout(() => {
-            if (!menuRef.current) {
+    function handleKeyDownCapture(e:React.KeyboardEvent) {
+        if (e.key === "ArrowUp") {
+            focusActiveItem.current = true;
+            setOpened(true);
+        } else if (loadedItems && /^[\p{L}\p{N}]$/u.test(e.key)) { // Check if the pressed key is alpha-numeric
+            const c = e.key.toLowerCase();
+            const currentIndex = currentValue ? loadedItems.findIndex(x => x.value === currentValue) : -1;
+            let item = loadedItems.find((x, index) => currentIndex === -1 || currentIndex < index && x.text.toLowerCase().startsWith(c));
+
+            if (!item && currentIndex !== -1) {
+                item = loadedItems.find(x => x.text.toLowerCase().startsWith(c));
+            }
+
+            if (item && item.value !== currentValue) {
+                handleChange(item.value);
+            } else {
                 return;
             }
-            const item = menuRef.current.querySelector("a.active.dropdown-item") as HTMLElement;
-            if (item) {
-                const menuRect = menuRef.current.getBoundingClientRect();
-                const itemRect = item.getBoundingClientRect();
+        } else {
+            return;
+        }
 
-                if (itemRect.top < menuRect.top) {
-                    menuRef.current.scrollTop -= menuRect.top - itemRect.top;
-                } else if (itemRect.bottom > menuRect.bottom) {
-                    menuRef.current.scrollTop += itemRect.bottom - menuRect.bottom;
-                }
-
-                try {
-                    item.focus({ preventScroll: true });
-                } catch {
-                    item.focus();
-                }
-            }
-        }, 0);
+        e.preventDefault();
+        e.stopPropagation();
     }
        
     return (
@@ -114,9 +148,12 @@ export default function ComboBox({
             >
                 <Dropdown.Toggle
                     ref={buttonRef}
+                    autoFocus={autoFocus}
                     variant="combobox"
                     className={`w-100 ${errorTooltip ? "is-invalid" : ""}`}
                     disabled={disabled || !loadedItems}
+                    onKeyDownCapture={handleKeyDownCapture}
+                    onKeyDown={onKeyDown}
                 >
                     <span
                         className="combobox-text overflow-hidden w-100 text-start"

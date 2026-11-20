@@ -398,7 +398,7 @@
 
     function onSubmitComplete() {
         if (this['_xhr'] && this._xhr.responseURL && this._xhr.responseURL !== window.location.href) {
-            window.location.href = this._xhr.responseURL;
+            redirectAfterComplete(this._xhr.responseURL);
             return;
         }
 
@@ -479,9 +479,9 @@
             success: function (data) {
                 if (data !== 'ERROR') {
                     if (redirectDelay) {
-                        workerTimer.setTimeout(function () { window.location.href = data; }, redirectDelay);
+                        workerTimer.setTimeout(function () { redirectAfterComplete(data); }, redirectDelay);
                     } else {
-                        window.location.href = data;
+                        redirectAfterComplete(data);
                     }
                 } else {
                     lockExam(defaultError.title, defaultError.message + ' (completeExam 1)');
@@ -541,7 +541,7 @@
                 }
 
                 const timerData = data.substring(0, separatorIndex1);
-                if (!setupTimer(timerData))
+                if (!setupTimer(timerData) || isLocked)
                     return;
 
                 const sectionIndex = parseInt(data.substring(separatorIndex1 + 1, separatorIndex2));
@@ -642,7 +642,7 @@
                 }
 
                 const timerData = data.substring(0, separatorIndex1);
-                if (!setupTimer(timerData))
+                if (!setupTimer(timerData) || isLocked)
                     return;
 
                 const sectionIndex = parseInt(data.substring(separatorIndex1 + 1, separatorIndex2));
@@ -1029,5 +1029,20 @@
             scrollTo = 0;
 
         $('html, body').animate({ scrollTop: scrollTo }, 250);
+    }
+
+    function redirectAfterComplete(redirectUrl) {
+        if (window.self === window.top || !_proctoringPageOrigin) {
+            window.location.href = redirectUrl;
+        } else {
+            // Consumed by /client/portal/assessments/attempts/answer
+            window.parent.postMessage(
+                {
+                    type: "attempt-complete",
+                    redirectUrl
+                },
+                _proctoringPageOrigin
+            );
+        }
     }
 })();

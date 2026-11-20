@@ -42,23 +42,27 @@
                             text-align: center;
                         }
 
-                        .table-report-container table.table-report > thead > tr > th.division-cell {
+                        .table-report-container table.table-report > thead > tr > th.jobdiv-cell,
+                        .table-report-container table.table-report > thead > tr > th.division-cell,
+                        .table-report-container table.table-report > thead > tr > th.dept-cell {
                             position: -webkit-sticky;
                             position: sticky;
-                            left: 160px;
                             z-index: 3;
                             vertical-align: middle;
                             text-align: center;
                         }
 
-                        .table-report-container table.table-report > thead > tr > th.dept-cell {
-                            position: -webkit-sticky;
-                            position: sticky;
-                            left: 320px;
-                            z-index: 3;
-                            vertical-align: middle;
-                            text-align: center;
-                        }
+                        /* Frozen-column offsets. Employee stays at 0; Job Division, Division and
+                           Department slide left as the optional columns are hidden. has-jobdiv and
+                           has-division are set on the container (ReportTablePanel) from the code-behind,
+                           and drive both the header (th) and body (td) cells. */
+                        .table-report-container.has-jobdiv .jobdiv-cell { left: 160px; }
+                        .table-report-container.has-division .division-cell { left: 160px; }
+                        .table-report-container.has-jobdiv.has-division .division-cell { left: 320px; }
+                        .table-report-container .dept-cell { left: 160px; }
+                        .table-report-container.has-jobdiv .dept-cell { left: 320px; }
+                        .table-report-container.has-division .dept-cell { left: 320px; }
+                        .table-report-container.has-jobdiv.has-division .dept-cell { left: 480px; }
 
 
                     .table-report-container table.table-report > thead > tr > td.group-header {
@@ -87,13 +91,14 @@
                         width: 144px;
                     }
 
+                .table-report-container table.table-report > tbody > tr > td.jobdiv-cell,
                 .table-report-container table.table-report > tbody > tr > td.division-cell {
                     position: -webkit-sticky;
                     position: sticky;
-                    left: 160px;
                     z-index: 1;
                 }
 
+                    .table-report-container table.table-report > tbody > tr > td.jobdiv-cell > div,
                     .table-report-container table.table-report > tbody > tr > td.division-cell > div {
                         width: 144px;
                     }
@@ -101,7 +106,6 @@
                 .table-report-container table.table-report > tbody > tr > td.dept-cell {
                     position: -webkit-sticky;
                     position: sticky;
-                    left: 320px;
                     z-index: 1;
                     background-color: #ffffff;
                 }
@@ -202,7 +206,7 @@
                         <table class="table table-striped table-report">
                             <thead>
                                 <tr>
-                                    <td colspan="3" class="group-header first-cell"></td>
+                                    <td runat="server" id="CornerHeaderCell" colspan="3" class="group-header first-cell"></td>
                                     <%-- Templates below are deliberately written on one line. Literal text in an
                                          ItemTemplate, indentation included, is emitted once per bound item, so
                                          formatting these for readability costs ~180 bytes on every cell. --%>
@@ -212,7 +216,8 @@
                                 </tr>
                                 <tr>
                                     <th class="name-cell">Employee</th>
-                                    <th class="division-cell">Job Division</th>
+                                    <th runat="server" id="JobDivisionHeader" class="jobdiv-cell">Job Division</th>
+                                    <th runat="server" id="DivisionHeader" class="division-cell">Division</th>
                                     <th class="dept-cell">Department</th>
                                     <asp:Repeater runat="server" ID="AchievementHeaderRepeater">
                                         <ItemTemplate><th class="resource-cell"><div><%# Eval("Text") %></div></th></ItemTemplate>
@@ -224,7 +229,8 @@
                                     <ItemTemplate>
                                         <tr>
                                             <td rowspan="<%# Eval("Children.Count") %>" class="name-cell<%# (Container.ItemIndex + 1) % 2 == 0 ? " even" : " odd" %>"><div><%# Eval("Text") %></div><div class="form-text"><%# Eval("Email") %></div></td>
-                                            <td rowspan="<%# Eval("Children.Count") %>" class="division-cell<%# (Container.ItemIndex + 1) % 2 == 0 ? " even" : " odd" %>"><div><%# Eval("JobDivision") %></div></td>
+                                            <td runat="server" visible='<%# ShowJobDivision %>' rowspan='<%# Eval("Children.Count") %>' class='<%# "jobdiv-cell" + ((Container.ItemIndex + 1) % 2 == 0 ? " even" : " odd") %>'><div><%# Eval("JobDivision") %></div></td>
+                                            <td runat="server" visible='<%# ShowDivision %>' rowspan='<%# Eval("Children.Count") %>' class='<%# "division-cell" + ((Container.ItemIndex + 1) % 2 == 0 ? " even" : " odd") %>'><div><%# Eval("DivisionName") %></div></td>
                                             <asp:Repeater runat="server" ID="DepartmentRepeater">
                                                 <ItemTemplate><td class="dept-cell"><div><%# Eval("Text") %></div></td><asp:Repeater runat="server" ID="CellRepeater"><ItemTemplate><td class="data-cell<%# Eval("CssClass") %>"><%# Eval("Text") %></td></ItemTemplate></asp:Repeater></ItemTemplate>
                                                 <SeparatorTemplate></tr><tr></SeparatorTemplate>

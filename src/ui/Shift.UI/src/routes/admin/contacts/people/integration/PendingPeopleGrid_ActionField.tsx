@@ -1,4 +1,6 @@
+import IconButton from "@/components/iconbutton/IconButton";
 import { ImportAction } from "./ImportAction";
+import { urlHelper } from "@/helpers/urlHelper";
 
 interface Props {
     pendingPersonId: string;
@@ -15,7 +17,7 @@ export default function PendingPeopleGrid_ActionField({
     onChange,
     onSelectMatch,
 }: Props) {
-    function handleSelectMatch(e: React.MouseEvent<HTMLAnchorElement>) {
+    function handleSelectMatch(e: React.MouseEvent) {
         e.preventDefault();
         if (!disabled) {
             onSelectMatch();
@@ -68,9 +70,19 @@ export default function PendingPeopleGrid_ActionField({
                     {action.name === "match" && action.match && (
                         <>
                             :{" "}
-                            <a href="#" onClick={handleSelectMatch}>
+                            <a
+                                target="_blank"
+                                href={urlHelper.getActionUrl(`/ui/admin/contacts/people/edit?contact=${action.match.userId}`)}
+                            >
                                 {action.match.userFullName}
                             </a>
+                            <IconButton
+                                iconStyle="solid"
+                                iconName="pencil"
+                                className="ms-1 fs-xs"
+                                title="Change Match"
+                                onClick={handleSelectMatch}
+                            />
                         </>
                     )}
                 </label>

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Data.SqlClient;
 
 using Shift.Common.Exceptions;
 using Shift.Common.Linq;
@@ -50,6 +50,10 @@ public class ExceptionHandlingMiddleware
             }
         }
         catch (OperationCanceledException)
+        {
+            await WriteResponseAsync(context, ProblemFactory.RequestTimeout());
+        }
+        catch (SqlException) when (context.RequestAborted.IsCancellationRequested)
         {
             await WriteResponseAsync(context, ProblemFactory.RequestTimeout());
         }

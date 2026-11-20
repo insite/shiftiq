@@ -35,6 +35,8 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                     PaymentTransactionId = PaymentTransactionId.Text,
                     AchievementTitle = AchievementName.Text,
                     InvoiceStatus = InvoiceStatus.Value,
+                    TaxCountry = TaxRegion.HasValue ? "CA" : null,
+                    TaxRegion = TaxRegion.Value
                 };
 
                 GetCheckedShowColumns(filter);
@@ -62,6 +64,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                 PaymentTransactionId.Text = value.PaymentTransactionId;
                 AchievementName.Text = value.AchievementTitle;
                 InvoiceStatus.Value = value.InvoiceStatus;
+                TaxRegion.Value = value.TaxRegion;
 
                 SortColumns.Value = value.OrderBy;
             }
@@ -104,6 +107,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
             PaymentTransactionId.Text = null;
             AchievementName.Text = null;
             InvoiceStatus.Value = null;
+            TaxRegion.Value = null;
         }
 
         protected static string GetEmptyMessage(string text) => LabelHelper.GetLabelContentText(text);

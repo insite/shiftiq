@@ -241,5 +241,53 @@ public class GroupController : ShiftControllerBase
         return Ok(matches);
     }
 
+    /// <summary>
+    /// Searches for the list of venues that match specific criteria
+    /// </summary>
+    /// <remarks>
+    /// Only groups of type "Venue" are returned. The group type is fixed for this endpoint and
+    /// cannot be changed by the caller.
+    ///
+    /// Use LastChangeTimeSince and LastChangeTimeBefore to restrict the result set to venues
+    /// modified within a specific window. Both parameters accept ISO 8601 date-time values, for
+    /// example "2026-07-06T14:00:00+00:00". LastChangeTimeSince is inclusive; LastChangeTimeBefore
+    /// is exclusive.
+    /// </remarks>
+    [HttpPost("api/contacts/groups/search-venue")]
+    [HybridPermission("directory/groups/venue", DataAccess.Read)]
+    [EndpointName("searchVenues")]
+    public async Task<ActionResult<IEnumerable<VenueMatch>>> PostSearchVenuesAsync([FromBody] SearchVenues query, CancellationToken cancellation = default)
+    {
+        return await SearchVenuesAsync(query, cancellation);
+    }
+
+    [HttpGet("api/contacts/groups/search-venue")]
+    [HybridPermission("directory/groups/venue", DataAccess.Read)]
+    [EndpointName("searchVenues_get")]
+    [AliasFor("searchVenues")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<ActionResult<IEnumerable<VenueMatch>>> GetSearchVenuesAsync([FromQuery] SearchVenues query, CancellationToken cancellation = default)
+    {
+        return await SearchVenuesAsync(query, cancellation);
+    }
+
+    private async Task<ActionResult<IEnumerable<VenueMatch>>> SearchVenuesAsync(SearchVenues query, CancellationToken cancellation)
+    {
+        var principal = _principalProvider.GetPrincipal();
+
+        if (!principal.Claims.Paging)
+            query.DisablePaging();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
+        var matches = await _groupService.SearchVenuesAsync(query, cancellation);
+
+        var count = await _groupService.CountVenuesAsync(query, cancellation);
+
+        Response.AddPagination(query.Filter, count);
+
+        return Ok(matches);
+    }
+
     #endregion Queries
 }

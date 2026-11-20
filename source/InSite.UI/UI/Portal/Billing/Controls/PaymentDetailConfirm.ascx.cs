@@ -1,6 +1,7 @@
 ﻿using System.Web.UI;
 
 using InSite.Domain.Payments;
+using InSite.UI.Portal.Billing.Utilities;
 
 namespace InSite.UI.Portal.Billing.Controls
 {
@@ -26,6 +27,20 @@ namespace InSite.UI.Portal.Billing.Controls
             PaymentAmount.Text = payment.Amount.ToString("n2");
 
             CardDetailConfirm.SetInputValues(payment.Card, payment.BillingAddress);
+        }
+
+        public void SetTaxBreakdown(decimal subtotal, decimal tax, decimal? rate)
+        {
+            var hasTax = tax > 0m;
+
+            TaxPanel.Visible = hasTax;
+
+            if (hasTax)
+            {
+                SubtotalAmount.Text = subtotal.ToString("n2");
+                TaxRateDisplay.Text = rate.HasValue ? " (" + TaxHelper.FormatRate(rate.Value) + ")" : null;
+                TaxAmount.Text = tax.ToString("n2");
+            }
         }
     }
 }

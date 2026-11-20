@@ -417,7 +417,7 @@ public class FileController : ShiftControllerBase
     /// <returns>
     /// Returns the file content with appropriate headers, or:
     /// - 404 Not Found if file doesn't exist or filename doesn't match
-    /// - 401 Unauthorized if user lacks permission to access the file
+    /// - 403 Forbidden if user lacks permission to access the file
     /// - 304 Not Modified if file hasn't changed since If-Modified-Since header date
     /// </returns>
     [HttpGet("api/assets/files/{id:guid}/{name}")]
@@ -433,7 +433,7 @@ public class FileController : ShiftControllerBase
                 return NotFound();
 
             case FileGrantStatus.Denied:
-                return Unauthorized();
+                return principal.IsAuthenticated ? Forbid() : Unauthorized();
 
             default:
                 break;

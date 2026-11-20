@@ -1,4 +1,6 @@
 import { ApiSpecWorkshop } from "@/api/controllers/assessments/workshop/ApiSpecWorkshop";
+import { ApiSpecWorkshopDetails } from "@/api/controllers/assessments/workshop/ApiSpecWorkshopDetails";
+import { SpecWorkshopDetails } from "@/contexts/workshop/models/SpecWorkshopDetails";
 import { WorkshopStandard } from "@/contexts/workshop/models/WorkshopStandard";
 import { SpecWorkshopState } from "@/contexts/workshop/states/SpecWorkshopState";
 
@@ -8,6 +10,38 @@ function findStandard(standardId: string, standards: Map<string, WorkshopStandar
         throw new Error(`Standard ${standardId} is not found`);
     }
     return standard;
+}
+
+function getDetailsInternal(
+    framework: WorkshopStandard | null,
+    areasMap: Map<string, WorkshopStandard>,
+    competenciesMap: Map<string, WorkshopStandard>,
+    details: ApiSpecWorkshopDetails,
+): SpecWorkshopDetails {
+    return {
+        specName: details.SpecName,
+        assetNumber: details.AssetNumber,
+        frameworkStandard: framework,
+        formLimit: details.FormLimit,
+        questionLimit: details.QuestionLimit,
+        criteria: details.Criteria.map(x => ({
+            criterionId: x.CriterionId,
+            title: x.Title,
+            weight: x.Weight,
+            areaStandards: x.StandardIds.map(standardId => findStandard(standardId, areasMap)),
+            competencies: x.Competencies.map(c => ({
+                standard: findStandard(c.StandardId, competenciesMap),
+                tax1Count: c.Tax1Count ?? null,
+                tax2Count: c.Tax2Count ?? null,
+                tax3Count: c.Tax3Count ?? null,
+                questionCount: c.QuestionCount ?? null,
+                tax1CountActual: c.Tax1CountActual,
+                tax2CountActual: c.Tax2CountActual,
+                tax3CountActual: c.Tax3CountActual,
+                unassignedCount: c.UnassignedCount ?? null,
+            }))
+        })),
+    };
 }
 
 export const specWorkshopAdapter = {
@@ -26,31 +60,15 @@ export const specWorkshopAdapter = {
         return {
             bankId,
             specificationId,
-            details: {
-                specName: details.SpecName,
-                assetNumber: details.AssetNumber,
-                frameworkStandard: framework,
-                formLimit: details.FormLimit,
-                questionLimit: details.QuestionLimit,
-                criteria: details.Criteria.map(x => ({
-                    criterionId: x.CriterionId,
-                    title: x.Title,
-                    weight: x.Weight,
-                    areaStandards: x.StandardIds.map(standardId => findStandard(standardId, areasMap)),
-                    competencies: x.Competencies.map(c => ({
-                        standard: findStandard(c.StandardId, competenciesMap),
-                        tax1Count: c.Tax1Count ?? null,
-                        tax2Count: c.Tax2Count ?? null,
-                        tax3Count: c.Tax3Count ?? null,
-                        questionCount: c.QuestionCount ?? null,
-                        tax1CountActual: c.Tax1CountActual,
-                        tax2CountActual: c.Tax2CountActual,
-                        tax3CountActual: c.Tax3CountActual,
-                        unassignedCount: c.UnassignedCount ?? null,
-                    }))
-                })),
-            },
+            details: getDetailsInternal(framework, areasMap, competenciesMap, details),
             readOnly: false,
         }
+    },
+
+    getDetails(old: SpecWorkshopDetails, newApi: ApiSpecWorkshopDetails): SpecWorkshopDetails {
+        const areasMap = new Map(old.criteria.flatMap(x => x.areaStandards.map(s => [s.standardId, s])));
+        const competenciesMap = new Map(old.criteria.flatMap(x => x.competencies.map(c => [c.standard.standardId, c.standard])));
+
+        return getDetailsInternal(old.frameworkStandard, areasMap, competenciesMap, newApi);
     },
 }

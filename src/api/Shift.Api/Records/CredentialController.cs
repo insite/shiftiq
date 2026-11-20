@@ -68,7 +68,7 @@ public class CredentialController : ShiftControllerBase
 
         _principalProvider.ValidateOrganizationId(principal, query);
 
-        var models = await _credentialService.CollectAsync(query, principal.TimeZone, cancellation);
+        var models = await _credentialService.CollectAsync(query, cancellation);
 
         var count = await _credentialService.CountAsync(query, cancellation);
 
@@ -143,7 +143,7 @@ public class CredentialController : ShiftControllerBase
         var exporter = new ExportHelper("Progress", "Credentials", query.Filter.Format, User);
 
         var models = await _credentialService
-            .DownloadAsync(query, principal.TimeZone, cancellation)
+            .DownloadAsync(query, cancellation)
             .ToListAsync(cancellation);
 
         var content = _credentialService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
@@ -169,7 +169,7 @@ public class CredentialController : ShiftControllerBase
     {
         var principal = _principalProvider.GetPrincipal();
 
-        var model = await _credentialService.RetrieveAsync(credential, principal.TimeZone, cancellation);
+        var model = await _credentialService.RetrieveAsync(credential, cancellation);
 
         if (model == null)
             return NotFound();

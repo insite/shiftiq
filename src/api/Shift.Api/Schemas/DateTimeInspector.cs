@@ -6,15 +6,6 @@ public static class DateTimeInspector
 {
     public class DateTimeReport
     {
-        private Dictionary<string, string> _preferredZones = new()
-        {
-            { "Eastern", "Eastern Standard Time" },
-            { "Mountain", "Mountain Standard Time" },
-            { "Pacific", "Pacific Standard Time" }
-        };
-
-        public Dictionary<string, string> GetPreferredZones() => _preferredZones;
-
         public string Original { get; set; } = null!;
 
         public Dictionary<string, string> Formats { get; set; } = [];
@@ -26,9 +17,11 @@ public static class DateTimeInspector
     {
         var report = new DateTimeReport();
 
-        var zones = report.GetPreferredZones();
+        var zoneId = TimeZones.FindTimeZoneId(dto);
 
-        var zoneName = GetTimeZoneNameFromOffset(dto.Offset, dto.DateTime, [.. zones.Values]);
+        var zoneName = zoneId != TimeZones.Ids.Utc
+            ? zoneId
+            : $"UTC{(dto.Offset.TotalHours >= 0 ? "+" : "")}{dto.Offset.TotalHours:0.##}";
 
         var result = new Dictionary<string, string>();
 
@@ -78,95 +71,28 @@ public static class DateTimeInspector
 
         report.Formats = result;
 
-        report.Conversions.Eastern = ConvertTimeZone(dto, "Eastern Standard Time", "Eastern");
-        report.Conversions.Mountain = ConvertTimeZone(dto, "Mountain Standard Time", "Mountain");
-        report.Conversions.Pacific = ConvertTimeZone(dto, "Pacific Standard Time", "Pacific");
+        report.Conversions.Eastern = ConvertTimeZone(dto, TimeZones.Ids.Eastern);
+        report.Conversions.Mountain = ConvertTimeZone(dto, TimeZones.Ids.Mountain);
+        report.Conversions.Pacific = ConvertTimeZone(dto, TimeZones.Ids.Pacific);
 
         return report;
     }
 
-    private static DateTimeReportConversionItem ConvertTimeZone(DateTimeOffset dto, string timeZoneId, string timeZoneSlug)
+    private static DateTimeReportConversionItem ConvertTimeZone(DateTimeOffset dto, string timeZoneId)
     {
         var item = new DateTimeReportConversionItem();
 
-        var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        var convertedTime = TimeZones.ConvertTime(dto, timeZoneId);
 
-        var convertedTime = TimeZoneInfo.ConvertTime(dto, timeZoneInfo);
+        var abbrev = TimeZones.GetAbbreviation(timeZoneId);
 
-        var timeZoneAbbreviation = GetTimeZoneAbbreviation(timeZoneSlug, timeZoneInfo.IsDaylightSavingTime(convertedTime));
+        var timeZoneAbbreviation = TimeZones.IsDaylightSavingTime(convertedTime, timeZoneId) ? abbrev.Daylight : abbrev.Standard;
 
         item.DateTime = convertedTime.ToString($"MMM d, yyyy h:mm:ss tt '{timeZoneAbbreviation}'");
 
         item.Offset = convertedTime.ToString("zzz");
 
         return item;
-    }
-
-    private static string GetTimeZoneAbbreviation(string timeZoneSlug, bool isDaylightSaving)
-    {
-        return timeZoneSlug switch
-        {
-            "Eastern" => isDaylightSaving ? "EDT" : "EST",
-            "Central" => isDaylightSaving ? "CDT" : "CST",
-            "Mountain" => isDaylightSaving ? "MDT" : "MST",
-            "Pacific" => isDaylightSaving ? "PDT" : "PST",
-            "Alaska" => isDaylightSaving ? "AKDT" : "AKST",
-            "Hawaii" => "HST", // Hawaii doesn't observe DST
-            "Atlantic" => isDaylightSaving ? "ADT" : "AST",
-            "Newfoundland" => isDaylightSaving ? "NDT" : "NST",
-            _ => ""
-        };
-    }
-
-    private static string GetTimeZoneNameFromOffset(TimeSpan offset, DateTime dateTime, string[] zones)
-    {
-        var tz = TimeZoneInfo.GetSystemTimeZones().Where(x => zones.Contains(x.Id)).ToArray();
-
-        var name = TryGetTimeZoneNameFromOffset(offset, dateTime, tz);
-
-        if (name == null)
-        {
-            tz = [.. TimeZoneInfo.GetSystemTimeZones()];
-
-            name = TryGetTimeZoneNameFromOffset(offset, dateTime, tz);
-        }
-
-        if (name == null)
-        {
-            name = $"UTC{(offset.TotalHours >= 0 ? "+" : "")}{offset.TotalHours:0.##}";
-        }
-
-        return name;
-    }
-
-    private static string? TryGetTimeZoneNameFromOffset(TimeSpan offset, DateTime dateTime, TimeZoneInfo[] zones)
-    {
-        // Try to find a matching time zone based on the offset
-
-        foreach (var timeZone in zones)
-        {
-            var offsetAtDateTime = timeZone.GetUtcOffset(dateTime);
-            if (offsetAtDateTime == offset)
-            {
-                // Check if it's a North American time zone we recognize
-                var isDst = timeZone.IsDaylightSavingTime(dateTime);
-
-                return timeZone.Id switch
-                {
-                    "Eastern Standard Time" => isDst ? "Eastern Daylight Time" : "Eastern Standard Time",
-                    "Central Standard Time" => isDst ? "Central Daylight Time" : "Central Standard Time",
-                    "Mountain Standard Time" => isDst ? "Mountain Daylight Time" : "Mountain Standard Time",
-                    "Pacific Standard Time" => isDst ? "Pacific Daylight Time" : "Pacific Standard Time",
-                    "Alaskan Standard Time" => isDst ? "Alaska Daylight Time" : "Alaska Standard Time",
-                    "Hawaiian Standard Time" => "Hawaii Standard Time",
-                    "Atlantic Standard Time" => isDst ? "Atlantic Daylight Time" : "Atlantic Standard Time",
-                    "Newfoundland Standard Time" => isDst ? "Newfoundland Daylight Time" : "Newfoundland Standard Time",
-                    _ => timeZone.DisplayName
-                };
-            }
-        }
-
-        return null;
     }
 
     private static int GetWeekOfYear(DateTimeOffset date)

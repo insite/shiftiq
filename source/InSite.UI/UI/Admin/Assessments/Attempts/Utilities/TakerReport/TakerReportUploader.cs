@@ -19,7 +19,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Utilities.TakerReport
 
         private static Guid OrganizationId => CurrentSessionState.Identity.Organization.Identifier;
         private static Guid UserId => CurrentSessionState.Identity.User.Identifier;
-        private static TimeZoneInfo TimeZone => CurrentSessionState.Identity.User.TimeZone;
+        private static string TimeZoneId => CurrentSessionState.Identity.User.TimeZone;
 
         public static void UploadBatch(Page page, List<PersonRow> people)
         {
@@ -29,7 +29,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Utilities.TakerReport
                 var caseId = Guid.Parse(person.CaseId);
                 var report = TakerReportControl.GetPdf(page, new List<TakerReportControl.AttemptItem> { attempt });
 
-                var now = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, TimeZone);
+                var now = TimeZones.ConvertTime(DateTimeOffset.UtcNow, TimeZoneId);
                 var documentName = $"{person.LastName}_{person.FirstName}_{person.PersonCode}_CAMLPR_ExamReport_{now:yyyy}-{now:MM}-{now:dd}";
 
                 SaveReportToCase(report, caseId, documentName);

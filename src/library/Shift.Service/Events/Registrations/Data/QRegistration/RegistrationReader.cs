@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Constant;
 using Shift.Contract;
 
 namespace Shift.Service.Booking;
@@ -55,6 +56,17 @@ public class RegistrationReader : IEntityReader
         }, cancellation);
     }
 
+    public Task<int> CountDetailsAsync(IRegistrationDetailsCriteria criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildDetailsQueryable(db, criteria);
+
+            return query.CountAsync(cancellation);
+
+        }, cancellation);
+    }
+
     public async IAsyncEnumerable<RegistrationEntity> DownloadAsync(IRegistrationCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
@@ -90,6 +102,117 @@ public class RegistrationReader : IEntityReader
 
             return ToMatchesAsync(query, cancellation);
 
+        }, cancellation);
+    }
+
+    public Task<List<RegistrationDetailsMatch>> SearchDetailsAsync(IRegistrationDetailsCriteria criteria, CancellationToken cancellation = default)
+    {
+        var physAddressType = AddressType.Physical.GetName();
+
+        return ExecuteAsync(async db =>
+        {
+            var query = BuildDetailsQueryable(db, criteria)
+                .Select(x => new
+                {
+                    Registration = x,
+                    Candidate = x.CandidateUser!,
+                    Person = x.CandidateUser!.People.FirstOrDefault(y => y.OrganizationIdentifier == x.OrganizationIdentifier),
+                    Event = x.Event!,
+                    EventVenueAddress = x.Event!.VenueLocation!.Addresses
+                        .Where(y => y.AddressType == physAddressType)
+                        .FirstOrDefault(),
+                    Instructors = x.Event!.Users
+                        .Where(y => y.AttendeeRole == "Instructor" && y.User != null)
+                        .OrderBy(y => y.User!.FullName)
+                        .Select(y => y.User!)
+                })
+                .Select(x => new
+                {
+                    RegistrationIdentifier = x.Registration.RegistrationIdentifier,
+                    ApprovalStatus = x.Registration.ApprovalStatus,
+                    Accommodation = string.Join(";", x.Registration.Accommodations
+                        .OrderBy(y => y.AccommodationType)
+                        .Select(y => y.AccommodationType)
+                        .Distinct()),
+
+                    FirstName = x.Candidate.FirstName,
+                    MiddleName = x.Candidate.MiddleName,
+                    LastName = x.Candidate.LastName,
+                    Email = x.Candidate.Email,
+                    Birthdate = x.Person!.Birthdate,
+                    PersonCode = x.Person.PersonCode,
+                    PreferredLanguage = x.Person.Language ?? "en",
+
+                    EventTitle = x.Event.EventTitle,
+                    EventVenue = x.Event.VenueLocation!.GroupName,
+                    EventVenueAddress = x.EventVenueAddress,
+                    EventVenueAddressSort =
+                        (x.EventVenueAddress!.Street1 ?? "") + " " + (x.EventVenueAddress.Street2 ?? "") + " " +
+                        (x.EventVenueAddress.City ?? "") + " " + (x.EventVenueAddress.Province ?? "") + " " +
+                        (x.EventVenueAddress.PostalCode ?? "") + " " + (x.EventVenueAddress.Country ?? ""),
+                    VenueIdentifier = x.Event.VenueLocationIdentifier,
+                    BuildingAndRoom = x.Event.VenueRoom,
+                    EventScheduledStart = x.Event.EventScheduledStart,
+                    EventScheduledEnd = x.Event.EventScheduledEnd,
+                    Instructor = string.Join(";", x.Instructors.Select(y => y.FullName)),
+                    InstructorEmail = string.Join(";", x.Instructors.Select(y => y.Email)),
+                });
+
+            var sortExpression = DefaultSort;
+
+            if (criteria.Filter.Sort.IsNotEmpty())
+            {
+                sortExpression = criteria.Filter.Sort;
+
+                if (QuerySort.TryParse(sortExpression, out var sort))
+                {
+                    var venueAddress = sort.Find("EventVenueAddress");
+                    if (venueAddress != null)
+                        venueAddress.Field = "EventVenueAddressSort";
+
+                    sortExpression = sort.ToString();
+                }
+            }
+
+            var result = await query
+                .OrderBy(sortExpression)
+                .ApplyPaging(criteria.Filter)
+                .ToListAsync(cancellation);
+
+            return result
+                .Select(x => new RegistrationDetailsMatch
+                {
+                    RegistrationIdentifier = x.RegistrationIdentifier,
+                    ApprovalStatus = x.ApprovalStatus,
+                    Accommodation = x.Accommodation,
+
+                    FirstName = x.FirstName,
+                    MiddleName = x.MiddleName,
+                    LastName = x.LastName,
+                    Email = x.Email,
+                    Birthdate = x.Birthdate,
+                    PersonCode = x.PersonCode,
+                    PreferredLanguage = x.PreferredLanguage,
+
+                    EventTitle = x.EventTitle,
+                    EventVenue = x.EventVenue,
+                    EventVenueAddress = x.EventVenueAddress == null ? null : LocationHelper.ToString(
+                        x.EventVenueAddress.Street1,
+                        x.EventVenueAddress.Street2,
+                        x.EventVenueAddress.City,
+                        x.EventVenueAddress.Province,
+                        x.EventVenueAddress.PostalCode,
+                        x.EventVenueAddress.Country,
+                        null,
+                        null),
+                    VenueIdentifier = x.VenueIdentifier,
+                    BuildingAndRoom = x.BuildingAndRoom,
+                    EventScheduledStart = x.EventScheduledStart,
+                    EventScheduledEnd = x.EventScheduledEnd,
+                    Instructor = x.Instructor.NullIfEmpty(),
+                    InstructorEmail = x.InstructorEmail.NullIfEmpty(),
+                })
+                .ToList();
         }, cancellation);
     }
 
@@ -171,6 +294,38 @@ public class RegistrationReader : IEntityReader
 
         if (criteria.RegistrationRequestedOnBefore.HasValue)
             query = query.Where(x => x.RegistrationRequestedOn < criteria.RegistrationRequestedOnBefore);
+
+        return query;
+    }
+
+    private IQueryable<RegistrationEntity> BuildDetailsQueryable(TableDbContext db, IRegistrationDetailsCriteria criteria)
+    {
+        ArgumentNullException.ThrowIfNull(criteria?.Filter, nameof(criteria.Filter));
+
+        var query = BuildQueryable(db);
+
+        if (criteria.OrganizationId != null)
+            query = query.Where(x => x.OrganizationIdentifier == criteria.OrganizationId.Value);
+
+        if (!string.IsNullOrWhiteSpace(criteria.ApprovalStatus))
+            query = query.Where(x => x.ApprovalStatus == criteria.ApprovalStatus);
+
+        var title = criteria.EventTitle;
+
+        if (!string.IsNullOrWhiteSpace(title))
+            query = query.Where(x => x.Event!.EventTitle != null && x.Event.EventTitle.Contains(title));
+
+        if (criteria.EventScheduledStartSince.HasValue)
+            query = query.Where(x => x.Event!.EventScheduledStart >= criteria.EventScheduledStartSince);
+
+        if (criteria.EventScheduledStartBefore.HasValue)
+            query = query.Where(x => x.Event!.EventScheduledStart < criteria.EventScheduledStartBefore);
+
+        if (criteria.EventScheduledEndSince.HasValue)
+            query = query.Where(x => x.Event!.EventScheduledEnd >= criteria.EventScheduledEndSince);
+
+        if (criteria.EventScheduledEndBefore.HasValue)
+            query = query.Where(x => x.Event!.EventScheduledEnd < criteria.EventScheduledEndBefore);
 
         return query;
     }

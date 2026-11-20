@@ -64,6 +64,7 @@ namespace Shift.Common
 
         string HelpUrl { get; set; }
         string LogoUrl { get; set; }
+        string TimeZoneSet { get; set; }
 
         bool IsE01();
         bool IsE02();

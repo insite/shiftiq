@@ -1,0 +1,6 @@
+PUT {{host}}/api/events/registrations/26da9e01-960b-8a71-8e22-c22ea73ded33/attendance-status
+Authorization: {{auth}}
+
+{
+    "AttendanceStatus": "Present"
+}

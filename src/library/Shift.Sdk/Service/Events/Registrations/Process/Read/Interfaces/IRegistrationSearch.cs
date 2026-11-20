@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -23,6 +23,7 @@ namespace InSite.Application.Registrations.Read
         List<QAccommodation> GetAccommodations(Guid registrationIdentifier);
         List<QAccommodation> GetAccommodations(IEnumerable<Guid> registrationIdentifiers);
         List<string> GetAccommodationTypes(Guid organizationIdentifier);
+        bool HasAccommodations(Guid eventIdentifier);
 
         List<ApprenticeCompletionRateReportItem> GetApprenticeCompletionRateReport(QRegistrationFilter filter);
         List<ApprenticeScoresReportItem> GetApprenticeScoresReport(QRegistrationFilter filter);
@@ -35,6 +36,10 @@ namespace InSite.Application.Registrations.Read
 
         QRegistration GetRegistration(Guid registration, params Expression<Func<QRegistration, object>>[] includes);
         QRegistration GetRegistration(QRegistrationFilter filter, params Expression<Func<QRegistration, object>>[] includes);
+
+        QRegistrationExamForm GetRegistrationExamForm(Guid examForm, params Expression<Func<QRegistrationExamForm, object>>[] includes);
+        List<QRegistrationExamForm> GetRegistrationExamForms(QRegistrationFilter filter, params Expression<Func<QRegistrationExamForm, object>>[] includes);
+        int CountRegistrationExamForms(QRegistrationFilter filter);
 
         List<QRegistration> GetRegistrations(QRegistrationFilter filter, params Expression<Func<QRegistration, object>>[] includes);
         List<RegistrationSearchDataItem> GetRegistrationSearchResults(QRegistrationFilter filter);
@@ -49,7 +54,8 @@ namespace InSite.Application.Registrations.Read
 
         List<QRegistration> GetRegistrationsByEvent(Guid @event,
             string filterText = null, Paging paging = null, string orderBy = null,
-            bool includeAccommodations = false, bool includeAttempt = false, bool includeCandidate = false, bool includeForm = false, bool includeInstructors = false);
+            bool includeAccommodations = false, bool includeAttempt = false, bool includeCandidate = false,
+            bool includeForm = false, bool includeInstructors = false);
 
         List<QRegistration> GetRegistrationsByCandidate(Guid candidate, params Expression<Func<QRegistration, object>>[] includes);
 

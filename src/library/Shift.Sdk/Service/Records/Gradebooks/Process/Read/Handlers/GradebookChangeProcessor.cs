@@ -369,7 +369,7 @@ namespace InSite.Application.Records.Read
 
             var user = _contacts.GetUser(courseEnrollment.LearnerUserIdentifier);
             var content = _contents.GetBlock(course.CourseIdentifier);
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(user.UserTimeZone);
+            var timeZone = user.UserTimeZone;
             var courseStarted = TimeZones.FormatDateOnly(courseEnrollment.CourseStarted, timeZone);
             var organizationCode = _courses.GetOrganizationCode(course.OrganizationIdentifier);
 

@@ -24,6 +24,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
             public int? LifetimeMonths { get; set; }
             public Guid OrganizationIdentifier { get; set; }
             public bool AllowSelfDeclared { get; set; }
+            public bool IssuesCertificate { get; set; }
         }
 
         private Guid? AchievementIdentifier
@@ -120,6 +121,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
             ValidForUnit.Value = ValidForUnits.Months;
             SubType.Value = info.AchievementLabel;
             Description.Text = info.AchievementDescription;
+            IssuesCertificate.Checked = info.AchievementIssuesCertificate;
 
             RowValidForCount.Style["display"] = info.ValidForCount.HasValue ? string.Empty : "none";
             TimeSensitiveImage.Style["display"] = info.ValidForCount.HasValue ? string.Empty : "none";
@@ -171,7 +173,8 @@ namespace InSite.Cmds.Controls.Training.Achievements
                         ? 12 * ValidForCount.ValueAsInt.Value
                         : ValidForCount.ValueAsInt,
                 OrganizationIdentifier = organizationIdentifier,
-                AllowSelfDeclared = EnableSignOff.Checked
+                AllowSelfDeclared = EnableSignOff.Checked,
+                IssuesCertificate = IssuesCertificate.Checked
             };
         }
 

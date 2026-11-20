@@ -9,7 +9,7 @@
     <section runat="server" ID="DepartmentSection" class="mb-3">
         <h2 class="h4 mb-3">
             <i class="far fa-industry me-1"></i>
-            District Information
+            Division Information
         </h2>
 
         <div class="card border-0 shadow-lg h-100">
@@ -25,7 +25,7 @@
                                 <div>
                                     <insite:TextBox runat="server" ID="Name" MaxLength="90" />
                                 </div>
-                                <div class="form-text">The name of the district.</div>
+                                <div class="form-text">The name of the division.</div>
                             </div>
                         </div>
                     </div>

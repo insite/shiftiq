@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -18,6 +19,32 @@ namespace InSite.UI.Portal.Learning
     public partial class Catalog : PortalBasePage
     {
         private CourseCatalogSearch _search;
+
+        // A program tile routes by the learner's enrollment state: enrolled goes to the training plan filtered
+        // to the program, otherwise to the pre-enrollment page. The enrollment set is loaded once per page,
+        // across the organizations the catalogue itself spans, and each program tile is tested against it.
+        private HashSet<Guid> _enrolledProgramIds;
+
+        private HashSet<Guid> EnrolledProgramIds => _enrolledProgramIds ?? (_enrolledProgramIds = LoadEnrolledProgramIds());
+
+        private HashSet<Guid> LoadEnrolledProgramIds()
+        {
+            if (User == null)
+                return new HashSet<Guid>();
+
+            var organizations = new[] { Organization.Identifier, ServiceLocator.Partition.Identifier }.Distinct().ToArray();
+
+            return new HashSet<Guid>(ProgramSearch1
+                .GetUserProgramEnrollments(User.UserIdentifier, organizations)
+                .Select(x => x.ProgramIdentifier));
+        }
+
+        private string GetCardUrl(CourseCatalogItem card)
+        {
+            return card.IsProgram && EnrolledProgramIds.Contains(card.ItemIdentifier)
+                ? $"/ui/portal/learning/plan?program={card.ItemIdentifier}"
+                : card.ItemStartUrl;
+        }
 
         private CatalogItemFilter Filter
         {
@@ -71,14 +98,6 @@ namespace InSite.UI.Portal.Learning
             }
         }
 
-        private bool ViewEntireCatalog
-        {
-            get
-            {
-                return string.Equals(Request.QueryString["view"], "1");
-            }
-        }
-
         private Guid? RequestedAchievementId
         {
             get
@@ -102,7 +121,8 @@ namespace InSite.UI.Portal.Learning
                     m.OverrideHomeLink("/ui/portal/learning/catalogue");
 
             var groups = Identity.Groups.Select(x => x.Identifier).ToArray();
-            _search = new CourseCatalogSearch(Identity.Organization.Identifier, RequestedCatalogId, groups, ViewEntireCatalog, ServiceLocator.Partition);
+            var displayPrograms = ServiceLocator.AppSettings.Application.Catalogues?.DisplayPrograms ?? false;
+            _search = new CourseCatalogSearch(Identity.Organization.Identifier, RequestedCatalogId, groups, displayPrograms, ServiceLocator.Partition);
 
             var achievementId = RequestedAchievementId;
 
@@ -124,6 +144,8 @@ namespace InSite.UI.Portal.Learning
                 var buttons = Filter.GetButtons(_search.Catalogs);
                 FilterButtonRepeater.DataSource = buttons;
                 FilterPanel.Visible = buttons.Count > 0;
+
+                BindCatalogDescription();
             };
             FilterButtonRepeater.ItemCreated += FilterButtonRepeater_ItemCreated;
             FilterButtonRepeater.ItemDataBound += FilterButtonRepeater_ItemDataBound;
@@ -171,7 +193,7 @@ namespace InSite.UI.Portal.Learning
 
         private void FilterCatalog()
         {
-            var cat = _search.FindCatalog(RequestedCatalogId, RequestCategory, ViewEntireCatalog);
+            var cat = _search.FindCatalog(RequestedCatalogId, RequestCategory);
             if (cat != null)
                 Filter.AddCategory(cat.CatalogSlug, RequestCategory);
         }
@@ -271,6 +293,27 @@ namespace InSite.UI.Portal.Learning
 
         #endregion
 
+        // While the results are filtered to one catalogue (its badge is showing), the sidebar shows
+        // that catalogue's description under the Instructions heading. The badges rebind on every
+        // filter change, so this runs from their DataBinding.
+        private void BindCatalogDescription()
+        {
+            string html = null;
+
+            var menu = _search.Catalogs.FirstOrDefault(x => StringHelper.Equals(x.CatalogSlug, Filter.CatalogSlug));
+
+            if (menu != null)
+            {
+                var description = CourseSearch.SelectCatalog(menu.CatalogId)?.CatalogDescription;
+                var hasDescription = description.HasValue();
+
+                if (hasDescription)
+                    html = Markdown.ToHtml(description);
+            }
+
+            PortalMaster?.SetHelpIntro(html);
+        }
+
         private void FilterButtonRepeater_ItemCreated(object sender, RepeaterItemEventArgs e)
         {
             if (!RepeaterHelper.IsContentItem(e))
@@ -320,10 +363,11 @@ namespace InSite.UI.Portal.Learning
             {
                 Identifier = card.ItemIdentifier,
                 Category = card.ItemSubcategories,
-                Flag = card.ItemFlag,
+                Flag = card.CardFlag,
+                FlagIsFee = card.IsPaidProgram,
                 Image = card.ThumbnailImageUrl,
                 Title = card.ItemTitle,
-                Url = card.ItemStartUrl,
+                Url = GetCardUrl(card),
                 IsOverview = card.IsOverview
             })
                 .ToList();

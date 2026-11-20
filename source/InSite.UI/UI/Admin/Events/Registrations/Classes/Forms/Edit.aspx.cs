@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Web.UI.WebControls;
-
-using Shift.Common.Timeline.Commands;
 
 using InSite.Application.Events.Read;
 using InSite.Application.Registrations.Read;
@@ -16,10 +16,12 @@ using InSite.UI.Layout.Admin;
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
 using AggregateOutline = InSite.Admin.Logs.Aggregates.Outline;
+using CheckBox = System.Web.UI.WebControls.CheckBox;
 
 namespace InSite.Admin.Events.Registrations.Forms
 {
@@ -30,6 +32,38 @@ namespace InSite.Admin.Events.Registrations.Forms
         private const string SearchUrl = "/ui/admin/events/registrations/search";
 
         private Guid RegistrationId => Guid.TryParse(Request.QueryString["id"], out var value) ? value : Guid.Empty;
+
+        private Guid EventId
+        {
+            get => (Guid)(ViewState[nameof(EventId)] ?? Guid.Empty);
+            set => ViewState[nameof(EventId)] = value;
+        }
+
+        private bool MultipleFormsAllowed
+        {
+            get => (bool)(ViewState[nameof(MultipleFormsAllowed)] ?? false);
+            set => ViewState[nameof(MultipleFormsAllowed)] = value;
+        }
+
+        private bool HasExamForm
+        {
+            get => (bool)(ViewState[nameof(HasExamForm)] ?? false);
+            set => ViewState[nameof(HasExamForm)] = value;
+        }
+
+        #endregion
+
+        #region Classes
+
+        private class FormItem
+        {
+            public Guid? FormIdentifier { get; set; }
+            public Guid[] ExcludeFormIdentifiers { get; set; }
+            public bool IsEligible { get; set; }
+            public bool ShowNumber { get; set; }
+            public int Number { get; set; }
+            public string Password { get; set; }
+        }
 
         #endregion
 
@@ -46,8 +80,13 @@ namespace InSite.Admin.Events.Registrations.Forms
             Employer.ValueChanged += (s, a) => OnEmployerValueChanged();
 
             AccommodationTypeSelector.AutoPostBack = true;
+            AccommodationTypeSelector.ValueChanged += (s, a) => UpdateAddAccommodationConfirm();
+
             AddAccommodationButton.Click += AddAccommodationButton_Click;
+
             AccommodationsRepeater.ItemCommand += AccommodationsRepeater_ItemCommand;
+
+            FormRepeater.ItemDataBound += FormRepeater_ItemDataBound;
 
             SaveButton.Click += (s, a) => Save();
         }
@@ -69,6 +108,8 @@ namespace InSite.Admin.Events.Registrations.Forms
             if (Request.QueryString["status"] == "saved")
                 SetStatus(ScreenStatus, StatusType.Saved);
 
+            MultipleFormsAllowed = Organization.Toolkits.Events?.AllowMultipleAssessmentForms == true;
+
             Open();
 
             CancelButton.NavigateUrl = GetParentUrl(null);
@@ -76,7 +117,16 @@ namespace InSite.Admin.Events.Registrations.Forms
 
         private void Open()
         {
-            var registration = ServiceLocator.RegistrationSearch.GetRegistration(RegistrationId, x => x.Event, x => x.Candidate);
+            var includes = new List<Expression<Func<QRegistration, object>>>
+            {
+                x => x.Event,
+                x => x.Candidate
+            };
+
+            if (MultipleFormsAllowed)
+                includes.Add(x => x.ExamForms);
+
+            var registration = ServiceLocator.RegistrationSearch.GetRegistration(RegistrationId, includes.ToArray());
             if (registration == null || registration.Event.OrganizationIdentifier != Organization.OrganizationIdentifier)
                 HttpResponseHelper.Redirect(SearchUrl);
 
@@ -93,30 +143,12 @@ namespace InSite.Admin.Events.Registrations.Forms
             ClassTitle.Text = $"<a href=\"/ui/admin/events/classes/outline?event={registration.Event.EventIdentifier}\">{registration.Event.EventTitle} </a>";
             CandidateName.Text = $"<a href=\"/ui/admin/contacts/people/edit?contact={registration.Candidate.UserIdentifier}\">{registration.Candidate.UserFullName}</a>";
 
-            var isEligible = StringHelper.Equals(registration.EligibilityStatus, "Eligible");
+            EventId = registration.EventIdentifier;
+            MultipleFormsAllowed = Organization.Toolkits.Events?.AllowMultipleAssessmentForms == true;
 
-            IsEligible.Checked = isEligible;
-            IsEligible.Enabled = isEligible;
+            FormRepeater.DataSource = GetFormItems(registration);
+            FormRepeater.DataBind();
 
-            FormIdentifier.Filter.EventIdentifier = registration.EventIdentifier;
-            FormIdentifier.Value = registration.ExamFormIdentifier;
-            FormIdentifier.Enabled = !isEligible;
-            FormIdentifier.AllowClear = !isEligible;
-
-            if (isEligible)
-            {
-                var examForm = registration.ExamFormIdentifier.HasValue
-                    ? ServiceLocator.BankSearch.GetForm(registration.ExamFormIdentifier.Value)
-                    : null;
-
-                if (examForm != null && examForm.FormCode.IsNotEmpty())
-                {
-                    FormIdentifier.Enabled = true;
-                    FormIdentifier.Filter.FormCode = examForm.FormCode;
-                }
-            }
-
-            RegistrationPassword.Text = registration.RegistrationPassword;
             ApprovalStatus.Value = registration.ApprovalStatus;
 
             WorkBasedHoursToDate.ValueAsInt = registration.WorkBasedHoursToDate;
@@ -136,6 +168,8 @@ namespace InSite.Admin.Events.Registrations.Forms
             Score.ValueAsDecimal = registration.Score * 100m;
 
             SetLabels(registration.Event.EventType);
+
+            HasExamForm = registration.ExamFormIdentifier.HasValue;
 
             BindAccommodations();
 
@@ -189,11 +223,51 @@ namespace InSite.Admin.Events.Registrations.Forms
 
             var showForms = ServiceLocator.EventSearch.CountEventAssessmentForms(new QEventAssessmentFormFilter { EventIdentifier = registration.EventIdentifier }) > 0;
 
-            FormField.Visible = showForms;
-            RegistrationPasswordField.Visible = showForms;
-            AccommodationCard.Visible = showForms;
+            FormRepeater.Visible = showForms;
 
             SaveButton.Visible = CanEdit;
+        }
+
+        private List<FormItem> GetFormItems(QRegistration registration)
+        {
+            var items = new List<FormItem>
+            {
+                new FormItem
+                {
+                    FormIdentifier = registration.ExamFormIdentifier,
+                    Password = registration.RegistrationPassword,
+                    IsEligible = StringHelper.Equals(registration.EligibilityStatus, "Eligible")
+                }
+            };
+
+            if (MultipleFormsAllowed && registration.ExamFormIdentifier.HasValue)
+            {
+                foreach (var examForm in registration.ExamForms.OrderBy(x => x.Sequence))
+                {
+                    items.Add(new FormItem
+                    {
+                        FormIdentifier = examForm.ExamFormIdentifier,
+                        Password = examForm.Password,
+                        IsEligible = StringHelper.Equals(examForm.EligibilityStatus, "Eligible")
+                    });
+                }
+            }
+
+            var assigned = items
+                .Where(x => x.FormIdentifier.HasValue)
+                .Select(x => x.FormIdentifier.Value)
+                .ToArray();
+
+            var number = 0;
+
+            foreach (var item in items)
+            {
+                item.Number = ++number;
+                item.ShowNumber = items.Count > 1;
+                item.ExcludeFormIdentifiers = assigned.Where(x => x != item.FormIdentifier).ToArray();
+            }
+
+            return items;
         }
 
         private void SetLabels(string eventType)
@@ -235,6 +309,34 @@ namespace InSite.Admin.Events.Registrations.Forms
             EmployerStatus.InnerText = employerStatus ?? string.Empty;
         }
 
+        private void FormRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (!IsContentItem(e))
+                return;
+
+            var item = (FormItem)e.Item.DataItem;
+
+            var formIdentifier = (FindBankForm)e.Item.FindControl("FormIdentifier");
+            formIdentifier.Filter.EventIdentifier = EventId;
+            formIdentifier.Filter.ExcludeFormIdentifiers = item.ExcludeFormIdentifiers;
+            formIdentifier.Value = item.FormIdentifier;
+            formIdentifier.Enabled = !item.IsEligible;
+            formIdentifier.AllowClear = !item.IsEligible;
+
+            if (item.IsEligible)
+            {
+                var examForm = item.FormIdentifier.HasValue
+                    ? ServiceLocator.BankSearch.GetForm(item.FormIdentifier.Value)
+                    : null;
+
+                if (examForm != null && examForm.FormCode.IsNotEmpty())
+                {
+                    formIdentifier.Enabled = true;
+                    formIdentifier.Filter.FormCode = examForm.FormCode;
+                }
+            }
+        }
+
         #endregion
 
         #region Methods (save)
@@ -244,7 +346,7 @@ namespace InSite.Admin.Events.Registrations.Forms
             if (!IsValid)
                 return;
 
-            var registration = ServiceLocator.RegistrationSearch.GetRegistration(RegistrationId);
+            var registration = ServiceLocator.RegistrationSearch.GetRegistration(RegistrationId, x => x.ExamForms);
             var commands = CreateCommands(registration);
 
             ServiceLocator.SendCommands(commands);
@@ -326,48 +428,116 @@ namespace InSite.Admin.Events.Registrations.Forms
                     commands.Add(new ExcludeRegistrationFromT2202(registration.RegistrationIdentifier));
             }
 
-
             if (registration.RegistrationRequestedBy != RegistrationRequestedBy.Value)
                 commands.Add(new ModifyRegistrationRequestedBy(registration.RegistrationIdentifier, RegistrationRequestedBy.Value));
 
             AddFormCommands(registration, commands);
-            AddRegistrationPasswordCommand(registration, commands);
 
             return commands;
         }
 
         private void AddFormCommands(QRegistration registration, List<ICommand> commands)
         {
+            var isFirst = true;
             var registrationId = registration.RegistrationIdentifier;
-            var isEligible = registration.EligibilityStatus == "Eligible";
-            var previousFormId = registration.ExamFormIdentifier;
-            var selectedFormId = FormIdentifier.Value;
 
-            if (previousFormId != selectedFormId)
+            foreach (RepeaterItem repeaterItem in FormRepeater.Items)
+            {
+                var previousFormId = GetPreviousForm(repeaterItem);
+                var selectedFormId = ((FindBankForm)repeaterItem.FindControl("FormIdentifier")).Value;
+
+                var wasEligible = StringHelper.Equals(GetEligibilityStatus(registration, previousFormId, isFirst), "Eligible");
+                var isEligible = ((CheckBox)repeaterItem.FindControl("IsEligible")).Checked;
+
+                if (previousFormId != selectedFormId)
+                {
+                    AddExamFormCommand(commands, registrationId, previousFormId, selectedFormId, wasEligible);
+
+                    if (MultipleFormsAllowed && selectedFormId != null)
+                        commands.Add(new LimitExamTime(registrationId, selectedFormId.Value));
+                    else
+                        commands.Add(new LimitExamTime(registrationId));
+                }
+
+                var formId = selectedFormId ?? previousFormId;
+
+                if (wasEligible != isEligible)
+                {
+                    var status = isEligible
+                        ? RegistrationEligibility.Eligible
+                        : RegistrationEligibility.NotEligible;
+
+                    if (MultipleFormsAllowed && formId != null)
+                        commands.Add(new ChangeEligibility(registrationId, formId.Value, status, null));
+                    else
+                        commands.Add(new ChangeEligibility(registrationId, status, null));
+                }
+
+                AddPasswordCommand(registration, commands, repeaterItem, isFirst, previousFormId, selectedFormId);
+
+                isFirst = false;
+            }
+        }
+
+        private void AddExamFormCommand(List<ICommand> commands, Guid registrationId, Guid? previousFormId, Guid? selectedFormId, bool wasEligible)
+        {
+            if (MultipleFormsAllowed)
+            {
+                if (previousFormId == null)
+                    commands.Add(new AddExamForm(registrationId, Guid.NewGuid(), selectedFormId.Value));
+                else if (selectedFormId != null)
+                    commands.Add(new ChangeExamForm(registrationId, previousFormId.Value, selectedFormId.Value));
+                else if (!wasEligible)
+                    commands.Add(new RemoveExamForm(registrationId, previousFormId.Value));
+            }
+            else
             {
                 if (selectedFormId != null)
                     commands.Add(new AssignExamForm(registrationId, selectedFormId.Value, previousFormId));
-                else if (!isEligible)
+                else if (!wasEligible)
                     commands.Add(new UnassignExamForm(registrationId));
-
-                commands.Add(new LimitExamTime(registrationId));
             }
-
-            if (isEligible && !IsEligible.Checked)
-                commands.Add(new ChangeEligibility(registrationId, "Not Eligible", null));
-            else if (!isEligible && IsEligible.Checked)
-                commands.Add(new ChangeEligibility(registrationId, "Eligible", null));
         }
 
-        private void AddRegistrationPasswordCommand(QRegistration registration, List<ICommand> commands)
+        private void AddPasswordCommand(
+            QRegistration registration, List<ICommand> commands, RepeaterItem repeaterItem,
+            bool isFirst, Guid? previousFormId, Guid? selectedFormId)
         {
-            var password = RegistrationPassword.Text.Trim();
-
-            if (string.IsNullOrEmpty(password) || string.Equals(password, registration.RegistrationPassword))
+            var password = ((ITextBox)repeaterItem.FindControl("RegistrationPassword")).Text.Trim();
+            if (password.IsEmpty())
                 return;
 
-            commands.Add(new ChangeRegistrationPassword(registration.RegistrationIdentifier, password));
+            if (isFirst)
+            {
+                if (password != registration.RegistrationPassword)
+                    commands.Add(new ChangeRegistrationPassword(registration.RegistrationIdentifier, password));
+
+                return;
+            }
+
+            if (selectedFormId == null)
+                return;
+
+            var examForm = GetExamForm(registration, previousFormId);
+
+            if (password != examForm?.Password)
+                commands.Add(new ChangeExamFormPassword(registration.RegistrationIdentifier, selectedFormId.Value, password));
         }
+
+        private static Guid? GetPreviousForm(RepeaterItem repeaterItem)
+        {
+            var value = ((System.Web.UI.WebControls.Literal)repeaterItem.FindControl("OriginalFormIdentifier")).Text;
+
+            return Guid.TryParse(value, out var formId) ? formId : (Guid?)null;
+        }
+
+        private static string GetEligibilityStatus(QRegistration registration, Guid? formId, bool isFirst) =>
+            isFirst ? registration.EligibilityStatus : GetExamForm(registration, formId)?.EligibilityStatus;
+
+        private static QRegistrationExamForm GetExamForm(QRegistration registration, Guid? formId) =>
+            formId.HasValue
+                ? registration.ExamForms.FirstOrDefault(x => x.ExamFormIdentifier == formId.Value)
+                : null;
 
         #endregion
 
@@ -395,6 +565,7 @@ namespace InSite.Admin.Events.Registrations.Forms
 
             BindAccommodations();
             AccommodationTypeSelector.Value = null;
+            UpdateAddAccommodationConfirm();
         }
 
         private void AccommodationsRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
@@ -406,13 +577,15 @@ namespace InSite.Admin.Events.Registrations.Forms
             }
         }
 
-        public void AddAccommodation(string type, string name)
+        private int GetTimeExtension(string type, out string resolvedType)
         {
+            resolvedType = type;
+
             if (type.IsEmpty())
-                return;
+                return 0;
 
             if (type.Length > 50)
-                type = type.Substring(0, 50);
+                resolvedType = type = type.Substring(0, 50);
 
             var timeExtension = 0;
             var item = TCollectionItemCache.SelectFirst(new TCollectionItemFilter
@@ -435,13 +608,33 @@ namespace InSite.Admin.Events.Registrations.Forms
             }
             else
             {
-                type = item.ItemName;
+                resolvedType = item.ItemName;
 
                 if (item.ItemHours.HasValue)
                     timeExtension = (int)(item.ItemHours * 60);
             }
 
-            ServiceLocator.SendCommand(new GrantAccommodation(RegistrationId, type, name, timeExtension));
+            return timeExtension;
+        }
+
+        private void UpdateAddAccommodationConfirm()
+        {
+            var type = AccommodationTypeSelector.Value;
+            var isTimeExtension = type.IsNotEmpty() && GetTimeExtension(type, out _) > 0;
+
+            AddAccommodationButton.ConfirmText = !HasExamForm && isTimeExtension
+                ? "There's no form attached to this registration. Are you sure you want to add a time accommodation?"
+                : null;
+        }
+
+        public void AddAccommodation(string type, string name)
+        {
+            if (type.IsEmpty())
+                return;
+
+            var timeExtension = GetTimeExtension(type, out var resolvedType);
+
+            ServiceLocator.SendCommand(new GrantAccommodation(RegistrationId, resolvedType, name, timeExtension));
             ServiceLocator.SendCommand(new LimitExamTime(RegistrationId));
         }
 
@@ -460,6 +653,11 @@ namespace InSite.Admin.Events.Registrations.Forms
             var allTypes = ServiceLocator.RegistrationSearch.GetAccommodationTypes(Organization.OrganizationIdentifier);
             AccommodationTypeSelector.Settings.AdditionalOptions = allTypes;
             AccommodationTypeSelector.RefreshData();
+
+            var showTimeExtWarning = !HasExamForm && accommodations.Any(x => (x.TimeExtension ?? 0) > 0);
+
+            TimeExtensionWarning1.Visible = showTimeExtWarning;
+            TimeExtensionWarning2.Visible = showTimeExtWarning;
         }
 
         public void DeleteAccommodation(string type)
@@ -467,7 +665,6 @@ namespace InSite.Admin.Events.Registrations.Forms
             ServiceLocator.SendCommand(new RevokeAccommodation(RegistrationId, type));
             ServiceLocator.SendCommand(new LimitExamTime(RegistrationId));
         }
-
 
         #endregion
     }

@@ -20,7 +20,7 @@ public class GradebookService : IEntityService
         return await _reader.AssertAsync(gradebook, organization, cancellation);
     }
 
-    public async Task<IEnumerable<GradebookModel>> CollectAsync(IGradebookCriteria criteria, TimeZoneInfo? timeZone, CancellationToken cancellation = default)
+    public async Task<IEnumerable<GradebookModel>> CollectAsync(IGradebookCriteria criteria, string? timeZone, CancellationToken cancellation = default)
     {
         var entities = await _reader.CollectAsync(criteria, cancellation);
 
@@ -32,7 +32,7 @@ public class GradebookService : IEntityService
         return await _reader.CountAsync(criteria, cancellation);
     }
 
-    public async IAsyncEnumerable<GradebookModel> DownloadAsync(IGradebookCriteria criteria, TimeZoneInfo? timeZone, [EnumeratorCancellation] CancellationToken cancellation)
+    public async IAsyncEnumerable<GradebookModel> DownloadAsync(IGradebookCriteria criteria, string? timeZone, [EnumeratorCancellation] CancellationToken cancellation)
     {
         await foreach (var entity in _reader.DownloadAsync(criteria, cancellation))
         {
@@ -40,7 +40,7 @@ public class GradebookService : IEntityService
         }
     }
 
-    public async Task<GradebookModel?> RetrieveAsync(Guid gradebook, TimeZoneInfo? timeZone, CancellationToken cancellation = default)
+    public async Task<GradebookModel?> RetrieveAsync(Guid gradebook, string? timeZone, CancellationToken cancellation = default)
     {
         var entity = await _reader.RetrieveAsync(gradebook, cancellation);
 
@@ -60,7 +60,7 @@ public class GradebookService : IEntityService
     /// <summary>
     /// Exports the gradebooks with matching criteria to a file.
     /// </summary>
-    public async Task ExportAsync(StartExport start, IGradebookCriteria criteria, TimeZoneInfo? timeZone, CancellationToken cancellation)
+    public async Task ExportAsync(StartExport start, IGradebookCriteria criteria, string? timeZone, CancellationToken cancellation)
     {
         var gradebooks = await DownloadAsync(criteria, timeZone, cancellation).ToListAsync(cancellation);
 

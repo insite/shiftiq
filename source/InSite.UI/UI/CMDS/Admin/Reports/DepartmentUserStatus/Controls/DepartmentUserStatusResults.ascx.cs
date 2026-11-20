@@ -17,7 +17,7 @@ namespace InSite.Custom.CMDS.Reports.Controls
 
         private class DataItem
         {
-            public DateTimeOffset AsAt { get; set; }
+            public DateTime AsAt { get; set; }
             public Guid DepartmentIdentifier { get; set; }
             public string DepartmentName { get; set; }
             public string OrganizationName { get; set; }

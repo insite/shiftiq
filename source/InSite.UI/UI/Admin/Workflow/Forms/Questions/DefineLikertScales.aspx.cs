@@ -151,15 +151,21 @@ namespace InSite.Admin.Workflow.Forms.Questions
         {
             for (var i = 0; i < Current.Question.Scales.Count; i++)
             {
-                var scale = new SurveyScale();
-                scale.Category = Current.Question.Scales[i].Category;
+                var existing = Current.Question.Scales[i];
+                var scale = new SurveyScale
+                {
+                    Category = existing.Category,
+                    Content = existing.Content?.Clone() ?? new ContentContainer()
+                };
 
-                GetSurveyScaleItem(scale, "A", i);
-                GetSurveyScaleItem(scale, "B", i);
-                GetSurveyScaleItem(scale, "C", i);
-                GetSurveyScaleItem(scale, "D", i);
-                GetSurveyScaleItem(scale, "E", i);
-                GetSurveyScaleItem(scale, "F", i);
+                AddScaleItem(scale, existing, "A", 0, i);
+                AddScaleItem(scale, existing, "B", 1, i);
+                AddScaleItem(scale, existing, "C", 2, i);
+                AddScaleItem(scale, existing, "D", 3, i);
+                AddScaleItem(scale, existing, "E", 4, i);
+                AddScaleItem(scale, existing, "F", 5, i);
+
+                scale.SyncDefaultContent();
 
                 ServiceLocator.SendCommand(new ChangeSurveyScale(Current.Survey.Form.Identifier, Current.Question.Identifier, scale));
             }
@@ -167,14 +173,14 @@ namespace InSite.Admin.Workflow.Forms.Questions
             LikertNavigator.RedirectToOutline();
         }
 
-        private void GetSurveyScaleItem(SurveyScale scale, string letter, int index)
+        private void AddScaleItem(SurveyScale scale, SurveyScale existing, string letter, int itemIndex, int index)
         {
-            var i = ScaleDtoRepeater.Items[index];
-            var minimum = (NumericBox)i.FindControl("Minimum" + letter);
-            var maximum = (NumericBox)i.FindControl("Maximum" + letter);
-            var grade = (ITextBox)i.FindControl("Grade" + letter);
-            var feedback = (ITextBox)i.FindControl("Feedback" + letter);
-            var calculation = (ComboBox)i.FindControl("Calculation" + letter);
+            var repeaterItem = ScaleDtoRepeater.Items[index];
+            var minimum = (NumericBox)repeaterItem.FindControl("Minimum" + letter);
+            var maximum = (NumericBox)repeaterItem.FindControl("Maximum" + letter);
+            var grade = (ITextBox)repeaterItem.FindControl("Grade" + letter);
+            var feedback = (ITextBox)repeaterItem.FindControl("Feedback" + letter);
+            var calculation = (ComboBox)repeaterItem.FindControl("Calculation" + letter);
 
             var hasValue = minimum.ValueAsDecimal.HasValue
                 && maximum.ValueAsDecimal.HasValue
@@ -189,10 +195,17 @@ namespace InSite.Admin.Workflow.Forms.Questions
                 Minimum = minimum.ValueAsDecimal.Value,
                 Maximum = maximum.ValueAsDecimal.Value,
                 Grade = grade.Text,
-                Content = new Shift.Common.ContentContainer(),
                 Calculation = calculation.Value
             };
-            item.Content.Description.Text = new MultilingualString { Default = StringHelper.BreakHtml(feedback.Text) };
+
+            if (itemIndex < existing.Items.Count)
+                item.Content = existing.Items[itemIndex].Content?.Clone();
+
+            if (item.Content == null)
+                item.Content = new ContentContainer();
+
+            item.Content.Description.Text.Default = StringHelper.BreakHtml(feedback.Text);
+
             scale.Items.Add(item);
         }
 

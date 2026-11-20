@@ -39,19 +39,22 @@ namespace InSite.Persistence
 
                 for (var i = 0; i < e.Items.Length; i++)
                 {
-                    var item = new QInvoiceItem
+                    var item = e.Items[i];
+
+                    db.QInvoiceItems.Add(new QInvoiceItem
                     {
                         InvoiceIdentifier = invoice.InvoiceIdentifier,
-                        ItemIdentifier = e.Items[i].Identifier,
-                        ProductIdentifier = e.Items[i].Product,
+                        ItemIdentifier = item.Identifier,
+                        ProductIdentifier = item.Product,
                         ItemSequence = i + 1,
-                        ItemQuantity = e.Items[i].Quantity,
-                        ItemPrice = e.Items[i].Price,
-                        TaxRate = e.Items[i].TaxRate,
-                        ItemDescription = StringHelper.Snip(e.Items[i].Description, DescriptionMaxLength),
+                        ItemQuantity = item.Quantity,
+                        ItemPrice = item.Price,
+                        TaxRate = item.TaxRate,
+                        TaxCountry = item.TaxCountry,
+                        TaxRegion = item.TaxRegion,
+                        ItemDescription = StringHelper.Snip(item.Description, DescriptionMaxLength),
                         OrganizationIdentifier = e.Tenant,
-                    };
-                    db.QInvoiceItems.Add(item);
+                    });
                 }
 
                 db.SaveChanges();
@@ -208,6 +211,8 @@ namespace InSite.Persistence
                     ProductIdentifier = e.Item.Product,
                     ItemPrice = e.Item.Price,
                     TaxRate = e.Item.TaxRate,
+                    TaxCountry = e.Item.TaxCountry,
+                    TaxRegion = e.Item.TaxRegion,
                     ItemQuantity = e.Item.Quantity,
                     ItemDescription = StringHelper.Snip(e.Item.Description, DescriptionMaxLength),
                     OrganizationIdentifier = e.OriginOrganization,
@@ -228,6 +233,8 @@ namespace InSite.Persistence
                 invoiceItem.ItemQuantity = e.Item.Quantity;
                 invoiceItem.ProductIdentifier = e.Item.Product;
                 invoiceItem.TaxRate = e.Item.TaxRate;
+                invoiceItem.TaxCountry = e.Item.TaxCountry;
+                invoiceItem.TaxRegion = e.Item.TaxRegion;
                 db.SaveChanges();
             }
         }

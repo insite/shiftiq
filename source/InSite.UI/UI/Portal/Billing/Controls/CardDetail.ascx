@@ -96,7 +96,7 @@
                 <insite:Literal runat="server" Text="Province" />
                 <insite:RequiredValidator runat="server" ID="ContactProvinceRequiredValidator" ControlToValidate="ContactProvince" />
             </label>
-            <insite:ProvinceComboBox ID="ContactProvince" runat="server" EnableSearch="true" UseCodeAsValue="true" OnlyCanadaAndUnitedStates="true"/>
+            <insite:ProvinceComboBox ID="ContactProvince" runat="server" EnableSearch="true" UseCodeAsValue="true" OnlyCanadaAndUnitedStates="true" AutoPostBack="true" />
         </div>
 
         <div runat="server" id="ContactPostalCodeField" class="form-group mb-3">

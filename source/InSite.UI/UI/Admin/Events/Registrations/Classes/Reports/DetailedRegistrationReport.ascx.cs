@@ -101,10 +101,12 @@ namespace InSite.Admin.Events.Registrations.Reports
 
                 sheet.Rows[i + 1].Height = 120;
 
+                var bd = registration.BirthDate != null ? TimeZones.Format(registration.BirthDate.Value) : "MMMM dd, yyyy";
+
                 string firstColumn = $"{registration.Number}. {registration.UserFullName} \r\n" +
                     $"Email: {registration.UserEmail} \r\n" +
                     $"ID #: {registration.PersonCode} \r\n" +
-                    $"Birthdate: {registration.BirthDate.Format("MMMM dd, yyyy")} Age: {registration.Age} \r\n" +
+                    $"Birthdate: {bd} Age: {registration.Age} \r\n" +
                     $"ESL: {(registration.ESL ? "Yes" : "No")}";
 
                 sheet.Cells.Add(new XlsxCell(0, i + 1) { Value = firstColumn, Style = normalStyle, WrapText = true });

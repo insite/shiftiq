@@ -30,22 +30,14 @@ namespace InSite.Persistence.Plugin.CMDS
             }
         }
 
-        public static void Delete(Guid organization, DateTimeOffset asAt)
+        public static void Delete(Guid organization, DateTime asAt)
         {
             var p1 = new SqlParameter("@OrganizationIdentifier", organization);
-            var p2 = new SqlParameter("@AsAt", asAt);
+            var p2 = new SqlParameter("@AsAt", SqlDbType.Date) { Value = asAt };
 
             using (var db = new InternalDbContext())
             {
                 ExecuteSlowCommand(db.Database, "DELETE custom_cmds.TUserStatus WHERE OrganizationIdentifier = @OrganizationIdentifier AND AsAt = @AsAt;", p1, p2);
-            }
-        }
-
-        public static void Refresh()
-        {
-            using (var db = new InternalDbContext())
-            {
-                ExecuteSlowCommand(db.Database, "EXEC custom_cmds.RefreshQUserStatus");
             }
         }
     }

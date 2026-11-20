@@ -32,7 +32,6 @@ namespace Shift.Common
                 ToClaim(ClaimName.UserId, principal.User.Identifier.ToString()),
                 ToClaim(ClaimName.UserEmail, principal.User.Email),
                 ToClaim(ClaimName.UserName, principal.User.Name),
-                ToClaim(ClaimName.Authority, principal.Authority.ToString()),
                 ToClaim(ClaimName.SecretId, principal.SecretId.ToString()),
             };
 
@@ -87,14 +86,6 @@ namespace Shift.Common
             {
                 claims.Add(ToClaim(ClaimName.ProxyAgent, principal.Proxy.Agent.Identifier.ToString()));
                 claims.Add(ToClaim(ClaimName.ProxySubject, principal.Proxy.Subject.Identifier.ToString()));
-            }
-
-            if (principal.Roles != null)
-            {
-                foreach (var role in principal.Roles)
-                {
-                    claims.Add(ToClaim(ClaimName.Role, role.Name));
-                }
             }
 
             return claims.ToArray();
@@ -184,9 +175,7 @@ namespace Shift.Common
                 },
                 Partition = new Model { Identifier = GetClaimAsGuid(ClaimName.PartitionId), Slug = GetClaim(ClaimName.PartitionSlug) },
                 Person = new Model { Identifier = GetClaimAsGuid(ClaimName.PersonId) },
-                Roles = GetRoles(ClaimName.Role),
                 IPAddress = GetClaim(ClaimName.UserIp),
-                Authority = GetAuthority(ClaimName.Authority),
                 SecretId = GetClaimAsGuid(ClaimName.SecretId)
             };
 
@@ -223,32 +212,6 @@ namespace Shift.Common
                 if (claim != null && int.TryParse(claim.Value, out var result))
                     return result;
                 return 0;
-            }
-
-            List<Role> GetRoles(ClaimName type)
-            {
-                var list = new List<Role>();
-
-                var roleClaims = claims.Where(x => type.ToJwtName() == x.Type);
-
-                foreach (var roleClaim in roleClaims)
-                {
-                    var value = roleClaim.Value;
-
-                    if (!string.IsNullOrEmpty(value))
-                        list.Add(new Role(value));
-                }
-
-                return list;
-            }
-
-            AuthorityAccess GetAuthority(ClaimName type)
-            {
-                var claim = GetClaim(type);
-
-                return Enum.TryParse<AuthorityAccess>(claim, out var result)
-                    ? result
-                    : AuthorityAccess.Unspecified;
             }
 
             Proxy GetProxy()

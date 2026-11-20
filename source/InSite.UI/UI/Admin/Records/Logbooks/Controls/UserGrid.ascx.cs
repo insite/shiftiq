@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.UI.WebControls;
 
 using InSite.Application.Records.Read;
+using InSite.Common;
 using InSite.Common.Web.UI;
 
 using Shift.Common.Linq;
@@ -30,6 +31,13 @@ namespace InSite.Admin.Records.Logbooks.Controls
         }
 
         public bool IsValidator { get; set; }
+
+        protected override void OnInit(EventArgs e)
+        {
+            Grid.Columns.FindByName("HourSum").HeaderText = LabelHelper.GetLabelContentText("Logbooks.Hours");
+
+            base.OnInit(e);
+        }
 
         public LoadResult LoadData(Guid journalSetupIdentifier, bool logbookHasAchievement, string keyword)
         {

@@ -74,6 +74,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             public string JobDivision { get; set; }
 
+            public string DivisionName { get; set; }
+
             public int CompareTo(EmployeeGroupNode other)
             {
                 if (other == null)
@@ -280,8 +282,8 @@ namespace InSite.Cmds.Actions.Reporting.Report
             var xlsxSheet = new XlsxWorksheet(Route.Title);
             var (companyHeaderStyle, achievementHeaderStyle, dataCellStyle) = BuildXlsxStyles();
 
-            WriteXlsxHeaders(xlsxSheet, dataSource, companyHeaderStyle, achievementHeaderStyle);
-            WriteXlsxRows(xlsxSheet, dataSource, dataCellStyle);
+            WriteXlsxHeaders(xlsxSheet, dataSource, companyHeaderStyle, achievementHeaderStyle, ShowJobDivision, ShowDivision);
+            WriteXlsxRows(xlsxSheet, dataSource, dataCellStyle, ShowJobDivision, ShowDivision);
 
             ReportXlsxHelper.Export(xlsxSheet);
         }
@@ -328,13 +330,28 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         #region Data binding
 
+        protected bool ShowJobDivision
+        {
+            get => (bool)(ViewState[nameof(ShowJobDivision)] ?? false);
+            private set => ViewState[nameof(ShowJobDivision)] = value;
+        }
+
+        protected bool ShowDivision
+        {
+            get => (bool)(ViewState[nameof(ShowDivision)] ?? false);
+            private set => ViewState[nameof(ShowDivision)] = value;
+        }
+
         private void LoadReport()
         {
             ReportTab.Visible = false;
 
+            ShowJobDivision = Criteria.JobDivisionEnabled;
+            ShowDivision = Criteria.DivisionsEnabled;
+
             CurrentParameters = new SearchParameters
             {
-                Departments = Criteria.DepartmentValues,
+                Departments = Criteria.DepartmentFilterValues,
                 Achievements = Criteria.SelectedAchievements,
                 Learners = Criteria.LearnerValues,
                 IsRequired = Criteria.IsRequiredFilter,
@@ -396,6 +413,13 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 return;
             }
 
+            JobDivisionHeader.Visible = ShowJobDivision;
+            DivisionHeader.Visible = ShowDivision;
+            CornerHeaderCell.ColSpan = 2 + (ShowJobDivision ? 1 : 0) + (ShowDivision ? 1 : 0);
+            ReportTablePanel.Attributes["class"] = "table-report-container"
+                + (ShowJobDivision ? " has-jobdiv" : "")
+                + (ShowDivision ? " has-division" : "");
+
             CompanyHeaderRepeater.DataSource = dataSource.Columns;
             CompanyHeaderRepeater.DataBind();
 
@@ -455,7 +479,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                 // Row
 
                 var employeeGroup = result.Rows.GetOrAdd(
-                    () => new EmployeeGroupNode { Text = row.FullName, Email = row.Email, JobDivision = row.JobDivision },
+                    () => new EmployeeGroupNode { Text = row.FullName, Email = row.Email, JobDivision = row.JobDivision, DivisionName = row.DivisionName },
                     row.UserIdentifier);
                 var departmentGroup = employeeGroup.Children.GetOrAdd(
                     () => new DefaultGroupLeaf { Text = row.DepartmentName },
@@ -502,27 +526,36 @@ namespace InSite.Cmds.Actions.Reporting.Report
             XlsxWorksheet sheet,
             ReportDataSource dataSource,
             XlsxCellStyle companyHeaderStyle,
-            XlsxCellStyle achievementHeaderStyle)
+            XlsxCellStyle achievementHeaderStyle,
+            bool showJobDivision,
+            bool showDivision)
         {
             const int CompanyHeaderRow = 0;
             const int AchievementHeaderRow = 1;
 
+            // Fixed leading columns: Employee, Email, optional Job Division, optional Division, Department.
+            // An optional column shifts everything to its right, so the count decides where the achievement
+            // columns start.
+            var fixedColumnLabels = new List<string> { "Employee", "Email" };
+            if (showJobDivision)
+                fixedColumnLabels.Add("Job Division");
+            if (showDivision)
+                fixedColumnLabels.Add("Division");
+            fixedColumnLabels.Add("Department");
+            var fixedColumnCount = fixedColumnLabels.Count;
+
             sheet.Columns[0].Width = 25;
             sheet.Columns[1].Width = 30;
-            sheet.Columns[2].Width = 20;
-            sheet.Columns[3].Width = 20;
+            for (var i = 2; i < fixedColumnCount; i++)
+                sheet.Columns[i].Width = 20;
 
             var companyColIndex = 0;
-            sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
-            sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
-            sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
-            sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
+            for (var i = 0; i < fixedColumnCount; i++)
+                sheet.Cells.Add(new XlsxCell(companyColIndex++, CompanyHeaderRow) { Style = companyHeaderStyle });
 
             var achievementColIndex = 0;
-            sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Employee" });
-            sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Email" });
-            sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Job Division" });
-            sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = "Department" });
+            foreach (var label in fixedColumnLabels)
+                sheet.Cells.Add(new XlsxCell(achievementColIndex++, AchievementHeaderRow) { Style = achievementHeaderStyle, Value = label });
 
             foreach (var companyGroup in dataSource.Columns)
             {
@@ -548,13 +581,16 @@ namespace InSite.Cmds.Actions.Reporting.Report
             }
         }
 
-        private static void WriteXlsxRows(XlsxWorksheet sheet, ReportDataSource dataSource, XlsxCellStyle dataCellStyle)
+        private static void WriteXlsxRows(XlsxWorksheet sheet, ReportDataSource dataSource, XlsxCellStyle dataCellStyle, bool showJobDivision, bool showDivision)
         {
             const int FirstDataRow = 2;
             const int EmployeeColumn = 0;
             const int EmailColumn = 1;
-            const int JobDivisionColumn = 2;
-            const int DepartmentColumn = 3;
+
+            var nextColumn = 2;
+            var jobDivisionColumn = showJobDivision ? nextColumn++ : -1;
+            var divisionColumn = showDivision ? nextColumn++ : -1;
+            var departmentColumn = nextColumn;
 
             var rowIndex = FirstDataRow;
             var columnLeaves = dataSource.Columns.SelectMany(x => x.Children).ToArray();
@@ -563,11 +599,16 @@ namespace InSite.Cmds.Actions.Reporting.Report
             {
                 sheet.Cells.Add(new XlsxCell(EmployeeColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.Text });
                 sheet.Cells.Add(new XlsxCell(EmailColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.Email });
-                sheet.Cells.Add(new XlsxCell(JobDivisionColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.JobDivision });
+
+                if (showJobDivision)
+                    sheet.Cells.Add(new XlsxCell(jobDivisionColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.JobDivision });
+
+                if (showDivision)
+                    sheet.Cells.Add(new XlsxCell(divisionColumn, rowIndex, rowSpan: employeeGroup.Children.Count) { Value = employeeGroup.DivisionName });
 
                 foreach (var departmentLeaf in employeeGroup.Children)
                 {
-                    var colIndex = DepartmentColumn;
+                    var colIndex = departmentColumn;
 
                     sheet.Cells.Add(new XlsxCell(colIndex++, rowIndex) { Value = departmentLeaf.Text });
 

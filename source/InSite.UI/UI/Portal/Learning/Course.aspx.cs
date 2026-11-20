@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,14 +24,13 @@ using InSite.Persistence;
 using InSite.UI.Admin.Records.Programs.Utilities;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 using InSite.UI.Portal.Integrations.Scorm;
 using InSite.UI.Portal.Learning.Controls;
 using InSite.UI.Portal.Learning.Models;
-using InSite.Web.Integration;
 using InSite.Web.Routing;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Learning
@@ -76,7 +75,6 @@ namespace InSite.UI.Portal.Learning
         #region Fields
 
         private GlossaryHelper _glossaryHelper;
-        private ScormIntegrator _scormLauncher;
         private ProgressState _state;
 
         private bool? _hasExpiredItems;
@@ -230,8 +228,6 @@ namespace InSite.UI.Portal.Learning
 
             LoadProgress();
 
-            ScormSyncGradebook();
-
             LoadOverviewPanel();
 
             if (ServiceLocator.Partition.IsE03())
@@ -309,6 +305,14 @@ namespace InSite.UI.Portal.Learning
                 return false;
             }
 
+            // A course that grants a paid program's achievement needs an approved enrollment in that
+            // program. Checked before LoadProgress, which can auto-enrol the learner in a program.
+            if (PaidProgramAchievementSearch.IsCourseAccessDenied(Progress.Course.Identifier, User.Identifier))
+            {
+                ShowCriticalError(GetDisplayText("Your account is not granted permission to access this course."));
+                return false;
+            }
+
             return true;
         }
 
@@ -367,20 +371,6 @@ namespace InSite.UI.Portal.Learning
                 {
                     RecordProgress(gradebook.Identifier, activity.GradeItem.Identifier, Complete);
                     Response.Redirect(Request.RawUrl);
-                }
-            }
-            else if (activity.Requirement == RequirementType.CompleteScorm)
-            {
-                if (!model.CurrentActivityResult.Completed.HasValue)
-                {
-                    var launcher = GetScormCloud();
-
-                    if (ScormContentIsCompleted(launcher.ActivityHook, User.UserIdentifier))
-                    {
-                        RecordProgress(gradebook.Identifier, activity.GradeItem.Identifier, Complete);
-
-                        _state.Reload();
-                    }
                 }
             }
 
@@ -901,7 +891,8 @@ namespace InSite.UI.Portal.Learning
 
                 ScormStartUrl.HRef = scormPackageSlug.IsEmpty() || StringHelper.Equals(scormPackageSlug, activityId.ToString())
                     ? BlankHref
-                    : Launch.GetScoopLaunchUrl(Request.Url.Host, scormPackageSlug, courseId, activityId, Progress.Course.Organization);
+                    : Launch.GetScoopLaunchUrl(Request.Url.Host, scormPackageSlug, activity.IsMultilingual, CurrentLanguage,
+                        courseId, activityId, Progress.Course.Organization);
 
                 ScormStartUrl.Target = link.Target.IsEmpty() ? "_self" : link.Target;
             }
@@ -928,9 +919,12 @@ namespace InSite.UI.Portal.Learning
             }
         }
 
-        private bool IsEmptyHref(string href)
+        // Static so the answer can only come from the argument. The second
+        // clause used to read ScormStartUrl.HRef rather than href, which was
+        // harmless only because the sole caller passes that same field.
+        private static bool IsEmptyHref(string href)
         {
-            return href.IsEmpty() || StringHelper.EqualsAny(ScormStartUrl.HRef, new[] { "#", BlankHref });
+            return href.IsEmpty() || StringHelper.EqualsAny(href, new[] { "#", BlankHref });
         }
 
         private void LoadQuizPanel()
@@ -1041,63 +1035,6 @@ namespace InSite.UI.Portal.Learning
                 VideoLaunchLink.HRef = languageUrl;
                 VideoLaunchLink.Target = target;
             }
-        }
-
-        #endregion
-
-        #region Methods (SCORM)
-
-        private void ScormSyncGradebook()
-        {
-            if (Page.Request["sync"] != "scorm-cloud")
-                return;
-
-            var gradebook = Progress.Course.Gradebook;
-            if (gradebook == null)
-                return;
-
-            try
-            {
-                var scormCloud = new ScormIntegrator(Organization, User, Guid.Empty);
-
-                var hooks = scormCloud.GetCourseHooks(gradebook.Identifier);
-                var activities = scormCloud.GetConditions(gradebook.Identifier);
-                var registrations = ScormRegistrationSearch.Select(hooks, activities, User.UserIdentifier);
-
-                bool isNewCompletion = scormCloud.Synchronize(registrations);
-
-                var url = RoutingConfiguration.PortalCourseUrl(Progress.Course.Identifier, Progress.CurrentActivity.Identifier);
-
-                if (isNewCompletion && url != Request.Url.PathAndQuery)
-                    Response.Redirect(url);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message != "Thread was being aborted.")
-                    AppSentry.SentryError(ex);
-            }
-        }
-
-        private bool ScormContentIsCompleted(string activityHook, Guid userId)
-        {
-            var registration = ScormRegistrationSearch.Select(activityHook, userId);
-            if (registration == null)
-                return false;
-
-            if (registration.ScormCompleted == null)
-                GetScormCloud().Synchronize(new[] { registration });
-
-            return registration.ScormCompleted != null;
-        }
-
-        private ScormIntegrator GetScormCloud()
-        {
-            var organization = OrganizationSearch.Select(Progress.Course.Organization);
-
-            if (_scormLauncher == null || _scormLauncher.Organization.Identifier != organization.Identifier || _scormLauncher.Activity.ActivityIdentifier != Progress.CurrentActivity.Identifier)
-                _scormLauncher = new ScormIntegrator(organization, User, Progress.CurrentActivity.Identifier);
-
-            return _scormLauncher;
         }
 
         #endregion

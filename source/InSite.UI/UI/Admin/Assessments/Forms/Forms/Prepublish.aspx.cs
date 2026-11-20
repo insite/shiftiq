@@ -11,9 +11,9 @@ using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Constant;
 
 namespace InSite.Admin.Assessments.Forms.Forms

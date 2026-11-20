@@ -83,7 +83,7 @@ function FormWorkshopInternal() {
 
         const model = await shiftClient.workshop.retrieveForm(id, newDefaultFilter?.sectionId ?? null, selectedQuestionId);
         if (!model) {
-            return;
+            throw new Error("Form is not found");
         }
 
         const questionChangeDates = newDefaultFilter && workshopQuestionFilter.hasDateFilter(newDefaultFilter)

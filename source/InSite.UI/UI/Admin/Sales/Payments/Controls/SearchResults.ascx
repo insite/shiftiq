@@ -52,6 +52,16 @@
             </ItemTemplate>
         </asp:TemplateField>
 
+        <asp:TemplateField HeaderText="Taxes" ItemStyle-Wrap="false">
+            <ItemTemplate>
+                <%# FormatTaxAmount() %>
+
+                <div runat="server" visible='<%# GetRegionName() != null %>' class="form-text">
+                    <%# GetRegionName() %>
+                </div>
+            </ItemTemplate>
+        </asp:TemplateField>
+
         <asp:TemplateField HeaderText="Payment Aborted">
             <ItemTemplate>
                 <%# GetLocalTime(Eval("PaymentAborted")) %>

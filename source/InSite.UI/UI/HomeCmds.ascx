@@ -26,6 +26,7 @@
 
             <a runat="server" id="ElearningLink" href="/ui/portal/learning/catalogue" class="btn btn-success"><i class="fa-solid fa-books me-2"></i>eLearning</a>
             <a runat="server" id="CustomCatalogLink" href="#" class="btn btn-warning"></a>
+            <a runat="server" id="FeaturedCatalogLink" href="#" class="btn btn-info"></a>
             <a runat="server" id="OrientationAnchor" class="btn btn-primary"><i class="fa-solid fa-passport me-2"></i>Orientations</a>
 
             <a runat="server" id="TrainingPlanLink1" href="/ui/portal/learning/plan" class="btn btn-secondary"><i class="fa-solid fa-map-marked-alt me-2"></i>Training Plan</a>
@@ -295,7 +296,20 @@
                     </div>
                 </div>
 
-                <div class="col">
+                <div runat="server" id="MyProgramsCard" class="col" visible="false">
+                    <div class="card card-tile shadow">
+                        <div class="card-body text-center">
+                            <i class='far fa-layer-group fa-3x mb-3 text-primary'></i>
+                            <h3 class='h5 nav-heading mb-2 text-break'>My Programs</h3>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <asp:Repeater runat="server" ID="MyProgramsRepeater">
+                                <ItemTemplate>
+                                    <li class="list-group-item"><a href='<%# "/ui/portal/learning/plan?program=" + Eval("ProgramIdentifier") %>'><%# Eval("ProgramName") %></a></li>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </ul>
+                    </div>
                 </div>
 
             </div>

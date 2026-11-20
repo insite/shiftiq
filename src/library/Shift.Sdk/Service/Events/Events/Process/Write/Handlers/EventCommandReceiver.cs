@@ -2,6 +2,9 @@
 using Shift.Common.Timeline.Commands;
 
 using InSite.Domain.Events;
+using InSite.Application.Assets.Read;
+using Shift.Contract;
+using System;
 
 namespace InSite.Application.Events.Write
 {
@@ -9,11 +12,13 @@ namespace InSite.Application.Events.Write
     {
         private readonly IChangeQueue _publisher;
         private readonly IChangeRepository _repository;
+        private readonly ISearchStore _searchStore;
 
-        public EventCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository)
+        public EventCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository, ISearchStore searchStore)
         {
             _publisher = publisher;
             _repository = repository;
+            _searchStore = searchStore;
 
             commander.Subscribe<AddEventAssessment>(Handle);
             commander.Subscribe<AddEventAttendee>(Handle);
@@ -70,6 +75,7 @@ namespace InSite.Application.Events.Write
             commander.Subscribe<LockEventRegistration>(Handle);
             commander.Subscribe<UnlockEventRegistration>(Handle);
             commander.Subscribe<ModifyAllowMultipleRegistrations>(Handle);
+            commander.Subscribe<ModifyFormAttachmentLimit>(Handle);
             commander.Subscribe<ModifyMandatorySurvey>(Handle);
             commander.Subscribe<ModifyPersonCodeIsRequired>(Handle);
             commander.Subscribe<ModifyRegistrationField>(Handle);
@@ -154,11 +160,18 @@ namespace InSite.Application.Events.Write
 
         public void Handle(ChangeEventFormat c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<EventAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.ChangeEventFormat(c.EventFormat);
+                if (aggregate.ChangeEventFormat(c.EventFormat))
+                    organizationId = aggregate.Data.Tenant;
+
                 Commit(aggregate, c);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Event);
         }
 
         public void Handle(ModifyEventCalendarColor c)
@@ -213,11 +226,18 @@ namespace InSite.Application.Events.Write
 
         public void Handle(ChangeExamType c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<EventAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 aggregate.ChangeExamType(c.Type);
                 Commit(aggregate, c);
+
+                organizationId = aggregate.Data.Tenant;
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Event);
         }
 
         public void Handle(CompleteEvent c)
@@ -339,11 +359,18 @@ namespace InSite.Application.Events.Write
 
         public void Handle(DeleteEvent c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<EventAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 aggregate.DeleteEvent();
                 Commit(aggregate, c);
+
+                organizationId = aggregate.Data.Tenant;
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Event);
         }
 
         public void Handle(AllowEventRegistrationWithLink c)
@@ -441,6 +468,8 @@ namespace InSite.Application.Events.Write
             var aggregate = new EventAggregate { AggregateIdentifier = c.AggregateIdentifier };
             aggregate.ScheduleAppointment(c.Tenant, c.Title, c.AppointmentType, c.Description, c.StartTime, c.EndTime);
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(c.Tenant, c.AggregateIdentifier, SearchObjectType.Event);
         }
 
         public void Handle(ScheduleClass c)
@@ -448,6 +477,8 @@ namespace InSite.Application.Events.Write
             var aggregate = new EventAggregate { AggregateIdentifier = c.AggregateIdentifier };
             aggregate.ScheduleClass(c.Tenant, c.Title, c.Status, c.Number, c.StartTime, c.EndTime, c.Duration, c.DurationUnit, c.Credit);
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(c.Tenant, c.AggregateIdentifier, SearchObjectType.Event);
         }
 
         public void Handle(ScheduleExam c)
@@ -455,6 +486,8 @@ namespace InSite.Application.Events.Write
             var aggregate = new EventAggregate { AggregateIdentifier = c.AggregateIdentifier };
             aggregate.ScheduleExam(c.Tenant, c.ExamType, c.EventFormat, c.EventTitle, c.EventStatus, c.EventBillingCode, c.EventClassCode, c.EventSource, c.ExamDuration, c.EventNumber, c.EventStartTime, c.VenueIdentifier, c.VenueRoom, c.CapacityMaximum);
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(c.Tenant, c.AggregateIdentifier, SearchObjectType.Event);
         }
 
         public void Handle(StartEventPublication c)
@@ -549,11 +582,18 @@ namespace InSite.Application.Events.Write
 
         public void Handle(ChangeAppointmentType c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<EventAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.ChangeAppointmentType(c.AppointmentType);
+                if (aggregate.ChangeAppointmentType(c.AppointmentType))
+                    organizationId = aggregate.Data.Tenant;
+
                 Commit(aggregate, c);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Event);
         }
 
         public void Handle(LockEventRegistration c)
@@ -579,6 +619,15 @@ namespace InSite.Application.Events.Write
             _repository.LockAndRun<EventAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 aggregate.ModifyAllowMultipleRegistrations(c.Value);
+                Commit(aggregate, c);
+            });
+        }
+
+        public void Handle(ModifyFormAttachmentLimit c)
+        {
+            _repository.LockAndRun<EventAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.ModifyFormAttachmentLimit(c.Value);
                 Commit(aggregate, c);
             });
         }

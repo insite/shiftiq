@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Web.UI;
@@ -69,13 +70,19 @@ namespace InSite.Admin.Events.Registrations.Controls
                     BillingCode = x.BillingCode,
                     Department = string.Join(", ", x.DepartmentNames),
                     ExamFormTitle = x.ExamFormTitle,
-                    ExamFormName = x.ExamFormName,
-                    ExamFormCode = x.ExamFormCode,
+                    ExamFormName = JoinExamForms(x.ExamFormName, x.AdditionalExamFormNames),
+                    ExamFormCode = JoinExamForms(x.ExamFormCode, x.AdditionalExamFormCodes),
                     AccommodationsHtml = string.Join("<br/>", x.AccommodationNames),
                     AccommodationsText = string.Join("; ", x.AccommodationNames)
                 })
                 .ToList()
                 .ToSearchResult();
+        }
+
+        private static string JoinExamForms(string primary, IEnumerable<string> additional)
+        {
+            var data = new[] { primary }.Concat(additional.EmptyIfNull()).Where(x => x.IsNotEmpty());
+            return string.Join(", ", data);
         }
 
         protected string GetScheduledTime()

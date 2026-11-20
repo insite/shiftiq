@@ -54,7 +54,7 @@ namespace InSite.Admin.Events.Candidates.Controls
                 return null;
 
             var candidates = ServiceLocator.RegistrationSearch
-                .GetRegistrationsByEvent(eventId, null, null, null, false, false, true)
+                .GetRegistrationsByEvent(eventId, includeCandidate: true)
                 .Where(x => !string.Equals(x.ApprovalStatus, "Not Eligible", StringComparison.OrdinalIgnoreCase))
                 .Select(x => new CandidateInfo(x))
                 .ToArray();

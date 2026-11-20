@@ -1,4 +1,4 @@
-<%@ Page Language="C#" CodeBehind="Change.aspx.cs" Inherits="InSite.Admin.Records.Logbooks.Change" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
+﻿<%@ Page Language="C#" CodeBehind="Change.aspx.cs" Inherits="InSite.Admin.Records.Logbooks.Change" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
@@ -77,24 +77,31 @@
                                 <div class="form-text"></div>
                             </div>
 
-				            <div class="form-group mb-3">
-				                <label class="form-label">Notification Message (Validator)</label>
-				                <div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Notification Message (Validator)</label>
+                                <div>
                                     <insite:FindMessage runat="server" ID="ValidatorMessageIdentifier" />
                                 </div>
                             </div>
 
-				            <div class="form-group mb-3">
-				                <label class="form-label">Notification Message (Learner)</label>
-				                <div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Notification Message (Learner)</label>
+                                <div>
                                     <insite:FindMessage runat="server" ID="LearnerMessageIdentifier" />
                                 </div>
                             </div>
 
-				            <div class="form-group mb-3">
-				                <label class="form-label">Notification Message (Learner Added)</label>
-				                <div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Notification Message (Learner Added)</label>
+                                <div>
                                     <insite:FindMessage runat="server" ID="LearnerAddedMessageIdentifier" />
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Notification Message (Supervisor Added)</label>
+                                <div>
+                                    <insite:FindMessage runat="server" ID="SupervisorMessageIdentifier" />
                                 </div>
                             </div>
 

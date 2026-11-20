@@ -37,7 +37,6 @@ namespace InSite.Persistence
                 foreach (var activity in activities)
                 {
                     DeleteAssessmentAttempts(learner, activity);
-                    DeleteScormRegistration(learner, activity);
                     DeleteSurveyResponses(learner, activity);
                 }
 
@@ -84,22 +83,6 @@ namespace InSite.Persistence
 
             foreach (var response in responses)
                 _send(new DeleteResponseSession(response));
-        }
-
-        private void DeleteScormRegistration(Guid learner, QActivity activity)
-        {
-            var isLink = activity.ActivityType == "Link";
-
-            var isScormCloud = activity.ActivityUrlType == "SCORM" && activity.ActivityPlatform == "SCORM Cloud";
-
-            var scormCloudCourseId = activity.ActivityHook;
-
-            if (!isLink || !isScormCloud || string.IsNullOrEmpty(scormCloudCourseId))
-                return;
-
-            var registration = ScormRegistrationSearch.Select(scormCloudCourseId, learner);
-            if (registration != null)
-                ScormRegistrationStore.Delete(registration.ScormRegistrationIdentifier);
         }
 
         private List<QActivity> GetActivities(Guid course)

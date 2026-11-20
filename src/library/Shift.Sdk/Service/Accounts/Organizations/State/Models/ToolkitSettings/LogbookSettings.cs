@@ -7,11 +7,13 @@ namespace InSite.Domain.Organizations
     {
         public bool DisplayTotalLogbookHours { get; set; }
         public bool LogbookBulkEntry { get; set; }
+        public Guid? SupervisorGroupIdentifier { get; set; }
 
         public bool IsEqual(LogbookSettings other)
         {
             return DisplayTotalLogbookHours == other.DisplayTotalLogbookHours
                 && LogbookBulkEntry == other.LogbookBulkEntry
+                && SupervisorGroupIdentifier == other.SupervisorGroupIdentifier
                 ;
         }
     }

@@ -6,6 +6,8 @@ import { urlHelper } from "@/helpers/urlHelper";
 import { cssHelper } from "@/helpers/cssHelper";
 import { validateLanguage } from "@/helpers/language";
 import { defaultSiteProviderContextData, SiteProviderContext } from "./SiteProviderContext";
+import { ApiSiteSetting } from "@/api/models/ApiSiteSetting";
+import { setTimeZones, TimeZoneId, TimeZoneInfo } from "@/helpers/date/timeZones";
 
 interface Props {
     children?: ReactNode;
@@ -65,6 +67,7 @@ export default function SiteProvider({ children }: Props) {
                 });
                 urlHelper.setOrgAndDomain(newSiteSetting.OrganizationCode, newSiteSetting.DomainName);
                 cssHelper.setShiftCssFile(newSiteSetting.StylePath);
+                setTimeZones(fromApiTimeZones(newSiteSetting.TimeZones));
             } catch (err) {
                 setState({
                     needToLoad: false,
@@ -92,4 +95,15 @@ export default function SiteProvider({ children }: Props) {
             {children}
         </SiteProviderContext.Provider>
     )
+}
+
+function fromApiTimeZones(timeZones: ApiSiteSetting["TimeZones"]): TimeZoneInfo[] {
+    return timeZones.map(x => ({
+        timeZoneId: x.TimeZoneId as TimeZoneId,
+        title: x.Title,
+        abbrev: x.Abbrev,
+        standardCode: x.StandardCode,
+        daylightCode: x.DaylightCode,
+        isIANACompatible: x.IsIANACompatible,
+    }));
 }

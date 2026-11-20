@@ -63,9 +63,14 @@ namespace Shift.Common.Integration.Google
 
             var url = $"{baseUrl}{Endpoints.Translation.Translate}?from={from}&to={to}";
 
-            var content = new StringContent(JsonConvert.SerializeObject(inputs), Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(inputs), Encoding.UTF8, "application/json")
+            };
 
-            var postResult = await StaticHttpClient.Client.PostAsync(url, content);
+            HubApiKey.Apply(request, _settings.ApiKey);
+
+            var postResult = await StaticHttpClient.Client.SendAsync(request);
             var apiResponseContent = await postResult.Content.ReadAsStringAsync();
 
             if (HttpStatusCode.OK != postResult.StatusCode)

@@ -289,7 +289,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Reports
                             {
                                 GAC = c.GAC,
                                 Competency = c.Competency,
-                                CreatedDate = TimeZoneInfo.ConvertTime(c.Created, timeZone).DateTime,
+                                CreatedDate = TimeZones.ConvertTime(c.Created, timeZone).DateTime,
                                 StartDate = c.Started,
                                 EndDate = c.Stopped,
                                 Employer = c.Employer,

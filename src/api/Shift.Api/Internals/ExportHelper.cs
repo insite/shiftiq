@@ -66,11 +66,9 @@ namespace Shift.Api
 
                 var count = _counters.AddOrUpdate(userId, 1, (key, value) => value + 1);
 
-                var timezone = _user.FindFirst("user_timezone")?.Value ?? "UTC";
+                var timezone = _user.FindFirst("user_timezone")?.Value ?? TimeZones.Ids.Utc;
 
-                var tz = TimeZoneInfo.FindSystemTimeZoneById(timezone);
-
-                var now = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, tz);
+                var now = TimeZones.ConvertTime(DateTimeOffset.UtcNow, timezone);
 
                 timestamp += $" {now:yyMMddHHmm}-{count}";
             }

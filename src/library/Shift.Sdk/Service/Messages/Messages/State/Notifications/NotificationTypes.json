@@ -216,7 +216,7 @@
   {
     "Slug": "CmdsTrainingRegistrationSubmitted",
     "MessageType": "Alert",
-    "Subject": "Validator Training Session Registration",
+    "Subject": "Course Registration Complete: $SessionTitle",
     "Purpose": "n/a",
     "Variables": "SessionIdentifier,SessionTitle,RegistrantName,RegistrantEmail,RegistrantCompany,Comment",
     "Courier": "Mailgun",
@@ -312,6 +312,14 @@
     "Subject": "Class Scheduled",
     "Purpose": "This notification is sent to any user who purchases an online class product. (SkillsCheck only.)",
     "Variables": "CustomerEmail,CustomerFullName,ClassEventUrl,ClassEventName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "CaseManagerAssigned",
+    "MessageType": "Alert",
+    "Subject": "Case Manager Assigned",
+    "Purpose": "This notification is sent to a case manager when a case is assigned to them.",
+    "Variables": "CaseID,CaseType,CaseStatus,Member,CaseURL",
     "Courier": "Mailgun"
   },
   {
@@ -629,6 +637,14 @@
     "Courier": "Mailgun"
   },
   {
+    "Slug": "LogbookSupervisorAssigned",
+    "MessageType": "Notification",
+    "Subject": "Logbook Supervisor Assigned",
+    "Purpose": "This notification is sent to a supervisor when they are listed as the supervisor on a logbook entry.(Configured in each logbook.)",
+    "Variables": "ActorName,AppUrl,LearnerName,LogbookTitle,LogbookUrl,OrganizationCode,OrganizationName",
+    "Courier": "Mailgun"
+  },
+  {
     "Slug": "ManagementWelcomeEmail",
     "MessageType": "Alert",
     "Subject": "Manager - Welcome!",
@@ -698,6 +714,33 @@
     "Subject": "Program Stalled",
     "Purpose": "This notification is sent to a learner and/or admin subscribers when a learner hasn't made progress on a program for the specified time. (Configured in each program.)",
     "Variables": "LearnerFirstName,LearnerLastName,ProgramName,ProgramStarted",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ProgramEnrollmentRequested",
+    "MessageType": "Alert",
+    "Subject": "Program Enrollment Requested",
+    "Purpose": "This notification is sent to the funder (the organization's Company Administrators, or CMDS for a self-funded request) when a learner requests enrollment in a paid program.",
+    "Body": "$LearnerFirstName $LearnerLastName has requested enrollment in $ProgramName.\n\n- Funding path: $FundingPath\n- Fee: $RequestFee\n\n[Review the request]($EnrollmentRequested)",
+    "Variables": "LearnerFirstName,LearnerLastName,ProgramName,RequestFee,FundingPath,EnrollmentRequested",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ProgramEnrollmentApproved",
+    "MessageType": "Alert",
+    "Subject": "Program Enrollment Approved",
+    "Purpose": "This notification is sent to a learner when their request to enroll in a paid program is approved.",
+    "Body": "Hi $LearnerFirstName,\n\nYour enrollment in $ProgramName has been approved. You can find it in your training plan.",
+    "Variables": "LearnerFirstName,LearnerLastName,ProgramName",
+    "Courier": "Mailgun"
+  },
+  {
+    "Slug": "ProgramEnrollmentRejected",
+    "MessageType": "Alert",
+    "Subject": "Program Enrollment Rejected",
+    "Purpose": "This notification is sent to a learner when their request to enroll in a paid program is rejected.",
+    "Body": "Hi $LearnerFirstName,\n\nYour request to enroll in $ProgramName was not approved.",
+    "Variables": "LearnerFirstName,LearnerLastName,ProgramName",
     "Courier": "Mailgun"
   },
   {

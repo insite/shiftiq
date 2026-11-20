@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -53,7 +54,28 @@ namespace InSite.UI.Admin.Contacts.Groups.Controls
         {
             AchievementIdentifier = achievementIdentifier;
 
+            var achievement = ServiceLocator.AchievementSearch.GetAchievement(achievementIdentifier);
+
+            var canAdd = false;
+            if (achievement != null)
+                canAdd = TAchievementDepartmentSearch.IsPermittedOwner(achievement.OrganizationIdentifier, Organization.Identifier);
+
             var data = VCmdsAchievementSearch.SelectForDepartmentChecklist(Organization.Identifier, achievementIdentifier);
+
+            // Another organization's achievement cannot be added to this organization's
+            // departments, so list only the departments that already hold it, which still lets an
+            // administrator remove those links.
+            if (!canAdd)
+            {
+                for (var i = data.Rows.Count - 1; i >= 0; i--)
+                {
+                    var isChecked = (bool)data.Rows[i]["IsChecked"];
+                    if (!isChecked)
+                        data.Rows.RemoveAt(i);
+                }
+            }
+
+            OwnerNotice.Visible = !canAdd;
 
             DepartmentsRepeater.DataSource = data;
             DepartmentsRepeater.DataBind();
@@ -125,6 +147,7 @@ namespace InSite.UI.Admin.Contacts.Groups.Controls
             if (AchievementIdentifier.HasValue)
             {
                 var insertList = new List<TAchievementDepartment>();
+                var insertCheckBoxes = new Dictionary<Guid, ICheckBoxControl>();
                 var deleteList = new List<TAchievementDepartment>();
 
                 foreach (DataListItem item in DepartmentsRepeater.Items)
@@ -146,13 +169,30 @@ namespace InSite.UI.Admin.Contacts.Groups.Controls
                         else
                         {
                             if (chk.Checked)
+                            {
                                 insertList.Add(new TAchievementDepartment { DepartmentIdentifier = departmentIdentifier, AchievementIdentifier = AchievementIdentifier.Value });
+                                insertCheckBoxes[departmentIdentifier] = chk;
+                            }
                         }
                     }
                 }
 
+                var permitted = TAchievementDepartmentSearch.SelectPermitted(insertList);
+
+                // Clear the box for links denied by the ownership rule, so the list shows what was
+                // saved (regardless of ownership).
+                var permittedDepartments = permitted.Select(x => x.DepartmentIdentifier).ToHashSet();
+                foreach (var insert in insertList)
+                {
+                    if (permittedDepartments.Contains(insert.DepartmentIdentifier))
+                        continue;
+
+                    insertCheckBoxes[insert.DepartmentIdentifier].Checked = false;
+                    count--;
+                }
+
                 TAchievementDepartmentStore.Delete(deleteList);
-                TAchievementDepartmentStore.Insert(insertList);
+                TAchievementDepartmentStore.Insert(permitted);
             }
 
             ChangedList.Clear();

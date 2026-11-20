@@ -32,6 +32,10 @@
             </div>
 
             <div class="mb-2">
+                <insite:LanguageComboBox runat="server" ID="Language" EmptyMessage="Preferred Language" />
+            </div>
+
+            <div class="mb-2">
                 <insite:TextBox ID="CommentKeyword" runat="server" EmptyMessage="Comment" MaxLength="256" />
             </div>
 

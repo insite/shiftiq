@@ -41,6 +41,20 @@ namespace InSite.Application.Messages.Write
             return SendAlert(organization, user, to, notification, type);
         }
 
+        public Guid[] Send(Notification notification, Guid[] to, Guid[] cc, Guid[] bcc = null)
+        {
+            var organization = notification.GetOriginOrganization();
+            var user = notification.GetOriginUser();
+            var type = notification.Type;
+
+            // Compose only honours cc/bcc when a single recipientId is present, so promote the first To
+            // address to recipientId and pass the remaining To addresses through the to[] array.
+            var recipientId = to != null && to.Length > 0 ? (Guid?)to[0] : null;
+            var remainingTo = to != null && to.Length > 1 ? to.Skip(1).ToArray() : null;
+
+            return SendAlert(organization, user, recipientId, notification, type, remainingTo, cc, bcc);
+        }
+
         public void Send(Guid organizationId, Guid userId, AlertCompetencyValidationRequested alert, Guid[] to)
             => SendAlert(organizationId, userId, null, alert, NotificationType.CmdsCompetencyValidationRequested, to);
 
@@ -92,8 +106,10 @@ namespace InSite.Application.Messages.Write
         public void Send(Guid organizationId, Guid userId, AlertPersonCodeNotEntered alert)
             => SendAlert(organizationId, userId, null, alert, NotificationType.PersonCodeNotEntered);
 
-        public void Send(Guid organizationId, Guid userId, AlertUserAccountWelcomed alert, Guid[] cc = null, Guid[] bcc = null)
-            => SendAlert(organizationId, userId, userId, alert, NotificationType.UserAccountWelcomed, null, cc, bcc);
+        public void Send(Guid organizationId, Guid userId, AlertUserAccountWelcomed alert,
+            Guid[] cc = null, Guid[] bcc = null, string subject = null, string body = null)
+            => SendAlert(organizationId, userId, userId, alert,
+                NotificationType.UserAccountWelcomed, null, cc, bcc, subject: subject, body: body);
 
         public void Send(Guid organizationId, Guid userId, AlertManagementWelcomeEmail alert, Guid[] cc = null, Guid[] bcc = null)
             => SendAlert(organizationId, userId, userId, alert, NotificationType.ManagementWelcomeEmail, null, cc, bcc);
@@ -144,14 +160,17 @@ namespace InSite.Application.Messages.Write
             => SendAlert(organizationId, userId, administratorUserId, alert, NotificationType.WorkflowAttachmentUpload, null, null, null, null);
 
         private Guid[] SendAlert(Guid organizationId, Guid userId, Guid? recipientId, Notification alert,
-            NotificationType type, Guid[] to = null, Guid[] cc = null, Guid[] bcc = null, string[] attachments = null)
+            NotificationType type, Guid[] to = null, Guid[] cc = null, Guid[] bcc = null,
+            string[] attachments = null, string subject = null, string body = null)
         {
             if (alert.Slug.IsEmpty())
                 alert.Type = type;
 
             try
             {
-                var emails = _outbox.Compose(_environment, type, organizationId, userId, recipientId, alert.MessageIdentifier, alert.BuildVariableList(), to, cc, bcc);
+                var emails = _outbox.Compose(_environment, type, organizationId, userId,
+                    recipientId, alert.MessageIdentifier, alert.BuildVariableList(), to, cc, bcc,
+                    subject, body);
 
                 foreach (var email in emails)
                 {

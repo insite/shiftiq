@@ -28,8 +28,7 @@ namespace InSite.Domain.Foundations
         public DateTimeOffset? PasswordExpiry { get; set; }
 
         public string Phone { get; set; }
-        public string TimeZoneId { get; set; }
-        public TimeZoneInfo TimeZone { get; set; }
+        public string TimeZone { get; set; }
 
         public bool MultiFactorAuthentication { get; set; }
         public OtpModes ActiveOtpMode { get; set; }

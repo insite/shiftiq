@@ -33,7 +33,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
             public string User { get; set; }
             public string InfoHtml { get; set; }
 
-            public static DataItem Create(string action, IChange e, Attachment a, TimeZoneInfo timeZone)
+            public static DataItem Create(string action, IChange e, Attachment a, string timeZoneId)
             {
                 return new DataItem
                 {
@@ -42,7 +42,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
 
                     UserID = e.OriginUser,
                     Version = e.AggregateVersion,
-                    Time = e.ChangeTime.Format(timeZone, true, true)
+                    Time = TimeZones.Format(e.ChangeTime, timeZoneId, true, true)
                 };
             }
         }
@@ -64,7 +64,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
 
         internal void LoadData(BankState bank, Guid attachmentId, bool showAllVersions)
         {
-            var timeZone = User.TimeZone;
+            var timeZoneId = User.TimeZone;
             var bankChanges = ServiceLocator.ChangeStore.GetChanges(bank.Identifier, -1);
             var dataItems = new List<DataItem>();
 
@@ -92,7 +92,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                         if (traceIds.Contains(e1.Attachment))
                         {
                             var a = traceBank.FindAttachment(e1.Attachment);
-                            item = DataItem.Create("Removed from Bank", e, a, timeZone);
+                            item = DataItem.Create("Removed from Bank", e, a, timeZoneId);
                         }
                     }
                 }
@@ -108,7 +108,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                         if (traceIds.Contains(e1.Attachment))
                         {
                             var a = traceBank.FindAttachment(e1.Attachment);
-                            item = DataItem.Create("Added to Bank", e, a, timeZone);
+                            item = DataItem.Create("Added to Bank", e, a, timeZoneId);
                         }
                     }
                     else if (e is AttachmentAddedToQuestion e2)
@@ -120,7 +120,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                             var a = traceBank.FindAttachment(e2.Attachment);
                             var q = traceBank.FindQuestion(e2.Question);
 
-                            item = DataItem.Create("Added to Question", e, a, timeZone);
+                            item = DataItem.Create("Added to Question", e, a, timeZoneId);
 
                             var html = Markdown.ToHtml(q.Content.Title.Default);
 
@@ -141,7 +141,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                             var a = traceBank.FindAttachment(e4.Attachment);
                             var q = traceBank.FindQuestion(e4.Question);
 
-                            item = DataItem.Create("Removed from Question", e, a, timeZone);
+                            item = DataItem.Create("Removed from Question", e, a, timeZoneId);
 
                             item.InfoHtml = $"<strong>Question #{q.BankIndex + 1} ({q.Asset}.{q.AssetVersion})</strong>:" +
                                 $"<div style='white-space:pre-wrap;'>{HttpUtility.HtmlEncode(q.Content.Title.Default)}</div>";
@@ -159,7 +159,7 @@ namespace InSite.Admin.Assessments.Attachments.Controls
                             var ca = traceBank.FindAttachment(e5.CurrentAttachment);
                             var ua = traceBank.FindAttachment(e5.UpgradedAttachment);
 
-                            item = DataItem.Create("Upgraded", e, ca, timeZone);
+                            item = DataItem.Create("Upgraded", e, ca, timeZoneId);
 
                             item.InfoHtml = $"Upgraded to <strong>{ua.Asset}.{ua.AssetVersion}</strong>";
                         }

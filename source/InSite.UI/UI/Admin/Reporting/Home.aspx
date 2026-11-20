@@ -87,6 +87,7 @@
                             </div>
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/compliance-summary"><%= InSite.Cmds.Admin.Reports.Forms.ComplianceSummaryReport.GetReportTitle(false) %></a></li>
+                                <li class="list-group-item"><a href="/ui/cmds/admin/reports/compliance-trend">Compliance Trend Report</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/competency-status-history">Competency Status History Chart</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/competency-status-per-user">Competency Statuses per Person</a></li>
                                 <li class="list-group-item"><a href="/ui/cmds/admin/reports/competencies-per-department">Competency Listing per Department</a></li>

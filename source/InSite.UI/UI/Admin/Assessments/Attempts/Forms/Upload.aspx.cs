@@ -524,7 +524,7 @@ namespace InSite.Admin.Assessments.Attempts.Forms
             }
 
             var preprocessor = new AttemptUploadPreprocessor(ServiceLocator.BankSearch, ServiceLocator.AttemptSearch, PersonSearch.GetUserIdentifier);
-            var attempts = preprocessor.Process(uploadItems, AttemptGraded.Value.Value.GetTimeZone(), Step2Data.EventIdentifier, Step2Data.FormIdentifier);
+            var attempts = preprocessor.Process(uploadItems, TimeZones.FindTimeZoneId(AttemptGraded.Value.Value), Step2Data.EventIdentifier, Step2Data.FormIdentifier);
 
             if (attempts == null)
                 return false;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -29,7 +29,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Utilities
             Guid journalSetupIdentifier,
             Guid userIdentifier,
             Guid organizationIdentifier,
-            TimeZoneInfo timeZone,
+            string timeZone,
             string language)
         {
             var person = ServiceLocator.ContactSearch.GetPerson(userIdentifier, organizationIdentifier);
@@ -156,7 +156,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Utilities
             return results;
         }
 
-        private static List<Experience> MapExperiences(List<QExperience> experiences, Guid journalSetupIdentifier, TimeZoneInfo timeZone, string language)
+        private static List<Experience> MapExperiences(List<QExperience> experiences, Guid journalSetupIdentifier, string timeZone, string language)
         {
             var results = new List<Experience>();
 

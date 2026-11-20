@@ -18,7 +18,11 @@ namespace InSite.Application.Registrations.Read
         void UpdateRegistration(CustomerAssigned e);
         void UpdateRegistration(EligibilityChanged e);
         void UpdateRegistration(EmployerAssigned e);
+        void UpdateRegistration(ExamFormAdded e);
         void UpdateRegistration(ExamFormAssigned e);
+        void UpdateRegistration(ExamFormChanged e);
+        void UpdateRegistration(ExamFormPasswordChanged e);
+        void UpdateRegistration(ExamFormRemoved e);
         void UpdateRegistration(ExamFormUnassigned e);
         void UpdateRegistration(ExamTimeLimited e);
         void UpdateRegistration(GradeChanged e);

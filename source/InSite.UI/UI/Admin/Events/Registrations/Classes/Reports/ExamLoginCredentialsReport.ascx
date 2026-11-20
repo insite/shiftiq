@@ -45,6 +45,9 @@
                             <th style="width:200px;">Name</th>
                             <th style="width:100px;">ID #</th>
                             <th style="width:200px;">Email</th>
+                            <insite:Container runat="server" Visible='<%# ShowAssessmentForm %>'>
+                                <th style="width:180px;">Assessment Form</th>
+                            </insite:Container>
                             <th style="width:120px;">Password</th>
                             <th style="width:250px;">Exam Login URL</th>
                         </tr>
@@ -60,6 +63,9 @@
                     <td><%# Eval("UserFullName") %></td>
                     <td><%# Eval("PersonCode") %></td>
                     <td><%# Eval("UserEmail") %></td>
+                    <insite:Container runat="server" Visible='<%# ShowAssessmentForm %>'>
+                        <td><%# Eval("FormTitle") %></td>
+                    </insite:Container>
                     <td><%# Eval("Password") %></td>
                     <td><%# Eval("ExamLoginUrl") %></td>
                 </tr>

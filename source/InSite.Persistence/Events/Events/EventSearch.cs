@@ -540,6 +540,7 @@ namespace InSite.Persistence
                              && e.EventPublicationStatus == "Published"
                              && e.EventType == "Exam"
                              && e.ExamType != "Test"
+                             && !e.IntegrationWithholdGrades
                              && (e.EventScheduledEnd ?? e.EventScheduledStart) < now
                              && (
                                 e.EventFormat == "Online" && DbFunctions.DiffHours((e.EventScheduledEnd ?? e.EventScheduledStart), now) <= onlineEventWindowHours

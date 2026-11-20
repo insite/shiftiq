@@ -285,9 +285,11 @@ public class PersonController : ShiftControllerBase
         var organizationData = organizationAdapter.ToData(organization);
         var fullNamePolicy = organizationData.Toolkits?.Contacts?.FullNamePolicy;
         var claimGroupNames = organizationData.Toolkits?.Contacts?.ImportReportGroupNames;
-        var timeZone = organizationData.TimeZone.Id;
+        var employerGroupName = organizationData.Toolkits?.Contacts?.IntegrationPortalEmployerGroupName;
+        var groupNames = organizationData.Toolkits?.Contacts?.IntegrationPortalGroupNames;
+        var timeZone = organizationData.TimeZone;
 
-        var result = await importer.ImportAsync(organizationId, fullNamePolicy, timeZone, submittedBy, submittedByName, imports);
+        var result = await importer.ImportAsync(organizationId, fullNamePolicy, timeZone, employerGroupName, groupNames, submittedBy, submittedByName, imports);
         var file = await reporter.SaveReportAsync(organizationId, submittedBy, timeZone, claimGroupNames, result, true);
 
         return new ImportResult

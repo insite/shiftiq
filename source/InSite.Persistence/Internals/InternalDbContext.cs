@@ -160,6 +160,7 @@ namespace InSite.Persistence
         public DbSet<QProgressHistory> QProgressHistories { get; set; }
         public DbSet<QRecipient> Recipients { get; set; }
         public DbSet<QRegistration> Registrations { get; set; }
+        public DbSet<QRegistrationExamForm> RegistrationExamForms { get; set; }
         public DbSet<QRegistrationInstructor> RegistrationInstructors { get; set; }
         public DbSet<QRegistrationTimer> Timers { get; set; }
         public DbSet<QResponseAnswer> QResponseAnswers { get; set; }
@@ -243,13 +244,12 @@ namespace InSite.Persistence
         public DbSet<TProgramCategory> TProgramCategories { get; set; }
         public DbSet<TProgramContainment> TProgramContainments { get; set; }
         public DbSet<TProgramEnrollment> TProgramEnrollments { get; set; }
+        public DbSet<TProgramEnrollmentRequest> TProgramEnrollmentRequests { get; set; }
         public DbSet<TProgramGroupEnrollment> TProgramGroupEnrollments { get; set; }
         public DbSet<TQuiz> TQuizzes { get; set; }
         public DbSet<TQuizAttempt> TQuizAttempts { get; set; }
         public DbSet<TReport> TReports { get; set; }
         public DbSet<TScormEvent> TScormEvents { get; set; }
-        public DbSet<TScormRegistration> TScormRegistrations { get; set; }
-        public DbSet<TScormRegistrationActivity> TScormRegistrationActivities { get; set; }
         public DbSet<TScormStatement> TScormStatements { get; set; }
         public DbSet<TSender> TSenders { get; set; }
         public DbSet<TSenderOrganization> TSenderOrganizations { get; set; }
@@ -507,6 +507,7 @@ namespace InSite.Persistence
             builder.Configurations.Add(new QProgressConfiguration());
             builder.Configurations.Add(new QProgressHistoryConfiguration());
             builder.Configurations.Add(new QRegistrationConfiguration());
+            builder.Configurations.Add(new QRegistrationExamFormConfiguration());
             builder.Configurations.Add(new QRegistrationInstructorConfiguration());
             builder.Configurations.Add(new QRegistrationTimerConfiguration());
             builder.Configurations.Add(new QResponseAnswerConfiguration());
@@ -601,6 +602,7 @@ namespace InSite.Persistence
             builder.Configurations.Add(new TProgramCategoryConfiguration());
             builder.Configurations.Add(new TProgramContainmentConfiguration());
             builder.Configurations.Add(new TProgramEnrollmentConfiguration());
+            builder.Configurations.Add(new TProgramEnrollmentRequestConfiguration());
             builder.Configurations.Add(new TProgramGroupEnrollmentConfiguration());
             builder.Configurations.Add(new TTaxConfiguration());
             builder.Configurations.Add(new TQuizConfiguration());
@@ -610,8 +612,6 @@ namespace InSite.Persistence
             builder.Configurations.Add(new QRubricCriterionConfiguration());
             builder.Configurations.Add(new QRubricRatingConfiguration());
             builder.Configurations.Add(new TScormEventConfiguration());
-            builder.Configurations.Add(new TScormRegistrationConfiguration());
-            builder.Configurations.Add(new TScormRegistrationActivityConfiguration());
             builder.Configurations.Add(new TScormStatementConfiguration());
             builder.Configurations.Add(new TSenderConfiguration());
             builder.Configurations.Add(new TSenderOrganizationConfiguration());

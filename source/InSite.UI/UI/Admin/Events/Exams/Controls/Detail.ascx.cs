@@ -273,17 +273,17 @@ namespace InSite.Admin.Events.Exams.Controls
             DistributionTab.Visible = true;
             ChangeDistributionLink.NavigateUrl = $"/ui/admin/events/exams/change-distribution?event={EventIdentifier}";
 
-            AttemptStarted.Text = @event.ExamStarted.Format(null, true, nullValue: "None");
+            AttemptStarted.Text = @event.ExamStarted.Format((string)null, true, nullValue: "None");
             ScheduleTimer.Text = @event.ExamMaterialReturnShipmentReceived == null
                 ? @event.EventScheduledStart.Humanize()
                 : (@event.ExamMaterialReturnShipmentReceived.Value - @event.EventScheduledStart).Humanize();
 
             if (@event.EventFormat != EventExamFormat.Online.Value)
             {
-                DistributionExpected.Text = @event.DistributionExpected.Format(null, true, nullValue: "None");
-                ExamMaterialReturnShipmentReceived2.Text = @event.ExamMaterialReturnShipmentReceived.Format(null, true, nullValue: "None");
-                DistributionOrdered.Text = @event.DistributionOrdered.Format(null, true, nullValue: "None");
-                DistributionShipped.Text = @event.DistributionShipped.Format(null, true, nullValue: "None");
+                DistributionExpected.Text = @event.DistributionExpected.Format((string)null, true, nullValue: "None");
+                ExamMaterialReturnShipmentReceived2.Text = @event.ExamMaterialReturnShipmentReceived.Format((string)null, true, nullValue: "None");
+                DistributionOrdered.Text = @event.DistributionOrdered.Format((string)null, true, nullValue: "None");
+                DistributionShipped.Text = @event.DistributionShipped.Format((string)null, true, nullValue: "None");
                 DistributionProcessOutput.Text = DistributionProcess.GetText(@event.DistributionProcess)
                     ?? DistributionProcess.Items[0].Text;
                 DistributionCourier.Text = @event.ExamMaterialReturnShipmentCode ?? "None";

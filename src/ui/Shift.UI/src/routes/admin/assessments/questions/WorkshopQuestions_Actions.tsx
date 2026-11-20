@@ -18,7 +18,7 @@ interface Props {
     specificationId: string | null;
     setId: string | null | undefined;
     question: WorkshopQuestion;
-    isEditable: boolean;
+    disabled: boolean;
     returnUrl: string;
     onMoveToQuestion: (questionId: string) => void;
 }
@@ -29,7 +29,7 @@ export default function WorkshopQuestions_Actions({
     specificationId,
     setId,
     question,
-    isEditable,
+    disabled,
     returnUrl,
     onMoveToQuestion
 }: Props) {
@@ -135,11 +135,12 @@ export default function WorkshopQuestions_Actions({
                 <InlineEditor
                     type="ComboBox"
                     className="mt-0"
+                    editorClassName="question-flag"
                     textClassName="form-text text-dark fw-bold"
                     value={question.questionFlag}
                     valueHtml={question.questionFlag}
                     items={allFlagItems}
-                    disabled={!isEditable}
+                    disabled={disabled}
                     onSave={handleSaveFlag}
                 />
             </div>

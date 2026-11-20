@@ -93,6 +93,12 @@
                     <div class="mb-2">
                         <insite:TextBox ID="PaymentTransactionId" runat="server" EmptyMessage="Payment Transaction ID" MaxLength="100" />
                     </div>
+
+                    <h4 class="mt-3">Taxes</h4>
+
+                    <div class="mb-2">
+                        <insite:TaxRegionComboBox ID="TaxRegion" runat="server" EmptyMessage="Province/State" />
+                    </div>
                 </div>
 
             </div>

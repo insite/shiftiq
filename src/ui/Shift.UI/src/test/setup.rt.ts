@@ -1,6 +1,7 @@
 import { requestHelper } from "@/api/requestHelper";
 import { shiftClient } from "@/api/shiftClient";
 import { shiftConfig } from "@/helpers/shiftConfig";
+import { setupShared } from "./setup.shared";
 
 declare global {
     // eslint-disable-next-line no-var
@@ -36,3 +37,5 @@ shiftConfig.isLocal = true;
 shiftConfig.shiftApiHostUrl = "https://local-api.shiftiq.com/v2/e01";
 
 requestHelper.setThrowAuthError(true);
+
+setupShared();

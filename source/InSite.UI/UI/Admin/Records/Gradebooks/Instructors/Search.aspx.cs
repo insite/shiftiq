@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Application.Records.Read;
 using InSite.UI.Layout.Admin;

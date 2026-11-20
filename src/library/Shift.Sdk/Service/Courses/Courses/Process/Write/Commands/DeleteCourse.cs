@@ -6,12 +6,14 @@ using InSite.Domain.Courses;
 
 namespace InSite.Application.Courses.Write
 {
-    public class DeleteCourse : Command, IHasRun
+    public class DeleteCourse : Command, IHasRun, IGlobalSearchUpdater
     {
         public DeleteCourse(Guid courseId)
         {
             AggregateIdentifier = courseId;
         }
+
+        bool IGlobalSearchUpdater.IsUpdater() => true;
 
         bool IHasRun.Run(CourseAggregate course)
         {

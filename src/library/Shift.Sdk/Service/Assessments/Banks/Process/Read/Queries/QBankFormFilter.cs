@@ -18,6 +18,7 @@ namespace InSite.Application.Banks.Read
         public Guid? BankIdentifier { get; set; }
         public Guid? SpecIdentifier { get; set; }
         public Guid[] FormIdentifiers { get; set; }
+        public Guid[] ExcludeFormIdentifiers { get; set; }
         public Guid[] AttemptCandidateOrganizationIdentifiers { get; set; }
         public Guid? GradeItemIdentifier { get; set; }
         public Guid? EventIdentifier { get; set; }
@@ -26,7 +27,12 @@ namespace InSite.Application.Banks.Read
         public string FormName { get; set; }
         public string FormTitle { get; set; }
         public string ExcludeFormStatus { get; set; }
-        public string IncludeFormStatus { get; set; }
+        public string IncludeFormStatus
+        {
+            get => IncludeFormStatuses != null && IncludeFormStatuses.Length == 1 ? IncludeFormStatuses[0] : null;
+            set => IncludeFormStatuses = value != null ? new[] { value } : null;
+        }
+        public string[] IncludeFormStatuses { get; set; }
         public string Keyword { get; set; }
         public int? AssetNumber { get; set; }
         public string SpecType { get; set; }

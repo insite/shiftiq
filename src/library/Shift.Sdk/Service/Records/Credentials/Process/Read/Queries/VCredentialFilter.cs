@@ -20,6 +20,11 @@ namespace InSite.Application.Records.Read
         public Guid? ItemGradebookIdentifier { get; set; }
         public Guid? JournalSetupIdentifier { get; set; }
         public Guid? OrganizationIdentifier { get; set; }
+
+        // Widens OrganizationIdentifier to also match achievements shared with the organization
+        // through achievements.TAchievementOrganization.
+        public bool IncludeSharedAchievements { get; set; }
+
         public Guid? UserIdentifier { get; set; }
         public Guid? EmployerGroupIdentifier { get; set; }
         public string CredentialStatus { get; set; }
@@ -33,6 +38,10 @@ namespace InSite.Application.Records.Read
         public string ContactKeyword { get; set; }
         public string AchievementLabel { get; set; }
         public string[] AchievementLabels { get; set; }
+
+        // Widens AchievementLabels to also match any achievement that issues a certificate.
+        public bool IncludeCertificateIssuingAchievements { get; set; }
+
         public string AchievementTitle { get; set; }
         public string CredentialDescriptionExact { get; set; }
 

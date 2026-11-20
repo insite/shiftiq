@@ -7,6 +7,7 @@ using InSite.Web.Integration;
 using InSite.Web.Routing;
 
 using Shift.Common;
+using Shift.Common.Integration.Scoop;
 
 namespace InSite.UI.Portal.Integrations.Scorm
 {
@@ -42,16 +43,20 @@ namespace InSite.UI.Portal.Integrations.Scorm
 
                 var courseId = courseActivity.Module.Unit.CourseIdentifier;
 
+                // The launch URL opens the provider's content directly, so it applies the same paid
+                // program gate as the course page.
+                if (PaidProgramAchievementSearch.IsCourseAccessDenied(courseId, User.Identifier))
+                {
+                    HandleError(GetDisplayText("Your account is not granted permission to access this course."));
+                    return;
+                }
+
                 ScormHeader.Text = courseActivity.Module.ModuleName + ": " + courseActivity.ActivityName;
 
                 ScormCloseLink.NavigateUrl = RoutingConfiguration.PortalCourseUrl(courseId, activityId);
 
-                if (ScormCloseLink.NavigateUrl.Contains("?"))
-                    ScormCloseLink.NavigateUrl += "&sync=scorm-cloud";
-                else
-                    ScormCloseLink.NavigateUrl += "?sync=scorm-cloud";
-
-                var url = GetScormLaunchUrl(courseActivity.ActivityPlatform, courseActivity.ActivityHook, courseId, activityId, organizationId);
+                var url = GetScormLaunchUrl(courseActivity.ActivityPlatform, courseActivity.ActivityHook,
+                    courseActivity.ActivityIsMultilingual, CurrentLanguage, courseId, activityId, organizationId);
 
                 if (string.IsNullOrEmpty(url) || url == "#")
                     return;
@@ -65,19 +70,22 @@ namespace InSite.UI.Portal.Integrations.Scorm
             }
         }
 
-        private string GetScormLaunchUrl(string platform, string package, Guid courseId, Guid activityId, Guid organizationId)
+        private string GetScormLaunchUrl(string platform, string package, bool isMultilingual, string language, Guid courseId, Guid activityId, Guid organizationId)
         {
-            if (StringHelper.Equals(platform, "Scoop"))
+            if (!StringHelper.Equals(platform, "Scoop"))
             {
-                HideNavigation(); // Scoop has its own navigation bar
-
-                return GetScoopLaunchUrl(Request.Url.Host, package, courseId, activityId, organizationId);
+                HandleError("This activity is not configured for a supported SCORM platform.");
+                return null;
             }
 
-            return GetRusticiLaunchUrl(organizationId, activityId); // Default to Rustici SCORM Cloud
+            HideNavigation(); // Scoop has its own navigation bar
+
+            return GetScoopLaunchUrl(Request.Url.Host, package, isMultilingual, language, courseId, activityId, organizationId);
         }
 
-        public static string GetScoopLaunchUrl(string host, string package, Guid courseId, Guid activityId, Guid organizationId)
+        // The language is passed in rather than read here: this method is static, CurrentLanguage
+        // is an instance property, and both callers already have one.
+        public static string GetScoopLaunchUrl(string host, string package, bool isMultilingual, string language, Guid courseId, Guid activityId, Guid organizationId)
         {
             var scoop = ServiceLocator.AppSettings.Engine.Api.Scoop;
 
@@ -91,6 +99,11 @@ namespace InSite.UI.Portal.Integrations.Scorm
 
             progressUrl = StringHelper.Replace(progressUrl, "{learner}", User.Identifier.ToString());
 
+            // Scoop posts progress back with no credential of its own, so the
+            // callback URL carries its own proof that Shift iQ minted it. An
+            // unsigned callback is refused by ScoopController.
+            progressUrl = ScoopCallbackSignature.Sign(progressUrl, activityId, User.Identifier, scoop.Relay?.Secret);
+
             var encodedProgressUrl = StringHelper.EncodeBase64(progressUrl);
 
             if (!scoop.Relay.Enabled)
@@ -99,12 +112,17 @@ namespace InSite.UI.Portal.Integrations.Scorm
             var linkGenerator = new ScoopLinkGenerator();
 
             // The account slug must identify the organization that hosts the SCORM package in
-            // OpenSCORM (e.g. the partition organization for global modules), which is not
+            // Scoop (e.g. the partition organization for global modules), which is not
             // necessarily the organization the current user is signed in to.
             var owner = OrganizationSearch.Select(organizationId);
             var accountSlug = owner != null ? owner.Code : Organization.Code;
 
-            var scoopUrl = linkGenerator.GenerateCourseUrl(Identity, host, accountSlug, package, encodedProgressUrl, encodedExitUrl);
+            // Shift iQ owns the language rule: the administrator stores one base SCORM Package ID
+            // and Scoop holds one package per language beneath it. Resolved here, where the
+            // owning account is already known, because that is the account the packages live in.
+            var courseSlug = ScoopPackageResolver.ResolveLaunchHandle(accountSlug, package, isMultilingual, language);
+
+            var scoopUrl = linkGenerator.GenerateCourseUrl(Identity, host, accountSlug, courseSlug, encodedProgressUrl, encodedExitUrl);
 
             return scoopUrl;
         }
@@ -112,31 +130,6 @@ namespace InSite.UI.Portal.Integrations.Scorm
         private void HideNavigation()
         {
             NavigationBar.Visible = false;
-        }
-
-        private string GetRusticiLaunchUrl(Guid organizationId, Guid activityId)
-        {
-            var options = ServiceLocator.AppSettings.Engine.Api.Scorm;
-
-            var callback = PathHelper.GetAbsoluteUrl(options.CallbackPath);
-
-            var organization = OrganizationSearch.Select(organizationId);
-
-            var rustici = new ScormIntegrator(organization, Identity.User, activityId);
-
-            if (!Validate(rustici))
-                return null;
-
-            return rustici.GetUrl(Request, callback);
-        }
-
-        private bool Validate(ScormIntegrator rustici)
-        {
-            if (rustici.Activity != null)
-                return true;
-
-            HandleError("The launch activity could not be validated.");
-            return false;
         }
 
         private bool HandleException(Exception ex)

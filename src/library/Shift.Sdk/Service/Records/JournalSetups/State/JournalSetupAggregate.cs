@@ -118,9 +118,9 @@ namespace InSite.Domain.Records
             Apply(new JournalSetupAreaHoursModified(area, hours));
         }
 
-        public void ChangeMessages(Guid? validatorMessage, Guid? learnerMessage, Guid? learnerAddedMessage)
+        public void ChangeMessages(Guid? validatorMessage, Guid? learnerMessage, Guid? learnerAddedMessage, Guid? supervisorMessage)
         {
-            Apply(new JournalSetupMessagesChanged(validatorMessage, learnerMessage, learnerAddedMessage));
+            Apply(new JournalSetupMessagesChanged(validatorMessage, learnerMessage, learnerAddedMessage, supervisorMessage));
         }
 
         public void Rename(string name)

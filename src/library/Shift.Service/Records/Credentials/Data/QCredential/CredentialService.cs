@@ -20,11 +20,11 @@ public class CredentialService : IEntityService
         return await _reader.AssertAsync(credential, organization, cancellation);
     }
 
-    public async Task<IEnumerable<CredentialModel>> CollectAsync(ICredentialCriteria criteria, TimeZoneInfo? timeZone, CancellationToken cancellation = default)
+    public async Task<IEnumerable<CredentialModel>> CollectAsync(ICredentialCriteria criteria, CancellationToken cancellation = default)
     {
         var entities = await _reader.CollectAsync(criteria, cancellation);
 
-        return _adapter.ToModel(entities, timeZone);
+        return _adapter.ToModel(entities);
     }
 
     public async Task<int> CountAsync(ICredentialCriteria criteria, CancellationToken cancellation = default)
@@ -32,19 +32,19 @@ public class CredentialService : IEntityService
         return await _reader.CountAsync(criteria, cancellation);
     }
 
-    public async IAsyncEnumerable<CredentialModel> DownloadAsync(ICredentialCriteria criteria, TimeZoneInfo? timeZone, [EnumeratorCancellation] CancellationToken cancellation)
+    public async IAsyncEnumerable<CredentialModel> DownloadAsync(ICredentialCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation)
     {
         await foreach (var entity in _reader.DownloadAsync(criteria, cancellation))
         {
-            yield return _adapter.ToModel(entity, timeZone);
+            yield return _adapter.ToModel(entity);
         }
     }
 
-    public async Task<CredentialModel?> RetrieveAsync(Guid credential, TimeZoneInfo? timeZone, CancellationToken cancellation = default)
+    public async Task<CredentialModel?> RetrieveAsync(Guid credential, CancellationToken cancellation = default)
     {
         var entity = await _reader.RetrieveAsync(credential, cancellation);
 
-        return entity != null ? _adapter.ToModel(entity, timeZone) : null;
+        return entity != null ? _adapter.ToModel(entity) : null;
     }
 
     public async Task<IEnumerable<CredentialMatch>> SearchAsync(ICredentialCriteria criteria, CancellationToken cancellation = default)

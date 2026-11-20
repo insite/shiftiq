@@ -78,24 +78,6 @@ namespace InSite.Admin.Courses.Outlines.Controls
         protected global::System.Web.UI.WebControls.CheckBox LinkIsMultilingual;
 
         /// <summary>
-        /// LinkIsPreview control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox LinkIsPreview;
-
-        /// <summary>
-        /// LinkIsDispatch control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox LinkIsDispatch;
-
-        /// <summary>
         /// ScoopLibraryUrl control.
         /// </summary>
         /// <remarks>

@@ -354,15 +354,15 @@ namespace InSite.Domain.Surveys.Forms
         {
             var question = Form.FindQuestion(e.Question);
 
-            var oldScale = question.Scales.FirstOrDefault(x => x.Category == e.Scale.Category);
-            if (oldScale != null)
-                question.Scales.Remove(oldScale);
-
             var newScale = e.Scale.Clone();
             newScale.Sort();
             newScale.Question = question;
 
-            question.Scales.Add(newScale);
+            var index = question.Scales.FindIndex(x => x.Category == e.Scale.Category);
+            if (index >= 0)
+                question.Scales[index] = newScale;
+            else
+                question.Scales.Add(newScale);
         }
 
         public void When(SurveyThirdPartyFormsSettingsChanged e)

@@ -68,7 +68,7 @@ public class CourseController : ShiftControllerBase
 
         _principalProvider.ValidateOrganizationId(principal, query);
 
-        var models = await _courseService.CollectAsync(query, principal.TimeZone, cancellation);
+        var models = await _courseService.CollectAsync(query, cancellation);
 
         var count = await _courseService.CountAsync(query, cancellation);
 
@@ -143,7 +143,7 @@ public class CourseController : ShiftControllerBase
         var exporter = new ExportHelper("Learning", "Courses", query.Filter.Format, User);
 
         var models = await _courseService
-            .DownloadAsync(query, principal.TimeZone, cancellation)
+            .DownloadAsync(query, cancellation)
             .ToListAsync(cancellation);
 
         var content = _courseService.Serialize(models, exporter.GetFileFormat(), query.Filter.Includes);
@@ -167,12 +167,12 @@ public class CourseController : ShiftControllerBase
     [EndpointName("retrieveCourse")]
     public async Task<ActionResult<CourseModel>> RetrieveAsync([FromRoute] Guid course, CancellationToken cancellation = default)
     {
-        var principal = _principalProvider.GetPrincipal();
-
-        var model = await _courseService.RetrieveAsync(course, principal.TimeZone, cancellation);
+        var model = await _courseService.RetrieveAsync(course, cancellation);
 
         if (model == null)
             return NotFound();
+
+        var principal = _principalProvider.GetPrincipal();
 
         if (!_principalProvider.AllowOrganizationAccess(principal, model.OrganizationId))
             return NotFound();

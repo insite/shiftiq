@@ -31,13 +31,13 @@ namespace Shift.Common
             {
                 var query = _queries[key];
 
-                var iQueryInterface = query.GetInterfaces()
-                    .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>));
+                // The result type is the argument of the Query<TResult> base class, not of an interface. IQuery
+                // is not generic, so asking it for its first generic argument threw an index out of range for
+                // every query type, which made this collection unusable for any assembly that declares one.
+                var resultType = GetResultTypeFromBase(query);
 
-                if (iQueryInterface == null)
-                    throw new InvalidOperationException($"{key} does not implement the IQuery interface.");
-
-                var resultType = iQueryInterface.GetGenericArguments()[0];
+                if (resultType == null)
+                    throw new InvalidOperationException($"{key} does not derive from Query<TResult>.");
 
                 _results.Add(query, resultType);
             }
@@ -61,6 +61,19 @@ namespace Shift.Common
             }
 
             return list;
+        }
+
+        private static Type GetResultTypeFromBase(Type type)
+        {
+            while (type != null && type != typeof(object))
+            {
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Query<>))
+                    return type.GetGenericArguments()[0];
+
+                type = type.BaseType;
+            }
+
+            return null;
         }
 
         private bool IsSubclassOfRawGeneric(Type generic, Type type)

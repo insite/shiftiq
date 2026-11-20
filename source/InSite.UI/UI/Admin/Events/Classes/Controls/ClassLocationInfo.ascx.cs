@@ -31,8 +31,8 @@ namespace InSite.UI.Admin.Events.Classes.Controls
 
         public void Bind(QEvent ev)
         {
-            EventScheduledStart.Text = ev.EventScheduledStart.Format(null, true);
-            EventScheduledEnd.Text = ev.EventScheduledEnd.Format(null, true, nullValue: "None");
+            EventScheduledStart.Text = ev.EventScheduledStart.Format((string)null, true);
+            EventScheduledEnd.Text = ev.EventScheduledEnd.Format((string)null, true, nullValue: "None");
 
             VenueInfo.Bind(ev.EventIdentifier, ev.VenueLocation);
 

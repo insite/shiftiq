@@ -17,6 +17,8 @@ using Shift.Common;
 using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
+using ValidateExperienceCommand = InSite.Application.Journals.Write.ValidateExperience;
+
 namespace InSite.UI.Admin.Records.Logbooks.Validators
 {
     public partial class BulkEntry : AdminBasePage, IHasParentLinkParameters
@@ -59,27 +61,27 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
             SearchResultRepeater.DataBinding += SearchResultRepeater_DataBinding;
             SearchResultRepeater.ItemDataBound += SearchResultRepeater_ItemDataBound;
 
-            NextButton.Click += NextButton_Click;
-            SaveButton.Click += SaveButton_Click;
+            SearchNextButton.Click += (s, a) => OnSearchNextClick();
+            FieldsNextButton.Click += (s, a) => OnFieldsNextClick();
+            ValidateSaveButton.Click += (s, a) => OnSaveClick();
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
-            {
-                if (!CanCreate)
-                    CreateAccessDeniedException();
-
-                CriteriaGroupIdentifier.Filter.OrganizationIdentifier = Organization.Key;
-
-                Open();
-            }
-            else
+            if (IsPostBack)
             {
                 GetCriteriaResultSelections();
+                return;
             }
+
+            if (!CanCreate)
+                CreateAccessDeniedException();
+
+            CriteriaGroupIdentifier.Filter.OrganizationIdentifier = Organization.Key;
+
+            Open();
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -131,7 +133,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
             SearchResultDataKeys.Add(id);
         }
 
-        private void NextButton_Click(object sender, EventArgs e)
+        private void OnSearchNextClick()
         {
             if (SearchSelectedEntities.Count == 0)
             {
@@ -143,7 +145,16 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
             FieldsTab.IsSelected = true;
         }
 
-        private void SaveButton_Click(object sender, EventArgs e)
+        private void OnFieldsNextClick()
+        {
+            if (!Page.IsValid)
+                return;
+
+            ValidateTab.Visible = true;
+            ValidateTab.IsSelected = true;
+        }
+
+        private void OnSaveClick()
         {
             if (!Page.IsValid)
                 return;
@@ -161,7 +172,6 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
 
             HttpResponseHelper.Redirect(url);
         }
-
 
         #endregion
 
@@ -192,12 +202,18 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
                 return;
             }
 
+            SkillRating.Items.Clear();
+            SkillRating.Items.Add(new ComboBoxOption());
+            for (var i = 1; i <= 5; i++)
+                SkillRating.Items.Add(new ComboBoxOption(i.ToString(), i.ToString()));
+
             CriteriaClear();
 
             Search();
 
-            CloseButton.NavigateUrl = OutlineUrl;
-            CancelButton.NavigateUrl = OutlineUrl;
+            SearchCloseButton.NavigateUrl = OutlineUrl;
+            FieldsCancelButton.NavigateUrl = OutlineUrl;
+            ValidateCancelButton.NavigateUrl = OutlineUrl;
         }
 
         private void CriteriaClear()
@@ -213,6 +229,9 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
 
         private int Save()
         {
+            var skillRating = SkillRating.ValueAsInt;
+            var validated = DateTimeOffset.UtcNow;
+
             foreach (var userId in SearchSelectedEntities)
             {
                 var commands = new List<Command>();
@@ -223,6 +242,8 @@ namespace InSite.UI.Admin.Records.Logbooks.Validators
                 commands.Add(new AddExperience(journalId, experienceId));
 
                 Fields.GetChanges(JournalSetupIdentifier, journalId, experienceId, commands);
+
+                commands.Add(new ValidateExperienceCommand(journalId, experienceId, User.UserIdentifier, validated, skillRating));
 
                 ServiceLocator.SendCommands(commands);
             }

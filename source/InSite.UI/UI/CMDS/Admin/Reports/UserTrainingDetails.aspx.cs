@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+using InSite.Custom.CMDS.Common.Controls.Server;
 using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 using InSite.UI.Layout.Admin;
@@ -56,6 +57,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             base.OnInit(e);
 
+            DivisionIdentifier.AutoPostBack = true;
+            DivisionIdentifier.ValueChanged += DivisionIdentifier_ValueChanged;
+
             DepartmentIdentifier.AutoPostBack = true;
             DepartmentIdentifier.ValueChanged += DepartmentIdentifier_ValueChanged;
 
@@ -81,6 +85,11 @@ namespace InSite.Cmds.Actions.Reporting.Report
             if (!Identity.HasAccessToAllCompanies)
                 DepartmentIdentifier.Filter.UserIdentifier = User.UserIdentifier;
 
+            // After the department finder's filter is set, so the division list is scoped the same way
+            // as the finder - only divisions the user can reach a department in, so picking one never
+            // lands on an empty department finder.
+            SetupDivisions();
+
             LoadAchievementTypes();
 
             AchievementIdentifier.Filter.AchievementType = "NA";
@@ -99,6 +108,14 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             if (Page.IsValid)
                 LoadReport();
+        }
+
+        private void DivisionIdentifier_ValueChanged(object sender, EventArgs e)
+        {
+            DepartmentIdentifier.Filter.DivisionIdentifier = DivisionIdentifier.ValueAsGuid;
+            DepartmentIdentifier.Value = null;
+
+            DepartmentIdentifier_ValueChanged(sender, e);
         }
 
         private void DepartmentIdentifier_ValueChanged(object sender, EventArgs e)
@@ -144,7 +161,19 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
             AchievementTitle.Text = VCmdsAchievementSearch.SelectFirst(x => x.AchievementIdentifier == AchievementIdentifier.Value.Value).AchievementTitle;
             CompanyName.Text = OrganizationSearch.Select(Organization.Identifier).Name;
+            DivisionName.Text = GetDivisionHeaderText(CurrentParameters.DepartmentIdentifier);
             DepartmentName.Text = DepartmentIdentifier.Item.Text;
+        }
+
+        /// <summary>
+        /// The division of the reported department, as a " :: name" fragment for the header line.
+        /// </summary>
+        private string GetDivisionHeaderText(Guid department)
+        {
+            var group = DepartmentSearch.Select(department);
+            var divisionName = GetDivisionName(group);
+
+            return divisionName.IsNotEmpty() ? " :: " + divisionName : string.Empty;
         }
 
         private IList GetReportDataSource(SearchParameters parameters)
@@ -165,6 +194,39 @@ namespace InSite.Cmds.Actions.Reporting.Report
         #endregion
 
         #region Helper methods
+
+        /// <summary>
+        /// The division a department belongs to, matching the text DivisionComboBox renders. Empty
+        /// when the organization does not use divisions, or the department sits outside a division.
+        /// </summary>
+        private string GetDivisionName(Department department)
+        {
+            if (!DivisionPanel.Visible)
+                return string.Empty;
+
+            if (department?.DivisionIdentifier == null)
+                return string.Empty;
+
+            var division = DivisionSearch.Select(department.DivisionIdentifier.Value);
+
+            if (division == null)
+                return string.Empty;
+
+            return division.DivisionName;
+        }
+
+        private void SetupDivisions()
+        {
+            var organization = OrganizationSearch.Select(Organization.Identifier);
+
+            DivisionPanel.Visible = OrganizationHelper.EnableDivisions(organization.CompanyDescription.CompanySize);
+
+            // Only query and populate the division list when the organization uses divisions. Skips the
+            // scoping round-trip entirely for organizations whose departments are not grouped into
+            // divisions.
+            if (DivisionPanel.Visible)
+                DivisionScoping.Bind(DivisionIdentifier, DepartmentIdentifier, Organization.Identifier);
+        }
 
         private void LoadAchievementTypes()
         {
@@ -227,6 +289,16 @@ namespace InSite.Cmds.Actions.Reporting.Report
             xlsxSheet.Cells.Add(new XlsxCell(0, rowNumber) { Value = "Organization:", Style = Style.HeaderStyle });
             xlsxSheet.Cells.Add(new XlsxCell(1, rowNumber) { Value = department.Organization.CompanyName, Style = Style.ColumnStyle });
             rowNumber++;
+
+            var divisionName = GetDivisionName(department);
+
+            if (divisionName.IsNotEmpty())
+            {
+                xlsxSheet.Cells.Add(new XlsxCell(0, rowNumber) { Value = "Division:", Style = Style.HeaderStyle });
+                xlsxSheet.Cells.Add(new XlsxCell(1, rowNumber) { Value = divisionName, Style = Style.ColumnStyle });
+                rowNumber++;
+            }
+
             xlsxSheet.Cells.Add(new XlsxCell(0, rowNumber) { Value = "Department:", Style = Style.HeaderStyle });
             xlsxSheet.Cells.Add(new XlsxCell(1, rowNumber) { Value = department.DepartmentName, Style = Style.ColumnStyle });
             rowNumber++;

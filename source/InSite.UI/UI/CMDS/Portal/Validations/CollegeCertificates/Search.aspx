@@ -14,7 +14,7 @@
                     <div class="alert alert-info mb-0" role="alert">
                         There are no college certificates currently available for your occupation profile(s). 
                         If you have any questions, then please contact us: 
-                        <a href="mailto:admin_cmds@keyera.com">admin_cmds@keyera.com</a>
+                        <asp:Literal runat="server" ID="SupportEmail" />
                     </div>
 
                 </div>

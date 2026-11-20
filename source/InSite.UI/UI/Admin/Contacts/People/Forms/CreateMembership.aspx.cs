@@ -107,7 +107,7 @@ namespace InSite.Admin.Contacts.People.Forms
 
             if (isEnabled && e.OldValue.IsEmpty())
             {
-                var nowDate = TimeZoneInfo.ConvertTime(DateTimeOffset.Now, User.TimeZone);
+                var nowDate = TimeZones.ConvertTime(DateTimeOffset.Now, User.TimeZone);
 
                 ReasonEffectiveDate.Value = nowDate;
                 ReasonExpiryDate.Value = nowDate.AddDays(180);

@@ -32,10 +32,23 @@ namespace InSite.UI.Admin.Assets
             };
         }
 
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            RefreshSearchButton.Click += RefreshSearchButton_Click;
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
             BindModelToControls(CreateHomeModel());
+        }
+
+        private void RefreshSearchButton_Click(object sender, EventArgs e)
+        {
+            ServiceLocator.SearchStore.CreateSearch(ServiceLocator.Partition.IsE03());
+            ScreenStatus.AddMessage(AlertType.Success, "Global Search refreshed.");
         }
 
         protected void BindModelToControls(HomeModel model)

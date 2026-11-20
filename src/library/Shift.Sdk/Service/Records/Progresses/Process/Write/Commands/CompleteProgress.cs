@@ -12,7 +12,7 @@ namespace InSite.Application.Progresses.Write
             decimal? percent,
             bool? pass,
             int? elapsedMinutes,
-            int? elapsedSeconds = 0
+            int? elapsedSeconds = null
             )
         {
             AggregateIdentifier = progress;

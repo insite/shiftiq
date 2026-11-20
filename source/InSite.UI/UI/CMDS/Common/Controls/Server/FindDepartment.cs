@@ -154,6 +154,23 @@ namespace InSite.Custom.CMDS.Common.Controls.Server
 
         public DataItem[] GetDataItems() => Select(GetFilter((string)null));
 
+        // The divisions reachable through the departments this control would show the current user.
+        // Built from the same access-scoped filter as the department cascade, minus any selected
+        // division, so the division dropdown can never offer a division whose departments resolve empty.
+        public Guid[] GetAccessibleDivisionIdentifiers()
+        {
+            var filter = GetFilter((string)null);
+            filter.Filter.DivisionIdentifier = null;
+            return ContactRepository3.SelectDivisionIdentifiersForDepartmentFilter(filter.Filter);
+        }
+
+        // Every department this control would show the current user, ignoring paging and any keyword.
+        public Guid[] GetAccessibleDepartmentIdentifiers()
+        {
+            var filter = GetFilter((string)null);
+            return ContactRepository3.SelectDepartmentIdentifiersForDepartmentFilter(filter.Filter);
+        }
+
         public int GetCount() => Count(GetFilter((string)null));
     }
 }

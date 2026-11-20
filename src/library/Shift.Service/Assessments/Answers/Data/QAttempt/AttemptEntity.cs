@@ -25,6 +25,8 @@ public partial class AttemptEntity
     public string? AttemptTag { get; set; }
     public string? TabTimeLimit { get; set; }
     public string? UserAgent { get; set; }
+    public string? AIProctoringProvider { get; set; }
+    public string? AIProctoringSessionId { get; set; }
 
     public int? ActiveQuestionIndex { get; set; }
     public int? ActiveSectionIndex { get; set; }

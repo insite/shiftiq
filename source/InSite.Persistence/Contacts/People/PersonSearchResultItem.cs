@@ -49,5 +49,6 @@ namespace InSite.Persistence
         public string PermissionLists { get; set; }
         public string PersonCode { get; set; }
         public string Region { get; set; }
+        public string Language { get; set; }
     }
 }

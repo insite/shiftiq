@@ -41,7 +41,7 @@ namespace InSite.Admin.Issues.Forms
 
             PageHelper.AutoBindHeader(this, qualifier: $"{issue.IssueTitle} <span class='fw-normal fs-md text-body-secondary'>Case #{issue.IssueNumber} - {issue.IssueType}</span>");
 
-            CaseInfo.BindIssue(issue, User.TimeZone, false);
+            CaseInfo.BindIssue(issue, false);
 
             IssueStatus.IssueType = issue.IssueType;
             IssueStatus.DataBind();

@@ -23,6 +23,7 @@ using InSite.UI.Portal.Assessments.Attempts.Controls;
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Common.Timeline.Exceptions;
 using Shift.Constant;
 
@@ -288,7 +289,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             }
 
             if (result == null)
-                result = AttemptHelper.LoadAttemptAnswer(form, baseUrl, out attempt);
+                result = AttemptHelper.LoadAttemptAnswer(null, form, baseUrl, out attempt);
 
             AnswerSectionsContainer.Remove(baseUrl.AttemptID.Value);
 
@@ -350,9 +351,30 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             var (result, msTimestamp) = GetTimestamp(attempt);
 
             if (msTimestamp >= 0)
-                ServiceLocator.SendCommand(new PingAttempt(attempt.AttemptIdentifier));
+                RecordPing(attempt.AttemptIdentifier);
 
             return result;
+        }
+
+        // The ping write is best effort. The timestamp is what the player needs to keep its clock
+        // honest; the write only records activity, and the next ping five seconds later records it
+        // again. A stalled change log used to surface here as a server error, which the player
+        // answers by locking the exam (Sentry 7709212927). A rejection raised by the attempt itself
+        // still propagates, because HandleAction turns the outdated-ping case into a quiet no-op.
+        private static void RecordPing(Guid attemptId)
+        {
+            try
+            {
+                ServiceLocator.SendCommand(new PingAttempt(attemptId));
+            }
+            catch (UnhandledCommandException ex) when (ex.InnerException is ApplicationError)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                AppSentry.SentryError(ex);
+            }
         }
 
         #endregion

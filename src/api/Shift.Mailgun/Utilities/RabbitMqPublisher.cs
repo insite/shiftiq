@@ -22,19 +22,25 @@ internal class RabbitMqPublisher : IAsyncDisposable
     }
 
     public static async Task<RabbitMqPublisher> CreateAsync(
-        AppSettings settings, 
-        ILogger<RabbitMqPublisher> logger, 
-        QueueHelper queueHelper)
+        AppSettings settings,
+        ILogger<RabbitMqPublisher> logger,
+        MailgunQueueHelper queueHelper)
     {
         var rabbitMq = settings.Integration.RabbitMq;
-        if (rabbitMq.Disabled)
+        if (rabbitMq.Mode == RabbitMqMode.Off)
             throw ApplicationError.Create("Cannot initialize {0}: RabbitMQ is disabled in configuration", nameof(RabbitMqPublisher));
 
         var factory = new ConnectionFactory
         {
             HostName = rabbitMq.Host,
+            Port = rabbitMq.Port ?? AmqpTcpEndpoint.UseDefaultPort,
             UserName = rabbitMq.Username,
-            Password = rabbitMq.Password
+            Password = rabbitMq.Password,
+            Ssl = new SslOption
+            {
+                Enabled = rabbitMq.Mode == RabbitMqMode.Tls,
+                ServerName = rabbitMq.Host
+            }
         };
 
         var connection = await factory.CreateConnectionAsync();

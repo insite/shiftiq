@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Shift.Common.Timeline.Commands;
@@ -111,7 +111,7 @@ namespace InSite.UI.Admin.Records.Logbooks
         /*
         private static string GetLocalTime(DateTimeOffset? item)
         {
-            return item.FormatDateOnly(User.TimeZone, nullValue: string.Empty);
+            return item.FormatDateOnly(User.TimeZoneId, nullValue: string.Empty);
         }
         */
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Application.Journals.Write;
 using InSite.Common.Web;

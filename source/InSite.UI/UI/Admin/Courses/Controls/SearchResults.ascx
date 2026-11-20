@@ -47,11 +47,11 @@
                 <table class="table-enrollments"><tbody>
                     <tr>
                         <td><%# Eval("EnrollmentCountStarted", "{0:n0}") %></td>
-                        <td>Started</td>
+                        <td><a href='<%# Eval("CourseId", "/ui/admin/courses/manage?course={0}&panel=course&tab=enrollments&enrollment=started") %>'>Started</a></td>
                     </tr>
                     <tr>
                         <td><%# Eval("EnrollmentCountCompleted", "{0:n0}") %></td>
-                        <td>Completed</td>
+                        <td><a href='<%# Eval("CourseId", "/ui/admin/courses/manage?course={0}&panel=course&tab=enrollments&enrollment=completed") %>'>Completed</a></td>
                     </tr>
                 </tbody></table>
             </ItemTemplate>

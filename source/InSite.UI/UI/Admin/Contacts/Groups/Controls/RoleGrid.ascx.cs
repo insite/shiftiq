@@ -145,9 +145,9 @@ namespace InSite.Admin.Contacts.Groups.Controls
         private void Grid_DeleteCommand(object sender, GridViewDeleteEventArgs e)
         {
             var grid = (Grid)sender;
-            var user = grid.GetDataKey<Guid>(e);
+            var membership = grid.GetDataKey<Guid>(e);
 
-            MembershipStore.Delete(MembershipSearch.Select(GroupIdentifier, user));
+            MembershipStore.Delete(membership);
 
             SearchWithCurrentPageIndex(new NullFilter());
 

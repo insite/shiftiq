@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Application.Invoices.Write;
 using InSite.Application.Payments.Read;

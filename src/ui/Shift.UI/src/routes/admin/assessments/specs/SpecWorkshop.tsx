@@ -64,9 +64,9 @@ function SpecWorkshopInternal() {
 
     const { siteSetting: { TimeZoneId: timeZoneId } } = useSiteProvider();
     const { setActionSubtitle, setBreadcrumbItemPath } = usePageProvider();
-    const { comments, attachments, problemQuestions, initOtherState } = useWorkshopOtherProvider();
+    const { comments, attachments, problemQuestions, initOtherState, modifyProblemQuestions } = useWorkshopOtherProvider();
     const { totalQuestionCount, initQuestionState } = useWorkshopQuestionProvider();
-    const { details, readOnly, specificationId, initState } = useSpecWorkshopProvider();
+    const { details, readOnly, specificationId, initState, modifyDetails } = useSpecWorkshopProvider();
     const { isSaving, runSave } = useSaveAction();
     const {
         control,
@@ -91,7 +91,7 @@ function SpecWorkshopInternal() {
 
         const model = await shiftClient.workshop.retrieveSpec(id, newDefaultFilter?.sectionId ?? null, selectedQuestionId);
         if (!model) {
-            return;
+            throw new Error("Specification is not found");
         }
 
         const questionChangeDates = newDefaultFilter && workshopQuestionFilter.hasDateFilter(newDefaultFilter)
@@ -155,7 +155,14 @@ function SpecWorkshopInternal() {
 
         const input = toApiSpecWorkshopInput(details, values);
 
-        if (await runSave(() => shiftClient.workshop.modifySpec(specificationId, input))) {
+        if (await runSave(async () => {
+            const result = await shiftClient.workshop.modifySpec(specificationId, input);
+            if (result) {
+                modifyDetails(specWorkshopAdapter.getDetails(details, result.Details));
+                modifyProblemQuestions(workshopOtherAdapter.getProblemQuestions(result.ProblemQuestions));
+            }
+        }))
+        {
             setTotalWeightPercent(calcTotalWeightPercent(details.criteria));
             setStatus("saved");
         } else {

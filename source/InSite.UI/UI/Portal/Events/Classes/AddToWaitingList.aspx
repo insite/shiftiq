@@ -5,7 +5,7 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 
-    <insite:ValidationSummary runat="server" />
+    <insite:ValidationSummary runat="server" ValidationGroup="WaitingList" />
 
     <div class="row" runat="server" ID="PersonDetailsPanel" >
         <div class="col-md-6 mb-3 mb-md-0">
@@ -21,7 +21,7 @@
                     <div runat="server" id="FirstNameField" class="form-group mb-3">
                         <label class="form-label" for="<%# FirstName.ClientID %>">
                             <insite:Literal runat="server" Text="First Name" />
-                            <insite:RequiredValidator runat="server" FieldName="First Name" ID="FirstNameRequiredValidator" ControlToValidate="FirstName" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="First Name" ID="FirstNameRequiredValidator" ControlToValidate="FirstName" Display="None" />
                         </label>
                         <div>
                             <insite:TextBox ID="FirstName" runat="server" MaxLength="32" Width="100%" />
@@ -31,7 +31,7 @@
                     <div runat="server" id="MiddleNameField" class="form-group mb-3">
                         <label class="form-label" for="<%# MiddleName.ClientID %>">
                             <insite:Literal runat="server" Text="Middle Name" />
-                            <insite:RequiredValidator runat="server" ID="MiddleNameRequiredValidator" ControlToValidate="MiddleName" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" ID="MiddleNameRequiredValidator" ControlToValidate="MiddleName" Display="None" />
                         </label>
                         <div>
                             <insite:TextBox ID="MiddleName" runat="server" MaxLength="32" Width="100%" />
@@ -41,7 +41,7 @@
                     <div runat="server" id="LastNameField" class="form-group mb-3">
                         <label class="form-label" for="<%# LastName.ClientID %>">
                             <insite:Literal runat="server" Text="Last Name" />
-                            <insite:RequiredValidator runat="server" ID="LastNameRequiredValidator" FieldName="Last Name" ControlToValidate="LastName" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" ID="LastNameRequiredValidator" FieldName="Last Name" ControlToValidate="LastName" Display="None" />
                         </label>
                         <div>
                             <insite:TextBox ID="LastName" runat="server" MaxLength="32" Width="100%" />
@@ -51,8 +51,8 @@
                     <div runat="server" id="EmailField" class="form-group mb-3">
                         <label class="form-label" for="<%# Email.ClientID %>">
                             <insite:Literal runat="server" Text="Email" />
-                            <insite:RequiredValidator runat="server" ID="EmailRequiredValidator"  FieldName="Email" ControlToValidate="Email" Display="None" />
-                            <insite:CustomValidator runat="server" ID="EmailUniqueValidator"
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" ID="EmailRequiredValidator"  FieldName="Email" ControlToValidate="Email" Display="None" />
+                            <insite:CustomValidator runat="server" ValidationGroup="WaitingList" ID="EmailUniqueValidator"
                                 ControlToValidate="Email"
                                 Display="None"
                                 ErrorMessage="There is another existing user account with the same Email address" />
@@ -67,7 +67,7 @@
                     <div runat="server" id="BirthdateField" class="form-group mb-3">
                         <label class="form-label" for="<%# Birthdate.ClientID %>">
                             <insite:Literal runat="server" Text="Birthdate" />
-                            <insite:RequiredValidator runat="server" ID="BirthdateRequiredValidator"  FieldName="Birthdate" ControlToValidate="Birthdate" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" ID="BirthdateRequiredValidator"  FieldName="Birthdate" ControlToValidate="Birthdate" Display="None" />
                         </label>
                         <div>
                             <insite:DateSelector ID="Birthdate" runat="server" />
@@ -77,8 +77,8 @@
                     <div runat="server" id="PersonCodeField" class="form-group mb-3">
                         <label class="form-label" for="<%# PersonCode.ClientID %>">
                             <insite:ContentTextLiteral runat="server" ContentLabel="Person Code"/>
-                            <insite:RequiredValidator runat="server" ID="PersonCodeRequiredValidator"  FieldName="Person Code" ControlToValidate="PersonCode" Display="None" />
-                            <insite:CustomValidator runat="server" ID="PersonCodeUniqueValidator"
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" ID="PersonCodeRequiredValidator"  FieldName="Person Code" ControlToValidate="PersonCode" Display="None" />
+                            <insite:CustomValidator runat="server" ValidationGroup="WaitingList" ID="PersonCodeUniqueValidator"
                                 ControlToValidate="PersonCode"
                                 Display="None"
                                 ErrorMessage="Learner ID entered is assigned to another user" />
@@ -94,7 +94,7 @@
                     <div runat="server" id="EmployerField" class="form-group mb-3">
                         <label class="form-label">
                             <insite:Literal runat="server" Text="Employer" />
-                            <insite:RequiredValidator runat="server" ID="EmployerGroupValidator" FieldName="Employer" ControlToValidate="EmployerGroupIdentifier" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" ID="EmployerGroupValidator" FieldName="Employer" ControlToValidate="EmployerGroupIdentifier" Display="None" />
                         </label>
                         <div class="mb-3">
                             <div class="mb-1">
@@ -183,14 +183,14 @@
                     <div class="form-group mb-3">
                         <label class="form-label" for="<%# NewEmployerName.ClientID %>">
                             <insite:Literal runat="server" Text="Name" />
-                            <insite:RequiredValidator runat="server" FieldName="Name" ControlToValidate="NewEmployerName" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="Name" ControlToValidate="NewEmployerName" Display="None" />
                         </label>
                         <insite:TextBox ID="NewEmployerName" runat="server" MaxLength="90" Width="100%" />
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label" for="<%# NewEmployerPhone.ClientID %>">
                             <insite:Literal runat="server" Text="Phone" />
-                            <insite:RequiredValidator runat="server" FieldName="Phone" ControlToValidate="NewEmployerPhone" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="Phone" ControlToValidate="NewEmployerPhone" Display="None" />
                         </label>
                         <insite:TextBox ID="NewEmployerPhone" runat="server" MaxLength="32" Width="100%" />
                     </div>
@@ -198,7 +198,7 @@
                     <div class="form-group mb-3">
                         <label for="<%# NewEmployerStreet1.ClientID %>" class="form-label">
                             <insite:Literal runat="server" Text="Address 1" />
-                            <insite:RequiredValidator runat="server" FieldName="Address 1" ControlToValidate="NewEmployerStreet1" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="Address 1" ControlToValidate="NewEmployerStreet1" Display="None" />
                         </label>
                         <div>
                             <insite:TextBox ID="NewEmployerStreet1" runat="server" MaxLength="128" />
@@ -208,7 +208,7 @@
                     <div class="form-group mb-3">
                         <label for="<%# NewEmployerCity.ClientID %>" class="form-label">
                             <insite:Literal runat="server" Text="City" />
-                            <insite:RequiredValidator runat="server" FieldName="City" ControlToValidate="NewEmployerCity" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="City" ControlToValidate="NewEmployerCity" Display="None" />
                         </label>
                         <div>
                             <insite:TextBox ID="NewEmployerCity" runat="server" MaxLength="128" />
@@ -218,7 +218,7 @@
                     <div class="form-group mb-3">
                         <label for="<%# NewEmployerProvinceSelector.ClientID %>" class="form-label">
                             <insite:Literal runat="server" Text="Province" />
-                            <insite:RequiredValidator runat="server" FieldName="Province" ControlToValidate="NewEmployerProvinceSelector" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="Province" ControlToValidate="NewEmployerProvinceSelector" Display="None" />
                         </label>
                         <div>
                             <insite:ProvinceComboBox ID="NewEmployerProvinceSelector" runat="server" UseCodeAsValue="true" />
@@ -228,7 +228,7 @@
                     <div class="form-group mb-3">
                         <label for="<%# NewEmployerPostalCode.ClientID %>" class="form-label">
                             <insite:Literal runat="server" Text="Postal Code" />
-                            <insite:RequiredValidator runat="server" FieldName="Postal Code" ControlToValidate="NewEmployerPostalCode" Display="None" />
+                            <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="Postal Code" ControlToValidate="NewEmployerPostalCode" Display="None" />
                         </label>
                         <div>
                             <insite:TextBox ID="NewEmployerPostalCode" runat="server" MaxLength="16" />
@@ -254,7 +254,7 @@
                                 <div class="form-group mb-3">
                                     <label class="form-label" for="<%# NewEmployerContactFirstName.ClientID %>">
                                         <insite:Literal runat="server" Text="First Name" />
-                                        <insite:RequiredValidator runat="server" FieldName="First Name" ControlToValidate="NewEmployerContactFirstName" Display="None" />
+                                        <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="First Name" ControlToValidate="NewEmployerContactFirstName" Display="None" />
                                     </label>
                                     <insite:TextBox ID="NewEmployerContactFirstName" runat="server" MaxLength="32" Width="100%" />
                                 </div>
@@ -262,7 +262,7 @@
                                 <div class="form-group mb-3">
                                     <label class="form-label" for="<%# NewEmployerContactLastName.ClientID %>">
                                         <insite:Literal runat="server" Text="Last Name" />
-                                        <insite:RequiredValidator runat="server" FieldName="Last Name" ControlToValidate="NewEmployerContactLastName" Display="None" />
+                                        <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="Last Name" ControlToValidate="NewEmployerContactLastName" Display="None" />
                                     </label>
                                     <insite:TextBox ID="NewEmployerContactLastName" runat="server" MaxLength="32" Width="100%" />
                                 </div>
@@ -270,7 +270,7 @@
                                 <div class="form-group mb-3">
                                     <label class="form-label" for="<%# NewEmployerContactPhone.ClientID %>">
                                         <insite:Literal runat="server" Text="Phone" />
-                                        <insite:RequiredValidator runat="server" FieldName="Phone" ControlToValidate="NewEmployerContactPhone" Display="None" />
+                                        <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="Phone" ControlToValidate="NewEmployerContactPhone" Display="None" />
                                     </label>
                                     <insite:TextBox ID="NewEmployerContactPhone" runat="server" MaxLength="32" Width="100%" />
                                 </div>
@@ -278,7 +278,7 @@
                                 <div class="form-group mb-3">
                                     <label class="form-label" for="<%# NewEmployerContactEmail.ClientID %>">
                                         <insite:Literal runat="server" Text="Email" />
-                                        <insite:RequiredValidator runat="server" FieldName="Email" ControlToValidate="NewEmployerContactEmail" Display="None" />
+                                        <insite:RequiredValidator runat="server" ValidationGroup="WaitingList" FieldName="Email" ControlToValidate="NewEmployerContactEmail" Display="None" />
                                     </label>
                                     <insite:TextBox ID="NewEmployerContactEmail" runat="server" MaxLength="32" Width="100%" />
                                 </div>
@@ -292,7 +292,7 @@
     </div>
 
     <div class="mt-3">
-        <insite:Button runat="server" ID="SaveButton" Text="Add to Waiting List" ButtonStyle="Success" Icon="fas fa-user-plus" />
+        <insite:Button runat="server" ID="SaveButton" Text="Add to Waiting List" ButtonStyle="Success" Icon="fas fa-user-plus" ValidationGroup="WaitingList" DisableAfterClick="true" />
         <insite:CancelButton runat="server" ID="CancelButton" ConfirmText="Are you sure to cancel?" />
     </div>
 

@@ -21,7 +21,7 @@ internal class SpecWorkshopDetailsCreator
     private Dictionary<Guid, List<WorkshopStandard>> _areaCompetencies = default!;
     private Dictionary<Guid, WorkshopStandard> _standards = default!;
 
-    public SpecWorkshop.SpecDetails CreateAsync(Specification spec, WorkshopStandard[] standards)
+    public SpecWorkshop.SpecDetails Create(Specification spec, WorkshopStandard[] standards)
     {
         if (standards.Length == 0)
         {

@@ -46,7 +46,7 @@ namespace InSite.Admin.Issues.Comments.Forms
             if (issue == null || !CaseVisibilityHelper.IsCaseVisible(issue))
                 CommentInfo.RedirectToSearch();
 
-            CaseInfo.BindIssue(issue, User.TimeZone);
+            CaseInfo.BindIssue(issue);
             CommentInfo.SetInputValues(issue, null);
             CancelButton.NavigateUrl = CommentInfo.GetReaderUrl();
         }

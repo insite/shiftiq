@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.SqlServer;
 using System.Linq;
@@ -132,6 +132,9 @@ namespace InSite.Persistence
 
             if (filter.MembershipFunction.IsNotEmpty())
                 query = query.Where(x => x.MembershipFunction == filter.MembershipFunction);
+
+            if (filter.GroupType.IsNotEmpty())
+                query = query.Where(x => x.Group.GroupType == filter.GroupType);
 
             if (filter.GroupIdentifiers.IsNotEmpty())
             {

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Shift.Common
 {
     /// <summary>
-    /// Defines a query with a strongly-typed result.
+    /// Defines a query.
     /// </summary>
-    public interface IQuery<TResult>
+    public interface IQuery
     {
         /// <summary>
         /// Unique identifier for the query (optional).
@@ -46,7 +46,7 @@ namespace Shift.Common
     /// <summary>
     /// Base class implementation for the IQuery interface.
     /// </summary>
-    public class Query<TResult> : IQuery<TResult>
+    public class Query<TResult> : IQuery
     {
         public Guid? Identifier { get; set; }
 
@@ -65,13 +65,13 @@ namespace Shift.Common
 
     public interface IQueryRunner
     {
-        TResult Run<TResult>(IQuery<TResult> query);
+        TResult Run<TResult>(IQuery query);
 
         bool CanRun(Type queryType);
     }
 
     public interface IQueryDispatcher
     {
-        TResult Dispatch<TResult>(IQuery<TResult> query);
+        TResult Dispatch<TResult>(IQuery query);
     }
 }

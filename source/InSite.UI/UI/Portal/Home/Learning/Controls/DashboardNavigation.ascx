@@ -4,15 +4,15 @@
 
     <a class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/learning/dashboard/home">
         <i class="fas fa-home fs-lg opacity-60 me-2"></i>
-        My SkillsChecks
+        <asp:Literal runat="server" ID="MySkillsCheckLiteral" Text="My SkillsChecks" />
     </a>
 
-    <a class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/learning/dashboard/badges">
+    <a runat="server" id="MyBadgesLink" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/learning/dashboard/badges">
         <i class="fas fa-copy fs-lg opacity-60 me-2"></i>
         My Badges
     </a>
 
-    <a class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/learning/dashboard/catalog">
+    <a runat="server" id="CatalogueLink" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/learning/dashboard/catalog">
         <i class="fas fa-check fs-lg opacity-60 me-2"></i>
         SkillsCheck Catalogue
     </a>

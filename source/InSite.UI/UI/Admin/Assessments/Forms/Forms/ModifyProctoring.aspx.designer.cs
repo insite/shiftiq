@@ -42,6 +42,15 @@ namespace InSite.Admin.Assessments.Forms.Forms
         protected global::InSite.Common.Web.UI.Alert EditorStatus;
 
         /// <summary>
+        /// AIProctoringEnabled control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox AIProctoringEnabled;
+
+        /// <summary>
         /// IsSafeExamBrowserRequired control.
         /// </summary>
         /// <remarks>

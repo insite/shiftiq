@@ -10,10 +10,6 @@
             background-color: #FFFFE0FF;
             cursor: pointer;
         }
-
-        & > p {
-            margin: 0;
-        }
     }
 
     & > div {

@@ -35,8 +35,8 @@ namespace InSite.UI.Admin.Records.Logbooks.Competencies
         private void DeleteButton_Click(object sender, EventArgs e)
         {
             var experienceCompetency = ServiceLocator.JournalSearch.GetExperienceCompetency(ExperienceIdentifier, CompetencyIdentifier, x => x.Experience);
-
-            ServiceLocator.SendCommand(new DeleteExperienceCompetency(experienceCompetency.Experience.JournalIdentifier, ExperienceIdentifier, CompetencyIdentifier));
+            if (experienceCompetency != null)
+                ServiceLocator.SendCommand(new DeleteExperienceCompetency(experienceCompetency.Experience.JournalIdentifier, ExperienceIdentifier, CompetencyIdentifier));
 
             HttpResponseHelper.Redirect(GetParentUrl(null));
         }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Contacts.Read;
 using InSite.Application.Groups.Write;
 using InSite.Application.Messages.Read;
@@ -18,6 +16,7 @@ using InSite.Web.Data;
 using InSite.Web.Security;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.UI.Admin.Contacts.Groups.Forms
@@ -301,17 +300,30 @@ namespace InSite.UI.Admin.Contacts.Groups.Forms
 
             foreach (var membership2 in memberships2)
             {
-                var membership1 = memberships1.FirstOrDefault(x => x.UserIdentifier == membership2.UserIdentifier);
+                var membership1 = memberships1
+                    .FirstOrDefault(x => x.UserIdentifier == membership2.UserIdentifier
+                                      && x.OrganizationIdentifier == membership2.OrganizationIdentifier);
 
                 MembershipStore.Delete(membership2);
 
-                if (canAddMembership &&
-                    (membership1 == null || membership1.MembershipType.IsEmpty() && membership2.MembershipType.IsNotEmpty())
-                    )
+                if (!canAddMembership)
+                    continue;
+
+                if (membership1 != null)
                 {
-                    membership2.GroupIdentifier = g1.GroupIdentifier;
-                    MembershipHelper.Save(membership2, false, false);
+                    if (membership1.MembershipType.IsNotEmpty() || membership2.MembershipType.IsEmpty())
+                        continue;
+
+                    membership2.MembershipIdentifier = membership1.MembershipIdentifier;
                 }
+                else
+                {
+                    membership2.MembershipIdentifier = Guid.Empty;
+                }
+
+                membership2.GroupIdentifier = g1.GroupIdentifier;
+
+                MembershipStore.Save(membership2, modifyFunction: true, modifyExpiry: true, matchOrganization: true);
             }
         }
 

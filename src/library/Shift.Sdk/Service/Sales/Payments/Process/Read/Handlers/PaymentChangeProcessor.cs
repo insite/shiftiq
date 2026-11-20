@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Net;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Gateways.Write;
 using InSite.Application.Invoices.Read;
 using InSite.Application.Invoices.Write;
@@ -13,6 +11,7 @@ using InSite.Domain.Payments;
 using Newtonsoft.Json;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 using Shift.Constant;
 
 namespace InSite.Application.Payments.Read
@@ -121,17 +120,17 @@ namespace InSite.Application.Payments.Read
 
         private void Handle(PaymentCompleted e)
         {
-            if (e.Response.Approved)
-            {
-                var payment = _payments.GetPayment(e.Payment);
-                var paymentSum = _payments
-                    .GetPayments(new QPaymentFilter { InvoiceIdentifier = payment.InvoiceIdentifier, Approved = true })
-                    .Sum(x => x.PaymentAmount);
+            if (!e.Response.Approved)
+                return;
 
-                var invoice = _invoices.GetInvoice(payment.InvoiceIdentifier);
-                if (paymentSum >= invoice.InvoiceAmount)
-                    _commander.Send(new PayInvoice(payment.InvoiceIdentifier, DateTimeOffset.UtcNow));
-            }
+            var payment = _payments.GetPayment(e.Payment);
+            var paymentSum = _payments
+                .GetPayments(new QPaymentFilter { InvoiceIdentifier = payment.InvoiceIdentifier, Approved = true })
+                .Sum(x => x.PaymentAmount);
+
+            var totalAmount = _invoices.GetInvoiceTotalAmount(payment.InvoiceIdentifier);
+            if (paymentSum >= totalAmount)
+                _commander.Send(new PayInvoice(payment.InvoiceIdentifier, DateTimeOffset.UtcNow));
         }
 
         private void Handle(PaymentAborted e)

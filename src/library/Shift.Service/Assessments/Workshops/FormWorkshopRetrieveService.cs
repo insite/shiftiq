@@ -32,7 +32,7 @@ public class FormWorkshopRetrieveService(
         Guid? questionId,
         string? publicationStatus,
         bool enableQuestionSubCompetencySelection,
-        TimeZoneInfo timeZone
+        string timeZone
         )
     {
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
@@ -46,7 +46,7 @@ public class FormWorkshopRetrieveService(
         result.BankId = bankId;
         result.Details = await new FormWorkshopDetailsCreator(standardReader).CreateAsync(bank, form, publicationStatus);
         result.Statistics = await new FormWorkshopStatisticsCreator(standardReader).CreateAsync(bank, form.GetQuestions(), enableQuestionSubCompetencySelection);
-        result.Comments = await commentCreator.CreateAsync(comments, true);
+        result.Comments = await commentCreator.CreateAsync(comments, true, WorkshopCommentCreator.SortOrder.NewestToOldest);
         result.Attachments = await new WorkshopAttachmentCreator(userReader, uploadReader, fileReader, changeReader, storageService).CreateAsync(bank);
         result.ProblemQuestions = WorkshopProblemQuestionCreator.Create(form.GetQuestions());
         
@@ -56,7 +56,7 @@ public class FormWorkshopRetrieveService(
         return result;
     }
 
-    public async Task<FormWorkshop.Section?> RetrieveSectionAsync(Guid bankId, Guid sectionId, TimeZoneInfo timeZone)
+    public async Task<FormWorkshop.Section?> RetrieveSectionAsync(Guid bankId, Guid sectionId, string timeZone)
     {
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
         var section = bank.FindSection(sectionId);
@@ -83,7 +83,7 @@ public class FormWorkshopRetrieveService(
         };
     }
 
-    public async Task<WorkshopQuestionComments> RetrieveQuestionCommentsAsync(Guid bankId, Guid fieldId, TimeZoneInfo timeZone)
+    public async Task<WorkshopQuestionComments> RetrieveQuestionCommentsAsync(Guid bankId, Guid fieldId, string timeZone)
     {
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
         var field = bank.FindField(fieldId);

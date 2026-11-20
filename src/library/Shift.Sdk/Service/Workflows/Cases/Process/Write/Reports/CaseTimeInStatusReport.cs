@@ -39,7 +39,7 @@ namespace InSite.Application.Issues.Write
         private readonly IStorageService _storageService;
 
         private Guid _organizationId;
-        private TimeZoneInfo _timeZone;
+        private string _timeZone;
         private Dictionary<Guid, string> _statuseNames;
         private HashSet<Guid> _openStatuses;
         private List<string> _orderedStatuses;
@@ -58,7 +58,7 @@ namespace InSite.Application.Issues.Write
             _organizationId = organizationId;
 
             var organization = _organizationSearch.GetModel(_organizationId);
-            _timeZone = organization.TimeZone;
+            _timeZone = TimeZones.IsValidZone(organization.TimeZone) ? organization.TimeZone : TimeZones.Ids.Utc;
 
             GetStatuses(caseTypes);
 
@@ -114,7 +114,7 @@ namespace InSite.Application.Issues.Write
 
             if (value.HasValue)
             {
-                var converted = TimeZones.ConvertFromUtc(value.Value, _timeZone);
+                var converted = TimeZones.ConvertTime(value.Value, _timeZone);
                 text = $"{converted:yyyy-MM-dd}";
             }
             else

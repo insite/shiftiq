@@ -1,12 +1,13 @@
 ﻿using System;
 
+using Shift.Common;
+using Shift.Constant;
 using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
 
+using InSite.Application.Assets.Read;
 using InSite.Domain.Banks;
-
-using Shift.Common;
-using Shift.Constant;
+using Shift.Contract;
 
 namespace InSite.Application.Banks.Write
 {
@@ -14,8 +15,9 @@ namespace InSite.Application.Banks.Write
     {
         private readonly IChangeQueue _publisher;
         private readonly IChangeRepository _repository;
+        private readonly ISearchStore _searchStore;
 
-        public BankCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository)
+        public BankCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository, ISearchStore searchStore)
         {
             commander.Subscribe<MemorizeBank>(Handle);
             commander.Subscribe<AddAttachment>(Handle);
@@ -159,6 +161,7 @@ namespace InSite.Application.Banks.Write
 
             _publisher = publisher;
             _repository = repository;
+            _searchStore = searchStore;
         }
 
         private void Commit(BankAggregate aggregate, ICommand c)
@@ -338,6 +341,8 @@ namespace InSite.Application.Banks.Write
             var aggregate = _repository.Get<BankAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
             aggregate.DeleteBank();
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(aggregate.Data.Tenant, c.AggregateIdentifier, SearchObjectType.Bank);
         }
 
         public void Handle(ConnectFormMessage c)
@@ -818,6 +823,8 @@ namespace InSite.Application.Banks.Write
             aggregate.OpenBank(c.Bank);
 
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(aggregate.Data.Tenant, c.AggregateIdentifier, SearchObjectType.Bank);
         }
 
         public void Handle(DeleteQuestionLikertColumn c)
@@ -1157,9 +1164,12 @@ namespace InSite.Application.Banks.Write
         public void Handle(RenameBank c)
         {
             var aggregate = _repository.Get<BankAggregate>(c.AggregateIdentifier, c.ExpectedVersion);
-            aggregate.RenameBank(c.Name);
+            var isChanged = aggregate.RenameBank(c.Name);
 
             Commit(aggregate, c);
+
+            if (isChanged)
+                _searchStore.EnqueueSearchObject(aggregate.Data.Tenant, c.AggregateIdentifier, SearchObjectType.Bank);
         }
 
         public void Handle(RenameSet c)

@@ -60,6 +60,7 @@ namespace InSite.Persistence
             Property(x => x.IntegrationWithholdGrades).IsRequired();
             Property(x => x.DisplayOnCalendar).IsRequired();
             Property(x => x.InvigilatorMinimum).IsOptional();
+            Property(x => x.FormAttachmentLimit).IsOptional();
             Property(x => x.LastChangeTime).IsOptional();
             Property(x => x.LastChangeType).IsOptional().IsUnicode(false).HasMaxLength(100);
             Property(x => x.LastChangeUser).IsOptional().IsUnicode(false).HasMaxLength(100);

@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { SpecWorkshopState } from "./states/SpecWorkshopState";
+import { SpecWorkshopDetails } from "./models/SpecWorkshopDetails";
 
 type ContextData = SpecWorkshopState & {
     initState(state: SpecWorkshopState): void;
@@ -9,6 +10,7 @@ type ContextData = SpecWorkshopState & {
     modifyTax1Count(criterionId: string, standardId: string, tax1Count: number | null): void;
     modifyTax2Count(criterionId: string, standardId: string, tax2Count: number | null): void;
     modifyTax3Count(criterionId: string, standardId: string, tax3Count: number | null): void;
+    modifyDetails(details: SpecWorkshopDetails): void;
 }
 
 export const SpecWorkshopProviderContext = createContext<ContextData>({
@@ -23,6 +25,7 @@ export const SpecWorkshopProviderContext = createContext<ContextData>({
     modifyTax1Count() {},
     modifyTax2Count() {},
     modifyTax3Count() {},
+    modifyDetails() {},
 });
 
 export function criterionWeightToPercent(weight: number): number {

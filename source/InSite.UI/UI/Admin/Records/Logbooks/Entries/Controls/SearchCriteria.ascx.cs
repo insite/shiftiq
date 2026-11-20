@@ -1,6 +1,7 @@
 ﻿using System;
 
 using InSite.Application.Records.Read;
+using InSite.Common;
 using InSite.Common.Web.UI;
 
 namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
@@ -73,6 +74,8 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
+            Hours.EmptyMessage = LabelHelper.GetLabelContentText("Logbooks.Hours");
 
             DepartmentIdentifier.AutoPostBack = true;
             DepartmentIdentifier.OrganizationIdentifier = Organization.Identifier;

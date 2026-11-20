@@ -15,6 +15,42 @@ namespace InSite.UI.Portal.Billing.Controls
     {
 
         /// <summary>
+        /// TaxPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl TaxPanel;
+
+        /// <summary>
+        /// SubtotalDisplay control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal SubtotalDisplay;
+
+        /// <summary>
+        /// TaxRateDisplay control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal TaxRateDisplay;
+
+        /// <summary>
+        /// TaxAmountDisplay control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal TaxAmountDisplay;
+
+        /// <summary>
         /// PaymentAmountPanel control.
         /// </summary>
         /// <remarks>

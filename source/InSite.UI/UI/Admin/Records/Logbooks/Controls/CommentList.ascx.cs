@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
@@ -44,7 +44,7 @@ namespace InSite.Admin.Records.Logbooks.Controls
                 .Select(x =>
                 {
 
-                    var posted = TimeZoneInfo.ConvertTime(x.CommentPosted, User.TimeZone);
+                    var posted = TimeZones.ConvertTime(x.CommentPosted, User.TimeZone);
 
                     return new
                     {

@@ -12,6 +12,7 @@ public partial class UserEntity
     public ICollection<PersonEntity> People { get; set; } = new List<PersonEntity>();
     public ICollection<FileEntity> Files { get; set; } = new List<FileEntity>();
     public ICollection<CredentialEntity> Credentials { get; set; } = new List<CredentialEntity>();
+    public ICollection<RegistrationEntity> CandidateRegistrations { get; set; } = new List<RegistrationEntity>();
 
     public Guid UserIdentifier { get; set; }
 

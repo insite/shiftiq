@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using InSite.Application.Contacts.Read;
@@ -25,6 +25,7 @@ namespace InSite.Application.Contents.Read
         bool Save(string type, Guid container, string label, string value, string language, Guid organization);
 
         void SaveContainer(Guid organization, string type, Guid container, ContentContainer data);
+        void SaveContainers(Guid organization, string type, IEnumerable<KeyValuePair<Guid, ContentContainer>> containers);
         bool SaveContainer(Guid organization, string type, Guid container, string label, string value, string language = Language.Default);
 
         void DuplicateContainer(Guid source, Guid destination);

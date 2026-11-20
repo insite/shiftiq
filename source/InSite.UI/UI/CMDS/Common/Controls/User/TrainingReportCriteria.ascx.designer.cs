@@ -24,6 +24,24 @@ namespace InSite.Cmds.Controls.Reporting.Report
         protected global::InSite.Common.Web.UI.CustomValidator AchievementSelectorValidator;
 
         /// <summary>
+        /// DivisionPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DivisionPanel;
+
+        /// <summary>
+        /// DivisionIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DivisionComboBox DivisionIdentifier;
+
+        /// <summary>
         /// FindDepartment control.
         /// </summary>
         /// <remarks>

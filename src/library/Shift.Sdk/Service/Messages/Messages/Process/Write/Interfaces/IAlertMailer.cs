@@ -14,6 +14,7 @@ namespace InSite.Application.Messages.Write
 
         Guid[] Send(Notification notification);
         Guid[] Send(Notification notification, Guid? to);
+        Guid[] Send(Notification notification, Guid[] to, Guid[] cc, Guid[] bcc = null);
 
         // Old approach
 
@@ -37,7 +38,8 @@ namespace InSite.Application.Messages.Write
         void Send(Guid organizationId, Guid userId, AlertPersonCodeNotEntered alert);
         void Send(Guid organizationId, Guid userId, AlertJobsCandidateContactRequested alert);
         void Send(Guid organizationId, Guid userId, AlertJobsCandidateAppliedForOpportunity alert, string[] attachments);
-        void Send(Guid organizationId, Guid userId, AlertUserAccountWelcomed alert, Guid[] cc = null, Guid[] bcc = null);
+        void Send(Guid organizationId, Guid userId, AlertUserAccountWelcomed alert,
+            Guid[] cc = null, Guid[] bcc = null, string subject = null, string body = null);
         void Send(Guid organizationId, Guid userId, AlertManagementWelcomeEmail alert, Guid[] cc = null, Guid[] bcc = null);
         void Send(Guid organizationId, Guid userId, AlertUserEmailVerificationRequested alert);
         void Send(Guid organizationId, Guid userId, AlertUserRegistrationSubmitted alert);

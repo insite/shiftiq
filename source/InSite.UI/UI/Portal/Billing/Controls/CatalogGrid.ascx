@@ -4,7 +4,10 @@
     <HeaderTemplate><div class="catalog-grid"></HeaderTemplate>
     <FooterTemplate></div></FooterTemplate>
     <ItemTemplate>
-        <div class="product-card">
+        <div class="product-card"
+            data-industry='<%# Eval("IndustryItemIdentifier") %>'
+            data-occupation='<%# Eval("OccupationItemIdentifier") %>'
+            data-level='<%# Eval("LevelItemIdentifier") %>'>
 
             <div
                 class="product-media"
@@ -27,7 +30,7 @@
 
                     <asp:PlaceHolder ID="SubscribeTitle" runat="server" Visible="false">
                         <div class="d-flex flex-column text-center">
-                            <span class="text-success fw-semibold">Subscribe &amp; Choose Later</span>
+                            <span class="text-success fw-semibold"><asp:Literal ID="SubTitle" runat="server" /></span>
                             <span class="fw-semibold text-secondary"><asp:Literal ID="SubName" runat="server" /></span>
                             <span class="text-muted"><asp:Literal ID="SubPack" runat="server" /></span>
                         </div>

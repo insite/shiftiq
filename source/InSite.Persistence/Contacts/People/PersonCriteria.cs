@@ -135,7 +135,8 @@ namespace InSite.Persistence
                         SessionCount = db.TUserSessions.Count(y => y.UserIdentifier == x.UserIdentifier && y.SessionIsAuthenticated),
                         PersonCode = x.PersonCode,
                         LastAuthenticated = x.LastAuthenticated,
-                        Region = x.Region
+                        Region = x.Region,
+                        Language = x.Language
                     })
                     .OrderBy(sortExpression)
                     .ApplyPaging(filter)
@@ -315,6 +316,9 @@ namespace InSite.Persistence
 
             if (filter.CodeNotExact.IsNotEmpty())
                 predicate = predicate.And(x => x.PersonCode != filter.CodeNotExact);
+
+            if (filter.Language.IsNotEmpty())
+                predicate = predicate.And(x => x.Language == filter.Language);
 
             if (filter.FullName.HasValue())
             {

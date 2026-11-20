@@ -20,6 +20,9 @@
     }
 
     .question-grid {
+        width: 100%;
+        table-layout: fixed;
+
         > tbody > tr > td {
             padding: 20px 0 20px 20px;
             vertical-align: top;
@@ -46,8 +49,25 @@
             white-space: nowrap;
         }
 
+        .question-flag {
+            width:180px;
+        }
+        .InlineEditor[data-editor-visible="true"]:has(.question-flag) {
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--ar-box-shadow-lg);
+            background-color: #fff;
+            z-index: 1;
+        }
+
         .option-grid {
             margin-left: 10px;
+            max-width: 100%;
+
+            &:has(.option-title .InlineEditor[data-editor-visible="true"]) {
+                width: calc(100% - 10px);
+                table-layout: fixed;
+            }
 
             td,
             th {
@@ -56,6 +76,17 @@
             }
 
             & > tbody {
+                > tr {
+                    > :first-child,
+                    > :has(+ .option-title) {
+                        width: 2rem;
+                    }
+
+                    > :last-child {
+                        width: 7rem;
+                    }
+                }
+
                 td,
                 th {
                     height: 52px;
@@ -64,8 +95,16 @@
                         padding-top: 8px;
                     }
 
-                    &.option-title .InlineEditor textarea {
-                        width: 400px;
+                    &.option-title .InlineEditor {
+                        textarea {
+                            flex: 0 1 400px;
+                            width: 400px;
+                            min-width: 0;
+                        }
+
+                        .edit-buttons {
+                            flex-shrink: 0;
+                        }
                     }
                 }
             }
@@ -74,6 +113,7 @@
 
     .question-right-cell {
         width: 340px;
+        min-width: 340px;
     }
 
     .option-points,

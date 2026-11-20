@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Web.UI.WebControls;
 
+using InSite.Application.Banks.Read;
 using InSite.Application.People.Write;
 using InSite.Application.Registrations.Read;
 using InSite.Application.Registrations.Write;
@@ -19,6 +22,20 @@ namespace InSite.UI.Lobby
 {
     public class LoginController
     {
+        private sealed class RegistrationMatch
+        {
+            public QRegistration Registration { get; }
+            public Guid? ExamFormIdentifier { get; }
+            public QBankForm Form { get; }
+
+            public RegistrationMatch(QRegistration registration, Guid? examFormIdentifier, QBankForm form)
+            {
+                Registration = registration;
+                ExamFormIdentifier = examFormIdentifier;
+                Form = form;
+            }
+        }
+
         private readonly OrganizationState _organization;
         private readonly Literal _errorMessage;
 
@@ -32,13 +49,13 @@ namespace InSite.UI.Lobby
         {
             var person = GetPerson(personCode);
 
-            var registration = ValidateAndGetRegistration(personCode, passcode, person, _organization);
-            if (registration == null)
+            var match = ValidateAndGetRegistration(personCode, passcode, person, _organization);
+            if (match == null)
                 return;
 
-            AutoAuthenticateUser(personCode, person, registration);
+            AutoAuthenticateUser(personCode, person, match.Registration);
 
-            var url = AttemptHelper.GetRegistrationStartUrl(registration.RegistrationIdentifier);
+            var url = AttemptHelper.GetRegistrationStartUrl(match.Registration.RegistrationIdentifier, match.ExamFormIdentifier);
 
             HttpResponseHelper.Redirect(url, true);
         }
@@ -87,7 +104,7 @@ namespace InSite.UI.Lobby
             AccountHelper.WriteLoginEvent(AuthenticationResult.Success, person.User, _organization.Identifier, AuthenticationSource.ShiftIqExamEvent);
         }
 
-        private QRegistration ValidateAndGetRegistration(string learner, string passcode, Person person, OrganizationState organization)
+        private RegistrationMatch ValidateAndGetRegistration(string learner, string passcode, Person person, OrganizationState organization)
         {
             string error = null;
 
@@ -98,29 +115,37 @@ namespace InSite.UI.Lobby
                 return null;
             }
 
+            var multipleFormsAllowed = organization.Toolkits?.Events?.AllowMultipleAssessmentForms == true;
+
+            var includes = new List<Expression<Func<QRegistration, object>>>
+            {
+                x => x.Event,
+                x => x.Event.GradebookEvents.Select(y => y.Gradebook), // Needed for GetClassStatus()
+                x => x.Form,
+                x => x.Accommodations
+            };
+
+            if (multipleFormsAllowed)
+                includes.Add(x => x.ExamForms.Select(y => y.Form));
+
             var registrations = ServiceLocator.RegistrationSearch
-                .GetRegistrationsByCandidate(person.UserIdentifier,
-                    x => x.Event,
-                    x => x.Event.GradebookEvents.Select(y => y.Gradebook), // Needed for GetClassStatus()
-                    x => x.Form,
-                    x => x.Accommodations
-                )
-                .Where(x => x.RegistrationPassword == passcode)
-                .ToList();
+                .GetRegistrationsByCandidate(person.UserIdentifier, includes.ToArray());
 
-            QRegistration registration = null;
+            var matches = GetMatches(registrations, passcode, multipleFormsAllowed);
 
-            if (registrations.Count == 0)
+            RegistrationMatch match = null;
+
+            if (matches.Count == 0)
                 error = $"The exam event password <strong>{passcode}</strong> does not match the registration for your current exam.";
-            else if (registrations.Count > 1)
+            else if (matches.Count > 1)
                 error = $"The exam event password <strong>{passcode}</strong> matches multiple registrations for your current exam.";
             else
             {
-                registration = registrations[0];
+                match = matches[0];
 
-                var validationModel = GetValidationModel(person, registration, organization);
+                var validationModel = GetValidationModel(person, match, organization);
 
-                error = StringHelper.Equals(registration.Event.EventType, "Class")
+                error = StringHelper.Equals(match.Registration.Event.EventType, "Class")
                     ? new ClassEventValidator().Validate(validationModel)
                     : new ExamEventValidator().Validate(validationModel);
             }
@@ -131,11 +156,36 @@ namespace InSite.UI.Lobby
                 return null;
             }
 
-            return registration;
+            return match;
         }
 
-        private EventValidationModel GetValidationModel(Person person, QRegistration registration, OrganizationState organization)
+        private static List<RegistrationMatch> GetMatches(List<QRegistration> registrations, string passcode, bool multipleFormsAllowed)
         {
+            var matches = new List<RegistrationMatch>();
+
+            foreach (var registration in registrations)
+            {
+                if (registration.RegistrationPassword == passcode)
+                    matches.Add(new RegistrationMatch(registration, registration.ExamFormIdentifier, registration.Form));
+
+                if (!multipleFormsAllowed)
+                    continue;
+
+                var examForms = registration.ExamForms.EmptyIfNull()
+                    .Where(x => x.Password == passcode)
+                    .OrderBy(x => x.Sequence);
+
+                foreach (var examForm in examForms)
+                    matches.Add(new RegistrationMatch(registration, examForm.ExamFormIdentifier, examForm.Form));
+            }
+
+            return matches;
+        }
+
+        private EventValidationModel GetValidationModel(Person person, RegistrationMatch match, OrganizationState organization)
+        {
+            var registration = match.Registration;
+
             var model = new EventValidationModel
             {
                 ApprovalStatus = registration.ApprovalStatus,
@@ -144,10 +194,10 @@ namespace InSite.UI.Lobby
                 EventFormat = registration.Event?.EventFormat,
                 EventSchedulingStatus = registration.Event?.EventSchedulingStatus,
                 EventScheduledStart = registration.Event?.EventScheduledStart ?? DateTimeOffset.UtcNow,
-                ExamFormIdentifier = registration.ExamFormIdentifier,
-                HasForm = registration.Form != null,
-                AssessmentCount = registration.Form != null
-                    ? ServiceLocator.PageSearch.Count(x => x.ObjectType == "Assessment" && x.ObjectIdentifier == registration.ExamFormIdentifier.Value)
+                ExamFormIdentifier = match.ExamFormIdentifier,
+                HasForm = match.Form != null,
+                AssessmentCount = match.Form != null
+                    ? ServiceLocator.PageSearch.Count(x => x.ObjectType == "Assessment" && x.ObjectIdentifier == match.ExamFormIdentifier.Value)
                     : 0,
                 HasAccommodations = registration.Accommodations != null,
                 HasResumeInterruptedOnlineExam = registration.Accommodations != null

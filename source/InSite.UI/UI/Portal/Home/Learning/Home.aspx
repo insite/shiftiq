@@ -39,7 +39,9 @@
 
     <div runat="server" id="NoCoursesPanel" class="alert alert-info" role="alert">
         <div class="d-flex align-items-center">
-            Your SkillsCheck is on its way, please keep an eye out for an email confirming once it has been assigned.
+            Your
+            <asp:Literal runat="server" ID="SkillsCheckLiteral" Text="SkillsCheck" />
+            is on its way, please keep an eye out for an email confirming once it has been assigned.
         </div>
     </div>
 

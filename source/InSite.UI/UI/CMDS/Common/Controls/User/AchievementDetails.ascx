@@ -44,6 +44,9 @@
                     <div>
                         <insite:CheckBox ID="IsTimeSensitive" runat="server" Text="This achievement is time-sensitive" SubText="(it expires after a set period)" onclick="showHideDateExpired();" />
                     </div>
+                    <div>
+                        <insite:CheckBox ID="IssuesCertificate" runat="server" Text="Completion of this achievement issues a certificate" />
+                    </div>
                 </div>
                 <div runat="server" ID="RowValidForCount" style="display:none;" class="form-group mb-3">
                     <label class="form-label">

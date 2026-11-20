@@ -20,11 +20,11 @@ namespace Shift.Common
         /// <summary>
         /// Returns a deserialized query.
         /// </summary>
-        public IQuery<TResult> Deserialize<TResult>(Type queryType, string queryCriteria)
+        public IQuery Deserialize<TResult>(Type queryType, string queryCriteria)
         {
             try
             {
-                var queryObject = _serializer.Deserialize<IQuery<TResult>>(queryType, queryCriteria, JsonPurpose.Storage);
+                var queryObject = _serializer.Deserialize<IQuery>(queryType, queryCriteria, JsonPurpose.Storage);
 
                 if (queryObject != null)
                 {
@@ -48,11 +48,11 @@ namespace Shift.Common
         /// <summary>
         /// Returns a deserialized query.
         /// </summary>
-        public IQuery<TResult> Deserialize<TResult>(SerializedQuery query)
+        public IQuery Deserialize<TResult>(SerializedQuery query)
         {
             try
             {
-                var criteria = _serializer.Deserialize<IQuery<TResult>>(Type.GetType(query.Class), query.Criteria, JsonPurpose.Storage);
+                var criteria = _serializer.Deserialize<IQuery>(Type.GetType(query.Class), query.Criteria, JsonPurpose.Storage);
 
                 criteria.Identifier = query.Identifier;
 
@@ -79,7 +79,7 @@ namespace Shift.Common
         /// <summary>
         /// Returns a serialized query.
         /// </summary>
-        public SerializedQuery Serialize<TResult>(IQuery<TResult> query)
+        public SerializedQuery Serialize<TResult>(IQuery query)
         {
             var id = query.Identifier ?? Guid.Empty;
 

@@ -10,6 +10,8 @@ namespace InSite.Application.Invoices.Read
         public Guid OrganizationIdentifier { get; set; }
 
         public string ItemDescription { get; set; }
+        public string TaxCountry { get; set; }
+        public string TaxRegion { get; set; }
 
         public int ItemQuantity { get; set; }
         public int ItemSequence { get; set; }

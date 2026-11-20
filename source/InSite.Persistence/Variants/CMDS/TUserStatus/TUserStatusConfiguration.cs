@@ -12,7 +12,7 @@ namespace InSite.Persistence.Plugin.CMDS
             HasKey(x => x.JoinIdentifier);
 
             Property(x => x.JoinIdentifier).IsRequired();
-            Property(x => x.AsAt).IsRequired();
+            Property(x => x.AsAt).IsRequired().HasColumnType("date");
             Property(x => x.CountCP).IsRequired();
             Property(x => x.CountEX).IsRequired();
             Property(x => x.CountNA).IsRequired();

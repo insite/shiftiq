@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using Shift.Common.Timeline.Commands;
@@ -70,6 +70,9 @@ namespace InSite.Admin.Records.Logbooks
             LearnerAddedMessageIdentifier.Filter.Type = MessageTypeName.Notification;
             LearnerAddedMessageIdentifier.Value = journalSetup.LearnerAddedMessageIdentifier;
 
+            SupervisorMessageIdentifier.Filter.Type = MessageTypeName.Notification;
+            SupervisorMessageIdentifier.Value = journalSetup.SupervisorMessageIdentifier;
+
             CancelButton.NavigateUrl = $"/ui/admin/records/logbooks/outline?journalsetup={JournalSetupIdentifier}&panel=setup";
         }
 
@@ -104,7 +107,8 @@ namespace InSite.Admin.Records.Logbooks
                         JournalSetupIdentifier,
                         ValidatorMessageIdentifier.Value,
                         LearnerMessageIdentifier.Value,
-                        LearnerAddedMessageIdentifier.Value
+                        LearnerAddedMessageIdentifier.Value,
+                        SupervisorMessageIdentifier.Value
                 )
             };
 

@@ -31,7 +31,7 @@ public class SpecWorkshopRetrieveService(
         Guid specificationId,
         Guid? setId,
         Guid? questionId,
-        TimeZoneInfo timeZone
+        string timeZone
         )
     {
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
@@ -45,8 +45,8 @@ public class SpecWorkshopRetrieveService(
         var result = new SpecWorkshop();
         result.BankId = bankId;
         result.Standards = standards;
-        result.Details = new SpecWorkshopDetailsCreator().CreateAsync(spec, standards);
-        result.Comments = await commentCreator.CreateAsync(comments, true);
+        result.Details = new SpecWorkshopDetailsCreator().Create(spec, standards);
+        result.Comments = await commentCreator.CreateAsync(comments, true, WorkshopCommentCreator.SortOrder.NewestToOldest);
         result.Attachments = await new WorkshopAttachmentCreator(userReader, uploadReader, fileReader, changeReader, storageService).CreateAsync(bank);
         result.ProblemQuestions = WorkshopProblemQuestionCreator.Create(spec.Bank.Sets.SelectMany(x => x.Questions));
 
@@ -56,7 +56,23 @@ public class SpecWorkshopRetrieveService(
         return result;
     }
 
-    public async Task<SpecWorkshop.Set?> RetrieveSpecSetAsync(Guid bankId, Guid specificationId, Guid setId, TimeZoneInfo timeZone)
+    public async Task<SpecWorkshopPartial> RetrievePartialAsync(Guid bankId, Guid specificationId)
+    {
+        var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
+        var spec = bank.FindSpecification(specificationId);
+        
+        var standards = await new SpecWorkshopStandardCreator(standardReader).CreateAsync(spec);
+        var details = new SpecWorkshopDetailsCreator().Create(spec, standards);
+        var problemQuestions = WorkshopProblemQuestionCreator.Create(spec.Bank.Sets.SelectMany(x => x.Questions));
+
+        return new SpecWorkshopPartial
+        {
+            Details = details,
+            ProblemQuestions = problemQuestions
+        };
+    }
+
+    public async Task<SpecWorkshop.Set?> RetrieveSpecSetAsync(Guid bankId, Guid specificationId, Guid setId, string timeZone)
     {
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
         var spec = bank.FindSpecification(specificationId);
@@ -72,7 +88,7 @@ public class SpecWorkshopRetrieveService(
         return await new WorkshopQuestionCreator(bank, standardReader, questionReader, collectionItemReader).CreateSetDataAsync(set, commentCreator);
     }
 
-    public async Task<WorkshopQuestionComments> RetrieveQuestionCommentsAsync(Guid bankId, Guid questionId, TimeZoneInfo timeZone)
+    public async Task<WorkshopQuestionComments> RetrieveQuestionCommentsAsync(Guid bankId, Guid questionId, string timeZone)
     {
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
         var question = bank.FindQuestion(questionId);

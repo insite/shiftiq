@@ -34,5 +34,7 @@ namespace InSite.Application.Payments.Read
         public int? InvoiceNumber { get; set; }
         public string CustomerEmployer { get; set; }
         public Guid? ProductIdentifier { get; set; }
+        public string TaxCountry { get; set; }
+        public string TaxRegion { get; set; }
     }
 }

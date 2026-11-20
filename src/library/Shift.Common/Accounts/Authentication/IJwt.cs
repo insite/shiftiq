@@ -17,7 +17,6 @@ namespace Shift.Common
         string Audience { get; set; }
         string Issuer { get; set; }
         string Subject { get; set; }
-        List<string> Roles { get; set; }
         DateTimeOffset? Expiry { get; set; }
         int? Lifetime { get; set; }
         bool Paging { get; set; }
@@ -69,9 +68,6 @@ namespace Shift.Common
         [EnumMember(Value = "typ")]
         Type,
 
-        [EnumMember(Value = "authority")]
-        Authority,
-
         [EnumMember(Value = "cookie_id")]
         CookieId,
 
@@ -89,9 +85,6 @@ namespace Shift.Common
 
         [EnumMember(Value = "person_id")]
         PersonId,
-
-        [EnumMember(Value = "role")]
-        Role,
 
         [EnumMember(Value = "role_debug")]
         RoleDebug,

@@ -1,8 +1,9 @@
-﻿<%@ Page Language="C#" CodeBehind="Search.aspx.cs" Inherits="InSite.UI.Portal.Contacts.People.Search" MasterPageFile="~/UI/Layout/Portal/Portal.master" %>
+<%@ Page Language="C#" CodeBehind="Search.aspx.cs" Inherits="InSite.UI.Portal.Contacts.People.Search" MasterPageFile="~/UI/Layout/Portal/Portal.master" %>
 
 <%@ Register Src="~/UI/Portal/Home/Management/Controls/DashboardNavigation.ascx" TagName="DashboardNavigation" TagPrefix="uc" %>
-<%@ Register TagPrefix="uc" TagName="SearchCriteria" Src="./Controls/SearchCriteria.ascx" %> 
+<%@ Register TagPrefix="uc" TagName="SearchCriteria" Src="./Controls/SearchCriteria.ascx" %>
 <%@ Register TagPrefix="uc" TagName="SearchResults" Src="./Controls/SearchResults.ascx" %>
+<%@ Register TagPrefix="uc" TagName="SearchDownload" Src="~/UI/Layout/Common/Controls/SearchDownload.ascx" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="HeadContent"></asp:Content>
 
@@ -12,7 +13,7 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="BodyContent">
 
-    <insite:Alert runat="server" ID="StatusAlert" />
+    <insite:Alert runat="server" ID="ScreenStatus" />
 
     <insite:Nav runat="server">
         <insite:NavItem ID="SearchResultsTab" runat="server" Title="Results" Icon="fas fa-database">
@@ -20,6 +21,9 @@
         </insite:NavItem>
         <insite:NavItem ID="SearchCriteriaTab" runat="server" Title="Criteria" Icon="fas fa-filter">
             <uc:SearchCriteria runat="server" ID="SearchCriteria" />
+        </insite:NavItem>
+        <insite:NavItem ID="DownloadsTab" runat="server" Title="Downloads" Icon="fas fa-download">
+            <uc:SearchDownload runat="server" ID="SearchDownload" />
         </insite:NavItem>
     </insite:Nav>
 

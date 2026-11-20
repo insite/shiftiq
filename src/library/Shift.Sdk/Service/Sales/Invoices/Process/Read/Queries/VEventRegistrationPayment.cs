@@ -44,6 +44,11 @@ namespace InSite.Application.Invoices.Read
         public string CurrentAttendanceStatus { get; set; }
         public string CurrentRegistrationStatus { get; set; }
 
+        public string TaxCountry { get; set; }
+        public string TaxRegion { get; set; }
+        public decimal? TaxRate { get; set; }
+        public decimal? TaxAmount { get; set; }
+
         public VEventRegistrationPayment Clone()
             => (VEventRegistrationPayment)MemberwiseClone();
     }

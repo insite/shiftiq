@@ -139,7 +139,7 @@
                                                 </table>
 
                                                 <insite:Container runat="server" ID="LikertScaleContainer" Visible="false">
-                                                    <h3>Likert Scales</h3>
+                                                    <h3 class="my-3">Likert Scales</h3>
 
                                                     <asp:Repeater runat="server" ID="LikertScaleRepeater">
                                                         <ItemTemplate>
@@ -153,7 +153,7 @@
                                                                 <ItemTemplate>
                                                                     <tr class="option">
                                                                         <td class="t-label">
-                                                                            <div class="form-text"><%# Eval("Title") %>.</div>
+                                                                            <div class="form-text"><%# Eval("Title") %></div>
                                                                         </td>
                                                                         <td class="t-text">
                                                                             <%# Eval("FromText") %>
@@ -168,6 +168,7 @@
                                                                 </ItemTemplate>
                                                             </asp:Repeater>
                                                         </ItemTemplate>
+                                                        <SeparatorTemplate><div class="mb-3"></div></SeparatorTemplate>
                                                     </asp:Repeater>
 
                                                 </insite:Container>
@@ -248,8 +249,13 @@
                 table.translation tr td.text {
                     border-left: solid 1px #d4d4d4;
                 }
+
+            .section-panel + .section-panel {
+                margin-bottom: 1.5rem;
+            }
         </style>
-    <link href="/UI/Admin/assets/contents/forms/translate.css" rel="stylesheet" type="text/css" />
-</insite:PageHeadContent>
+
+        <link href="/UI/Admin/assets/contents/forms/translate.css" rel="stylesheet" type="text/css" />
+    </insite:PageHeadContent>
 
 </asp:Content>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Shift.Sdk.UI
 {
@@ -15,5 +16,18 @@ namespace Shift.Sdk.UI
         public DashboardChartLegend Legend { get; set; }
         public DashboardChartLayout Layout { get; set; }
         public DashboardChartDataset[] Datasets { get; set; }
+
+        public DashboardChartSettings Clone() => new DashboardChartSettings
+        {
+            Type = Type,
+            DataType = DataType,
+            Label = Label,
+            Query = Query?.Clone(),
+            Stacked = Stacked,
+            Height = Height,
+            Legend = Legend?.Clone(),
+            Layout = Layout?.Clone(),
+            Datasets = Datasets?.Select(d => d.Clone()).ToArray()
+        };
     }
 }

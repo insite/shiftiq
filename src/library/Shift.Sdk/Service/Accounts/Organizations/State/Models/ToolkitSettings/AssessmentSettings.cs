@@ -24,6 +24,7 @@ namespace InSite.Domain.Organizations
         public bool LockPublishedStandards { get; set; }
         public ReportSettings PerformanceReport { get; set; }
         public TakerReportSettings TakerReport { get; set; }
+        public bool AIProctoringEnabled { get; set; }
 
         public AssessmentSettings()
         {
@@ -43,6 +44,7 @@ namespace InSite.Domain.Organizations
                 && LockPublishedStandards == other.LockPublishedStandards
                 && TakerReport?.DocumentType == other.TakerReport?.DocumentType
                 && TakerReport?.DocumentSubtype == other.TakerReport?.DocumentSubtype
+                && AIProctoringEnabled == other.AIProctoringEnabled
                 ;
         }
     }

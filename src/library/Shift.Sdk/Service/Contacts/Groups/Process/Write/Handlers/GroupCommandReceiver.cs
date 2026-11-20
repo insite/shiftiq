@@ -1,11 +1,15 @@
-﻿using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
+﻿using System;
 
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
+using Shift.Constant;
+
+using InSite.Application.Assets.Read;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Groups.Write;
 using InSite.Domain.Contacts;
 
-using Shift.Constant;
+using SearchObjectType = Shift.Contract.SearchObjectType;
 
 namespace InSite.Application.Contacts.Write
 {
@@ -15,13 +19,15 @@ namespace InSite.Application.Contacts.Write
         private readonly IChangeQueue _publisher;
         private readonly IChangeRepository _repository;
         private readonly IGroupSearch _groupSearch;
+        private readonly ISearchStore _searchQueueObjectStore;
 
-        public GroupCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository, IGroupSearch groupSearch)
+        public GroupCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository, IGroupSearch groupSearch, ISearchStore searchQueueObjectStore)
         {
             _commander = commander;
             _publisher = publisher;
             _repository = repository;
             _groupSearch = groupSearch;
+            _searchQueueObjectStore = searchQueueObjectStore;
 
             commander.Subscribe<ChangeGroupAddress>(Handle);
             commander.Subscribe<ChangeGroupCapacity>(Handle);
@@ -357,12 +363,18 @@ namespace InSite.Application.Contacts.Write
             aggregate.CreateGroup(c.Tenant, c.Type, c.Name);
 
             Commit(aggregate, c);
+
+            _searchQueueObjectStore.EnqueueSearchObject(c.Tenant, c.AggregateIdentifier, SearchObjectType.Group);
         }
 
         public void Handle(DeleteGroup c)
         {
+            Guid organizationId;
+
             _repository.LockAndRun<GroupAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
+                organizationId = aggregate.Data.Tenant;
+
                 if (aggregate.Data.Connections.Count > 0)
                     throw new GroupException($"Group {aggregate.AggregateIdentifier} has connections and therefore cannot be deleted");
 
@@ -373,10 +385,14 @@ namespace InSite.Application.Contacts.Write
 
                 Commit(aggregate, c);
             });
+
+            _searchQueueObjectStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Group);
         }
 
         public void Handle(DescribeGroup c)
         {
+            Guid? organizationId = null;
+        
             _repository.LockAndRun<GroupAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
                 var data = aggregate.Data;
@@ -389,8 +405,13 @@ namespace InSite.Application.Contacts.Write
                     aggregate.DescribeGroup(c.Category, c.Code, c.Description, c.Label);
 
                     Commit(aggregate, c);
+
+                    organizationId = data.Tenant;
                 }
             });
+
+            if (organizationId != null)
+                _searchQueueObjectStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Group);
         }
 
         public void Handle(DisconnectGroup c)
@@ -423,6 +444,8 @@ namespace InSite.Application.Contacts.Write
 
         public void Handle(RenameGroup c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<GroupAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
                 var data = aggregate.Data;
@@ -433,8 +456,13 @@ namespace InSite.Application.Contacts.Write
                     aggregate.RenameGroup(c.Type, c.Name);
 
                     Commit(aggregate, c);
+
+                    organizationId = data.Tenant;
                 }
             });
+
+            if (organizationId != null)
+                _searchQueueObjectStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Group);
         }
 
         public void Handle(ChangeGroupExpiry c)

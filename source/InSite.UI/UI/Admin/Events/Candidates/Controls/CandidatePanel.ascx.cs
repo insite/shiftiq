@@ -7,8 +7,6 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Exceptions;
-
 using Humanizer;
 
 using InSite.Application.Events.Read;
@@ -20,6 +18,8 @@ using InSite.Persistence;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Common.Timeline.Exceptions;
+using Shift.Constant;
 
 namespace InSite.Admin.Events.Candidates.Controls
 {
@@ -400,7 +400,7 @@ namespace InSite.Admin.Events.Candidates.Controls
 
             try
             {
-                ServiceLocator.SendCommand(new ChangeEligibility(registration, "Check Eligibility in DA", null));
+                ServiceLocator.SendCommand(new ChangeEligibility(registration, RegistrationEligibility.CheckEligibilityInDA, null));
             }
             catch (Exception ex)
             {

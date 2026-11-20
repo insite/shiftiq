@@ -51,6 +51,15 @@ namespace InSite.UI
         protected global::System.Web.UI.HtmlControls.HtmlAnchor CustomCatalogLink;
 
         /// <summary>
+        /// FeaturedCatalogLink control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor FeaturedCatalogLink;
+
+        /// <summary>
         /// OrientationAnchor control.
         /// </summary>
         /// <remarks>
@@ -436,6 +445,24 @@ namespace InSite.UI
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ManageUploadsLink;
+
+        /// <summary>
+        /// MyProgramsCard control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl MyProgramsCard;
+
+        /// <summary>
+        /// MyProgramsRepeater control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater MyProgramsRepeater;
 
         /// <summary>
         /// ProgressSection control.

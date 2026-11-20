@@ -169,7 +169,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Controls
                 null,
                 null,
                 x => x.JournalSetup.Fields,
-                x => x.Experiences
+                x => x.Experiences.Select(y => y.Supervisor)
             );
 
             var competencyFilter = new QExperienceCompetencyFilter

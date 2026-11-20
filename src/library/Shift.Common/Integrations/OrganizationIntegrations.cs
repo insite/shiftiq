@@ -76,7 +76,7 @@ namespace Shift.Common
 
         public BamboraEndpoint()
         {
-            HostName = "api.na.bambora.com";
+            HostName = "api.bam.shift4api.net";
             Endpoint = "v1";
         }
 
@@ -133,28 +133,6 @@ namespace Shift.Common
             return new PrometricEndpoint
             {
                 ClientCode = ClientCode,
-                UserName = UserName,
-                Password = Password
-            };
-        }
-    }
-
-    [Serializable]
-    public sealed class ScormCloudApiConfiguration
-    {
-        public string UserName { get; set; }
-        public string Password { get; set; }
-
-        public bool IsEqual(ScormCloudApiConfiguration other)
-        {
-            return UserName == other.UserName
-                && Password == other.Password;
-        }
-
-        public ScormCloudApiConfiguration Clone()
-        {
-            return new ScormCloudApiConfiguration
-            {
                 UserName = UserName,
                 Password = Password
             };
@@ -240,7 +218,6 @@ namespace Shift.Common
         public BCMailIntegration BCMail { get; set; }
         public RecaptchaIntegration Recaptcha { get; set; }
         public PrometricEndpoint Prometric { get; set; }
-        public ScormCloudApiConfiguration ScormCloud { get; set; }
 
         public OrganizationIntegrations()
         {
@@ -248,7 +225,6 @@ namespace Shift.Common
             BCMail = new BCMailIntegration();
             Recaptcha = new RecaptchaIntegration();
             Prometric = new PrometricEndpoint();
-            ScormCloud = new ScormCloudApiConfiguration();
         }
     }
 }

@@ -3,6 +3,8 @@
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
 
+using Shift.Common;
+
 namespace InSite.UI.Portal.Events
 {
     public partial class Calendar : PortalBasePage
@@ -12,7 +14,7 @@ namespace InSite.UI.Portal.Events
             get
             {
                 if (!DateTime.TryParse(Request.QueryString["date"], out var date))
-                    date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, User.TimeZone);
+                    date = TimeZones.ConvertTimeFromUtc(DateTime.UtcNow, User.TimeZone);
 
                 return date.ToShortDateString();
             }

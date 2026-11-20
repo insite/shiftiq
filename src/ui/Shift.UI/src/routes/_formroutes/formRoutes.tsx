@@ -25,6 +25,7 @@ import ChatbotSystemPrompt from "../admin/chatbot/system-prompt/ChatbotSystemPro
 import PersonIntegration from "../admin/contacts/people/integration/PersonIntegration";
 import CEPerformanceReport from "../test/reports/ce-performance/CEPerformanceReport";
 import CapabilityReport from "../test/reports/capability/CapabilityReport";
+import ProctoringStatus from "../admin/assessments/attempts/ProctoringStatus";
 
 export interface MenuItem {
     href: string;
@@ -200,7 +201,7 @@ export const formRoutes: FormRoute[] = [
             {
                 title: "Workshop",
                 menuTitle: "Workshop",
-                path: "/client/admin/assessment/forms/workshop/:id",
+                path: "/client/admin/assessments/forms/workshop/:id",
                 element: <FormWorkshop />,
                 customBreadcrumbs: [
                     {
@@ -225,7 +226,7 @@ export const formRoutes: FormRoute[] = [
             {
                 title: "Table of Specifications",
                 menuTitle: "Table of Specifications",
-                path: "/client/admin/assessment/specs/workshop/:id",
+                path: "/client/admin/assessments/specs/workshop/:id",
                 element: <SpecWorkshop />,
                 customBreadcrumbs: [
                     {
@@ -319,6 +320,31 @@ export const formRoutes: FormRoute[] = [
                     {
                         title: "Contacts",
                         path: "/ui/admin/contacts/home",
+                    },
+                ],
+            },
+            {
+                title: "AI Proctoring Status",
+                menuTitle: "Status",
+                path: "/client/admin/assessments/attempts/proctoring-status/:id",
+                element: <ProctoringStatus />,
+                customBreadcrumbs: [
+                    {
+                        title: "Admin",
+                        path: "/client/admin/home",
+                    },
+                    {
+                        title: "Assessments",
+                        path: "/ui/admin/assessments/home",
+                    },
+                    {
+                        title: "Search",
+                        path: "/ui/admin/assessments/attempts/reports/search",
+                        category: "Attempts"
+                    },
+                    {
+                        title: "View",
+                        path: "/ui/admin/assessments/attempts/view",
                     },
                 ],
             },

@@ -1,8 +1,11 @@
 ﻿using InSite.Application.Achievements.Write;
+using InSite.Application.Assets.Read;
 using InSite.Domain.Records;
 
 using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
+
+using SearchObjectType = Shift.Contract.SearchObjectType;
 
 namespace InSite.Application.Records.Write
 {
@@ -10,11 +13,13 @@ namespace InSite.Application.Records.Write
     {
         private readonly IChangeQueue _publisher;
         private readonly IChangeRepository _repository;
+        private readonly ISearchStore _searchStore;
 
-        public AchievementCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository)
+        public AchievementCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository, ISearchStore searchStore)
         {
             _publisher = publisher;
             _repository = repository;
+            _searchStore = searchStore;
 
             commander.Subscribe<CreateAchievement>(Handle);
             commander.Subscribe<DescribeAchievement>(Handle);
@@ -31,6 +36,7 @@ namespace InSite.Application.Records.Write
             commander.Subscribe<DisableAchievementBadgeImage>(Handle);
             commander.Subscribe<EnableAchievementReporting>(Handle);
             commander.Subscribe<DisableAchievementReporting>(Handle);
+            commander.Subscribe<ChangeAchievementCertificateIssuance>(Handle);
             commander.Subscribe<AddAchievementPrerequisite>(Handle);
             commander.Subscribe<DeleteAchievementPrerequisite>(Handle);
         }
@@ -51,6 +57,8 @@ namespace InSite.Application.Records.Write
             var aggregate = new AchievementAggregate { AggregateIdentifier = c.AggregateIdentifier };
             aggregate.CreateAchievement(c.Tenant, c.Label, c.Title, c.Description, c.Expiration, c.Source);
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(c.Tenant, c.AggregateIdentifier, SearchObjectType.Achievement);
         }
 
         public void Handle(ChangeAchievementBadgeImageUrl c)
@@ -79,6 +87,8 @@ namespace InSite.Application.Records.Write
             var aggregate = _repository.Get<AchievementAggregate>(c.AggregateIdentifier);
             aggregate.DescribeAchievement(c.Label, c.Title, c.Description, c.AllowSelfDeclared);
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(aggregate.Data.Tenant, c.AggregateIdentifier, SearchObjectType.Achievement);
         }
 
         public void Handle(ChangeAchievementExpiry c)
@@ -139,6 +149,8 @@ namespace InSite.Application.Records.Write
             var aggregate = _repository.Get<AchievementAggregate>(c.AggregateIdentifier);
             aggregate.DeleteAchievement(c.Cascade);
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(aggregate.Data.Tenant, c.AggregateIdentifier, SearchObjectType.Achievement);
         }
 
         public void Handle(EnableAchievementReporting c)
@@ -152,6 +164,13 @@ namespace InSite.Application.Records.Write
         {
             var aggregate = _repository.Get<AchievementAggregate>(c.AggregateIdentifier);
             aggregate.DisableAchievementReporting();
+            Commit(aggregate, c);
+        }
+
+        public void Handle(ChangeAchievementCertificateIssuance c)
+        {
+            var aggregate = _repository.Get<AchievementAggregate>(c.AggregateIdentifier);
+            aggregate.ChangeAchievementCertificateIssuance(c.IssuesCertificate);
             Commit(aggregate, c);
         }
 

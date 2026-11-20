@@ -58,4 +58,12 @@ export interface ApiSiteSetting {
     CurrentLanguage: Language;
     SupportedLanguages: Language[];
     RecentLinksKey: string;
+    TimeZones: {
+        TimeZoneId: string;
+        Title: string;
+        Abbrev: string;
+        StandardCode: string;
+        DaylightCode: string;
+        IsIANACompatible: boolean;
+    }[];
 }

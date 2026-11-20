@@ -1,0 +1,7 @@
+GET {{host}}/api/me/permissions
+Authorization: {{auth}}
+
+###
+
+GET {{host}}/api/me/context
+Authorization: {{auth}}

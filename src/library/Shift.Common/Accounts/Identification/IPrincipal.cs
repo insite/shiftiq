@@ -17,7 +17,7 @@ namespace Shift.Common
 
         bool IsOperator { get; }
 
-        TimeZoneInfo TimeZone { get; }
+        string TimeZone { get; }
     }
 
     public interface IPrincipal : System.Security.Principal.IIdentity, System.Security.Principal.IPrincipal, ISimplePrincipal

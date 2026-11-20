@@ -57,7 +57,6 @@
             </h3>
 
             <h3 runat="server" id="SubmissionCompletionHeader">
-                <%= Translate("Your assessment submission is complete. You will receive your results after the assessment is marked.") %>
             </h3>
 
             <asp:Literal runat="server" ID="CompletionInstruction" />

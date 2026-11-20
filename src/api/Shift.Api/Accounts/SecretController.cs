@@ -1,6 +1,10 @@
+using InSite.Application.People.Write;
+
 using Microsoft.AspNetCore.Mvc;
 
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
+using Shift.Sdk.Service;
 using Shift.Service.Directory;
 
 namespace Shift.Api;
@@ -12,17 +16,20 @@ public class SecretController : ShiftControllerBase
     private readonly IPrincipalProvider _identityService;
     private readonly PersonService _personService;
     private readonly PersonSecretService _personSecretService;
+    private readonly ICommanderAsync _commander;
     private readonly SecuritySettings _securitySettings;
 
     public SecretController(
         IPrincipalProvider identityService,
         PersonService personService,
         PersonSecretService personSecretService,
+        ICommanderAsync commander,
         SecuritySettings securitySettings)
     {
         _identityService = identityService;
         _personService = personService;
         _personSecretService = personSecretService;
+        _commander = commander;
         _securitySettings = securitySettings;
     }
 
@@ -97,8 +104,10 @@ public class SecretController : ShiftControllerBase
             Filter = new QueryFilter()
         });
 
+        var commands = new List<ICommand>();
+
         foreach (var item in existing)
-            await _personSecretService.DeleteAsync(item.SecretId);
+            commands.Add(new RemovePersonSecret(personId, item.SecretId));
 
         var secretId = UniqueIdentifier.Create();
 
@@ -108,16 +117,16 @@ public class SecretController : ShiftControllerBase
 
         var secretExpiry = DateTimeOffset.Now.AddDays(secretExpiryInDays);
 
-        await _personSecretService.CreateAsync(new CreatePersonSecret
-        {
-            PersonId = personId,
-            SecretId = secretId,
-            SecretType = type,
-            SecretName = name,
-            SecretValue = value,
-            SecretLifetimeLimit = ValidateLifetimeInMinutes(tokenLifetimeInMinutes),
-            SecretExpiry = secretExpiry
-        });
+        commands.Add(new AddPersonSecret(
+            personId,
+            secretId,
+            type,
+            name,
+            value,
+            secretExpiry,
+            ValidateLifetimeInMinutes(tokenLifetimeInMinutes)));
+
+        await _commander.SendCommandsAsync(commands);
 
         var secret = await _personSecretService.RetrieveAsync(secretId);
 

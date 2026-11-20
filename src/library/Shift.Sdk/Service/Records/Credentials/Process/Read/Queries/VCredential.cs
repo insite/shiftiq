@@ -94,6 +94,7 @@ namespace InSite.Application.Records.Read
         }
 
         public bool AchievementAllowSelfDeclared { get; set; }
+        public bool AchievementIssuesCertificate { get; set; }
         public bool CredentialAllowSelfDeclared { get; set; }
     }
 }

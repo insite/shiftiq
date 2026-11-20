@@ -9,12 +9,14 @@ namespace InSite.Domain.Records
         public Guid? ValidatorMessage { get; }
         public Guid? LearnerMessage { get; }
         public Guid? LearnerAddedMessage { get; }
+        public Guid? SupervisorMessage { get; }
 
-        public JournalSetupMessagesChanged(Guid? validatorMessage, Guid? learnerMessage, Guid? learnerAddedMessage)
+        public JournalSetupMessagesChanged(Guid? validatorMessage, Guid? learnerMessage, Guid? learnerAddedMessage, Guid? supervisorMessage)
         {
             ValidatorMessage = validatorMessage;
             LearnerMessage = learnerMessage;
             LearnerAddedMessage = learnerAddedMessage;
+            SupervisorMessage = supervisorMessage;
         }
     }
 }

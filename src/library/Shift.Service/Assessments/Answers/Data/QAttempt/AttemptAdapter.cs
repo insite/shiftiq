@@ -117,6 +117,8 @@ public class AttemptAdapter : IEntityAdapter
             RegistrationId = entity.RegistrationIdentifier,
             OrganizationId = entity.OrganizationIdentifier,
             UserAgent = entity.UserAgent,
+            AIProctoringProvider = entity.AIProctoringProvider,
+            AIProctoringSessionId = entity.AIProctoringSessionId,
             AttemptSubmitted = entity.AttemptSubmitted,
             LearnerUserId = entity.LearnerUserIdentifier,
             GradingAssessorUserId = entity.GradingAssessorUserIdentifier,

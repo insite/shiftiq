@@ -42,5 +42,13 @@ namespace InSite.Domain.Banks
                 TimerType = TimerType
             };
         }
+
+        public bool IsEqual(SectionTabConfiguration other)
+        {
+            return this.WarningOnNextTabEnabled == other.WarningOnNextTabEnabled
+                && this.BreakTimerEnabled == other.BreakTimerEnabled
+                && this.TimeLimit == other.TimeLimit
+                && this.TimerType == other.TimerType;
+        }
     }
 }

@@ -12,12 +12,12 @@ public class CredentialAdapter : IEntityAdapter
             : JsonHelper.SerializeJson(models, includes);
     }
 
-    public IEnumerable<CredentialModel> ToModel(IEnumerable<CredentialEntity> entities, TimeZoneInfo? timezone)
+    public IEnumerable<CredentialModel> ToModel(IEnumerable<CredentialEntity> entities)
     {
-        return entities.Select(x => ToModel(x, timezone));
+        return entities.Select(ToModel);
     }
 
-    public CredentialModel ToModel(CredentialEntity entity, TimeZoneInfo? timezone)
+    public CredentialModel ToModel(CredentialEntity entity)
     {
         var model = new CredentialModel
         {
@@ -67,28 +67,5 @@ public class CredentialAdapter : IEntityAdapter
         };
 
         return model;
-    }
-
-    public IEnumerable<CredentialMatch> ToMatch(IEnumerable<CredentialEntity> entities, TimeZoneInfo? timezone)
-    {
-        return entities.Select(x => ToMatch(x, timezone));
-    }
-
-    public CredentialMatch ToMatch(CredentialEntity entity, TimeZoneInfo? timezone)
-    {
-        var match = new CredentialMatch
-        {
-            AchievementId = entity.AchievementIdentifier,
-
-            UserId = entity.UserIdentifier,
-
-            CredentialId = entity.CredentialIdentifier,
-            CredentialIssued = entity.CredentialGranted,
-            CredentialStatus = entity.CredentialStatus,
-            CredentialNecessity = entity.CredentialNecessity,
-            CredentialIsRequired = entity.CredentialNecessity == "Mandatory"
-        };
-
-        return match;
     }
 }

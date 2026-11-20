@@ -23,6 +23,13 @@
                             <div class="card border-0 shadow-lg">
                                 <div class="card-body">
 
+                                    <div runat="server" id="DivisionPanel" class="form-group mb-3">
+                                        <label class="form-label">
+                                            Division
+                                        </label>
+                                        <insite:DivisionComboBox runat="server" ID="DivisionIdentifier" EmptyMessage="All divisions" DisplayNameOnly="true" />
+                                    </div>
+
                                     <div class="form-group mb-3">
                                         <label class="form-label">
                                             Department
@@ -78,13 +85,13 @@
                                 <td colspan="6" class="fw-bold text-white" style="background-color: #2c2d3f;">
                                     Worker Training Details for <asp:Literal runat="server" ID="AchievementTitle" />
                                     <br />
-                                    <asp:Literal runat="server" ID="CompanyName" /> :: <asp:Literal runat="server" ID="DepartmentName" />
+                                    <asp:Literal runat="server" ID="CompanyName" /><asp:Literal runat="server" ID="DivisionName" /> :: <asp:Literal runat="server" ID="DepartmentName" />
                                 </td>
                             </tr>
                             <tr>
                                 <th class="align-middle">Person</th>
-                                <th class="text-center align-middle">Date Completed</th>
-                                <th class="text-center align-middle">Date Expired</th>
+                                <th class="text-center align-middle">Completed</th>
+                                <th class="text-center align-middle">Expiry</th>
                                 <th class="align-middle">Status</th>
                             </tr>
                         </thead>

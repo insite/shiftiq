@@ -1,4 +1,4 @@
-<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchResults.ascx.cs" Inherits="InSite.Admin.Contacts.People.Controls.SearchResults" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchResults.ascx.cs" Inherits="InSite.Admin.Contacts.People.Controls.SearchResults" %>
 
 <insite:PageHeadContent runat="server">
     <style type="text/css">
@@ -27,9 +27,15 @@
 <insite:Grid runat="server" ID="Grid" DataKeyNames="UserIdentifier">
     <Columns>
 
-        <asp:TemplateField ItemStyle-Width="40" ItemStyle-HorizontalAlign="Center" HeaderStyle-CssClass="merge-checkbox hide" ItemStyle-CssClass="merge-checkbox hide">
+        <asp:TemplateField HeaderStyle-Width="40" ItemStyle-HorizontalAlign="Center" HeaderStyle-CssClass="merge-checkbox hide" ItemStyle-CssClass="merge-checkbox hide">
             <ItemTemplate>
                 <asp:CheckBox runat="server" ID="MergeCheckBox" onclick="" />
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderStyle-Width="30" ItemStyle-HorizontalAlign="Center" ItemStyle-Wrap="false">
+            <ItemTemplate>
+                <asp:HyperLink runat="server" ID="CommentIndicatorLink" ToolTip="Open Comments" />
             </ItemTemplate>
         </asp:TemplateField>
 
@@ -130,6 +136,12 @@
         <asp:TemplateField HeaderText="Person Code">
             <ItemTemplate>
                 <%# Eval("PersonCode") %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="Preferred Language">
+            <ItemTemplate>
+                <%# Eval("Language") %>
             </ItemTemplate>
         </asp:TemplateField>
 

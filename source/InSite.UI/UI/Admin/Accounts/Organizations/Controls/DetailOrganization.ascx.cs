@@ -84,7 +84,7 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
         {
             SetupContainer.Visible = false;
 
-            TimeZone.Value = TimeZones.Pacific.Id;
+            TimeZone.Value = TimeZones.Ids.Pacific;
 
             Languages.Values = new[] { "en" };
         }
@@ -128,7 +128,7 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
             CompanyWebSiteUrl.Text = webSiteUrl;
 
             Languages.Values = organization.Languages.Select(x => x.TwoLetterISOLanguageName).ToArray();
-            TimeZone.Value = organization.TimeZone.Id;
+            TimeZone.Value = organization.TimeZone;
         }
 
         public void GetInputValues(OrganizationState organization)
@@ -149,7 +149,7 @@ namespace InSite.UI.Admin.Accounts.Organizations.Controls
                     languages.Add(new CultureInfo(selection));
                 organization.Languages = languages.ToArray();
             }
-            organization.TimeZone = TimeZones.GetInfo(TimeZone.Value);
+            organization.TimeZone = TimeZone.Value;
         }
 
         #endregion

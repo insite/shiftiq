@@ -13,6 +13,7 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 
 using Shift.Common.Integration.Google;
+using Shift.Common.Integrations.Proview;
 using Shift.Constant;
 using Shift.Contract.Presentation;
 using Shift.Sdk.Service;
@@ -24,9 +25,11 @@ using Shift.Service.Chatbot.OpenAI;
 using Shift.Service.Chatbot.ShiftTools;
 using Shift.Service.Content;
 using Shift.Service.Content.PageContents;
+using Shift.Service.Content.Searches;
 using Shift.Service.Directory;
 using Shift.Service.Evaluation.Workshops;
 using Shift.Service.Feedback;
+using Shift.Service.Integrations.Proctoring.Proview;
 using Shift.Service.Metadata.Sequences.Data;
 using Shift.Service.Orchestration;
 using Shift.Service.Platform.Dashboard;
@@ -145,6 +148,8 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
 
     var services = builder.Services;
 
+    builder.UseMonitoring(settings.Shift.Api.Telemetry.Monitoring, release);
+
     AddSettings(services);
 
     AddEntities(services);
@@ -178,12 +183,14 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
     services.AddSingleton<IDashboardService, DashboardService>();
     services.AddSingleton<IChatbotToolService, ShiftChatbotToolService>();
     services.AddSingleton<IChatbotService, OpenAiChatbotService>();
+    services.AddSingleton<SearchEntryRepository>();
+    services.AddSingleton<SearchEntryService>();
+    services.AddSingleton(_ => new ProviewClient(StaticHttpClient.Client, settings));
 
     services.AddScoped<ISequence, Sequence>();
     services.AddScoped<ICommanderAsync, TimelineService>();
     services.AddScoped<ITimelineQuery, TimelineService>();
     services.AddScoped<ITranslatorService, TranslatorService>();
-    services.AddScoped<IGroupLookupService, GroupLookupService>();
     services.AddScoped<IContentRetrieveService, ContentRetrieveService>();
     services.AddScoped<IContentModifyService, ContentModifyService>();
     services.AddScoped<IFormWorkshopRetrieveService, FormWorkshopRetrieveService>();
@@ -192,6 +199,7 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
     services.AddScoped<IWorkshopModifyQuestionService, WorkshopModifyQuestionService>();
     services.AddScoped<IWorkshopModifyOptionService, WorkshopModifyOptionService>();
     services.AddScoped<IWorkshopImageListService, WorkshopImageListService>();
+    services.AddScoped<ProviewService>();
 
     services.AddLogging(builder =>
     {
@@ -199,8 +207,6 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
         builder.AddSerilog(dispose: true);
         builder.Services.AddSingleton(Serilog.Log.Logger);
     });
-
-    services.AddMonitoring(settings.Shift.Api.Telemetry.Monitoring, release);
 
     services.AddSingleton<Shift.Common.IJsonSerializer, Shift.Common.Json.Serializer>();
     services.AddSingleton<IJsonSerializerBase, JsonSerializer2>();
@@ -285,13 +291,26 @@ WebApplication BuildHost(AppSettings settings, ReleaseSettings release, Telemetr
         }
     });
 
+    InitializeTimeZones(settings);
+
     ImageHelper.Initialize(settings.Engine.Api.ImageMagick);
 
     services.AddMemoryCache();
     services.AddScoped<MailgunWebhookHandler>();
-    services.AddHostedService<MailgunWebhookListener>();
+
+    MailgunWebhookListener.RegisterService(services, Serilog.Log.Logger, settings);
+
+    services.AddHostedService<SearchQueueBackgroundService>();
 
     return BuildApplication(builder, settings, settings.Shift.Api, telemetry);
+}
+
+void InitializeTimeZones(AppSettings settings)
+{
+    var timeZoneSet = settings.TimeZoneSets.FirstOrDefault(x => string.Equals(x.Name, settings.Partition.TimeZoneSet, StringComparison.OrdinalIgnoreCase))
+        ?? throw new ArgumentNullException("TimeZones");
+
+    TimeZones.Initialize(timeZoneSet.TimeZones);
 }
 
 WebApplication BuildApplication(WebApplicationBuilder builder, AppSettings settings, ShiftSettingsApi api, TelemetrySettings telemetry)

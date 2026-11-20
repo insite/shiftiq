@@ -1,9 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web.UI.WebControls;
 
+using Humanizer;
+
+using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Common.Web.UI.Chart;
 using InSite.Persistence;
@@ -13,6 +17,7 @@ using Shift.Common;
 using Shift.Common.Colors;
 using Shift.Constant;
 using Shift.Sdk.UI;
+using Shift.Toolbox;
 
 namespace InSite.UI.Admin.Reports.Dashboards
 {
@@ -20,7 +25,23 @@ namespace InSite.UI.Admin.Reports.Dashboards
     {
         #region Properties
 
-        public DashboardChartSettings Settings { get; set; }
+        public string DownloadName
+        {
+            get => (string)ViewState[nameof(DownloadName)];
+            set => ViewState[nameof(DownloadName)] = value;
+        }
+
+        public DashboardChartSettings Settings
+        {
+            get => (DashboardChartSettings)ViewState[nameof(Settings)];
+            set => ViewState[nameof(Settings)] = value;
+        }
+
+        private Dictionary<string, string> WidgetQueryParameters
+        {
+            get => (Dictionary<string, string>)ViewState[nameof(WidgetQueryParameters)];
+            set => ViewState[nameof(WidgetQueryParameters)] = value;
+        }
 
         public bool HasData
         {
@@ -30,29 +51,47 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
         #endregion
 
+        #region Initialization
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            DownloadXlsx.Click += (sender, args) => DownloadXlsxFile();
+        }
+
+        #endregion
+
         #region Binding
 
         public void BindModel(DashboardWidget widget)
         {
-            Settings = widget.Chart;
-
-            var chart = CreateChart(widget.Chart);
-            var table = CreateDataSource(widget);
+            DownloadName = widget.Title;
+            Settings = widget.Chart.Clone();
+            WidgetQueryParameters = widget.QueryParameters.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            
+            var chart = CreateChart();
+            var table = CreateDataSource();
 
             HasData = table.Rows.Count > 0;
 
             NoDataMessage.Visible = !HasData;
             chart.Visible = HasData;
+            DownloadXlsx.Visible = widget.AllowDownload && HasData;
+            DownloadCount.Visible = widget.AllowDownload && HasData;
+            DownloadCount.InnerText = "result".ToQuantity(table.Rows.Count, "N0");
 
             if (HasData)
                 LoadData(chart, table);
         }
 
-        private static DataTable CreateDataSource(DashboardWidget widget)
+        private DataTable CreateDataSource()
         {
-            var sqlParameters = DashboardBuilder.BuildQueryParameters(widget.QueryParameters, widget.Chart.Query.Parameters);
+            var query = Settings.Query;
 
-            return DatabaseHelper.CreateDataTable(widget.Chart.Query.Sql, sqlParameters);
+            var sqlParameters = DashboardBuilder.BuildQueryParameters(WidgetQueryParameters, query.Parameters);
+
+            return DatabaseHelper.CreateDataTable(query.Sql, sqlParameters);
         }
 
         private void LoadData(BaseChart chart, DataTable table)
@@ -82,13 +121,89 @@ namespace InSite.UI.Admin.Reports.Dashboards
 
         #endregion
 
+        #region Download
+
+        private void DownloadXlsxFile()
+        {
+            try
+            {
+                var table = CreateDataSource();
+
+                LocalizeDates(table);
+
+                var helper = new XlsxExportHelper();
+
+                MapColumns(helper, table);
+
+                var bytes = helper.GetXlsxBytes(table, DownloadName);
+
+                var fileName = StringHelper.Sanitize(DownloadName, '-', false);
+
+                Page.Response.SendFile(fileName, "xlsx", bytes, null, false);
+            }
+            catch (Exception ex)
+            {
+                if (!ex.Message.StartsWith("Thread was being aborted"))
+                    ControlStatus.AddMessage(AlertType.Error, ex.Message);
+            }
+        }
+
+        private void MapColumns(XlsxExportHelper helper, DataTable table)
+        {
+            var settings = Settings;
+            var mapped = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            if (settings.Label.IsNotEmpty() && table.Columns.Contains(settings.Label))
+            {
+                helper.Map(settings.Label, settings.Label);
+                mapped.Add(settings.Label);
+            }
+
+            if (settings.Datasets != null)
+            {
+                foreach (var config in settings.Datasets)
+                {
+                    if (config.Name.IsEmpty() || !table.Columns.Contains(config.Name))
+                        continue;
+
+                    if (!mapped.Add(config.Name))
+                        continue;
+
+                    helper.Map(config.Name, config.Label ?? config.Name);
+                }
+            }
+
+            if (mapped.Count > 0)
+                return;
+
+            foreach (DataColumn column in table.Columns)
+                helper.Map(column.ColumnName, column.ColumnName);
+        }
+
+        private static void LocalizeDates(DataTable table)
+        {
+            foreach (DataRow row in table.Rows)
+            {
+                foreach (DataColumn column in table.Columns)
+                {
+                    var value = row[column];
+                    if (value is DateTimeOffset d)
+                        row[column] = TimeZones.ConvertTime(d, User.TimeZone);
+                }
+            }
+        }
+
+        #endregion
+
         #region Chart Initialization
 
-        private BaseChart CreateChart(DashboardChartSettings settings)
+        private BaseChart CreateChart()
         {
             BaseChart chart;
 
             Container.UnloadControl();
+
+            var settings = Settings;
 
             if (settings.Type == DashboardChartType.Bar)
             {
@@ -146,7 +261,7 @@ namespace InSite.UI.Admin.Reports.Dashboards
                 return string.Empty;
 
             if (value is DateTimeOffset offset)
-                return TimeZones.ConvertFromUtc(offset, User.TimeZone).ToString("MMM d, yyyy");
+                return TimeZones.ConvertTime(offset, User.TimeZone).ToString("MMM d, yyyy");
 
             if (value is DateTime date)
                 return date.ToString("MMM d, yyyy");

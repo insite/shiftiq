@@ -6,6 +6,7 @@ using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
 
+using Shift.Common;
 using Shift.Sdk.UI;
 
 namespace InSite.UI.Portal.Contacts.Referral
@@ -41,7 +42,6 @@ namespace InSite.UI.Portal.Contacts.Referral
         private PersonOutlineModel CreateModel()
         {
             var learner = PersonSearch.Select(Organization.Identifier, LearnerIdentifier, x => x.User, x => x.OccupationStandard);
-
             if (learner == null)
                 return null;
 
@@ -58,9 +58,11 @@ namespace InSite.UI.Portal.Contacts.Referral
             {
                 FullName = learner.User.FullName,
                 Email = learner.User.Email,
+                Birthdate = learner.Birthdate.HasValue ? $"{learner.Birthdate:MMM d, yyyy}" : string.Empty,
                 AccountCode = learner.PersonCode ?? "-",
                 Phone = learner.Phone ?? "-",
                 OccupationTitle = learner.OccupationStandard?.ContentTitle ?? "-",
+                PreferredLanguage = Language.GetName(learner.Language) ?? string.Empty,
                 HasCase = @case != null,
                 CaseType = @case?.IssueType,
                 CaseStatus = @case?.IssueStatusName,

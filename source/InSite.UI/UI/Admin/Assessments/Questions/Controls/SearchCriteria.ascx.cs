@@ -60,7 +60,10 @@ namespace InSite.Admin.Assessments.Questions.Controls
                     else
                         dateTimeRange = new DateTimeRange(QuestionDateRangeSince.Value, QuestionDateRangeBefore.Value);
 
-                    filter.QuestionChangedRange = new DateTimeOffsetRange(dateTimeRange.Since, dateTimeRange.Before, User.TimeZone.BaseUtcOffset);
+                    filter.QuestionChangedRange = new DateTimeOffsetRange(
+                        TimeZones.ToDateTimeOffset(dateTimeRange.Since, User.TimeZone),
+                        TimeZones.ToDateTimeOffset(dateTimeRange.Before, User.TimeZone)
+                    );
                 }
 
                 GetCheckedShowColumns(filter);

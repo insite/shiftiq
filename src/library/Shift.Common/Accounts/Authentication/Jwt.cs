@@ -309,23 +309,6 @@ namespace Shift.Common
             }
         }
 
-        public List<string> Roles
-        {
-            get
-            {
-                return GetClaimValues(ClaimName.Role);
-            }
-            set
-            {
-                if (value == null || value.Count() == 0)
-                    Delete(ClaimName.Role);
-
-                foreach (var item in value)
-                    if (item.IsNotEmpty())
-                        SetValue(ClaimName.Role, item, true);
-            }
-        }
-
         #endregion
 
         #region Helpers

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -26,6 +26,7 @@ namespace InSite.Admin.Contacts.People.Controls
     public partial class SearchResults : SearchResultsGridViewController<PersonFilter>
     {
         private Models.PersonSearchResultsModel _model;
+        private Dictionary<Guid, string> _commentFlags;
 
         protected override void OnInit(EventArgs e)
         {
@@ -112,6 +113,7 @@ namespace InSite.Admin.Contacts.People.Controls
 
             BindIssueStatus(e, userIdentifier);
             BindDocuments(e, userIdentifier);
+            BindCommentIndicator(e, userIdentifier);
         }
 
         private static void SetContentLabelHeaders(GridViewRowEventArgs e)
@@ -146,6 +148,19 @@ namespace InSite.Admin.Contacts.People.Controls
 
             var link = (HtmlAnchor)e.Row.FindControl("DocumentsLink");
             link.Visible = _model.HasDocuments(userIdentifier);
+        }
+
+        private void BindCommentIndicator(GridViewRowEventArgs e, Guid userIdentifier)
+        {
+            var link = (HyperLink)e.Row.FindControl("CommentIndicatorLink");
+            var hasComments = _commentFlags.TryGetValue(userIdentifier, out var flag);
+
+            link.Visible = hasComments;
+            if (!hasComments)
+                return;
+
+            link.Text = PersonHelper.GetCommentIndicatorHtml(flag);
+            link.NavigateUrl = $"/ui/admin/contacts/people/edit?contact={userIdentifier}&panel=comments";
         }
 
         private void SaveBulkButton_Click(object sender, EventArgs e)
@@ -300,7 +315,10 @@ namespace InSite.Admin.Contacts.People.Controls
                     item.PermissionLists = memberships.GetOrDefault(item.UserIdentifier);
             }
 
-            _model = CreateModel(result.Select(x => x.UserIdentifier).ToArray());
+            var userIds = result.Select(x => x.UserIdentifier).ToArray();
+
+            _model = CreateModel(userIds);
+            _commentFlags = PersonCommentSummarySearch.SelectLatestCommentFlags(Organization.Identifier, userIds);
 
             return result.ToSearchResult();
         }

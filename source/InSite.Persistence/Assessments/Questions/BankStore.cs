@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
@@ -20,10 +20,12 @@ namespace InSite.Persistence
     public class BankStore : IBankStore
     {
         private readonly ILearnerAttemptSummarySearch _attemptSummary;
+        private readonly IContentStore _contentStore;
 
-        public BankStore(ILearnerAttemptSummarySearch attemptSummary)
+        public BankStore(ILearnerAttemptSummarySearch attemptSummary, IContentStore contentStore)
         {
             _attemptSummary = attemptSummary;
+            _contentStore = contentStore;
         }
 
         internal InternalDbContext CreateContext() => new InternalDbContext(true);
@@ -77,6 +79,7 @@ namespace InSite.Persistence
         {
             using (var db = CreateContext())
             {
+                db.Database.ExecuteSqlCommand("DELETE contents.TContent WHERE ContainerType = 'Exam Question'");
                 db.Database.ExecuteSqlCommand("TRUNCATE TABLE banks.QBank");
                 db.Database.ExecuteSqlCommand("TRUNCATE TABLE banks.QBankForm");
                 db.Database.ExecuteSqlCommand("TRUNCATE TABLE banks.QBankOption");
@@ -90,6 +93,14 @@ namespace InSite.Persistence
             using (var db = CreateContext())
             {
                 var sql = @"
+delete
+    contents.TContent
+from
+    contents.TContent
+    inner join banks.QBankQuestion on QBankQuestion.QuestionIdentifier = TContent.ContainerIdentifier
+ where
+    QBankQuestion.BankIdentifier = @Aggregate
+    and TContent.ContainerType = 'Exam Question';
 delete from banks.QBank WHERE BankIdentifier = @Aggregate;
 delete from assets.QComment WHERE AssessmentBankIdentifier = @Aggregate;
 delete from banks.QBankForm WHERE BankIdentifier = @Aggregate;
@@ -115,7 +126,9 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             var ids = questions.Select(x => x.QuestionIdentifier).ToArray();
             var subQuestions = db.BankQuestions.Where(x => ids.Contains(x.ParentQuestionIdentifier.Value)).ToArray();
             var subIds = subQuestions.Select(x => x.QuestionIdentifier).ToArray();
-            var allIds = ids.Union(subIds);
+            var allIds = ids.Union(subIds).ToArray();
+
+            DeleteQuestionContents(db, allIds);
 
             var subCompetencies = db.BankQuestionSubCompetencies.Where(x => allIds.Contains(x.QuestionIdentifier));
             db.BankQuestionSubCompetencies.RemoveRange(subCompetencies);
@@ -141,11 +154,72 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
         #endregion
 
+        #region Methods (content)
+
+        private static void DeleteQuestionContents(InternalDbContext db, Guid[] containers)
+        {
+            if (containers.IsEmpty())
+                return;
+
+            db.TContents.RemoveRange(db.TContents.Where(x => containers.Contains(x.ContainerIdentifier)).ToArray());
+        }
+
+        private void SaveQuestionContent(Change e, Guid questionId)
+        {
+            var state = (BankState)e.AggregateState;
+            var question = state.FindQuestion(questionId);
+
+            SaveQuestionContent(state, question);
+        }
+
+        private void SaveQuestionContent(BankState bank, Question question)
+        {
+            _contentStore.SaveContainer(
+                bank.Tenant,
+                ContentContainerType.ExamQuestion,
+                question.Identifier,
+                ContentContainer.Create(question.Content));
+        }
+
+        private void SaveLikertRowContent(Change e, Guid questionId, Guid rowId)
+        {
+            var state = (BankState)e.AggregateState;
+            var row = state.FindQuestion(questionId).Likert.GetRow(rowId);
+            SaveLikertRowContent(state, row);
+        }
+
+        private void SaveLikertRowContent(BankState bank, LikertRow row)
+        {
+            _contentStore.SaveContainer(
+                bank.Tenant,
+                ContentContainerType.ExamQuestion,
+                row.Identifier,
+                ContentContainer.Create(row.Content));
+        }
+
+        private void SaveQuestionContents(BankState bank)
+        {
+            var items = new Dictionary<Guid, ContentContainer>();
+
+            foreach (var question in bank.Sets.SelectMany(x => x.Questions).SelectMany(x => x.EnumerateAllVersions()))
+            {
+                items[question.Identifier] = ContentContainer.Create(question.Content);
+
+                foreach (var row in question.Likert.Rows)
+                    items[row.Identifier] = ContentContainer.Create(row.Content);
+            }
+
+            _contentStore.SaveContainers(bank.Tenant, ContentContainerType.ExamQuestion, items);
+        }
+
+        #endregion
+
         #region Methods (insert)
 
         public void Insert(BankOpened e)
         {
             Insert(e, e.Bank);
+            SaveQuestionContents(e.Bank);
         }
 
         private void Insert(IChange e, BankState bank)
@@ -831,6 +905,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
                 UpdateFormCounts(db, bank);
             });
+
+            SaveQuestionContent(e, e.Question);
         }
 
         public void Update(QuestionClassificationChanged e)
@@ -860,6 +936,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
                 SetLastChange(query, e);
             });
+
+            SaveQuestionContent(e, e.Question);
         }
 
         public void Update(QuestionDuplicated2 e)
@@ -885,6 +963,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
                 UpdateFormCounts(db, bank);
             });
+
+            SaveQuestionContent(e, e.DestinationQuestion);
         }
 
         public void Update(QuestionFlagChanged e)
@@ -993,36 +1073,48 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
                 query.BankSubIndex = likert.GetRow(query.QuestionIdentifier).Index;
         });
 
-        public void Update(QuestionLikertRowAdded e) => UpdateCursor(e, (db, bank) =>
+        public void Update(QuestionLikertRowAdded e)
         {
-            var query = new QBankQuestion();
-            var row = bank.FindQuestion(e.QuestionIdentifier).Likert.GetRow(e.RowIdentifier);
+            UpdateCursor(e, (db, bank) =>
+            {
+                var query = new QBankQuestion();
+                var row = bank.FindQuestion(e.QuestionIdentifier).Likert.GetRow(e.RowIdentifier);
 
-            SetCreate(query, e);
-            BindLikertRowQuery(query, row);
-            SetLastChange(query, e);
+                SetCreate(query, e);
+                BindLikertRowQuery(query, row);
+                SetLastChange(query, e);
 
-            db.BankQuestions.Add(query);
+                db.BankQuestions.Add(query);
 
-            SyncQuestionSubCompetencies(db, row.Identifier, row.SubStandards);
-        });
+                SyncQuestionSubCompetencies(db, row.Identifier, row.SubStandards);
+            });
 
-        public void Update(QuestionLikertRowChanged e) => UpdateCursor(e, (db, bank) =>
+            SaveLikertRowContent(e, e.QuestionIdentifier, e.RowIdentifier);
+        }
+
+        public void Update(QuestionLikertRowChanged e)
         {
-            var query = db.BankQuestions.FirstOrDefault(x => x.QuestionIdentifier == e.RowIdentifier)
-                ?? throw new ArgumentException($"The question is not found: {e.RowIdentifier}");
+            UpdateCursor(e, (db, bank) =>
+            {
+                var query = db.BankQuestions.FirstOrDefault(x => x.QuestionIdentifier == e.RowIdentifier)
+                    ?? throw new ArgumentException($"The question is not found: {e.RowIdentifier}");
 
-            var row = bank.FindQuestion(e.QuestionIdentifier).Likert.GetRow(e.RowIdentifier);
+                var row = bank.FindQuestion(e.QuestionIdentifier).Likert.GetRow(e.RowIdentifier);
 
-            BindLikertRowQuery(query, row);
-            SetLastChange(query, e);
-            SyncQuestionSubCompetencies(db, row.Identifier, row.SubStandards);
-        });
+                BindLikertRowQuery(query, row);
+                SetLastChange(query, e);
+                SyncQuestionSubCompetencies(db, row.Identifier, row.SubStandards);
+            });
+
+            SaveLikertRowContent(e, e.QuestionIdentifier, e.RowIdentifier);
+        }
 
         public void Update(QuestionLikertRowDeleted e) => UpdateCursor(e, (db, bank) =>
         {
             var deleteEntity = db.BankQuestions.Single(x => x.QuestionIdentifier == e.RowIdentifier);
             db.BankQuestions.Remove(deleteEntity);
+
+            DeleteQuestionContents(db, new[] { e.RowIdentifier });
 
             var subCompetencies = db.BankQuestionSubCompetencies.Where(x => x.QuestionIdentifier == e.RowIdentifier).ToArray();
             db.BankQuestionSubCompetencies.RemoveRange(subCompetencies);
@@ -1060,58 +1152,71 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
             UpdateFormCounts(db, bank);
         });
 
-        public void Update(QuestionMovedIn e) => UpdateCursor(e, (db, bank) =>
+        public void Update(QuestionMovedIn e)
         {
+            UpdateCursor(e, (db, bank) =>
             {
-                var question = bank.FindQuestion(e.Question.Identifier);
-                var query = new QBankQuestion();
-
-                SetCreate(query, e);
-                BindQuestionQuery(db, query, question);
-
-                db.BankQuestions.Add(query);
-
-                UpdateQuestions(
-                    db,
-                    bank.Sets.SelectMany(x => x.Questions)
-                        .SelectMany(x => x.EnumerateAllVersions())
-                        .Where(x => x.Identifier != e.Question.Identifier));
-                SyncQuestionSubCompetencies(db, question);
-
-                InsertOptions(db, bank, question.Options);
-            }
-
-            if (e.Comments.IsNotEmpty())
-            {
-                var filter = e.Comments.Select(x => x.Identifier).ToArray();
-                if (db.QComments.Any(x => filter.Contains(x.CommentIdentifier)))
                 {
-                    var invalidIds = new HashSet<Guid>();
+                    var question = bank.FindQuestion(e.Question.Identifier);
+                    var query = new QBankQuestion();
+
+                    SetCreate(query, e);
+                    BindQuestionQuery(db, query, question);
+
+                    db.BankQuestions.Add(query);
+
+                    UpdateQuestions(
+                        db,
+                        bank.Sets.SelectMany(x => x.Questions)
+                            .SelectMany(x => x.EnumerateAllVersions())
+                            .Where(x => x.Identifier != e.Question.Identifier));
+                    SyncQuestionSubCompetencies(db, question);
+
+                    InsertOptions(db, bank, question.Options);
+                }
+
+                if (e.Comments.IsNotEmpty())
+                {
+                    var filter = e.Comments.Select(x => x.Identifier).ToArray();
+                    if (db.QComments.Any(x => filter.Contains(x.CommentIdentifier)))
+                    {
+                        var invalidIds = new HashSet<Guid>();
+
+                        foreach (var comment in e.Comments)
+                        {
+                            if (invalidIds.Contains(comment.Identifier))
+                                continue;
+
+                            if (db.QComments.Any(x => x.CommentIdentifier == comment.Identifier))
+                                invalidIds.Add(comment.Identifier);
+                        }
+
+                        throw new ArgumentException(
+                            $"{Shift.Common.Humanizer.ToQuantity(invalidIds.Count, "comment")} ('{string.Join("', '", invalidIds)}')" +
+                            $" already exists in the bank ({bank.Identifier}). It can be revised but it cannot be reposted.");
+                    }
 
                     foreach (var comment in e.Comments)
                     {
-                        if (invalidIds.Contains(comment.Identifier))
-                            continue;
-
-                        if (db.QComments.Any(x => x.CommentIdentifier == comment.Identifier))
-                            invalidIds.Add(comment.Identifier);
+                        var query = new QComment();
+                        BindCommentQuery(query, bank, comment);
+                        db.QComments.Add(query);
                     }
 
-                    throw new ArgumentException(
-                        $"{Shift.Common.Humanizer.ToQuantity(invalidIds.Count, "comment")} ('{string.Join("', '", invalidIds)}')" +
-                        $" already exists in the bank ({bank.Identifier}). It can be revised but it cannot be reposted.");
+                    UpdateFormCounts(db, bank);
                 }
+            });
 
-                foreach (var comment in e.Comments)
-                {
-                    var query = new QComment();
-                    BindCommentQuery(query, bank, comment);
-                    db.QComments.Add(query);
-                }
+            var bankState = (BankState)e.AggregateState;
+            var movedQuestion = bankState.FindQuestion(e.Question.Identifier);
 
-                UpdateFormCounts(db, bank);
+            foreach (var version in movedQuestion.EnumerateAllVersions())
+            {
+                SaveQuestionContent(bankState, version);
+                foreach (var row in version.Likert.Rows)
+                    SaveLikertRowContent(bankState, row);
             }
-        });
+        }
 
         public void Update(QuestionMovedOut e) => UpdateCursor(e, (db, bank) => OnQuestionRemoved(db, bank, e.Question, e));
 
@@ -1274,6 +1379,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
                 InsertOptions(db, bank, question.Options);
             });
+
+            SaveQuestionContent(e, e.UpgradedQuestion);
         }
 
         public void Update(SectionAdded e)
@@ -1321,7 +1428,11 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
         public void Update(SetAdded e) => UpdateCursor(e, null);
 
-        public void Update(SetImported e) => UpdateCursor(e, null);
+        public void Update(SetImported e)
+        {
+            UpdateCursor(e, null);
+            SaveQuestionContents((BankState)e.AggregateState);
+        }
 
         public void Update(SetRandomizationChanged e) => UpdateCursor(e, null);
 
@@ -1926,6 +2037,8 @@ delete from banks.QBankSpecification WHERE BankIdentifier = @Aggregate;
 
             query.WhenAttemptStartedNotifyAdminMessageIdentifier = form.WhenAttemptStartedNotifyAdminMessageIdentifier;
             query.WhenAttemptCompletedNotifyAdminMessageIdentifier = form.WhenAttemptCompletedNotifyAdminMessageIdentifier;
+
+            query.AIProctoringProvider = form.Invigilation.AIProctoringProvider?.ToString();
         }
 
         private static void BindQuestionQuery(InternalDbContext db, QBankQuestion query, Question question) =>

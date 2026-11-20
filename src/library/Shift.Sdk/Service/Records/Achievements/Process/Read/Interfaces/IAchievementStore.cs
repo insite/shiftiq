@@ -26,6 +26,7 @@ namespace InSite.Application.Records.Read
 
         void UpdateAchievement(AchievementReportingDisabled e);
         void UpdateAchievement(AchievementReportingEnabled e);
+        void UpdateAchievement(AchievementCertificateIssuanceChanged e);
 
         void InsertCredential(CredentialCreated e, CredentialStatus status);
         void UpdateCredential(CredentialAuthorityChanged e);

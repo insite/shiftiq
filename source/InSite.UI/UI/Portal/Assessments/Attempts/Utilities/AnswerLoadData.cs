@@ -1,6 +1,8 @@
 ﻿using InSite.Application.Attempts.Read;
 using InSite.Domain.Banks;
 
+using Shift.Common.Attempts;
+
 namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 {
     public class AnswerLoadData

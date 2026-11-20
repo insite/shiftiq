@@ -299,28 +299,33 @@ ORDER BY
             return DatabaseHelper.CreateDataTable(query, 60 * 5, new SqlParameter("Now", now));
         }
 
+        // The item numbers and names reported by custom_cmds.CalculateUserStatus.
+        private static readonly Dictionary<int, string> AchievementTypeNames = new Dictionary<int, string>
+        {
+            { 1, "Time-Sensitive Safety Certificate" },
+            { 2, "Additional Compliance Requirement" },
+            { 3, "Critical Competencies" },
+            { 4, "Non-Critical Competencies" },
+            { 5, "Code of Practice" },
+            { 6, "Safe Operating Practice" },
+            { 7, "Human Resources Document" },
+            { 8, "Module" },
+            { 9, "Training Guide" },
+            { 10, "Site-Specific Operating Procedure" },
+            { 11, "Orientation" },
+            { 12, "HR Learning Module" }
+        };
+
         public static ListItem[] SelectAchievementTypes(Dictionary<string, string> translator)
         {
-            var list = new List<ListItem>();
-
-            const string query = "select distinct ItemNumber, ItemName from custom_cmds.QUserStatus with (nolock) order by ItemNumber";
-
-            var table = DatabaseHelper.CreateDataTable(query);
-
-            foreach (DataRow row in table.Rows)
-            {
-                var name = (string)row["ItemName"];
-
-                var item = new ListItem
+            return AchievementTypeNames
+                .Select(x => new ListItem
                 {
-                    Text = translator.GetOrDefault(name, name),
-                    Value = row["ItemNumber"].ToString()
-                };
-
-                list.Add(item);
-            }
-
-            return list.OrderBy(x => x.Text).ToArray();
+                    Text = translator.GetOrDefault(x.Value, x.Value),
+                    Value = x.Key.ToString()
+                })
+                .OrderBy(x => x.Text)
+                .ToArray();
         }
 
         public static DataTable SelectCertificationMissingCompetencies(Guid profileStandardIdentifier, Guid userKey, Guid organizationId)

@@ -175,13 +175,6 @@ namespace InSite
                 ? ServiceLocator.Partition.Identifier
                 : (Guid?)null;
 
-            var roles = ServiceLocator.GroupSearch.BindGroups(g => g.GroupName,
-                    g => (g.Organization.OrganizationCode == organization || (parentOrganizationId != null && g.OrganizationIdentifier == parentOrganizationId))
-                      && g.GroupType == "Role"
-                      && g.QMemberships.Any(m => m.GroupIdentifier == g.GroupIdentifier
-                                              && m.UserIdentifier == userId))
-                    .ToArray();
-
             var people = ServiceLocator.PersonSearch.GetPersons(new QPersonFilter { UserIdentifier = userId });
             var person = people.First(x => x.OrganizationIdentifier == organizationEntity.OrganizationIdentifier);
 
@@ -192,10 +185,6 @@ namespace InSite
             var token = CookieTokenModule.SignedIn(
                 userEmail,
                 userId,
-                isAdministrator,
-                isDeveloper,
-                isOperator,
-                roles,
                 impersonatorOrganization,
                 impersonatorUser,
                 language,

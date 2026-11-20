@@ -5,8 +5,6 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-using Shift.Common.Timeline.Commands;
-
 using Humanizer;
 
 using InSite.Admin.Assets.Contents.Controls;
@@ -17,6 +15,7 @@ using InSite.UI.Layout.Admin;
 
 using Shift.Common;
 using Shift.Common.Events;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Admin.Workflow.Forms
@@ -27,7 +26,7 @@ namespace InSite.Admin.Workflow.Forms
 
         private enum ContainerType
         {
-            Survey, Question, OptionList, Option, LikertScaleItem
+            Survey, Question, OptionList, Option, LikertScale, LikertScaleItem
         }
 
         [Serializable]
@@ -36,14 +35,14 @@ namespace InSite.Admin.Workflow.Forms
             public Guid QuestionId { get; }
             public string ScaleCategory { get; }
             public int ItemIndex { get; }
-            public Shift.Common.ContentContainer Content { get; }
+            public ContentContainer Content { get; }
 
-            public LikertScaleDataItem(Guid questionId, string scaleCategory, int itemIndex, Shift.Common.ContentContainer content)
+            public LikertScaleDataItem(Guid questionId, string scaleCategory, int itemIndex, ContentContainer content)
             {
                 QuestionId = questionId;
                 ScaleCategory = scaleCategory;
                 ItemIndex = itemIndex;
-                Content = content ?? new Shift.Common.ContentContainer();
+                Content = content ?? new ContentContainer();
             }
         }
 
@@ -375,7 +374,9 @@ namespace InSite.Admin.Workflow.Forms
 
                     foreach (var scale in question.Scales)
                     {
-                        var hasTranslation = false;
+                        scale.SyncDefaultContent();
+
+                        var hasTranslation = AddData(scale.Content);
 
                         foreach (var scaleItem in scale.Items)
                         {
@@ -393,21 +394,21 @@ namespace InSite.Admin.Workflow.Forms
                 foreach (var command in commands)
                     ServiceLocator.SendCommand(command);
 
-                bool AddData(Shift.Common.ContentContainer content)
+                bool AddData(ContentContainer content)
                 {
+                    if (content == null)
+                        return false;
+
                     var isUpdated = false;
 
-                    if (content != null)
+                    foreach (var item in content.GetItems())
                     {
-                        foreach (var item in content.GetItems())
-                        {
-                            if (string.IsNullOrEmpty(item.Text[fromLang]) || !string.IsNullOrEmpty(item.Text[toLang]))
-                                continue;
+                        if (item.Text[fromLang].IsEmpty() || item.Text[toLang].IsNotEmpty())
+                            continue;
 
-                            data.Add(item.Text);
+                        data.Add(item.Text);
 
-                            isUpdated = true;
-                        }
+                        isUpdated = true;
                     }
 
                     return isUpdated;
@@ -503,19 +504,7 @@ namespace InSite.Admin.Workflow.Forms
 
                             questionItem.LikertScales = question.Scales.Where(x => x.Items.IsNotEmpty()).Select(scale => new LikertScaleGroup(scale)
                             {
-                                Items = scale.Items.Select((item, index) =>
-                                {
-                                    var scaleItemId = Guid.NewGuid();
-                                    var scaleItem = new LikertScaleItem(Calculator.ToBase26(index + 1));
-
-                                    BindDataItem(scaleItem, "Description", item.Content, ContainerType.LikertScaleItem, scaleItemId);
-
-                                    LikertScaleItemMapping.Add(
-                                        scaleItemId,
-                                        new LikertScaleDataItem(question.Identifier, scale.Category, index, item.Content));
-
-                                    return scaleItem;
-                                })
+                                Items = GetLikertScaleItems(question, scale).ToList()
                             });
 
                             return questionItem;
@@ -530,7 +519,42 @@ namespace InSite.Admin.Workflow.Forms
             QuestionCount.Text = "Question".ToQuantity(questionCount);
             FieldCount.Text = "Option".ToQuantity(optionCount);
 
-            void BindDataItem(BaseTranslationItem item, string label, Shift.Common.ContentContainer content, ContainerType container, Guid containerId)
+            IEnumerable<LikertScaleItem> GetLikertScaleItems(SurveyQuestion question, SurveyScale scale)
+            {
+                scale.SyncDefaultContent();
+
+                var scaleId = Guid.NewGuid();
+                var scaleItem = new LikertScaleItem(SurveyScale.CategoryLabel);
+
+                BindDataItem(scaleItem, SurveyScale.CategoryLabel, scale.Content, ContainerType.LikertScale, scaleId);
+
+                LikertScaleItemMapping.Add(
+                    scaleId,
+                    new LikertScaleDataItem(question.Identifier, scale.Category, -1, scale.Content));
+
+                yield return scaleItem;
+
+                for (var i = 0; i < scale.Items.Count; i++)
+                {
+                    var item = scale.Items[i];
+                    var letter = Calculator.ToBase26(i + 1);
+                    var itemId = Guid.NewGuid();
+
+                    LikertScaleItemMapping.Add(
+                        itemId,
+                        new LikertScaleDataItem(question.Identifier, scale.Category, i, item.Content));
+
+                    var gradeItem = new LikertScaleItem($"{letter}. Grade");
+                    BindDataItem(gradeItem, SurveyScaleItem.GradeLabel, item.Content, ContainerType.LikertScaleItem, itemId);
+                    yield return gradeItem;
+
+                    var feedbackItem = new LikertScaleItem($"{letter}. Feedback");
+                    BindDataItem(feedbackItem, "Description", item.Content, ContainerType.LikertScaleItem, itemId);
+                    yield return feedbackItem;
+                }
+            }
+
+            void BindDataItem(BaseTranslationItem item, string label, ContentContainer content, ContainerType container, Guid containerId)
             {
                 item.FromText = content?.GetText(label, fromLang);
 
@@ -564,63 +588,26 @@ namespace InSite.Admin.Workflow.Forms
 
             CurrentField = FieldKey.Deserialize(e.Key);
 
-            var content = CurrentField.Container == ContainerType.LikertScaleItem
+            var content = IsLikertContainer(CurrentField.Container)
                 ? LikertScaleItemMapping[CurrentField.EntityID].Content
                 : ServiceLocator.ContentSearch.GetBlock(CurrentField.EntityID, labels: new[] { CurrentField.Field });
 
             e.Translation = content[CurrentField.Field].Text.Serialize();
             e.Language = ToLanguage.Value;
-            e.AllowHtml = true;
+            e.AllowHtml = !IsLikertPlainTextField(CurrentField);
         }
 
         private void TranslationWindow_SaveTranslation(object sender, StringValueArgs e)
         {
             if (SurveyID.HasValue && CurrentField != null)
             {
-                var content = CurrentField.Container == ContainerType.LikertScaleItem
+                var content = IsLikertContainer(CurrentField.Container)
                     ? LikertScaleItemMapping[CurrentField.EntityID].Content
                     : ServiceLocator.ContentSearch.GetBlock(CurrentField.EntityID);
 
                 content[CurrentField.Field].Text = MultilingualString.Deserialize(e.Value);
 
-                Command cmd;
-
-                switch (CurrentField.Container)
-                {
-                    case ContainerType.Survey:
-                        cmd = new Application.Surveys.Write.ChangeSurveyFormContent(SurveyID.Value, content);
-                        break;
-                    case ContainerType.Question:
-                        cmd = new Application.Surveys.Write.ChangeSurveyQuestionContent(SurveyID.Value, CurrentField.EntityID, content);
-                        break;
-                    case ContainerType.OptionList:
-                        cmd = new Application.Surveys.Write.ChangeSurveyOptionListContent(SurveyID.Value, CurrentField.EntityID, content, null);
-                        break;
-                    case ContainerType.Option:
-                        cmd = new Application.Surveys.Write.ChangeSurveyOptionItemContent(SurveyID.Value, CurrentField.EntityID, content);
-                        break;
-                    case ContainerType.LikertScaleItem:
-                        var scaleItemData = LikertScaleItemMapping[CurrentField.EntityID];
-                        var question = Survey.FindQuestion(scaleItemData.QuestionId);
-
-                        cmd = null;
-
-                        if (question.Scales == null)
-                            break;
-
-                        var scale = question.Scales.FirstOrDefault(x => x.Category == scaleItemData.ScaleCategory);
-                        if (scale == null || scale.Items.Count == 0 || scaleItemData.ItemIndex >= scale.Items.Count)
-                            break;
-
-                        scale.Items[scaleItemData.ItemIndex].Content = content;
-
-                        cmd = new Application.Surveys.Write.ChangeSurveyScale(Survey.Identifier, question.Identifier, scale);
-
-                        break;
-                    default:
-                        throw new NotImplementedException("Invalid container type: " + CurrentField.Container.GetName());
-                }
-
+                var cmd = CreateSaveCommand(content);
                 if (cmd != null)
                     ServiceLocator.SendCommand(cmd);
             }
@@ -632,6 +619,61 @@ namespace InSite.Admin.Workflow.Forms
                 TranslationWindow.GetCloseScript() + $" $('#{UpdateButton.ClientID}').click();",
                 true);
         }
+
+        private ICommand CreateSaveCommand(ContentContainer content)
+        {
+            switch (CurrentField.Container)
+            {
+                case ContainerType.Survey:
+                    return new Application.Surveys.Write.ChangeSurveyFormContent(SurveyID.Value, content);
+
+                case ContainerType.Question:
+                    return new Application.Surveys.Write.ChangeSurveyQuestionContent(SurveyID.Value, CurrentField.EntityID, content);
+
+                case ContainerType.OptionList:
+                    var category = Survey.FindOptionList(CurrentField.EntityID)?.Category;
+                    return new Application.Surveys.Write.ChangeSurveyOptionListContent(SurveyID.Value, CurrentField.EntityID, content, category);
+
+                case ContainerType.Option:
+                    return new Application.Surveys.Write.ChangeSurveyOptionItemContent(SurveyID.Value, CurrentField.EntityID, content);
+
+                case ContainerType.LikertScaleItem:
+                case ContainerType.LikertScale:
+                    return CreateLikertScaleSaveCommand(content);
+
+                default:
+                    throw new NotImplementedException("Invalid container type: " + CurrentField.Container.GetName());
+            }
+        }
+
+        private ICommand CreateLikertScaleSaveCommand(ContentContainer content)
+        {
+            var scaleItemData = LikertScaleItemMapping[CurrentField.EntityID];
+            var question = Survey.FindQuestion(scaleItemData.QuestionId);
+
+            if (question.Scales == null)
+                return null;
+
+            var scale = question.Scales.FirstOrDefault(x => x.Category == scaleItemData.ScaleCategory);
+            if (scale == null)
+                return null;
+
+            if (CurrentField.Container == ContainerType.LikertScale)
+                scale.Content = content;
+            else if (scale.Items.Count != 0 && scaleItemData.ItemIndex < scale.Items.Count)
+                scale.Items[scaleItemData.ItemIndex].Content = content;
+            else
+                return null;
+
+            return new Application.Surveys.Write.ChangeSurveyScale(Survey.Identifier, question.Identifier, scale);
+        }
+
+        private static bool IsLikertContainer(ContainerType container) =>
+            container == ContainerType.LikertScaleItem || container == ContainerType.LikertScale;
+
+        private static bool IsLikertPlainTextField(FieldKey field) =>
+               field.Container == ContainerType.LikertScale
+            || field.Container == ContainerType.LikertScaleItem && field.Field == SurveyScaleItem.GradeLabel;
 
         #endregion
     }

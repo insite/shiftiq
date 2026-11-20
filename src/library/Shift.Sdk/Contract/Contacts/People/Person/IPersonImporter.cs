@@ -10,6 +10,8 @@ namespace Shift.Contract
             Guid organizationId,
             string fullNamePolicy,
             string timeZone,
+            string employerGroupName,
+            string[] groupNames,
             Guid submittedBy,
             string submittedByName,
             IEnumerable<ImportPerson> imports
@@ -19,6 +21,8 @@ namespace Shift.Contract
             Guid organizationId,
             string fullNamePolicy,
             string timeZone,
+            string emloyerGroupName,
+            string[] groupNames,
             string submittedByName,
             IEnumerable<ImportPendingPerson> imports
         );

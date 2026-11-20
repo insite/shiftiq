@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+
+using Shift.Common;
+
+namespace Shift.Contract
+{
+    public class SearchVenues : Query<IEnumerable<VenueMatch>>, IGroupCriteria
+    {
+        string IGroupCriteria.GroupType
+        {
+            get => "Venue";
+            set { }
+        }
+
+        public Guid? OrganizationId { get; set; }
+
+        public string GroupCode { get; set; }
+        public string[] GroupNames { get; set; }
+        public DateTimeOffset? GroupCreatedSince { get; set; }
+        public DateTimeOffset? GroupCreatedBefore { get; set; }
+        public DateTimeOffset? GroupExpirySince { get; set; }
+        public DateTimeOffset? GroupExpiryBefore { get; set; }
+        public DateTimeOffset? LastChangeTimeSince { get; set; }
+        public DateTimeOffset? LastChangeTimeBefore { get; set; }
+    }
+}

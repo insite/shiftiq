@@ -116,7 +116,7 @@ namespace InSite.Admin.Contacts.Comments.Forms
             CancelButton.NavigateUrl = GetParentUrl();
         }
 
-        private string GetLocalTime(DateTimeOffset? item, TimeZoneInfo tz)
+        private string GetLocalTime(DateTimeOffset? item, string tz)
         {
             return item.Format(tz, nullValue: "None");
         }

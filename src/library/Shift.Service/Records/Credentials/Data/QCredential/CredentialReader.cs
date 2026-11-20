@@ -119,7 +119,7 @@ public class CredentialReader : IEntityReader
                         PersonCode = person!.PersonCode
                     }
                 )
-                .OrderBy(criteria.Filter.Sort ?? DefaultSort)
+                .OrderBy(criteria.Filter.Sort, nameof(CredentialMatch.CredentialId))
                 .ApplyPaging(criteria.Filter)
                 .ToListAsync(cancellation);
         }, cancellation);

@@ -115,7 +115,7 @@ namespace InSite.Admin.Assessments.Comments.Forms
         public static DateTimeOffset? GetEventDate(string text)
         {
             if (DateTime.TryParse(text, out DateTime result))
-                return new DateTimeOffset(TimeZoneInfo.ConvertTime(result, User.TimeZone, TimeZones.Utc));
+                return new DateTimeOffset(TimeZones.ConvertTime(result, User.TimeZone, TimeZones.Ids.Utc));
             return null;
         }
 
@@ -147,7 +147,7 @@ namespace InSite.Admin.Assessments.Comments.Forms
                     {
                         Instructor.Value = comment.Instructor;
                         EventDate.Text = comment.EventDate.HasValue
-                            ? TimeZoneInfo.ConvertTime(comment.EventDate.Value, User.TimeZone).ToString("MMM d, yyyy")
+                            ? TimeZones.ConvertTime(comment.EventDate.Value, User.TimeZone).ToString("MMM d, yyyy")
                             : null;
                     }
 

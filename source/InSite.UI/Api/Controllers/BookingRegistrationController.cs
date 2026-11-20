@@ -238,6 +238,9 @@ namespace InSite.Api.Controllers
         [HttpPost]
         public HttpResponseMessage PostRegistration([FromUri] Guid registration, AddRegistrationLax add)
         {
+            if (add == null)
+                return JsonError("Bad request");
+
             try
             {
                 var organization = GetOrganization().Identifier;
@@ -275,7 +278,7 @@ namespace InSite.Api.Controllers
 
                 SendCommand(new RequestRegistration(registration, organization, exam.Value, learner.UserIdentifier, null, null, null, null, null));
                 SendCommand(new AssignExamForm(registration, assessment.FormIdentifier, null));
-                SendCommand(new ChangeEligibility(registration, "Eligible", "API", null));
+                SendCommand(new ChangeEligibility(registration, RegistrationEligibility.Eligible, "API", null));
                 SendCommand(new ChangeApproval(registration, "Eligible", "Eligible", null, null));
 
                 if (!string.IsNullOrEmpty(add.LearnerRegistrantType))
@@ -486,7 +489,7 @@ namespace InSite.Api.Controllers
 
                 SendCommand(new AssignExamForm(registration, assessment.FormIdentifier, null));
                 SendCommand(new LimitExamTime(registration));
-                SendCommand(new ChangeEligibility(registration, "Eligible", "API", null));
+                SendCommand(new ChangeEligibility(registration, RegistrationEligibility.Eligible, "API", null));
                 SendCommand(new ChangeApproval(registration, "Eligible", "Eligible", null, null));
 
                 return JsonSuccess(new { form = assessment.FormIdentifier, registration }, HttpStatusCode.Created);
@@ -661,24 +664,24 @@ namespace InSite.Api.Controllers
             var venueAddress = ServiceLocator.GroupSearch.GetAddress(venue.GroupIdentifier, AddressType.Physical);
             if (venueAddress != null)
             {
-                TimeZoneInfo venueTimeZone = null;
+                string venueTimeZone = null;
 
                 if (venueAddress.PostalCode.IsNotEmpty())
                 {
                     venueTimeZone = venueAddress.Country.IsNotEmpty()
-                        ? TimeZones.FindByPostalCode(venueAddress.PostalCode, venueAddress.Country)
-                        : TimeZones.FindByPostalCode(venueAddress.PostalCode);
+                        ? TimeZones.FindTimeZoneIdByPostalCode(venueAddress.PostalCode, venueAddress.Country)
+                        : TimeZones.FindTimeZoneIdByPostalCode(venueAddress.PostalCode);
                 }
 
                 if (venueTimeZone == null && venueAddress.Province.IsNotEmpty())
                 {
                     venueTimeZone = venueAddress.Country.IsNotEmpty()
-                        ? TimeZones.FindByProvince(venueAddress.Province, venueAddress.Country)
-                        : TimeZones.FindByProvince(venueAddress.Province);
+                        ? TimeZones.FindTimeZoneIdByProvince(venueAddress.Province, venueAddress.Country)
+                        : TimeZones.FindTimeZoneIdByProvince(venueAddress.Province);
                 }
 
                 if (venueTimeZone != null)
-                    eventStart = TimeZoneInfo.ConvertTime(eventStart, venueTimeZone);
+                    eventStart = TimeZones.ConvertTime(eventStart, venueTimeZone);
             }
 
             var venueIdentifier = venue.GroupIdentifier;

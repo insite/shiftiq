@@ -17,6 +17,7 @@ namespace Shift.Common
         public Platform Platform { get; set; }
         public EngineSettings Engine { get; set; }
         public ShiftSettings Shift { get; set; }
+        public TimeZoneSet[] TimeZoneSets { get; set; }
         public PartitionSettings[] Partitions { get; set; }
         public RouteSettings RouteSettings { get; set; }
 
@@ -73,6 +74,7 @@ namespace Shift.Common
 
                 current.HelpUrl = partition.HelpUrl;
                 current.LogoUrl = partition.LogoUrl;
+                current.TimeZoneSet = partition.TimeZoneSet;
 
                 _partition = current;
 

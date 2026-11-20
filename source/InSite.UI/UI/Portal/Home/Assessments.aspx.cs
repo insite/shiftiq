@@ -5,9 +5,9 @@ using InSite.Application.Attempts.Read;
 using InSite.Domain.Banks;
 using InSite.UI.Layout.Admin;
 using InSite.UI.Layout.Portal;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Home

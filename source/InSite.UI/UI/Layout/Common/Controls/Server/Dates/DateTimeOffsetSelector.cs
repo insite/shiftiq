@@ -34,6 +34,9 @@ namespace InSite.Common.Web.UI
             [JsonProperty(PropertyName = "moment")]
             public string MomentName { get; set; }
 
+            [JsonProperty(PropertyName = "isIANACompatible")]
+            public bool IsIANACompatible { get; set; }
+
             #endregion
         }
 
@@ -49,15 +52,14 @@ namespace InSite.Common.Web.UI
             {
                 get
                 {
-                    var info = Value.GetTimeZone();
+                    var timeZoneId = Value != null
+                        ? TimeZones.FindTimeZoneId(Value.Value, CurrentSessionState.Identity.User.TimeZone)
+                        : _defaultTimeZone;
 
-                    if (info == null)
-                        info = TimeZones.GetInfo(_defaultTimeZone);
-
-                    if (info == null)
+                    if (TimeZones.GetAbbreviation(timeZoneId) == null)
                         throw new KeyNotFoundException("Time zone not found: " + (Value.HasValue ? Value.Value.ToString() : _defaultTimeZone));
 
-                    return info.GetAbbreviation().Generic;
+                    return timeZoneId;
                 }
             }
 
@@ -100,7 +102,7 @@ namespace InSite.Common.Web.UI
 
         public string DefaultTimeZone
         {
-            get { return (string)(ViewState[nameof(DefaultTimeZone)] ?? CurrentSessionState.Identity?.User?.TimeZone.Id ?? TimeZones.Utc.Id); }
+            get { return (string)(ViewState[nameof(DefaultTimeZone)] ?? CurrentSessionState.Identity?.User?.TimeZone ?? TimeZones.Ids.Utc); }
             set { ViewState[nameof(DefaultTimeZone)] = value; }
         }
 
@@ -139,7 +141,7 @@ namespace InSite.Common.Web.UI
 
                 if (newValue.HasValue && ApplyUserTimezone)
                 {
-                    newValue = TimeZones.ConvertFromUtc(
+                    newValue = TimeZones.ConvertTime(
                         newValue.Value,
                         CurrentSessionState.Identity?.User?.TimeZone ?? throw new ArgumentNullException("CurrentSessionState.Identity.User")
                     );
@@ -198,6 +200,7 @@ namespace InSite.Common.Web.UI
             return new JsonDateTimeOffsetOutput(DefaultTimeZone)
             {
                 FullDateFormat = "MMM D, YYYY h:mm A z",
+                NoTimeZoneDateFormat = "MMM D, YYYY h:mm A",
                 ShortDateFormat = "MMM D, YYYY",
             };
         }
@@ -207,15 +210,16 @@ namespace InSite.Common.Web.UI
         {
             var timeZones = new List<JsonTimeZone>();
 
-            foreach (var tz in TimeZones.Supported)
+            foreach (var tzId in TimeZones.Supported)
             {
-                var abbrv = tz.GetAbbreviation();
+                var abbrv = TimeZones.GetAbbreviation(tzId);
 
                 timeZones.Add(new JsonTimeZone
                 {
-                    DisplayName = tz.DisplayName,
+                    DisplayName = abbrv.DisplayName,
                     Abbreviation = abbrv.Generic,
-                    MomentName = abbrv.Moment
+                    MomentName = abbrv.TimeZoneId,
+                    IsIANACompatible = abbrv.IsIANACompatible
                 });
             }
 

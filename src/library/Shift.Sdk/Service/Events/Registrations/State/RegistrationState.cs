@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Shift.Common.Timeline.Changes;
 
@@ -11,13 +12,12 @@ namespace InSite.Domain.Registrations
 
         public Guid CandidateIdentifier { get; set; }
 
-        public Guid? FormIdentifier { get; set; }
-        public Guid? PreviousFormIdentifier { get; set; }
-
         public string RegistrationPassword { get; set; }
         public string BillingCode { get; set; }
 
         public DateTimeOffset? Voided { get; set; }
+
+        public List<RegistrationExamFormState> Forms { get; set; } = new List<RegistrationExamFormState>();
 
         #region When
 
@@ -33,22 +33,54 @@ namespace InSite.Domain.Registrations
 
         public void When(CustomerAssigned _) { }
 
-        public void When(EligibilityChanged _) { }
+        public void When(EligibilityChanged e)
+        {
+            foreach (var form in Forms)
+            {
+                if (!e.Form.HasValue || form.FormIdentifier == e.Form.Value)
+                    form.EligibilityStatus = e.Status;
+            }
+        }
 
         public void When(EmployerAssigned _) { }
 
         public void When(ExamFormAssigned e)
         {
-            PreviousFormIdentifier = e.PreviousForm;
-            FormIdentifier = e.Form;
+            Forms.Clear();
+            Forms.Add(new RegistrationExamFormState
+            {
+                FormIdentifier = e.Form
+            });
         }
+
+        public void When(ExamFormAdded e)
+        {
+            Forms.Add(new RegistrationExamFormState
+            {
+                FormIdentifier = e.Form
+            });
+        }
+
+        public void When(ExamFormChanged e)
+        {
+            var form = Forms.Find(x => x.FormIdentifier == e.FromForm);
+            form.FormIdentifier = e.ToForm;
+        }
+
+        public void When(ExamFormPasswordChanged _) { }
 
         public void When(ExamFormReplaced e) { }
 
-        public void When(ExamFormUnassigned _)
+        public void When(ExamFormUnassigned e)
         {
-            PreviousFormIdentifier = FormIdentifier;
-            FormIdentifier = null;
+            Forms.Clear();
+        }
+
+        public void When(ExamFormRemoved e)
+        {
+            var index = Forms.FindIndex(x => x.FormIdentifier == e.Form);
+            if (index >= 0)
+                Forms.RemoveAt(index);
         }
 
         public void When(ExamTimeLimited _) { }
@@ -73,7 +105,10 @@ namespace InSite.Domain.Registrations
 
         public void When(RegistrationPaymentAssigned _) { }
 
-        public void When(RegistrationPasswordChanged e) { RegistrationPassword = e.Password; }
+        public void When(RegistrationPasswordChanged e)
+        {
+            RegistrationPassword = e.Password;
+        }
 
         public void When(RegistrationRequested e)
         {

@@ -53,6 +53,7 @@ namespace InSite.Custom.CMDS.User.Progressions.Forms
 
                 PageHelper.AutoBindHeader(this, null, user.FullName);
 
+                AchievementDetails.ExcludePaidProgramAchievements = true;
                 AchievementDetails.SetDefaultInputValues(PersonID, ContainerGuid);
 
                 CancelButton.NavigateUrl = SearchUrl;
@@ -164,6 +165,11 @@ namespace InSite.Custom.CMDS.User.Progressions.Forms
         public static string CreateCredential(Guid userKey, Guid credentialIdentifier, EmployeeAchievementDetails.EducationItem item)
         {
             var userIdentifier = userKey;
+
+            // The selector hides paid-program achievements; this catches a stale page or a forged post.
+            var isPaidAchievement = PaidProgramAchievementSearch.IsPaidAchievement(item.CredentialAchievement.Value);
+            if (isPaidAchievement)
+                return PaidProgramAchievementSearch.AssignmentRefusedMessage;
 
             var achievement = ServiceLocator.AchievementSearch.GetAchievement(item.CredentialAchievement.Value);
             var lifetime = item.LifetimeMonths;

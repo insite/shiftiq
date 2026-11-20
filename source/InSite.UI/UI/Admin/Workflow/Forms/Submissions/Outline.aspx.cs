@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -219,7 +219,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions
                         .OrderBy(x => x.OptionSequence)
                         .ToArray();
 
-                    var likertScale = ReviewDetails.GetLikertScale(q, options, Current.Session.QResponseOptions, likertType);
+                    var likertScale = ReviewDetails.GetLikertScale(q, options, Current.Session.QResponseOptions, likertType, Current.Language);
 
                     return likertScale?.Items == null || likertScale.Items.Count == 0
                         ? default
@@ -545,7 +545,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions
 
             var likertType = ReviewDetails.GetLikertType(question.LikertAnalysis);
 
-            var likertScale = ReviewDetails.GetLikertScale(question, options, response.QResponseOptions, likertType);
+            var likertScale = ReviewDetails.GetLikertScale(question, options, response.QResponseOptions, likertType, Current.Language);
             if (likertScale?.Items == null || likertScale.Items.Count == 0)
                 return (new string[0], null);
 

@@ -44,7 +44,7 @@ namespace Shift.Common
 
                     var end = start.Add(duration);
 
-                    var tz = Shift.Common.Base.TimeZones.GetZone(lockout.Interval.Zone);
+                    var tz = TimeZones.IsValidZone(lockout.Interval.Zone) ? lockout.Interval.Zone : TimeZones.Ids.Utc;
 
                     Description = $"Scheduled system maintenance started at {DescribeTime(start, tz)} "
                         + $"and is expected to complete within {DescribeDuration(duration)}, so you "
@@ -77,7 +77,7 @@ namespace Shift.Common
 
                     var end = start.Add(duration);
 
-                    var tz = Shift.Common.Base.TimeZones.GetZone(lockout.Interval.Zone);
+                    var tz = TimeZones.IsValidZone(lockout.Interval.Zone) ? lockout.Interval.Zone : TimeZones.Ids.Utc;
 
                     Description = $"Scheduled system maintenance begins in "
                         + $"**{ToQuantity(next.Value, "minute")}**. Please save your work **before "
@@ -105,7 +105,7 @@ namespace Shift.Common
             return ToQuantity((int)duration.TotalMinutes, "minute");
         }
 
-        private string DescribeTime(DateTimeOffset when, TimeZoneInfo tz)
+        private string DescribeTime(DateTimeOffset when, string tz)
         {
             return Shift.Common.Base.Clock.FormatTime(when, tz);
         }

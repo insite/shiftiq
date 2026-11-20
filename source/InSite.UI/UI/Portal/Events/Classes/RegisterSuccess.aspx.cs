@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Admin.Invoices.Controls;
 using InSite.Application.Registrations.Read;

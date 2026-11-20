@@ -35,6 +35,7 @@ namespace InSite.Application.Attempts.Read
         void UpdateAttempt(AttemptGradedDateChanged e);
         void UpdateAttempt(AttemptFixed e);
         void UpdateAttempt(AttemptTagged e);
+        void UpdateAttempt(AttemptAIProctoringSessionIdModified e);
         void UpdateAttempt(QuestionVoided e);
         void UpdateAttempt(QuestionRegraded e, Form form);
         void UpdateAttempt(ComposedQuestionScored e);

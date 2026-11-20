@@ -16,6 +16,7 @@ namespace InSite.Domain.Records
         public decimal? Points { get; set; }
         public decimal? MaxPoints { get; set; }
         public string Comment { get; set; }
+        public DateTimeOffset? Started { get; set; }
         public DateTimeOffset? Graded { get; set; }
         public bool IsPublished { get; set; }
         public string Status { get; set; }
@@ -90,8 +91,9 @@ namespace InSite.Domain.Records
 
         }
 
-        public void When(ProgressStarted _)
+        public void When(ProgressStarted e)
         {
+            Started = e.Started;
             Percent = null;
             Graded = null;
             Status = ProgressStarted.Status;
@@ -104,6 +106,7 @@ namespace InSite.Domain.Records
 
         public void When(ProgressIncompleted _)
         {
+            Started = null;
             Percent = null;
             Graded = null;
             Status = ProgressIncompleted.Status;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +11,6 @@ using InSite.UI.Admin.Events.Classes.Reports;
 using Shift.Common;
 using Shift.Constant;
 using Shift.Toolbox;
-
-using TimeZone = Shift.Common.TimeZone;
 
 namespace InSite.Admin.Events.Classes.Reports
 {
@@ -264,12 +262,12 @@ namespace InSite.Admin.Events.Classes.Reports
 
         private static string GetTimeFrame(EventParticipationSummary summary)
         {
-            var start = TimeZone.ConvertTime(summary.EventScheduledStart.UtcDateTime, TimeZones.Utc, CurrentSessionState.Identity.User.TimeZone);
+            var start = TimeZones.ConvertTime(summary.EventScheduledStart, CurrentSessionState.Identity.User.TimeZone);
 
             if (summary.EventScheduledEnd == null)
                 return $"{start:MMM d, yyyy}";
 
-            var end = TimeZone.ConvertTime(summary.EventScheduledEnd.Value.UtcDateTime, TimeZones.Utc, CurrentSessionState.Identity.User.TimeZone);
+            var end = TimeZones.ConvertTime(summary.EventScheduledEnd.Value, CurrentSessionState.Identity.User.TimeZone);
 
             return $"{start:MMM d} - {end:MMM d, yyyy}";
         }

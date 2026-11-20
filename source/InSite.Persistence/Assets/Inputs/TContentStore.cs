@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -201,7 +201,20 @@ namespace InSite.Persistence
 
             using (var db = new InternalDbContext())
             {
-                UpdateDeleteContainer(type, container, innerData, db);
+                TContent[] entities;
+
+                if (!innerData.IsLoaded) // This option should prevent removing of items that is not loaded to ContentBlock. It can be used when the ContentBlock was partialy loaded.
+                {
+                    var filter = innerData.GetLabels().ToArray();
+
+                    entities = db.TContents.Where(x => x.ContainerIdentifier == container && filter.Contains(x.ContentLabel)).ToArray();
+                }
+                else
+                {
+                    entities = db.TContents.Where(x => x.ContainerIdentifier == container).ToArray();
+                }
+
+                UpdateDeleteContainer(type, innerData, entities, db);
 
                 InsertContainer(organization, type, container, innerData, db);
 
@@ -209,21 +222,48 @@ namespace InSite.Persistence
             }
         }
 
-        private static void UpdateDeleteContainer(string type, Guid container, ContentContainer innerData, InternalDbContext db)
+        public void SaveContainers(Guid organization, string type, IEnumerable<KeyValuePair<Guid, ContentContainer>> containers)
         {
-            TContent[] entities;
+            const int chunkSize = 200;
 
-            if (!innerData.IsLoaded) // This option should prevent removing of items that is not loaded to ContentBlock. It can be used when the ContentBlock was partialy loaded.
+            var data = containers.ToArray();
+            if (data.Length == 0)
+                return;
+
+            for (var i = 0; i < data.Length; i += chunkSize)
             {
-                var filter = innerData.GetLabels().ToArray();
+                var chunk = data.Skip(i).Take(chunkSize).ToArray();
+                var chunkIds = chunk.Select(x => x.Key).Distinct().ToArray();
 
-                entities = db.TContents.Where(x => x.ContainerIdentifier == container && filter.Contains(x.ContentLabel)).ToArray();
-            }
-            else
-            {
-                entities = db.TContents.Where(x => x.ContainerIdentifier == container).ToArray();
-            }
+                using (var db = new InternalDbContext())
+                {
+                    var existingEntities = db.TContents
+                        .Where(x => chunkIds.Contains(x.ContainerIdentifier))
+                        .ToArray();
 
+                    var entitiesByContainer = existingEntities
+                        .GroupBy(x => x.ContainerIdentifier)
+                        .ToDictionary(g => g.Key, g => g.ToArray());
+
+                    foreach (var pair in chunk)
+                    {
+                        var containerId = pair.Key;
+                        var innerData = pair.Value?.Clone() ?? new ContentContainer { IsLoaded = true };
+                        innerData.CreateSnips();
+
+                        var entities = entitiesByContainer.GetOrDefault(containerId, () => Array.Empty<TContent>());
+
+                        UpdateDeleteContainer(type, innerData, entities, db);
+                        InsertContainer(organization, type, containerId, innerData, db);
+                    }
+
+                    db.SaveChanges();
+                }
+            }
+        }
+
+        private static void UpdateDeleteContainer(string type, ContentContainer innerData, TContent[] entities, InternalDbContext db)
+        {
             for (var i = 0; i < entities.Length; i++)
             {
                 var entity = entities[i];

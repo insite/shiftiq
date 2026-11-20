@@ -48,6 +48,20 @@
 
                                 <h3>Attempt</h3>
 
+                                <div runat="server" id="AIProctoringStateField" class="form-group mb-3" Visible="false">
+                                    <label class="form-label">AI Proctoring</label>
+                                    <div>
+                                        Enabled
+                                    </div>
+                                </div>
+
+                                <div runat="server" id="AIProctoringSessionIdField" class="form-group mb-3" Visible="false">
+                                    <label class="form-label"><asp:Literal runat="server" ID="AIProctoringProviderName" /> Session Id</label>
+                                    <div>
+                                        <asp:Literal runat="server" ID="AIProctoringSessionId" />
+                                    </div>
+                                </div>
+
                                 <div class="form-group mb-3">
                                     <label class="form-label">Started</label>
                                     <div>

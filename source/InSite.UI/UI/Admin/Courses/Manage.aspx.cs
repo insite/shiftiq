@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -144,18 +144,18 @@ namespace InSite.UI.Admin.Courses
             if (course == null || !CourseSearch.CourseExists(x => x.CourseIdentifier == course))
                 HttpResponseHelper.Redirect("/ui/admin/courses/search");
 
-            var activity = _url.GetGuid("activity");
-            if (activity != null)
+            if (_url.GetGuid("activity") != null)
                 return;
 
-            activity = CourseSearch.GetFirstCourseActivity(course.Value);
-            if (activity != null)
-                HttpResponseHelper.Redirect($"/ui/admin/courses/manage?course={course}&activity={activity}");
+            var activityId = CourseSearch.GetFirstCourseActivity(course.Value) ?? CreateLesson(course.Value);
+            var redirectUrl = $"/ui/admin/courses/manage?course={course}&activity={activityId}" + BuildUrlParameters(_url);
 
-            var activityId = CreateLesson(course.Value);
-
-            HttpResponseHelper.Redirect($"/ui/admin/courses/manage?course={course}&activity={activityId}");
+            HttpResponseHelper.Redirect(redirectUrl);
         }
+
+        private static readonly string[] UrlRequiredParameters = new[] { "panel", "tab", "enrollment" };
+        private static string BuildUrlParameters(UrlParser.Url url) => 
+            string.Concat(UrlRequiredParameters.Where(x => url.Exists(x)).Select(x => $"&{x}={HttpUtility.UrlEncode(url.Get(x))}"));
 
         private Guid CreateLesson(Guid courseId)
         {

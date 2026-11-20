@@ -20,11 +20,11 @@ public class CourseService : IEntityService
         return await _reader.AssertAsync(course, organization, cancellation);
     }
 
-    public async Task<IEnumerable<CourseModel>> CollectAsync(ICourseCriteria criteria, TimeZoneInfo? timeZone, CancellationToken cancellation = default)
+    public async Task<IEnumerable<CourseModel>> CollectAsync(ICourseCriteria criteria, CancellationToken cancellation = default)
     {
         var entities = await _reader.CollectAsync(criteria, cancellation);
 
-        return _adapter.ToModel(entities, timeZone);
+        return _adapter.ToModel(entities);
     }
 
     public async Task<int> CountAsync(ICourseCriteria criteria, CancellationToken cancellation = default)
@@ -32,19 +32,19 @@ public class CourseService : IEntityService
         return await _reader.CountAsync(criteria, cancellation);
     }
 
-    public async IAsyncEnumerable<CourseModel> DownloadAsync(ICourseCriteria criteria, TimeZoneInfo? timeZone, [EnumeratorCancellation] CancellationToken cancellation)
+    public async IAsyncEnumerable<CourseModel> DownloadAsync(ICourseCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation)
     {
         await foreach (var entity in _reader.DownloadAsync(criteria, cancellation))
         {
-            yield return _adapter.ToModel(entity, timeZone);
+            yield return _adapter.ToModel(entity);
         }
     }
 
-    public async Task<CourseModel?> RetrieveAsync(Guid course, TimeZoneInfo? timeZone, CancellationToken cancellation = default)
+    public async Task<CourseModel?> RetrieveAsync(Guid course, CancellationToken cancellation = default)
     {
         var entity = await _reader.RetrieveAsync(course, cancellation);
 
-        return entity != null ? _adapter.ToModel(entity, timeZone) : null;
+        return entity != null ? _adapter.ToModel(entity) : null;
     }
 
     public async Task<IEnumerable<CourseMatch>> SearchAsync(ICourseCriteria criteria, CancellationToken cancellation = default)

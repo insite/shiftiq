@@ -6,8 +6,6 @@ public interface IPrincipalProvider
 
     Guid OrganizationId { get; }
 
-    TimeZoneInfo GetTimeZone();
-
     void ValidateOrganizationId(IPrincipal principal, IQueryByOrganization query);
 
     Guid? GetOrganizationId(IPrincipal principal);

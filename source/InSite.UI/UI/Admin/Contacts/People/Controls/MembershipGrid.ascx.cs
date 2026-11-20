@@ -225,7 +225,7 @@ namespace InSite.Admin.Contacts.People.Controls
 
         protected string GetEditUrl()
         {
-            var url = $"/ui/admin/contacts/people/edit-membership?from={Eval("GroupIdentifier")}&to={UserIdentifier}";
+            var url = $"/ui/admin/contacts/people/edit-membership?id={Eval("MembershipIdentifier")}";
 
             if (_returnUrl != null)
                 url = _returnUrl.GetRedirectUrl(url);
@@ -235,7 +235,7 @@ namespace InSite.Admin.Contacts.People.Controls
 
         protected string GetDeleteUrl()
         {
-            var url = $"/ui/admin/contacts/people/delete-membership?from={Eval("GroupIdentifier")}&to={UserIdentifier}";
+            var url = $"/ui/admin/contacts/people/delete-membership?id={Eval("MembershipIdentifier")}";
 
             if (_returnUrl != null)
                 url = _returnUrl.GetRedirectUrl(url);

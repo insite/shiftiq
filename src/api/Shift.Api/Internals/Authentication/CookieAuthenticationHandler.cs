@@ -172,18 +172,6 @@ public class CookieAuthenticationHandler : AuthenticationHandler<CookieAuthentic
             list.Add(_converter.ToClaim(ClaimName.ProxyAgentEmail, claims.ImpersonatorUser));
         }
 
-        foreach (var role in claims.UserRoles)
-        {
-            list.Add(_converter.ToClaim(ClaimName.Role, role.ToString()));
-        }
-
-        var (access, systemRoles) = PrincipalSearch.GetAuthority(claims);
-
-        list.Add(_converter.ToClaim(ClaimName.Authority, access.ToString()));
-
-        foreach (var role in systemRoles)
-            list.Add(_converter.ToClaim(ClaimName.Role, role.Name));
-
         return new ClaimsPrincipal(new ClaimsIdentity(list, authenticationType));
     }
 }

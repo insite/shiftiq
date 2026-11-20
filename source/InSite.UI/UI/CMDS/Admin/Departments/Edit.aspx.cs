@@ -154,6 +154,7 @@ namespace InSite.Cmds.Admin.Departments.Forms
             PageHelper.AutoBindHeader(this, qualifier: $"{organization.CompanyName} ({department.DepartmentName})");
 
             AchievementEditor.SetEditable(CanEdit, CanEdit);
+            AchievementEditor.OwnerOrganizationIdentifier = department.OrganizationIdentifier;
             AchievementEditor.LoadAchievements();
 
             var personFilter = new PersonFilter
@@ -252,18 +253,13 @@ namespace InSite.Cmds.Admin.Departments.Forms
             return VCmdsAchievementSearch.SelectDepartmentAchievements(DepartmentIdentifier);
         }
 
+        /// <summary>
+        /// Lists every achievement linked to the department, not only those in the search scope, so
+        /// a link to another organization's achievement stays visible and can be removed.
+        /// </summary>
         private List<AchievementListGridItem> GetAssignedAchievements(List<AchievementListGridItem> list)
         {
-            var groupId = DepartmentIdentifier;
-
-            var groupAchievementIds = TAchievementDepartmentSearch
-                .Bind(x => x.AchievementIdentifier, x => x.DepartmentIdentifier == groupId);
-
-            var assignedAchievementIds = groupAchievementIds.Select(x => x).ToList();
-
-            return list
-                .Where(x => assignedAchievementIds.Contains(x.AchievementIdentifier))
-                .ToList();
+            return VCmdsAchievementSearch.SelectOrganizationAchievements(null, AchievementEditor.Keyword, DepartmentIdentifier);
         }
 
         private void DeleteAchievements(IEnumerable<Guid> achievements)
@@ -284,11 +280,18 @@ namespace InSite.Cmds.Admin.Departments.Forms
                     list.Add(new TAchievementDepartment { DepartmentIdentifier = DepartmentIdentifier, AchievementIdentifier = achievementID });
             }
 
-            TAchievementDepartmentStore.Insert(list);
+            var permitted = TAchievementDepartmentSearch.SelectPermitted(list);
 
-            InsertAchievementOrganizations(list);
+            var rejected = list.Count - permitted.Count;
+            if (rejected > 0)
+                ScreenStatus.AddMessage(AlertType.Warning,
+                    $"{Shift.Common.Humanizer.ToQuantity(rejected, "achievement")} could not be added. A department can hold only achievements owned by its own organization or by Global.");
 
-            return list.Count;
+            TAchievementDepartmentStore.Insert(permitted);
+
+            InsertAchievementOrganizations(permitted);
+
+            return permitted.Count;
         }
 
         /// <summary>

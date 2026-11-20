@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Application.Progresses.Write;
 using InSite.Application.Records.Read;

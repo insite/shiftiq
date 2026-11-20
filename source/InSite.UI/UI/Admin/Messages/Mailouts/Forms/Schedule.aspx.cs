@@ -217,8 +217,8 @@ namespace InSite.Admin.Messages.Mailouts.Forms
 
             MessageSubjectOutput.InnerText = message.MessageTitle;
 
-            ScheduleDate.DefaultTimeZone = User.TimeZone.Id;
-            ScheduleDate.Value = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
+            ScheduleDate.DefaultTimeZone = User.TimeZone;
+            ScheduleDate.Value = TimeZones.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
 
             LoadRecipients(Message.Recipients);
         }

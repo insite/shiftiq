@@ -15,9 +15,9 @@ namespace InSite.Admin.Issues.Outlines.Utilities
 {
     public class CaseDownloader
     {
-        private readonly TimeZoneInfo _tz;
+        private readonly string _tz;
 
-        public CaseDownloader(TimeZoneInfo tz)
+        public CaseDownloader(string tz)
         {
             _tz = tz;
         }

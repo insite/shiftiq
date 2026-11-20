@@ -105,7 +105,7 @@ namespace InSite.Admin.Assessments.Outlines.Controls
                 .OrderByDescending(x => x.Posted)
                 .Select(comment =>
                 {
-                    var postedOn = TimeZoneInfo.ConvertTime(comment.Posted, User.TimeZone);
+                    var postedOn = TimeZones.ConvertTime(comment.Posted, User.TimeZone);
                     Guid questionID = Guid.Empty;
                     bool isQuestion = false;
 

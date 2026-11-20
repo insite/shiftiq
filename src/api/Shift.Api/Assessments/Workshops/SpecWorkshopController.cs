@@ -9,8 +9,6 @@ namespace Shift.Api.Assessments.Workshops;
 public class SpecWorkshopController(
     IPrincipalProvider principalProvider,
     BankSpecificationReader specificationReader,
-    OrganizationService organizationService,
-    OrganizationAdapter organizationAdapter,
     ISpecWorkshopRetrieveService retrieveService,
     ISpecWorkshopModifyService modifyService
 ) : ShiftControllerBase
@@ -18,21 +16,19 @@ public class SpecWorkshopController(
     [HttpPut("api/assessments/workshops/specs/{specificationId}")]
     [HybridPermission("evaluation/banks", DataAccess.Read)]
     [EndpointName("modifySpecWorkshop")]
-    public async Task<ActionResult<SpecWorkshop>> ModifySpecAsync(Guid specificationId, SpecWorkshop.Input input)
+    public async Task<ActionResult<SpecWorkshopPartial>> ModifySpecAsync(Guid specificationId, SpecWorkshop.Input input)
     {
         var principal = principalProvider.GetPrincipal();
         var entity = await specificationReader.RetrieveAsync(specificationId);
 
-        if (entity == null
-            || !principalProvider.AllowOrganizationAccess(principal, entity.OrganizationIdentifier)
-            )
-        {
+        if (entity == null || entity.OrganizationIdentifier != principal.OrganizationId)
             return NotFound();
-        }
 
         var result = await modifyService.ModifyAsync(entity.BankIdentifier, specificationId, input);
 
-        return result ? Ok(new { }) : NotFound();
+        return result
+            ? await retrieveService.RetrievePartialAsync(entity.BankIdentifier, entity.SpecIdentifier)
+            : NotFound();
     }
 
     [HttpGet("api/assessments/workshops/specs/{specificationId}")]
@@ -43,16 +39,10 @@ public class SpecWorkshopController(
         var principal = principalProvider.GetPrincipal();
         var entity = await specificationReader.RetrieveAsync(specificationId);
 
-        if (entity == null
-            || !principalProvider.AllowOrganizationAccess(principal, entity.OrganizationIdentifier)
-            )
-        {
+        if (entity == null || entity.OrganizationIdentifier != principal.OrganizationId)
             return NotFound();
-        }
 
-        var organization = await organizationService.RetrieveAsync(entity.OrganizationIdentifier) ?? throw new ArgumentNullException("organization");
-        var organizationData = organizationAdapter.ToData(organization);
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
 
         var formWorkshop = await retrieveService.RetrieveAsync(
             entity.BankIdentifier,
@@ -73,14 +63,10 @@ public class SpecWorkshopController(
         var principal = principalProvider.GetPrincipal();
         var entity = await specificationReader.RetrieveAsync(specificationId);
 
-        if (entity == null
-            || !principalProvider.AllowOrganizationAccess(principal, entity.OrganizationIdentifier)
-            )
-        {
+        if (entity == null || entity.OrganizationIdentifier != principal.OrganizationId)
             return NotFound();
-        }
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
 
         var set = await retrieveService.RetrieveSpecSetAsync(
             entity.BankIdentifier,

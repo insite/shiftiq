@@ -34,6 +34,7 @@ namespace InSite.Domain.Events
 
     public class EventState : AggregateState
     {
+        public Guid Tenant { get; set; }
         public EventType EventType { get; set; }
         public DateTimeOffset EventTime { get; set; }
         public string EventFormat { get; set; }
@@ -42,6 +43,7 @@ namespace InSite.Domain.Events
         public Guid? MandatorySurveyFormIdentifier { get; set; }
 
         public bool AllowMultipleRegistrations { get; set; }
+        public int? FormAttachmentLimit { get; set; }
         public bool PersonCodeIsRequired { get; set; }
 
         public EventExam Exam { get; set; }
@@ -171,12 +173,14 @@ namespace InSite.Domain.Events
 
         public void When(ClassScheduled2 e)
         {
+            Tenant = e.Tenant;
             EventType = EventType.Class;
             EventTime = e.StartTime;
         }
 
-        public void When(ClassImported _)
+        public void When(ClassImported e)
         {
+            Tenant = e.Tenant;
             EventType = EventType.Class;
         }
 
@@ -232,6 +236,7 @@ namespace InSite.Domain.Events
 
         public void When(ExamScheduled2 e)
         {
+            Tenant = e.Tenant;
             EventType = EventType.Exam;
             EventTime = e.StartTime;
             EventFormat = e.Format;
@@ -240,6 +245,7 @@ namespace InSite.Domain.Events
 
         public void When(AppointmentScheduled e)
         {
+            Tenant = e.Tenant;
             EventType = EventType.Appointment;
             EventTime = e.StartTime;
         }
@@ -253,6 +259,7 @@ namespace InSite.Domain.Events
 
         public void When(MeetingScheduled2 e)
         {
+            Tenant = e.Tenant;
             EventType = EventType.Meeting;
             EventTime = e.StartTime;
         }
@@ -295,6 +302,11 @@ namespace InSite.Domain.Events
         public void When(EventAllowMultipleRegistrationsModified e)
         {
             AllowMultipleRegistrations = e.Value;
+        }
+
+        public void When(EventFormAttachmentLimitModified e)
+        {
+            FormAttachmentLimit = e.Limit;
         }
 
         public void When(EventPersonCodeIsRequiredModified e)

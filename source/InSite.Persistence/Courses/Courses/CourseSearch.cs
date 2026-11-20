@@ -1331,6 +1331,72 @@ namespace InSite.Persistence
             return list;
         }
 
+        public static int CountCourseGradeItems(Guid courseId)
+        {
+            using (var db = new InternalDbContext())
+            {
+                return db.QActivities.AsNoTracking()
+                    .Where(a => a.Module.Unit.CourseIdentifier == courseId && a.GradeItemIdentifier != null)
+                    .Select(a => a.GradeItemIdentifier.Value)
+                    .Distinct()
+                    .Count();
+            }
+        }
+
+        public static List<CourseLearnerProgress> GetCourseLearnerProgress(Guid courseId, Guid gradebookId, ICollection<Guid> learnerIds)
+        {
+            const int chunkSize = 1000;
+
+            if (learnerIds.IsEmpty())
+                return new List<CourseLearnerProgress>();
+
+            var result = new List<CourseLearnerProgress>(learnerIds.Count);
+
+            using (var db = new InternalDbContext())
+            {
+                var gradeItemQuery = db.QActivities
+                    .Where(x => x.Module.Unit.CourseIdentifier == courseId && x.GradeItemIdentifier.HasValue)
+                    .Select(x => x.GradeItemIdentifier.Value);
+
+                for (var i = 0; i < learnerIds.Count; i += chunkSize)
+                {
+                    var chunk = learnerIds.Skip(i).Take(chunkSize).ToList();
+
+                    var enrollments = db.QCourseEnrollments.AsNoTracking()
+                        .Where(x => x.CourseIdentifier == courseId && chunk.Contains(x.LearnerUserIdentifier))
+                        .GroupBy(x => x.LearnerUserIdentifier)
+                        .ToDictionary(x => x.Key, x => x.Max(y => y.CourseCompleted));
+
+                    var completedItems = db.QProgresses.AsNoTracking()
+                        .Where(x => x.GradebookIdentifier == gradebookId
+                                 && chunk.Contains(x.UserIdentifier)
+                                 && x.ProgressIsCompleted
+                                 && (x.ProgressPassOrFail == null || x.ProgressPassOrFail != "Fail")
+                                 && gradeItemQuery.Contains(x.GradeItemIdentifier))
+                        .Select(x => new
+                        {
+                            x.UserIdentifier,
+                            x.GradeItemIdentifier
+                        })
+                        .Distinct()
+                        .GroupBy(x => x.UserIdentifier)
+                        .ToDictionary(x => x.Key, x => x.Count());
+
+                    foreach (var learnerId in chunk)
+                    {
+                        result.Add(new CourseLearnerProgress
+                        {
+                            LearnerIdentifier = learnerId,
+                            CourseCompleted = enrollments.GetOrDefault(learnerId),
+                            CompletedCount = completedItems.GetOrDefault(learnerId)
+                        });
+                    }
+                }
+            }
+
+            return result;
+        }
+
         #endregion
     }
 }

@@ -68,6 +68,14 @@
                                                 <asp:Literal runat="server" ID="ProgramFlagText" />
                                             </div>
                                         </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Program Fee
+                                            </label>
+                                            <div>
+                                                <asp:Literal runat="server" ID="ProgramFee" />
+                                            </div>
+                                        </div>
 
                                     </div>
                                 </div>

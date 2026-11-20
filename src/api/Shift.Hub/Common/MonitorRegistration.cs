@@ -73,11 +73,38 @@ namespace Shift.Hub
                 if (!Settings.Enabled)
                     return null;
 
-                var sentryLevel = MapToSentryLevel(level);
+                // Send the template with its arguments, not the bare template. Sentry keeps grouping
+                // on the template and titles each event with the rendered text, so a warning names
+                // its method, path and caller instead of showing {Method} {Path} from {Caller}.
+                var sentryEvent = new SentryEvent
+                {
+                    Level = MapToSentryLevel(level),
+                    Message = new SentryMessage
+                    {
+                        Message = message,
+                        Params = args,
+                        Formatted = Render(message, args)
+                    }
+                };
 
-                var eventId = SentrySdk.CaptureMessage(message, sentryLevel);
+                var eventId = SentrySdk.CaptureEvent(sentryEvent);
 
                 return CreateSentryEventUri(new Uri(Settings.BaseUrl), Settings.Project, eventId.ToString());
+            }
+
+            // Renders a Serilog message template the same way the log file does, so the Sentry event
+            // and the log line read alike. Falls back to the bare template when it cannot be bound.
+            private static string Render(string message, object[] args)
+            {
+                if (args == null || args.Length == 0)
+                    return message;
+
+                var bound = Serilog.Log.Logger.BindMessageTemplate(message, args, out var template, out var properties);
+
+                if (!bound || template == null || properties == null)
+                    return message;
+
+                return template.Render(properties.ToDictionary(p => p.Name, p => p.Value));
             }
 
             protected override Uri? OnLogException(Exception exception)

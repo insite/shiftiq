@@ -8,6 +8,8 @@ using InSite.Common.Web.UI;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
 
+using Shift.Common;
+
 namespace InSite.UI.Admin.Learning.Catalogs
 {
     public partial class Edit : AdminBasePage
@@ -41,6 +43,7 @@ namespace InSite.UI.Admin.Learning.Catalogs
             var catalog = CourseSearch.SelectCatalog(CatalogIdentifier);
             catalog.CatalogName = CatalogName.Text;
             catalog.IsHidden = CatalogIsHidden.Checked;
+            catalog.CatalogDescription = CatalogDescription.Value.NullIfEmpty();
 
             var store = new Course1Store();
             store.UpdateCatalog(catalog);
@@ -60,6 +63,8 @@ namespace InSite.UI.Admin.Learning.Catalogs
             CatalogName.Text = catalog.CatalogName;
 
             CatalogIsHidden.Checked = catalog.IsHidden;
+
+            CatalogDescription.Value = catalog.CatalogDescription;
 
             var courses = CourseSearch.GetCatalogCourseList(CatalogIdentifier, Identity, (hook, course) => null)
                 .OrderBy(x => x.Title)

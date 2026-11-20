@@ -184,10 +184,6 @@ namespace InSite
         public static CookieToken SignedIn(
             string userEmail,
             Guid userId,
-            bool isAdministrator,
-            bool isDeveloper,
-            bool isOperator,
-            string[] roles,
             string impersonatorOrganization,
             string impersonatorUser,
             string language,
@@ -204,11 +200,6 @@ namespace InSite
             token.UserEmail = userEmail;
             token.UserIdentifier = userId;
 
-            token.IsAdministrator = isAdministrator;
-            token.IsDeveloper = isDeveloper;
-            token.IsOperator = isOperator;
-
-            token.UserRoles = roles;
             token.ImpersonatorOrganization = impersonatorOrganization;
             token.ImpersonatorUser = impersonatorUser;
             token.Language = language.IsEmpty() || !Language.CodeExists(language) ? DefaultLanguage : language;

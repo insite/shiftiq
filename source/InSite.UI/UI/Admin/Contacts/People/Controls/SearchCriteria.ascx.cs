@@ -30,6 +30,7 @@ namespace InSite.Admin.Contacts.People.Controls
                     NameFilterType = NameFilterType.Value,
 
                     CodeContains = Code.Text,
+                    Language = Language.Value,
                     CommentKeyword = CommentKeyword.Text,
 
                     Gender = Gender.Value,
@@ -91,6 +92,7 @@ namespace InSite.Admin.Contacts.People.Controls
                 NameFilterType.Value = value.NameFilterType;
 
                 Code.Text = value.CodeContains;
+                Language.Value = value.Language;
                 CommentKeyword.Text = value.CommentKeyword;
 
                 Gender.Value = value.Gender;
@@ -193,6 +195,13 @@ namespace InSite.Admin.Contacts.People.Controls
             SetCheckAll(Province, "Provinces");
             SetCheckAll(City, "Cities");
             SetCheckAll(CommentFlags, "Comments Flag");
+
+            Language.Settings.IncludeLanguage = CurrentSessionState.Identity.Organization.Languages
+                .Select(x => x.TwoLetterISOLanguageName)
+                .Append(MultilingualString.DefaultLanguage)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            Language.RefreshData();
         }
 
         #endregion
@@ -240,6 +249,7 @@ namespace InSite.Admin.Contacts.People.Controls
             NameFilterType.ClearSelection();
 
             Code.Text = null;
+            Language.Value = null;
             CommentKeyword.Text = null;
 
             Gender.Value = null;

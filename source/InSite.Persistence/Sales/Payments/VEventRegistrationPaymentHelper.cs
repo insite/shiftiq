@@ -63,6 +63,12 @@ namespace InSite.Persistence
             if (filter.PaymentTransactionId.HasValue())
                 query = query.Where(x => x.TransactionCode.Contains(filter.PaymentTransactionId));
 
+            if (filter.TaxCountry.IsNotEmpty())
+                query = query.Where(x => x.TaxCountry == filter.TaxCountry);
+
+            if (filter.TaxRegion.IsNotEmpty())
+                query = query.Where(x => x.TaxRegion == filter.TaxRegion);
+
             return query;
         }
     }

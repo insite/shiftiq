@@ -296,7 +296,8 @@ namespace InSite.UI.Admin.Assets.Files.Controls
                 ReviewedUserIdentifier = reviewedUser,
                 ApprovedTime = approvedTime,
                 ApprovedUserIdentifier = approvedUser,
-                AllowLearnerToView = AllowLearnerToViewYes.Checked
+                AllowLearnerToView = AllowLearnerToViewYes.Checked,
+                Tag = oldProperties?.Tag
             };
         }
 

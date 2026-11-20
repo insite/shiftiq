@@ -48,6 +48,10 @@
                     </div>
 
                     <div class="mb-2">
+                        <insite:FindEmployer runat="server" ID="LearnerEmployerId" EmptyMessage="Employed By" />
+                    </div>
+
+                    <div class="mb-2">
                         <insite:TextBox runat="server" ID="AssessorName" EmptyMessage="Assessor Name" />
                     </div>
 

@@ -1,20 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NoWarn>1701;1702;IDE1006;NU1902;NU1903;</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
+	  <Compile Remove="Contacts\People\Data\Tables\QPersonSecret\QPersonSecretWriter.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.19" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.19" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.19" />
 		<PackageReference Include="OpenAI" Version="2.11.0" />
 		<PackageReference Include="Scrutor" Version="6.0.1" />
 		<PackageReference Include="System.Linq.Async" Version="7.0.0" />
-		<PackageReference Include="System.Text.Json" Version="10.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>

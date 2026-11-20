@@ -456,6 +456,24 @@ namespace InSite.Admin.Assessments.Forms.Controls
         protected global::InSite.Common.Web.UI.IconLink EditProctoringLink;
 
         /// <summary>
+        /// AIProctoringField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AIProctoringField;
+
+        /// <summary>
+        /// AIProctoringState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal AIProctoringState;
+
+        /// <summary>
         /// SafeExamBrowserField control.
         /// </summary>
         /// <remarks>

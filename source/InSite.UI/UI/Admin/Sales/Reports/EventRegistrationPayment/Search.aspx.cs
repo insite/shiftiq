@@ -31,6 +31,10 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
             if (learnerCodeColumn != null)
                 learnerCodeColumn.Title = LabelHelper.GetLabelContentText("Person Code");
 
+            var taxPercentColumn = columns.Find(x => x.Name == nameof(SearchResults.ExportDataItem.TaxPercent));
+            if (taxPercentColumn != null)
+                taxPercentColumn.Format = "0.00%";
+
             return columns;
         }
     }

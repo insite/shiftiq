@@ -23,7 +23,7 @@ namespace Shift.Toolbox
 
         #region Fields
 
-        private TimeZoneInfo _timeZone;
+        private string _timeZoneId;
 
         private List<XlsxExportMappingInfo> _mappings;
         private bool _isRebuildProcessor = true;
@@ -34,14 +34,14 @@ namespace Shift.Toolbox
 
         #region Constructor
 
-        public XlsxExportHelper() : this(TimeZoneInfo.Utc)
+        public XlsxExportHelper() : this(TimeZones.Ids.Utc)
         {
 
         }
 
-        public XlsxExportHelper(TimeZoneInfo timeZone)
+        public XlsxExportHelper(string timeZoneId)
         {
-            _timeZone = timeZone ?? throw new ArgumentNullException(nameof(timeZone));
+            _timeZoneId = timeZoneId ?? throw new ArgumentNullException(nameof(timeZoneId));
             _mappings = new List<XlsxExportMappingInfo>();
         }
 
@@ -258,7 +258,7 @@ namespace Shift.Toolbox
         private object GetExportDate(DateTimeOffset? value)
         {
             return value.HasValue
-                ? TimeZoneInfo.ConvertTime(value.Value, _timeZone).DateTime
+                ? TimeZones.ConvertTime(value.Value, _timeZoneId).DateTime
                 : (object)null;
         }
 

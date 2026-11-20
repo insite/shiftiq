@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
@@ -43,7 +43,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
                 .Where(x => !x.CommentIsPrivate || x.AuthorUserIdentifier == user.UserIdentifier)
                 .Select(x =>
                 {
-                    var posted = TimeZoneInfo.ConvertTime(x.CommentPosted, user.TimeZone);
+                    var posted = TimeZones.ConvertTime(x.CommentPosted, user.TimeZone);
                     return new
                     {
                         x.LogbookIdentifier,

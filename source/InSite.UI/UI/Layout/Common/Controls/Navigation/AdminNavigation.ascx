@@ -1,6 +1,7 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="AdminNavigation.ascx.cs" Inherits="InSite.UI.Layout.Admin.AdminNavigation" %>
 
 <%@ Register Src="~/UI/Layout/Common/Controls/Navigation/AdminMenu.ascx" TagName="AdminMenu" TagPrefix="uc" %>
+<%@ Register Src="AdminNavigationSearch.ascx" TagName="AdminNavigationSearch" TagPrefix="uc" %>
 
 <header class="navbar admin-navbar navbar-expand-lg justify-content-end fixed-top shadow-sm bg-white py-0 px-3 px-lg-4" data-scroll-header="">
     <div class="container-fluid">
@@ -10,7 +11,9 @@
         <button type="button" class="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="<%= "#" + MobileMenu.ClientID %>" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        
+
+        <uc:AdminNavigationSearch runat="server" ID="AdminNavigationSearch" />
+
         <nav class="collapse navbar-collapse">
             
             <ul class="navbar-nav ms-auto">

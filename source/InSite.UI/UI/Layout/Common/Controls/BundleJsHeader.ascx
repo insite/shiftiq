@@ -24,6 +24,7 @@
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/common.js" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/common.base64.js" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/common.adminSidebar.js" />
+        <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/common.adminNavigationSearch.js" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/common.portalSidebar.js" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/common.validators.js" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/js/common.baseEditor.js" />

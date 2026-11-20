@@ -20,15 +20,20 @@ namespace InSite.Persistence
         private List<CatalogMenu> _catalogs;
         private List<CourseCatalogItem> _items;
 
+        // The organization whose subdomain is being browsed. Cards owned by anyone else need an
+        // absolute image URL - see CourseCatalogItem.ResolveImageUrl.
+        private readonly string _viewerOrganizationCode;
+
         public int ItemCount { get; private set; }
         public int PageCount { get; private set; }
 
         public List<CatalogMenu> Catalogs => _catalogs;
 
-        private VCatalogProgramSearch(List<VCatalogProgram> datasource, List<CatalogMenu> catalogs)
+        private VCatalogProgramSearch(List<VCatalogProgram> datasource, List<CatalogMenu> catalogs, string viewerOrganizationCode)
         {
             _datasource = datasource;
             _catalogs = catalogs;
+            _viewerOrganizationCode = viewerOrganizationCode;
         }
 
         public static VCatalogProgramSearch Create(Guid organizationId, string catalog, Guid[] groupIds, bool viewEntireCatalog, IPartitionModel partition)
@@ -36,7 +41,9 @@ namespace InSite.Persistence
             var datasource = GetCatalogPrograms(organizationId, catalog, groupIds, viewEntireCatalog, partition);
             var catalogs = GetCatalogs(datasource);
 
-            return new VCatalogProgramSearch(datasource, catalogs);
+            var viewer = OrganizationSearch.Select(organizationId)?.OrganizationCode;
+
+            return new VCatalogProgramSearch(datasource, catalogs, viewer);
         }
 
         public PaginationItem[] CreatePages(int current, int count)
@@ -90,7 +97,7 @@ namespace InSite.Persistence
                     ItemSubcategories = GetCategoriesHtml(x.ProgramIdentifier),
                     ItemDescription = x.ProgramDescription,
                     Posted = x.ProgramModified,
-                    ThumbnailImageUrl = x.ProgramImage,
+                    ThumbnailImageUrl = CourseCatalogItem.ResolveImageUrl(x.ProgramImage, x.OrganizationCode, _viewerOrganizationCode),
                     CourseFlagColor = x.ProgramFlagColor,
                     CourseFlagText = x.ProgramFlagText,
                 })
@@ -178,7 +185,7 @@ namespace InSite.Persistence
             using (var db = new InternalDbContext(false))
             {
                 var query = db.VCatalogPrograms
-                    .Where(x => !x.CatalogIsHidden && organizationIds.Any(t => t == x.OrganizationIdentifier));
+                    .Where(x => !x.CatalogIsHidden && !x.ProgramIsHidden && organizationIds.Any(t => t == x.OrganizationIdentifier));
 
                 if (!string.IsNullOrEmpty(catalog) && !viewEntireCatalog)
                     query = query.Where(x => x.CatalogName == catalog);

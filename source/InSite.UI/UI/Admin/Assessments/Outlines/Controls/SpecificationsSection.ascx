@@ -20,7 +20,6 @@
                 </insite:DropDownButton>
 
                 <insite:Button runat="server" ID="SpecificationWorkshopButton" ButtonStyle="Default" ToolTip="Workshop" Text="Workshop" Icon="far fa-industry-alt" />
-                <insite:Button runat="server" ID="SpecificationWorkshopNewButton" ButtonStyle="Default" ToolTip="Workshop" Text="Workshop (New)" Icon="far fa-industry-alt" />
             </div>
         </div>
 

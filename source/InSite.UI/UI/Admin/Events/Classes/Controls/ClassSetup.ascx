@@ -6,8 +6,8 @@
 <div class="row mb-3">
     <div class="col-md-6 mb-3 mb-md-0">
 
-		<div class="card mb-3">
-			<div class="card-body">
+        <div class="card mb-3">
+            <div class="card-body">
 
                 <h3>Class Information</h3>
 
@@ -133,16 +133,28 @@
                     </div>
                     <asp:Label runat="server" AssociatedControlID="AchievementTitle" Text="Achievement (used to group like Classes together)" CssClass="form-label" />
                     <div>
-                        <asp:Literal runat="server" ID="AchievementTitle" />                                
+                        <asp:Literal runat="server" ID="AchievementTitle" />
                     </div>
                 </div>
 
             </div>
         </div>
-                                    
-		<div class="card">
-			<div class="card-body">
+
+        <div class="card">
+            <div class="card-body">
                 <h3>Assessments</h3>
+
+                <div runat="server" id="FormAttachmentLimitField" class="form-group mb-3">
+                    <div class="float-end">
+                        <insite:IconLink Name="pencil" runat="server" id="FormAttachmentLimitLink" style="padding:8px" ToolTip="Change Form Attachment Limit" />
+                    </div>
+                    <label class="form-label">
+                        Form Attachment Limit
+                    </label>
+                    <div>
+                        <asp:Literal runat="server" ID="FormAttachmentLimit" />
+                    </div>
+                </div>
 
                 <uc:ClassAssessmentList runat="server" ID="AssessmentList" />
             </div>
@@ -151,10 +163,10 @@
     </div>
     <div class="col-md-6">
 
-		<div class="card mb-3">
-			<div class="card-body">
+        <div class="card mb-3">
+            <div class="card-body">
 
-                    <h3>Schedule Information</h3>
+                <h3>Schedule Information</h3>
 
                 <div class="form-group mb-3">
                     <div class="float-end">
@@ -235,9 +247,9 @@
 
             </div>
         </div>
-                                    
-		<div class="card">
-			<div class="card-body">
+
+        <div class="card">
+            <div class="card-body">
 
                 <h3>Instructors</h3>
 

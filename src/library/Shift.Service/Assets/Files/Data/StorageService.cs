@@ -10,6 +10,18 @@ namespace Shift.Service.Content
 {
     public partial class StorageService : IStorageServiceAsync
     {
+        record CachedModel(FileStorageModel? Model)
+        {
+            private const int ExpirationInMinutes = 5;
+
+            public DateTime Added { get; } = DateTime.UtcNow;
+            
+            public bool IsExpired()
+            {
+                return Added.AddMinutes(ExpirationInMinutes) < DateTime.UtcNow;
+            }
+        }
+
         private static readonly Encoding LatinEncoding = Encoding.GetEncoding("ISO-8859-1");
 
         private static readonly Regex FileUrlRegex = new Regex("^/api/(content|assets)/files/(?<fileId>[^/]+)/(?<fileName>[^/]+)$");
@@ -20,7 +32,7 @@ namespace Shift.Service.Content
         private readonly IFileManagerServiceAsync _fileManagerService;
         private readonly int _tempFileExpirationInMinutes;
 
-        private readonly ConcurrentDictionary<Guid, FileStorageModel> _files;
+        private readonly ConcurrentDictionary<Guid, CachedModel> _files;
 
         public StorageService(
             IFileSearchAsync fileSearch,
@@ -33,7 +45,7 @@ namespace Shift.Service.Content
             _fileStore = fileStore;
             _fileManagerService = fileManagerService;
             _tempFileExpirationInMinutes = appSettings.Application.TempFileExpirationInMinutes;
-            _files = new ConcurrentDictionary<Guid, FileStorageModel>();
+            _files = new ConcurrentDictionary<Guid, CachedModel>();
         }
 
         public string GetFileUrl(FileStorageModel model, bool download = false, bool legacyLink = false) =>
@@ -160,7 +172,7 @@ namespace Shift.Service.Content
 
             model = await _fileStore.InsertModelAsync(model);
 
-            _files.AddOrUpdate(model.FileIdentifier, model, (x, y) => model);
+            SaveModelToCache(model.FileIdentifier, model);
 
             return model.Clone();
         }
@@ -176,7 +188,7 @@ namespace Shift.Service.Content
 
             await _fileStore.UpdateObjectAsync(fileIdentifier, objectIdentifier, objectType);
 
-            _files.AddOrUpdate(fileIdentifier, model, (x, y) => model);
+            SaveModelToCache(fileIdentifier, model);
         }
 
         public async Task RenameFileAsync(Guid fileIdentifier, Guid userIdentifier, string newFileName)
@@ -198,7 +210,7 @@ namespace Shift.Service.Content
 
             lastActivity.CopyToModel(model);
 
-            _files.AddOrUpdate(fileIdentifier, model, (x, y) => model);
+            SaveModelToCache(fileIdentifier, model);
         }
 
         public async Task ChangePropertiesAsync(Guid fileIdentifier, Guid userIdentifier, FileProperties properties, bool updateActivityChanges)
@@ -212,7 +224,7 @@ namespace Shift.Service.Content
 
             lastActivity.CopyToModel(model);
 
-            _files.AddOrUpdate(fileIdentifier, model, (x, y) => model);
+            SaveModelToCache(fileIdentifier, model);
         }
 
         public async Task ChangeClaimsAsync(Guid fileIdentifier, IEnumerable<FileClaim> claims)
@@ -224,7 +236,7 @@ namespace Shift.Service.Content
 
             await _fileStore.UpdateClaimsAsync(fileIdentifier, claims);
 
-            _files.AddOrUpdate(fileIdentifier, model, (x, y) => model);
+            SaveModelToCache(fileIdentifier, model);
         }
 
         public async Task DeleteAsync(Guid fileIdentifier)
@@ -263,13 +275,14 @@ namespace Shift.Service.Content
 
         public async Task<FileStorageModel?> GetFileAsync(Guid fileIdentifier)
         {
-            if (!_files.TryGetValue(fileIdentifier, out var model))
+            if (!_files.TryGetValue(fileIdentifier, out var cachedModel) || cachedModel.IsExpired())
             {
-                model = await _fileSearch.GetModelAsync(fileIdentifier);
-                _files.TryAdd(fileIdentifier, model);
+                var model = await _fileSearch.GetModelAsync(fileIdentifier);
+
+                cachedModel = SaveModelToCache(fileIdentifier, model);
             }
 
-            return model?.Clone();
+            return cachedModel.Model?.Clone();
         }
 
         public async Task<(FileStorageModel, Stream)> GetFileStreamAsync(Guid fileIdentifier)
@@ -401,6 +414,15 @@ namespace Shift.Service.Content
             var ext = fileName.Substring(separatorIndex);
 
             return (fileNameWithoutExt, ext);
+        }
+
+        private CachedModel SaveModelToCache(Guid fileId, FileStorageModel model)
+        {
+            var cachedModel = new CachedModel(model);
+
+            _files.AddOrUpdate(fileId, cachedModel, (_, _) => cachedModel);
+
+            return cachedModel;
         }
 
         private static string RemoveNonLatinLetters(string text)

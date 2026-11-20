@@ -23,7 +23,7 @@ export default function WorkshopQuestions_Options_TableHeader({
                     <th></th>
                     {!isBooleanTable && <th></th>}
                     {question.layoutColumns.map((x, index) => (
-                        <th key={index}>
+                        <th key={index} className="option-title">
                             <InlineEditor
                                 type="TextBox"
                                 className="w-100"

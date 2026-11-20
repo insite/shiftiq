@@ -20,6 +20,7 @@ import WorkshopQuestions_AddButton from "./WorkshopQuestions_AddButton";
 import { WorkshopNewQuestionCommand } from "@/api/controllers/assessments/workshop/_workshopController";
 import { useSaveWithResultAction } from "@/hooks/useSaveWithResultAction";
 import { ApiSpecWorkshopSet } from "@/api/controllers/assessments/workshop/ApiSpecWorkshopSet";
+import { ListItem } from "@/models/listItem";
 
 interface Props {
     selectedQuestionId: string | null;
@@ -35,6 +36,7 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
         sections,
         sectionId,
         sectionCompetencies,
+        sectionCompetencyItems,
         sectionQuestions,
         questionChangeDates,
         selectSection,
@@ -68,7 +70,7 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
     const returnUrl = urlHelper.getInSiteReturnUrl(`tab=questions&filter=${serializedFilter}`);
 
     useEffect(() => {
-        const defaultCompetencyId = getDefaultCompetencyId(sectionCompetencies);
+        const defaultCompetencyId = getDefaultCompetencyId(sectionCompetencyItems);
 
         setAppliedFilter(prev => ({
             ...prev,
@@ -80,7 +82,7 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
             sectionId,
             competencyId: prev.competencyId === "" || sectionCompetencies?.some(x => x.standardId === prev.competencyId) ? prev.competencyId: defaultCompetencyId,
         }));
-    }, [sectionId, sectionCompetencies]);
+    }, [sectionId, sectionCompetencies, sectionCompetencyItems]);
 
     useEffect(() => {
         if (defaultFilter) {
@@ -200,7 +202,7 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
     }
 
     function handleClearFilter() {
-        const competencyId = getDefaultCompetencyId(sectionCompetencies);
+        const competencyId = getDefaultCompetencyId(sectionCompetencyItems);
         const emptyDraftFilter = workshopQuestionFilter.createWorkshopQuestionsFilterState(sectionId, competencyId);
         const emptyAppliedFilter = workshopQuestionFilter.createWorkshopQuestionsFilterState(sectionId, competencyId);
 
@@ -342,8 +344,13 @@ function cloneFilter(currentFilter: WorkshopQuestionFilterState, nextFilter?: Wo
     };
 }
 
-function getDefaultCompetencyId(competencies: WorkshopStandard[] | null): string | null {
-    return competencies?.[0]?.standardId ?? null;
+function getDefaultCompetencyId(competencies: ListItem[] | null): string | null {
+    // Default selected competency is the second competency in Competency cobobox because the first competency in the combobox is 'No Competency Assigned'
+    // sectionCompetencies and sectionItemCompetencies could have different sort order, therefore we use sectionItemCompetencies
+
+    return competencies && competencies.length > 1
+        ? competencies[1].value
+        : null;
 }
 
 function handleMoveTop(tableRef: React.RefObject<HTMLTableElement | null>) {

@@ -1,11 +1,15 @@
+using Shift.Service.Directory;
 using Shift.Service.Progress;
 
 namespace Shift.Service.Booking;
 
 public partial class EventEntity
 {
+    public GroupEntity? VenueLocation { get; set; }
+
     public ICollection<GradebookEntity> Gradebooks { get; set; } = new List<GradebookEntity>();
     public ICollection<EventUserEntity> Users { get; set; } = new List<EventUserEntity>();
+    public ICollection<RegistrationEntity> Registrations { get; set; } = new List<RegistrationEntity>();
 
     public Guid? AchievementIdentifier { get; set; }
     public Guid EventIdentifier { get; set; }
@@ -58,6 +62,7 @@ public partial class EventEntity
     public int EventNumber { get; set; }
     public int? ExamDurationInMinutes { get; set; }
     public int? InvigilatorMinimum { get; set; }
+    public int? FormAttachmentLimit { get; set; }
 
     public decimal? CreditHours { get; set; }
 

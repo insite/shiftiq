@@ -1,0 +1,11 @@
+.HelpButton {
+    position: relative;
+
+    .search-help-popup {
+        width: min(24rem, calc(100vw - 2rem));
+        color: var(--ar-body-color);
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin-top: 0.375rem;
+    }
+}

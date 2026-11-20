@@ -108,8 +108,8 @@ namespace InSite.Persistence
             else
             {
                 var notification = Notifications.Select(alertType);
-                if (notification.Body != null)
-                    return GetEmail(organization, notification.Subject, notification.Body);
+                if (notification?.Body != null)
+                    message = CreateDefaultMessage(messageName, notification);
             }
 
             if (message == null) 
@@ -175,15 +175,45 @@ namespace InSite.Persistence
             return subscribers;
         }
 
-        public static EmailDraft GetEmail(OrganizationState organization, string subject, string body)
+        private static readonly object _lockCreateDefaultMessage = new object();
+
+        // The default copy in NotificationTypes.json is delivered by materializing it as a message under
+        // the Global organization the first time a notification type is used. A draft with no message row
+        // cannot be sent: the outbox keys subscribers, mailouts, and deliveries by message identifier, and
+        // the JSON default carries no sender. Creating the message once gives it both, records its mailouts
+        // like any other message, and lets an administrator edit the copy in place; the name lookup in
+        // GetEmail finds it on every later call. An organization or the partition that wants different
+        // wording still creates a message of the same name at its own level.
+        private static VMessage CreateDefaultMessage(string messageName, Notification notification)
         {
-            var draft = EmailDraft.Create(organization.OrganizationIdentifier, null, Guid.Empty, false);
+            var organizationId = OrganizationIdentifiers.Global;
 
-            draft.OrganizationIdentifier = organization.OrganizationIdentifier;
-            draft.ContentSubject = new MultilingualString(subject);
-            draft.ContentBody = new MultilingualString(body);
+            lock (_lockCreateDefaultMessage)
+            {
+                var existing = GetMessageWithoutException(organizationId, messageName);
+                if (existing != null)
+                    return existing;
 
-            return draft;
+                var senders = TSenderSearch.Select("Mailgun", organizationId, true);
+                if (senders.IsEmpty())
+                    throw new MessageNotFoundException($"Message Not Found: no enabled Mailgun sender is available to create the default {messageName} message");
+
+                var message = new VMessage
+                {
+                    OrganizationIdentifier = organizationId,
+                    SenderIdentifier = senders[0].SenderIdentifier,
+                    MessageType = MessageTypeName.Alert,
+                    MessageName = messageName
+                };
+
+                var content = new ContentContainer();
+                content.Title.Text = new MultilingualString { Default = notification.Subject };
+                content.Body.Text = new MultilingualString { Default = notification.Body };
+
+                ServiceLocator.SendCommands(MessageHelper.CreateMessage(message, content));
+
+                return GetMessage(organizationId, messageName);
+            }
         }
 
         public static string GetEmailPriority(NotificationType notification)

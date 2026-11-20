@@ -138,7 +138,7 @@ namespace InSite.UI.Admin.Records.Validators.Forms
             if (!string.IsNullOrEmpty(instructions))
                 InstructionBody.Text = Markdown.ToHtml(instructions);
 
-            var fieldCount = Fields.LoadData(JournalSetupIdentifier, null);
+            var fieldCount = Fields.LoadData(JournalSetupIdentifier, null, UserIdentifier);
             var competencyCount = Competencies.LoadData(JournalSetupIdentifier, null);
 
             var hasFields = fieldCount > 0;

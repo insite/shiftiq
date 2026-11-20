@@ -86,9 +86,9 @@ namespace InSite.Domain.Records
             Apply(new ExperienceInstructorChanged(experience, instructor));
         }
 
-        public void ChangeExperienceSupervisor(Guid experience, string supervisor)
+        public void ChangeExperienceSupervisor(Guid experience, Guid? supervisor)
         {
-            Apply(new ExperienceSupervisorChanged(experience, supervisor));
+            Apply(new ExperienceSupervisorChanged2(experience, supervisor));
         }
 
         public void ChangeExperienceTime(Guid experience, DateTime? started, DateTime? stopped)

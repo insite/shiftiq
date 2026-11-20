@@ -57,6 +57,16 @@
             </ItemTemplate>
         </asp:TemplateField>
 
+        <asp:TemplateField HeaderText="Taxes" ItemStyle-Wrap="false">
+            <ItemTemplate>
+                <%# FormatTaxAmount("TaxAmount", "TaxRate") %>
+
+                <div runat="server" visible='<%# Eval("TaxRegion") != null %>' class="form-text">
+                    <%# GetRegionName("TaxRegion") %>
+                </div>
+            </ItemTemplate>
+        </asp:TemplateField>
+
         <asp:BoundField HeaderText="Amount" DataField="RegistrationFee" DataFormatString="{0:c2}" HeaderStyle-HorizontalAlign="Right" ItemStyle-HorizontalAlign="Right" />
         <asp:BoundField HeaderText="Status" DataField="TransactionStatus" />
 

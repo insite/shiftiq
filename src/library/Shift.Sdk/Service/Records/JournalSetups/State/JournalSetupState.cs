@@ -28,6 +28,7 @@ namespace InSite.Domain.Records
         public Guid? ValidatorMessage { get; set; }
         public Guid? LearnerMessage { get; set; }
         public Guid? LearnerAddedMessage { get; set; }
+        public Guid? SupervisorMessage { get; set; }
         public DateTimeOffset? JournalSetupLocked { get; set; }
 
         public Shift.Common.ContentContainer Content { get; set; }
@@ -61,9 +62,6 @@ namespace InSite.Domain.Records
         public bool ShouldSerializeCompetencyRequirements() => CompetencyRequirements.Count > 0;
         public bool ShouldSerializeContentLabel() => false;
         public bool ShouldSerializeIsValidationRequired() => IsValidationRequired == true;
-        public bool ShouldSerializeValidatorMessage() => ValidatorMessage.HasValue;
-        public bool ShouldSerializeLearnerMessage() => LearnerMessage.HasValue;
-        public bool ShouldSerializeLearnerAddedMessage() => LearnerAddedMessage.HasValue;
         public bool ShouldSerializeAreaRequirements() => AreaRequirements.Count > 0;
 
         public void When(CompetencyRequirementAdded e)
@@ -215,6 +213,7 @@ namespace InSite.Domain.Records
             ValidatorMessage = e.ValidatorMessage;
             LearnerMessage = e.LearnerMessage;
             LearnerAddedMessage = e.LearnerAddedMessage;
+            SupervisorMessage = e.SupervisorMessage;
         }
 
         public void When(JournalSetupRenamed e)

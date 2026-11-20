@@ -160,8 +160,8 @@
                             </div>
 
                             <div>
-                                <insite:NextButton runat="server" ID="NextButton" />
-                                <insite:CloseButton runat="server" ID="CloseButton" />
+                                <insite:NextButton runat="server" ID="SearchNextButton" />
+                                <insite:CloseButton runat="server" ID="SearchCloseButton" />
                             </div>
 
                         </div>
@@ -184,8 +184,39 @@
                     </div>
 
                     <div class="pt-3">
-                        <insite:SaveButton runat="server" ID="SaveButton" ValidationGroup="Journal" DisableAfterClick="true" />
-                        <insite:CancelButton runat="server" ID="CancelButton" ConfirmText="Are you sure you want to close page without saving any information?" />
+                        <insite:NextButton runat="server" ID="FieldsNextButton" ValidationGroup="Journal" />
+                        <insite:CancelButton runat="server" ID="FieldsCancelButton" ConfirmText="Are you sure you want to close page without saving any information?" />
+                    </div>
+                </div>
+            </div>
+
+        </insite:NavItem>
+        <insite:NavItem ID="ValidateTab" runat="server" Title="Validate Entries" Icon="far fa-graduation-cap" Visible="false">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-md-7">
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">
+                                    Skill Rating
+                                </label>
+                                <div>
+                                    <insite:ComboBox runat="server" ID="SkillRating" Width="100px" />
+                                </div>
+                                <div class="form-text">
+                                    <insite:Literal runat="server" Text="[Records.Logbooks.ValidateExperience].[SkillRating].[HelpText]" Mode="Markdown" />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="pt-3">
+                        <insite:SaveButton runat="server" ID="ValidateSaveButton" ValidationGroup="Journal" DisableAfterClick="true" />
+                        <insite:CancelButton runat="server" ID="ValidateCancelButton" ConfirmText="Are you sure you want to close page without saving any information?" />
                     </div>
                 </div>
             </div>

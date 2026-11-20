@@ -11,6 +11,7 @@ public partial class AchievementEntity
     public bool AchievementAllowSelfDeclared { get; set; }
     public bool AchievementIsEnabled { get; set; }
     public bool AchievementReportingDisabled { get; set; }
+    public bool AchievementIssuesCertificate { get; set; }
     public bool? HasBadgeImage { get; set; }
 
     public string? AchievementDescription { get; set; }

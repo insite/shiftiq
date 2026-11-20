@@ -10,6 +10,7 @@ import { ApiWorkshopImage } from "./ApiWorkshopImage";
 import { ApiSpecWorkshop } from "./ApiSpecWorkshop";
 import { ApiSpecWorkshopSet } from "./ApiSpecWorkshopSet";
 import { ApiSpecWorkshopInput } from "./ApiSpecWorkshopInput";
+import { ApiSpecWorkshopPartial } from "./ApiSpecWorkshopPartial";
 
 type WorkshopQuestionField = "Title" | "Code" | "Flag" | "LIG" | "Reference" | "Tag" | "Taxonomy" | "Condition" | "Standard" | "ColumnHeader";
 
@@ -19,8 +20,13 @@ export type WorkshopReplaceQuestionCommand = "NewVersion" | "NewQuestionAndSurpl
 
 export type WorkshopNewQuestionCommand = "QuickMultipleChoice" | "QuickComposedEssay" | "QuickComposedVoice" | "QuickMultipleCorrect" | "QuickBooleanTable" | "QuickMatching";
 
-interface ModifyResult {
+interface QuestionModifyResult {
     Html: string | null | undefined;
+}
+
+interface OptionModifyResult {
+    Html: string | null | undefined;
+    QuestionPoints: number | null | undefined;
 }
 
 export const _workshopController = {
@@ -63,8 +69,8 @@ export const _workshopController = {
         return await fetchHelper.get<ApiSpecWorkshopSet>(`/api/assessments/workshops/specs/${specificationId}/sets/${setId}`, null, true);
     },
 
-    async modifySpec(specificationId: string, input: ApiSpecWorkshopInput): Promise<boolean> {
-        return await fetchHelper.put(`/api/assessments/workshops/specs/${specificationId}`, input, null, true) != null;
+    async modifySpec(specificationId: string, input: ApiSpecWorkshopInput): Promise<ApiSpecWorkshopPartial | null> {
+        return await fetchHelper.put(`/api/assessments/workshops/specs/${specificationId}`, input, null, true);
     },
 
     async collectQuestionChangeDates(bankId: string): Promise<ApiQuestionChangeDate[] | null> {
@@ -99,7 +105,7 @@ export const _workshopController = {
             ColumnIndex: columnIndex,
             Value: value
         };
-        const result = await fetchHelper.put<ModifyResult>(`/api/assessments/workshops/banks/${bankId}/questions/${questionId}`, body);
+        const result = await fetchHelper.put<QuestionModifyResult>(`/api/assessments/workshops/banks/${bankId}/questions/${questionId}`, body);
         return result.Html ?? null;
     },
 
@@ -110,14 +116,13 @@ export const _workshopController = {
         field: WorkshopQuestionOptionField,
         columnIndex: number | null,
         value: string | null
-    ): Promise<string | null> {
+    ): Promise<OptionModifyResult | null> {
         const body = {
             Field: field,
             ColumnIndex: columnIndex,
             Value: value
         };
-        const result = await fetchHelper.put<ModifyResult>(`/api/assessments/workshops/banks/${bankId}/questions/${questionId}/options/${optionNumber}`, body);
-        return result.Html ?? null;
+        return await fetchHelper.put(`/api/assessments/workshops/banks/${bankId}/questions/${questionId}/options/${optionNumber}`, body);
     },
 
     async postFieldComment(bankId: string, fieldId: string, authorType: string, flag: WorkshopFlag, text: string): Promise<ApiWorkshopQuestionComments | null> {

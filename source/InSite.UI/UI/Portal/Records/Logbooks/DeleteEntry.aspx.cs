@@ -18,13 +18,13 @@ namespace InSite.UI.Portal.Records.Logbooks
 
         private Guid JournalSetupIdentifier
         {
-            get => (Guid)ViewState[nameof(JournalSetupIdentifier)];
+            get => (Guid)(ViewState[nameof(JournalSetupIdentifier)] ?? Guid.Empty);
             set => ViewState[nameof(JournalSetupIdentifier)] = value;
         }
 
         private Guid JournalIdentifier
         {
-            get => (Guid)ViewState[nameof(JournalIdentifier)];
+            get => (Guid)(ViewState[nameof(JournalIdentifier)] ?? Guid.Empty);
             set => ViewState[nameof(JournalIdentifier)] = value;
         }
 
@@ -57,9 +57,13 @@ namespace InSite.UI.Portal.Records.Logbooks
             if (MediaEvidenceFileIdentifier.HasValue)
                 ServiceLocator.StorageService.Delete(MediaEvidenceFileIdentifier.Value);
 
-            ServiceLocator.SendCommand(new DeleteExperience(JournalIdentifier, ExperienceIdentifier));
+            if (JournalIdentifier.IsNotEmpty() && ExperienceIdentifier.IsNotEmpty())
+                ServiceLocator.SendCommand(new DeleteExperience(JournalIdentifier, ExperienceIdentifier));
 
-            var url = $"/ui/portal/records/logbooks/outline?journalsetup={JournalSetupIdentifier}";
+            var url = JournalSetupIdentifier.IsNotEmpty()
+                ? $"/ui/portal/records/logbooks/outline?journalsetup={JournalSetupIdentifier}"
+                : "/ui/portal/records/logbooks/search";
+
             HttpResponseHelper.Redirect(url);
         }
 

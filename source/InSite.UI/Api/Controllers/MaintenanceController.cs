@@ -74,7 +74,7 @@ namespace InSite.UI.Api
         [Route("api/maintenance/cmds/run-daily-jobs")]
         public HttpResponseMessage RunDailyJobs()
         {
-            var response = ExecuteMaintenanceRoutine(() =>
+            return ExecuteMaintenanceRoutine(() =>
             {
                 var partition = ServiceLocator.Partition;
 
@@ -89,24 +89,6 @@ namespace InSite.UI.Api
 
                 return JsonSuccess("OK");
             });
-
-            // It might take 5+ minutes to refresh the snapshots, and we don't need to wait for the refresh to complete
-            // here, so invoke the Refresh method inside a fire-and-forget thread. Catch and report any unhandled
-            // exceptions, in case anything goes haywire.
-
-            Task.Run(() =>
-            {
-                try
-                {
-                    TUserStatusStore.Refresh();
-                }
-                catch (Exception ex)
-                {
-                    AppSentry.SentryError(ex);
-                }
-            });
-
-            return response;
         }
 
         [HttpPost]
@@ -191,10 +173,10 @@ namespace InSite.UI.Api
 
                 var classReminder = new ExamAutomation(
                     ServiceLocator.EventSearch,
-                    ServiceLocator.RegistrationSearch,
                     ServiceLocator.OrganizationSearch,
                     ServiceLocator.IdentityService,
-                    ServiceLocator.SendCommand
+                    ServiceLocator.SendCommand,
+                    AppSentry.SentryError
                 );
 
                 var count = classReminder.ValidateAndPublishGrades();

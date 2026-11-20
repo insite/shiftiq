@@ -16,6 +16,8 @@ namespace Shift.Constant
         public static Guid SkilledTradesBC = Guid.Parse("EFB530A0-8B3C-448C-9FB4-DDF7602489A6");
         public static Guid SkillsCheck = Guid.Parse("947701F8-2AA7-4EBE-AEED-ACB40166736E");
 
+        public static Guid Any = Guid.Parse("75f517c3-5ed1-4f22-94c9-6a6edebc799c");
+
         public static void Initialize(Common.Organizations organizations)
         {
             Archive = organizations.Archive;

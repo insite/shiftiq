@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Application.Events.Read;
 using InSite.Common.Web;
@@ -57,7 +57,7 @@ namespace InSite.UI.Portal.Events.Appointments
 
             Date.Text = scheduledDateAndTime;
 
-            var localeDate = TimeZoneInfo.ConvertTime(@event.EventScheduledStart, User.TimeZone).Date;
+            var localeDate = TimeZones.ConvertTime(@event.EventScheduledStart, User.TimeZone).Date;
             ReturnToCalendar.NavigateUrl = $"/ui/portal/events/calendar?date={localeDate.ToShortDateString()}";
             ReturnToCalendar.Visible = !(Identity.Organization.Toolkits.Events?.HideReturnToCalendar ?? false);
         }

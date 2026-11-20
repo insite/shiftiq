@@ -127,7 +127,7 @@ namespace InSite.Application.Events.Read
                     GroupIdentifier = venue.Value,
                     GroupName = group.GroupName,
                     EventIdentifier = change.AggregateIdentifier,
-                    EventDate = TimeZones.Format(@event.EventScheduledStart, @event.EventScheduledStart.GetTimeZone()),
+                    EventDate = TimeZones.Format(@event.EventScheduledStart, TimeZones.FindTimeZoneId(@event.EventScheduledStart)),
                     EventName = @event.EventTitle,
                     EventNumber = @event.EventNumber.ToString()
                 });

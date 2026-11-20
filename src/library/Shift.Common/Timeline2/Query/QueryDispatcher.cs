@@ -20,12 +20,12 @@ namespace Shift.Common
             _runners = runners;
         }
 
-        public TResult Dispatch<TResult>(IQuery<TResult> query)
+        public TResult Dispatch<TResult>(IQuery query)
         {
             var runner = _runners.FirstOrDefault(h => h.CanRun(query.GetType()));
 
             return runner != null
-                ? runner.Run(query)
+                ? runner.Run<TResult>(query)
                 : throw new InvalidOperationException($"Missing query runner class for {query.GetType().Name}.");
         }
     }

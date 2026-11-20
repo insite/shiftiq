@@ -167,6 +167,50 @@ namespace InSite.Application.Records.Write
             return notification;
         }
 
+        // No MessageIdentifier is set: the template resolves by the notification's Type name (shared across
+        // organizations, with the org -> CMDS -> Global -> metadata fallback in MessageRepository.GetEmail).
+        public ProgramEnrollmentRequestedNotification RequestedNotification(Guid organizationId, string learnerFirstName, string learnerLastName, string programName, string requestFee, string fundingPath, string enrollmentRequested)
+        {
+            var notification = new ProgramEnrollmentRequestedNotification
+            {
+                OriginOrganization = organizationId,
+                LearnerFirstName = learnerFirstName,
+                LearnerLastName = learnerLastName,
+                ProgramName = programName,
+                RequestFee = requestFee,
+                FundingPath = fundingPath,
+                EnrollmentRequested = enrollmentRequested
+            };
+
+            return notification;
+        }
+
+        public ProgramEnrollmentApprovedNotification ApprovedNotification(Guid organizationId, string learnerFirstName, string learnerLastName, string programName)
+        {
+            var notification = new ProgramEnrollmentApprovedNotification
+            {
+                OriginOrganization = organizationId,
+                LearnerFirstName = learnerFirstName,
+                LearnerLastName = learnerLastName,
+                ProgramName = programName
+            };
+
+            return notification;
+        }
+
+        public ProgramEnrollmentRejectedNotification RejectedNotification(Guid organizationId, string learnerFirstName, string learnerLastName, string programName)
+        {
+            var notification = new ProgramEnrollmentRejectedNotification
+            {
+                OriginOrganization = organizationId,
+                LearnerFirstName = learnerFirstName,
+                LearnerLastName = learnerLastName,
+                ProgramName = programName
+            };
+
+            return notification;
+        }
+
         public void SendNotification(Notification notification, Guid? to)
         {
             if (notification == null)

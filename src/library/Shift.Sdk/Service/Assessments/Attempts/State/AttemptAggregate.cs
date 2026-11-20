@@ -294,6 +294,13 @@ namespace InSite.Domain.Attempts
             Apply(e);
         }
 
+        public void ModifyAIProctoringSessionId(string sessionId)
+        {
+            var e = new AttemptAIProctoringSessionIdModified(sessionId);
+
+            Apply(e);
+        }
+
         public void VoidAttempt(string reason)
         {
             Apply(new AttemptVoided(reason));
@@ -384,7 +391,7 @@ namespace InSite.Domain.Attempts
                     questionIndex = question.QuestionIndex;
                 }
             }
-            else if (Data.ActiveSectionIndex.Value < Data.Sections.Length)
+            else if (Data.ActiveSectionIndex.Value + 1 < Data.Sections.Length)
             {
                 sectionIndex = Data.ActiveSectionIndex.Value + 1;
                 questionIndex = Data.Questions.Length - 1;

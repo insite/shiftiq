@@ -6,6 +6,21 @@
     <div class="col-lg-12">
         <div class="settings">
 
+            <div runat="server" id="TaxPanel" class="form-group mb-3" visible="false">
+                <div class="mb-1">
+                    <label class="form-label">
+                        <insite:Literal runat="server" Text="Subtotal" />:
+                    </label>
+                    <asp:Literal runat="server" ID="SubtotalDisplay" />
+                </div>
+                <div>
+                    <label class="form-label">
+                        <insite:Literal runat="server" Text="Tax" /><asp:Literal runat="server" ID="TaxRateDisplay" />:
+                    </label>
+                    <asp:Literal runat="server" ID="TaxAmountDisplay" />
+                </div>
+            </div>
+
             <div runat="server" id="PaymentAmountPanel" class="form-group mb-3">
                 <label class="form-label">
                     <insite:Literal runat="server" Text="Payment Amount" />:

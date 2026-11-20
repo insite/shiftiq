@@ -114,7 +114,7 @@ namespace InSite.Custom.CMDS.User.Achievements.Controls
             if (credential.CredentialExpirationExpected.HasValue)
             {
                 var expires = credential.CredentialExpirationExpected
-                    .FormatDateOnly(CurrentSessionState.Identity.User.TimeZone.Id);
+                    .FormatDateOnly(CurrentSessionState.Identity.User.TimeZone);
 
                 ExpiryPanel.InnerHtml = $"Expires: <strong>{expires}</strong>";
             }

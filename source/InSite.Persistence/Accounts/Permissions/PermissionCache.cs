@@ -75,7 +75,20 @@ namespace InSite.Persistence
 
             PermissionMatrix matrix;
 
-            if (organizationId != null && organizationId != Guid.Empty)
+            // The partition's permissions are merged into every other organization, and the merge
+            // only adds. Reloading the partition alone would leave a revoked grant in every other
+            // organization until the next full load, so a partition refresh reloads everything.
+            var isPartialLoad = organizationId != null && organizationId != Guid.Empty;
+
+            if (isPartialLoad && Partition.HasValue())
+            {
+                var organizationCode = loader.GetOrganizationCode(organizationId.Value);
+
+                if (StringHelper.Equals(organizationCode, Partition))
+                    isPartialLoad = false;
+            }
+
+            if (isPartialLoad)
             {
                 matrix = _matrix ?? new PermissionMatrix();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Shift.Common.Timeline.Commands;
@@ -8,7 +9,7 @@ namespace Shift.Sdk.Service
 {
     public interface ICommanderAsync
     {
-        Task SendCommandsAsync(IEnumerable<ICommand> commands);
-        Task SendCommandsAsync(Guid organizationId, Guid userId, IEnumerable<ICommand> commands);
+        Task SendCommandsAsync(IEnumerable<ICommand> commands, CancellationToken ct = default);
+        Task SendCommandsAsync(Guid organizationId, Guid userId, IEnumerable<ICommand> commands, CancellationToken ct = default);
     }
 }

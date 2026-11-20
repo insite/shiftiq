@@ -126,7 +126,7 @@ namespace InSite.UI.Portal.Contacts.People
             user.MiddleName = PersonMiddleName.Text;
             user.LastName = PersonLastName.Text;
             user.Email = PersonEmail.Text;
-            user.TimeZone = Organization.TimeZone.Id;
+            user.TimeZone = Organization.TimeZone;
 
             person.Phone = PersonPhone.Text;
             person.HomeAddress = GetAddress();

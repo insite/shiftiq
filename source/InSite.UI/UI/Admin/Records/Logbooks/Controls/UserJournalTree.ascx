@@ -35,7 +35,7 @@
                                         </a>
                                     </div>
                                     <div class="form-text">
-                                        Total Hours: <%# Eval("Hours") %>
+                                        Total <insite:ContentTextLiteral runat="server" ContentLabel="Logbooks.Hours" />: <%# Eval("Hours") %>
                                     </div>
                                 </div>
                             </div>
@@ -59,7 +59,7 @@
                                                                 </ItemTemplate>
                                                             </asp:Repeater>
                                                             <th style='<%# Eval("ColumnStyle") + "text-align:right;" %>'>
-                                                                Hours
+                                                                <insite:ContentTextLiteral runat="server" ContentLabel="Logbooks.Hours" />
                                                             </th>
                                                             <th style='<%# Eval("ColumnStyle") + "text-align:center;" %>'>
                                                                 Skill Rating

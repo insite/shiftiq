@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 
+using InSite.Application.Assets.Read;
 using InSite.Application.Contacts.Read;
 
 using Shift.Common;
@@ -11,6 +12,10 @@ namespace InSite.Persistence
 {
     public static class TGroupPermissionStore
     {
+        private const string Action = "Action";
+
+        public static ISearchStore SearchStore { get; set; }
+
         public static void Copy(Guid fromGroup, Guid toGroup)
         {
             var organizations = new HashSet<Guid>();
@@ -51,6 +56,8 @@ namespace InSite.Persistence
                 db.SaveChanges();
             }
 
+            SearchStore.EnqueueSearchPermission(toGroup, SearchQueueOperation.Insert);
+
             foreach (var organization in organizations)
                 PermissionCache.Refresh(organization);
         }
@@ -63,6 +70,9 @@ namespace InSite.Persistence
                 db.SaveChanges();
             }
 
+            if (string.Equals(entity.ObjectType, Action, StringComparison.OrdinalIgnoreCase))
+                SearchStore.EnqueueSearchPermission(entity.ObjectIdentifier, entity.GroupIdentifier, SearchQueueOperation.Insert);
+
             PermissionCache.Refresh(entity.OrganizationIdentifier);
         }
 
@@ -71,6 +81,8 @@ namespace InSite.Persistence
             var isPartitionPermissionChanged = false;
 
             Guid? organizationId = null;
+            string objectType = null;
+            Guid? objectId = null, groupId = null;
 
             using (var db = new InternalDbContext())
             {
@@ -79,6 +91,9 @@ namespace InSite.Persistence
                 if (privacy != null)
                 {
                     organizationId = privacy.OrganizationIdentifier;
+                    objectType = privacy.ObjectType;
+                    objectId = privacy.ObjectIdentifier;
+                    groupId = privacy.GroupIdentifier;
 
                     db.Entry(privacy).State = EntityState.Deleted;
 
@@ -92,6 +107,9 @@ namespace InSite.Persistence
                     isPartitionPermissionChanged = StringHelper.Equals(organizationCode, PermissionCache.Partition);
                 }
             }
+
+            if (string.Equals(objectType, Action, StringComparison.OrdinalIgnoreCase))
+                SearchStore.EnqueueSearchPermission(objectId.Value, groupId.Value, SearchQueueOperation.Delete);
 
             // If a partition-wide permission has changed then the entire cache must be refreshed. Otherwise we can
             // refresh only the organization affected by the change.
@@ -158,8 +176,8 @@ namespace InSite.Persistence
         private static Guid Update(Guid group, Guid @objectId, string objectType, bool read, bool write, bool create, bool delete, bool administrate, bool configure, bool? trial)
         {
             Guid permissionId = Guid.Empty;
-
             Guid organizationId = Guid.Empty;
+            bool isInserted = false;
 
             using (var db = new InternalDbContext())
             {
@@ -178,6 +196,8 @@ namespace InSite.Persistence
                         ObjectType = objectType,
                         AllowTrialAccess = false
                     });
+
+                    isInserted = true;
                 }
 
                 permission.AllowRead = read || write || create || delete || administrate || configure;
@@ -197,6 +217,9 @@ namespace InSite.Persistence
                 permissionId = permission.PermissionIdentifier;
             }
 
+            if (isInserted && string.Equals(objectType, Action, StringComparison.OrdinalIgnoreCase))
+                SearchStore.EnqueueSearchPermission(@objectId, group, SearchQueueOperation.Insert);
+
             PermissionCache.Refresh(organizationId);
 
             return permissionId;
@@ -205,6 +228,8 @@ namespace InSite.Persistence
         public static void Update(DateTimeOffset granted, Guid user, Guid container, string containerType, List<Guid> grants, List<Guid> revokes)
         {
             var organizations = new HashSet<Guid>();
+            var insertedGroups = new List<Guid>();
+            var deletedGroups = new List<Guid>();
 
             using (var db = new InternalDbContext())
             {
@@ -212,6 +237,8 @@ namespace InSite.Persistence
                 {
                     var deletes = db.TGroupPermissions.Where(x => x.ObjectIdentifier == container && revokes.Any(y => y == x.GroupIdentifier));
                     db.TGroupPermissions.RemoveRange(deletes);
+
+                    deletedGroups.AddRange(deletes.Select(x => x.GroupIdentifier));
                 }
 
                 foreach (var grant in grants)
@@ -223,6 +250,7 @@ namespace InSite.Persistence
                             continue;
 
                         organizations.Add(organizationId);
+                        insertedGroups.Add(grant);
 
                         var wpg = new TGroupPermission
                         {
@@ -239,6 +267,15 @@ namespace InSite.Persistence
                 }
 
                 db.SaveChanges();
+            }
+
+            if (string.Equals(containerType, Action, StringComparison.OrdinalIgnoreCase))
+            {
+                foreach (var groupId in deletedGroups)
+                    SearchStore.EnqueueSearchPermission(container, groupId, SearchQueueOperation.Delete);
+
+                foreach (var groupId in insertedGroups)
+                    SearchStore.EnqueueSearchPermission(container, groupId, SearchQueueOperation.Insert);
             }
 
             foreach (var organization in organizations)

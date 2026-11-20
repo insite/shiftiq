@@ -90,6 +90,9 @@ namespace InSite.Domain.Invoices
                 item.Price = e.Item.Price;
                 item.Quantity = e.Item.Quantity;
                 item.Product = e.Item.Product;
+                item.TaxRate = e.Item.TaxRate;
+                item.TaxCountry = e.Item.TaxCountry;
+                item.TaxRegion = e.Item.TaxRegion;
             }
         }
 

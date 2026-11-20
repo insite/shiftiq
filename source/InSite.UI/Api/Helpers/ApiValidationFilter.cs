@@ -133,7 +133,7 @@ namespace InSite.Api.Settings
                 FirstName = userEntity.FirstName,
                 LastName = userEntity.LastName,
                 FullName = userEntity.FullName,
-                TimeZone = TimeZoneInfo.FindSystemTimeZoneById(userEntity.TimeZone),
+                TimeZone = TimeZones.ValidateZone(userEntity.TimeZone),
             };
             var identity = new ApiUserIdentity(organization, userPacket, userEntity.IsAdministrator.Value);
 

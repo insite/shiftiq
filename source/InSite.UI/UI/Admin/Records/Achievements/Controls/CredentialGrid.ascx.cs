@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -162,7 +162,7 @@ namespace InSite.Admin.Achievements.Achievements.Controls
             if (!targetDate.HasValue)
                 return null;
 
-            var adjustedDate = targetDate.Value.ToOffset(userTimeZone.GetUtcOffset(targetDate.Value));
+            var adjustedDate = targetDate.Value.ToOffset(TimeZones.GetUtcOffset(targetDate.Value, userTimeZone));
 
             return string.IsNullOrEmpty(dateTimeFormat)
                 ? TimeZones.FormatDateOnly(adjustedDate, userTimeZone)

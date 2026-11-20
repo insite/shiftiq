@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 using Shift.Common.Timeline.Changes;
@@ -72,7 +71,7 @@ namespace InSite.UI.Portal.Billing.Utilities
         {
             if (!isNewUser)
             {
-                SendInvoicePaid(invoice, person.UserIdentifier, TimeZones.GetInfo(person.User.TimeZone), true, true);
+                SendInvoicePaid(invoice, person.UserIdentifier, person.User.TimeZone, true, true);
                 return;
             }
 
@@ -88,11 +87,11 @@ namespace InSite.UI.Portal.Billing.Utilities
                 Url = HttpRequestHelper.CurrentRootUrl,
                 WelcomeMsgDictionary = ServiceLocator.CoreProcessManager.GetWelcomeMsgPasswordInfo
                     (notification.UserPassword, notification.UserPasswordHash),
-                InvoicePaidProperties = BuildInvoicePaidVariableList(invoice, TimeZones.GetInfo(person.User.TimeZone), true)
+                InvoicePaidProperties = BuildInvoicePaidVariableList(invoice, person.User.TimeZone, true)
             }, attachments);
         }
 
-        public static void SendInvoicePaid(VInvoice invoice, Guid userId, TimeZoneInfo timeZone, bool includeReport, bool createOrderInfo)
+        public static void SendInvoicePaid(VInvoice invoice, Guid userId, string timeZone, bool includeReport, bool createOrderInfo)
         {
             string[] attachments;
             if (includeReport)
@@ -109,7 +108,7 @@ namespace InSite.UI.Portal.Billing.Utilities
             }, attachments);
         }
 
-        private static StringDictionary BuildInvoicePaidVariableList(VInvoice invoice, TimeZoneInfo timeZone, bool createOrderInfo)
+        private static StringDictionary BuildInvoicePaidVariableList(VInvoice invoice, string timeZone, bool createOrderInfo)
         {
             var dict = new StringDictionary();
 

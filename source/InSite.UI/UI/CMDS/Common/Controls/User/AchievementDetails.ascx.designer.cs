@@ -96,6 +96,15 @@ namespace InSite.Cmds.Controls.Training.Achievements
         protected global::InSite.Common.Web.UI.CheckBox IsTimeSensitive;
 
         /// <summary>
+        /// IssuesCertificate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.CheckBox IssuesCertificate;
+
+        /// <summary>
         /// RowValidForCount control.
         /// </summary>
         /// <remarks>

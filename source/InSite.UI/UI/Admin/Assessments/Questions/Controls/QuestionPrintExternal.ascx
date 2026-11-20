@@ -62,7 +62,6 @@
             margin-bottom: 0.5in;
             margin-top: 0.80em;
             width: 100%;
-            table-layout: fixed;
         }
 
             table.question > tbody > tr.title > td {
@@ -78,6 +77,7 @@
 
                 table.question > tbody > tr.title > td.qtext {
                     word-wrap: break-word;
+                    word-break: break-word;
                 }
 
             table.question > tbody > tr > td > .table-option {
@@ -488,14 +488,14 @@
                 var questions = document.querySelectorAll('table.question');
                 if (questions.length > 0) {
                     var lastTable = questions[questions.length - 1];
-                    lastTable.style.marginBottom = '0 !important';
+                    lastTable.style.marginBottom = '0';
 
                     var tBody = lastTable.querySelector('tbody');
                     if (!tBody)
                         tBody = lastTable;
 
                     var lastTr = document.createElement('tr');
-                    lastTr.innerHTML = `<td colspan="2" style="padding-top:2.23em; text-align:center; font-weight:bold;">THIS IS THE FINAL PAGE OF QUESTIONS IN THIS EXAM</td>`;
+                    lastTr.innerHTML = '<td colspan="2" style="padding-top:2.23em; text-align:center; font-weight:bold;">THIS IS THE FINAL PAGE OF QUESTIONS IN THIS EXAM</td>';
                     tBody.appendChild(lastTr);
                 }
             })();

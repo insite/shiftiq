@@ -176,7 +176,7 @@ namespace InSite.UI.Portal.Home
                         EventIdentifier = x.Event.EventIdentifier,
                         EventTitle = x.Event.EventTitle,
                         EventScheduledStart = x.Event.EventScheduledStart,
-                        EventScheduledText = x.Event.EventScheduledStart.Format(null, true),
+                        EventScheduledText = x.Event.EventScheduledStart.Format((string)null, true),
                         ExamType = x.Event.ExamType,
                         ExamFormat = x.Event.EventFormat,
                         EventNumber = x.Event.EventNumber.ToString()

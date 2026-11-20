@@ -1,6 +1,6 @@
 import { useState, KeyboardEvent, useEffect } from "react";
 import { DateFormatType, DateOrDateTime, DateTimeParts, isDateTime, isDateTimeInvalid } from "@/helpers/date/dateTimeTypes";
-import { TimeZoneId, timeZones } from "@/helpers/date/timeZones";
+import { TimeZoneId, getTimeZones } from "@/helpers/date/timeZones";
 import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
 
 export const dateInputFormatType: DateFormatType = "mmm d, yyyy";
@@ -42,7 +42,7 @@ export function useDatePicker(
         }
 
         const timeZoneId: TimeZoneId = currentValue?.time?.timeZoneId ?? defaultTimeZoneId ?? "UTC";
-        const timeZone = timeZones.find(x => x.timeZoneId === timeZoneId);
+        const timeZone = getTimeZones().find(x => x.timeZoneId === timeZoneId);
 
         return timeZone ? {
             timeZoneId,
@@ -214,7 +214,7 @@ export function useDatePicker(
             return;
         }
 
-        const timeZoneAbbrev = timeZones.find(x => x.timeZoneId === timeZoneId)?.abbrev ?? "UTC";
+        const timeZoneAbbrev = getTimeZones().find(x => x.timeZoneId === timeZoneId)?.abbrev ?? "UTC";
 
         setTimeZone({
             timeZoneId,

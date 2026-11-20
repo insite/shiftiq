@@ -138,15 +138,9 @@ namespace Shift.Common.Integration.Partitions
             }
         }
 
-        // The shared HttpClient is a process-wide singleton, so the key is set per-request rather
-        // than on DefaultRequestHeaders to avoid leaking it onto unrelated callers.
-
         private void AddApiKey(HttpRequestMessage request)
         {
-            var apiKey = _api?.ApiKey;
-
-            if (!string.IsNullOrEmpty(apiKey))
-                request.Headers.Add("X-Api-Key", apiKey);
+            HubApiKey.Apply(request, _api?.ApiKey);
         }
 
         // Engine:Api:BaseUrl is the API root shared by every Engine client (Google, Premailer,

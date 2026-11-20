@@ -58,12 +58,12 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
 
             if (!process.HasErrors && !process.HasWarnings)
             {
-                _broker.Send(e, new ChangeEligibility(id, "Eligible in DA", e.Reason, process));
+                _broker.Send(e, new ChangeEligibility(id, RegistrationEligibility.EligibleInDA, e.Reason, process));
                 _broker.Send(e, new ChangeApproval(id, "Eligible", "Eligible in DA", null, registration.ApprovalStatus));
             }
             else
             {
-                _broker.Send(e, new ChangeEligibility(id, "Not Eligible in DA", e.Reason, process));
+                _broker.Send(e, new ChangeEligibility(id, RegistrationEligibility.NotEligibleInDA, e.Reason, process));
             }
         }
 
@@ -73,8 +73,9 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                 var change = new ChangeSynchronization(e.AggregateIdentifier, "Pull from Direct Access", null);
                 _broker.Send(e, change);
             }
+
             {
-                var change = new ChangeEligibility(e.AggregateIdentifier, "Check Eligibility in DA", null);
+                var change = new ChangeEligibility(e.AggregateIdentifier, RegistrationEligibility.CheckEligibilityInDA, null);
                 _broker.Send(e, change);
             }
         }
@@ -147,6 +148,41 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
 
                 _broker.Send(e, new ChangeSynchronization(registration, operation, process));
             }
+        }
+
+        public void HandleBefore(EventChanged e)
+        {
+            var registration = e.AggregateIdentifier;
+
+            CancelRegistrationNotificationTimer(e, registration);
+
+            // RegistrationCancelled
+
+            var packet = GetRegistrationPacket(registration);
+
+            if (!EnableIntegrationWithDirectAccess(packet))
+                return;
+
+            RemoveCandidateFromDirectAccess(e, packet, e.OriginUser, "Transferred");
+
+            if (!IsNotificationDisabled(packet))
+                ExecuteMailout(e, "ITA022");
+        }
+
+        public void HandleAfter(EventChanged e)
+        {
+            // ApprovalChanged
+
+            var registration = _registrations.GetRegistration(e.AggregateIdentifier);
+            if (registration?.ApprovalStatus == null)
+                return;
+
+            _broker.Send(e, new ChangeApproval(
+                registration.RegistrationIdentifier,
+                registration.ApprovalStatus,
+                $"Transferred to Event {e.Event}: {e.Reason}",
+                CommandBroker.CreateProcess("Force Execution"),
+                registration.ApprovalStatus));
         }
     }
 }

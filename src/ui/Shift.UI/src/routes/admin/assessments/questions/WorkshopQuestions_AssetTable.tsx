@@ -95,7 +95,7 @@ export default function WorkshopQuestions_AssetTable({
                             value={taxonomyValue}
                             valueHtml={taxonomyName}
                             items={taxonomyItems}
-                            disabled={readOnly}
+                            disabled={readOnly || question.questionPublicationStatusDescription?.toLowerCase() === "published"}
                             onSave={value => handleQuestionFieldSave("Taxonomy", value)}
                         />
                     </td>
@@ -164,7 +164,7 @@ export default function WorkshopQuestions_AssetTable({
                             {(question.forms ?? []).map(f => (
                                 <div key={f.formId} className="form-ref-row">
                                     <ActionLink
-                                        href={`/client/admin/assessment/forms/workshop/${f.formId}?tab=questions&question=${question.questionId}`}
+                                        href={`/client/admin/assessments/forms/workshop/${f.formId}?tab=questions&question=${question.questionId}`}
                                         target="_blank"
                                         className={f.formId === formId ? "fst-italic" : ""}
                                     >

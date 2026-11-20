@@ -40,15 +40,17 @@ public class TableDbContext : DbContext
     internal DbSet<EventEntity> QEvent { get; set; }
     internal DbSet<EventUserEntity> QEventUser { get; set; }
     internal DbSet<RegistrationEntity> QRegistration { get; set; }
+    internal DbSet<AccommodationEntity> QAccommodation { get; set; }
 
     // Domain: Competency
     internal DbSet<StandardEntity> QStandard { get; set; }
 
     // Domain: Contact
-    internal DbSet<AddressEntity> QPersonAddress { get; set; }
+    internal DbSet<GroupAddressEntity> QGroupAddress { get; set; }
     internal DbSet<GroupEntity> QGroup { get; set; }
     internal DbSet<MembershipEntity> QMembership { get; set; }
     internal DbSet<MembershipDeletionEntity> QMembershipDeletion { get; set; }
+    internal DbSet<PersonAddressEntity> QPersonAddress { get; set; }
     internal DbSet<PersonEntity> QPerson { get; set; }
     internal DbSet<QPersonSecretEntity> QPersonSecret { get; set; }
 
@@ -132,6 +134,7 @@ public class TableDbContext : DbContext
         builder.ApplyConfiguration(new EventUserConfiguration());
         builder.ApplyConfiguration(new EventConfiguration());
         builder.ApplyConfiguration(new RegistrationConfiguration());
+        builder.ApplyConfiguration(new AccommodationConfiguration());
 
         // Domain: Competency
         builder.ApplyConfiguration(new StandardConfiguration());
@@ -148,11 +151,12 @@ public class TableDbContext : DbContext
         builder.ApplyConfiguration(new RecipientConfiguration());
 
         // Domain: Directory
-        builder.ApplyConfiguration(new AddressConfiguration());
+        builder.ApplyConfiguration(new GroupAddressConfiguration());
         builder.ApplyConfiguration(new GroupConfiguration());
         builder.ApplyConfiguration(new MembershipConfiguration());
         builder.ApplyConfiguration(new MembershipDeletionConfiguration());
         builder.ApplyConfiguration(new PendingPersonConfiguration());
+        builder.ApplyConfiguration(new PersonAddressConfiguration());
         builder.ApplyConfiguration(new PersonConfiguration());
         builder.ApplyConfiguration(new QPersonSecretConfiguration());
 

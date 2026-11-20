@@ -135,6 +135,7 @@
             <insite:Button runat="server" ID="BuildAddendum" ButtonStyle="Success" Icon="fas fa-download" Text="Print Addendum" />
             <insite:Button runat="server" ID="BuildFormInternal" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Form (internal)" />
             <insite:Button runat="server" ID="BuildFormDocx" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Form (DOCX)" />
+            <insite:Button runat="server" ID="BuildFormBasicDocx" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Form (Basic, DOCX)" />
             <insite:Button runat="server" ID="BuildFormCompact" ButtonStyle="Info" Icon="fas fa-download" Text="Print Form (compact)" />
             <insite:CloseButton runat="server" ID="GoBackButton" />
         </div>

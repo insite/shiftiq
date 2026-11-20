@@ -156,7 +156,7 @@
         <div runat="server" id="DistrictField" class="col-sm-6">
             <div class="mb-3 pb-1">
                 <label class="form-label">
-                    <insite:Literal runat="server" Text="District" />
+                    <insite:Literal runat="server" Text="Division" />
                 </label>
                 <div>
                     <insite:TextBox ID="District" runat="server" ReadOnly="true" />

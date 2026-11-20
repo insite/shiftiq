@@ -22,8 +22,6 @@ namespace Shift.Common
     /// </example>
     public class Interval
     {
-        private const string MST = "Mountain Standard Time";
-
         private const string RequiredDateFormat = "yyyy-MM-dd";
 
         private const string RequiredTimeFormat = "HH:mm";
@@ -74,7 +72,7 @@ namespace Shift.Common
         }
 
         public Interval(DateTimeOffset effective, string length, string weekdays = null)
-            : this(effective.DateTime, Shift.Common.Base.TimeZones.GetZone(effective).Id, length, weekdays)
+            : this(effective.DateTime, TimeZones.FindTimeZoneId(effective), length, weekdays)
         {
 
         }
@@ -144,8 +142,7 @@ namespace Shift.Common
             var d = DateTime.ParseExact(Date, "yyyy-MM-dd", CultureInfo.CurrentCulture);
             var t = DateTime.ParseExact(Time, "HH:mm", CultureInfo.CurrentCulture);
             var dt = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0);
-            var offset = Shift.Common.Base.TimeZones.GetOffset(dt, Zone);
-            var dto = new DateTimeOffset(dt, offset);
+            var dto = TimeZones.ToDateTimeOffset(dt, Zone);
             return dto;
         }
 
@@ -157,17 +154,15 @@ namespace Shift.Common
             // Ensure we are working in the same time zone. If the effective date is MST and the 
             // current date is MDT (or vice versa) then adjust the offset by one hour.
 
-            var tz = Shift.Common.Base.TimeZones.GetZone(Zone);
-
             var effective = GetEffective();
 
             var offset = effective.Offset;
 
-            if (tz.IsDaylightSavingTime(current) && !tz.IsDaylightSavingTime(effective))
+            if (TimeZones.IsDaylightSavingTime(current, Zone) && !TimeZones.IsDaylightSavingTime(effective, Zone))
             {
                 offset = offset.Add(new TimeSpan(1, 0, 0));
             }
-            else if (!tz.IsDaylightSavingTime(current) && tz.IsDaylightSavingTime(effective))
+            else if (!TimeZones.IsDaylightSavingTime(current, Zone) && TimeZones.IsDaylightSavingTime(effective, Zone))
             {
                 offset = offset.Add(new TimeSpan(-1, 0, 0));
             }
@@ -315,7 +310,7 @@ namespace Shift.Common
             if (!DateTime.TryParseExact(Time, RequiredTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var time))
                 AddProblem(errors, nameof(Time), $"{Time} is not an expected time format. Please use {RequiredTimeFormat}.");
 
-            if (!Shift.Common.Base.TimeZones.IsValidZone(Zone))
+            if (!TimeZones.IsValidZone(Zone))
                 AddProblem(errors, nameof(Zone), $"{Zone} is not a valid time zone.");
 
             try

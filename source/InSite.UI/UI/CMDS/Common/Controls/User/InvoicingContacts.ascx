@@ -16,7 +16,7 @@
                             <div>
                                 <insite:IconButton runat="server" Name="minus-circle" CommandName="Remove"
                                     Visible='<%# AllowMembershipDeletion %>'
-                                    CommandArgument='<%# Eval("GroupId") + "|" + Eval("UserId") %>'
+                                    CommandArgument='<%# Eval("MembershipId") %>'
                                     ToolTip="Remove from team"
                                     OnClientClick="if (!confirm('Remove this user from the team?')) return false;" />
                                 <%# Eval("UserName") %>

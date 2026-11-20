@@ -73,11 +73,14 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
 
         #region Public methods
 
-        public int LoadData(Guid journalSetupIdentifier, QExperience experience)
+        public int LoadData(Guid journalSetupIdentifier, QExperience experience, Guid? learnerUserIdentifier = null)
         {
             _experience = experience ?? new QExperience
             {
-                JournalIdentifier = journalSetupIdentifier
+                JournalIdentifier = journalSetupIdentifier,
+                Journal = learnerUserIdentifier.HasValue
+                    ? new QJournal { UserIdentifier = learnerUserIdentifier.Value }
+                    : null
             };
 
             var fields = ServiceLocator.JournalSearch.GetJournalSetupFields(journalSetupIdentifier);

@@ -1,4 +1,4 @@
-<%@ Page Language="C#" CodeBehind="Register.aspx.cs" Inherits="InSite.UI.Portal.Events.Classes.Register" MasterPageFile="~/UI/Layout/Portal/Portal.master" %>
+﻿<%@ Page Language="C#" CodeBehind="Register.aspx.cs" Inherits="InSite.UI.Portal.Events.Classes.Register" MasterPageFile="~/UI/Layout/Portal/Portal.master" %>
 
 <%@ Register Src="Controls/PaymentDetail.ascx" TagName="PaymentDetail" TagPrefix="uc" %>
 <%@ Register Src="Controls/CardDetailConfirm.ascx" TagName="CardDetailConfirm" TagPrefix="uc" %>
@@ -347,14 +347,14 @@
 
                         <ul class="list-unstyled mb-0">
                             <li id="AddressArea" runat="server" class="d-flex py-1">
-                                <i class="far fa-map-marker-alt fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-map-marker-alt fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Mailing Address" /></span>
                                     <asp:HyperLink ID="EmployerAddress" runat="server" Target="_blank" />
                                 </div>
                             </li>
                             <li runat="server" id="EmployerPhoneArea" class="d-flex py-1">
-                                <i class="far fa-phone fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-phone fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div>
                                     <div runat="server" id="EmployerPhoneField" class="ps-3">
                                         <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Phone" /></span>
@@ -379,16 +379,16 @@
                         </h5>
 
                         <div class="d-flex pt-2 pb-3">
-                            <i class="far fa-user fs-lg align-self-center text-primary"></i>
+                            <i class="far fa-user fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                             <div class="ps-3"><span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Name" /></span><span class="d-block"><asp:Literal ID="EmployerContactName" runat="server" /></span></div>
                         </div>
 
                         <div runat="server" id="EmployerContactPhoneNumberField" class="d-flex pt-2 pb-3">
-                            <i class="far fa-phone fs-lg align-self-center text-primary"></i>
+                            <i class="far fa-phone fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                             <div class="ps-3"><span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Phone" /></span><span class="d-block"><asp:Literal ID="EmployerContactPhoneNumber" runat="server" /></span></div>
                         </div>
 
-                        <div class="d-flex pt-2 pb-3"><i class="far fa-envelope fs-lg align-self-center text-primary"></i>
+                        <div class="d-flex pt-2 pb-3"><i class="far fa-envelope fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                             <div class="ps-3"><span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Email" /></span><span class="d-block"><asp:Literal ID="EmployerContactEmail" runat="server" /></span></div>
                         </div>
 
@@ -584,7 +584,7 @@
                                 </div>
                             </li>
                             <li runat="server" id="BillingCustomerField" class="d-flex py-1">
-                                <i class="far fa-money-check-edit-alt fs-lg align-self-center text-primary border-top"></i>
+                                <i class="far fa-money-check-edit-alt fs-lg align-self-center text-primary border-top fa-fw flex-shrink-0"></i>
                                 <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Billing To" />
                                     <insite:RequiredValidator runat="server" ControlToValidate="BillingCustomer" Display="None" />
                                 </span>
@@ -632,21 +632,21 @@
                         <h5 class="mb-2" runat="server"><asp:Literal runat="server" ID="ConfirmClassName" /></h5>
                         <ul class="list-unstyled mb-0">
                             <li class="d-flex py-1">
-                                <i class="far fa-calendar-alt fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-calendar-alt fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="When" /></span>
                                     <asp:Literal runat="server" ID="ConfirmClassDates" />
                                 </div>
                             </li>
                             <li class="d-flex py-1 border-top">
-                                <i class="far fa-location fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-location fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Where" /></span>
                                     <asp:Literal runat="server" ID="ConfirmClassVenue" />
                                 </div>
                             </li>
                             <li class="d-flex py-1 border-top">
-                                <i class="far fa-map-marker-alt fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-map-marker-alt fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Address" /></span>
                                     <asp:HyperLink runat="server" ID="ConfirmClassVenueAddress" Target="_blank" />
@@ -676,14 +676,14 @@
                         <h5 class="mb-2" runat="server"><asp:Literal runat="server" ID="ConfirmParticipantName" /></h5>
                         <ul class="list-unstyled mb-0">
                             <li class="d-flex py-1">
-                                <i class="far fa-envelope fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-envelope fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Email" /></span>
                                     <asp:Literal runat="server" ID="ConfirmParticipantEmail" />
                                 </div>
                             </li>
                             <li id="ConfirmParticipantAddressDiv" runat="server"  class="d-flex py-1 border-top">
-                                <i class="far fa-map-marker-alt fs-lg align-self-baseline mt-1 text-primary"></i>
+                                <i class="far fa-map-marker-alt fs-lg align-self-baseline mt-1 text-primary fa-fw flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Address" /></span>
                                     <asp:HyperLink runat="server" ID="ConfirmParticipantAddress" Target="_blank" />
@@ -696,21 +696,21 @@
                         <h5 class="mb-2" runat="server"><asp:Literal runat="server" ID="ConfirmEmployerName" /></h5>
                         <ul class="list-unstyled mb-0">
                             <li id="ComfirmEmployerEmailDiv" runat="server" class="d-flex py-1">
-                                <i class="far fa-envelope fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-envelope fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Email" /></span>
                                     <asp:Literal ID="ConfirmEmployerEmail" runat="server" />
                                 </div>
                             </li>
                             <li id="ConfirmEmployerAddressDiv" runat="server"  class="d-flex py-1">
-                                <i class="far fa-map-marker-alt fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-map-marker-alt fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Mailing Address" /></span>
                                     <asp:HyperLink ID="ConfirmEmployerAddress" runat="server" Target="_blank" />
                                 </div>
                             </li>
                             <li runat="server" id="ComfirmEmployerPhonesDiv" class="d-flex py-1">
-                                <i class="far fa-phone fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-phone fs-lg align-self-center text-primary fa-fw flex-shrink-0"></i>
                                 <div>
                                     <div runat="server" id="ConfirmEmployerPhoneDiv" class="ps-3">
                                         <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Phone" /></span>
@@ -744,21 +744,35 @@
 
                         <h5 class="mb-2" runat="server"><asp:Literal runat="server" ID="ConfirmSeatName" /></h5>
                         <ul class="list-unstyled mb-0">
-                            <li class="d-flex py-1">
-                                <i class="far fa-dollar-sign fs-lg align-self-center text-primary"></i>
+                            <li runat="server" id="SeatPriceItem" class="d-flex py-1" visible="false">
+                                <i class="far fa-dollar-sign fa-fw fs-lg align-self-center text-primary flex-shrink-0"></i>
                                 <div class="ps-3">
-                                    <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Payment Amount ($)" /></span>
-                                    <asp:Literal runat="server" ID="PaymentAmountLiteral" />
+                                    <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Price ($)" /></span>
+                                    <span runat="server" ID="SeatPriceLiteral" class="text-dark"></span>
+                                </div>
+                            </li>
+                            <li runat="server" id="SeatTaxItem" class="d-flex py-1" visible="false">
+                                <i class="far fa-percent fa-fw fs-lg align-self-center text-primary flex-shrink-0"></i>
+                                <div class="ps-3">
+                                    <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Tax ($)" /></span>
+                                    <span runat="server" ID="SeatTaxLiteral" class="text-dark"></span>
                                 </div>
                             </li>
                             <li class="d-flex py-1">
-                                <i class="far fa-file-contract fs-lg align-self-center text-primary border-top"></i>
+                                <i class="far fa-dollar-sign fa-fw fs-lg align-self-center text-primary flex-shrink-0"></i>
+                                <div class="ps-3">
+                                    <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Payment Amount ($)" /></span>
+                                    <span runat="server" ID="PaymentAmountLiteral" class="text-dark"></span>
+                                </div>
+                            </li>
+                            <li class="d-flex py-1">
+                                <i class="far fa-file-contract fa-fw fs-lg align-self-baseline text-primary border-top flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <asp:Literal runat="server" ID="ConfirmSeatAgreement" />
                                 </div>
                             </li>
                             <li runat="server" id="BillingCustomerDiv" class="d-flex py-1 border-top">
-                                <i class="far fa-money-check-edit-alt fs-lg align-self-center text-primary"></i>
+                                <i class="far fa-money-check-edit-alt fa-fw fs-lg align-self-center text-primary flex-shrink-0"></i>
                                 <div class="ps-3">
                                     <span class="fs-ms text-body-secondary"><insite:Literal runat="server" Text="Tuition fee is being paid by" /></span>
                                     <asp:Literal runat="server" ID="ConfirmSeatPaidBy" />

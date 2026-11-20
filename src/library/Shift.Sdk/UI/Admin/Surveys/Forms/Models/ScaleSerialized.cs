@@ -9,5 +9,7 @@ namespace Shift.Sdk.UI
         public string Category { get; set; }
 
         public List<ScaleItemSerialized> Items { get; set; }
+
+        public List<SurveyContentSerialized> Content { get; set; }
     }
 }

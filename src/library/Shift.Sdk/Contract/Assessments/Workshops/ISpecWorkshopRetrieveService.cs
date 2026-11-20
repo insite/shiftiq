@@ -10,11 +10,13 @@ namespace Shift.Contract
             Guid specificationId,
             Guid? setId,
             Guid? questionId,
-            TimeZoneInfo timeZone
+            string timeZone
         );
 
-        Task<SpecWorkshop.Set> RetrieveSpecSetAsync(Guid bankId, Guid specificationId, Guid setId, TimeZoneInfo timeZone);
+        Task<SpecWorkshop.Set> RetrieveSpecSetAsync(Guid bankId, Guid specificationId, Guid setId, string timeZone);
 
-        Task<WorkshopQuestionComments> RetrieveQuestionCommentsAsync(Guid bankId, Guid questionId, TimeZoneInfo timeZone);
+        Task<SpecWorkshopPartial> RetrievePartialAsync(Guid bankId, Guid specificationId);
+
+        Task<WorkshopQuestionComments> RetrieveQuestionCommentsAsync(Guid bankId, Guid questionId, string timeZone);
     }
 }

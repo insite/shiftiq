@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Application.Events.Read;
 using InSite.Application.Events.Write;

@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Shift.Common;
 using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
+using Shift.Constant;
 
+using InSite.Application.Assets.Read;
 using InSite.Application.Events.Read;
 using InSite.Application.Gradebooks;
 using InSite.Application.Gradebooks.Write;
 using InSite.Application.Records.Read;
 using InSite.Domain.Records;
 
-using Shift.Common;
-using Shift.Constant;
+using SearchObjectType = Shift.Contract.SearchObjectType;
 
 namespace InSite.Application.Records.Write
 {
@@ -22,14 +24,22 @@ namespace InSite.Application.Records.Write
         private readonly IChangeRepository _repository;
         private readonly IEventSearch _eventSearch;
         private readonly IRecordSearch _recordSearch;
+        private readonly ISearchStore _searchStore;
 
-        public GradebookCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository,
-            IEventSearch eventSearch, IRecordSearch recordSearch)
+        public GradebookCommandReceiver(
+            ICommandQueue commander,
+            IChangeQueue publisher,
+            IChangeRepository repository,
+            IEventSearch eventSearch,
+            IRecordSearch recordSearch,
+            ISearchStore searchStore
+            )
         {
             _publisher = publisher;
             _repository = repository;
             _eventSearch = eventSearch;
             _recordSearch = recordSearch;
+            _searchStore = searchStore;
 
             commander.Subscribe<AddEnrollment>(Handle);
             commander.Subscribe<AddGradebookValidation>(Handle);
@@ -460,6 +470,8 @@ namespace InSite.Application.Records.Write
             var aggregate = new GradebookAggregate { AggregateIdentifier = c.AggregateIdentifier };
             aggregate.CreateRecord(c.Tenant, c.Name, c.Type, c.Event, c.Achievement, c.Framework);
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(c.Tenant, c.AggregateIdentifier, SearchObjectType.Gradebook);
         }
 
         public void Handle(DeleteGradeItem c)
@@ -520,11 +532,18 @@ namespace InSite.Application.Records.Write
 
         public void Handle(LockGradebook c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<GradebookAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
+                organizationId = aggregate.Data.Tenant;
+
                 aggregate.Lock();
                 Commit(aggregate, c);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Gradebook);
         }
 
         public void Handle(NoteGradebookUser c)
@@ -580,16 +599,23 @@ namespace InSite.Application.Records.Write
 
         public void Handle(RenameGradebook c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<GradebookAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
                 ValidateLocked(aggregate);
 
                 if (aggregate.Data.Name != c.Name)
                 {
+                    organizationId = aggregate.Data.Tenant;
+
                     aggregate.RenameRecord(c.Name);
                     Commit(aggregate, c);
                 }
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Gradebook);
         }
 
         public void Handle(ReorderGradeItem c)
@@ -615,20 +641,29 @@ namespace InSite.Application.Records.Write
 
         public void Handle(UnlockGradebook c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<GradebookAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
                 if (aggregate.Data.IsLocked)
                 {
+                    organizationId = aggregate.Data.Tenant;
+
                     aggregate.Unlock();
                     Commit(aggregate, c);
                 }
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Gradebook);
         }
 
         public void Handle(DeleteGradebook c)
         {
             if (_recordSearch.RecordHasProgress(c.AggregateIdentifier))
                 throw new CloseGradebookException($"Record has progress and cannot be deleted");
+
+            Guid? organizationId = null;
 
             _repository.LockAndRun<GradebookAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
@@ -637,9 +672,14 @@ namespace InSite.Application.Records.Write
                 if (data.Enrollments.Count > 0)
                     throw new CloseGradebookException($"Gradebook has students and cannot be voided");
 
+                organizationId = data.Tenant;
+
                 aggregate.Delete();
                 Commit(aggregate, c);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Gradebook);
         }
 
         private void CopyItems(

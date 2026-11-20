@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-
-using Shift.Common.Timeline.Changes;
 
 using InSite.Application.Events.Write;
 using InSite.Application.Integrations.Prometric;
@@ -10,13 +9,13 @@ using InSite.Application.Registrations.Write;
 using InSite.Domain.Registrations;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Constant;
 
 namespace InSite.Application.Registrations.Read
 {
     public class RegistrationChangeProcessor
     {
-        private const string Eligible = "Eligible";
-        private const string NotEligible = "Not Eligible";
         private const string Registered = "Registered";
 
         private readonly ICommander _commander;
@@ -39,6 +38,7 @@ namespace InSite.Application.Registrations.Read
             publisher.Subscribe<EligibilityChanged>(Handle);
             publisher.Subscribe<ExamFormAssigned>(Handle);
             publisher.Subscribe<ExamFormUnassigned>(Handle);
+            publisher.Subscribe<ExamFormAdded>(Handle);
 
             publisher.Subscribe<RegistrationCancelled>(Handle);
             publisher.Subscribe<RegistrationDeleted>(Handle);
@@ -58,21 +58,27 @@ namespace InSite.Application.Registrations.Read
             if (!IsPrometricIntegrationEnabled(e.OriginOrganization))
                 return;
 
-            var registration = _registrations.GetRegistration(
-                e.AggregateIdentifier, 
-                x => x.Candidate.User, x => x.Candidate.HomeAddress, x => x.Form, x => x.Accommodations);
+            var registration = _registrations.GetRegistration(e.AggregateIdentifier,
+                x => x.Candidate.User, x => x.Candidate.HomeAddress, x => x.Accommodations, x => x.Form,
+                x => x.ExamForms.Select(f => f.Form));
 
             // Prometric requires an assessment form for every exam event registration. If the registration does not
             // have an assessment form, then we can't send any change request(s) to Prometric.
-
-            if (registration.ExamFormIdentifier == null)
+            if (registration == null || registration.ExamFormIdentifier == null && !registration.ExamForms.Any())
                 return;
 
-            if (e.Status == Eligible)
-                _prometric.SaveEligibility(registration);
+            var forms = ToExamForms(registration);
+            if (e.Form.HasValue)
+                forms = forms.Where(x => x.ExamFormIdentifier == e.Form.Value);
 
-            else if (e.Status == NotEligible)
-                _prometric.DeleteEligibility(registration);
+            foreach (var form in forms)
+            {
+                if (e.Status == RegistrationEligibility.Eligible)
+                    _prometric.SaveEligibility(registration, form);
+
+                else if (e.Status == RegistrationEligibility.NotEligible)
+                    _prometric.DeleteEligibility(registration, form);
+            }
         }
 
         public void Handle(ExamFormAssigned e)
@@ -84,6 +90,11 @@ namespace InSite.Application.Registrations.Read
         public void Handle(ExamFormUnassigned e)
         {
             CheckForPrometricIntegration(e.AggregateIdentifier);
+        }
+
+        public void Handle(ExamFormAdded e)
+        {
+            CheckForPrometricIntegration(e.AggregateIdentifier, e.Form);
         }
 
         public void Handle(RegistrationCancelled e)
@@ -115,12 +126,12 @@ namespace InSite.Application.Registrations.Read
 
         public void Handle(EventChanged e)
         {
-            if (e.CancelEmptyEvent)
-            {
-                var state = (Registration)e.AggregateState;
-                if (state.PreviousEventIdentifier.HasValue)
-                    CancelEmptyEvent(state.PreviousEventIdentifier.Value);
-            }
+            if (!e.CancelEmptyEvent)
+                return;
+
+            var state = (Registration)e.AggregateState;
+            if (state.PreviousEventIdentifier.HasValue)
+                CancelEmptyEvent(state.PreviousEventIdentifier.Value);
         }
 
         private void CancelPendingTimers(Guid registration)
@@ -131,17 +142,32 @@ namespace InSite.Application.Registrations.Read
                 _commander.Send(new CancelRegistrationTimer(registration, timer.TriggerCommand));
         }
 
-        private void CheckForPrometricIntegration(Guid id)
+        private void CheckForPrometricIntegration(Guid registrationId, Guid? formId = null)
         {
-            var registration = _registrations.GetRegistration(id);
+            var registration = _registrations.GetRegistration(registrationId, x => x.ExamForms);
             if (registration == null || !IsPrometricIntegrationEnabled(registration.OrganizationIdentifier))
                 return;
 
-            if (registration.ApprovalStatus == Registered && registration.ExamFormIdentifier.HasValue)
-                _commander.Send(new ChangeEligibility(id, Eligible, $"Add eligibility to Prometric because the approval status for this event registration is {registration.ApprovalStatus} and assessment form {registration.ExamFormIdentifier} is assigned to it."));
+            var forms = ToExamForms(registration);
+            if (formId.HasValue)
+                forms = forms.Where(x => x.ExamFormIdentifier == formId.Value);
 
-            else if (registration.EligibilityStatus == NotEligible)
-                _commander.Send(new ChangeEligibility(id, NotEligible, $"Remove eligibility from Prometric."));
+            foreach (var form in forms)
+            {
+                if (registration.ApprovalStatus == Registered)
+                {
+                    _commander.Send(new ChangeEligibility(registrationId, form.ExamFormIdentifier, RegistrationEligibility.Eligible,
+                        $"Add eligibility to Prometric because the approval status for " +
+                        $"this event registration is {registration.ApprovalStatus} and " +
+                        $"assessment form {form.ExamFormIdentifier} is assigned to it."));
+                }
+
+                else if (form.EligibilityStatus == RegistrationEligibility.NotEligible)
+                {
+                    _commander.Send(new ChangeEligibility(registrationId, form.ExamFormIdentifier, RegistrationEligibility.NotEligible,
+                        "Remove eligibility from Prometric."));
+                }
+            }
         }
 
         private bool IsPrometricIntegrationEnabled(Guid organizationId)
@@ -163,5 +189,28 @@ namespace InSite.Application.Registrations.Read
             if (registrations.IsEmpty() || registrations.All(x => x.GradingStatus == "Cancelled"))
                 _commander.Send(new CancelEvent(eventId, "Auto-cancellation: the event has no open registrations.", true));
         }
+
+        private static IEnumerable<QRegistrationExamForm> ToExamForms(QRegistration registration)
+        {
+            if (registration.ExamFormIdentifier != null)
+                yield return ToExamForm(registration);
+
+            foreach (var form in registration.ExamForms.OrderBy(x => x.Sequence).EmptyIfNull())
+                yield return form;
+        }
+
+        private static QRegistrationExamForm ToExamForm(QRegistration registration) => new QRegistrationExamForm
+        {
+            RegistrationIdentifier = registration.RegistrationIdentifier,
+            ExamFormIdentifier = registration.ExamFormIdentifier.Value,
+            Form = registration.Form,
+            AttemptIdentifier = registration.AttemptIdentifier,
+            Password = registration.RegistrationPassword,
+            ExamTimeLimit = registration.ExamTimeLimit,
+            EligibilityProcess = registration.EligibilityProcess,
+            EligibilityStatus = registration.EligibilityStatus,
+            EligibilityUpdated = registration.EligibilityUpdated,
+            Sequence = -1
+        };
     }
 }

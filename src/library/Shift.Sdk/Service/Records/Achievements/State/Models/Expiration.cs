@@ -75,9 +75,9 @@ namespace InSite.Domain.Records
         }
 
         public override string ToString()
-            => ToString(TimeZones.Pacific);
+            => ToString(TimeZones.Ids.Pacific);
 
-        public string ToString(TimeZoneInfo tz)
+        public string ToString(string tz)
         {
             var s = Type.ToString();
 

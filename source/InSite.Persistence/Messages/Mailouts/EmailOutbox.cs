@@ -478,13 +478,16 @@ namespace InSite.Persistence
         }
 
         public static EmailVariables CreateEmailVariables(EmailDraft email, Guid userId, string address)
+            => CreateEmailVariables(email.OrganizationIdentifier, userId, address, email.ContentVariables);
+
+        public static EmailVariables CreateEmailVariables(Guid organizationId, Guid userId, string address, Dictionary<string, string> variables)
         {
-            var result = new EmailVariables(userId, address, email.OrganizationIdentifier, email.ContentVariables);
+            var result = new EmailVariables(userId, address, organizationId, variables);
 
             if (result.RecipientEmail.IsEmpty())
                 result.RecipientEmail = address;
 
-            var person = ServiceLocator.PersonSearch.GetPerson(userId, email.OrganizationIdentifier, x => x.User);
+            var person = ServiceLocator.PersonSearch.GetPerson(userId, organizationId, x => x.User);
 
             if (person != null)
             {
@@ -699,10 +702,12 @@ namespace InSite.Persistence
             Guid? recipient,
             Guid? message,
             StringDictionary variables,
-            Guid[] to = null, Guid[] cc = null, Guid[] bcc = null
+            Guid[] to = null, Guid[] cc = null, Guid[] bcc = null,
+            string subject = null, string body = null
             )
         {
-            return Compose(environment, trigger, organization, user, message, variables, draft =>
+            return Compose(environment, trigger, organization, user, message, variables,
+                subject, body, draft =>
             {
                 var subscribers = draft.IgnoreSubscribers
                     ? new List<EmailSubscriber>()
@@ -738,12 +743,20 @@ namespace InSite.Persistence
             Guid userId,
             Guid? messageId,
             StringDictionary variables,
+            string subject,
+            string body,
             Func<EmailDraft, RecipientList> getRecipients
             )
         {
             var draft = messageId.HasValue
                 ? MessageRepository.GetEmail(messageId.Value)
                 : MessageRepository.GetEmail(organizationId, trigger);
+
+            if (IsEdited(draft.ContentSubject, subject))
+                draft.ContentSubject = new MultilingualString(subject);
+
+            if (IsEdited(draft.ContentBody, body))
+                draft.ContentBody = new MultilingualString(body);
 
             if (variables.IsNotEmpty())
             {
@@ -799,6 +812,20 @@ namespace InSite.Persistence
 
                 return JsonConvert.SerializeObject(data.ToDictionary(x => x.Identifier, x => x.Address));
             }
+        }
+
+        // An override that matches the template's default text is not an edit, so the template
+        // stays whole and a recipient whose language has its own translation still receives it.
+        // A browser posts a textarea with CRLF line endings whatever the template stored, so line
+        // endings do not count.
+        private static bool IsEdited(MultilingualString template, string text)
+        {
+            if (text.IsEmpty())
+                return false;
+
+            return Normalize(text) != Normalize(template?.Default);
+
+            string Normalize(string value) => (value ?? string.Empty).Replace("\r\n", "\n").Trim();
         }
 
         private static EmailDraft[] ConvertMailoutToEmail(List<QMailout> mailouts)

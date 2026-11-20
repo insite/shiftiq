@@ -56,7 +56,7 @@ namespace InSite.Cmds.Admin.Organizations.Forms
                     CompanySummary = null,
                     LegalName = null
                 },
-                TimeZone = TimeZones.Mountain,
+                TimeZone = TimeZones.Ids.Mountain,
                 PlatformCustomization = new PlatformCustomization(),
                 Languages = new CultureInfo[] { new CultureInfo("en") },
             };

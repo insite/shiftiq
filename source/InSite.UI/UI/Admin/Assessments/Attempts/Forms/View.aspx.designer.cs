@@ -69,6 +69,42 @@ namespace InSite.Admin.Assessments.Attempts.Forms
         protected global::InSite.Common.Web.UI.Button CompleteCommand;
 
         /// <summary>
+        /// AIProctoringStateField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AIProctoringStateField;
+
+        /// <summary>
+        /// AIProctoringSessionIdField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AIProctoringSessionIdField;
+
+        /// <summary>
+        /// AIProctoringProviderName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal AIProctoringProviderName;
+
+        /// <summary>
+        /// AIProctoringSessionId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal AIProctoringSessionId;
+
+        /// <summary>
         /// AttemptStartedOutput control.
         /// </summary>
         /// <remarks>

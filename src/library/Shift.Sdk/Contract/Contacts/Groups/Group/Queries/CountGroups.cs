@@ -6,6 +6,8 @@ namespace Shift.Contract
 {
     public class CountGroups : Query<int>, IGroupCriteria
     {
+        string IGroupCriteria.GroupType { get => null; set { } }
+
         public Guid? OrganizationId { get; set; }
 
         public string GroupCode { get; set; }

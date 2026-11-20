@@ -136,8 +136,7 @@ namespace InSite.Domain.Contacts
                     Comments[e.Comment.Comment] = e.Comment.Clone();
                     break;
                 case CommentActionType.Delete:
-                    if (!Comments.Remove(e.Comment.Comment))
-                        throw new KeyNotFoundException($"Cannot delete comment {e.Comment.Comment}: not found.");
+                    Comments.Remove(e.Comment.Comment);
                     break;
                 default:
                     throw new ArgumentException($"Unsupported comment type: {e.CommentActionType}");

@@ -71,7 +71,9 @@ export default function WorkshopQuestions_Comments({
                     <IconButton
                         iconStyle="solid"
                         iconName={showHidden ? "eye-slash" : "eye"}
+                        iconClassName="icon"
                         className="ms-2"
+                        title={showHidden ? "Hide Hidden Comments" : "Show Hidden Comments"}
                         onClick={() => setShowHidden(prev => !prev)}
                     />
                 </span>

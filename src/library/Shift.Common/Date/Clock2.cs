@@ -8,13 +8,13 @@ namespace Shift.Common.Base
 
         public static DateTimeOffset NextCentury = new DateTimeOffset(new DateTime(2100, 1, 1, 0, 0, 0), TimeSpan.Zero);
 
-        public static string FormatTime(DateTimeOffset when, TimeZoneInfo zone)
+        public static string FormatTime(DateTimeOffset when, string zoneId)
         {
-            var time = TimeZoneInfo.ConvertTime(when, zone);
+            var time = TimeZones.ConvertTime(when, zoneId);
 
-            var alias = Shift.Common.Base.TimeZones.GetAlias(zone);
+            var abbrev = TimeZones.GetAbbreviation(zoneId);
 
-            var name = alias.GetName(time);
+            var name = abbrev.GetAbbreviation(time);
 
             var format = "{0:" + DefaultTimeFormat + "} {1}";
 

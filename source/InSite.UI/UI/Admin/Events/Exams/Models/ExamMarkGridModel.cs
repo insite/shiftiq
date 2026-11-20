@@ -18,10 +18,10 @@ namespace InSite.Admin.Events.Exams.Controls
 {
     public class ExamMarkGridModel
     {
-        private readonly TimeZoneInfo _zone;
+        private readonly string _zone;
         private readonly Dictionary<Guid, QAttempt> _attemptCache = new Dictionary<Guid, QAttempt>();
 
-        public ExamMarkGridModel(TimeZoneInfo zone)
+        public ExamMarkGridModel(string zone)
         {
             _zone = zone;
         }

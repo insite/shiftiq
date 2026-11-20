@@ -50,6 +50,6 @@ public class AssessmentConfiguration : IEntityTypeConfiguration<AssessmentEntity
         builder.Property(x => x.GradebookIdentifier).HasColumnName("GradebookIdentifier");
         builder.Property(x => x.WhenAttemptStartedNotifyAdminMessageIdentifier).HasColumnName("WhenAttemptStartedNotifyAdminMessageIdentifier");
         builder.Property(x => x.WhenAttemptCompletedNotifyAdminMessageIdentifier).HasColumnName("WhenAttemptCompletedNotifyAdminMessageIdentifier");
-
+        builder.Property(x => x.AIProctoringProvider).HasColumnName("AIProctoringProvider").IsUnicode(false).HasMaxLength(50);
     }
 }

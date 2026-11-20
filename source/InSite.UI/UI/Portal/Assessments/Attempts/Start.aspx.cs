@@ -3,6 +3,7 @@ using System.Linq;
 
 using Humanizer;
 
+using InSite.Application.Registrations.Read;
 using InSite.Common.Web;
 using InSite.Domain.Banks;
 using InSite.Persistence;
@@ -10,6 +11,7 @@ using InSite.UI.Layout.Portal;
 using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Constant;
 
 namespace InSite.Portal.Assessments.Attempts
@@ -109,7 +111,10 @@ namespace InSite.Portal.Assessments.Attempts
                     TimeExtension,
                     Language);
 
-                var redirectUrl = AttemptUrl.GetAnswerUrl(attemptId);
+                var aiProctoringEnabled = _bankForm.Invigilation.AIProctoringProvider == AIProctoringProvider.Proview
+                    && Organization.Toolkits.Assessments.AIProctoringEnabled;
+
+                var redirectUrl = AttemptUrl.GetAnswerUrl(attemptId, aiProctoringEnabled);
 
                 HttpResponseHelper.Redirect(redirectUrl);
             }
@@ -177,7 +182,9 @@ namespace InSite.Portal.Assessments.Attempts
             }
             else if (Guid.TryParse(Request.QueryString["registration"], out var registrationId))
             {
-                action = LoadRegistration(registrationId, attemptId, isInit);
+                var examFormId = ValueConverter.ToGuidNullable(Request.QueryString["exam-form"]);
+
+                action = LoadRegistration(registrationId, examFormId, attemptId, isInit);
             }
             else if (Guid.TryParse(Request.QueryString["form"], out var formId))
             {
@@ -211,32 +218,49 @@ namespace InSite.Portal.Assessments.Attempts
             return OnFormLoaded(url, contentStyle, isInit, allowAssessor);
         }
 
-        private AttemptHelper.IAction LoadRegistration(Guid registrationId, Guid? attemptId, bool isInit)
+        private AttemptHelper.IAction LoadRegistration(Guid registrationId, Guid? examFormId, Guid? attemptId, bool isInit)
         {
             var resourceId = Guid.Empty;
 
             var registration = ServiceLocator.RegistrationSearch.GetRegistration(registrationId);
             if (registration != null
                 && registration.OrganizationIdentifier == Organization.Identifier
-                && registration.CandidateIdentifier == User.UserIdentifier
-                && registration.ExamFormIdentifier.HasValue)
+                && registration.CandidateIdentifier == User.UserIdentifier)
             {
-                var resources = ServiceLocator.PageSearch.Bind(x => x.PageIdentifier,
-                    x => x.ObjectType == "Assessment" && x.ObjectIdentifier == registration.ExamFormIdentifier.Value);
+                var formId = registration.ExamFormIdentifier;
+                var examTimeLimit = registration.ExamTimeLimit;
 
-                if (resources.Length == 1)
+                if (examFormId.HasValue && examFormId != registration.ExamFormIdentifier)
                 {
-                    resourceId = resources[0];
+                    var examForm = Organization.Toolkits?.Events?.AllowMultipleAssessmentForms == true
+                        ? ServiceLocator.RegistrationSearch
+                            .GetRegistrationExamForms(new QRegistrationFilter { RegistrationIdentifier = registrationId })
+                            .FirstOrDefault(x => x.ExamFormIdentifier == examFormId.Value)
+                        : null;
 
-                    RegistrationIdentifier = registration.RegistrationIdentifier;
+                    formId = examForm?.ExamFormIdentifier;
+                    examTimeLimit = examForm?.ExamTimeLimit;
+                }
 
-                    if (registration.ExamTimeLimit.HasValue)
+                if (formId.HasValue)
+                {
+                    var resources = ServiceLocator.PageSearch.Bind(x => x.PageIdentifier,
+                        x => x.ObjectType == "Assessment" && x.ObjectIdentifier == formId.Value);
+
+                    if (resources.Length == 1)
                     {
-                        TimeLimit = registration.ExamTimeLimit.Value;
+                        resourceId = resources[0];
 
-                        var accommodations = ServiceLocator.RegistrationSearch.GetAccommodations(registration.RegistrationIdentifier);
+                        RegistrationIdentifier = registration.RegistrationIdentifier;
 
-                        TimeExtension = accommodations.Count > 0 ? accommodations.Sum(x => x.TimeExtension ?? 0) : 0;
+                        if (examTimeLimit.HasValue)
+                        {
+                            TimeLimit = examTimeLimit.Value;
+
+                            var accommodations = ServiceLocator.RegistrationSearch.GetAccommodations(registration.RegistrationIdentifier);
+
+                            TimeExtension = accommodations.Count > 0 ? accommodations.Sum(x => x.TimeExtension ?? 0) : 0;
+                        }
                     }
                 }
             }
@@ -264,7 +288,10 @@ namespace InSite.Portal.Assessments.Attempts
             {
                 MultiView.SetActiveView(StartExamView);
 
-                var actionResult = AttemptHelper.LoadAttemptStart(_bankForm, learnerId.Value, url);
+                var aiProctoringEnabled = _bankForm.Invigilation.AIProctoringProvider == AIProctoringProvider.Proview
+                    && Organization.Toolkits.Assessments.AIProctoringEnabled;
+
+                var actionResult = AttemptHelper.LoadAttemptStart(_bankForm, learnerId.Value, url, aiProctoringEnabled);
                 if (actionResult != null)
                     return actionResult;
             }
@@ -361,7 +388,7 @@ namespace InSite.Portal.Assessments.Attempts
             var content = bankForm.Content;
             var invigilation = bankForm.Invigilation;
 
-            KioskMode.Visible = invigilation.IsKioskModeRequired;
+            KioskMode.Visible = invigilation.IsKioskModeRequired || invigilation.AIProctoringProvider == AIProctoringProvider.Proview;
 
             AssessmentTitle.InnerText = content.Title?[Language] ?? content.Title?.Default;
 
@@ -463,7 +490,7 @@ namespace InSite.Portal.Assessments.Attempts
             if (eventScheduled.HasValue)
             {
                 var timeZone = CurrentSessionState.Identity.User.TimeZone;
-                var scheduled = TimeZoneInfo.ConvertTime(eventScheduled.Value, timeZone);
+                var scheduled = TimeZones.ConvertTime(eventScheduled.Value, timeZone);
                 var timeZoneAbbrv = TimeZones.GetAbbreviation(timeZone).GetAbbreviation(eventScheduled.Value);
 
                 EventScheduled.Text = $"{scheduled:MMM d, yyyy h:mm tt} {timeZoneAbbrv}";

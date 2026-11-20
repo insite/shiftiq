@@ -15,6 +15,15 @@ namespace InSite.UI.Portal.Contacts.People.Controls
     {
 
         /// <summary>
+        /// MatchNamesWith control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox MatchNamesWith;
+
+        /// <summary>
         /// FullName control.
         /// </summary>
         /// <remarks>
@@ -40,6 +49,15 @@ namespace InSite.UI.Portal.Contacts.People.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.TextBox PersonCode;
+
+        /// <summary>
+        /// SessionCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NumericBox SessionCount;
 
         /// <summary>
         /// SearchButton control.
@@ -94,6 +112,24 @@ namespace InSite.UI.Portal.Contacts.People.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.DateTimeOffsetSelector LastAuthenticatedBefore;
+
+        /// <summary>
+        /// ApprovalFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox ApprovalFilter;
+
+        /// <summary>
+        /// Scope control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox Scope;
 
         /// <summary>
         /// FilterManager control.

@@ -126,6 +126,9 @@ namespace InSite.Application.Contacts.Read
                 );
             }
 
+            if (filter.MembershipGroupIdentifier.HasValue)
+                query = query.Where(x => x.Memberships.Any(y => y.GroupIdentifier == filter.MembershipGroupIdentifier.Value));
+
             if (filter.UserIdentifiers.IsNotEmpty())
                 query = query.Where(x => filter.UserIdentifiers.Contains(x.UserIdentifier));
 

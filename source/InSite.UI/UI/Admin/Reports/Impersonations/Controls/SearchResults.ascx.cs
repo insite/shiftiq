@@ -31,7 +31,7 @@ namespace InSite.Admin.Reports.Impersonations.Controls
             public string Started { get; set; }
             public DateTimeOffset? ImpersonationStopped { get; set; }
             public string Stopped { get; set; }
-            public TimeZoneInfo TimeZone { get; set; }
+            public string TimeZone { get; set; }
         }
 
         #endregion
@@ -62,9 +62,9 @@ namespace InSite.Admin.Reports.Impersonations.Controls
                     ImpersonatorContactName = x.ImpersonatorUserFullName,
                     ImpersonatorContactLink = GetImpersonationName(x.ImpersonatorUserIdentifier, x.ImpersonatorUserFullName),
                     ImpersonationStarted = x.ImpersonationStarted,
-                    Started = x.ImpersonationStarted.Format(user.TimeZone),
+                    Started = x.ImpersonationStarted.Format(User.TimeZone),
                     ImpersonationStopped = x.ImpersonationStopped,
-                    Stopped = x.ImpersonationStopped.Format(user.TimeZone, nullValue: string.Empty),
+                    Stopped = x.ImpersonationStopped.Format(User.TimeZone, nullValue: string.Empty),
                     TimeZone = timeZone
                 })
                 .ToList();

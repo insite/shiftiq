@@ -8,6 +8,7 @@ namespace InSite.Application.Invoices.Read
     public class TTaxFilter : Filter
     {
         public Guid? OrganizationIdentifier { get; set; }
+        public string CountryCode { get; set; }
         public string RegionCode { get; set; }
         public string TaxName { get; set; }
     }

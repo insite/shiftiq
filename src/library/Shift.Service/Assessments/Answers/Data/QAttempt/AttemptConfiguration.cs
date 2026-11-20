@@ -47,6 +47,8 @@ public class AttemptConfiguration : IEntityTypeConfiguration<AttemptEntity>
         builder.Property(x => x.TabTimeLimit).HasColumnName("TabTimeLimit").IsUnicode(false).HasMaxLength(8);
         builder.Property(x => x.AttemptPingInterval).HasColumnName("AttemptPingInterval");
         builder.Property(x => x.AttemptLanguage).HasColumnName("AttemptLanguage").IsUnicode(false).HasMaxLength(2);
+        builder.Property(x => x.AIProctoringProvider).HasColumnName("AIProctoringProvider").IsUnicode(false).HasMaxLength(50);
+        builder.Property(x => x.AIProctoringSessionId).HasColumnName("AIProctoringSessionId").IsUnicode(false).HasMaxLength(100);
 
     }
 }

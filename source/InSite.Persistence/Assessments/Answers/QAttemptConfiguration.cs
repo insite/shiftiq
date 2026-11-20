@@ -30,6 +30,8 @@ namespace InSite.Persistence
             Property(x => x.TabTimeLimit).IsUnicode(false).HasMaxLength(8);
             Property(x => x.AttemptDuration).HasPrecision(12, 3);
             Property(x => x.AttemptLanguage).IsOptional().IsUnicode(false).HasMaxLength(2);
+            Property(x => x.AIProctoringProvider).IsUnicode(false).HasMaxLength(50);
+            Property(x => x.AIProctoringSessionId).IsUnicode(false).HasMaxLength(100);
         }
     }
 }

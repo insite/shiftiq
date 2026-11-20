@@ -1,10 +1,11 @@
-﻿namespace Shift.Constant
+namespace Shift.Constant
 {
     public class ContentContainerType
     {
         public static string Activity => "Activity";
         public static string Application => "Application";
         public static string Course => "Course";
+        public static string ExamQuestion => "Exam Question";
         public static string GlossaryTerm => "Glossary Term";
         public static string JournalSetup => "Journal Setup";
         public static string JournalSetupField => "Journal Setup Field";

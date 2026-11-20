@@ -4,29 +4,29 @@ namespace Shift.Api;
 
 public static class MonitorRegistration
 {
-    public static IServiceCollection AddMonitoring(this IServiceCollection services, MonitoringSettings monitoring, ReleaseSettings release)
+    public static void UseMonitoring(this WebApplicationBuilder builder, MonitoringSettings monitoring, ReleaseSettings release)
     {
-        services.AddSingleton<ILog, Log>();
+        builder.Services.AddSingleton<ILog, Log>();
 
-        services.AddSingleton<IMonitor, SentryMonitor>();
+        builder.Services.AddSingleton<IMonitor, SentryMonitor>();
 
         if (monitoring.Enabled)
-            InitSentry(services, monitoring, release);
-
-        return services;
+            InitSentry(builder, monitoring, release);
     }
 
-    private static void InitSentry(IServiceCollection services, MonitoringSettings monitoring, ReleaseSettings release)
+    private static void InitSentry(WebApplicationBuilder builder, MonitoringSettings monitoring, ReleaseSettings release)
     {
         var dsn = monitoring.Enabled
             ? monitoring.Dsn
             : SentryConstants.DisableSdkDsnValue;
 
-        SentrySdk.Init(options =>
+        builder.WebHost.UseSentry(options =>
         {
             if (Uri.TryCreate(monitoring.Dsn, UriKind.Absolute, out Uri? uriResult))
+            {
                 if (uriResult.Scheme == Uri.UriSchemeHttp)
                     dsn = uriResult.ToString();
+            }
 
             options.AttachStacktrace = true;
             options.AutoSessionTracking = true;
@@ -52,8 +52,6 @@ public static class MonitorRegistration
                     options.DiagnosticLogger = new FileDiagnosticLogger(path);
             }
 
-            services.AddSentryTunneling();
-
             // If Sentry's Debug setting is enabled with a FileDiagnosticLogger then the logger
             // sometimes throws an unhandled exception from here:
             // Sentry.Integrations.AppDomainProcessExitIntegration.HandleProcessExit.
@@ -64,6 +62,8 @@ public static class MonitorRegistration
 
             options.DisableAppDomainProcessExitFlush();
         });
+
+        builder.Services.AddSentryTunneling();
     }
 
     public class SentryMonitor : BaseMonitor
@@ -96,30 +96,20 @@ public static class MonitorRegistration
             var eventId = SentrySdk.CaptureException(exception, scope =>
             {
                 var principal = _identityService.GetPrincipal();
+                if (principal == null)
+                    return;
 
-                if (principal != null)
+                var user = principal.User;
+
+                scope.User = new SentryUser
                 {
-                    if (principal.IPAddress != null)
-                        scope.SetTag("principal-ip-address", principal.IPAddress);
+                    Id = user != null && user.Identifier != Guid.Empty
+                        ? user.Identifier.ToString()
+                        : null,
 
-                    if (principal.Name != null)
-                        scope.SetTag("principal-name", principal.Name);
-
-                    var user = principal.User;
-
-                    if (user != null)
-                    {
-                        if (user.Email != null)
-                            scope.SetTag("principal-user-email", user.Email);
-
-                        if (user.Identifier != Guid.Empty)
-                            scope.SetTag("principal-user-id", user.Identifier.ToString());
-
-                        if (user.Name != null)
-                            scope.SetTag("principal-user-name", user.Name);
-                    }
-                }
-
+                    Username = user?.Email ?? principal.Name,
+                    IpAddress = principal.IPAddress
+                };
             });
 
             return CreateSentryEventUri(new Uri(Settings.BaseUrl), Settings.Project, eventId.ToString());

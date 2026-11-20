@@ -252,11 +252,7 @@ namespace InSite.UI.Portal
 
         private void Open()
         {
-            var isPreProduction = ServiceLocator.AppSettings.Environment.IsPreProduction();
-            var isE03 = ServiceLocator.Partition.IsE03();
-
-            // No organization in the E03 partition uses feature flags.
-            FeatureFlagCard.Visible = Identity.IsAdministrator && isPreProduction && !isE03;
+            FeatureFlagCard.Visible = Identity.IsAdministrator;
 
             FeatureFlagHeading.InnerText = ServiceLocator.Partition.Brand + " Feature Flags";
 

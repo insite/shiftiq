@@ -53,7 +53,16 @@ namespace InSite.Domain.Records
             int? totalSeconds = null;
 
             if (elapsedMinutes.HasValue || elapsedSeconds.HasValue)
+            {
                 totalSeconds = Number.CheckRange(elapsedMinutes ?? 0, 0) * 60 + Number.CheckRange(elapsedSeconds ?? 0, 0);
+            }
+            else if (completed.HasValue && Data.Started.HasValue)
+            {
+                var duration = (completed.Value - Data.Started.Value).TotalSeconds;
+                totalSeconds = duration >= 0
+                    ? (int)Math.Round(duration, MidpointRounding.AwayFromZero)
+                    : 0;
+            }
 
             Apply(new ProgressCompleted2(completed, percent, pass, totalSeconds));
         }

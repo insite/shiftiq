@@ -1,4 +1,4 @@
-﻿namespace Shift.Constant
+namespace Shift.Constant
 {
     public static class ContentLabel
     {
@@ -8,6 +8,7 @@
         public static string Copyright => "Copyright";
         public static string Description => "Description";
         public static string EndingInstructions => "Ending Instructions";
+        public static string Exemplar => "Exemplar";
         public static string Feedback => "Feedback";
         public static string FeedbackWhenNotSelected => "Feedback When Not Selected";
         public static string Footer => "Footer";
@@ -20,6 +21,9 @@
         public static string PageFooter => "Page Footer";
         public static string PageHeader => "Page Header";
         public static string Purpose => "Purpose";
+        public static string Rationale => "Rationale";
+        public static string RationaleOnCorrectAnswer => "RationaleOnCorrectAnswer";
+        public static string RationaleOnIncorrectAnswer => "RationaleOnIncorrectAnswer";
         public static string Shortcuts => "Shortcuts";
         public static string StandardsOverview => "StandardsOverview";
         public static string StartingInstructions => "Starting Instructions";

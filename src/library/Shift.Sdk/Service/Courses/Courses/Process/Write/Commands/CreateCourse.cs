@@ -8,7 +8,7 @@ using Shift.Common;
 
 namespace InSite.Application.Courses.Write
 {
-    public class CreateCourse : Command, IHasRun, IHasAggregate
+    public class CreateCourse : Command, IHasRun, IHasAggregate, IGlobalSearchUpdater
     {
         private CourseAggregate Course { get; set; }
 
@@ -27,6 +27,8 @@ namespace InSite.Application.Courses.Write
             CourseName = courseName;
             CourseContent = courseContent;
         }
+
+        bool IGlobalSearchUpdater.IsUpdater() => true;
 
         bool IHasRun.Run(CourseAggregate course)
         {

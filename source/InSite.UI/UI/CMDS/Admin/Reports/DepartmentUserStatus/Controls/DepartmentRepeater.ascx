@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="DepartmentRepeater.ascx.cs" Inherits="InSite.Custom.CMDS.Reports.Controls.DepartmentRepeater" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="DepartmentRepeater.ascx.cs" Inherits="InSite.Custom.CMDS.Reports.Controls.DepartmentRepeater" %>
 
 <div class="my-3">
     <insite:Button runat="server" ID="DownloadXlsx" ButtonStyle="Default" Text="Download XLSX" Icon="far fa-download" />
@@ -12,7 +12,7 @@
             <Columns>
                 <asp:TemplateField HeaderText="As At">
                     <ItemTemplate>
-                        <%# Shift.Common.TimeZones.Format((DateTimeOffset)Eval("AsAt"), User.TimeZone, true) %>
+                        <%# Eval("AsAt", "{0:yyyy-MM-dd}") %>
                     </ItemTemplate>
                 </asp:TemplateField>
 

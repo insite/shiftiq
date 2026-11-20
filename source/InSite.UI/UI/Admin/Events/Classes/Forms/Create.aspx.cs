@@ -224,55 +224,43 @@ namespace InSite.Admin.Events.Classes.Forms
 
         private void SaveOne()
         {
-            var aggregate = new EventAggregate { AggregateIdentifier = UniqueIdentifier.Create() };
-            var changes = CreateOneChanges();
+            var eventId = UniqueIdentifier.Create();
+            var commands = CreateOneChanges(eventId);
 
-            for (var i = 0; i < changes.Count; i++)
-            {
-                var change = changes[i];
-                change.AggregateIdentifier = aggregate.AggregateIdentifier;
-                change.AggregateVersion = i + 1;
-                change.OriginOrganization = Organization.Identifier;
-                change.OriginUser = User.UserIdentifier;
-                change.ChangeTime = DateTimeOffset.Now;
-            }
+            ServiceLocator.SendCommands(commands);
 
-            ServiceLocator.ChangeStore.Save(aggregate, changes);
-
-            for (int i = 0; i < changes.Count; i++)
-                ServiceLocator.ChangeQueue.Publish(changes[i]);
-
-            HttpResponseHelper.Redirect(OutlineUrl + $"?event={aggregate.AggregateIdentifier}");
+            HttpResponseHelper.Redirect(OutlineUrl + $"?event={eventId}");
         }
 
-        private List<IChange> CreateOneChanges()
+        private List<ICommand> CreateOneChanges(Guid eventId)
         {
             var number = Sequence.Increment(Organization.OrganizationIdentifier, SequenceType.Event);
             var start = OneEventScheduledStart.Value.Value;
             var end = OneEventScheduledEnd.Value.Value;
             var (duration, durationUnit) = CalcDuration(start, end, OneEventDuration.ValueAsInt, OneEventDurationUnit.Value);
-            var changes = new List<IChange>();
+            var commands = new List<ICommand>();
 
-            changes.Add(new ClassScheduled2(Organization.OrganizationIdentifier, OneEventTitle.Text, "Active", number, start, end, duration, durationUnit, null));
+            commands.Add(new ScheduleClass(eventId, Organization.OrganizationIdentifier, OneEventTitle.Text, "Active", number, start, end, duration, durationUnit, null));
 
             if (OneAchievementIdentifier.HasValue)
-                changes.Add(new EventAchievementAdded(OneAchievementIdentifier.Value.Value));
+                commands.Add(new AddEventAchievement(eventId, OneAchievementIdentifier.Value.Value));
 
             if (OneEventSummary.Text.HasValue())
-                changes.Add(new EventDescribed(
+                commands.Add(new DescribeEvent(
+                    eventId,
                     new MultilingualString { Default = OneEventTitle.Text },
                     new MultilingualString { Default = OneEventSummary.Text },
                     null, null, null, null));
 
-            changes.Add(new EventCalendarColorModified("primary"));
+            commands.Add(new ModifyEventCalendarColor(eventId, "primary"));
 
             if (OneVenueLocationGroup.HasValue)
             {
                 var venue = ServiceLocator.GroupSearch.GetGroup(OneVenueLocationGroup.Value.Value);
-                changes.Add(new EventVenueChanged2(venue.GroupIdentifier, venue.GroupIdentifier, OneVenueRoom.Text));
+                commands.Add(new ChangeEventVenue(eventId, venue.GroupIdentifier, venue.GroupIdentifier, OneVenueRoom.Text));
             }
 
-            return changes;
+            return commands;
         }
 
         #endregion

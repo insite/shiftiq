@@ -63,6 +63,7 @@ public class PendingPersonReader : IEntityReader
                     UserFirstName = x.UserFirstName,
                     UserLastName = x.UserLastName,
                     EmployeeStatus = x.EmployeeStatus,
+                    SubmittedAt = x.SubmittedAt,
                     MatchCount = db.QPerson
                         .Where(y =>
                             y.OrganizationIdentifier == x.OrganizationIdentifier

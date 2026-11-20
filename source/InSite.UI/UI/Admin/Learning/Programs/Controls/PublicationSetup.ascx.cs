@@ -72,6 +72,11 @@ namespace InSite.Admin.Records.Programs.Controls
             ProgramImage.ImageUrl = program.ProgramImage;
             ProgramImageField.Visible = program.ProgramImage.IsNotEmpty();
 
+            // Null or zero means an unpaid program.
+            ProgramFee.Text = program.ProgramFee.HasValue && program.ProgramFee.Value > 0
+                ? program.ProgramFee.Value.ToString("C")
+                : "None";
+
             if (program.ProgramFlagColor.IsNotEmpty())
             {
                 var indicator = program.ProgramFlagColor.ToEnum<Indicator>();

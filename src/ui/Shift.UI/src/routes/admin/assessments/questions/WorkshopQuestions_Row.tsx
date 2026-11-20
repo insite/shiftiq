@@ -96,7 +96,8 @@ export default function WorkshopQuestions_Row({
     async function handleSaveOptionTitle(optionNumber: number, columnIndex: number | null, title: string) {
         const serverValue = workshopQuestionTextHelper.toServerMarkdown(title);
         const field = columnIndex === null ? "Title" : "ColumnTitle";
-        const html = await shiftClient.workshop.modifyOption(bankId, question.questionId, optionNumber, field, columnIndex, serverValue);
+        const result = await shiftClient.workshop.modifyOption(bankId, question.questionId, optionNumber, field, columnIndex, serverValue);
+        const html = result?.Html ?? null;
 
         if (columnIndex === null) {
             modifyQuestionOptionTitle(question.questionId, optionNumber, title, html);
@@ -110,8 +111,8 @@ export default function WorkshopQuestions_Row({
         if (pointsDecimal === null) {
             return;
         }
-        await shiftClient.workshop.modifyOption(bankId, question.questionId, optionNumber, "Points", null, String(pointsDecimal));
-        modifyQuestionOptionPoints(question.questionId, optionNumber, pointsDecimal);
+        const result = await shiftClient.workshop.modifyOption(bankId, question.questionId, optionNumber, "Points", null, String(pointsDecimal));
+        modifyQuestionOptionPoints(question.questionId, optionNumber, pointsDecimal, result?.QuestionPoints ?? 0);
     }
 
     return (
@@ -130,7 +131,7 @@ export default function WorkshopQuestions_Row({
                     specificationId={specificationId}
                     setId={setId}
                     question={question}
-                    isEditable={isEditable}
+                    disabled={readOnly}
                     returnUrl={returnUrl}
                     onMoveToQuestion={onMoveToQuestion}
                 />

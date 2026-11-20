@@ -306,13 +306,31 @@ namespace InSite.Persistence
                 query = query.Where(x => x.AchievementTitle.Contains(filter.AchievementTitle));
 
             if (filter.AchievementLabels.IsNotEmpty())
-                query = query.Where(x => filter.AchievementLabels.Contains(x.AchievementLabel));
+            {
+                if (filter.IncludeCertificateIssuingAchievements)
+                    query = query.Where(x => filter.AchievementLabels.Contains(x.AchievementLabel)
+                        || db.QAchievements.Any(a => a.AchievementIdentifier == x.AchievementIdentifier && a.AchievementIssuesCertificate));
+                else
+                    query = query.Where(x => filter.AchievementLabels.Contains(x.AchievementLabel));
+            }
 
             if (filter.AchievementDescription.HasValue())
                 query = query.Where(x => x.AchievementDescription.Contains(filter.AchievementDescription));
 
             if (filter.AchievementIsEnabled.HasValue)
                 query = query.Where(x => x.AchievementIsEnabled == filter.AchievementIsEnabled);
+
+            if (filter.AchievementAllowSelfDeclared.HasValue)
+                query = query.Where(x => x.AchievementAllowSelfDeclared == filter.AchievementAllowSelfDeclared);
+
+            if (filter.AchievementIssuesCertificate.HasValue)
+                query = query.Where(x => db.QAchievements.Any(a => a.AchievementIdentifier == x.AchievementIdentifier
+                    && a.AchievementIssuesCertificate == filter.AchievementIssuesCertificate));
+
+            if (filter.AvailableToOrganizationIdentifier.HasValue)
+                query = query.Where(x => x.OrganizationIdentifier == filter.AvailableToOrganizationIdentifier
+                    || db.TAchievementOrganizations.Any(t => t.AchievementIdentifier == x.AchievementIdentifier
+                        && t.OrganizationIdentifier == filter.AvailableToOrganizationIdentifier));
 
             if (filter.ExpirationType.HasValue())
                 query = query.Where(x => x.ExpirationType == filter.ExpirationType);
@@ -648,7 +666,13 @@ namespace InSite.Persistence
                 if (filter.OrganizationIdentifier.Value != _partition.Identifier)
                     orgIds.Add(_partition.Identifier);
 
-                query = query.Where(x => orgIds.Contains(x.OrganizationIdentifier));
+                var organizationId = filter.OrganizationIdentifier.Value;
+
+                if (filter.IncludeSharedAchievements)
+                    query = query.Where(x => orgIds.Contains(x.OrganizationIdentifier)
+                        || db.TAchievementOrganizations.Any(t => t.AchievementIdentifier == x.AchievementIdentifier && t.OrganizationIdentifier == organizationId));
+                else
+                    query = query.Where(x => orgIds.Contains(x.OrganizationIdentifier));
             }
 
             if (filter.UserIdentifier.HasValue)
@@ -727,7 +751,12 @@ namespace InSite.Persistence
                 query = query.Where(x => x.AchievementLabel == filter.AchievementLabel);
 
             if (filter.AchievementLabels != null && filter.AchievementLabels.Length > 0)
-                query = query.Where(x => filter.AchievementLabels.Any(label => label == x.AchievementLabel));
+            {
+                if (filter.IncludeCertificateIssuingAchievements)
+                    query = query.Where(x => filter.AchievementLabels.Any(label => label == x.AchievementLabel) || x.AchievementIssuesCertificate);
+                else
+                    query = query.Where(x => filter.AchievementLabels.Any(label => label == x.AchievementLabel));
+            }
 
             if (filter.AchievementTitle.HasValue())
                 query = query.Where(x => x.AchievementTitle.Contains(filter.AchievementTitle));
@@ -819,6 +848,18 @@ namespace InSite.Persistence
         {
             using (var db = new InternalDbContext())
             {
+                // A learner holds at most one credential per achievement (IX_QCredential_Unique), so a
+                // live one always wins. A history row can belong to a credential that was deleted and
+                // later assigned again under a new identifier, and its identifier then inserts a
+                // second credential for the same learner and achievement.
+                var live = db.QCredentials
+                    .Where(x => x.AchievementIdentifier == achievement && x.UserIdentifier == user)
+                    .Select(x => (Guid?)x.CredentialIdentifier)
+                    .FirstOrDefault();
+
+                if (live.HasValue)
+                    return live.Value;
+
                 var tombstone = db.QCredentialHistories
                     .Where(x => x.AchievementIdentifier == achievement && x.UserIdentifier == user)
                     .OrderByDescending(x => x.ChangeTime)

@@ -86,7 +86,7 @@ namespace InSite.Admin.Assets.Uploads.Forms
             var path = fileInfo.NavigateUrl;
             var size = fileInfo.ContentSize ?? 0;
             var uploader = fileInfo.Uploader;
-            var uploaded = TimeZoneInfo.ConvertTime(fileInfo.Uploaded, User.TimeZone);
+            var uploaded = TimeZones.ConvertTime(fileInfo.Uploaded, User.TimeZone);
 
             var location = FileModel.GetLocation(Path);
             location = location.Substring(0, location.Length - 1);

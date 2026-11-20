@@ -87,6 +87,21 @@ namespace InSite.Persistence
             }
         }
 
+        public QPerson GetPerson(QPersonFilter filter, params Expression<Func<QPerson, object>>[] includes)
+        {
+            using (var db = CreateContext())
+            {
+                var query = CreateQuery(filter, db).ApplyIncludes(includes);
+
+                if (filter.OrderBy.IsEmpty())
+                    query = query.OrderBy(x => x.PersonIdentifier);
+                else
+                    query = query.OrderBy(filter.OrderBy);
+
+                return query.FirstOrDefault();
+            }
+        }
+
         public List<QPerson> GetPersonsByEmployer(Guid employerGroupId)
         {
             using (var db = CreateContext())
@@ -412,7 +427,7 @@ namespace InSite.Persistence
             return query;
         }
 
-        private static InternalDbContext CreateContext(bool proxy = true)
+        private static InternalDbContext CreateContext(bool proxy = false)
         {
             var db = new InternalDbContext();
 

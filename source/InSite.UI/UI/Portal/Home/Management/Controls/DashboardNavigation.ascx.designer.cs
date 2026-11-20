@@ -33,13 +33,13 @@ namespace InSite.UI.Portal.Home.Management.Controls
         protected global::System.Web.UI.HtmlControls.HtmlAnchor MyContacts;
 
         /// <summary>
-        /// A1 control.
+        /// MyInvoices control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlAnchor A1;
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor MyInvoices;
 
         /// <summary>
         /// MyCatalog control.

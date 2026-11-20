@@ -974,7 +974,7 @@ namespace InSite.Persistence
                 }
             }
 
-            AnnotateRespondent(e.OriginOrganization, e.OriginUser, e.Question, e.Answer);
+            AnnotateRespondent(e.AggregateIdentifier, e.Question, e.Answer);
         }
 
         public void UpdateResponse(ResponseGroupChanged e)
@@ -1001,17 +1001,38 @@ namespace InSite.Persistence
             });
         }
 
-        private void AnnotateRespondent(Guid organization, Guid user, Guid questionId, string answerText)
+        private bool TryGetRespondent(Guid responseSessionId, out Guid organizationId, out Guid userId)
         {
-            QSurveyQuestion question;
+            organizationId = Guid.Empty;
+            userId = Guid.Empty;
 
             using (var db = CreateContext())
             {
-                question = db.QSurveyQuestions
-                    .FirstOrDefault(x => x.SurveyQuestionIdentifier == questionId);
+                var session = db.QResponseSessions
+                    .Where(x => x.ResponseSessionIdentifier == responseSessionId)
+                    .Select(x => new { x.OrganizationIdentifier, x.RespondentUserIdentifier })
+                    .FirstOrDefault();
+
+                if (session == null)
+                    return false;
+
+                organizationId = session.OrganizationIdentifier;
+                userId = session.RespondentUserIdentifier;
+
+                return true;
             }
+        }
+
+        private void AnnotateRespondent(Guid sessionId, Guid questionId, string answerText)
+        {
+            QSurveyQuestion question;
+            using (var db = CreateContext())
+                question = db.QSurveyQuestions.FirstOrDefault(x => x.SurveyQuestionIdentifier == questionId);
 
             if (string.IsNullOrWhiteSpace(question?.SurveyQuestionAttribute))
+                return;
+
+            if (!TryGetRespondent(sessionId, out Guid organization, out Guid user))
                 return;
 
             if (!string.IsNullOrWhiteSpace(answerText))
@@ -1020,8 +1041,11 @@ namespace InSite.Persistence
                 TPersonFieldStore.Delete(organization, user, question.SurveyQuestionAttribute);
         }
 
-        private void AnnotateRespondent(Guid organization, Guid user, Guid optionId, bool isSelected)
+        private void AnnotateRespondent(Guid sessionId, Guid optionId, bool isSelected)
         {
+            if (!TryGetRespondent(sessionId, out Guid organization, out Guid user))
+                return;
+
             string attribute;
             TContent content;
 
@@ -1072,7 +1096,7 @@ namespace InSite.Persistence
                 response.LastAnsweredQuestionIdentifier = questionId;
             });
 
-            AnnotateRespondent(e.OriginOrganization, e.OriginUser, e.Item, true);
+            AnnotateRespondent(e.AggregateIdentifier, e.Item, true);
         }
 
         public void UpdateResponse(ResponseOptionUnselected e)
@@ -1097,7 +1121,7 @@ namespace InSite.Persistence
                 response.LastAnsweredQuestionIdentifier = questionId;
             });
 
-            AnnotateRespondent(e.OriginOrganization, e.OriginUser, e.Item, false);
+            AnnotateRespondent(e.AggregateIdentifier, e.Item, false);
         }
 
         public void UpdateResponse(ResponseOptionsAdded e)

@@ -9,15 +9,6 @@ namespace InSite.Persistence.Plugin.CMDS
 {
     public static class ZUserStatusSearch
     {
-        public static void GetMinimumAndMaximumDates(out DateTimeOffset? from, out DateTimeOffset? thru)
-        {
-            using (var db = new InternalDbContext())
-            {
-                from = db.ZUserStatuses.Min(x => x.AsAt);
-                thru = db.ZUserStatuses.Max(x => x.AsAt);
-            }
-        }
-
         public static DataTable SelectByFilter(EmployeeComplianceSnapshotFilter filter)
         {
             const string query = @"

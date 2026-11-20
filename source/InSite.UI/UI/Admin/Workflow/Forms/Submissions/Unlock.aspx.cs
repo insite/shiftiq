@@ -46,7 +46,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions
             if (surveyForm == null)
                 HttpResponseHelper.SendHttp400($"Form not found: {response.SurveyFormIdentifier}");
 
-            var userTimeZone = User.TimeZone.Id;
+            var userTimeZone = User.TimeZone;
             var studentUser = ServiceLocator.UserSearch.GetUser(response.RespondentUserIdentifier);
             var studentPerson = ServiceLocator.PersonSearch.GetPerson(response.RespondentUserIdentifier, surveyForm.OrganizationIdentifier);
 

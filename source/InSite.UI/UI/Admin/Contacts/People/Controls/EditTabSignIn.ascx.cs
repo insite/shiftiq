@@ -151,7 +151,7 @@ namespace InSite.UI.Admin.Contacts.People.Controls
             if (user.UserPasswordExpired != null)
             {
                 PasswordExpires.Enabled = true;
-                PasswordExpires.DefaultTimeZone = User.TimeZone.Id;
+                PasswordExpires.DefaultTimeZone = User.TimeZone;
                 PasswordExpires.Value = user.UserPasswordExpired;
             }
             else
@@ -331,7 +331,7 @@ namespace InSite.UI.Admin.Contacts.People.Controls
                         MembershipHelper.Save(groupId, user.UserIdentifier, "Membership");
                 }
                 else
-                    MembershipStore.Delete(MembershipSearch.Select(groupId, user.UserIdentifier));
+                    MembershipStore.Delete(MembershipSearch.Select(groupId, user.UserIdentifier, Organization.Identifier));
             }
         }
 

@@ -125,7 +125,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
                         .Where(q => q.LastChangeTime.HasValue)
                         .GroupBy(q =>
                         {
-                            var userDate = TimeZoneInfo.ConvertTime(q.LastChangeTime.Value, User.TimeZone).DateTime;
+                            var userDate = TimeZones.ConvertTime(q.LastChangeTime.Value, User.TimeZone).DateTime;
                             return Clock.Trim(userDate, QuestionsChangesDatesPrecision);
                         })
                         .Select(

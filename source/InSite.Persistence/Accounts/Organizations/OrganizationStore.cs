@@ -278,7 +278,7 @@ namespace InSite.Persistence
                 CompanyName = state.Name,
                 AccountOpened = state.AccountOpened,
                 AccountStatus = state.AccountStatus.GetName(),
-                TimeZone = state.TimeZone.Id,
+                TimeZone = state.TimeZone,
                 CompetencyAutoExpirationMode = state.PlatformCustomization.AutomaticCompetencyExpiration.Type.GetName(),
             };
 
@@ -337,7 +337,7 @@ namespace InSite.Persistence
 
         public void Update(OrganizationLocalizationModified e) => UpdateOrganization(e, (entity, state) =>
         {
-            entity.TimeZone = state.TimeZone.Id;
+            entity.TimeZone = state.TimeZone;
         });
 
         public void Update(OrganizationLocationModified e) => UpdateOrganization(e, (entity, state) => { });

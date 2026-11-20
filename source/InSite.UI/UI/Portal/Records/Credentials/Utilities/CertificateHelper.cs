@@ -12,7 +12,7 @@ namespace InSite.UI.Portal.Records.Credentials.Utilities
 {
     public static class CertificateHelper
     {
-        public static BaseCertificate TryCreateCredential(VCredential credential, TimeZoneInfo tz, string defaultLayoutCode = null)
+        public static BaseCertificate TryCreateCredential(VCredential credential, string tz, string defaultLayoutCode = null)
         {
             var code = credential.AchievementCertificateLayoutCode.IfNullOrEmpty(defaultLayoutCode);
             if (code.IsEmpty())

@@ -149,7 +149,7 @@ export const fetchHelper = {
         };
     },
 
-    async get<T>(relativeUrl: string, params?: Param[] | null, returnNullOn404?: boolean): Promise<T> {
+    async get<T>(relativeUrl: string, params?: Param[] | null, returnNullOn404?: boolean, throwAuthError: boolean = false): Promise<T> {
         const url = requestHelper.beforeRequest(relativeUrl, params);
         if (!url) {
             return null as T;
@@ -164,7 +164,37 @@ export const fetchHelper = {
             credentials: "include"
         });
 
-        return await afterRequest(response, false, returnNullOn404 === true, false);
+        return await afterRequest(response, false, returnNullOn404 === true, throwAuthError);
+    },
+
+    async getQueryResult<Row extends object>(relativeUrl: string, params?: Param[] | null, returnNullOn404?: boolean): Promise<QueryResult<Row> | null> {
+        const url = requestHelper.beforeRequest(relativeUrl, params);
+        if (!url) {
+            return null;
+        }
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Accept": "*/*",
+                "Override-Origin": localStorageHelper.getOverrideOrigin() ?? "",
+            },
+            credentials: "include"
+        });
+
+        const rows = await afterRequest<Row[]>(response, false, returnNullOn404 === true, false);
+        if (!rows) {
+            return null;
+        }
+
+        const pagination = getPagination(response);
+
+        return {
+            pageIndex: pagination.Page - 1,
+            rows,
+            totalRowCount: pagination.TotalCount,
+            rowsPerPage: pagination.PageSize
+        };
     },
 
     async post<T>(relativeUrl: string, body: unknown, params?: Param[] | null, returnNullOn404: boolean = false, throwAuthError: boolean = false): Promise<T> {

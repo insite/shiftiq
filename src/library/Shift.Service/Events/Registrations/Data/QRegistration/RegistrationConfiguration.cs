@@ -62,5 +62,14 @@ public class RegistrationConfiguration : IEntityTypeConfiguration<RegistrationEn
         builder.Property(x => x.EligibilityUpdated).HasColumnName("EligibilityUpdated");
         builder.Property(x => x.BillingCode).HasColumnName("BillingCode").IsUnicode(false).HasMaxLength(100);
 
+        builder.HasOne(x => x.Event)
+            .WithMany(x => x.Registrations)
+            .HasForeignKey(x => x.EventIdentifier)
+            .HasPrincipalKey(x => x.EventIdentifier);
+
+        builder.HasOne(x => x.CandidateUser)
+            .WithMany(x => x.CandidateRegistrations)
+            .HasForeignKey(x => x.CandidateIdentifier)
+            .HasPrincipalKey(x => x.UserIdentifier);
     }
 }

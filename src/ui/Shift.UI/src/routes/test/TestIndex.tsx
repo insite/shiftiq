@@ -9,11 +9,12 @@ import TestRichTextEditor from "./TestRichTextEditor";
 import TestContentEditor from "./TestContentEditor";
 import TestAggregate from "./TestAggregate";
 import { TestInlineEditor } from "./TestInlineEditor";
+import TestPermissions from "./TestPermissions";
 
 export default function TestIndex() {
     return (
         <>
-            <Tabs defaultActiveKey="InlineEditor" transition={false}>
+            <Tabs defaultActiveKey="Permissions" transition={false}>
                 <Tab eventKey="BasicControls" title="Basic Controls">
                     <FormCard>
                         <form onSubmit={e => {
@@ -59,6 +60,9 @@ export default function TestIndex() {
                 </Tab>
                 <Tab eventKey="InlineEditor" title="Inline Editor">
                     <TestInlineEditor />
+                </Tab>
+                <Tab eventKey="Permissions" title="Permissions">
+                    <TestPermissions />
                 </Tab>
             </Tabs>
         </>

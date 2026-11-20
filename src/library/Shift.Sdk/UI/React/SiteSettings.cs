@@ -34,6 +34,7 @@ namespace Shift.Contract.Presentation
         public string CurrentLanguage { get; set; }
         public List<string> SupportedLanguages { get; set; }
         public string RecentLinksKey { get; set; }
+        public List<ReactTimeZoneInfo> TimeZones { get; set; }
 
         public class HomeSettings
         {

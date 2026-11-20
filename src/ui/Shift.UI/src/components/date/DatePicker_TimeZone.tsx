@@ -1,4 +1,4 @@
-import { TimeZoneId, timeZones } from "@/helpers/date/timeZones";
+import { TimeZoneId, getTimeZones } from "@/helpers/date/timeZones";
 import PopupPanel from "../PopupPanel";
 import "./DatePicker_TimeZone.css";
 
@@ -25,7 +25,7 @@ export default function DatePicker_TimeZone({
             onClose={onClose}
         >
             <div className="timezone-list">
-                {timeZones.map(({ timeZoneId, title }) => (
+                {getTimeZones().map(({ timeZoneId, title }) => (
                     <button
                         key={timeZoneId}
                         type="button"

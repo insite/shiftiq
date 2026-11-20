@@ -42,7 +42,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
         public void Bind(string timeZone, ISurveyResponse[] sessions)
         {
-            _timeZone = (timeZone ?? CurrentSessionState.Identity.Organization.TimeZone.ToString());
+            _timeZone = timeZone ?? CurrentSessionState.Identity.Organization.TimeZone;
             _allowDelete = CurrentSessionState.Identity
                 .IsGranted(PermissionIdentifiers.Admin_Surveys_Responses, DataAccess.Delete);
 
@@ -135,7 +135,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 return "-";
 
             return TimeZones.Format(time.Value,
-                (_timeZone ?? CurrentSessionState.Identity.Organization.TimeZone.ToString()),
+                (_timeZone ?? CurrentSessionState.Identity.Organization.TimeZone),
                 CurrentSessionState.Identity.Language);
         }
 

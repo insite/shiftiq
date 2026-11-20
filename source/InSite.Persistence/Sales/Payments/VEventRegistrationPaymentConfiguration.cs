@@ -36,6 +36,8 @@ namespace InSite.Persistence
             Property(x => x.CurrentRegistrationStatus).IsOptional().IsUnicode(false).HasMaxLength(30);
             Property(x => x.SeatTitle).IsUnicode().IsUnicode(false);
             Property(x => x.AttendanceTaken).IsOptional();
+            Property(x => x.TaxCountry).IsUnicode(false).HasMaxLength(2);
+            Property(x => x.TaxRegion).IsUnicode(false).HasMaxLength(10);
         }
     }
 }

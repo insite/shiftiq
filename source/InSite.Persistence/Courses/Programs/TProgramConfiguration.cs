@@ -24,6 +24,7 @@ namespace InSite.Persistence
             Property(x => x.NotificationStalledLearnerMessageIdentifier).IsOptional();
             Property(x => x.NotificationCompletedAdministratorMessageIdentifier).IsOptional();
             Property(x => x.NotificationCompletedLearnerMessageIdentifier).IsOptional();
+            Property(x => x.ProgramFee).IsOptional().HasPrecision(7, 2);
             Property(x => x.NotificationStalledReminderLimit).IsOptional();
             Property(x => x.NotificationStalledTriggerDay).IsOptional();
             Property(x => x.CompletionTaskIdentifier).IsOptional();

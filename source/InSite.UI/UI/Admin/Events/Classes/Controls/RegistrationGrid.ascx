@@ -77,21 +77,33 @@
         <insite:TemplateField FieldName="AssessmentForm" HeaderText="Assessment">
             <ItemTemplate>
                 <insite:FindBankForm runat="server" ID="FormIdentifier" Visible='<%# Eval("FormIdentifier") == null %>' />
-                <div runat="server" visible='<%# Eval("FormIdentifier") != null %>'>
-                    <%# Eval("FormTitle") %>
-                    <div class="form-text">
-                        Name:
-                        <%# Eval("FormName") %>
-                    </div>
-                    <div>
-                        <insite:IconButton runat="server" ID="CancelAssessmentButton"
-                            ToolTip="Cancel Assessment"
-                            CommandName="DeleteForm"
-                            Name="ban"
-                            ConfirmText="Are you sure you want to cancel the assessment form selection for this candidate?"
-                        />
-                    </div>
+                <div class="reg-exam-forms">
+                    <asp:Repeater runat="server" ID="FormRepeater" DataSource='<%# Eval("AssignedForms") %>'>
+                        <ItemTemplate>
+                            <div class="reg-exam-form">
+                                <%# Eval("FormTitle") %>
+                                <div class="form-text">
+                                    Name:
+                                    <%# Eval("FormName") %>
+                                </div>
+                                <div>
+                                    <insite:IconButton runat="server" ID="CancelAssessmentButton"
+                                        ToolTip="Cancel Assessment"
+                                        CommandName="DeleteForm"
+                                        CommandArgument='<%# Eval("FormIdentifier") %>'
+                                        Name="ban"
+                                        ConfirmText="Are you sure you want to cancel the assessment form selection for this candidate?"
+                                    />
+                                </div>
+                            </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
                 </div>
+                <insite:IconButton runat="server" ID="AddFormButton"
+                    ToolTip="Add Assessment Form"
+                    Name="layer-plus"
+                    OnClientClick='<%# Eval("RegistrationIdentifier", "registrationGrid.addForm(\"{0}\"); return false;") %>'
+                />
             </ItemTemplate>
         </insite:TemplateField>
 
@@ -103,12 +115,18 @@
                 <span runat="server" visible='<%# (string)Eval("ApprovalStatus") == "Invitation Sent" %>'>
                     on <%# GetInvitationSentTime() %>
                 </span>
-                <div runat="server" visible='<%# (string)Eval("ApprovalStatus") == "Registered" && ShowForms %>'>
-                    <div class="text-nowrap form-text text-body-secondary">
-                        Password: <%# Eval("Password") %>
-                    </div>
+                <div class="reg-exam-forms">
+                    <asp:Repeater runat="server" ID="FormStatusRepeater" DataSource='<%# Eval("Forms") %>'>
+                        <ItemTemplate>
+                            <div class="reg-exam-form">
+                                <div runat="server" visible='<%# Eval("ShowPassword") %>' class="text-nowrap form-text text-body-secondary">
+                                    Password: <%# Eval("Password") %>
+                                </div>
+                                <%# Eval("EligibilityStatusHtml") %>
+                            </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
                 </div>
-                <%# Eval("EligibilityStatusHtml") %>
             </ItemTemplate>
         </asp:TemplateField>
 
@@ -163,7 +181,7 @@
             <HeaderTemplate>
                 T2202
                 <div>
-                    <asp:CheckBox runat="server" ID="AllT2202" onclick="if (!allT2202_click(event)) return false;" />
+                    <asp:CheckBox runat="server" ID="AllT2202" onclick="if (!registrationGrid.allT2202_click(event)) return false;" />
                 </div>
             </HeaderTemplate>
             <ItemTemplate>
@@ -194,14 +212,34 @@
     </Columns>
 </insite:Grid>
 
-<insite:PageFooterContent runat="server">
-    <script>
-        function allT2202_click(e) {
-            const message = e.target.checked
-                ? "Are you sure all of these registrations qualify for a T2202 tax credit?"
-                : "Are you sure none of these registrations qualify for a T2202 tax credit?";
+<insite:FindBankForm runat="server" ID="AddFormSelector" Output="None" />
+<asp:HiddenField runat="server" ID="AddFormRegistrationIdentifier" />
 
-            return confirm(message);
+<insite:PageHeadContent runat="server">
+    <style type="text/css">
+        .reg-exam-forms > .reg-exam-form:not(:only-child) {
+            min-height: 3.25rem;
         }
+    </style>
+</insite:PageHeadContent>
+
+<insite:PageFooterContent runat="server">
+    <script type="text/javascript">
+        (function () {
+            const instance = window.registrationGrid = window.registrationGrid || {};
+
+            instance.addForm = function(regId) {
+                document.getElementById('<%= AddFormRegistrationIdentifier.ClientID %>').value = regId;
+                document.getElementById('<%= AddFormSelector.ClientID %>').show();
+            };
+
+            instance.allT2202_click = function(e) {
+                const message = e.target.checked
+                    ? "Are you sure all of these registrations qualify for a T2202 tax credit?"
+                    : "Are you sure none of these registrations qualify for a T2202 tax credit?";
+
+                return confirm(message);
+            }
+        })();
     </script>
 </insite:PageFooterContent>

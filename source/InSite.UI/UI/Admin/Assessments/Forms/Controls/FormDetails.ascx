@@ -292,6 +292,15 @@
             <insite:IconLink Name="pencil" runat="server" ID="EditProctoringLink" CssClass="form-details-link fs-6" ToolTip="Edit form proctoring" />
         </h3>
 
+        <div runat="server" id="AIProctoringField" class="form-group mb-3">
+            <label class="form-label">
+                AI Proctoring
+            </label>
+            <div>
+                <asp:Literal runat="server" ID="AIProctoringState" />
+            </div>
+        </div>
+
         <div runat="server" id="SafeExamBrowserField" class="form-group mb-3">
             <label class="form-label">
                 Safe Exam Browser

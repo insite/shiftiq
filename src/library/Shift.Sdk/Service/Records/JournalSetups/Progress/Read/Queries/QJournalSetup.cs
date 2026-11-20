@@ -24,6 +24,7 @@ namespace InSite.Application.Records.Read
         public Guid? ValidatorMessageIdentifier { get; set; }
         public Guid? LearnerMessageIdentifier { get; set; }
         public Guid? LearnerAddedMessageIdentifier { get; set; }
+        public Guid? SupervisorMessageIdentifier { get; set; }
 
         public virtual QAchievement Achievement { get; set; }
         public virtual QEvent Event { get; set; }

@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchCriteria.ascx.cs" Inherits="InSite.UI.Portal.Contacts.People.Controls.SearchCriteria" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchCriteria.ascx.cs" Inherits="InSite.UI.Portal.Contacts.People.Controls.SearchCriteria" %>
 
 <%@ Register TagPrefix="uc" TagName="FilterManager" Src="~/UI/Layout/Common/Controls/SearchCriteriaFilterManager.ascx" %>
 
@@ -11,6 +11,15 @@
                 <div class="col-6">
 
                     <div class="mb-2">
+                        <insite:ComboBox runat="server" ID="MatchNamesWith" EnableTranslation="true">
+                            <Items>
+                                <insite:ComboBoxOption Text="Exact Spelling" Value="Exact" />
+                                <insite:ComboBoxOption Text="Similar Pronunciation" Value="Similar" />
+                            </Items>
+                        </insite:ComboBox>
+                    </div>
+
+                    <div class="mb-2">
                         <insite:TextBox ID="FullName" runat="server" MaxLength="100" EmptyMessage="Full Name" />
                     </div>
 
@@ -20,6 +29,10 @@
 
                     <div class="mb-2">
                         <insite:TextBox ID="PersonCode" runat="server" MaxLength="100" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:NumericBox ID="SessionCount" runat="server" NumericMode="Integer" EmptyMessage="Session Count" />
                     </div>
 
                     <div class="mt-3 mb-2">
@@ -42,6 +55,24 @@
                     </div>
                      <div class="mb-2">
                         <insite:DateTimeOffsetSelector runat="server" ID="LastAuthenticatedBefore" EmptyMessage="Last Authenticated Before" />
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:ComboBox runat="server" ID="ApprovalFilter">
+                            <Items>
+                                <insite:ComboBoxOption Value="Approved" Text="Approved users only" Selected="true" />
+                                <insite:ComboBoxOption Value="All" Text="All users" />
+                            </Items>
+                        </insite:ComboBox>
+                    </div>
+
+                    <div class="mb-2">
+                        <insite:ComboBox runat="server" ID="Scope" EnableTranslation="true">
+                            <Items>
+                                <insite:ComboBoxOption Value="MyContacts" Text="My contacts" Selected="true" />
+                                <insite:ComboBoxOption Value="AllUsers" Text="All users" />
+                            </Items>
+                        </insite:ComboBox>
                     </div>
 
                 </div>

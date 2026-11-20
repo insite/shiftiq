@@ -37,7 +37,7 @@ namespace InSite.Admin.Events.Exams.Controls
             Schedule.Visible = showSchedule;
             if (Schedule.Visible)
             {
-                EventScheduledStart.Text = @event.EventScheduledStart.Format(null, true);
+                EventScheduledStart.Text = @event.EventScheduledStart.Format((string)null, true);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -40,6 +40,7 @@ namespace InSite.Admin.Issues.Controls
         private Dictionary<Guid, int> _responseAttachmentCounts = new Dictionary<Guid, int>();
 
         private Dictionary<Guid, string> _departments = new Dictionary<Guid, string>();
+        private Dictionary<Guid, string> _districts = new Dictionary<Guid, string>();
 
         #endregion
 
@@ -96,6 +97,7 @@ namespace InSite.Admin.Issues.Controls
             GetIssueComments(issues);
             CalcResponseAttachmentCount(issues);
             GetDepartments(issues);
+            GetDistricts(issues);
 
             BulkHasSelectionOnOtherPages.Value =
                 SelectedItems.Any(x => !issues.Any(y => y.IssueIdentifier == x))
@@ -315,6 +317,31 @@ namespace InSite.Admin.Issues.Controls
                 .ToDictionary(x => x.Key, x => string.Join(", ", x.Select(y => y.Group.GroupName).OrderBy(y => y)));
         }
 
+        private void GetDistricts(List<VIssue> issues)
+        {
+            var userIds = issues
+                .Where(x => x.TopicUserIdentifier.HasValue)
+                .Select(x => x.TopicUserIdentifier.Value)
+                .ToArray();
+
+            if (userIds.Length == 0)
+            {
+                _districts.Clear();
+                return;
+            }
+
+            var filter = new QMembershipFilter
+            {
+                GroupOrganizationIdentifier = Organization.Identifier,
+                UserIdentifiers = userIds,
+                GroupType = "District"
+            };
+
+            _districts = ServiceLocator.MembershipSearch.Select(filter, x => x.Group)
+                .GroupBy(x => x.UserIdentifier)
+                .ToDictionary(x => x.Key, x => string.Join(", ", x.Select(y => y.Group.GroupName).Distinct().OrderBy(y => y)));
+        }
+
         internal void IssuTypeSet(bool hasValue, string issueType)
         {
             StartBulkCaseStatusButton.Enabled = hasValue;
@@ -354,6 +381,14 @@ namespace InSite.Admin.Issues.Controls
             var entity = (VIssue)Page.GetDataItem();
             return entity.TopicUserIdentifier.HasValue
                 ? _departments.GetOrDefault(entity.TopicUserIdentifier.Value)
+                : null;
+        }
+
+        protected string GetTopicDistricts()
+        {
+            var entity = (VIssue)Page.GetDataItem();
+            return entity.TopicUserIdentifier.HasValue
+                ? _districts.GetOrDefault(entity.TopicUserIdentifier.Value)
                 : null;
         }
 

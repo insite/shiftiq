@@ -7,6 +7,8 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
+using AngleSharp.Html.Parser;
+
 using InSite.Admin.Assessments.Questions.Utilities;
 using InSite.Admin.Assets.Contents.Utilities;
 using InSite.Common.Web;
@@ -31,8 +33,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid BankID { get; }
 
-            public BankOptions(Guid organizationId, TimeZoneInfo timeZone, string language, Guid bankId)
-                : base(organizationId, timeZone, language)
+            public BankOptions(Guid organizationId, string timeZoneId, string language, Guid bankId)
+                : base(organizationId, timeZoneId, language)
             {
                 BankID = bankId;
             }
@@ -42,8 +44,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             public Guid FormID { get; }
 
-            public FormOptions(Guid organizationId, TimeZoneInfo timeZone, string language, Guid formId)
-                : base(organizationId, timeZone, language)
+            public FormOptions(Guid organizationId, string timeZoneId, string language, Guid formId)
+                : base(organizationId, timeZoneId, language)
             {
                 FormID = formId;
             }
@@ -52,7 +54,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
         public class Options
         {
             public Guid OrganizationID { get; }
-            public TimeZoneInfo TimeZone { get; }
+            public string TimeZoneId { get; }
             public string Language { get; }
 
             public string CurrentUrl { get; }
@@ -64,10 +66,10 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
             public QuestionPrintHelper.QuestionFilter QuestionFilter { get; set; }
 
-            public Options(Guid organizationId, TimeZoneInfo timeZone, string language)
+            public Options(Guid organizationId, string timeZoneId, string language)
             {
                 OrganizationID = organizationId;
-                TimeZone = timeZone;
+                TimeZoneId = timeZoneId;
                 Language = language;
 
                 var request = HttpContext.Current.Request;
@@ -345,7 +347,7 @@ namespace InSite.Admin.Assessments.Questions.Controls
             QuestionRepeater.DataBind();
         }
 
-        #region Methods (render PDF)
+        #region Methods (render PDF & DOCX)
 
         public static PrintOutputFile RenderPdf(BankOptions options)
         {
@@ -366,6 +368,78 @@ namespace InSite.Admin.Assessments.Questions.Controls
         }
 
         private static PrintOutputFile RenderPdf(ControlData data, Options options)
+        {
+            var (fileName, assetNumber, html) = RenderHtml(data, options);
+
+            var pdfData = HtmlConverter.HtmlToPdf(html, new HtmlConverterSettings(ServiceLocator.AppSettings.Application.WebKitHtmlToPdfExePath)
+            {
+                EnablePrintMediaType = true,
+                PageSize = PageSizeType.Letter,
+                MarginTop = 25f,
+                HeaderSpacing = 7,
+                HeaderUrl = options.HeaderUrl,
+                Variables = new HtmlConverterSettings.Variable[]
+                {
+                    new HtmlConverterSettings.Variable("title", data.Title),
+                    new HtmlConverterSettings.Variable("name", data.Name),
+                    new HtmlConverterSettings.Variable("asset_number", assetNumber),
+                },
+            });
+
+            return new PrintOutputFile(fileName, pdfData);
+        }
+
+        public static PrintOutputFile RenderDocx(BankOptions options, string authorName, string defaultImagePath, string websiteUrl)
+        {
+            var bank = ServiceLocator.BankSearch.GetBankState(options.BankID);
+            if (bank == null || bank.Tenant != options.OrganizationID)
+                return null;
+
+            return RenderDocx(new ControlData(bank, options.Language), options, authorName, defaultImagePath, websiteUrl);
+        }
+
+        public static PrintOutputFile RenderDocx(FormOptions options, string authorName, string defaultImagePath, string websiteUrl)
+        {
+            var form = ServiceLocator.BankSearch.GetFormData(options.FormID);
+            if (form == null || form.Specification.Bank.Tenant != options.OrganizationID)
+                return null;
+
+            return RenderDocx(new ControlData(form, options.Language), options, authorName, defaultImagePath, websiteUrl);
+        }
+
+        private static PrintOutputFile RenderDocx(ControlData data, Options options, string authorName, string defaultImagePath, string websiteUrl)
+        {
+            var (fileName, assetNumber, html) = RenderHtml(data, options);
+
+            html = PrepareDocxHtml(html, data.Title, assetNumber);
+
+            return new QuestionDocxPrinter(authorName, defaultImagePath, websiteUrl).RenderDocx(fileName, html);
+        }
+
+        private static string PrepareDocxHtml(string html, string title, string assetNumber)
+        {
+            using (var document = new HtmlParser().ParseDocument(html))
+            {
+                var heading = document.CreateElement("div");
+                heading.SetAttribute("style", "font-size:28pt");
+                heading.TextContent = title ?? string.Empty;
+
+                var asset = document.CreateElement("div");
+                asset.SetAttribute("style", "font-size:11pt; color:#666666;");
+                asset.TextContent = assetNumber ?? string.Empty;
+
+                var prefix = document.CreateDocumentFragment();
+                prefix.AppendChild(heading);
+                prefix.AppendChild(asset);
+                prefix.AppendChild(document.CreateElement("br"));
+                // Prefixing the complete document moves its metadata title into the body.
+                document.Body.InsertBefore(prefix, document.Body.FirstChild);
+
+                return document.DocumentElement.OuterHtml;
+            }
+        }
+
+        private static (string fileName, string assetNumber, string html) RenderHtml(ControlData data, Options options)
         {
             using (var page = new Page())
             {
@@ -388,22 +462,9 @@ namespace InSite.Admin.Assessments.Questions.Controls
 
                 var fileName = $"{StringHelper.Sanitize(data.Title, '_')}_internal_{DateTime.UtcNow:yyyyMMdd}-{DateTime.UtcNow:HHmmss}";
 
-                var pdfData = HtmlConverter.HtmlToPdf(htmlString, new HtmlConverterSettings(ServiceLocator.AppSettings.Application.WebKitHtmlToPdfExePath)
-                {
-                    EnablePrintMediaType = true,
-                    PageSize = PageSizeType.Letter,
-                    MarginTop = 25f,
-                    HeaderSpacing = 7,
-                    HeaderUrl = options.HeaderUrl,
-                    Variables = new HtmlConverterSettings.Variable[]
-                    {
-                        new HtmlConverterSettings.Variable("title", data.Title),
-                        new HtmlConverterSettings.Variable("name", data.Name),
-                        new HtmlConverterSettings.Variable("asset_number", $"{report.CustomTranslate("Asset #")}{data.AssetNumber}"),
-                    },
-                });
+                var assetNumber = $"{report.CustomTranslate("Asset #")}{data.AssetNumber}";
 
-                return new PrintOutputFile(fileName, pdfData);
+                return (fileName, assetNumber, htmlString);
             }
         }
 
@@ -501,8 +562,8 @@ namespace InSite.Admin.Assessments.Questions.Controls
         {
             var dataItem = Page.GetDataItem();
             var value = (DateTimeOffset)DataBinder.Eval(dataItem, name);
-            value = TimeZoneInfo.ConvertTime(value, _options.TimeZone);
-            var tz = TimeZones.GetAbbreviation(_options.TimeZone)?.GetAbbreviation(value) ?? _options.TimeZone.Id;
+            value = TimeZones.ConvertTime(value, _options.TimeZoneId);
+            var tz = TimeZones.GetAbbreviation(_options.TimeZoneId)?.GetAbbreviation(value) ?? _options.TimeZoneId;
 
             return string.Format("{0:MMM d, yyyy} at {0:h:mm tt} <span class='comment-timezone'>{1}</span>", value, tz);
         }

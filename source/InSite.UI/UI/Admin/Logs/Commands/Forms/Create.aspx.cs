@@ -69,7 +69,7 @@ namespace InSite.Admin.Logs.Commands.Forms
             BookmarkExpired.Value = null;
 
             ScheduledDateField.Visible = status == Shift.Sdk.UI.StatusType.Scheduled;
-            ScheduledDate.Value = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow.AddMinutes(2), User.TimeZone);
+            ScheduledDate.Value = TimeZones.ConvertTime(DateTimeOffset.UtcNow.AddMinutes(2), User.TimeZone);
         }
 
         private void SaveButton_Click(object sender, EventArgs e)

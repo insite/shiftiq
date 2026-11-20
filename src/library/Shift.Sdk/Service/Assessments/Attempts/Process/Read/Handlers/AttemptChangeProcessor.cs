@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
-
 using InSite.Application.Attempts.Write;
 using InSite.Application.Banks.Read;
 using InSite.Application.Banks.Write;
@@ -22,6 +19,8 @@ using InSite.Domain.Banks;
 using InSite.Domain.Messages;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 namespace InSite.Application.Attempts.Read
@@ -75,7 +74,7 @@ namespace InSite.Application.Attempts.Read
 
             // Link the attempt to the registration.
             if (e.Registration.HasValue)
-                _commander.Send(new AssignAttempt(e.Registration.Value, e.AggregateIdentifier));
+                _commander.Send(new AssignAttempt(e.Registration.Value, e.Form, e.AggregateIdentifier));
         }
 
         public void Handle(AttemptStarted3 e)
@@ -90,7 +89,7 @@ namespace InSite.Application.Attempts.Read
 
             // Link the attempt to the registration.
             if (e.RegistrationIdentifier.HasValue)
-                _commander.Send(new AssignAttempt(e.RegistrationIdentifier.Value, e.AggregateIdentifier));
+                _commander.Send(new AssignAttempt(e.RegistrationIdentifier.Value, e.FormIdentifier, e.AggregateIdentifier));
 
             if (form?.WhenAttemptStartedNotifyAdminMessageIdentifier == null)
             {
@@ -114,7 +113,7 @@ namespace InSite.Application.Attempts.Read
         {
             // FixAttempt rebinds an attempt to a different registration; the back-pointer must follow.
             if (e.Registration.HasValue)
-                _commander.Send(new AssignAttempt(e.Registration.Value, e.AggregateIdentifier));
+                _commander.Send(new AssignAttempt(e.Registration.Value, null, e.AggregateIdentifier));
         }
 
         public void Handle(AttemptSubmitted e)

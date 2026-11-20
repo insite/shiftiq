@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using Shift.Common;
 using Shift.Common.Linq;
+using Shift.Constant;
 using Shift.Contract;
 
 namespace Shift.Service.Directory;
@@ -13,6 +14,7 @@ public class GroupReader : IEntityReader
     private readonly IDbContextFactory<TableDbContext> _context;
 
     private string DefaultSort = "GroupIdentifier";
+    private string DefaultVenueSort = "GroupName,Country,Province,City,PhysicalAddress1,PhysicalAddress2";
 
     public GroupReader(IDbContextFactory<TableDbContext> context)
     {
@@ -121,6 +123,9 @@ public class GroupReader : IEntityReader
         if (!string.IsNullOrEmpty(criteria.GroupCode))
             query = query.Where(x => x.GroupCode == criteria.GroupCode);
 
+        if (!string.IsNullOrEmpty(criteria.GroupType))
+            query = query.Where(x => x.GroupType == criteria.GroupType);
+
         if (criteria.GroupNames != null && criteria.GroupNames.Length > 0)
             query = query.Where(x => criteria.GroupNames.Contains(x.GroupName));
 
@@ -165,11 +170,11 @@ public class GroupReader : IEntityReader
         return matches;
     }
 
-    public async Task<string[]> SearchUserRolesAsync(Guid partitionId, Guid organizationId, Guid userId)
+    public async Task<List<GroupMatch>> SearchUserRolesAsync(Guid partitionId, Guid organizationId, Guid userId, CancellationToken cancellation = default)
     {
         using var db = _context.CreateDbContext();
 
-        return await db.QMembership.Where(m => m.UserIdentifier == userId)
+        var query = db.QMembership.Where(m => m.UserIdentifier == userId)
             .Join(
                 db.QGroup
                     .Where(g =>
@@ -178,40 +183,54 @@ public class GroupReader : IEntityReader
                     ),
                 m => m.GroupIdentifier,
                 g => g.GroupIdentifier,
-                (m, g) => g.GroupName
-            )
-            .ToArrayAsync();
-    }
-}
+                (m, g) => g
+            );
 
-public interface IGroupLookupService
-{
-    Task<IReadOnlyDictionary<Guid, string>> GetGroupNamesAsync(IEnumerable<Guid> groupIds);
-}
-
-public class GroupLookupService : IGroupLookupService
-{
-    private readonly IDbContextFactory<TableDbContext> _context;
-
-    public GroupLookupService(IDbContextFactory<TableDbContext> context)
-    {
-        _context = context;
+        return await ToMatchesAsync(query, cancellation);
     }
 
-    public async Task<IReadOnlyDictionary<Guid, string>> GetGroupNamesAsync(IEnumerable<Guid> groupIds)
+    public Task<List<VenueMatch>> SearchVenuesAsync(SearchVenues criteria, CancellationToken cancellation = default)
     {
-        var ids = groupIds.ToList();
+        var physicalAddressType = AddressType.Physical.GetName();
 
-        if (ids.Count == 0)
-            return new Dictionary<Guid, string>();
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria)
+                .Select(x => new
+                {
+                    Group = x,
+                    Address = x.Addresses.Where(y => y.AddressType == physicalAddressType).FirstOrDefault()
+                })
+                .Select(x => new VenueMatch
+                {
+                    VenueIdentifier = x.Group.GroupIdentifier,
+                    GroupName = x.Group.GroupName,
+                    GroupType = x.Group.GroupType,
 
-        using var db = _context.CreateDbContext();
+                    PhysicalAddress1 = x.Address!.Street1,
+                    PhysicalAddress2 = x.Address!.Street2,
+                    City = x.Address!.City,
+                    Province = x.Address!.Province,
+                    PostalCode = x.Address!.PostalCode,
+                    Country = x.Address!.Country
+                });
 
-        return await db.QGroup
-            .AsNoTracking()
-            .Where(g => ids.Contains(g.GroupIdentifier))
-            .ToDictionaryAsync(
-                g => g.GroupIdentifier,
-                g => g.GroupName);
+            return query
+                .OrderBy(criteria.Filter.Sort ?? DefaultVenueSort)
+                .ApplyPaging(criteria.Filter)
+                .ToListAsync(cancellation);
+
+        }, cancellation);
+    }
+
+    public Task<int> CountVenuesAsync(SearchVenues criteria, CancellationToken cancellation = default)
+    {
+        return ExecuteAsync(db =>
+        {
+            var query = BuildQueryable(db, criteria);
+
+            return query.CountAsync(cancellation);
+
+        }, cancellation);
     }
 }

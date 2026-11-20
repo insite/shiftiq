@@ -218,7 +218,7 @@
 
                         if (valueType === 'string') {
                             if (dateRegex.test(value)) {
-                                item.value = moment(value).format('MMM D, YYYY h:mm:ss A');
+                                item.value = moment.parseZone(value).format('MMM D, YYYY h:mm:ss A');
                             } else {
                                 item.value = value;
                             }

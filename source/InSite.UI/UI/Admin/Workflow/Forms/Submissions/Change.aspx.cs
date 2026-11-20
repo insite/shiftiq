@@ -43,7 +43,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions
             }
 
             var surveyForm = ServiceLocator.SurveySearch.GetSurveyForm(response.SurveyFormIdentifier);
-            var userTimeZone = User.TimeZone.Id;
+            var userTimeZone = User.TimeZone;
             var studentPerson = ServiceLocator.PersonSearch.GetPerson(response.RespondentUserIdentifier, surveyForm.OrganizationIdentifier, x => x.User);
 
             if (!surveyForm.EnableUserConfidentiality && studentPerson != null)

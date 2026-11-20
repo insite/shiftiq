@@ -36,7 +36,7 @@ export default function AdminHomeLayout() {
             <SessionProvider>
                 <PageProvider>
 
-                    <AdminHomeLayout_Navigation onStateChange={setState} />
+                    <AdminHomeLayout_Navigation state={state} onStateChange={setState} />
 
                     <main className={`admin-container ${getStateClass(state)}`}>
                         <div className="row pb-3 pb-md-4">

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using Shift.Common;
@@ -39,23 +38,6 @@ namespace InSite.Persistence
             using (var db = new InternalDbContext())
             {
                 return db.TScormStatements.FirstOrDefault(x => x.StatementIdentifier == statement);
-            }
-        }
-
-        public static TScormStatement Select(string hook, Guid user)
-        {
-            using (var db = new InternalDbContext())
-            {
-                return db.TScormStatements.FirstOrDefault(x => x.Registration.ScormPackageHook == hook && x.Registration.LearnerIdentifier == user);
-            }
-        }
-
-        public static List<TScormStatement> SelectByOrganizationIdentifier(Guid organization)
-        {
-            using (var db = new InternalDbContext())
-            {
-                var query = db.TScormStatements.Where(x => x.Registration.OrganizationIdentifier == organization);
-                return query.OrderByDescending(x => x.StatementTimestamp).ToList();
             }
         }
 

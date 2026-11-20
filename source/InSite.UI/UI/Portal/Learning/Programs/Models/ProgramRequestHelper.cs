@@ -72,7 +72,6 @@ namespace InSite.UI.Portal.Learning.Programs.Models
             var commands = new List<ICommand>
             {
                 new OpenIssue(caseId, OrganizationId, number, issueTitle, null, DateTimeOffset.UtcNow, null, CaseType, DateTimeOffset.UtcNow),
-                new AssignUser(caseId, supervisorUserId, "Administrator"),
                 new AssignUser(caseId, UserId, "Topic"),
                 new AssignUser(caseId, supervisorUserId, "Owner"),
                 new ChangeIssueStatus(caseId, caseStatusId, DateTimeOffset.UtcNow, statusCategory),
@@ -98,6 +97,8 @@ namespace InSite.UI.Portal.Learning.Programs.Models
                 submitted: null,
                 resolved: null
             ));
+
+            commands.Add(new AssignUser(caseId, supervisorUserId, "Administrator"));
 
             return commands;
         }

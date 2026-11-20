@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Web.Routing;
 using System.Web.UI;
@@ -11,11 +11,11 @@ using InSite.Common.Web.UI;
 using InSite.Domain.Foundations;
 using InSite.Persistence;
 using InSite.Persistence.Content;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 using InSite.UI.Portal.Workflow.Forms.Models;
 using InSite.Web.Routing;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Sites

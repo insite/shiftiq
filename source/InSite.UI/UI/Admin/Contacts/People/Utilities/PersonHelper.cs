@@ -7,11 +7,18 @@ using InSite.Domain.Users;
 using InSite.Persistence;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.Admin.Contacts.People.Utilities
 {
     public static class PersonHelper
     {
+        public static string GetCommentIndicatorHtml(string latestFlag)
+        {
+            var flagHtml = latestFlag.ToEnumNullable<FlagType>()?.ToIconHtml();
+            return flagHtml.IsNotEmpty() ? flagHtml : "<span class=\"text-primary\"><i class=\"fas fa-comment\"></i></span>";
+        }
+
         public static UserAccountWelcomed CreateWelcomeMessage(Guid organizationId, Guid userId, bool increaseSendWelcomeEmailCounter = true)
         {
             var organization = OrganizationSearch.Select(organizationId)
@@ -51,7 +58,9 @@ namespace InSite.Admin.Contacts.People.Utilities
             };
         }
 
-        public static void SendWelcomeMessage(Guid organizationId, Guid userId, Guid[] ccUserIds = null, bool increaseSendWelcomeEmailCounter = true)
+        public static void SendWelcomeMessage(Guid organizationId, Guid userId,
+            Guid[] ccUserIds = null, bool increaseSendWelcomeEmailCounter = true,
+            string subject = null, string body = null)
         {
             var notification = CreateWelcomeMessage(organizationId, userId, increaseSendWelcomeEmailCounter);
             var alert = new AlertUserAccountWelcomed
@@ -68,7 +77,8 @@ namespace InSite.Admin.Contacts.People.Utilities
                         (notification.UserPassword, notification.UserPasswordHash)
             };
 
-            ServiceLocator.AlertMailer.Send(organizationId, userId, alert, ccUserIds);
+            ServiceLocator.AlertMailer.Send(organizationId, userId, alert, ccUserIds,
+                subject: subject, body: body);
         }
 
         public static void SendAccountCreated(Guid organizationId, string organizationName, QUser user, QPerson person)

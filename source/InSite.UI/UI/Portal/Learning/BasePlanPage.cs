@@ -24,6 +24,8 @@ namespace InSite.UI.Portal.Learning
 
         protected string AchievementType => Request["achievementType"];
 
+        protected Guid? ProgramIdentifier => Guid.TryParse(Request["program"], out var program) ? program : (Guid?)null;
+
         protected bool ShowAllAchievementsParam => Request["showAllAchievements"] == "1";
 
         protected abstract string PageUrl { get; }
@@ -116,6 +118,9 @@ namespace InSite.UI.Portal.Learning
 
             if (AchievementType.IsNotEmpty())
                 parameters += $"&achievementType={AchievementType}";
+
+            if (ProgramIdentifier.HasValue)
+                parameters += $"&program={ProgramIdentifier.Value}";
 
             if (GetDisplayToggle().Checked)
                 parameters += "&showAllAchievements=1";

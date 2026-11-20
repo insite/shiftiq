@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Contract\Contacts\People\PersonSecret\Commands\**" />
+    <EmbeddedResource Remove="Contract\Contacts\People\PersonSecret\Commands\**" />
+    <None Remove="Contract\Contacts\People\PersonSecret\Commands\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Service\Messages\Messages\State\Notifications\NotificationTypes.json" />
   </ItemGroup>
 	

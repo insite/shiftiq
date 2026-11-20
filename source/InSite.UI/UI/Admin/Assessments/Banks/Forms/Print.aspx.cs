@@ -58,6 +58,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
             BuildImagesButton.Click += BuildImagesButton_Click;
             BuildQuestionsInternal.Click += BuildQuestionsInternal_Click;
             BuildQuestionsDocx.Click += BuildQuestionsDocx_Click;
+            BuildQuestionsBasicDocx.Click += BuildQuestionsBasicDocx_Click;
             BuildQuestionsCompact.Click += BuildQuestionsCompact_Click;
             BuildQuestionsExternal.Click += BuildQuestionsExternal_Click;
 
@@ -128,15 +129,34 @@ namespace InSite.Admin.Assessments.Banks.Forms
 
         private void BuildQuestionsDocx_Click(object sender, EventArgs e)
         {
+            var authorName = User.FullName;
+            var defaultImagePath = MapPath("~/UI/Layout/Common/Images/None.png");
+            var websiteUrl = $"{Request.Url.Scheme}://{Request.Url.Host}";
+
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, BankID,
-                new QuestionDocxPrinter.PrinterOptions
+                new QuestionPrintInternal.BankOptions(Organization.Identifier, User.TimeZone, ReportLanguage.Value, BankID)
+                {
+                    IncludeImages = IncludeImages.Checked,
+                    IncludeAdminComments = IncludeAdminComments.Checked,
+                    ExcludeHiddenComments = ExcludeHiddenComments.Checked,
+                    QuestionFilter = CreateQuestionFilter()
+                },
+                (user, options) => QuestionPrintInternal.RenderDocx(options, authorName, defaultImagePath, websiteUrl));
+        }
+
+        private void BuildQuestionsBasicDocx_Click(object sender, EventArgs e)
+        {
+            PrintQueue.QueuePrint(
+                _queueStoragePath,
+                User.Identifier, BankID,
+                new QuestionBasicDocxPrinter.PrinterOptions
                 {
                     OrganizationId = Organization.Identifier,
                     BankId = BankID,
                     Language = ReportLanguage.Value,
-                    TimeZone = User.TimeZone,
+                    TimeZoneId = User.TimeZone,
                     IncludeImages = IncludeImages.Checked,
                     IncludeAdminComments = IncludeAdminComments.Checked,
                     ExcludeHiddenComments = ExcludeHiddenComments.Checked,
@@ -145,7 +165,7 @@ namespace InSite.Admin.Assessments.Banks.Forms
                     DefaultImagePath = MapPath("~/UI/Layout/Common/Images/None.png"),
                     WebsiteUrl = $"{Request.Url.Scheme}://{Request.Url.Host}"
                 },
-                (_, options) => QuestionDocxPrinter.RenderBankQuestions(options));
+                (_, options) => QuestionBasicDocxPrinter.RenderBankQuestions(options));
         }
 
         private void BuildQuestionsCompact_Click(object sender, EventArgs e)
@@ -220,12 +240,14 @@ namespace InSite.Admin.Assessments.Banks.Forms
             {
                 BuildQuestionsInternal.Attributes.Remove("disabled");
                 BuildQuestionsDocx.Attributes.Remove("disabled");
+                BuildQuestionsBasicDocx.Attributes.Remove("disabled");
                 BuildQuestionsCompact.Attributes.Remove("disabled");
             }
             else
             {
                 BuildQuestionsInternal.Attributes["disabled"] = "disabled";
                 BuildQuestionsDocx.Attributes["disabled"] = "disabled";
+                BuildQuestionsBasicDocx.Attributes["disabled"] = "disabled";
                 BuildQuestionsCompact.Attributes["disabled"] = "disabled";
             }
 

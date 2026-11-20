@@ -50,7 +50,7 @@ namespace InSite.Common.Web.UI
                 { "/ui/admin/assets/collections/edit", ("Collection", "collection") },
                 { "/ui/admin/assets/collections/edit-item", ("Collection", "item") },
                 { "/ui/admin/assets/labels/edit", ("Label", "label") },
-                { "/ui/admin/contacts/people/edit-membership", ("Person", "to") },
+                { "/ui/admin/contacts/people/edit-membership", ("Membership", "id") },
                 { "/ui/admin/schemas/columns/outline", ("Column", "columnName") },
                 { "/ui/admin/events/appointments/outline", ("Appointment", "event") },
                 { "/ui/admin/integrations/api-requests/outline", ("API", "request") },

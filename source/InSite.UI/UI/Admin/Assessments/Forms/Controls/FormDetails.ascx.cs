@@ -7,7 +7,6 @@ using InSite.Application.Banks.Write;
 using InSite.Common.Web.UI;
 using InSite.Domain.Banks;
 using InSite.Persistence;
-using InSite.UI.Admin.Assessments.Forms.Utilities;
 
 using Shift.Common;
 using Shift.Constant;
@@ -98,7 +97,8 @@ namespace InSite.Admin.Assessments.Forms.Controls
             FeedbackField.Visible = IsFieldVisible(DetailsField.Feedback);
             RationaleField.Visible = IsFieldVisible(DetailsField.Rationale);
             SimulateField.Visible = IsFieldVisible(DetailsField.Simulate);
-            ProctoringColumn.Visible = IsAnyFieldVisible(DetailsField.SafeExamBrowser, DetailsField.KioskMode, DetailsField.ScheduleOpenDate, DetailsField.ScheduleCloseDate, DetailsField.TimeLimit, DetailsField.AttemptLimit, DetailsField.AttemptLimitPerSession, DetailsField.TimeLimitPerSession, DetailsField.TimeLimitPerLockout);
+            ProctoringColumn.Visible = IsAnyFieldVisible(DetailsField.AIProctoring, DetailsField.SafeExamBrowser, DetailsField.KioskMode, DetailsField.ScheduleOpenDate, DetailsField.ScheduleCloseDate, DetailsField.TimeLimit, DetailsField.AttemptLimit, DetailsField.AttemptLimitPerSession, DetailsField.TimeLimitPerSession, DetailsField.TimeLimitPerLockout);
+            AIProctoringField.Visible = IsFieldVisible(DetailsField.AIProctoring) && Organization.Toolkits.Assessments.AIProctoringEnabled;
             SafeExamBrowserField.Visible = IsFieldVisible(DetailsField.SafeExamBrowser);
             KioskModeField.Visible = IsFieldVisible(DetailsField.KioskMode);
             ScheduleOpenDateField.Visible = IsFieldVisible(DetailsField.ScheduleOpenDate);
@@ -170,6 +170,7 @@ namespace InSite.Admin.Assessments.Forms.Controls
             TimeLimitHelpDefault.Visible = !isCalculatedTimeLimit;
             TimeLimitHelpCalculated.Visible = isCalculatedTimeLimit;
 
+            AIProctoringState.Text = form.Invigilation.AIProctoringProvider == AIProctoringProvider.Proview ? "Enabled" : "None";
             SafeExamBrowserState.Text = form.Invigilation.IsSafeExamBrowserRequired ? "Required" : "Optional";
             KioskModeState.Text = form.Invigilation.IsKioskModeRequired ? "Required" : "Disabled";
             ScheduleOpenDate.Text = form.Invigilation.Opened.Format(User.TimeZone, nullValue: "N/A");

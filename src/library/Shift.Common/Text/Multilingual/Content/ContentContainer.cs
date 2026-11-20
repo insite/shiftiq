@@ -167,6 +167,28 @@ namespace Shift.Common
             };
         }
 
+        public static ContentContainer Create(MultilingualDictionary source)
+        {
+            var result = new ContentContainer { IsLoaded = true };
+            if (source == null)
+                return result;
+
+            foreach (var label in source.GetNames())
+            {
+                var value = source[label];
+                if (value == null || value.IsEmpty)
+                    continue;
+
+                foreach (var kv in value)
+                {
+                    if (!string.IsNullOrWhiteSpace(kv.Value) && Language.CodeExists(kv.Key))
+                        result.SetText(label, kv.Key, kv.Value);
+                }
+            }
+
+            return result;
+        }
+
         public IEnumerable<string> GetLabels() => _items.Keys;
 
         public IEnumerable<ContentContainerItem> GetItems() => _items.Values;

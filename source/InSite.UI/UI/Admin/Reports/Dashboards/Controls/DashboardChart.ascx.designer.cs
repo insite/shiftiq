@@ -15,6 +15,33 @@ namespace InSite.UI.Admin.Reports.Dashboards
     {
 
         /// <summary>
+        /// DownloadXlsx control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton DownloadXlsx;
+
+        /// <summary>
+        /// DownloadCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DownloadCount;
+
+        /// <summary>
+        /// ControlStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Alert ControlStatus;
+
+        /// <summary>
         /// Container control.
         /// </summary>
         /// <remarks>

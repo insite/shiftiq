@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Web;
 using System.Web.UI;
@@ -51,10 +52,97 @@ namespace InSite.Admin.Events.Classes.Controls
         {
             public string UserFullName { get; set; }
             public bool HasPerson { get; set; }
-            public Guid? GroupIdentifier { get; set; }
+            public Guid? GroupId { get; set; }
             public string GroupName { get; set; }
             public string PersonCode { get; set; }
             public string OccupationInterest { get; set; }
+        }
+
+        private class RegistrationGridItem
+        {
+            public bool HasPerson { get; set; }
+            public bool IncludeInT2202 { get; set; }
+
+            public DateTimeOffset? RegistrationRequestedOn { get; set; }
+
+            public decimal? RegistrationFee { get; set; }
+
+            public Guid CandidateIdentifier { get; set; }
+            public Guid EventIdentifier { get; set; }
+            public Guid RegistrationIdentifier { get; set; }
+            public Guid? EmployerIdentifier { get; set; }
+            public Guid? FormIdentifier { get; set; }
+
+            public int? RegistrationSequence { get; set; }
+
+            public string ApprovalStatus { get; set; }
+            public string AttendanceStatus { get; set; }
+            public string EmployerName { get; set; }
+            public string FormCode { get; set; }
+            public string PaymentStatus { get; set; }
+            public string UserFullName { get; set; }
+            public string PersonCode { get; set; }
+            public string OccupationInterest { get; set; }
+            public string BillingCode { get; set; }
+
+            public List<QAccommodation> AccommodationList { get; set; }
+
+            public List<RegistrationFormItem> Forms { get; set; } = new List<RegistrationFormItem>();
+
+            public List<RegistrationFormItem> AssignedForms => Forms.Where(x => x.FormIdentifier != null).ToList();
+
+            public string Accommodations
+            {
+                get
+                {
+                    if (AccommodationList == null || AccommodationList.Count == 0)
+                        return "None";
+
+                    var html = new StringBuilder();
+                    foreach (var item in AccommodationList)
+                    {
+                        html.Append($"<div class='text-nowrap'>{item.AccommodationName}</div>");
+                    }
+
+                    return html.ToString().IfNullOrEmpty("None");
+                }
+            }
+        }
+
+        private class RegistrationFormItem
+        {
+            public Guid? FormIdentifier { get; set; }
+
+            public bool ShowPassword { get; set; }
+
+            public DateTimeOffset? EligibilityUpdated { get; set; }
+
+            public string EligibilityStatus { get; set; }
+            public string FormName { get; set; }
+            public string FormTitle { get; set; }
+            public string Password { get; set; }
+
+            public string EligibilityStatusHtml
+            {
+                get
+                {
+                    if (EligibilityStatus == null)
+                        return string.Empty;
+
+                    var indicator = "info";
+                    if (EligibilityStatus == RegistrationEligibility.Eligible)
+                        indicator = "success";
+                    else if (EligibilityStatus == RegistrationEligibility.NotEligible)
+                        indicator = "danger";
+
+                    var result = $"<div class=\"badge bg-{indicator}\">{EligibilityStatus}</div>";
+
+                    if (EligibilityUpdated.HasValue)
+                        result += $"<div class=\"form-text text-body-secondary\">Sent {EligibilityUpdated.Value.Format(CurrentSessionState.Identity.User.TimeZone)}</div>";
+
+                    return result;
+                }
+            }
         }
 
         #endregion
@@ -75,10 +163,10 @@ namespace InSite.Admin.Events.Classes.Controls
             set => ViewState[nameof(ReturnParams)] = value;
         }
 
-        private Guid EventIdentifier
+        private Guid EventId
         {
-            get => (Guid)ViewState[nameof(EventIdentifier)];
-            set => ViewState[nameof(EventIdentifier)] = value;
+            get => (Guid)ViewState[nameof(EventId)];
+            set => ViewState[nameof(EventId)] = value;
         }
 
         protected bool ShowForms
@@ -87,14 +175,23 @@ namespace InSite.Admin.Events.Classes.Controls
             private set => ViewState[nameof(ShowForms)] = value;
         }
 
-        private Dictionary<Guid, CachedFilter> CachedFilters
+        private bool MultipleFormsAllowed
         {
-            get
-            {
-                return (Dictionary<Guid, CachedFilter>)(Session["RegistrationGrid.CachedFilters"]
-                    ?? (Session["RegistrationGrid.CachedFilters"] = new Dictionary<Guid, CachedFilter>()));
-            }
+            get => (bool)(ViewState[nameof(MultipleFormsAllowed)] ?? false);
+            set => ViewState[nameof(MultipleFormsAllowed)] = value;
         }
+
+        private int? FormAttachmentLimit
+        {
+            get => (int?)ViewState[nameof(FormAttachmentLimit)];
+            set => ViewState[nameof(FormAttachmentLimit)] = value;
+        }
+
+        private const string CachedFiltersKey = "RegistrationGrid.CachedFilters";
+
+        private Dictionary<Guid, CachedFilter> CachedFilters =>
+            (Dictionary<Guid, CachedFilter>)(Session[CachedFiltersKey]
+                ?? (Session[CachedFiltersKey] = new Dictionary<Guid, CachedFilter>()));
 
         #endregion
 
@@ -102,7 +199,8 @@ namespace InSite.Admin.Events.Classes.Controls
 
         private ReturnUrl _returnUrl;
 
-        private List<RegistrationGridItem> _data;
+        private bool _hasData;
+        private bool _isAllIncludeInT2202;
 
         #endregion
 
@@ -119,6 +217,10 @@ namespace InSite.Admin.Events.Classes.Controls
 
             AttendanceStatusComboBox.AutoPostBack = true;
             AttendanceStatusComboBox.ValueChanged += (a, b) => Search();
+
+            AddFormSelector.AutoPostBack = true;
+            AddFormSelector.ItemsRequested += AddFormSelector_ItemsRequested;
+            AddFormSelector.ValueChanged += AddFormSelector_ValueChanged;
 
             Grid.DataBinding += Grid_DataBinding;
             Grid.RowCreated += Grid_RowCreated;
@@ -169,10 +271,14 @@ namespace InSite.Admin.Events.Classes.Controls
                 T2202.AutoPostBack = true;
                 T2202.CheckedChanged += T2202_CheckedChanged;
 
-                var formIdentifier = (FindBankForm)e.Row.FindControl("FormIdentifier");
-                formIdentifier.Filter.EventIdentifier = EventIdentifier;
-                formIdentifier.AutoPostBack = true;
-                formIdentifier.ValueChanged += FormIdentifier_ValueChanged;
+                var formId = (FindBankForm)e.Row.FindControl("FormIdentifier");
+                formId.Filter.EventIdentifier = EventId;
+                formId.AutoPostBack = true;
+                formId.ValueChanged += FormIdentifier_ValueChanged;
+
+                var formRepeater = (Repeater)e.Row.FindControl("FormRepeater");
+                formRepeater.ItemCommand += FormRepeater_ItemCommand;
+                formRepeater.ItemDataBound += FormRepeater_ItemDataBound;
             }
         }
 
@@ -187,8 +293,8 @@ namespace InSite.Admin.Events.Classes.Controls
         private void BindHeaderRow(GridViewRowEventArgs e)
         {
             var allT2202 = (CheckBox)e.Row.FindControl("AllT2202");
-            allT2202.Checked = _data.All(x => x.IncludeInT2202);
-            allT2202.Enabled = _data.Count > 0;
+            allT2202.Checked = _isAllIncludeInT2202;
+            allT2202.Enabled = _hasData;
         }
 
         private void BindContentRow(GridViewRowEventArgs e)
@@ -232,24 +338,47 @@ namespace InSite.Admin.Events.Classes.Controls
             var voidItemButton = e.Row.FindControl("VoidItemButton");
             voidItemButton.Visible = CanWrite;
 
-            var cancelAssessmentButton = (IconButton)e.Row.FindControl("CancelAssessmentButton");
-            cancelAssessmentButton.Visible = item.EligibilityStatus != "Eligible";
+            var addFormButton = (IconButton)e.Row.FindControl("AddFormButton");
+            addFormButton.Visible = CanWrite
+                && MultipleFormsAllowed
+                && item.AssignedForms.Count > 0
+                && (FormAttachmentLimit == null || item.AssignedForms.Count < FormAttachmentLimit.Value);
+        }
+
+        private void FormRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (!IsContentItem(e))
+                return;
+
+            var form = (RegistrationFormItem)e.Item.DataItem;
+
+            var cancelAssessmentButton = (IconButton)e.Item.FindControl("CancelAssessmentButton");
+            cancelAssessmentButton.Visible = form.EligibilityStatus != "Eligible";
+        }
+
+        private void FormRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName != "DeleteForm")
+                return;
+
+            var row = (GridViewRow)((Repeater)source).NamingContainer;
+            var registrationId = Grid.GetDataKey<Guid>(row);
+
+            DeleteForm(registrationId, Guid.Parse((string)e.CommandArgument));
         }
 
         private void Grid_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            var registrationIdentifier = Grid.GetDataKey<Guid>(e);
+            var registrationId = Grid.GetDataKey<Guid>(e);
 
             if (e.CommandName == "SendInvite")
-                SendInvite(registrationIdentifier);
-            else if (e.CommandName == "DeleteForm")
-                DeleteForm(registrationIdentifier);
+                SendInvite(registrationId);
         }
 
-        private void SendInvite(Guid registrationIdentifier)
+        private void SendInvite(Guid registrationId)
         {
             var registration = RegistrationInvitationHelper.SendInvitation(
-                registrationIdentifier,
+                registrationId,
                 User.UserIdentifier,
                 true,
                 ServiceLocator.SendCommand,
@@ -258,7 +387,7 @@ namespace InSite.Admin.Events.Classes.Controls
 
             if (registration == null)
                 return;
-                
+
             var recipient = SendRegistrationInvitationMessage(registration);
 
             SearchWithCurrentPageIndex(Filter);
@@ -291,8 +420,8 @@ namespace InSite.Admin.Events.Classes.Controls
                     ClassTitle = registration.Event.EventTitle,
                     ClassRegistrationLink = registrationAbsoluteUrl,
                     RegistrationEndTime = DateTimeOffset.UtcNow.AddHours(RegistrationInvitationHelper.InvitationExpiresInHours).
-                        Format(TimeZoneInfo.FindSystemTimeZoneById(registration.Candidate.UserTimeZone)),
-                    ClassStartTime = registration.Event.EventScheduledStart.Format(TimeZoneInfo.FindSystemTimeZoneById(registration.Candidate.UserTimeZone)),
+                        Format(registration.Candidate.UserTimeZone),
+                    ClassStartTime = registration.Event.EventScheduledStart.Format(registration.Candidate.UserTimeZone),
                     ClassAchievement = GetAchievementName(registration.Event)
                 }
             );
@@ -308,10 +437,14 @@ namespace InSite.Admin.Events.Classes.Controls
             }
         }
 
-        private void DeleteForm(Guid registrationIdentifier)
+        private void DeleteForm(Guid registrationId, Guid formId)
         {
-            ServiceLocator.SendCommand(new UnassignExamForm(registrationIdentifier));
-            ServiceLocator.SendCommand(new LimitExamTime(registrationIdentifier));
+            if (MultipleFormsAllowed)
+                ServiceLocator.SendCommand(new RemoveExamForm(registrationId, formId));
+            else
+                ServiceLocator.SendCommand(new UnassignExamForm(registrationId));
+
+            ServiceLocator.SendCommand(new LimitExamTime(registrationId));
 
             SearchWithCurrentPageIndex(Filter);
         }
@@ -360,29 +493,81 @@ namespace InSite.Admin.Events.Classes.Controls
             var T2202 = (CheckBox)sender;
             var row = (GridViewRow)T2202.NamingContainer;
             var grid = (Grid)row.NamingContainer;
-            var registrationIdentifier = grid.GetDataKey<Guid>(row);
+            var registrationId = grid.GetDataKey<Guid>(row);
 
             var command = T2202.Checked
-                ? new IncludeRegistrationToT2202(registrationIdentifier)
-                : (Command)new ExcludeRegistrationFromT2202(registrationIdentifier);
+                ? new IncludeRegistrationToT2202(registrationId)
+                : (Command)new ExcludeRegistrationFromT2202(registrationId);
 
             ServiceLocator.SendCommand(command);
         }
 
         private void FormIdentifier_ValueChanged(object sender, FindEntityValueChangedEventArgs e)
         {
-            var formIdentifier = (FindBankForm)sender;
-            if (formIdentifier.Value == null)
+            var formId = (FindBankForm)sender;
+            if (formId.Value == null)
                 return;
 
-            var row = (GridViewRow)formIdentifier.NamingContainer;
+            var row = (GridViewRow)formId.NamingContainer;
             var grid = (Grid)row.NamingContainer;
-            var registrationIdentifier = grid.GetDataKey<Guid>(row);
+            var registrationId = grid.GetDataKey<Guid>(row);
 
-            ServiceLocator.SendCommand(new AssignExamForm(registrationIdentifier, formIdentifier.Value.Value, null));
-            ServiceLocator.SendCommand(new LimitExamTime(registrationIdentifier));
+            if (MultipleFormsAllowed)
+            {
+                ServiceLocator.SendCommand(new AddExamForm(registrationId, Guid.NewGuid(), formId.Value.Value));
+                ServiceLocator.SendCommand(new LimitExamTime(registrationId, formId.Value.Value));
+            }
+            else
+            {
+                ServiceLocator.SendCommand(new AssignExamForm(registrationId, formId.Value.Value, null));
+                ServiceLocator.SendCommand(new LimitExamTime(registrationId));
+            }
 
             SearchWithCurrentPageIndex(Filter);
+        }
+
+        private void AddFormSelector_ItemsRequested(object sender, EventArgs e)
+        {
+            var registrationId = GetAddFormRegistration();
+
+            AddFormSelector.Filter.EventIdentifier = EventId;
+            AddFormSelector.Filter.ExcludeFormIdentifiers = GetAssignedForms(registrationId);
+        }
+
+        private void AddFormSelector_ValueChanged(object sender, FindEntityValueChangedEventArgs e)
+        {
+            var registrationId = GetAddFormRegistration();
+            var formId = AddFormSelector.Value;
+
+            AddFormSelector.Value = null;
+            AddFormRegistrationIdentifier.Value = null;
+
+            if (registrationId == null || formId == null)
+                return;
+
+            ServiceLocator.SendCommand(new AddExamForm(registrationId.Value, Guid.NewGuid(), formId.Value));
+            ServiceLocator.SendCommand(new LimitExamTime(registrationId.Value, formId.Value));
+
+            SearchWithCurrentPageIndex(Filter);
+        }
+
+        private Guid[] GetAssignedForms(Guid? registrationId)
+        {
+            var registration = registrationId.HasValue
+                ? ServiceLocator.RegistrationSearch.GetRegistration(registrationId.Value, x => x.ExamForms)
+                : null;
+
+            if (registration == null)
+                return null;
+
+            var forms = new List<Guid>();
+
+            if (registration.ExamFormIdentifier.HasValue)
+                forms.Add(registration.ExamFormIdentifier.Value);
+
+            forms.AddRange(registration.ExamForms.Select(x => x.ExamFormIdentifier));
+
+            return forms.ToArray();
         }
 
         #endregion
@@ -394,7 +579,11 @@ namespace InSite.Admin.Events.Classes.Controls
             CanWrite = canWrite;
             ShowForms = showForms;
             ReturnParams = returnParams;
-            EventIdentifier = eventId;
+            EventId = eventId;
+            MultipleFormsAllowed = showForms && Organization.Toolkits.Events?.AllowMultipleAssessmentForms == true;
+            FormAttachmentLimit = MultipleFormsAllowed
+                ? ServiceLocator.EventSearch.GetEvent(eventId)?.FormAttachmentLimit
+                : null;
 
             AddButton.Visible = canWrite;
             AddButton.NavigateUrl = GetRedirectUrl($"/ui/admin/registrations/classes/add?event={eventId}");
@@ -402,7 +591,7 @@ namespace InSite.Admin.Events.Classes.Controls
             BindStatuses();
 
             Grid.Columns.FindByName("AssessmentForm").Visible = ShowForms;
-            Grid.Columns.FindByName("AccommodationsForm").Visible = ShowForms;
+            Grid.Columns.FindByName("AccommodationsForm").Visible = ServiceLocator.RegistrationSearch.HasAccommodations(eventId);
             Grid.Columns.FindByName("Employer").HeaderText = LabelHelper.GetLabelContentText("Employer at time of Registration");
 
             LoadCachedFilter(eventId);
@@ -457,7 +646,7 @@ namespace InSite.Admin.Events.Classes.Controls
                 .GetRegistrations(new QRegistrationFilter
                 {
                     OrganizationIdentifier = Organization.Identifier,
-                    EventIdentifier = EventIdentifier
+                    EventIdentifier = EventId
                 });
 
             var approvalStatuses = registrations
@@ -495,7 +684,7 @@ namespace InSite.Admin.Events.Classes.Controls
             var registrations = GetRegistrations(filter);
             var users = GetUsers(registrations.Select(x => x.CandidateIdentifier).Distinct());
 
-            _data = registrations
+            var data = registrations
                 .Select(x =>
                 {
                     users.TryGetValue(x.CandidateIdentifier, out var user);
@@ -505,18 +694,14 @@ namespace InSite.Admin.Events.Classes.Controls
                         ApprovalStatus = x.ApprovalStatus,
                         AttendanceStatus = x.AttendanceStatus,
                         CandidateIdentifier = x.CandidateIdentifier,
-                        EligibilityStatus = x.EligibilityStatus,
-                        EligibilityUpdated = x.EligibilityUpdated,
                         EmployerIdentifier = x.EmployerIdentifier,
                         EmployerName = x.Employer?.GroupName,
                         EventIdentifier = x.EventIdentifier,
                         FormCode = x.Form?.FormCode,
                         FormIdentifier = x.ExamFormIdentifier,
-                        FormName = x.Form?.FormName,
-                        FormTitle = x.Form?.FormTitle,
+                        Forms = GetForms(x),
                         HasPerson = user?.HasPerson ?? false,
                         IncludeInT2202 = x.IncludeInT2202,
-                        Password = x.RegistrationPassword,
                         PaymentStatus = string.Equals(x.Payment?.PaymentStatus, "Completed", StringComparison.OrdinalIgnoreCase) ? "Paid" : x.Payment?.PaymentStatus,
                         RegistrationFee = x.RegistrationFee,
                         RegistrationIdentifier = x.RegistrationIdentifier,
@@ -531,22 +716,68 @@ namespace InSite.Admin.Events.Classes.Controls
                 })
                 .ToList();
 
-            return _data.ToSearchResult();
+            _hasData = data.Count > 0;
+            _isAllIncludeInT2202 = data.All(x => x.IncludeInT2202);
+
+            return data.ToSearchResult();
         }
 
         private List<QRegistration> GetRegistrations(QRegistrationFilter filter)
         {
             filter.OrderBy = "RegistrationSequence,RegistrationRequestedOn,CandidateIdentifier";
 
-            var data = ServiceLocator.RegistrationSearch.GetRegistrations(
-                filter,
+            var includes = new List<Expression<Func<QRegistration, object>>>
+            {
                 x => x.Payment,
                 x => x.Form,
                 x => x.Accommodations,
                 x => x.Employer
-            );
+            };
+
+            if (MultipleFormsAllowed)
+                includes.Add(x => x.ExamForms.Select(f => f.Form));
+
+            var data = ServiceLocator.RegistrationSearch.GetRegistrations(filter, includes.ToArray());
 
             return data;
+        }
+
+        private List<RegistrationFormItem> GetForms(QRegistration registration)
+        {
+            var showPassword = ShowForms && StringHelper.Equals(registration.ApprovalStatus, "Registered");
+
+            var forms = new List<RegistrationFormItem>
+            {
+                new RegistrationFormItem
+                {
+                    FormIdentifier = registration.ExamFormIdentifier,
+                    FormName = registration.Form?.FormName,
+                    FormTitle = registration.Form?.FormTitle,
+                    Password = registration.RegistrationPassword,
+                    ShowPassword = showPassword,
+                    EligibilityStatus = registration.EligibilityStatus,
+                    EligibilityUpdated = registration.EligibilityUpdated
+                }
+            };
+
+            if (!MultipleFormsAllowed || registration.ExamFormIdentifier == null)
+                return forms;
+
+            foreach (var examForm in registration.ExamForms.OrderBy(x => x.Sequence))
+            {
+                forms.Add(new RegistrationFormItem
+                {
+                    FormIdentifier = examForm.ExamFormIdentifier,
+                    FormName = examForm.Form?.FormName,
+                    FormTitle = examForm.Form?.FormTitle,
+                    Password = examForm.Password,
+                    ShowPassword = showPassword,
+                    EligibilityStatus = examForm.EligibilityStatus,
+                    EligibilityUpdated = examForm.EligibilityUpdated
+                });
+            }
+
+            return forms;
         }
 
         private Dictionary<Guid, PersonItem> GetUsers(IEnumerable<Guid> userFilter)
@@ -574,12 +805,12 @@ namespace InSite.Admin.Events.Classes.Controls
                 {
                     UserFullName = x.FullName,
                     HasPerson = x.Person != null,
-                    GroupIdentifier = x.Person?.EmployerGroup?.GroupIdentifier,
+                    GroupId = x.Person?.EmployerGroup?.GroupIdentifier,
                     GroupName = x.Person?.EmployerGroup?.GroupName,
                     PersonCode = x.Person?.PersonCode,
                     OccupationInterest = x.Person?.OccupationStandard?.ContentName
                 });
-            
+
             return users;
         }
 
@@ -881,6 +1112,9 @@ namespace InSite.Admin.Events.Classes.Controls
 
         #region Helpers
 
+        private Guid? GetAddFormRegistration() =>
+            Guid.TryParse(AddFormRegistrationIdentifier.Value, out var value) ? value : (Guid?)null;
+
         protected string GetRedirectUrl(string format, params object[] args)
         {
             var url = string.Format(format, args);
@@ -902,9 +1136,9 @@ namespace InSite.Admin.Events.Classes.Controls
         protected string GetInvitationSentTime()
         {
             var item = Page.GetDataItem();
-            var registrationIdentifier = (Guid)DataBinder.Eval(item, "RegistrationIdentifier");
+            var registrationId = (Guid)DataBinder.Eval(item, "RegistrationIdentifier");
 
-            var time = RegistrationInvitationHelper.GetInvitationSentTime(registrationIdentifier, ServiceLocator.RegistrationSearch);
+            var time = RegistrationInvitationHelper.GetInvitationSentTime(registrationId, ServiceLocator.RegistrationSearch);
 
             return time.HasValue
                 ? TimeZones.Format(time.Value, User.TimeZone, true)
@@ -912,79 +1146,5 @@ namespace InSite.Admin.Events.Classes.Controls
         }
 
         #endregion
-    }
-
-    internal class RegistrationGridItem
-    {
-        public bool HasPerson { get; set; }
-        public bool IncludeInT2202 { get; set; }
-
-        public DateTimeOffset? RegistrationRequestedOn { get; set; }
-        public DateTimeOffset? EligibilityUpdated { get; set; }
-
-        public decimal? RegistrationFee { get; set; }
-
-        public Guid CandidateIdentifier { get; set; }
-        public Guid EventIdentifier { get; set; }
-        public Guid RegistrationIdentifier { get; set; }
-        public Guid? EmployerIdentifier { get; set; }
-        public Guid? FormIdentifier { get; set; }
-
-        public int? RegistrationSequence { get; set; }
-
-        public string ApprovalStatus { get; set; }
-        public string AttendanceStatus { get; set; }
-        public string EligibilityStatus { get; set; }
-        public string EmployerName { get; set; }
-        public string FormCode { get; set; }
-        public string FormName { get; set; }
-        public string FormTitle { get; set; }
-        public string Password { get; set; }
-        public string PaymentStatus { get; set; }
-        public string UserFullName { get; set; }
-        public string PersonCode { get; set; }
-        public string OccupationInterest { get; set; }
-        public string BillingCode { get; set; }
-
-        public List<QAccommodation> AccommodationList { get; set; }
-
-        public string Accommodations
-        {
-            get
-            {
-                if (AccommodationList == null && AccommodationList.Count == 0)
-                    return string.Empty;
-
-                var html = new StringBuilder();
-                foreach (var item in AccommodationList)
-                {
-                    html.Append($"<div class='text-nowrap'>{item.AccommodationName}</div>");
-                }
-
-                return html.ToString().IfNullOrEmpty("None");
-            }
-        }
-
-        public string EligibilityStatusHtml
-        {
-            get
-            {
-                if (EligibilityStatus == null)
-                    return string.Empty;
-
-                var indicator = "info";
-                if (EligibilityStatus == "Eligible")
-                    indicator = "success";
-                else if (EligibilityStatus == "Not Eligible")
-                    indicator = "danger";
-
-                var result = $"<div class=\"badge bg-{indicator}\">{EligibilityStatus}</div>";
-
-                if (EligibilityUpdated.HasValue)
-                    result += $"<div class=\"form-text text-body-secondary\">Sent {EligibilityUpdated.Value.Format(CurrentSessionState.Identity.User.TimeZone)}</div>";
-
-                return result;
-            }
-        }
     }
 }

@@ -50,7 +50,7 @@ namespace InSite.UI.Portal.Home.Learning
                 return;
 
             PortalMaster.ShowAvatar(dashboardUrl: "/ui/portal/learning/dashboard/home");
-            PortalMaster.RenderHelpContent(null);
+            PortalMaster.RenderHelpContent(ActionModel, true);
             PortalMaster.HideBreadcrumbsAndTitle();
 
             PageHelper.AutoBindHeader(this);
@@ -61,6 +61,9 @@ namespace InSite.UI.Portal.Home.Learning
             UserFirstName.Text = User.FirstName;
 
             BindDistributions();
+
+            if (Organization.Toolkits.Accounts.AHRIFeatures)
+                SkillsCheckLiteral.Text = "Assessment";
         }
 
         private void BindDistributions()

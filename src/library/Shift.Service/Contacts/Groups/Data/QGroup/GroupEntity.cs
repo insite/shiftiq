@@ -6,6 +6,7 @@ public partial class GroupEntity
 {
     public ICollection<MembershipEntity> Memberships { get; set; } = new List<MembershipEntity>();
     public ICollection<TPermissionEntity> Permissions { get; set; } = new List<TPermissionEntity>();
+    public ICollection<GroupAddressEntity> Addresses { get; set; } = new List<GroupAddressEntity>();
 
     public Guid GroupIdentifier { get; set; }
     public Guid? MembershipProductIdentifier { get; set; }

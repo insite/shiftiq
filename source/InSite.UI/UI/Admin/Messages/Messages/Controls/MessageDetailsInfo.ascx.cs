@@ -7,7 +7,7 @@ namespace InSite.Admin.Messages.Messages.Controls
 {
     public partial class MessageDetailsInfo : UserControl
     {
-        public void BindMessage(VMessage message, TimeZoneInfo tz)
+        public void BindMessage(VMessage message)
         {
             MessageLink.HRef = $"/ui/admin/messages/outline?message={message.MessageIdentifier}";
             MessageTitle.Text = message.MessageTitle;

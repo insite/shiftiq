@@ -61,7 +61,7 @@ namespace InSite.UI.Admin.Assessments.Attempts
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            var now = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, User.TimeZone);
+            var now = TimeZones.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
             var fileName = $"CAMLPR_ExamReport_{now:yyyy}-{now:MM}-{now:dd}.csv";
 
             CsvFile.SaveFile(Organization.Identifier, FileObjectType.Organization, fileName);

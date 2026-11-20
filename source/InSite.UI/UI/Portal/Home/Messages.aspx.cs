@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -125,7 +125,7 @@ namespace InSite.UI.Portal.Home
                 email.ContentVariables = JsonConvert.DeserializeObject<Dictionary<string, string>>(item.Data.ContentVariables);
 
             var message = MessageHelper.BuildMessage(email, CurrentLanguage);
-            var envelope = new EmailVariables(recipient.Identifier.Value, recipient.Address, email.OrganizationIdentifier, recipient.Variables);
+            var envelope = EmailOutbox.CreateEmailVariables(email.OrganizationIdentifier, recipient.Identifier.Value, recipient.Address, recipient.Variables);
             var body = MessageHelper.ReplacePlaceholdersForMailgun(Organization.Identifier, item.Data.SenderIdentifier, null, message.Body, envelope);
 
             return HttpUtility.HtmlEncode(body);

@@ -185,7 +185,8 @@ namespace InSite.Admin.Workflow.Forms.Utilities
                 results.Add(new SurveyScale
                 {
                     Category = scale.Category,
-                    Items = AddScaleItems(scale.Items)
+                    Items = AddScaleItems(scale.Items),
+                    Content = AddContentContainer("", scale.Content)
                 });
             }
             return results;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace InSite.Application.Issues.Read
 {
@@ -28,6 +28,7 @@ namespace InSite.Application.Issues.Read
         public string TopicUserEmail { get; set; }
         public string TopicPersonCode { get; set; }
         public string TopicUserDepartment { get; set; }
+        public string TopicUserDistrict { get; set; }
 
         public int IssueNumber { get; set; }
         public int? IssueStatusSequence { get; set; }

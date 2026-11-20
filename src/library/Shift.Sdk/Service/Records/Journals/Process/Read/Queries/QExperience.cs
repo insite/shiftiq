@@ -12,7 +12,7 @@ namespace InSite.Application.Records.Read
         public Guid? ValidatorUserIdentifier { get; set; }
         public int Sequence { get; set; }
         public string Employer { get; set; }
-        public string Supervisor { get; set; }
+        public Guid? SupervisorUserIdentifier { get; set; }
         public string Instructor { get; set; }
         public DateTimeOffset ExperienceCreated { get; set; }
         public DateTime? ExperienceStarted { get; set; }
@@ -34,6 +34,7 @@ namespace InSite.Application.Records.Read
 
         public virtual QJournal Journal { get; set; }
         public virtual VUser Validator { get; set; }
+        public virtual VUser Supervisor { get; set; }
 
         public virtual ICollection<QExperienceCompetency> Competencies { get; set; } = new HashSet<QExperienceCompetency>();
     }

@@ -54,7 +54,7 @@ namespace InSite.Admin.Issues.Comments.Forms
             if (comment == null)
                 CommentInfo.RedirectToReader();
 
-            CaseInfo.BindIssue(issue, User.TimeZone);
+            CaseInfo.BindIssue(issue);
             CommentInfo.SetInputValues(issue, comment);
             RemoveButton.Visible = true;
             RemoveButton.NavigateUrl = $"/ui/admin/workflow/comments/delete?case={CaseIdentifier}&comment={CommentIdentifier}";

@@ -13,7 +13,7 @@ namespace Shift.Sdk.UI
 
         public string What { get; }
 
-        public HtmlDataItem(HistoryEntity change, TimeZoneInfo timeZone)
+        public HtmlDataItem(HistoryEntity change, string timeZone)
         {
             When = TimeZones.Format(change.Date, timeZone);
             Who = HttpUtility.HtmlEncode(change.UserName);

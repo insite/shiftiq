@@ -4,7 +4,7 @@
 
 <insite:Grid runat="server" ID="Grid">
     <Columns>
-            
+
         <asp:TemplateField ItemStyle-Width="70px">
             <ItemTemplate>
                 <insite:IconLink runat="server" Name="pencil" Type="Regular" ToolTip='Edit Registration'
@@ -22,7 +22,7 @@
                 </div>
             </ItemTemplate>
         </asp:TemplateField>
-          
+
         <asp:TemplateField HeaderText="Registrant">
             <ItemTemplate>
                 <a href="<%# Eval("CandidateIdentifier", "/ui/admin/contacts/people/edit?contact={0}") %>"><%# Eval("UserFullName") %></a>
@@ -69,7 +69,7 @@
             </ItemTemplate>
         </asp:TemplateField>
 
-        <asp:TemplateField HeaderText="Fee" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end" >
+        <asp:TemplateField HeaderText="Fee" HeaderStyle-CssClass="text-end" ItemStyle-CssClass="text-end">
             <ItemTemplate>
 
                 <div runat="server" visible='<%# (string)Eval("ApprovalStatus") != "Moved" %>'>

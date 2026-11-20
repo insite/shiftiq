@@ -17,9 +17,9 @@ namespace InSite.Admin.Assessments.Outlines.Utilities
 {
     public class BankDownloader
     {
-        private readonly TimeZoneInfo _tz;
+        private readonly string _tz;
 
-        public BankDownloader(TimeZoneInfo tz)
+        public BankDownloader(string tz)
         {
             _tz = tz;
         }

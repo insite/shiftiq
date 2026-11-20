@@ -17,7 +17,7 @@ namespace Shift.Common
             return _methods.ContainsKey(queryType);
         }
 
-        public TResult Run<TResult>(IQuery<TResult> query)
+        public TResult Run<TResult>(IQuery query)
         {
             if (_methods.TryGetValue(query.GetType(), out var runner))
             {

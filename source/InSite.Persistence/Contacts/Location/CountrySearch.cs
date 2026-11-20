@@ -9,13 +9,13 @@ namespace InSite.Persistence
 {
     public class CountrySearch
     {
-        private readonly string _engineApiUrl;
+        private readonly ApiSettings _googleApi;
 
         private Country[] _countries;
 
-        public CountrySearch(string engineApiUrl)
+        public CountrySearch(ApiSettings googleApi)
         {
-            _engineApiUrl = engineApiUrl;
+            _googleApi = googleApi;
         }
 
         private Country[] GetCountries()
@@ -29,9 +29,9 @@ namespace InSite.Persistence
             if (_countries != null)
                 return;
 
-            var client = new LocationClient();
+            var client = new LocationClient(_googleApi.ApiKey);
 
-            _countries = client.CollectCountries(_engineApiUrl);
+            _countries = client.CollectCountries(_googleApi.BaseUrl);
         }
 
         public int Count(string searchText)

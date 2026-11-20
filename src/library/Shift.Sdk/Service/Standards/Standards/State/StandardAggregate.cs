@@ -411,7 +411,7 @@ namespace InSite.Domain.Standards
             Apply(new StandardContentModified(changeContent));
         }
 
-        public void ModifyStandardFieldText(StandardField field, string value)
+        public bool ModifyStandardFieldText(StandardField field, string value)
         {
             if (value.IsEmpty())
                 value = null;
@@ -419,9 +419,11 @@ namespace InSite.Domain.Standards
             StandardFieldList.Validate(field, value, true);
 
             if (Data.GetTextValue(field) == value)
-                return;
+                return false;
 
             Apply(new StandardFieldTextModified(field, value));
+
+            return true;
         }
 
         public void ModifyStandardFieldDateOffset(StandardField field, DateTimeOffset? value)

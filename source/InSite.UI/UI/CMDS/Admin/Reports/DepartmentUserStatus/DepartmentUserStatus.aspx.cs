@@ -24,9 +24,9 @@ namespace InSite.Custom.CMDS.Admin.Reports
 
         public override string EntityName => "Department User Status";
 
-        private List<DateTimeOffset> SnapshotRepeaterKeys
+        private List<DateTime> SnapshotRepeaterKeys
         {
-            get => (List<DateTimeOffset>)ViewState[nameof(SnapshotRepeaterKeys)];
+            get => (List<DateTime>)ViewState[nameof(SnapshotRepeaterKeys)];
             set => ViewState[nameof(SnapshotRepeaterKeys)] = value;
         }
 
@@ -166,7 +166,7 @@ namespace InSite.Custom.CMDS.Admin.Reports
 
         private void SnapshotRepeater_DataBinding(object sender, EventArgs e)
         {
-            SnapshotRepeaterKeys = new List<DateTimeOffset>();
+            SnapshotRepeaterKeys = new List<DateTime>();
         }
 
         private void SnapshotRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
@@ -203,17 +203,15 @@ namespace InSite.Custom.CMDS.Admin.Reports
         {
             var reader = new TUserStatusSearch();
 
-            reader.GetAsAt(Organization.Identifier, out DateTimeOffset? from, out DateTimeOffset? thru);
+            reader.GetAsAt(Organization.Identifier, out DateTime? from, out DateTime? thru);
 
             if (from.HasValue && thru.HasValue)
             {
-                var text = $@"Compliance statistics for {Organization.CompanyName} were last calculated {thru.Humanize()}.";
+                var text = $@"Compliance statistics for {Organization.CompanyName} were last calculated on {thru.Value:yyyy-MM-dd}.";
 
-                // If the variance between the minimum and maximum "As At" values exceeds 60 seconds then display both values.
-                if ((thru - from).Value.TotalSeconds > 60)
-                    text += $@" ({from.Value.Format(User.TimeZone, true)} to {thru.Value.Format(User.TimeZone, true)}).";
-                else
-                    text += $@" ({from.Value.Format(User.TimeZone, true)}).";
+                // If there is more than one snapshot then display the first and last "As At" values.
+                if (from.Value != thru.Value)
+                    text += $@" Snapshots run from {from.Value:yyyy-MM-dd} to {thru.Value:yyyy-MM-dd}.";
 
                 SnapshotAlert.AddMessage(AlertType.Information, text);
             }
@@ -263,9 +261,7 @@ namespace InSite.Custom.CMDS.Admin.Reports
             foreach (var item in data)
             {
                 var dataset = datasets[item.StatisticName];
-                var userDate = TimeZoneInfo.ConvertTime(item.AsAt, User.TimeZone);
-
-                dataset.NewItem(userDate.DateTime, (double)item.ComplianceScore);
+                dataset.NewItem(item.AsAt, (double)item.ComplianceScore);
             }
 
             Dictionary<string, DateTimeChartDataset> GetStatisticDatasets(IEnumerable<TUserStatusSearch.ChartDataItem> items)

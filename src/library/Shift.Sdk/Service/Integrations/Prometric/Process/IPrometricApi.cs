@@ -9,15 +9,15 @@ namespace InSite.Application.Integrations.Prometric
 
         bool EligibilityExists(GetEligibilityInput input);
         bool EligibilityExists(SaveEligibilityInput input);
-        bool EligibilityExists(QRegistration registration);
+        bool EligibilityExists(QRegistration registration, QRegistrationExamForm examForm);
 
         GetEligibilityOutput GetEligibility(GetEligibilityInput input);
-        GetEligibilityOutput GetEligibility(QRegistration registration);
+        GetEligibilityOutput GetEligibility(QRegistration registration, QRegistrationExamForm examForm);
 
         SaveEligibilityOutput SaveEligibility(SaveEligibilityInput input);
         SaveEligibilityOutput DeleteEligibility(SaveEligibilityInput input);
 
-        SaveEligibilityOutput SaveEligibility(QRegistration registration);
-        SaveEligibilityOutput DeleteEligibility(QRegistration registration);
+        SaveEligibilityOutput SaveEligibility(QRegistration registration, QRegistrationExamForm examForm);
+        SaveEligibilityOutput DeleteEligibility(QRegistration registration, QRegistrationExamForm examForm);
     }
 }

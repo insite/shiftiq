@@ -24,6 +24,24 @@ namespace InSite.UI.Portal.Learning
         protected global::InSite.Common.Web.UI.Alert PlanAlert;
 
         /// <summary>
+        /// ProgramFilterPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ProgramFilterPanel;
+
+        /// <summary>
+        /// ProgramFilter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ProgramFilter;
+
+        /// <summary>
         /// DisplayTogglePanel control.
         /// </summary>
         /// <remarks>

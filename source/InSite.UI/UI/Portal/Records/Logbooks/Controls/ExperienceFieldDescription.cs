@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Web;
 
-using Shift.Common.Timeline.Commands;
-
+using InSite.Application.Contacts.Read;
 using InSite.Application.Journals.Write;
 using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
+using InSite.Domain.Organizations;
 
 using Shift.Common;
+using Shift.Common.Timeline.Commands;
 using Shift.Constant;
 
 using AspLiteral = System.Web.UI.WebControls.Literal;
@@ -106,6 +108,35 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
                     value.IsNotEmpty()
                         ? "<div style='white-space:pre-wrap;'>" + HttpUtility.HtmlEncode(value) + "</div>"
                         : string.Empty;
+            }
+
+            public static class User
+            {
+                public const string Name = "User";
+
+                public static void Set(IExperienceField field, Guid? value, Guid? restrictToGroupId, Guid[] restrictToUserIds)
+                {
+                    var input = (IExperienceUserField)field;
+                    input.Value = value;
+                    input.RestrictToUsers(restrictToUserIds);
+                    input.RestrictToGroup(restrictToGroupId);
+                }
+
+                public static Guid? Get(IExperienceField field)
+                {
+                    var input = (IExperienceUserField)field;
+                    return input.Value;
+                }
+
+                public static string GetHtml(Guid? userId, string userName)
+                {
+                    var result = userName;
+
+                    if (result.IsEmpty() && userId.HasValue)
+                        result = ServiceLocator.ContactSearch.GetUser(userId.Value)?.UserFullName;
+
+                    return HttpUtility.HtmlEncode(result);
+                }
             }
 
             public static class Date
@@ -207,7 +238,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
                 x => new ChangeExperienceEmployer(x.JournalIdentifier, x.ExperienceIdentifier, x.Employer);
 
             public static readonly ChangeAction Supervisor =
-                x => new ChangeExperienceSupervisor(x.JournalIdentifier, x.ExperienceIdentifier, x.Supervisor);
+                x => new ChangeExperienceSupervisor(x.JournalIdentifier, x.ExperienceIdentifier, x.SupervisorUserIdentifier);
 
             public static readonly ChangeAction StartAndEndDate =
                 x => new ChangeExperienceTime(x.JournalIdentifier, x.ExperienceIdentifier, x.ExperienceStarted, x.ExperienceStopped);
@@ -276,24 +307,33 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
                 JournalSetupFieldType.Supervisor,
                 new ExperienceFieldDescription
                 {
-                    ControlName = FieldInfo.Text.Name,
+                    ControlName = FieldInfo.User.Name,
                     Load = (field, entity) =>
                     {
-                        FieldInfo.Text.Set(field, entity.Supervisor, 100);
+                        var restrictToGroupId= Organization.Toolkits.Logbooks?.SupervisorGroupIdentifier;
+                        var restrictToUserIds = restrictToGroupId.HasValue
+                            ? null
+                            : (GetSupervisorUserIdentifiers(entity.Journal?.UserIdentifier) ?? new[] { Guid.Empty });
+
+                        FieldInfo.User.Set(field, entity.SupervisorUserIdentifier, restrictToGroupId, restrictToUserIds);
                     },
                     Save = (field, entity) =>
                     {
-                        entity.Supervisor = FieldInfo.Text.Get(field);
+                        entity.SupervisorUserIdentifier = FieldInfo.User.Get(field);
                         return ChangeActions.Supervisor;
                     },
                     AddValue = (entity, container) =>
                     {
                         var literal = container.LoadControl<AspLiteral>();
-                        literal.Text = FieldInfo.Text.GetHtml(entity.Supervisor).IfNullOrEmpty("<i>None</i>");
+                        literal.Text = FieldInfo.User
+                            .GetHtml(entity.SupervisorUserIdentifier, entity.Supervisor?.UserFullName)
+                            .IfNullOrEmpty("<i>None</i>");
                     },
                     GetHtml = (entity) =>
                     {
-                        return FieldInfo.Text.GetHtml(entity.Supervisor).IfNullOrEmpty("<i>None</i>");
+                        return FieldInfo.User
+                            .GetHtml(entity.SupervisorUserIdentifier, entity.Supervisor?.UserFullName)
+                            .IfNullOrEmpty("<i>None</i>");
                     }
                 }
             },
@@ -614,6 +654,23 @@ namespace InSite.UI.Portal.Records.Logbooks.Controls
         #endregion
 
         #region Methods (helpers)
+
+        private static OrganizationState Organization => CurrentSessionState.Identity.Organization;
+
+        private static Guid[] GetSupervisorUserIdentifiers(Guid? learnerId)
+        {
+            if (!learnerId.HasValue)
+                return new Guid[0];
+
+            var connections = ServiceLocator.UserSearch.GetConnections(new QUserConnectionFilter
+            {
+                ToUserId = learnerId.Value,
+                FromUserOrganizationId = Organization.Identifier,
+                IsValidator = true
+            });
+
+            return connections.Select(x => x.FromUserIdentifier).Distinct().ToArray();
+        }
 
         private static readonly string UniqueIdStorage = typeof(ExperienceFieldDescription).FullName + ".UniqueID";
 

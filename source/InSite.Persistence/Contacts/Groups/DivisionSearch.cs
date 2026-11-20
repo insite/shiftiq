@@ -53,6 +53,29 @@ namespace InSite.Persistence
             }
         }
 
+        // Name-only variant, ordered by name. The default above leads with DivisionCode, which for
+        // code-heavy organizations (e.g. Keyera) shows a list of bare numbers sorted numerically.
+        // The training reports want human-readable division names in alphabetical order instead.
+        public static ListItem[] SelectForDivisionComboBoxByName(Guid organization, Guid[] allowed = null)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var query = db.Divisions.Where(x => x.OrganizationIdentifier == organization);
+
+                if (allowed != null)
+                    query = query.Where(x => allowed.Contains(x.DivisionIdentifier));
+
+                return query
+                    .OrderBy(x => x.DivisionName)
+                    .Select(x => new ListItem
+                    {
+                        Value = x.DivisionIdentifier.ToString(),
+                        Text = x.DivisionName
+                    })
+                    .ToArray();
+            }
+        }
+
         #endregion
 
         #region Select (filter)

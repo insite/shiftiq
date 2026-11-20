@@ -21,12 +21,15 @@ namespace InSite.UI.Portal.Billing.Models
             ? Math.Max(PackageQuantity.Value - TotalSelected, 0)
             : 0;
 
-        public void Reset(PriceSelectionMode mode, Guid? packageId = null, int? packageQty = null)
+        public bool IsTransfer { get; private set; }
+
+        public void Reset(PriceSelectionMode mode, Guid? packageId = null, int? packageQty = null, bool isTransfer = false)
         {
             Items.Clear();
             Mode = mode;
             PackageProductId = packageId;
             PackageQuantity = packageQty;
+            IsTransfer = mode == PriceSelectionMode.Subscribe && isTransfer;
         }
 
         public int Add(Guid productId, int qty, out int actuallyAdded)

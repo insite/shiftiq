@@ -12,15 +12,16 @@ internal class PayloadValidator
     private readonly ILogger<PayloadValidator> _logger;
     private readonly Microsoft.Extensions.Caching.Memory.IMemoryCache _tokenCache;
     private readonly AppSettings _settings;
-    private readonly QueueHelper _queueHelper;
+    private readonly MailgunQueueHelper _queueHelper;
 
     private static readonly TimeSpan _timestampTolerance = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan _clockSkewTolerance = TimeSpan.FromMinutes(1);
 
     public PayloadValidator(
         ILogger<PayloadValidator> logger, 
         Microsoft.Extensions.Caching.Memory.IMemoryCache tokenCache, 
         AppSettings settings,
-        QueueHelper queueHelper)
+        MailgunQueueHelper queueHelper)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _tokenCache = tokenCache ?? throw new ArgumentNullException(nameof(tokenCache));
@@ -28,10 +29,9 @@ internal class PayloadValidator
         _queueHelper = queueHelper ?? throw new ArgumentNullException(nameof(queueHelper));
     }
 
-    public IResult? ParseAndValidate(string json, out string? environmentDomain, out string? queueName)
+    public IResult? ParseAndValidate(string json, out string? queueFullName)
     {
-        environmentDomain = null;
-        queueName = null;
+        queueFullName = null;
 
         if (json.HasNoValue())
         {
@@ -82,15 +82,15 @@ internal class PayloadValidator
             return InvalidPayload(6);
         }
 
-        if (!userVariables.TryGetValue("environment-domain", out environmentDomain) || environmentDomain.IsEmpty())
+        if (!userVariables.TryGetValue(MailgunQueueHelper.VariableName, out var queueShortName) || queueShortName.IsEmpty())
         {
-            _logger.LogWarning("Missing environment-domain in user-variables");
+            _logger.LogWarning("Missing {VariableName} in user-variables", MailgunQueueHelper.VariableName);
             return InvalidPayload(7);
         }
 
-        if (!_queueHelper.TryGetQueueName(environmentDomain, out queueName))
+        if (!_queueHelper.TryGetQueueFullName(queueShortName, out queueFullName))
         {
-            _logger.LogWarning("Invalid environment-domain: {EnvironmentDomain}", environmentDomain);
+            _logger.LogWarning("Invalid {VariableName}: {QueueShortName}", MailgunQueueHelper.VariableName, queueShortName);
             return InvalidPayload(8);
         }
 
@@ -107,7 +107,7 @@ internal class PayloadValidator
         }
 
         var signatureAge = DateTime.UtcNow - signatureTimestamp;
-        if (signatureAge < TimeSpan.Zero || signatureAge > _timestampTolerance)
+        if (signatureAge < -_clockSkewTolerance || signatureAge > _timestampTolerance)
         {
             _logger.LogWarning("Signature timestamp out of tolerance: age={SignatureAge}", signatureAge);
             return InvalidPayload(11);

@@ -58,7 +58,7 @@ namespace InSite.Api.Controllers
             if (DateTime.TryParse(date, out var start))
             {
                 var firstDay = new DateTime(start.Year, start.Month, 1);
-                filter.EventScheduledPeriodSince = new DateTimeOffset(firstDay, CurrentUser.TimeZone.BaseUtcOffset);
+                filter.EventScheduledPeriodSince = TimeZones.ToDateTimeOffset(firstDay, CurrentUser.TimeZone);
                 filter.EventScheduledPeriodBefore = filter.EventScheduledPeriodSince.Value.AddMonths(1);
             }
 
@@ -196,7 +196,7 @@ namespace InSite.Api.Controllers
 
         private static List<CalendarEvent> GetEvents(QEventFilter filter)
         {
-            var timeZone = CurrentUser.TimeZone;
+            var timeZoneId = CurrentUser.TimeZone;
 
             return ServiceLocator.EventSearch
                 .GetEvents(filter)
@@ -223,7 +223,7 @@ namespace InSite.Api.Controllers
 
             string DateToStr(DateTimeOffset date)
             {
-                var localizedDate = TimeZoneInfo.ConvertTime(date, timeZone);
+                var localizedDate = TimeZones.ConvertTime(date, timeZoneId);
                 return localizedDate.ToString("yyyy-MM-dd HH:mm:ss");
             }
         }

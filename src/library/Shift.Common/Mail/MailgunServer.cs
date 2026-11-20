@@ -286,7 +286,7 @@ namespace Shift.Common
 
             AddParameter(form, "v:mailout-id", email.MailoutIdentifier.ToString().ToLowerInvariant());
             AddParameter(form, "v:sender-domain", address.Domain);
-            AddParameter(form, "v:environment-domain", _settings.Domain);
+            AddParameter(form, "v:" + MailgunQueueHelper.VariableName, _settings.QueueName);
 
             AddParameter(form, "from", $"{email.SenderName} <{email.SystemMailbox}>");
 

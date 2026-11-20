@@ -32,15 +32,15 @@
 <div class="row">
     <div class="col-xs-12">
 
-        <insite:Grid runat="server" ID="Grid" DataKeyNames="UserIdentifier">
+        <insite:Grid runat="server" ID="Grid" DataKeyNames="MembershipIdentifier">
             <Columns>
 
                 <asp:TemplateField ItemStyle-Wrap="false" ItemStyle-Width="60px">
                     <ItemTemplate>
                         <insite:IconLink runat="server" ID="EditButton" Name="pencil" ToolTip="Edit"
-                            NavigateUrl='<%# string.Format("/ui/admin/contacts/people/edit-membership?from={0}&to={1}", GroupIdentifier, Eval("UserIdentifier")) %>' />
+                            NavigateUrl='<%# string.Format("/ui/admin/contacts/people/edit-membership?id={0}", Eval("MembershipIdentifier")) %>' />
                         <insite:IconLink runat="server" Name="trash-alt" ToolTip='Delete'
-                            NavigateUrl='<%# string.Format("/ui/admin/contacts/people/delete-membership?from={0}&to={1}", GroupIdentifier, Eval("UserIdentifier")) %>' />
+                            NavigateUrl='<%# string.Format("/ui/admin/contacts/people/delete-membership?id={0}", Eval("MembershipIdentifier")) %>' />
                         <insite:IconLink runat="server" ID="HistoryLink" Name="history" ToolTip="History" />
                     </ItemTemplate>
                 </asp:TemplateField>

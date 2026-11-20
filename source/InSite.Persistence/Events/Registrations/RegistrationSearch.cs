@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -215,6 +215,15 @@ namespace InSite.Persistence
             }
         }
 
+        public bool HasAccommodations(Guid eventIdentifier)
+        {
+            using (var db = CreateContext())
+            {
+                return db.Accommodations
+                    .Any(x => x.Registration.EventIdentifier == eventIdentifier);
+            }
+        }
+
         public List<string> GetAccommodationTypes(Guid organizationIdentifier)
         {
             using (var db = CreateContext())
@@ -260,6 +269,47 @@ namespace InSite.Persistence
             }
         }
 
+        public QRegistrationExamForm GetRegistrationExamForm(Guid examForm, params Expression<Func<QRegistrationExamForm, object>>[] includes)
+        {
+            using (var db = CreateContext())
+            {
+                var query = db.RegistrationExamForms.AsNoTracking().ApplyIncludes(includes);
+
+                return query.FirstOrDefault(x => x.RegistrationExamFormIdentifier == examForm);
+            }
+        }
+
+        public List<QRegistrationExamForm> GetRegistrationExamForms(
+            QRegistrationFilter filter,
+            params Expression<Func<QRegistrationExamForm, object>>[] includes)
+        {
+            using (var db = CreateContext())
+            {
+                var registrationQuery = CreateQuery(filter, db);
+
+                var query = db.RegistrationExamForms.AsNoTracking().AsQueryable()
+                    .ApplyIncludes(includes)
+                    .Where(x => registrationQuery.Any(r => r.RegistrationIdentifier == x.RegistrationIdentifier));
+
+                query = string.IsNullOrEmpty(filter.OrderBy)
+                    ? query.OrderBy(x => x.RegistrationIdentifier).ThenBy(x => x.Sequence)
+                    : query.OrderBy(filter.OrderBy);
+
+                return query.ApplyPaging(filter).ToList();
+            }
+        }
+
+        public int CountRegistrationExamForms(QRegistrationFilter filter)
+        {
+            using (var db = CreateContext())
+            {
+                var registrationQuery = CreateQuery(filter, db);
+
+                return db.RegistrationExamForms
+                    .Count(x => registrationQuery.Any(r => r.RegistrationIdentifier == x.RegistrationIdentifier));
+            }
+        }
+
         public QRegistration GetRegistration(
             QRegistrationFilter filter,
             params Expression<Func<QRegistration, object>>[] includes)
@@ -269,7 +319,7 @@ namespace InSite.Persistence
                 var query = CreateQuery(filter, db).ApplyIncludes(includes);
 
                 query = string.IsNullOrEmpty(filter.OrderBy)
-                    ? query.OrderBy(x => x.Attempt.AttemptStarted)
+                    ? query.OrderBy(x => x.RegistrationIdentifier)
                     : query.OrderBy(filter.OrderBy);
 
                 return query.FirstOrDefault();
@@ -285,7 +335,7 @@ namespace InSite.Persistence
                 var query = CreateQuery(filter, db).ApplyIncludes(includes);
 
                 query = string.IsNullOrEmpty(filter.OrderBy)
-                    ? query.OrderBy(x => x.Attempt.AttemptStarted)
+                    ? query.OrderBy(x => x.RegistrationIdentifier)
                     : query.OrderBy(filter.OrderBy);
 
                 return query.ApplyPaging(filter).ToList();
@@ -300,7 +350,7 @@ namespace InSite.Persistence
                 var query = CreateQuery(filter, db);
 
                 query = filter.OrderBy.IsEmpty()
-                    ? query.OrderBy(x => x.Attempt.AttemptStarted)
+                    ? query.OrderBy(x => x.RegistrationRequestedOn).ThenBy(x => x.RegistrationIdentifier)
                     : query.OrderBy(filter.OrderBy);
 
                 return query
@@ -343,6 +393,8 @@ namespace InSite.Persistence
                         ExamFormTitle = x.Form.FormTitle,
                         ExamFormName = x.Form.FormName,
                         ExamFormCode = x.Form.FormCode,
+                        AdditionalExamFormNames = x.ExamForms.OrderBy(f => f.Sequence).Select(f => f.Form.FormName),
+                        AdditionalExamFormCodes = x.ExamForms.OrderBy(f => f.Sequence).Select(f => f.Form.FormCode),
                         DepartmentNames = x.Candidate.User.Memberships
                             .Where(m => m.Group.OrganizationIdentifier == organizationId
                                      && m.Group.GroupType == GroupTypes.Department)
@@ -362,7 +414,7 @@ namespace InSite.Persistence
                 var query = CreateQuery(filter, db);
 
                 query = string.IsNullOrEmpty(filter.OrderBy)
-                    ? query.OrderBy(x => x.Attempt.AttemptStarted)
+                    ? query.OrderBy(x => x.RegistrationIdentifier)
                     : query.OrderBy(filter.OrderBy);
 
                 return query.Select(x => (Guid?)x.RegistrationIdentifier).FirstOrDefault();
@@ -376,7 +428,7 @@ namespace InSite.Persistence
                 var query = CreateQuery(filter, db);
 
                 query = string.IsNullOrEmpty(filter.OrderBy)
-                    ? query.OrderBy(x => x.Attempt.AttemptStarted)
+                    ? query.OrderBy(x => x.RegistrationIdentifier)
                     : query.OrderBy(filter.OrderBy);
 
                 return query.ApplyPaging(filter).Select(x => x.RegistrationIdentifier).ToList();
@@ -400,7 +452,7 @@ namespace InSite.Persistence
                 var query = CreateQuery(filter, db);
 
                 query = string.IsNullOrEmpty(filter.OrderBy)
-                    ? query.OrderBy(x => x.Attempt.AttemptStarted)
+                    ? query.OrderBy(x => x.Candidate.UserFullName)
                     : query.OrderBy(filter.OrderBy);
 
                 return query.ApplyPaging(filter)
@@ -441,7 +493,8 @@ namespace InSite.Persistence
 
         public List<QRegistration> GetRegistrationsByEvent(Guid @event,
             string filterText = null, Paging paging = null, string orderBy = null,
-            bool includeAccommodations = false, bool includeAttempt = false, bool includeCandidate = false, bool includeForm = false, bool includeInstructors = false)
+            bool includeAccommodations = false, bool includeAttempt = false, bool includeCandidate = false,
+            bool includeForm = false, bool includeInstructors = false)
         {
             using (var db = CreateContext())
             {
@@ -683,7 +736,11 @@ namespace InSite.Persistence
                 query = query.Where(x => x.Form.BankIdentifier == inputFilter.BankIdentifier);
 
             if (inputFilter.ExamFormIdentifier.HasValue)
-                query = query.Where(x => x.ExamFormIdentifier == inputFilter.ExamFormIdentifier.Value);
+            {
+                var formId = inputFilter.ExamFormIdentifier.Value;
+                query = query.Where(x => x.ExamFormIdentifier == formId
+                                      || x.ExamForms.Any(f => f.ExamFormIdentifier == formId));
+            }
 
             if (inputFilter.AttemptFormIdentifiers.IsNotEmpty())
                 query = query.Where(x => inputFilter.AttemptFormIdentifiers.Contains(x.Attempt.FormIdentifier));

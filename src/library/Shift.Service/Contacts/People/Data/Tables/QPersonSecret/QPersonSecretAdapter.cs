@@ -9,17 +9,6 @@ namespace Shift.Service.Directory;
 
 public class QPersonSecretAdapter : IEntityAdapter
 {
-    public void Copy(ModifyPersonSecret modify, QPersonSecretEntity entity)
-    {
-        entity.PersonIdentifier = modify.PersonId;
-        entity.SecretType = modify.SecretType;
-        entity.SecretName = modify.SecretName;
-        entity.SecretExpiry = modify.SecretExpiry;
-        entity.SecretLifetimeLimit = modify.SecretLifetimeLimit;
-        entity.SecretValue = modify.SecretValue;
-
-    }
-
     public string Serialize(IEnumerable<PersonSecretModel> models, string format)
     {
         var content = string.Empty;
@@ -43,21 +32,6 @@ public class QPersonSecretAdapter : IEntityAdapter
         }
 
         return content;
-    }
-
-    public QPersonSecretEntity ToEntity(CreatePersonSecret create)
-    {
-        var entity = new QPersonSecretEntity
-        {
-            PersonIdentifier = create.PersonId,
-            SecretIdentifier = create.SecretId,
-            SecretType = create.SecretType,
-            SecretName = create.SecretName,
-            SecretExpiry = create.SecretExpiry,
-            SecretLifetimeLimit = create.SecretLifetimeLimit,
-            SecretValue = create.SecretValue
-        };
-        return entity;
     }
 
     public IEnumerable<PersonSecretModel> ToModel(IEnumerable<QPersonSecretEntity> entities)

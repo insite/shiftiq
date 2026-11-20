@@ -50,6 +50,8 @@ namespace Shift.Contract
         public int? AttemptPingInterval { get; set; }
         public int? AttemptTimeLimit { get; set; }
         public string UserAgent { get; set; }
+        public string AIProctoringProvider { get; set; }
+        public string AIProctoringSessionId { get; set; }
 
         // Timestamps
 

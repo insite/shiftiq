@@ -14,20 +14,38 @@ namespace InSite.Admin.Contacts.People.Forms
 {
     public partial class DeleteMembership : AdminBasePage, IHasParentLinkParameters
     {
-        private Guid? FromKey => Guid.TryParse(Request["from"], out var value) ? value : (Guid?)null;
+        #region Classes
 
-        private Guid? ToKey => Guid.TryParse(Request["to"], out var value) ? value : (Guid?)null;
-
-        private Guid? FromIdentifier
+        private enum ParentType
         {
-            get => ViewState[nameof(FromIdentifier)] as Guid?;
-            set => ViewState[nameof(FromIdentifier)] = value;
+            Group, Person
         }
 
-        private Guid? ToIdentifier
+        [Serializable]
+        private class ScreenData
         {
-            get => ViewState[nameof(ToIdentifier)] as Guid?;
-            set => ViewState[nameof(ToIdentifier)] = value;
+            public Guid MembershipId { get; }
+            public Guid GroupId { get; }
+            public Guid UserId { get; }
+            public ParentType Parent { get; }
+
+            public ScreenData(Membership entity, ParentType parent)
+            {
+                MembershipId = entity.MembershipIdentifier;
+                GroupId = entity.GroupIdentifier;
+                UserId = entity.UserIdentifier;
+                Parent = parent;
+            }
+        }
+
+        #endregion
+
+        private Guid MembershipId => Guid.TryParse(Request["id"], out var value) ? value : Guid.Empty;
+
+        private ScreenData Data
+        {
+            get => (ScreenData)ViewState[nameof(Data)];
+            set => ViewState[nameof(Data)] = value;
         }
 
         protected override void OnInit(EventArgs e)
@@ -39,35 +57,34 @@ namespace InSite.Admin.Contacts.People.Forms
 
         private void DeleteButton_Click(object sender, EventArgs e)
         {
-            if (FromKey == null || ToKey == null)
-            {
-                RedirectToSearch();
-
-                return;
-            }
-
-            var membership = MembershipSearch.Select(FromKey.Value, ToKey.Value);
-            if (membership != null)
-            {
-                MembershipStore.Delete(membership);
-
-                if (membership.MembershipType == MembershipType.Employee)
-                {
-                    var persons = ServiceLocator.PersonSearch.GetPersons(new QPersonFilter
-                    {
-                        EmployerGroupIdentifier = membership.GroupIdentifier,
-                        UserIdentifier = membership.UserIdentifier
-                    });
-
-                    foreach (var person in persons)
-                    {
-                        person.EmployerGroupIdentifier = null;
-                        PersonStore.Update(person);
-                    }
-                }
-            }
+            if (Data != null)
+                Delete(Data.MembershipId);
 
             HttpResponseHelper.Redirect(GetReturnUrlInternal());
+        }
+
+        private void Delete(Guid membershipId)
+        {
+            var membership = MembershipSearch.SelectFirst(x => x.MembershipIdentifier == membershipId);
+            if (membership == null || membership.UserIdentifier != Data.UserId || membership.GroupIdentifier != Data.GroupId)
+                return;
+
+            MembershipStore.Delete(membership.MembershipIdentifier);
+
+            if (membership.MembershipType != MembershipType.Employee)
+                return;
+
+            var persons = ServiceLocator.PersonSearch.GetPersons(new QPersonFilter
+            {
+                EmployerGroupIdentifier = membership.GroupIdentifier,
+                UserIdentifier = membership.UserIdentifier
+            });
+
+            foreach (var person in persons)
+            {
+                person.EmployerGroupIdentifier = null;
+                PersonStore.Update(person);
+            }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -77,36 +94,28 @@ namespace InSite.Admin.Contacts.People.Forms
             if (IsPostBack)
                 return;
 
-            if (FromKey == null || ToKey == null)
-            {
+            var entity = MembershipSearch.SelectFirst(x => x.MembershipIdentifier == MembershipId, x => x.Group, x => x.User);
+            if (entity == null || entity.Group.OrganizationIdentifier != Organization.OrganizationIdentifier)
                 RedirectToSearch();
-                return;
-            }
 
-            var role = MembershipSearch.SelectFirst(x => x.GroupIdentifier == FromKey && x.UserIdentifier == ToKey, x => x.Group, x => x.User);
-            if (role == null || role.Group.OrganizationIdentifier != CurrentSessionState.Identity.Organization.OrganizationIdentifier)
-                HttpResponseHelper.Redirect($"/ui/admin/contacts/people/search", true);
+            var parent = Request.UrlReferrer?.ToString().Contains("/groups/") == true ? ParentType.Group : ParentType.Person;
+            var screenData = Data = new ScreenData(entity, parent);
 
-            if (Request.UrlReferrer != null && Request.UrlReferrer.ToString().Contains("/groups/"))
-                FromIdentifier = role.Group.GroupIdentifier;
-            else
-                ToIdentifier = role.User.UserIdentifier;
+            BuildBreadcrumbs(entity);
 
-            BuildBreadcrumbs(role);
-
-            var _person = UserSearch.Select(ToKey.Value);
+            var _person = UserSearch.Select(screenData.UserId);
             FullName.Text = $"<a href=\"/ui/admin/contacts/people/edit?contact={_person.UserIdentifier}\">{_person.FullName}</a>";
 
-            AssignedOn.Text = role.Assigned.Format(User.TimeZone);
-            RoleType.Text = role.MembershipType ?? "None";
+            AssignedOn.Text = entity.Assigned.Format(User.TimeZone);
+            RoleType.Text = entity.MembershipType ?? "None";
 
-            var group = ServiceLocator.GroupSearch.GetGroup(FromKey.Value);
+            var group = ServiceLocator.GroupSearch.GetGroup(screenData.GroupId);
             GroupName.Text = group.GroupName;
             GroupLink.HRef = $"/ui/admin/contacts/groups/edit?contact={group.GroupIdentifier}";
 
             var reasonCount = ServiceLocator.MembershipReasonSearch.Count(new QMembershipReasonFilter
             {
-                MembershipIdentifier = role.MembershipIdentifier
+                MembershipIdentifier = entity.MembershipIdentifier
             });
 
             ReasonCount.Text = reasonCount.ToString("n0");
@@ -118,15 +127,15 @@ namespace InSite.Admin.Contacts.People.Forms
         {
             BreadcrumbItem parentSearch, parentEditor;
 
-            if (FromIdentifier.HasValue)
+            if (Data.Parent == ParentType.Group)
             {
                 parentSearch = new BreadcrumbItem("Groups", "/ui/admin/contacts/groups/search");
-                parentEditor = new BreadcrumbItem("Edit Group", $"/ui/admin/contacts/groups/edit?contact={FromIdentifier.Value}");
+                parentEditor = new BreadcrumbItem("Edit Group", $"/ui/admin/contacts/groups/edit?contact={Data.GroupId}");
             }
             else
             {
                 parentSearch = new BreadcrumbItem("People", "/ui/admin/contacts/people/search");
-                parentEditor = new BreadcrumbItem("Edit Person", $"/ui/admin/contacts/people/edit?contact={ToIdentifier.Value}");
+                parentEditor = new BreadcrumbItem("Edit Person", $"/ui/admin/contacts/people/edit?contact={Data.UserId}");
             }
 
             var title = $"<span class='form-text'>Assignment from </span>{role.Group.GroupName}<span class='form-text'> group to </span>{role.User.FullName}<span class='form-text'> user</span>";
@@ -146,9 +155,9 @@ namespace InSite.Admin.Contacts.People.Forms
             if (!string.IsNullOrEmpty(url))
                 return url;
 
-            return FromIdentifier.HasValue
-                ? $"/ui/admin/contacts/groups/edit?contact={FromIdentifier}&panel=people"
-                : $"/ui/admin/contacts/people/edit?contact={ToIdentifier}&panel=groups";
+            return Data.Parent == ParentType.Group
+                ? $"/ui/admin/contacts/groups/edit?contact={Data.GroupId}&panel=people"
+                : $"/ui/admin/contacts/people/edit?contact={Data.UserId}&panel=groups";
         }
 
         private void RedirectToSearch() => HttpResponseHelper.Redirect("/ui/admin/contacts/people/search");
@@ -156,7 +165,7 @@ namespace InSite.Admin.Contacts.People.Forms
         public string GetParentLinkParameters(IWebRoute parent)
         {
             return parent.Name.EndsWith("/edit")
-                ? $"contact={ToIdentifier}"
+                ? $"contact={Data.UserId}"
                 : null;
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Web.UI;
 
 using InSite.Common.Web.UI;
@@ -41,8 +42,8 @@ namespace InSite.Custom.CMDS.Admin.Reports.Controls
             {
                 SnapshotDate.Items.Add(new ComboBoxOption
                 {
-                    Text = item.AsAt.Format(User.TimeZone),
-                    Value = DateTimeOffsetToString(item.AsAt)
+                    Text = SnapshotDateToString(item.AsAt),
+                    Value = SnapshotDateToString(item.AsAt)
                 });
             }
         }
@@ -85,9 +86,7 @@ namespace InSite.Custom.CMDS.Admin.Reports.Controls
                 }
                 else if (!string.IsNullOrEmpty(SnapshotDate.Value))
                 {
-                    var date = DateTimeOffsetFromString(SnapshotDate.Value);
-                    filter.AsAt.Since = date;
-                    filter.AsAt.Before = date;
+                    filter.SnapshotAsAt = SnapshotDateFromString(SnapshotDate.Value);
                 }
 
                 GetCheckedShowColumns(filter);
@@ -112,10 +111,10 @@ namespace InSite.Custom.CMDS.Admin.Reports.Controls
                 {
                     SnapshotDate.ClearSelection();
 
-                    if (filter.AsAt?.Since != null)
+                    if (filter.SnapshotAsAt != null)
                     {
-                        var dtoStr = DateTimeOffsetToString(filter.AsAt.Since.Value);
-                        var option = SnapshotDate.FindOptionByValue(dtoStr);
+                        var dateStr = SnapshotDateToString(filter.SnapshotAsAt.Value);
+                        var option = SnapshotDate.FindOptionByValue(dateStr);
                         if (option != null)
                             option.Selected = true;
                     }
@@ -139,18 +138,14 @@ namespace InSite.Custom.CMDS.Admin.Reports.Controls
             Criticality.ClearSelection();
         }
 
-        private static string DateTimeOffsetToString(DateTimeOffset value)
+        private static string SnapshotDateToString(DateTime value)
         {
-            return $"{value.DateTime.Ticks}:{(int)value.Offset.TotalMinutes}";
+            return value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
 
-        private static DateTimeOffset DateTimeOffsetFromString(string value)
+        private static DateTime SnapshotDateFromString(string value)
         {
-            var parts = value.Split(':');
-            var ticks = long.Parse(parts[0]);
-            var offset = int.Parse(parts[1]);
-
-            return new DateTimeOffset(ticks, TimeSpan.FromMinutes(offset));
+            return DateTime.ParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
     }
 }

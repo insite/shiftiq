@@ -24,7 +24,7 @@
         </h5>
 
         <div class="form-text">
-            posted <%# TimeZoneInfo.ConvertTime((DateTimeOffset)Eval("PostedOn"), User.TimeZone).Humanize() %>
+            posted <%# TimeZones.ConvertTime((DateTimeOffset)Eval("PostedOn"), User.TimeZone).Humanize() %>
         </div>
 
         <div class="mt-1 fw-light">

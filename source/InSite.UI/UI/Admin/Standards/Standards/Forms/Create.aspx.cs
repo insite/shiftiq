@@ -778,7 +778,7 @@ namespace InSite.Admin.Standards.Standards.Forms
             Tiers.Text = DefaultTiers;
             Outline.Text = DefaultOutlines[0].Text;
             AuthorName.Text = User.FullName;
-            AuthorDate.Value = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
+            AuthorDate.Value = TimeZones.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
             StandardType.Value = Shift.Constant.StandardType.Competency;
 
             DefaultOutlineRepeater.DataSource = DefaultOutlines;

@@ -48,15 +48,17 @@ namespace Shift.Common.Linq
         private static readonly ConcurrentDictionary<(Type EntityType, string PropertyName), (Type Type, LambdaExpression Body)> _orderBySelectorCache =
             new ConcurrentDictionary<(Type, string), (Type Type, LambdaExpression Body)>();
 
-        public static IQueryable<TSource> OrderBy<TSource>(this IQueryable<TSource> query, string sortExpression)
+        public static IQueryable<TSource> OrderBy<TSource>(this IQueryable<TSource> query, string sortExpression, string defaultSortExpression = null)
         {
-            if (sortExpression.IsEmpty())
+            var finalSortExpression = sortExpression.IsNotEmpty() ? sortExpression : defaultSortExpression;
+
+            if (finalSortExpression.IsEmpty())
                 return query;
 
             var entityType = typeof(TSource);
             IOrderedQueryable<TSource> orderedQuery = null;
 
-            var sortExpressions = sortExpression.Split(new[] { ',' }, StringSplitOptions.None);
+            var sortExpressions = finalSortExpression.Split(new[] { ',' }, StringSplitOptions.None);
             foreach (var expr in sortExpressions)
             {
                 var exprInfo = GetOrderByExpressionInfo(expr);

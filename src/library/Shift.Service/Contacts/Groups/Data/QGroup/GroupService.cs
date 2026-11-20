@@ -78,13 +78,23 @@ public class GroupService : IEntityService
         return await _reader.SearchAsync(criteria, cancellation);
     }
 
-    public async Task<string[]> SearchUserRolesAsync(Guid partitionId, Guid organizationId, Guid userId)
+    public async Task<List<GroupMatch>> SearchUserRolesAsync(Guid partitionId, Guid organizationId, Guid userId, CancellationToken cancellation = default)
     {
-        return await _reader.SearchUserRolesAsync(partitionId, organizationId, userId);
+        return await _reader.SearchUserRolesAsync(partitionId, organizationId, userId, cancellation);
     }
 
     public string Serialize<T>(IEnumerable<T> models, string format, string includes)
     {
         return _adapter.Serialize(models, format, includes);
+    }
+
+    public async Task<IEnumerable<VenueMatch>> SearchVenuesAsync(SearchVenues criteria, CancellationToken cancellation = default)
+    {
+        return await _reader.SearchVenuesAsync(criteria, cancellation);
+    }
+
+    public async Task<int> CountVenuesAsync(SearchVenues criteria, CancellationToken cancellation = default)
+    {
+        return await _reader.CountVenuesAsync(criteria, cancellation);
     }
 }

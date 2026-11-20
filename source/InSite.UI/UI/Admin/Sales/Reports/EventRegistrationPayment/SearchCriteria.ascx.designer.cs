@@ -186,6 +186,15 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
         protected global::InSite.Common.Web.UI.TextBox PaymentTransactionId;
 
         /// <summary>
+        /// TaxRegion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TaxRegionComboBox TaxRegion;
+
+        /// <summary>
         /// ShowColumns control.
         /// </summary>
         /// <remarks>

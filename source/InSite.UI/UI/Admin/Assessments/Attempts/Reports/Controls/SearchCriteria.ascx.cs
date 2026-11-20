@@ -40,6 +40,7 @@ namespace InSite.Admin.Attempts.Reports.Controls
                     LearnerName = CandidateName.Text,
                     LearnerCode = CandidateCode.Text,
                     LearnerEmail = CandidateEmail.Text,
+                    LearnerEmployerId = LearnerEmployerId.Value,
                     AssessorName = AssessorName.Text,
                     EventIdentifier = ExamEventID.Value,
                     EventFormat = EventFormat.Value,
@@ -90,6 +91,7 @@ namespace InSite.Admin.Attempts.Reports.Controls
                 CandidateName.Text = value.LearnerName;
                 CandidateCode.Text = value.LearnerCode;
                 CandidateEmail.Text = value.LearnerEmail;
+                LearnerEmployerId.Value = value.LearnerEmployerId;
                 AssessorName.Text = value.AssessorName;
                 ExamCandidateID.Value = value.LearnerUserIdentifier;
 
@@ -178,6 +180,8 @@ namespace InSite.Admin.Attempts.Reports.Controls
             var personCodeLabel = LabelHelper.GetLabelContentText("Person Code");
             CandidateCode.EmptyMessage = personCodeLabel;
             CustomValidator.ErrorMessage = $"Please select 'Exam Bank' or 'Exam Candidate Name' or 'Exam Candidate {personCodeLabel}' or 'Exam Candidate Email'";
+
+            LearnerEmployerId.Filter.OrganizationIdentifier = Organization.Identifier;
         }
 
         private void ExamBankFrameworkID_ValueChanged(object sender, EventArgs e) => OnExamBankFrameworkSelected();
@@ -246,6 +250,7 @@ namespace InSite.Admin.Attempts.Reports.Controls
             CandidateName.Text = null;
             CandidateCode.Text = null;
             CandidateEmail.Text = null;
+            LearnerEmployerId.Value = null;
             AssessorName.Text = null;
 
             ExamEventID.Value = null;

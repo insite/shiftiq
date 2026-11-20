@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -111,6 +112,13 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
 
                 LoadData();
             }
+            else if (StringHelper.Equals(e.CommandName, "DeleteStoredFile") && AllowEdit)
+            {
+                if (Guid.TryParse((string)e.CommandArgument, out var fileId))
+                    DeleteStoredFile(fileId);
+
+                LoadData();
+            }
         }
 
         private void RefreshDownloadsButton_Click(object sender, EventArgs e)
@@ -151,10 +159,59 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
                 x => x.ContainerIdentifier == ContainerGuid && x.UploadType == UploadType.CmdsFile,
                 "Title");
 
-            Repeater.DataSource = uploads;
+            var items = uploads
+                .Select(x => new DownloadItem
+                {
+                    Identifier = x.UploadIdentifier,
+                    DeleteCommand = "DeleteFile",
+                    Url = CmdsUploadProvider.GetFileRelativeUrl(x.ContainerIdentifier, x.Name),
+                    Title = x.Title,
+                    Description = x.Description,
+                    ContentSize = x.ContentSize ?? 0
+                })
+                .ToList();
+
+            // Files attached to the credential through the new file storage, such as a
+            // certificate a learner uploaded for review.
+            var storedFiles = ServiceLocator.FileSearch.GetModels(null, ContainerGuid, null, false);
+
+            items.AddRange(storedFiles
+                .OrderBy(x => x.FileName)
+                .Select(x => new DownloadItem
+                {
+                    Identifier = x.FileIdentifier,
+                    DeleteCommand = "DeleteStoredFile",
+                    Url = ServiceLocator.StorageService.GetFileUrl(x.FileIdentifier, x.FileName, true),
+                    Title = x.FileName,
+                    ContentSize = x.FileSize
+                }));
+
+            Repeater.DataSource = items;
             Repeater.DataBind();
 
-            Repeater.Visible = uploads.Count > 0;
+            Repeater.Visible = items.Count > 0;
+        }
+
+        private void DeleteStoredFile(Guid fileId)
+        {
+            var file = ServiceLocator.FileSearch.GetModels(null, ContainerGuid, null, false)
+                .FirstOrDefault(x => x.FileIdentifier == fileId);
+
+            // Only a file attached to this container can be deleted from here.
+            if (file == null)
+                return;
+
+            ServiceLocator.StorageService.Delete(fileId);
+        }
+
+        private class DownloadItem
+        {
+            public Guid Identifier { get; set; }
+            public string DeleteCommand { get; set; }
+            public string Url { get; set; }
+            public string Title { get; set; }
+            public string Description { get; set; }
+            public int ContentSize { get; set; }
         }
 
         #endregion

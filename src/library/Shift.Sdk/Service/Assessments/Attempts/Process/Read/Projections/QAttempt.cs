@@ -27,6 +27,8 @@ namespace InSite.Application.Attempts.Read
         public string AttemptTag { get; set; }
         public string AttemptLanguage { get; set; }
         public string UserAgent { get; set; }
+        public string AIProctoringProvider { get; set; }
+        public string AIProctoringSessionId { get; set; }
 
         public bool AttemptIsPassing { get; set; }
 
@@ -70,6 +72,7 @@ namespace InSite.Application.Attempts.Read
         public virtual ICollection<QRegistration> Registrations { get; set; }
         public virtual ICollection<QAttemptSolution> Solutions { get; set; }
         public virtual ICollection<QAttemptSection> Sections { get; set; }
+        public virtual ICollection<QRegistrationExamForm> RegistrationExamForms { get; set; }
 
         public bool IsTimeLimitEnabled => AttemptTimeLimit.HasValue && AttemptTimeLimit.Value > 0
             || SectionsAsTabsEnabled && !TabNavigationEnabled
@@ -84,6 +87,7 @@ namespace InSite.Application.Attempts.Read
             Registrations = new HashSet<QRegistration>();
             Solutions = new HashSet<QAttemptSolution>();
             Sections = new HashSet<QAttemptSection>();
+            RegistrationExamForms = new HashSet<QRegistrationExamForm>();
         }
     }
 }

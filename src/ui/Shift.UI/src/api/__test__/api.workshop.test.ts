@@ -218,7 +218,7 @@ test("PUT /api/assessments/workshops/banks/<bankId>/questions/<questionId>/optio
     const duplicatedQuestionId = duplicated!.QuestionId!;
     const duplicatedOptionNumber = duplicated!.Questions.find(x => x.QuestionId === duplicatedQuestionId)!.Options![0].Number;
     const optionTitle = createUniqueText("Mutable Option");
-    const optionTitleHtml = await shiftClient.workshop.modifyOption(mutableBankId, duplicatedQuestionId, duplicatedOptionNumber, "Title", null, optionTitle);
+    const optionTitleHtml = (await shiftClient.workshop.modifyOption(mutableBankId, duplicatedQuestionId, duplicatedOptionNumber, "Title", null, optionTitle))?.Html;
     await shiftClient.workshop.modifyOption(mutableBankId, duplicatedQuestionId, duplicatedOptionNumber, "Points", null, "7500");
 
     expect(optionTitleHtml).toContain(optionTitle);
@@ -331,7 +331,7 @@ test("PUT /api/assessments/workshops/specs/<specificationId>: authenticated", as
 
     try {
         const saved = await shiftClient.workshop.modifySpec(mutableSpecificationId, updatedInput);
-        expect(saved).toBe(true);
+        expect(saved).toBeTypeOf("object");
 
         const updated = await shiftClient.workshop.retrieveSpec(mutableSpecificationId, null, null);
         expect(updated).not.toBe(null);

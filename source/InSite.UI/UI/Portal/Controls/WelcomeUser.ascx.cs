@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Common.Web.UI;
 
@@ -15,7 +15,7 @@ namespace InSite.UI.Portal.Controls
             if (IsPostBack || !Identity.IsAuthenticated)
                 return;
 
-            var time = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, User.TimeZone);
+            var time = TimeZones.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
             TimeLiteral.Text = Translate($"{time:dddd, MMMM d, yyyy}");
 
             var greeting = Translate(GetGreeting(time));

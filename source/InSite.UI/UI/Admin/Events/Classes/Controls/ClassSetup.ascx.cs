@@ -91,6 +91,7 @@ namespace InSite.UI.Admin.Events.Classes.Controls
 
             EnableEventBillingCode.Text = ev.BillingCodeEnabled ? "Yes" : "No";
             AllowMultipleRegistrations.Text = ev.AllowMultipleRegistrations ? "Yes" : "No";
+            FormAttachmentLimit.Text = ev.FormAttachmentLimit.HasValue ? $"{ev.FormAttachmentLimit.Value:n0}" : "No Limit";
             CreditHours.Text = ev.CreditHours.HasValue ? $"{ev.CreditHours:n2}" : "None";
 
             FormPublicationStatus.Visible = isPublished;
@@ -129,6 +130,10 @@ namespace InSite.UI.Admin.Events.Classes.Controls
             PersonCodeIsRequiredLink.NavigateUrl =
             AllowMultipleRegistrationsLink.NavigateUrl =
                 $"/ui/admin/events/classes/limit-capacity?event={eventId}";
+
+            FormAttachmentLimitField.Visible = Organization.Toolkits.Events.AllowMultipleAssessmentForms;
+            FormAttachmentLimitLink.NavigateUrl = $"/ui/admin/events/classes/limit-form?event={eventId}";
+            FormAttachmentLimitLink.Visible = canEdit;
 
             EventTitleLink.Visible = canEdit;
             AchievementTitleLink.Visible = canEdit;

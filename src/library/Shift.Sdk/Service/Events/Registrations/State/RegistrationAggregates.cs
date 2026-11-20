@@ -1,8 +1,8 @@
 ﻿using System;
-
-using Shift.Common.Timeline.Changes;
+using System.Linq;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Domain.Registrations
 {
@@ -14,9 +14,9 @@ namespace InSite.Domain.Registrations
 
         #region Methods (commands)
 
-        public void AssignAttempt(Guid attempt)
+        public void AssignAttempt(Guid? form, Guid attempt)
         {
-            Apply(new AttemptAssigned(attempt));
+            Apply(new AttemptAssigned(form, attempt));
         }
 
         public void ChangeApproval(string status, string reason, ProcessState process, string previous)
@@ -29,9 +29,16 @@ namespace InSite.Domain.Registrations
             Apply(new CandidateTypeChanged(type));
         }
 
-        public void ChangeEligibility(string status, string reason, ProcessState process)
+        public void ChangeEligibility(Guid? form, string status, string reason, ProcessState process)
         {
-            Apply(new EligibilityChanged(status, reason, process));
+            var forms = Data.Forms.AsEnumerable();
+            if (form.HasValue)
+                forms = Data.Forms.Where(x => x.FormIdentifier == form.Value);
+
+            if (forms.Any() && forms.All(x => x.EligibilityStatus == status))
+                return;
+
+            Apply(new EligibilityChanged(form, status, reason, process));
         }
 
         public void ChangeSynchronization(string status, ProcessState process)
@@ -49,9 +56,9 @@ namespace InSite.Domain.Registrations
             Apply(new EventChanged(@event, reason, cancelEmptyEvent));
         }
 
-        public void LimitExamTime(int? minutes)
+        public void LimitExamTime(Guid form, int? minutes)
         {
-            Apply(new ExamTimeLimited(minutes));
+            Apply(new ExamTimeLimited(form, minutes));
         }
 
         public void AssignCustomer(Guid? customer)
@@ -103,6 +110,14 @@ namespace InSite.Domain.Registrations
 
         public void ChangeRegistrationPassword(string password)
             => Apply(new RegistrationPasswordChanged(password));
+
+        public void ChangeExamFormPassword(Guid form, string password)
+        {
+            if (!Data.Forms.Any(x => x.FormIdentifier == form))
+                return;
+
+            Apply(new ExamFormPasswordChanged(form, password));
+        }
 
         public void CancelRegistration(string reason, bool cancelEmptyEvent)
         {
@@ -193,6 +208,16 @@ namespace InSite.Domain.Registrations
             Apply(e);
         }
 
+        public void AddExamForm(Guid examForm, Guid form)
+        {
+            if (Data.Forms.Any(x => x.FormIdentifier == form))
+                return;
+
+            var password = RandomStringGenerator.CreatePasscode();
+
+            Apply(new ExamFormAdded(examForm, form, password));
+        }
+
         public void AssignExamForm(Guid form, Guid? previousForm)
         {
             Apply(new ExamFormAssigned(form, previousForm));
@@ -255,6 +280,28 @@ namespace InSite.Domain.Registrations
                 return;
 
             Apply(new RegistrationBillingCodeModified(billingCode));
+        }
+
+        public void ChangeExamForm(Guid fromForm, Guid toForm)
+        {
+            if (fromForm == toForm)
+                return;
+
+            if (!Data.Forms.Any(x => x.FormIdentifier == fromForm))
+                return;
+
+            if (Data.Forms.Any(x => x.FormIdentifier == toForm))
+                return;
+
+            Apply(new ExamFormChanged(fromForm, toForm));
+        }
+
+        public void RemoveExamForm(Guid form)
+        {
+            if (!Data.Forms.Any(x => x.FormIdentifier == form))
+                return;
+
+            Apply(new ExamFormRemoved(form));
         }
 
         #endregion

@@ -10,7 +10,6 @@ using InSite.Persistence.Plugin.CMDS;
 using Shift.Common;
 using Shift.Common.Events;
 using Shift.Constant;
-using Shift.Constant.CMDS;
 
 namespace InSite.UI.CMDS.Common.Controls.User
 {
@@ -83,6 +82,19 @@ namespace InSite.UI.CMDS.Common.Controls.User
         {
             get => GroupByComboBox.Value.ToEnum<GroupByEnum>();
         }
+
+        /// <summary>
+        /// The organization whose achievements the search offers, alongside the partition (Global)
+        /// organization. Defaults to the signed-in organization; set it when the entity being
+        /// edited belongs to a different organization.
+        /// </summary>
+        public Guid? OwnerOrganizationIdentifier
+        {
+            get => ViewState[nameof(OwnerOrganizationIdentifier)] as Guid?;
+            set => ViewState[nameof(OwnerOrganizationIdentifier)] = value;
+        }
+
+        public string Keyword => SearchText.Text;
 
         #endregion
 
@@ -254,6 +266,12 @@ namespace InSite.UI.CMDS.Common.Controls.User
 
             var hasUnassignedAchievements = unassignedAchievements.Count > 0;
 
+            if (!hasAssignedAchievements)
+                AchievementNoMatch.InnerText = GetAssignedEmptyMessage(keyword);
+
+            if (!hasUnassignedAchievements)
+                NewAchievementNoMatch.InnerText = GetUnassignedEmptyMessage(owners, keyword, hasMatchingAchievements);
+
             var isGrouping = IsGroupingEnabled();
 
             if (isGrouping)
@@ -291,15 +309,74 @@ namespace InSite.UI.CMDS.Common.Controls.User
             return assignedAchievements.Count;
         }
 
-        private Guid[] SelectedOwnerOrganizationIdentifiers()
+        private string GetAssignedEmptyMessage(string keyword)
         {
-            var organizationId = Organization.Identifier;
-            var partitionId = ServiceLocator.Partition.Identifier;
+            return string.IsNullOrEmpty(keyword)
+                ? $"There are no achievements assigned to this {EntityName}."
+                : "There are no assigned achievements matching your search criteria.";
+        }
 
+        /// <summary>
+        /// Explains why nothing is available to add. An empty list is usually not the keyword's
+        /// fault: everything may already be assigned, or the department behind the list may have
+        /// nothing to offer in this scope.
+        /// </summary>
+        private string GetUnassignedEmptyMessage(Guid[] owners, string keyword, bool hasMatchingAchievements)
+        {
+            var hasKeyword = !string.IsNullOrEmpty(keyword);
+
+            if (hasMatchingAchievements)
+            {
+                return hasKeyword
+                    ? $"Every achievement matching your search criteria is already assigned to this {EntityName}."
+                    : $"Every available achievement is already assigned to this {EntityName}.";
+            }
+
+            var isBroadestScope = SelectedScope() == OrganizationScopeSelector.ScopeBoth;
+            var scopePhrase = isBroadestScope ? string.Empty : " in the selected scope";
+
+            if (DepartmentId.HasValue)
+            {
+                // With no keyword the department itself is empty. With one, check whether the
+                // department has anything at all before blaming the keyword.
+                var isDepartmentEmpty = !hasKeyword;
+                if (hasKeyword)
+                {
+                    var departmentAchievements = GetMatchingAchievements(owners, null, DepartmentId);
+                    isDepartmentEmpty = departmentAchievements.Count == 0;
+                }
+
+                if (isDepartmentEmpty)
+                {
+                    var department = ServiceLocator.GroupSearch.GetGroup(DepartmentId.Value);
+                    var subject = department != null
+                        ? $"The department \"{department.GroupName}\""
+                        : "The department";
+
+                    return $"{subject} has no achievements{scopePhrase}. "
+                        + $"Add achievements to the department first, then add them to this {EntityName}.";
+                }
+            }
+
+            return hasKeyword
+                ? "There are no achievements matching your search criteria."
+                : $"There are no achievements{scopePhrase}.";
+        }
+
+        private string SelectedScope()
+        {
             // When the scope selector is hidden, default to the broadest scope.
-            var scope = Visibility.IsHidden(AccountScope)
+            return Visibility.IsHidden(AccountScope)
                 ? OrganizationScopeSelector.ScopeBoth
                 : AccountScope.Value;
+        }
+
+        private Guid[] SelectedOwnerOrganizationIdentifiers()
+        {
+            var organizationId = OwnerOrganizationIdentifier ?? Organization.Identifier;
+            var partitionId = ServiceLocator.Partition.Identifier;
+
+            var scope = SelectedScope();
 
             switch (scope)
             {

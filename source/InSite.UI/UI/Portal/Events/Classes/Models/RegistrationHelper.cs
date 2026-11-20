@@ -175,7 +175,7 @@ namespace InSite.UI.Portal.Events.Classes.Models
                     employerStatus = TCollectionItemCache.GetName(employer.GroupStatusItemIdentifier);
                 }
 
-                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(candidate.User.TimeZone);
+                var timeZone = candidate.User.TimeZone;
                 var eventDate = @event.EventScheduledEnd.HasValue
                     ? $"{@event.EventScheduledStart.FormatDateOnly(timeZone)} - {@event.EventScheduledEnd.Value.FormatDateOnly(timeZone)}"
                     : $"{@event.EventScheduledStart.FormatDateOnly(timeZone)}";

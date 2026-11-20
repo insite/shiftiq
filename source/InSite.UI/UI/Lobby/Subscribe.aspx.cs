@@ -170,7 +170,7 @@ namespace InSite.UI.Lobby
                 }
                 else
                 {
-                    MembershipStore.Delete(MembershipSearch.Select(groupIdentifier, user));
+                    MembershipStore.Delete(MembershipSearch.Select(groupIdentifier, user, Organization.Identifier));
                     unsubscribed.Add(groupSelector.Text);
                 }
             }

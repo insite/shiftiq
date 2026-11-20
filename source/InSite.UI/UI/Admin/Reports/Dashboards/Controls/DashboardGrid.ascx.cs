@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -416,7 +416,7 @@ namespace InSite.UI.Admin.Reports.Dashboards
                 {
                     var value = row[column];
                     if (value is DateTimeOffset d)
-                        row[column] = TimeZones.ConvertFromUtc(d, User.TimeZone);
+                        row[column] = TimeZones.ConvertTime(d, User.TimeZone);
                 }
             }
         }

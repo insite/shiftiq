@@ -9,6 +9,7 @@
         public static string Leaders => "CMDS Leaders";
         public static string Managers => "CMDS Managers";
         public static string OfficeAdministrators => "CMDS Office Administrators";
+        public static string ProgramEnrollmentReviewers => "CMDS Program Enrollment Reviewers";
         public static string Programmers => "CMDS Programmers";
         public static string SuperValidators => "CMDS Super Validators";
         public static string Supervisors => "CMDS Supervisors";

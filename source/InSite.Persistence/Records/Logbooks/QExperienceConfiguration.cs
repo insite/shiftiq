@@ -18,6 +18,7 @@ namespace InSite.Persistence
 
             HasRequired(a => a.Journal).WithMany(b => b.Experiences).HasForeignKey(c => c.JournalIdentifier).WillCascadeOnDelete(false);
             HasOptional(a => a.Validator).WithMany(b => b.ValidatorExperiences).HasForeignKey(c => c.ValidatorUserIdentifier).WillCascadeOnDelete(false);
+            HasOptional(a => a.Supervisor).WithMany().HasForeignKey(c => c.SupervisorUserIdentifier).WillCascadeOnDelete(false);
         }
     }
 }

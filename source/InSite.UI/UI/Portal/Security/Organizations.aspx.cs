@@ -69,6 +69,19 @@ namespace InSite.UI.Portal.Security
         private static List<PartitionRegistration> _cachedPartitions;
         private static DateTimeOffset _cachedPartitionsExpiry;
 
+        // Evicts the process-wide Hub partition cache so the next org-selector load refetches
+        // names from the Hub. Neither the admin "Clear Cache" nor "Resync with Hub" action used to
+        // touch this cache, so Hub-sourced org names stayed stale until the TTL lapsed or the app
+        // pool restarted. Both actions now call this to force an immediate refresh.
+        public static void ClearPartitionCache()
+        {
+            lock (_partitionsLock)
+            {
+                _cachedPartitions = null;
+                _cachedPartitionsExpiry = default;
+            }
+        }
+
         #endregion
 
         #region Properties
@@ -179,7 +192,7 @@ namespace InSite.UI.Portal.Security
             }
             catch (Exception ex)
             {
-                AppSentry.SentryWarning(ex);
+                AppSentry.SentryError(ex);
                 partitions = new List<PartitionRegistration>();
                 return false;
             }

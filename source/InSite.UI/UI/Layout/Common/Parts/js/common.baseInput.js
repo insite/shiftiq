@@ -47,6 +47,8 @@
 
                 $elem
                     .on('keypress', onNumericKeypress)
+                    .on('beforeinput', onNumericBeforeInput)
+                    .on('input', onNumericInput)
                     .on('change', onNumericChange);
 
                 _onfocus = onNumericFocus;
@@ -383,13 +385,44 @@
 
         e.preventDefault();
 
-        const $this = $(this);
+        showNumericError($(this));
+    }
 
+    function onNumericBeforeInput() {
+        $(this).data('baseInput').snapshot = {
+            value: this.value,
+            start: this.selectionStart,
+            end: this.selectionEnd
+        };
+    }
+
+    function onNumericInput() {
+        const $this = $(this);
+        const settings = $this.data('baseInput');
+        const snapshot = settings.snapshot;
+
+        settings.snapshot = null;
+
+        const pattern = settings.numeric.group == true ? /^[\s\d.,-]*$/ : /^[\s\d.-]*$/;
+        if (pattern.test(this.value))
+            return;
+
+        if (snapshot) {
+            this.value = snapshot.value;
+            this.setSelectionRange(snapshot.start, snapshot.end);
+        } else {
+            this.value = '';
+        }
+
+        showNumericError($this);
+    }
+
+    function showNumericError($this) {
         const timeoutHandler = parseInt($this.data('invalid-timeout'));
         if (!isNaN(timeoutHandler))
             clearTimeout(timeoutHandler);
         else
-            $(this).addClass('input-error');
+            $this.addClass('input-error');
 
         $this.data('invalid-timeout', setTimeout(function ($this) {
             $this.removeClass('input-error');

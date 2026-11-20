@@ -1,13 +1,19 @@
 import { ReactNode, useMemo, useReducer } from "react";
 import { WorkshopOtherProviderContext } from "./WorkshopOtherProviderContext";
 import { WorkshopOtherState } from "./states/WorkshopOtherState";
+import { WorkshopProblemQuestion } from "./models/WorkshopProblemQuestion";
 
 interface InitStateAction {
     type: "initState";
     state: WorkshopOtherState;
 }
 
-type Action = InitStateAction;
+interface ModifyProblemQuestionsAction {
+    type: "modifyProblemQuestions";
+    problemQuestions: WorkshopProblemQuestion[];
+}
+
+type Action = InitStateAction | ModifyProblemQuestionsAction;
 
 const _initialState: WorkshopOtherState = {
     bankId: "empty",
@@ -19,7 +25,7 @@ const _initialState: WorkshopOtherState = {
     readOnly: true,
 }
 
-function reducer(_: WorkshopOtherState, action: Action): WorkshopOtherState {
+function reducer(state: WorkshopOtherState, action: Action): WorkshopOtherState {
     const { type } = action;
     switch (type) {
         case "initState":
@@ -27,6 +33,14 @@ function reducer(_: WorkshopOtherState, action: Action): WorkshopOtherState {
             return {
                 ...action.state,
             };
+        }
+
+        case "modifyProblemQuestions":
+        {
+            return {
+                ...state,
+                problemQuestions: action.problemQuestions,
+            }
         }
 
         default:
@@ -44,6 +58,9 @@ export default function WorkshopOtherProvider({ children }: Props) {
     const methods = useMemo(() => ({
         initOtherState(state: WorkshopOtherState): void {
             dispatch({ type: "initState", state });
+        },
+        modifyProblemQuestions(problemQuestions: WorkshopProblemQuestion[]): void {
+            dispatch({ type: "modifyProblemQuestions", problemQuestions });
         },
     }), [dispatch]);
 

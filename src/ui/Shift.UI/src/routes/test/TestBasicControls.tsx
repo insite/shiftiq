@@ -108,14 +108,14 @@ export default function TestBasicControls() {
                         <DatePicker
                             name="DateTimePicker2"
                             showTime
-                            value={dateTimeHelper.parseDateTime("Feb 28, 2025 11:45 AM MT")}
+                            defaultValue={dateTimeHelper.parseDateTime("Feb 28, 2025 11:45 AM MT")}
                         />
                     </FormField>
 
                     <FormField label="DateTime picker (current time):">
                         <DatePicker
                             name="DateTimePicker3"
-                            value={dateTimeHelper.now(siteSetting.TimeZoneId)}
+                            defaultValue={dateTimeHelper.now(siteSetting.TimeZoneId)}
                             showTime
                         />
                     </FormField>

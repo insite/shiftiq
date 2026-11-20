@@ -131,7 +131,7 @@ namespace InSite.Domain.Foundations
 
         public Guid UserId => User?.UserIdentifier ?? Guid.Empty;
 
-        public TimeZoneInfo TimeZone => User?.TimeZone ?? TimeZoneInfo.Utc;
+        public string TimeZone => User?.TimeZone ?? TimeZones.Ids.Utc;
 
         /// <summary>
         /// The default constructor creates an empty list for each collection. Disallow construction 

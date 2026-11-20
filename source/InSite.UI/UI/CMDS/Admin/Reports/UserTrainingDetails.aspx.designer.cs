@@ -51,6 +51,24 @@ namespace InSite.Cmds.Actions.Reporting.Report
         protected global::InSite.Common.Web.UI.UpdatePanel ReportUpdatePanel;
 
         /// <summary>
+        /// DivisionPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DivisionPanel;
+
+        /// <summary>
+        /// DivisionIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DivisionComboBox DivisionIdentifier;
+
+        /// <summary>
         /// DepartmentIdentifier control.
         /// </summary>
         /// <remarks>
@@ -121,6 +139,15 @@ namespace InSite.Cmds.Actions.Reporting.Report
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal CompanyName;
+
+        /// <summary>
+        /// DivisionName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal DivisionName;
 
         /// <summary>
         /// DepartmentName control.

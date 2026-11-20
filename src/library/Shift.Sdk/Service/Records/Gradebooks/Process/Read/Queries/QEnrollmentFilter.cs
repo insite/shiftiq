@@ -14,5 +14,6 @@ namespace InSite.Application.Records.Read
         public string LearnerFullName { get; set; }
         public DateTimeOffset? GradedSince { get; set; }
         public DateTimeOffset? GradedBefore { get; set; }
+        public Guid? CompletedCourseIdentifier { get; set; }
     }
 }

@@ -47,6 +47,16 @@
                         </insite:ComboBox>
                     </div>
 
+                    <div class="mb-2">
+                        <insite:ComboBox runat="server" ID="IssuesCertificate" EmptyMessage="Certificate">
+                            <Items>
+                                <insite:ComboBoxOption Value="" />
+                                <insite:ComboBoxOption Value="True" Text="Issues a certificate" />
+                                <insite:ComboBoxOption Value="False" Text="Does not issue a certificate" />
+                            </Items>
+                        </insite:ComboBox>
+                    </div>
+
                     <cmds:TrainingCategorySelector runat="server" ID="Category" EmptyMessage="Category" />
 
                 </div>

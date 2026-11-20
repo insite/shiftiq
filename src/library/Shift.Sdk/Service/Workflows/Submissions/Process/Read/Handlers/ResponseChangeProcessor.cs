@@ -195,7 +195,7 @@ namespace InSite.Application.Surveys.Read
                 {
                     var progress = GetProgress(gradebook.Value, session.RespondentUserIdentifier, gradeitem.Value);
                     if (progress != null && !progress.ProgressIsCompleted)
-                        _commander.Send(new CompleteProgress(progress.ProgressIdentifier, e.ChangeTime, 1, null, null));
+                        _commander.Send(new CompleteProgress(progress.ProgressIdentifier, e.ChangeTime, 1, null, null, null));
                 }
             }
 
@@ -388,7 +388,7 @@ namespace InSite.Application.Surveys.Read
                     ?? CreateProgress(gradebook, user, gradeitem);
 
                 if (complete)
-                    _commander.Send(new CompleteProgress(progressIdentifier, DateTimeOffset.UtcNow, 1, null, null));
+                    _commander.Send(new CompleteProgress(progressIdentifier, DateTimeOffset.UtcNow, 1, null, null, null));
                 else
                     _commander.Send(new StartProgress(progressIdentifier, DateTimeOffset.UtcNow));
             }

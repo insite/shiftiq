@@ -123,6 +123,16 @@ namespace Shift.Common
             }
         }
 
+        /// <summary>
+        /// Gets the account code of an active organization, or null when there is no such organization.
+        /// </summary>
+        public string GetOrganizationCode(Guid organizationId)
+        {
+            return GetActiveOrganizations()
+                .SingleOrDefault(o => o.OrganizationIdentifier == organizationId)
+                ?.OrganizationCode;
+        }
+
         public void Load(PermissionMatrix matrix, Guid organizationId)
         {
             var context = BuildLoadContext();

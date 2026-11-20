@@ -19,6 +19,8 @@ namespace InSite.UI.Portal.Security.Impersonation
 {
     public partial class Start : PortalBasePage
     {
+        private const string ImpersonationResource = "resource/ui/portal/security/impersonation/start";
+
         private static string ReturnUrl
         {
             get
@@ -147,7 +149,10 @@ namespace InSite.UI.Portal.Security.Impersonation
         {
             var isAdministrator = impersonator.Person != null;
             var isUser = impersonated.Person != null;
-            var isAuthorized = Identity.IsGranted("ui/portal/identity/impersonate");
+            // Check the resource the impersonation grants are made on. The old check named
+            // ui/portal/identity/impersonate, which has no row in settings.TAction, and an
+            // unknown action is granted to everyone, so it never refused anyone.
+            var isAuthorized = Identity.IsGranted(ImpersonationResource);
 
             if (!isAdministrator)
                 ImpersonationStatus.AddMessage(AlertType.Error, $"{impersonator.User.FullName} {Translate("is not connected to")} {organization.CompanyName}.");
@@ -156,7 +161,7 @@ namespace InSite.UI.Portal.Security.Impersonation
                 ImpersonationStatus.AddMessage(AlertType.Error, $"{impersonated.User.FullName} {Translate("is not connected to")} {organization.CompanyName}.");
 
             if (!isAuthorized)
-                ImpersonationStatus.AddMessage(AlertType.Error, $"{impersonator.User.FullName} {Translate("is not assigned to a role with access granted to")} ui/portal/identity/impersonate.");
+                ImpersonationStatus.AddMessage(AlertType.Error, $"{impersonator.User.FullName} {Translate("is not assigned to a role with access granted to")} {ImpersonationResource}.");
 
             return isAdministrator && isUser && isAuthorized;
         }

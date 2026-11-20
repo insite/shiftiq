@@ -3,13 +3,11 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 
-using Shift.Common.Timeline.Changes;
-
 using InSite.Application.Registrations.Read;
 using InSite.Domain.Registrations;
 
 using Shift.Common;
-using Shift.Toolbox;
+using Shift.Common.Timeline.Changes;
 
 namespace InSite.Persistence
 {
@@ -52,7 +50,9 @@ namespace InSite.Persistence
             }
         }
 
-        private void Update(IChange e, Action<QRegistration> change)
+        private void Update(IChange e, Action<QRegistration> change) => Update(e, (db, reg) => change(reg));
+
+        private void Update(IChange e, Action<InternalDbContext, QRegistration> change)
         {
             using (var db = CreateContext())
             {
@@ -60,7 +60,7 @@ namespace InSite.Persistence
                 if (registration == null)
                     return;
 
-                change(registration);
+                change(db, registration);
 
                 SetLastChange(registration, e);
 
@@ -111,9 +111,18 @@ namespace InSite.Persistence
 
         public void UpdateRegistration(AttemptAssigned e)
         {
-            Update(e, registration =>
+            Update(e, (db, registration) =>
             {
-                registration.AttemptIdentifier = e.Attempt;
+                if (e.Form.HasValue && registration.ExamFormIdentifier != e.Form.Value)
+                {
+                    var forms = GetTargetForms(db, e.AggregateIdentifier, e.Form);
+                    foreach (var form in forms)
+                        form.AttemptIdentifier = e.Attempt;
+                }
+                else
+                {
+                    registration.AttemptIdentifier = e.Attempt;
+                }
             });
         }
 
@@ -130,9 +139,18 @@ namespace InSite.Persistence
 
         public void UpdateRegistration(ExamTimeLimited e)
         {
-            Update(e, registration =>
+            Update(e, (db, registration) =>
             {
-                registration.ExamTimeLimit = e.Minutes;
+                if (e.Form.HasValue && registration.ExamFormIdentifier != e.Form.Value)
+                {
+                    var forms = GetTargetForms(db, e.AggregateIdentifier, e.Form);
+                    foreach (var form in forms)
+                        form.ExamTimeLimit = e.Minutes;
+                }
+                else
+                {
+                    registration.ExamTimeLimit = e.Minutes;
+                }
             });
         }
 
@@ -146,11 +164,26 @@ namespace InSite.Persistence
 
         public void UpdateRegistration(EligibilityChanged e)
         {
-            Update(e, registration =>
+            Update(e, (db, registration) =>
             {
-                registration.EligibilityStatus = e.Status;
-                registration.EligibilityProcess = _serializer.Serialize(e.Process);
-                registration.EligibilityUpdated = e.ChangeTime;
+                var process = _serializer.Serialize(e.Process);
+
+                if (e.Form.HasValue && registration.ExamFormIdentifier != e.Form.Value)
+                {
+                    var forms = GetTargetForms(db, e.AggregateIdentifier, e.Form);
+                    foreach (var form in forms)
+                    {
+                        form.EligibilityStatus = e.Status;
+                        form.EligibilityProcess = process;
+                        form.EligibilityUpdated = e.ChangeTime;
+                    }
+                }
+                else
+                {
+                    registration.EligibilityStatus = e.Status;
+                    registration.EligibilityProcess = process;
+                    registration.EligibilityUpdated = e.ChangeTime;
+                }
             });
         }
 
@@ -162,11 +195,118 @@ namespace InSite.Persistence
             });
         }
 
+        public void UpdateRegistration(ExamFormAdded e)
+        {
+            var state = (Registration)e.AggregateState;
+
+            Update(e, (db, registration) =>
+            {
+                var index = state.Forms.FindIndex(x => x.FormIdentifier == e.Form);
+
+                if (index > 0)
+                {
+                    db.RegistrationExamForms.Add(new QRegistrationExamForm
+                    {
+                        RegistrationExamFormIdentifier = e.ExamForm,
+                        RegistrationIdentifier = e.AggregateIdentifier,
+                        ExamFormIdentifier = e.Form,
+                        OrganizationIdentifier = registration.OrganizationIdentifier,
+                        Password = e.Password,
+                        Sequence = index
+                    });
+                }
+                else
+                {
+                    registration.ExamFormIdentifier = e.Form;
+                }
+            });
+        }
+
         public void UpdateRegistration(ExamFormAssigned e)
         {
             Update(e, registration =>
             {
                 registration.ExamFormIdentifier = e.Form;
+            });
+        }
+
+        public void UpdateRegistration(ExamFormChanged e)
+        {
+            Update(e, (db, registration) =>
+            {
+                if (registration.ExamFormIdentifier == e.FromForm)
+                {
+                    registration.ExamFormIdentifier = e.ToForm;
+                    return;
+                }
+
+                var examForm = registration.ExamForms.FirstOrDefault(x => x.ExamFormIdentifier == e.FromForm);
+                if (examForm != null)
+                    examForm.ExamFormIdentifier = e.ToForm;
+            });
+        }
+
+        public void UpdateRegistration(ExamFormPasswordChanged e)
+        {
+            Update(e, (db, registration) =>
+            {
+                if (registration.ExamFormIdentifier == e.Form)
+                {
+                    registration.RegistrationPassword = e.Password;
+                    return;
+                }
+
+                var examForm = registration.ExamForms.FirstOrDefault(x => x.ExamFormIdentifier == e.Form);
+                if (examForm != null)
+                    examForm.Password = e.Password;
+            });
+        }
+
+        public void UpdateRegistration(ExamFormRemoved e)
+        {
+            Update(e, (db, registration) =>
+            {
+                var examForms = registration.ExamForms.OrderBy(x => x.Sequence).ToArray();
+
+                if (registration.ExamFormIdentifier == e.Form)
+                {
+                    var promoted = examForms.FirstOrDefault();
+                    if (promoted == null)
+                    {
+                        registration.ExamFormIdentifier = null;
+                        return;
+                    }
+
+                    registration.ExamFormIdentifier = promoted.ExamFormIdentifier;
+                    registration.RegistrationPassword = promoted.Password;
+                    registration.AttemptIdentifier = promoted.AttemptIdentifier;
+                    registration.ExamTimeLimit = promoted.ExamTimeLimit;
+                    registration.EligibilityProcess = promoted.EligibilityProcess;
+                    registration.EligibilityStatus = promoted.EligibilityStatus;
+                    registration.EligibilityUpdated = promoted.EligibilityUpdated;
+
+                    db.RegistrationExamForms.Remove(promoted);
+                    examForms = examForms.Skip(1).ToArray();
+                }
+                else
+                {
+                    var removed = examForms.FirstOrDefault(x => x.ExamFormIdentifier == e.Form);
+                    if (removed == null)
+                        return;
+
+                    db.RegistrationExamForms.Remove(removed);
+                    examForms = examForms.Where(x => x != removed).ToArray();
+                }
+
+                var sequence = 0;
+
+                foreach (var form in examForms)
+                {
+                    sequence++;
+
+                    if (form.Sequence != sequence)
+                        form.Sequence = sequence;
+                }
             });
         }
 
@@ -411,10 +551,11 @@ namespace InSite.Persistence
             using (var db = CreateContext())
             {
                 var sql = @"
+TRUNCATE TABLE registrations.QRegistrationInstructor;
+TRUNCATE TABLE registrations.QRegistrationExamForm;
+TRUNCATE TABLE registrations.QRegistrationTimer;
 TRUNCATE TABLE registrations.QAccommodation;
 TRUNCATE TABLE registrations.QRegistration;
-TRUNCATE TABLE registrations.QRegistrationInstructor;
-TRUNCATE TABLE registrations.QRegistrationTimer;
 ";
                 db.Database.ExecuteSqlCommand(sql);
             }
@@ -425,8 +566,9 @@ TRUNCATE TABLE registrations.QRegistrationTimer;
             using (var db = CreateContext())
             {
                 var sql = @"
-DELETE FROM registrations.QRegistration WHERE RegistrationIdentifier = @Aggregate;
+DELETE FROM registrations.QRegistrationExamForm WHERE RegistrationIdentifier = @Aggregate;
 DELETE FROM registrations.QRegistrationTimer WHERE RegistrationIdentifier = @Aggregate;
+DELETE FROM registrations.QRegistration WHERE RegistrationIdentifier = @Aggregate;
 ";
 
                 db.Database.ExecuteSqlCommand(sql, new SqlParameter("@Aggregate", registration));
@@ -484,6 +626,16 @@ DELETE FROM registrations.QRegistrationTimer WHERE RegistrationIdentifier = @Agg
             registration.LastChangeTime = e.ChangeTime;
             registration.LastChangeType = e.GetType().Name;
             registration.LastChangeUser = UserSearch.GetFullName(e.OriginUser);
+        }
+
+        private static QRegistrationExamForm[] GetTargetForms(InternalDbContext db, Guid registrationId, Guid? formId)
+        {
+            var query = db.RegistrationExamForms.Where(x => x.RegistrationIdentifier == registrationId);
+
+            if (formId.HasValue)
+                query = query.Where(x => x.ExamFormIdentifier == formId.Value);
+
+            return query.OrderBy(x => x.Sequence).ToArray();
         }
 
         #endregion

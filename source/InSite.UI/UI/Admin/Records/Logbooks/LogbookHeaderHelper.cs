@@ -1,6 +1,4 @@
-﻿using System;
-
-using InSite.Application.Records.Read;
+﻿using InSite.Application.Records.Read;
 
 using Shift.Common;
 
@@ -8,7 +6,7 @@ namespace InSite.Admin.Records.Logbooks
 {
     public static class LogbookHeaderHelper
     {
-        public static string GetLogbookHeader(QJournalSetup journalSetup, TimeZoneInfo tz)
+        public static string GetLogbookHeader(QJournalSetup journalSetup, string tz)
         {
             var header = journalSetup.JournalSetupName;
 

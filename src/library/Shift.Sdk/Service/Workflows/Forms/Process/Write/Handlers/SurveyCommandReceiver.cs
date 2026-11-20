@@ -1,7 +1,11 @@
-﻿using InSite.Domain.Surveys.Forms;
+﻿using System;
+
+using InSite.Application.Assets.Read;
+using InSite.Domain.Surveys.Forms;
 
 using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
+using Shift.Contract;
 
 namespace InSite.Application.Surveys.Write.Handlers
 {
@@ -9,11 +13,13 @@ namespace InSite.Application.Surveys.Write.Handlers
     {
         private readonly IChangeQueue _publisher;
         private readonly IChangeRepository _repository;
+        private readonly ISearchStore _searchStore;
 
-        public SurveyCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository)
+        public SurveyCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository, ISearchStore searchStore)
         {
             _publisher = publisher;
             _repository = repository;
+            _searchStore = searchStore;
 
             commander.Subscribe<AddSurveyBranch>(Handle);
             commander.Subscribe<AddSurveyCondition>(Handle);
@@ -199,11 +205,18 @@ namespace InSite.Application.Surveys.Write.Handlers
 
         public void Handle(ChangeSurveyFormStatus c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<SurveyAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.ChangeSurveyFormStatus(c.Status);
+                if (aggregate.ChangeSurveyFormStatus(c.Status))
+                    organizationId = aggregate.Data.Form.Tenant;
+
                 Commit(aggregate, c);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Form);
         }
 
         public void Handle(ChangeSurveyHook c)
@@ -294,6 +307,8 @@ namespace InSite.Application.Surveys.Write.Handlers
             var aggregate = new SurveyAggregate { AggregateIdentifier = c.AggregateIdentifier };
             aggregate.CreateSurveyForm(c.Source, c.Tenant, c.Asset, c.Name, c.Status, c.Language);
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(aggregate.Data.Form.Tenant, c.AggregateIdentifier, SearchObjectType.Form);
         }
 
         public void Handle(LockSurveyForm c)
@@ -388,11 +403,18 @@ namespace InSite.Application.Surveys.Write.Handlers
 
         public void Handle(RenameSurveyForm c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<SurveyAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.RenameSurveyForm(c.Name);
+                if (aggregate.RenameSurveyForm(c.Name))
+                    organizationId = aggregate.Data.Form.Tenant;
+
                 Commit(aggregate, c);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Form);
         }
 
         public void Handle(ReorderSurveyOptionItems c)
@@ -433,11 +455,18 @@ namespace InSite.Application.Surveys.Write.Handlers
 
         public void Handle(DeleteSurveyForm c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<SurveyAggregate>(c.AggregateIdentifier, aggregate =>
             {
+                organizationId = aggregate.Data.Form.Tenant;
+
                 aggregate.DeleteSurveyForm();
                 Commit(aggregate, c);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Form);
         }
     }
 }

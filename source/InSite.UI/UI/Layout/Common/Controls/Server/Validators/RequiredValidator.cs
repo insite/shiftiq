@@ -91,12 +91,7 @@ namespace InSite.Common.Web.UI
 
         protected override void OnPreRender(EventArgs e)
         {
-            if (!string.IsNullOrEmpty(FieldNameControl))
-            {
-                var ctrl = NamingContainer.FindControl(FieldNameControl) as ITextControl
-                    ?? throw ApplicationError.Create("ITextControl not found: {0}", FieldName);
-                FieldName = ctrl.Text;
-            }
+            SetFieldName(FieldNameControl);
 
             if (string.IsNullOrEmpty(Text))
             {
@@ -110,6 +105,28 @@ namespace InSite.Common.Web.UI
                 ErrorMessage = $"{ControlToValidate.Humanize(LetterCasing.Title)} is a required field.";
 
             base.OnPreRender(e);
+        }
+
+        private void SetFieldName(string ctrlId)
+        {
+            if (ctrlId.IsEmpty())
+                return;
+
+            var ctrl = NamingContainer.FindControl(FieldNameControl);
+
+            if (ctrl is ContentTextLiteral lit)
+            {
+                FieldName = lit.Text.IfNullOrEmpty(() =>
+                    lit.ContentLabel.IsEmpty() ? null : LabelHelper.GetLabelContentText(lit.ContentLabel));
+            }
+            else if (ctrl is ITextControl txt)
+            {
+                FieldName = txt.Text;
+            }
+            else
+            {
+                throw ApplicationError.Create("ITextControl not found: {0}", FieldNameControl);
+            }
         }
 
         protected override void AddAttributesToRender(HtmlTextWriter writer)

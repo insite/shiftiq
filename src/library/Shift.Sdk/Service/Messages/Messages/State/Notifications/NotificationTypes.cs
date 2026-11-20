@@ -470,7 +470,33 @@ namespace InSite.Domain.Messages
             var properties = GetType().GetProperties();
             foreach (var property in properties)
             {
-                var text = (property.GetValue(this) ?? string.Empty).ToString();
+                var text = property.GetValue(this)?.ToString() ?? string.Empty;
+                dict.Add(property.Name, text);
+            }
+            return dict;
+        }
+    }
+
+    public class Notification_CaseManagerAssigned : Notification
+    {
+        public string CaseID { get; set; }
+        public string CaseType { get; set; }
+        public string CaseStatus { get; set; }
+        public string Member { get; set; }
+        public string CaseURL { get; set; }
+
+        public Notification_CaseManagerAssigned()
+        {
+            Type = NotificationType.CaseManagerAssigned;
+        }
+
+        public override StringDictionary BuildVariableList()
+        {
+            var dict = new StringDictionary();
+            var properties = GetType().GetProperties();
+            foreach (var property in properties)
+            {
+                var text = property.GetValue(this)?.ToString() ?? string.Empty;
                 dict.Add(property.Name, text);
             }
             return dict;
@@ -494,7 +520,7 @@ namespace InSite.Domain.Messages
             var properties = GetType().GetProperties();
             foreach (var property in properties)
             {
-                var text = (property.GetValue(this) ?? string.Empty).ToString();
+                var text = property.GetValue(this)?.ToString() ?? string.Empty;
                 dict.Add(property.Name, text);
             }
             return dict;
@@ -520,6 +546,7 @@ namespace InSite.Domain.Messages
         Guid? MessageToLearnerWhenLogbookModified { get; set; }
         Guid? MessageToLearnerWhenLogbookStarted { get; set; }
         Guid? MessageToValidatorWhenLogbookModified { get; set; }
+        Guid? MessageToSupervisorWhenAssigned { get; set; }
     }
 
     public class LogbookJoinedNotification : Notification, ILogbookNotification
@@ -547,6 +574,7 @@ namespace InSite.Domain.Messages
 
         Guid? ILogbookNotification.MessageToLearnerWhenLogbookModified { get => null; set { } }
         Guid? ILogbookNotification.MessageToValidatorWhenLogbookModified { get => null; set { } }
+        Guid? ILogbookNotification.MessageToSupervisorWhenAssigned { get => null; set { } }
 
         #endregion
     }
@@ -580,6 +608,40 @@ namespace InSite.Domain.Messages
         #region Unused
 
         Guid? ILogbookNotification.MessageToLearnerWhenLogbookStarted { get => null; set { } }
+        Guid? ILogbookNotification.MessageToSupervisorWhenAssigned { get => null; set { } }
+
+        #endregion
+    }
+
+    public class LogbookSupervisorAssignedNotification : Notification, ILogbookNotification
+    {
+        public LogbookSupervisorAssignedNotification()
+        {
+            Type = NotificationType.LogbookSupervisorAssigned;
+        }
+
+        public string OrganizationCode { get; set; }
+        public string OrganizationName { get; set; }
+        public string AppUrl { get; set; }
+
+        public string LogbookTitle { get; set; }
+        public string LogbookUrl { get; set; }
+
+        public string ActorName { get; set; }
+        public string LearnerName { get; set; }
+
+        public Guid? ExperienceIdentifier { get; set; }
+        public Guid? JournalSetupIdentifier { get; set; }
+        public Guid? LearnerIdentifier { get; set; }
+        public Guid? SupervisorIdentifier { get; set; }
+
+        public Guid? MessageToSupervisorWhenAssigned { get; set; }
+
+        #region Unused
+
+        Guid? ILogbookNotification.MessageToLearnerWhenLogbookModified { get => null; set { } }
+        Guid? ILogbookNotification.MessageToLearnerWhenLogbookStarted { get => null; set { } }
+        Guid? ILogbookNotification.MessageToValidatorWhenLogbookModified { get => null; set { } }
 
         #endregion
     }
@@ -756,6 +818,45 @@ namespace InSite.Domain.Messages
         public string LearnerLastName { get; set; }
         public string ProgramName { get; set; }
         public string ProgramStarted { get; set; }
+    }
+
+    public class ProgramEnrollmentRequestedNotification : Notification
+    {
+        public ProgramEnrollmentRequestedNotification()
+        {
+            Type = NotificationType.ProgramEnrollmentRequested;
+        }
+
+        public string LearnerFirstName { get; set; }
+        public string LearnerLastName { get; set; }
+        public string ProgramName { get; set; }
+        public string RequestFee { get; set; }
+        public string FundingPath { get; set; }
+        public string EnrollmentRequested { get; set; }   // deep link to the request's Program Enrollment Request Detail page
+    }
+
+    public class ProgramEnrollmentApprovedNotification : Notification
+    {
+        public ProgramEnrollmentApprovedNotification()
+        {
+            Type = NotificationType.ProgramEnrollmentApproved;
+        }
+
+        public string LearnerFirstName { get; set; }
+        public string LearnerLastName { get; set; }
+        public string ProgramName { get; set; }
+    }
+
+    public class ProgramEnrollmentRejectedNotification : Notification
+    {
+        public ProgramEnrollmentRejectedNotification()
+        {
+            Type = NotificationType.ProgramEnrollmentRejected;
+        }
+
+        public string LearnerFirstName { get; set; }
+        public string LearnerLastName { get; set; }
+        public string ProgramName { get; set; }
     }
 
     public abstract class ResponseNotification : Notification

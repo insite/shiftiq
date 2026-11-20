@@ -48,6 +48,7 @@ export const defaultSiteProviderContextData: ContextData = {
         CurrentLanguage: "en",
         SupportedLanguages: ["en"],
         RecentLinksKey: "NA",
+        TimeZones: [],
     },
     refreshSiteSetting() {},
 }

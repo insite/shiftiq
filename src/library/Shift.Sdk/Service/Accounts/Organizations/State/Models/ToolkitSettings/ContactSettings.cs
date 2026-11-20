@@ -20,10 +20,12 @@ namespace InSite.Domain.Organizations
         public Guid? ProfileSecurityGroupId { get; set; }
         public bool DisplayIntegrationPortalLink { get; set; }
         public string[] ImportReportGroupNames { get; set; }
+        public string[] IntegrationPortalGroupNames { get; set; }
+        public string IntegrationPortalEmployerGroupName { get; set; }
 
         public bool IsEqual(ContactSettings other)
         {
-            var isEqual =
+            return
                 FullNamePolicy.NullIfEmpty() == other.FullNamePolicy.NullIfEmpty() &&
                 DefaultMFA == other.DefaultMFA &&
                 PortalSearchActiveMembershipReasons == other.PortalSearchActiveMembershipReasons &&
@@ -33,16 +35,19 @@ namespace InSite.Domain.Organizations
                 EnableTraineeDepartment == other.EnableTraineeDepartment &&
                 PortalSearchRequiresReferral == other.PortalSearchRequiresReferral &&
                 ProfileSecurityGroupId == other.ProfileSecurityGroupId &&
-                DisplayIntegrationPortalLink == other.DisplayIntegrationPortalLink
+                DisplayIntegrationPortalLink == other.DisplayIntegrationPortalLink &&
+                GroupsEqual(ImportReportGroupNames, other.ImportReportGroupNames) &&
+                GroupsEqual(IntegrationPortalGroupNames, other.IntegrationPortalGroupNames) &&
+                IntegrationPortalEmployerGroupName.NullIfEmpty() == other.IntegrationPortalEmployerGroupName.NullIfEmpty()
                 ;
+        }
 
-            if (!isEqual)
-                return false;
-
-            var groups1 = ImportReportGroupNames.EmptyIfNull();
-            var groups2 = other.ImportReportGroupNames.EmptyIfNull();
-            return groups1.Length == groups2.Length
-                && groups1.Zip(groups2, (a, b) => string.Equals(a, b)).All(x => x);
+        private static bool GroupsEqual(string[] groups1, string[] groups2)
+        {
+            var groupsOrEmpty1 = groups1.EmptyIfNull();
+            var groupsOrEmpty2 = groups2.EmptyIfNull();
+            return groupsOrEmpty1.Length == groupsOrEmpty2.Length
+                && groupsOrEmpty1.Zip(groupsOrEmpty2, (a, b) => string.Equals(a, b)).All(x => x);
         }
     }
 }

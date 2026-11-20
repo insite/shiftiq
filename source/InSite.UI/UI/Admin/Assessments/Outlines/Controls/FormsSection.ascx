@@ -36,7 +36,6 @@
 
                 <insite:Button runat="server" ID="ReportButton" ButtonStyle="Default" ToolTip="View attempts report" Text="Report" Icon="far fa-chart-bar" />
                 <insite:Button runat="server" ID="FormWorkshopButton" ButtonStyle="Default" ToolTip="Workshop" Text="Workshop" Icon="far fa-industry-alt" />
-                <insite:Button runat="server" ID="FormWorkshopNewButton" ButtonStyle="Default" ToolTip="Workshop" Text="Workshop (New)" Icon="far fa-industry-alt" />
 
                 <div runat="server" id="PinSection" class="mt-3">
                     <span runat="server" id="PinLabel" class="pe-1">

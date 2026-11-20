@@ -95,6 +95,14 @@ namespace InSite.Domain.Records
         public void DisableAchievementReporting()
             => Apply(new AchievementReportingDisabled());
 
+        public void ChangeAchievementCertificateIssuance(bool issuesCertificate)
+        {
+            if (Data.IssuesCertificate == issuesCertificate)
+                return;
+
+            Apply(new AchievementCertificateIssuanceChanged(issuesCertificate));
+        }
+
         public void ChangeAchievementNotification(NotificationSettings settings)
         {
             if (Data.NotificationSettings.IsEqual(settings))

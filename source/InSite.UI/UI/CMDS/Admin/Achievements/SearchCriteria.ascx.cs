@@ -28,6 +28,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
 
                     IsTimeSensitive = IsTimeSensitive.ValueAsBoolean,
                     AllowSelfDeclared = AllowSelfDeclaration.ValueAsBoolean,
+                    IssuesCertificate = IssuesCertificate.ValueAsBoolean,
                     CategoryIdentifier = Category.ValueAsGuid,
 
                     AchievementScope = AchievementScope.Value
@@ -45,6 +46,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
 
                 IsTimeSensitive.ValueAsBoolean = value.IsTimeSensitive;
                 AllowSelfDeclaration.ValueAsBoolean = value.AllowSelfDeclared;
+                IssuesCertificate.ValueAsBoolean = value.IssuesCertificate;
                 Category.ValueAsGuid = value.CategoryIdentifier;
 
                 AchievementScope.Value = string.IsNullOrEmpty(value.AchievementScope)
@@ -86,6 +88,7 @@ namespace InSite.Cmds.Controls.Training.Achievements
 
             IsTimeSensitive.ClearSelection();
             AllowSelfDeclaration.ClearSelection();
+            IssuesCertificate.ClearSelection();
             AchievementScope.Value = OrganizationScopeSelector.ScopeOrganization;
             LoadCategories();
         }

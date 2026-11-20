@@ -8,7 +8,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Controls
 {
     public partial class LogbookDetailsV2 : UserControl
     {
-        public void BindLogbook(Guid journalSetupIdentifier, QJournalSetup journalSetup, TimeZoneInfo tz, bool isValidator)
+        public void BindLogbook(Guid journalSetupIdentifier, QJournalSetup journalSetup, string tz, bool isValidator)
         {
             var outlineURL = isValidator
                 ? $"/ui/admin/records/logbooks/validators/outline?journalsetup={journalSetupIdentifier}"
@@ -37,7 +37,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Controls
                 : "None";
         }
 
-        private static string GetLocalTime(object obj, TimeZoneInfo tz)
+        private static string GetLocalTime(object obj, string tz)
         {
             if (obj == null)
                 return null;

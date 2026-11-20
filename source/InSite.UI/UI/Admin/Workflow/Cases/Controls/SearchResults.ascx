@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchResults.ascx.cs" Inherits="InSite.Admin.Issues.Controls.SearchResults" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SearchResults.ascx.cs" Inherits="InSite.Admin.Issues.Controls.SearchResults" %>
 
 <asp:Literal id="Instructions" runat="server" />
 
@@ -81,6 +81,12 @@
         <asp:TemplateField HeaderText="Department">
             <ItemTemplate>
                 <%# GetTopicDepartments() %>
+            </ItemTemplate>
+        </asp:TemplateField>
+
+        <asp:TemplateField HeaderText="District">
+            <ItemTemplate>
+                <%# GetTopicDistricts() %>
             </ItemTemplate>
         </asp:TemplateField>
 

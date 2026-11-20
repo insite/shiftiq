@@ -73,15 +73,25 @@ namespace InSite.Cmds.Admin.People.Controls
             ApplyUserGroupAssignmentPermission(UserRoleList, $"{GroupNames.Trainee} Users", $"{GroupNames.Trainee} Administrators");
 
             ApplyUserGroupAssignmentPermission(UserRoleList, "TSSC Only Users", CmdsRole.Administrators, CmdsRole.Programmers, CmdsRole.SystemAdministrators);
+
+            // This role carries fiscal authority over program enrollments, so it is gated on the Operator
+            // system role rather than on membership in another CMDS role.
+            ApplyUserGroupAssignmentPermission(UserRoleList, CmdsRole.ProgramEnrollmentReviewers, Identity.IsOperator);
         }
 
         private void ApplyUserGroupAssignmentPermission(InSite.Common.Web.UI.CheckBoxList list, string role, params string[] accessors)
+        {
+            var isVisible = accessors.Any(accessor => Identity.IsInRole(accessor));
+
+            ApplyUserGroupAssignmentPermission(list, role, isVisible);
+        }
+
+        private void ApplyUserGroupAssignmentPermission(InSite.Common.Web.UI.CheckBoxList list, string role, bool isVisible)
         {
             var item = list.Items.FindByText(role);
             if (item == null)
                 return;
 
-            var isVisible = accessors.Any(accessor => Identity.IsInRole(accessor));
             if (!isVisible)
                 list.Items.Remove(item);
         }
@@ -334,7 +344,7 @@ namespace InSite.Cmds.Admin.People.Controls
             user.MiddleName = MiddleName.Text;
             user.LastName = LastName.Text;
             user.Email = EmailWork.Text;
-            user.TimeZone = TimeZone.Visible ? TimeZone.Value : CurrentSessionState.Identity.Organization.TimeZone.Id;
+            user.TimeZone = TimeZone.Visible ? TimeZone.Value : CurrentSessionState.Identity.Organization.TimeZone;
             person.EmailEnabled = EmailEnabled.Checked;
 
             if (PasswordExpires.Value.HasValue)
@@ -551,7 +561,7 @@ namespace InSite.Cmds.Admin.People.Controls
                 }
                 else
                 {
-                    MembershipStore.Delete(MembershipSearch.Select(groupId, user.UserIdentifier));
+                    MembershipStore.Delete(MembershipSearch.Select(groupId, user.UserIdentifier, organizationId));
                 }
             }
         }

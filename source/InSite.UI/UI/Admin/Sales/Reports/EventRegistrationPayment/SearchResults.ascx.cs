@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using InSite.Application.Invoices.Read;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
+using InSite.UI.Portal.Billing.Utilities;
 
 using Shift.Common.Linq;
 
@@ -27,6 +29,9 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
             public string Registrant { get; set; }
             public string LearnerCode { get; set; }
             public string CurrentRegistrationStatus { get; set; }
+            public string TaxProvince { get; set; }
+            public decimal? TaxPercent { get; set; }
+            public decimal? TaxAmount { get; set; }
             public decimal? RegistrationFee { get; set; }
             public string CurrentAttendanceStatus { get; set; }
             public DateTimeOffset? AttendanceTaken { get; set; }
@@ -66,6 +71,23 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                 .ToSearchResult();
         }
 
+        protected string FormatTaxAmount(string amount, string rate)
+        {
+            var dataItem = Page.GetDataItem();
+            var amountValue = DataBinder.Eval(dataItem, amount) as decimal?;
+            var rateValue = DataBinder.Eval(dataItem, rate) as decimal?;
+
+            return TaxHelper.FormatTaxAmount(amountValue, rateValue);
+        }
+
+        protected string GetRegionName(string region)
+        {
+            var dataItem = Page.GetDataItem();
+            var regionValue = DataBinder.Eval(dataItem, region) as string;
+
+            return TaxHelper.GetRegionName(regionValue);
+        }
+
         #region Export Data
 
         public override IListSource GetExportData(VEventRegistrationPaymentFilter filter, bool empty)
@@ -87,6 +109,9 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                 Registrant = x.LearnerAttendee,
                 LearnerCode = x.LearnerCode,
                 CurrentRegistrationStatus = x.CurrentRegistrationStatus,
+                TaxProvince = TaxHelper.GetRegionName(x.TaxRegion),
+                TaxPercent = x.TaxRate,
+                TaxAmount = x.TaxAmount,
                 RegistrationFee = x.RegistrationFee,
                 CurrentAttendanceStatus = x.CurrentAttendanceStatus,
                 AttendanceTaken = x.AttendanceTaken,
@@ -111,7 +136,7 @@ namespace InSite.UI.Admin.Sales.Reports.EventRegistrationPayment
                 CreditAmount = x.CreditAmount
             }).ToList();
 
-            CallUpdateDateTimeOffsets(data, User.TimeZoneId);
+            CallUpdateDateTimeOffsets(data, User.TimeZone);
 
             return data.ToSearchResult();
         }

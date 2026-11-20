@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="BankCommentaryResults.ascx.cs" Inherits="InSite.Admin.Assessments.Reports.Controls.BankCommentaryResults" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="BankCommentaryResults.ascx.cs" Inherits="InSite.Admin.Assessments.Reports.Controls.BankCommentaryResults" %>
 
 <asp:Literal runat="server" ID="Instructions" />
 

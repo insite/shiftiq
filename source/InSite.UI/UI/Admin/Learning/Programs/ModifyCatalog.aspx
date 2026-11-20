@@ -32,6 +32,16 @@
                             </div>
                         </div>
 
+                        <div class="form-group mb-3">
+                            <label class="form-label">
+                                Settings
+                            </label>
+                            <insite:CheckBox runat="server" ID="ProgramIsHidden" Text="Hidden" />
+                            <div class="form-text">
+                                A hidden program stays published and reachable by direct link, but is kept out of the public catalogue grid and search.
+                            </div>
+                        </div>
+
                         <uc:ProgramCategoryList runat="server" ID="ProgramCategoryList" />
 
                     </div>

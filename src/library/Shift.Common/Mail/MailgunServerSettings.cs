@@ -12,14 +12,17 @@ namespace Shift.Common
         public ReadOnlyCollection<string> WhitelistDomains { get; }
         public ReadOnlyCollection<string> WhitelistTesters { get; }
         public ReadOnlyCollection<string> ForcedTypes { get; }
-        public string Domain { get; }
+        public string QueueName { get; }
 
         public int MinutesBeforeCancellationIsDisallowed { get; set; } = 5;
 
         public bool MailgunCallbackEnabled { get; }
 
-        public MailgunServerSettings(IPartitionModel partition, EnvironmentModel environment, Application application)
+        public MailgunServerSettings(IPartitionModel partition, AppSettings appSettings)
         {
+            var environment = appSettings.Environment;
+            var application = appSettings.Application;
+
             EmailOutboxDisabled = application.EmailOutboxDisabled;
             EmailOutboxFiltered = application.EmailOutboxFiltered;
             ForcedTypes = application.AlertsToForceSendList.EmptyIfNull().AsReadOnly();
@@ -27,7 +30,7 @@ namespace Shift.Common
             WhitelistDomains = Array.AsReadOnly(StringHelper.Split(partition.WhitelistDomains));
             WhitelistTesters = Array.AsReadOnly(StringHelper.Split(partition.WhitelistEmails));
 
-            Domain = (environment.GetSubdomainPrefix() + partition.Slug + "." + partition.Domain).ToLowerInvariant();
+            QueueName = MailgunQueueHelper.GetQueueShortName(appSettings);
 
             MailgunCallbackEnabled = application.MailgunCallbackEnabled;
         }
@@ -35,14 +38,14 @@ namespace Shift.Common
         public MailgunServerSettings(
             bool emailOutboxDisabled, bool emailOutboxFiltered,
             IEnumerable<string> whitelistDomains, IEnumerable<string> whitelistTesters, IEnumerable<string> forcedTypes,
-            string domain)
+            string queueName)
         {
             EmailOutboxDisabled = emailOutboxDisabled;
             EmailOutboxFiltered = emailOutboxFiltered;
             WhitelistDomains = Array.AsReadOnly(whitelistDomains.EmptyIfNull().ToArray());
             WhitelistTesters = Array.AsReadOnly(whitelistTesters.EmptyIfNull().ToArray());
             ForcedTypes = Array.AsReadOnly(forcedTypes.EmptyIfNull().ToArray());
-            Domain = domain;
+            QueueName = queueName;
         }
     }
 }

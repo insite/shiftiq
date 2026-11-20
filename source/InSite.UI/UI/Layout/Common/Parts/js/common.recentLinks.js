@@ -30,7 +30,7 @@
         '/ui/admin/assets/collections/edit': { name: 'Collection', idParam: 'collection' },
         '/ui/admin/assets/collections/edit-item': { name: 'Collection', idParam: 'item' },
         '/ui/admin/assets/labels/edit': { name: 'Label', idParam: 'label' },
-        '/ui/admin/contacts/people/edit-membership': { name: 'Person', idParam: 'to' },
+        '/ui/admin/contacts/people/edit-membership': { name: 'Membership', idParam: 'id' },
         '/ui/admin/schemas/columns/outline': { name: 'Column', idParam: 'columnName' },
         '/ui/admin/events/appointments/outline': { name: 'Appointment', idParam: 'event' },
         '/ui/admin/integrations/api-requests/outline': { name: 'API', idParam: 'request' },

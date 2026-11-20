@@ -29,9 +29,8 @@ namespace InSite.Application.Organizations.Write
             var isBCMailSame = state.Integrations.BCMail.IsEqual(Integrations.BCMail);
             var isRecaptchaSame = state.Integrations.Recaptcha.IsEqual(Integrations.Recaptcha);
             var isPrometricSame = state.Integrations.Prometric.IsEqual(Integrations.Prometric);
-            var isScormCloudSame = state.Integrations.ScormCloud.IsEqual(Integrations.ScormCloud);
 
-            if (isBamboraSame && isBCMailSame && isRecaptchaSame && isPrometricSame && isScormCloudSame)
+            if (isBamboraSame && isBCMailSame && isRecaptchaSame && isPrometricSame)
                 return true;
 
             if (isBamboraSame)
@@ -45,9 +44,6 @@ namespace InSite.Application.Organizations.Write
 
             if (isPrometricSame)
                 Integrations.Prometric = null;
-
-            if (isScormCloudSame)
-                Integrations.ScormCloud = null;
 
             aggregate.Apply(new OrganizationIntegrationSettingsModified(Integrations));
 

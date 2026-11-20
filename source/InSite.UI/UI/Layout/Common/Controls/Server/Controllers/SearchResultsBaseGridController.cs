@@ -505,7 +505,7 @@ namespace InSite.Common.Web.UI
             string timeZoneId)
             where T : class
         {
-            TimeZoneInfo userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            string userTimeZone = TimeZones.ValidateZone(timeZoneId);
 
             foreach (var obj in objects)
             {
@@ -529,11 +529,11 @@ namespace InSite.Common.Web.UI
             }
         }
 
-        private static void UpdateDateTimeOffsetProperty<T>(TimeZoneInfo userTimeZone, T obj, System.Reflection.PropertyInfo property, DateTimeOffset? value) where T : class
+        private static void UpdateDateTimeOffsetProperty<T>(string userTimeZone, T obj, System.Reflection.PropertyInfo property, DateTimeOffset? value) where T : class
         {
             var utcDateTime = value.Value.UtcDateTime;
-            var newDateTime = TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, userTimeZone);
-            property.SetValue(obj, new DateTimeOffset(newDateTime, userTimeZone.BaseUtcOffset));
+            var newDateTime = TimeZones.ConvertTimeFromUtc(utcDateTime, userTimeZone);
+            property.SetValue(obj, TimeZones.ToDateTimeOffset(newDateTime, userTimeZone));
         }
 
         protected virtual void SetupExportButton(DropDownButton button)
@@ -627,7 +627,7 @@ namespace InSite.Common.Web.UI
             if (list.Count == 0)
                 return null;
 
-            CallUpdateDateTimeOffsets(list, User.TimeZoneId);
+            CallUpdateDateTimeOffsets(list, User.TimeZone);
 
             var columns = GetDownloadColumns(list);
             if (columns == null)
@@ -663,7 +663,7 @@ namespace InSite.Common.Web.UI
             if (list.Count == 0)
                 return null;
 
-            CallUpdateDateTimeOffsets(list, User.TimeZoneId);
+            CallUpdateDateTimeOffsets(list, User.TimeZone);
 
             var columns = GetDownloadColumns(list);
             if (columns == null)

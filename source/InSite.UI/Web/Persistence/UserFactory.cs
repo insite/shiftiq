@@ -92,7 +92,7 @@ namespace InSite.Web.Data
 
             return new QUser
             {
-                TimeZone = organization.TimeZone.Id,
+                TimeZone = organization.TimeZone,
                 MultiFactorAuthentication = organization.Toolkits.Contacts?.DefaultMFA ?? false
             };
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,8 +9,6 @@ using InSite.Domain.Registrations;
 using Shift.Common;
 using Shift.Constant;
 using Shift.Toolbox;
-
-using TimeZone = Shift.Common.TimeZone;
 
 namespace InSite.Admin.Events.Registrations.Reports
 {
@@ -149,7 +147,7 @@ namespace InSite.Admin.Events.Registrations.Reports
                     {
                         AchievementDescription = item.AchievementDescription,
                         EventTitle = item.EventTitle,
-                        EventScheduledStart = TimeZone.ConvertTime(item.EventScheduledStart.UtcDateTime, TimeZones.Utc, user.TimeZone),
+                        EventScheduledStart = TimeZones.ConvertTime(item.EventScheduledStart.UtcDateTime, TimeZones.Ids.Utc, user.TimeZone),
                         UserFullName = item.UserFullName,
                         UserEmail = item.UserEmail,
                         EmployerGroupName = item.EmployerGroupName,

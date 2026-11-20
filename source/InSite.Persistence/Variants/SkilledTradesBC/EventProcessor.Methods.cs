@@ -30,7 +30,7 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                 return;
 
             var id = @event.EventIdentifier;
-            var registrations = _registrations.GetRegistrationsByEvent(id, null, null, null, true).ToArray();
+            var registrations = _registrations.GetRegistrationsByEvent(id, includeAccommodations: true).ToArray();
 
             var now = DateTimeOffset.UtcNow;
             var start = @event.EventScheduledStart;
@@ -114,7 +114,13 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
 
                 var @event = _events.GetEvent(eventIdentifier, x => x.VenueLocation, x => x.VenueOffice, x => x.VenueCoordinator, x => x.Attendees, x => x.Attendees.Select(y => y.Person));
                 var venueAddress = @event.VenueLocationIdentifier.HasValue ? _groups.GetAddress(@event.VenueLocationIdentifier.Value, AddressType.Physical) : null;
-                var registrations = _registrations.GetRegistrationsByEvent(@event.EventIdentifier, null, null, null, true, true, true, true).ToArray();
+                var registrations = _registrations
+                    .GetRegistrationsByEvent(@event.EventIdentifier,
+                        includeAccommodations: true,
+                        includeAttempt: true,
+                        includeCandidate: true,
+                        includeForm: true)
+                    .ToArray();
                 var attempts = _attempts.GetAttemptsByEvent(@event.EventIdentifier, null, null, true).ToArray();
 
                 var forms = new List<QBankForm>();
@@ -297,7 +303,9 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
         {
             if (registrations.IsEmpty())
                 return _registrations
-                    .GetRegistrationsByEvent(@event, null, null, null, false, true, true)
+                    .GetRegistrationsByEvent(@event,
+                        includeAttempt: true,
+                        includeCandidate: true)
                     .Where(x => x.IsPresent)
                     .ToList();
 
@@ -325,6 +333,9 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
 
             var trainingProviders = _builder.GetContactCodes(_events.GetAttendees(e.AggregateIdentifier, x => x.Person), "Training Provider");
 
+            var timeZoneId = TimeZones.FindTimeZoneId(@event.EventScheduledStart);
+            var abbrev = TimeZones.GetAbbreviation(timeZoneId);
+
             var input = new ExamEventInput
             {
                 EventNumber = @event.EventNumber,
@@ -340,7 +351,7 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                 ScheduledBy = 0,
                 Start = string.Format("{0:yyyy-MM-dd}T{0:HH:mm}:00.000Z", @event.EventScheduledStart),
                 TPContacts = trainingProviders,
-                TZ = @event.EventScheduledStart.GetTimeZone().GetAbbreviation().GetAbbreviation(@event.EventScheduledStart)
+                TZ = abbrev.GetAbbreviation(@event.EventScheduledStart)
             };
 
             if (int.TryParse(@event.VenueLocation.GroupCode, out int organizationId))
@@ -412,7 +423,7 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
                         x => x.Attempt, x => x.Candidate, x => x.Form, x => x.RegistrationInstructors)
                     .ToList();
             else
-                registrations = _registrations.GetRegistrationsByEvent(@event.EventIdentifier, null, null, null, false, false, false, false, true);
+                registrations = _registrations.GetRegistrationsByEvent(@event.EventIdentifier, includeInstructors: true);
 
             registrations = registrations
                 .Where(x => !x.GradeWithheld.HasValue)
@@ -461,7 +472,13 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
         private void ValidateAttempts(IChange e, QEvent @event, List<QRegistration> registrations)
         {
             if (registrations.IsEmpty())
-                registrations = _registrations.GetRegistrationsByEvent(@event.EventIdentifier, null, null, null, true, true, true, true);
+                registrations = _registrations
+                    .GetRegistrationsByEvent(@event.EventIdentifier,
+                        includeAccommodations: true,
+                        includeAttempt: true,
+                        includeCandidate: true,
+                        includeForm: true);
+
             registrations = registrations.Where(x => x.Attempt != null).ToList();
 
             const decimal ThirtyPercent = 0.30m;

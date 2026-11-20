@@ -53,7 +53,7 @@ namespace InSite.UI.Lobby.Integration.Lti
 
             var user = Authenticate(organization, email, errors);
 
-            var signature = model.GetSignature(organization.OrganizationIdentifier, "POST", Request.Url);
+            var signature = model.GetSignature(organization.Identifier, "POST", Request.Url);
 
             if (signature != Request.Form["oauth_signature"])
                 errors.Add("OAuth Signature Mismatch");
@@ -94,7 +94,7 @@ namespace InSite.UI.Lobby.Integration.Lti
 
             if (Guid.TryParse(organizationIdentifier, out Guid result))
             {
-                if (organization.OrganizationIdentifier != result)
+                if (organization.Identifier != result)
                 {
                     errors.Add($"OAuth Validation Failed: Organization Identifier Mismatch");
                     return null;
@@ -117,7 +117,7 @@ namespace InSite.UI.Lobby.Integration.Lti
 
             CurrentSessionState.DateSignedIn = DateTime.UtcNow;
 
-            SessionHelper.StartSession(organization.OrganizationIdentifier, user.UserIdentifier);
+            SessionHelper.StartSession(organization.Identifier, user.UserIdentifier);
 
             RecentSessionHelper.Clear();
 
@@ -127,21 +127,46 @@ namespace InSite.UI.Lobby.Integration.Lti
         private QUser GetOrCreateUser(string firstName, string lastName, string userEmail, string personCode, OrganizationState organization, List<string> errors)
         {
             var user = ServiceLocator.UserSearch.GetUserByEmail(userEmail);
-            if (user != null)
-                return user;
-
-            if (!string.IsNullOrEmpty(personCode)
-                && ServiceLocator.PersonSearch.IsPersonExist(organization.Identifier, personCode)
-                )
+            if (user == null)
             {
-                errors.Add($"The person with the code '{personCode}' already exists");
+                return CheckPersonExists(organization.Identifier, personCode, errors)
+                    ? null
+                    : CreateNewUser(firstName, lastName, userEmail, personCode, organization);
+            }
+
+            var person = ServiceLocator.PersonSearch.GetPerson(user.UserIdentifier, organization.Identifier);
+            if (person == null)
+            {
+                if (CheckPersonExists(organization.Identifier, personCode, errors))
+                    return null;
+
+                person = CreateQPerson(user.UserIdentifier, personCode, organization);
+
+                PersonStore.Insert(person);
+
+                MembershipHelper.Save(organization.Identifier, "Role", organization.CompanyName + " Learner", user.UserIdentifier, "Membership");
+            }
+            else if (!person.UserAccessGranted.HasValue)
+            {
+                errors.Add("This user account does not have access to this organization.");
                 return null;
             }
 
-            return CreateNewUser(firstName, lastName, userEmail, personCode, organization);
+            return user;
         }
 
-        private QUser CreateNewUser(string firstName, string lastName, string userEmail, string personCode, OrganizationState organization)
+        private static bool CheckPersonExists(Guid organizationId, string personCode, List<string> errors)
+        {
+            var exists = personCode.IsNotEmpty()
+                      && ServiceLocator.PersonSearch.IsPersonExist(organizationId, personCode);
+
+            if (exists)
+                errors.Add($"The person code '{personCode}' is already assigned to another person in this organization.");
+
+            return exists;
+        }
+
+        private static QUser CreateNewUser(string firstName, string lastName, string userEmail, string personCode, OrganizationState organization)
         {
             var user = UserFactory.Create();
 
@@ -150,21 +175,27 @@ namespace InSite.UI.Lobby.Integration.Lti
             user.Email = userEmail;
             user.SetDefaultPassword();
 
-            var person = new QPerson();
-
-            person.UserIdentifier = user.UserIdentifier;
-            person.OrganizationIdentifier = organization.Identifier;
-            person.IsLearner = true;
-            person.PersonCode = personCode;
-            person.EmailEnabled = true;
-            person.UserAccessGranted = DateTimeOffset.UtcNow;
-            person.UserAccessGrantedBy = "Launch Lti";
+            var person = CreateQPerson(user.UserIdentifier, personCode, organization);
 
             UserStore.Insert(user, person);
 
-            MembershipHelper.Save(organization.OrganizationIdentifier, "Role", organization.CompanyName + " Learner", user.UserIdentifier, "Membership");
+            MembershipHelper.Save(organization.Identifier, "Role", organization.CompanyName + " Learner", user.UserIdentifier, "Membership");
 
             return user;
+        }
+
+        private static QPerson CreateQPerson(Guid userIdentifier, string personCode, OrganizationState organization)
+        {
+            return new QPerson
+            {
+                UserIdentifier = userIdentifier,
+                OrganizationIdentifier = organization.Identifier,
+                IsLearner = true,
+                PersonCode = personCode,
+                EmailEnabled = true,
+                UserAccessGranted = DateTimeOffset.UtcNow,
+                UserAccessGrantedBy = "Launch Lti"
+            };
         }
     }
 

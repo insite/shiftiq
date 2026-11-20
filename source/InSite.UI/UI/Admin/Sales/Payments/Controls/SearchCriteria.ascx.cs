@@ -32,6 +32,9 @@ namespace InSite.Admin.Payments.Controls
 
                     ProductIdentifier = Product.Value,
 
+                    TaxCountry = TaxRegion.HasValue ? "CA" : null,
+                    TaxRegion = TaxRegion.Value,
+
                     ExcludeBrokenReferences = true
                 };
 
@@ -62,6 +65,8 @@ namespace InSite.Admin.Payments.Controls
                 TransactionID.Text = value.TransactionIdentifier;
 
                 Product.Value = value.ProductIdentifier;
+
+                TaxRegion.Value = value.TaxRegion;
             }
         }
 
@@ -88,6 +93,8 @@ namespace InSite.Admin.Payments.Controls
             TransactionID.Text = null;
 
             Product.Value = null;
+
+            TaxRegion.Value = null;
         }
     }
 }

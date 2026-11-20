@@ -96,6 +96,33 @@ namespace InSite.Cmds.Actions.Reporting.Report
         protected global::InSite.Common.Web.UI.DownloadButton DownloadXlsx;
 
         /// <summary>
+        /// ReportHeaderCell control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell ReportHeaderCell;
+
+        /// <summary>
+        /// DivisionHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell DivisionHeader;
+
+        /// <summary>
+        /// JobDivisionHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell JobDivisionHeader;
+
+        /// <summary>
         /// CompanyName control.
         /// </summary>
         /// <remarks>

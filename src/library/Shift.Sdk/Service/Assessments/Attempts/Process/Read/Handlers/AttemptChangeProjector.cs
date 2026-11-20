@@ -42,6 +42,7 @@ namespace InSite.Application.Attempts.Read
             publisher.Subscribe<AttemptStarted2>(Handle);
             publisher.Subscribe<AttemptStarted3>(Handle);
             publisher.Subscribe<AttemptTagged>(Handle);
+            publisher.Subscribe<AttemptAIProctoringSessionIdModified>(Handle);
             publisher.Subscribe<AttemptVoided>(Handle);
             publisher.Subscribe<AttemptCommentPosted>(Handle);
             publisher.Subscribe<ComposedQuestionAnswered>(Handle);
@@ -106,6 +107,9 @@ namespace InSite.Application.Attempts.Read
             => _attemptStore.InsertAttempt(change);
 
         public void Handle(AttemptTagged e)
+            => _attemptStore.UpdateAttempt(e);
+
+        public void Handle(AttemptAIProctoringSessionIdModified e)
             => _attemptStore.UpdateAttempt(e);
 
         public void Handle(AttemptVoided e) =>

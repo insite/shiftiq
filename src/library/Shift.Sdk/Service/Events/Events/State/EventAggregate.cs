@@ -64,12 +64,14 @@ namespace InSite.Domain.Events
             Apply(e);
         }
 
-        public void ChangeEventFormat(string format)
+        public bool ChangeEventFormat(string format)
         {
             if (Data.EventFormat == format)
-                return;
+                return false;
 
             Apply(new EventFormatChanged(format));
+
+            return true;
         }
 
         public void ChangeEventCalendarColor(string calendarColor)
@@ -357,12 +359,14 @@ namespace InSite.Domain.Events
             Apply(new ExamMaterialReturned(code, received, condition));
         }
 
-        public void ChangeAppointmentType(string appointmentType)
+        public bool ChangeAppointmentType(string appointmentType)
         {
             if (Data.AppointmentType == appointmentType)
-                return;
+                return false;
 
             Apply(new AppointmentTypeChanged(appointmentType));
+
+            return true;
         }
 
         public void LockEventRegistration()
@@ -387,6 +391,14 @@ namespace InSite.Domain.Events
                 return;
 
             Apply(new EventAllowMultipleRegistrationsModified(value));
+        }
+
+        public void ModifyFormAttachmentLimit(int? value)
+        {
+            if (Data.FormAttachmentLimit == value)
+                return;
+
+            Apply(new EventFormAttachmentLimitModified(value));
         }
 
         public void ModifyPersonCodeIsRequired(bool value)

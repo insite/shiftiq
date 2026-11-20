@@ -1,7 +1,13 @@
 using System.Runtime.CompilerServices;
 
+using InSite.Application.Registrations.Write;
+
 using Shift.Common;
+using Shift.Common.Exceptions;
+using Shift.Constant;
 using Shift.Contract;
+using Shift.Sdk.Service;
+using Shift.Service.Utility;
 
 namespace Shift.Service.Booking;
 
@@ -10,11 +16,15 @@ public class RegistrationService : IEntityService
     private readonly RegistrationReader _reader;
     private readonly RegistrationWriter _writer;
     private readonly RegistrationAdapter _adapter = new RegistrationAdapter();
+    private readonly CollectionItemReader _collectionItemReader;
+    private readonly ICommanderAsync _commander;
 
-    public RegistrationService(RegistrationReader reader, RegistrationWriter writer)
+    public RegistrationService(RegistrationReader reader, RegistrationWriter writer, CollectionItemReader collectionItemReader, ICommanderAsync commander)
     {
         _reader = reader;
         _writer = writer;
+        _commander = commander;
+        _collectionItemReader = collectionItemReader;
     }
 
     public async Task<bool> AssertAsync(Guid registration, Guid? organization, CancellationToken cancellation = default)
@@ -32,18 +42,11 @@ public class RegistrationService : IEntityService
     public async Task<int> CountAsync(IRegistrationCriteria criteria, CancellationToken cancellation = default)
     {
         return await _reader.CountAsync(criteria, cancellation);
-    } 
-
-    public async Task<bool> CreateAsync(CreateRegistration create, CancellationToken cancellation = default)
-    {
-        var entity = _adapter.ToEntity(create);
-
-        return await _writer.CreateAsync(entity, cancellation);
     }
 
-    public async Task<bool> DeleteAsync(Guid registration, CancellationToken cancellation = default)
+    public async Task<int> CountDetailsAsync(IRegistrationDetailsCriteria criteria, CancellationToken cancellation = default)
     {
-        return await _writer.DeleteAsync(registration, cancellation);
+        return await _reader.CountDetailsAsync(criteria, cancellation);
     }
 
     public async IAsyncEnumerable<RegistrationModel> DownloadAsync(IRegistrationCriteria criteria, [EnumeratorCancellation] CancellationToken cancellation)
@@ -52,18 +55,6 @@ public class RegistrationService : IEntityService
         {
             yield return _adapter.ToModel(entity);
         }
-    }
-
-    public async Task<bool> ModifyAsync(ModifyRegistration modify, CancellationToken cancellation = default)
-    {
-        var entity = await _reader.RetrieveAsync(modify.RegistrationIdentifier, cancellation);
-
-        if (entity == null)
-            return false;
-
-        _adapter.Copy(modify, entity);
-
-        return await _writer.ModifyAsync(entity, cancellation);
     }
 
     public async Task<RegistrationModel?> RetrieveAsync(Guid registration, CancellationToken cancellation = default)
@@ -78,8 +69,44 @@ public class RegistrationService : IEntityService
         return await _reader.SearchAsync(criteria, cancellation);
     }
 
+    public async Task<IEnumerable<RegistrationDetailsMatch>> SearchDetailsAsync(IRegistrationDetailsCriteria criteria, CancellationToken cancellation = default)
+    {
+        return await _reader.SearchDetailsAsync(criteria, cancellation);
+    }
+
     public string Serialize<T>(IEnumerable<T> models, string format, string includes)
     {
         return _adapter.Serialize(models, format, includes);
+    }
+
+    public async Task<bool> ModifyAttendanceStatusAsync(Guid organizationId, Guid registrationId, string? attendanceStatus, CancellationToken cancellation)
+    {
+        await ValidateAttendanceStatusAsync(organizationId, attendanceStatus, cancellation);
+
+        var entity = await _reader.RetrieveAsync(registrationId, cancellation);
+        if (entity == null || entity.OrganizationIdentifier != organizationId)
+            return false;
+
+        if (attendanceStatus == string.Empty)
+            attendanceStatus = null;
+
+        if (string.Equals(entity.AttendanceStatus ?? null, attendanceStatus, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        await _commander.SendCommandsAsync([new TakeAttendance(registrationId, attendanceStatus, null, null)], cancellation);
+
+        return true;
+    }
+
+    private async Task ValidateAttendanceStatusAsync(Guid organizationId, string? attendanceStatus, CancellationToken cancellation)
+    {
+        if (string.IsNullOrEmpty(attendanceStatus))
+            return;
+
+        var items = await _collectionItemReader
+            .CollectAsync(organizationId, CollectionName.Registrations_Attendance_Status, cancellation);
+
+        if (!items.Any(x => string.Equals(x.ItemName, attendanceStatus, StringComparison.OrdinalIgnoreCase)))
+            throw new ClientErrorException($"Invalid AttendanceStatus: {attendanceStatus}");
     }
 }

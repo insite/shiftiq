@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -75,7 +75,7 @@ namespace InSite.Admin.Issues.Forms
             if (IsPostBack)
                 return;
 
-            DateReported.Value = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, User.TimeZone);
+            DateReported.Value = TimeZones.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
 
             CancelButton.NavigateUrl = $"/ui/admin/workflow/cases/search";
 
@@ -355,23 +355,10 @@ namespace InSite.Admin.Issues.Forms
         private void SendCommands(Application.Issues.Read.VIssue result, bool v)
         {
             var number = ServiceLocator.IssueSearch.GetNextIssueNumber(Organization.Identifier);
-            OpenIssue open = null;
-            AssignUser admin = null;
-            AssignUser assignee = null;
 
-            open = new OpenIssue(result.IssueIdentifier,
-                Organization.OrganizationIdentifier,
-                number, result.IssueTitle,
-                result.IssueDescription,
-                DateTimeOffset.UtcNow,
-                null, result.IssueType,
-                result.IssueReported);
-            admin = new AssignUser(result.IssueIdentifier, result.AdministratorUserIdentifier.Value, "Administrator");
-            assignee = new AssignUser(result.IssueIdentifier, result.TopicUserIdentifier.Value, "Topic");
-
-            ServiceLocator.SendCommand(open);
-            ServiceLocator.SendCommand(admin);
-            ServiceLocator.SendCommand(assignee);
+            ServiceLocator.SendCommand(new OpenIssue(result.IssueIdentifier, Organization.OrganizationIdentifier, number, result.IssueTitle, result.IssueDescription, DateTimeOffset.UtcNow, null, result.IssueType, result.IssueReported));
+            ServiceLocator.SendCommand(new AssignUser(result.IssueIdentifier, result.TopicUserIdentifier.Value, "Topic"));
+            ServiceLocator.SendCommand(new AssignUser(result.IssueIdentifier, result.AdministratorUserIdentifier.Value, "Administrator"));
         }
 
         private void SendCommands(Guid issue, bool isDuplication = false)
@@ -381,13 +368,12 @@ namespace InSite.Admin.Issues.Forms
             if (isDuplication)
             {
                 ServiceLocator.SendCommand(new OpenIssue(issue, Organization.OrganizationIdentifier, number, DuplicateIssueTitle.Text, DuplicateIssueDescription.Text, DateTimeOffset.UtcNow, null, DuplicateIssueType.Value, DuplicateDateReported.Value));
-                ServiceLocator.SendCommand(new AssignUser(issue, DuplicateAdministratorID.Value.Value, "Administrator"));
                 ServiceLocator.SendCommand(new AssignUser(issue, DuplicateAssigneeID.Value.Value, "Topic"));
+                ServiceLocator.SendCommand(new AssignUser(issue, DuplicateAdministratorID.Value.Value, "Administrator"));
             }
             else
             {
                 ServiceLocator.SendCommand(new OpenIssue(issue, Organization.OrganizationIdentifier, number, IssueTitle.Text, IssueDescription.Text, DateTimeOffset.UtcNow, null, IssueType.Value, DateReported.Value));
-                ServiceLocator.SendCommand(new AssignUser(issue, AdministratorIdentifier.Value.Value, "Administrator"));
                 ServiceLocator.SendCommand(new AssignUser(issue, TopicIdentifier.Value.Value, "Topic"));
 
                 var statusId = IssueStatus.ValueAsGuid;
@@ -399,6 +385,8 @@ namespace InSite.Admin.Issues.Forms
 
                 if (OwnerIdentifier.Value.HasValue)
                     ServiceLocator.SendCommand(new AssignUser(issue, OwnerIdentifier.Value.Value, "Owner"));
+
+                ServiceLocator.SendCommand(new AssignUser(issue, AdministratorIdentifier.Value.Value, "Administrator"));
             }
 
             if (isDuplication)

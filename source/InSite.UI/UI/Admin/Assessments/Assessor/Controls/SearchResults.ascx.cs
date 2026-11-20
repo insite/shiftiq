@@ -96,13 +96,13 @@ namespace InSite.Admin.Assessments.Assessor.Controls
 
             var attempt = (QAttempt)Page.GetDataItem();
             if (attempt.AttemptStarted.HasValue)
-                html.Append("<div>Started " + attempt.AttemptStarted.Value.Format(User.TimeZone, true) + "</div>");
+                html.Append("<div>Started " + TimeZones.Format(attempt.AttemptStarted.Value, User.TimeZone, true) + "</div>");
 
             if (attempt.AttemptGraded.HasValue)
-                html.Append("<div>Completed " + attempt.AttemptGraded.Value.Format(User.TimeZone, true) + "</div>");
+                html.Append("<div>Completed " + TimeZones.Format(attempt.AttemptGraded.Value, User.TimeZone, true) + "</div>");
 
             if (attempt.AttemptImported.HasValue)
-                html.Append("<div class='form-text'>Imported " + attempt.AttemptImported.Value.Format(User.TimeZone, true) + "</div>");
+                html.Append("<div class='form-text'>Imported " + TimeZones.Format(attempt.AttemptImported.Value, User.TimeZone, true) + "</div>");
 
             if (attempt.AttemptDuration.HasValue)
                 html.Append("<div class='form-text'>Time Taken = " + ((double)attempt.AttemptDuration).Seconds().Humanize(2, minUnit: TimeUnit.Second) + "</div>");

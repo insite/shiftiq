@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -8,6 +8,7 @@ using InSite.Application.Invoices.Read;
 using InSite.Application.Payments.Read;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
+using InSite.UI.Portal.Billing.Utilities;
 
 using Shift.Common;
 using Shift.Common.Linq;
@@ -32,6 +33,10 @@ namespace InSite.Admin.Payments.Controls
             public string CustomerName { get; set; }
             public string CustomerEmail { get; set; }
 
+            public string TaxProvince { get; set; }
+            public decimal? TaxPercent { get; set; }
+            public decimal? TaxAmount { get; set; }
+
             public decimal PaymentAmount { get; set; }
 
             public int? InvoiceNumber { get; set; }
@@ -45,7 +50,6 @@ namespace InSite.Admin.Payments.Controls
             public string Employer { get; internal set; }
             public string ProductName { get; set; }
         }
-
 
         #endregion
 
@@ -66,8 +70,24 @@ namespace InSite.Admin.Payments.Controls
             filter.OrderBy = "PaymentStarted desc";
 
             return ServiceLocator.PaymentSearch
-                .GetPayments(filter, x=>x.CreatedByUser, x => x.CreatedInvoice, x => x.CreatedInvoice.InvoiceItems.Select(y => y.Product))
+                .GetPayments(filter, x => x.CreatedByUser, x => x.CreatedInvoice, x => x.CreatedInvoice.InvoiceItems.Select(y => y.Product))
                 .ToSearchResult();
+        }
+
+        protected string FormatTaxAmount()
+        {
+            var payment = (QPayment)Page.GetDataItem();
+            var tax = TaxHelper.GetInvoiceTax(payment.CreatedInvoice?.InvoiceItems);
+
+            return TaxHelper.FormatTaxAmount(tax.Amount, tax.Rate);
+        }
+
+        protected string GetRegionName()
+        {
+            var payment = (QPayment)Page.GetDataItem();
+            var tax = TaxHelper.GetInvoiceTax(payment.CreatedInvoice?.InvoiceItems);
+
+            return TaxHelper.GetRegionName(tax.Region);
         }
 
         protected string GetLocalTime(object item)
@@ -90,7 +110,7 @@ namespace InSite.Admin.Payments.Controls
 
             var invoice = payment.CreatedInvoice;
 
-            if(invoice == null) 
+            if (invoice == null)
                 return;
 
             var products = invoice.InvoiceItems
@@ -112,27 +132,47 @@ namespace InSite.Admin.Payments.Controls
 
         public override IListSource GetExportData(QPaymentFilter filter, bool empty)
         {
-            return SelectData(filter).GetList().Cast<QPayment>().Select(x => new ExportDataItem
+            return SelectData(filter).GetList().Cast<QPayment>().Select(x =>
             {
-                CreatedBy= x.CreatedBy,
-                CustomerIP= x.CustomerIP,
-                InvoiceIdentifier= x.InvoiceIdentifier,
-                OrganizationIdentifier= x.OrganizationIdentifier,
-                PaymentAborted= x.PaymentAborted,
-                PaymentApproved= x.PaymentApproved,
-                PaymentAmount= x.PaymentAmount,
-                PaymentStatus= x.PaymentStatus,
-                PaymentDeclined= x.PaymentDeclined,
-                PaymentIdentifier= x.PaymentIdentifier,
-                PaymentStarted= x.PaymentStarted,
-                ResultCode= x.ResultCode,
-                ResultMessage= x.ResultMessage,
-                TransactionIdentifier= x.TransactionId,
-                CustomerEmail = x.CreatedByUser.UserEmail,
-                CustomerName = x.CreatedByUser.UserFullName,
-                InvoiceNumber = x.CreatedInvoice.InvoiceNumber,
-                Employer = x.CreatedInvoice.CustomerEmployer,
-                ProductName = GetExportProducts(x.CreatedInvoice.InvoiceItems)
+                var result = new ExportDataItem
+                {
+                    CreatedBy = x.CreatedBy,
+                    CustomerIP = x.CustomerIP,
+                    InvoiceIdentifier = x.InvoiceIdentifier,
+                    OrganizationIdentifier = x.OrganizationIdentifier,
+                    PaymentAborted = x.PaymentAborted,
+                    PaymentApproved = x.PaymentApproved,
+                    PaymentAmount = x.PaymentAmount,
+                    PaymentStatus = x.PaymentStatus,
+                    PaymentDeclined = x.PaymentDeclined,
+                    PaymentIdentifier = x.PaymentIdentifier,
+                    PaymentStarted = x.PaymentStarted,
+                    ResultCode = x.ResultCode,
+                    ResultMessage = x.ResultMessage,
+                    TransactionIdentifier = x.TransactionId
+                };
+
+                if (x.CreatedByUser != null)
+                {
+                    var user = x.CreatedByUser;
+                    result.CustomerEmail = user.UserEmail;
+                    result.CustomerName = user.UserFullName;
+                }
+
+                if (x.CreatedInvoice != null)
+                {
+                    var invoice = x.CreatedInvoice;
+                    var tax = TaxHelper.GetInvoiceTax(invoice.InvoiceItems);
+
+                    result.InvoiceNumber = invoice.InvoiceNumber;
+                    result.Employer = invoice.CustomerEmployer;
+                    result.ProductName = GetExportProducts(invoice.InvoiceItems);
+                    result.TaxProvince = TaxHelper.GetRegionName(tax.Region);
+                    result.TaxPercent = tax.Rate;
+                    result.TaxAmount = tax.Amount;
+                }
+
+                return result;
             }).ToList().ToSearchResult();
         }
 

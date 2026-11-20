@@ -11,6 +11,7 @@ namespace InSite.Persistence.Plugin.CMDS
         public string AchievementTitle { get; set; }
         public bool AchievementIsEnabled { get; set; }
         public bool AchievementAllowSelfDeclared { get; set; }
+        public bool AchievementIssuesCertificate { get; set; }
         public string ValidForUnit { get; set; }
         public string Visibility { get; set; }
         public Guid OrganizationIdentifier { get; set; }

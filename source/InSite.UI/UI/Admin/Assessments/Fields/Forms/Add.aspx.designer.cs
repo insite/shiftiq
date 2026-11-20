@@ -87,6 +87,51 @@ namespace InSite.Admin.Assessments.Fields.Forms
         protected global::System.Web.UI.WebControls.Literal SetName;
 
         /// <summary>
+        /// QuestionsUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel QuestionsUpdatePanel;
+
+        /// <summary>
+        /// QuestionModeSelect control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.RadioButton QuestionModeSelect;
+
+        /// <summary>
+        /// QuestionModeText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.RadioButton QuestionModeText;
+
+        /// <summary>
+        /// QuestionModeMultiView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.MultiView QuestionModeMultiView;
+
+        /// <summary>
+        /// SelectModeView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.View SelectModeView;
+
+        /// <summary>
         /// QuestionIdValidator control.
         /// </summary>
         /// <remarks>
@@ -130,6 +175,33 @@ namespace InSite.Admin.Assessments.Fields.Forms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel NoQuestionsMessage;
+
+        /// <summary>
+        /// TextModeView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.View TextModeView;
+
+        /// <summary>
+        /// QuestionCodeValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.RequiredValidator QuestionCodeValidator;
+
+        /// <summary>
+        /// QuestionCodes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.TextBox QuestionCodes;
 
         /// <summary>
         /// SaveButton control.

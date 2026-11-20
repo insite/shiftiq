@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -63,6 +64,12 @@ namespace InSite.Admin.Assessments.Fields.Forms
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
+            QuestionModeSelect.AutoPostBack = true;
+            QuestionModeSelect.CheckedChanged += (s, a) => SetModeVisiblity();
+
+            QuestionModeText.AutoPostBack = true;
+            QuestionModeText.CheckedChanged += (s, a) => SetModeVisiblity();
 
             QuestionIdValidator.ServerValidate += QuestionIdValidator_ServerValidate;
 
@@ -130,7 +137,8 @@ namespace InSite.Admin.Assessments.Fields.Forms
 
         private void QuestionIdValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
-            args.IsValid = QuestionRepeaterDataSource != null && QuestionRepeaterDataSource.Any(x => !x.FieldIndex.HasValue && x.Checked);
+            args.IsValid = !QuestionModeSelect.Checked
+                || QuestionRepeaterDataSource != null && QuestionRepeaterDataSource.Any(x => !x.FieldIndex.HasValue && x.Checked);
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
@@ -160,6 +168,14 @@ namespace InSite.Admin.Assessments.Fields.Forms
 
         private void Save()
         {
+            if (QuestionModeSelect.Checked)
+                SaveSelectMode();
+            else if (QuestionModeText.Checked)
+                SaveTextMode();
+        }
+
+        private void SaveSelectMode()
+        {
             for (var i = 0; i < QuestionRepeaterDataSource.Length; i++)
             {
                 var item = QuestionRepeaterDataSource[i];
@@ -170,9 +186,74 @@ namespace InSite.Admin.Assessments.Fields.Forms
             RedirectToBankReader(FormID, SectionID, Guid.Empty);
         }
 
+        private void SaveTextMode()
+        {
+            var codes = QuestionCodes.Text
+                .Split(new[] { ',', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => x.IsNotEmpty())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (codes.Count == 0)
+            {
+                CreatorStatus.AddMessage(AlertType.Error, "No valid question codes found. Please enter at least one question code separated by commas or new lines.");
+                return;
+            }
+
+            var bank = ServiceLocator.BankSearch.GetBankState(BankID);
+            if (bank == null)
+                RedirectToFinder();
+
+            var section = bank.FindSection(SectionID);
+            if (section == null || section.Form.Specification.Type != SpecificationType.Static)
+                RedirectToBankReader();
+
+            var set = section.Criterion.Sets.FirstOrDefault();
+            if (set == null)
+                RedirectToBankReader();
+
+            var questionsByCode = set.Questions
+                .Where(x => x.Classification.Code.IsNotEmpty())
+                .GroupBy(x => x.Classification.Code, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+
+            var invalidCodes = new List<string>();
+            var matchedQuestions = new List<Domain.Banks.Question>();
+            var addedQuestionIds = new HashSet<Guid>(section.Fields.Select(f => f.QuestionIdentifier));
+
+            foreach (var code in codes)
+            {
+                if (!questionsByCode.TryGetValue(code, out var question))
+                    invalidCodes.Add(code);
+                else if (addedQuestionIds.Add(question.Identifier))
+                    matchedQuestions.Add(question);
+            }
+
+            if (invalidCodes.Count > 0)
+            {
+                var items = string.Concat(invalidCodes.Select(c => $"<li>{HttpUtility.HtmlEncode(c)}</li>"));
+                CreatorStatus.AddMessage(AlertType.Error, $"The code entered does not exist in the current set. Please verify the code and try again.<ul>{items}</ul>");
+                return;
+            }
+
+            var startIndex = section.Fields.Count;
+            for (var i = 0; i < matchedQuestions.Count; i++)
+            {
+                ServiceLocator.SendCommand(new AddField(
+                    BankID,
+                    UniqueIdentifier.Create(),
+                    SectionID,
+                    matchedQuestions[i].Identifier,
+                    startIndex + i));
+            }
+
+            RedirectToBankReader(FormID, SectionID, Guid.Empty);
+        }
+
         #endregion
 
-        #region Settin/getting input values
+        #region Setting/getting input values
 
         private void SetInputValues(Section section)
         {
@@ -193,6 +274,7 @@ namespace InSite.Admin.Assessments.Fields.Forms
             FormName.Text = form.Name;
             SectionName.Text = $"Section {section.Sequence} of {form.Sections.Count}";
 
+            SetModeVisiblity();
             BindQuestionRepeater(section);
 
             CancelButton.NavigateUrl = GetReaderUrl(FormID, section.Identifier);
@@ -242,6 +324,16 @@ namespace InSite.Admin.Assessments.Fields.Forms
 
             QuestionRepeater.DataSource = QuestionRepeaterDataSource;
             QuestionRepeater.DataBind();
+        }
+
+        private void SetModeVisiblity()
+        {
+            if (QuestionModeSelect.Checked)
+                QuestionModeMultiView.SetActiveView(SelectModeView);
+            else if (QuestionModeText.Checked)
+                QuestionModeMultiView.SetActiveView(TextModeView);
+            else
+                QuestionModeMultiView.ActiveViewIndex = -1;
         }
 
         #endregion

@@ -17,6 +17,7 @@ using InSite.UI.Layout.Portal;
 using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
+using Shift.Constant;
 using Shift.Sdk.UI;
 
 namespace InSite.Portal.Assessments.Attempts
@@ -146,9 +147,13 @@ namespace InSite.Portal.Assessments.Attempts
             var bankForm = _loadData.BankForm;
             var attempt = _loadData.Attempt;
 
+            AIProctoringProvider? aiProctoringProvider = null;
+            if (Enum.TryParse<AIProctoringProvider>(attempt.AIProctoringProvider, out var aiProctoringProviderTemp))
+                aiProctoringProvider = aiProctoringProviderTemp;
+
             QuestionNav.Visible = false;
             QuestionList.Visible = false;
-            KioskMode.Visible = bankForm.Invigilation.IsKioskModeRequired;
+            KioskMode.Visible = bankForm.Invigilation.IsKioskModeRequired || aiProctoringProviderTemp == AIProctoringProvider.Proview;
 
             var bankTitle = bankForm.Content.Title?[CurrentSessionState.Identity.Language] ?? bankForm.Content.Title?.Default;
 
@@ -247,9 +252,11 @@ namespace InSite.Portal.Assessments.Attempts
             var examShowTimer = bankForm.Invigilation.IsTimerVisible ? "true" : "false";
             var images = AttemptImageInfo.CreateDictionary(bankForm.Specification.Bank.EnumerateAllAttachments());
             var pingInterval = attempt.AttemptPingInterval ?? AttemptConfiguration.DefaultPingInterval;
+            var proctoringPageOrigin = AttemptHelper.GetScriptProctoringPageOrigin(attempt);
 
             InitFieldScript.Text = $@"
 <script type=""text/javascript"">
+    const _proctoringPageOrigin = {proctoringPageOrigin};
     const _accessTimerCount = {pingInterval * 2};
     const _examShowTimer = {examShowTimer};
     const _pingInterval = {pingInterval};

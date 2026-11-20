@@ -7,6 +7,8 @@ namespace Shift.Contract
 {
     public class SearchGroups : Query<IEnumerable<GroupMatch>>, IGroupCriteria
     {
+        string IGroupCriteria.GroupType { get => null; set { } }
+
         public Guid? OrganizationId { get; set; }
 
         public string GroupCode { get; set; }

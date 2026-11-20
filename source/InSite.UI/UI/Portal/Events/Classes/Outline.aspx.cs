@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -232,10 +232,10 @@ namespace InSite.UI.Portal.Events.Classes
             }
 
             RegistrationStartField.Visible = @event.RegistrationStart.HasValue;
-            RegistrationStart.Text = @event.RegistrationStart.Format(null, true);
+            RegistrationStart.Text = @event.RegistrationStart.Format((string)null, true);
 
             RegistrationDeadline.Text = @event.RegistrationDeadline.HasValue
-                ? @event.RegistrationDeadline.Format(null, true)
+                ? @event.RegistrationDeadline.Format((string)null, true)
                 : @event.EventScheduledStart.Format(User.TimeZone, true);
 
             Venue.BindVenue(@event, "Location", "Venue");
@@ -260,7 +260,7 @@ namespace InSite.UI.Portal.Events.Classes
 
             RegistrationCompeted.Text = registrationCompetedInstruction.HasValue() ? Markdown.ToHtml(registrationCompetedInstruction) : string.Empty;
 
-            var localeDate = TimeZoneInfo.ConvertTime(@event.EventScheduledStart, User.TimeZone).Date;
+            var localeDate = TimeZones.ConvertTime(@event.EventScheduledStart, User.TimeZone).Date;
             ReturnToCalendar.NavigateUrl = $"/ui/portal/events/calendar?date={localeDate.ToShortDateString()}";
             ReturnToCalendar.Visible = !(Identity.Organization.Toolkits.Events?.HideReturnToCalendar ?? false);
         }

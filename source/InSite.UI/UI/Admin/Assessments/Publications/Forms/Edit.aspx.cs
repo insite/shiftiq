@@ -7,9 +7,9 @@ using InSite.Application.Sites.Read;
 using InSite.Common.Web;
 using InSite.Persistence;
 using InSite.UI.Layout.Admin;
-using InSite.UI.Portal.Assessments.Attempts.Utilities;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Common.Linq;
 using Shift.Constant;
 

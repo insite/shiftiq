@@ -237,6 +237,14 @@ DELETE FROM achievements.QAchievement WHERE AchievementIdentifier = @Achievement
             });
         }
 
+        public void UpdateAchievement(AchievementCertificateIssuanceChanged e)
+        {
+            Update(e, achievement =>
+            {
+                achievement.AchievementIssuesCertificate = e.IssuesCertificate;
+            });
+        }
+
         public void DeleteAchievement(AchievementDeleted e)
         {
             using (var db = CreateContext())

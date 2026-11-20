@@ -15,7 +15,7 @@ namespace InSite.Persistence
             return new UserModel
             {
                 PasswordExpiry = user.UserPasswordExpired,
-                TimeZone = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone),
+                TimeZone = TimeZones.ValidateZone(user.TimeZone),
                 Identifier = user.UserIdentifier,
                 Email = user.Email,
                 PersonCode = personCode,

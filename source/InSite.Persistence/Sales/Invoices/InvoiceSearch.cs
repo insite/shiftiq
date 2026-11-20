@@ -380,6 +380,9 @@ namespace InSite.Persistence
             if (!string.IsNullOrEmpty(filter.RegionCode))
                 query = query.Where(x => x.RegionCode == filter.RegionCode);
 
+            if (!string.IsNullOrEmpty(filter.CountryCode))
+                query = query.Where(x => x.CountryCode == filter.CountryCode);
+
             if (!string.IsNullOrEmpty(filter.TaxName))
                 query = query.Where(x => x.TaxName.Contains(filter.TaxName));
 

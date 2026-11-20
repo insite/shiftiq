@@ -135,7 +135,7 @@ namespace InSite.Application.Events.Write
 
             foreach (var registration in registrations)
             {
-                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(registration.Candidate.UserTimeZone);
+                var timeZone = registration.Candidate.UserTimeZone;
 
                 var notification = new ClassReminderLearnerNotification
                 {
@@ -187,7 +187,7 @@ namespace InSite.Application.Events.Write
 
             foreach (var instructor in instructors)
             {
-                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(instructor.Person.User.UserTimeZone);
+                var timeZone = instructor.Person.User.UserTimeZone;
 
                 var notification = new ClassReminderInstructorNotification
                 {

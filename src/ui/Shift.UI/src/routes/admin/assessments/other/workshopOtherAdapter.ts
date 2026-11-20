@@ -6,6 +6,7 @@ import { urlHelper } from "@/helpers/urlHelper";
 import { ApiWorkshopComment } from "@/api/controllers/assessments/workshop/ApiWorkshopComment";
 import { ApiWorkshopAttachment } from "@/api/controllers/assessments/workshop/ApiWorkshopAttachment";
 import { ApiWorkshopProblemQuestion } from "@/api/controllers/assessments/workshop/ApiWorkshopProblemQuestion";
+import { WorkshopProblemQuestion } from "@/contexts/workshop/models/WorkshopProblemQuestion";
 
 function validateAttachmentType(attachmentType: string) {
     switch (attachmentType) {
@@ -17,6 +18,25 @@ function validateAttachmentType(attachmentType: string) {
         default:
             throw new Error(`Unsupported attachment type: ${attachmentType}`);
     }
+}
+
+function getProblemQuestions(problemQuestions: ApiWorkshopProblemQuestion[]): WorkshopProblemQuestion[] {
+    return problemQuestions.map(q => ({
+        questionId: q.QuestionId,
+        questionBankIndex: q.QuestionBankIndex,
+        questionAssetNumber: q.QuestionAssetNumber,
+        questionAssetVersion: q.QuestionAssetVersion,
+        questionSetName: q.QuestionSetName,
+        questionTitle: q.QuestionTitle ?? null,
+        canDelete: q.CanDelete,
+        problemDescription: q.ProblemDescription,
+        options: q.Options.map(o => ({
+            number: o.Number,
+            title: o.Title ?? null,
+            letter: o.Letter,
+            points: o.Points,
+        })),
+    }));
 }
 
 export const workshopOtherAdapter = {
@@ -68,23 +88,10 @@ export const workshopOtherAdapter = {
                 imageDimensions: a.ImageDimensions ?? null,
                 color: a.Color ?? null,
             })),
-            problemQuestions: problemQuestions.map(q => ({
-                questionId: q.QuestionId,
-                questionBankIndex: q.QuestionBankIndex,
-                questionAssetNumber: q.QuestionAssetNumber,
-                questionAssetVersion: q.QuestionAssetVersion,
-                questionSetName: q.QuestionSetName,
-                questionTitle: q.QuestionTitle ?? null,
-                canDelete: q.CanDelete,
-                problemDescription: q.ProblemDescription,
-                options: q.Options.map(o => ({
-                    number: o.Number,
-                    title: o.Title ?? null,
-                    letter: o.Letter,
-                    points: o.Points,
-                })),
-            })),
+            problemQuestions: getProblemQuestions(problemQuestions),
             readOnly: false,
         }
     },
+
+    getProblemQuestions,
 }

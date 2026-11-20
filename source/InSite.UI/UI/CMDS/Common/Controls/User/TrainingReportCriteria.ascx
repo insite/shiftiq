@@ -5,11 +5,18 @@
 
 <insite:Alert runat="server" Indicator="Information">
     <strong>Please note:</strong> to prevent timeout errors, the system does not allow reporting on all achievements for all departments at the same time.
-    If all achievements are selected, then a selection of departments must be made.
+    If all achievements are selected, then a selection of divisions or departments must be made.
 </insite:Alert>
 
 <div class="row">
     <div class="col-lg-6">
+
+        <div runat="server" id="DivisionPanel" class="form-group mb-3">
+            <label class="form-label">
+                Division
+            </label>
+            <insite:DivisionComboBox runat="server" ID="DivisionIdentifier" EmptyMessage="All divisions" DisplayNameOnly="true" />
+        </div>
 
         <div class="form-group mb-3">
             <label class="form-label">

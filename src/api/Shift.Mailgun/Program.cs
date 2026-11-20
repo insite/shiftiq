@@ -29,7 +29,7 @@ builder.Services.AddLogging(lb =>
 
 var app = builder.Build();
 var programLogger = app.Services.GetRequiredService<ILogger<Program>>();
-var queueHelper = new QueueHelper(settings);
+var queueHelper = new MailgunQueueHelper(settings);
 
 // Step 4. Initialize RabbitMQ publisher
 
@@ -49,13 +49,13 @@ app.MapPost("/api/handle-webhook", async (HttpRequest request) =>
     using (var reader = new StreamReader(request.Body))
         json = await reader.ReadToEndAsync();
 
-    var error = validator.ParseAndValidate(json, out var environmentDomain, out var queueName);
+    var error = validator.ParseAndValidate(json, out var queueFullName);
     if (error != null)
         return error;
 
-    await publisher.PublishJsonAsync(queueName!, json);
+    await publisher.PublishJsonAsync(queueFullName!, json);
 
-    programLogger.LogInformation("Published webhook to {QueueName} for {EnvironmentDomain}", queueName, environmentDomain);
+    programLogger.LogInformation("Published webhook to {QueueFullName}", queueFullName);
 
     return Results.Ok();
 });

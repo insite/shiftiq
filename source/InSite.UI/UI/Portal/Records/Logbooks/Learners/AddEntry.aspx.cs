@@ -147,7 +147,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Learners
             if (!string.IsNullOrEmpty(instructions))
                 InstructionBody.Text = Markdown.ToHtml(instructions);
 
-            var fieldCount = Fields.LoadData(JournalSetupIdentifier, null);
+            var fieldCount = Fields.LoadData(JournalSetupIdentifier, null, UserIdentifier);
             var competencyCount = Competencies.LoadData(JournalSetupIdentifier, null);
 
             FieldsTab.Visible = fieldCount > 0;

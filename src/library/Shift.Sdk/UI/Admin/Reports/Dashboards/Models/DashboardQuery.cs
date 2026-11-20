@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Newtonsoft.Json;
 
@@ -20,5 +21,14 @@ namespace Shift.Sdk.UI
         {
             Parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
+
+        public DashboardQuery Clone() => new DashboardQuery
+        {
+            File = File,
+            FileRaw = FileRaw,
+            Sql = Sql,
+            SqlRaw = SqlRaw,
+            Parameters = Parameters.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase)
+        };
     }
 }

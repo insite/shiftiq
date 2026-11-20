@@ -20,6 +20,7 @@ using InSite.Persistence;
 using InSite.UI.Admin.Records.Programs.Utilities;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Constant;
 
 namespace InSite.UI.Portal.Assessments.Attempts.Utilities
@@ -52,17 +53,36 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 
         public sealed class ActionRedirect : IAction
         {
+            private readonly Page _page;
+            private readonly string _proctoringPageOrigin;
+
             public string Url { get; }
 
-            public ActionRedirect(string url)
+            public ActionRedirect(Page page, string proctoringPageOrigin, string url)
             {
-                Url = url.NullIfEmpty()
-                    ?? throw new ArgumentNullException(nameof(url));
+                _page = page;
+                _proctoringPageOrigin = proctoringPageOrigin;
+
+                Url = url.NullIfEmpty() ?? throw new ArgumentNullException(nameof(url));
             }
 
             public void Execute(Alert errorAlert, ITextControl notification)
             {
-                HttpResponseHelper.Redirect(Url);
+                if (!string.IsNullOrEmpty(_proctoringPageOrigin) && _page != null)
+                {
+                    _page.ClientScript.RegisterStartupScript(_page.GetType(), "redirect", $@"
+                        // Consumed by /client/portal/assessments/attempts/answer
+                        window.parent.postMessage(
+                            {{
+                                type: ""attempt-complete"",
+                                redirectUrl: '{Url}'
+                            }},
+                            {_proctoringPageOrigin}
+                        );
+                    ", true);
+                }
+                else
+                    HttpResponseHelper.Redirect(Url);
             }
         }
 
@@ -141,7 +161,8 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                 TabNavigation = spec.TabNavigationEnabled,
                 SingleQuestionPerTab = spec.SingleQuestionPerTabEnabled,
                 TabTimeLimit = spec.TabTimeLimit,
-                CriteriaAsSections = spec.SectionsAsTabsEnabled && spec.Type == SpecificationType.Dynamic
+                CriteriaAsSections = spec.SectionsAsTabsEnabled && spec.Type == SpecificationType.Dynamic,
+                AIProctoringProvider = bankForm.Invigilation.AIProctoringProvider
             };
             var sections = AttemptStarter.CreateSections(bankForm);
 
@@ -317,7 +338,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             }
         }
 
-        public static IAction LoadAttemptStart(Form form, Guid learnerId, AttemptUrlBase url)
+        public static IAction LoadAttemptStart(Form form, Guid learnerId, AttemptUrlBase url, bool aiProctoringEnabled)
         {
             var isFormOpened = !form.Invigilation.Opened.HasValue || form.Invigilation.Opened.Value <= DateTimeOffset.Now;
             if (!isFormOpened)
@@ -330,7 +351,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             {
                 if (url is AttemptUrlResource || url is AttemptUrlForm)
                 {
-                    return new ActionRedirect(url.GetResultUrl(summary.AttemptLastPassedIdentifier.Value));
+                    return new ActionRedirect(null, null, url.GetResultUrl(summary.AttemptLastPassedIdentifier.Value));
                 }
                 else
                     throw new InvalidOperationException($"Unexpected URL type: {url.GetType()}");
@@ -338,26 +359,26 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 
             var isLastAttempt = !url.AttemptID.HasValue || summary.AttemptLastStartedIdentifier == url.AttemptID;
             if (!isLastAttempt)
-                return new ActionRedirect(url.GetResultUrl());
+                return new ActionRedirect(null, null, url.GetResultUrl());
 
             var isAllAttemptsGraded = summary.AttemptSubmittedCount > summary.AttemptGradedCount;
             if (isAllAttemptsGraded)
-                return new ActionRedirect(url.GetResultUrl(summary.AttemptLastSubmittedIdentifier.Value));
+                return new ActionRedirect(null, null, url.GetResultUrl(summary.AttemptLastSubmittedIdentifier.Value));
 
             var isLimitExceeded = form.Invigilation.AttemptLimit > 0 && summary.AttemptSubmittedCount >= form.Invigilation.AttemptLimit;
             if (isLimitExceeded)
-                return new ActionRedirect(url.GetResultUrl(summary.AttemptLastSubmittedIdentifier.Value));
+                return new ActionRedirect(null, null, url.GetResultUrl(summary.AttemptLastSubmittedIdentifier.Value));
 
             var hasActiveAttempt = summary.AttemptLastStartedIdentifier.HasValue
                 && summary.AttemptLastStartedIdentifier != summary.AttemptLastSubmittedIdentifier;
             if (hasActiveAttempt)
-                return new ActionRedirect(url.GetAnswerUrl(summary.AttemptLastStartedIdentifier.Value));
+                return new ActionRedirect(null, null, url.GetAnswerUrl(summary.AttemptLastStartedIdentifier.Value, aiProctoringEnabled));
 
             var isFormClosed = form.Invigilation.Closed.HasValue && form.Invigilation.Closed.Value < DateTimeOffset.Now;
             if (isFormClosed)
             {
                 if (summary.AttemptLastStartedIdentifier.HasValue)
-                    return new ActionRedirect(url.GetResultUrl(summary.AttemptLastStartedIdentifier.Value));
+                    return new ActionRedirect(null, null, url.GetResultUrl(summary.AttemptLastStartedIdentifier.Value));
 
                 return ActionFormClosed(form, url);
             }
@@ -415,21 +436,23 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             return null;
         }
 
-        public static IAction LoadAttemptAnswer(Form form, AttemptUrlBase url, out QAttempt attempt)
+        public static IAction LoadAttemptAnswer(Page page, Form form, AttemptUrlBase url, out QAttempt attempt)
         {
             attempt = null;
 
             if (!url.AttemptID.HasValue)
                 return ActionInvalidAttemptKey();
 
-            var isFormOpened = !form.Invigilation.Opened.HasValue || form.Invigilation.Opened.Value <= DateTimeOffset.Now;
-            var isFormClosed = form.Invigilation.Closed.HasValue && form.Invigilation.Closed.Value < DateTimeOffset.Now;
-            if (!isFormOpened || isFormClosed)
-                return new ActionRedirect(url.GetResultUrl());
-
             var entity = ServiceLocator.AttemptSearch.GetAttempt(url.AttemptID.Value, x => x.Form, x => x.Form.Bank);
             if (entity == null)
                 return ActionInvalidAttemptKey();
+
+            var proctoringPageOrigin = GetScriptProctoringPageOrigin(entity);
+
+            var isFormOpened = !form.Invigilation.Opened.HasValue || form.Invigilation.Opened.Value <= DateTimeOffset.Now;
+            var isFormClosed = form.Invigilation.Closed.HasValue && form.Invigilation.Closed.Value < DateTimeOffset.Now;
+            if (!isFormOpened || isFormClosed)
+                return new ActionRedirect(page, proctoringPageOrigin, url.GetResultUrl());
 
             var user = CurrentSessionState.Identity.User;
             if (user == null)
@@ -444,13 +467,13 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
             var isAttemptStarted = summary.AttemptLastStartedIdentifier.HasValue
                 && url.AttemptID.Value == summary.AttemptLastStartedIdentifier.Value;
             if (!isAttemptStarted)
-                return new ActionRedirect(url.GetResultUrl());
+                return new ActionRedirect(page, proctoringPageOrigin, url.GetResultUrl());
 
             if (entity.AttemptSubmitted.HasValue)
-                return new ActionRedirect(url.GetResultUrl());
+                return new ActionRedirect(page, proctoringPageOrigin, url.GetResultUrl());
 
             if (!entity.AttemptStarted.HasValue)
-                return new ActionRedirect(url.GetStartUrl(entity.AttemptIdentifier));
+                return new ActionRedirect(page, proctoringPageOrigin, url.GetStartUrl(entity.AttemptIdentifier));
 
             attempt = entity;
 
@@ -461,7 +484,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 
                 var timeElapsed = ((double?)entity.AttemptDuration ?? 0).Seconds();
                 if (timeElapsed.TotalMinutes >= attempt.AttemptTimeLimit.Value)
-                    return new ActionRedirect(url.GetResultUrl());
+                    return new ActionRedirect(page, proctoringPageOrigin, url.GetResultUrl());
             }
 
             var pingDate = entity.AttemptPinged ?? entity.AttemptStarted ?? DateTimeOffset.UtcNow;
@@ -487,7 +510,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                 return ActionInvalidAttemptKey();
 
             if (!currentAttempt.AttemptStarted.HasValue)
-                return new ActionRedirect(url.GetStartUrl(currentAttempt.AttemptIdentifier));
+                return new ActionRedirect(null, null, url.GetStartUrl(currentAttempt.AttemptIdentifier));
 
             attempt = currentAttempt;
 
@@ -595,6 +618,17 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
 
         #region Methods (Helpers)
 
+        public static string GetScriptProctoringPageOrigin(QAttempt attempt)
+        {
+            AIProctoringProvider? aiProctoringProvider = null;
+            if (Enum.TryParse<AIProctoringProvider>(attempt.AIProctoringProvider, out var aiProctoringProviderTemp))
+                aiProctoringProvider = aiProctoringProviderTemp;
+
+            return aiProctoringProvider == AIProctoringProvider.Proview
+                ? ServiceLocator.AppSettings.Environment.IsLocal() ? "'http://localhost:3000'" : "window.location.origin"
+                : "null";
+        }
+
         private static IAction ActionInvalidAttemptKey()
         {
             return GetErrorResult(
@@ -624,8 +658,15 @@ namespace InSite.UI.Portal.Assessments.Attempts.Utilities
                 url.GetReturnUrl());
         }
 
-        public static string GetRegistrationStartUrl(Guid registrationId) =>
-            $"/ui/portal/assessments/attempts/start?registration={registrationId}";
+        public static string GetRegistrationStartUrl(Guid registrationId, Guid? examFormId = null)
+        {
+            var url = $"/ui/portal/assessments/attempts/start?registration={registrationId}";
+
+            if (examFormId.HasValue)
+                url += $"&exam-form={examFormId}";
+
+            return url;
+        }
 
         public static IAction GetErrorResult(string title, string message) =>
             new ActionError($"<b>{title}.</b> {message}");

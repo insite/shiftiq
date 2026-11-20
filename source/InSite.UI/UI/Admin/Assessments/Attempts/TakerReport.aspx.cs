@@ -6,6 +6,7 @@ using InSite.UI.Admin.Assessments.Attempts.Controls;
 using InSite.UI.Admin.Assessments.Attempts.Utilities.TakerReport;
 using InSite.UI.Layout.Admin;
 
+using Shift.Common;
 using Shift.Constant;
 using Shift.Sdk.UI;
 
@@ -78,7 +79,7 @@ namespace InSite.UI.Admin.Assessments.Attempts
 
             var report = TakerReportControl.GetPdf(this, userId, attemptIds, ReportOptions.Language);
 
-            var date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, User.TimeZone);
+            var date = TimeZones.ConvertTime(DateTime.UtcNow, TimeZones.Ids.Utc, User.TimeZone);
             var language = ReportOptions.Language == TakerReportControl.Language.English ? "en" : "fr";
             var documentName = $"{date:yyyyMMdd} High Stakes Test Taker Report ({language})";
 

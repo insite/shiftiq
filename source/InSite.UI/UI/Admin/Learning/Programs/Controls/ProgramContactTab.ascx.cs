@@ -26,7 +26,15 @@ namespace InSite.UI.Admin.Learning.Programs.Controls
 
             NoLearners.Visible = !PersonGrid.Visible && !GroupGrid.Visible;
 
-            if (program.ProgramType == "Achievements Only")
+            // Where Add Learners goes is decided by the fee first and the program type second. Only
+            // Add Learners to Program carries the funding path a fee needs, and group assignment
+            // refuses a paid program outright - so an Achievements Only program that also charges a
+            // fee has to go to the paid page, or the button lands on a page that tells the admin to
+            // use a page the button will not take them to.
+            var isPaid = program.ProgramFee > 0;
+            var isAchievementsOnly = program.ProgramType == "Achievements Only";
+
+            if (isAchievementsOnly && !isPaid)
             {
                 var returnUrl = new ReturnUrl("id&tab=enrollments");
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -76,52 +77,24 @@ namespace InSite.Persistence.Plugin.CMDS
             public string Summary { get; set; }
         }
 
-        public class EmployeeComplianceHistory
-        {
-            public Guid OrganizationIdentifier { get; set; }
-            public string CompanyName { get; set; }
-            public Guid DepartmentIdentifier { get; set; }
-            public string DepartmentName { get; set; }
-            public Guid UserIdentifier { get; set; }
-            public string UserFullName { get; set; }
-            public Guid? PrimaryProfileIdentifier { get; set; }
-            public string PrimaryProfileNumber { get; set; }
-            public string PrimaryProfileTitle { get; set; }
-            public int Sequence { get; set; }
-            public string Heading { get; set; }
-            public int Required { get; set; }
-            public int Satisfied { get; set; }
-            public decimal Score { get; set; }
-            public int? Expired { get; set; }
-            public int? NotCompleted { get; set; }
-            public int? NotApplicable { get; set; }
-            public int? NeedsTraining { get; set; }
-            public int? SelfAssessed { get; set; }
-            public int? Submitted { get; set; }
-            public int? Validated { get; set; }
-            public DateTime? SnapshotDate1 { get; set; }
-            public decimal? Score1 { get; set; }
-            public DateTime? SnapshotDate2 { get; set; }
-            public decimal? Score2 { get; set; }
-            public DateTime? SnapshotDate3 { get; set; }
-            public decimal? Score3 { get; set; }
-        }
-
-        public class EmployeeComplianceHistoryChart
-        {
-            public Guid DepartmentIdentifier { get; set; }
-            public int Sequence { get; set; }
-            public string Heading { get; set; }
-            public DateTime? SnapshotDate { get; set; }
-            public decimal? Score { get; set; }
-        }
-
         [Serializable]
         public class EmployeeComplianceDepartment
         {
             public Guid DepartmentIdentifier { get; set; }
             public string DepartmentName { get; set; }
             public int UserCount { get; set; }
+        }
+
+        public class ComplianceTrend
+        {
+            public Guid DepartmentIdentifier { get; set; }
+            public string DepartmentName { get; set; }
+            public int ItemNumber { get; set; }
+            public string Heading { get; set; }
+            public DateTime SnapshotDate { get; set; }
+            public int Required { get; set; }
+            public int Satisfied { get; set; }
+            public decimal? Score { get; set; }
         }
 
         public class CollegeCertificate
@@ -319,6 +292,7 @@ namespace InSite.Persistence.Plugin.CMDS
         public class TrainingCompletionDate
         {
             public string CompanyName { get; set; }
+            public string DivisionName { get; set; }
             public string DepartmentName { get; set; }
             public Guid UserIdentifier { get; set; }
             public string FullName { get; set; }
@@ -339,6 +313,7 @@ namespace InSite.Persistence.Plugin.CMDS
         {
             public Guid OrganizationIdentifier { get; set; }
             public string CompanyName { get; set; }
+            public string DivisionName { get; set; }
             public Guid DepartmentIdentifier { get; set; }
             public string DepartmentName { get; set; }
             public Guid UserIdentifier { get; set; }
@@ -358,6 +333,7 @@ namespace InSite.Persistence.Plugin.CMDS
         public class TrainingHistoryPerUser
         {
             public Guid UserIdentifier { get; set; }
+            public string DivisionName { get; set; }
             public string PersonFullName { get; set; }
             public string PersonEmail { get; set; }
             public string ResourceTitle { get; set; }
@@ -365,6 +341,7 @@ namespace InSite.Persistence.Plugin.CMDS
             public DateTimeOffset? ExpirationDate { get; set; }
             public string AccreditorName { get; set; }
             public bool IsCompetent { get; set; }
+            public string CredentialStatus { get; set; }
             public decimal? Score { get; set; }
             public string JobDivision { get; set; }
         }
@@ -563,7 +540,7 @@ namespace InSite.Persistence.Plugin.CMDS
                 if (!string.IsNullOrEmpty(jobDivision))
                     credentials = credentials.Where(x => db.QPersons.Any(p => p.UserIdentifier == x.UserIdentifier && p.OrganizationIdentifier == organizationId && p.JobDivision == jobDivision));
 
-                return credentials
+                var rows = credentials
                     .Select(x => new TrainingHistoryPerUser
                     {
                         UserIdentifier = x.UserIdentifier,
@@ -574,6 +551,7 @@ namespace InSite.Persistence.Plugin.CMDS
                         ExpirationDate = x.CredentialExpirationExpected,
                         AccreditorName = x.AuthorityName,
                         IsCompetent = x.CredentialGranted != null, // && x.AchievementLabel != "Module"
+                        CredentialStatus = x.CredentialStatus,
                         JobDivision = db.QPersons
                             .Where(p => p.UserIdentifier == x.UserIdentifier && p.OrganizationIdentifier == organizationId)
                             .Select(p => p.JobDivision)
@@ -582,6 +560,70 @@ namespace InSite.Persistence.Plugin.CMDS
                     .OrderBy(x => x.PersonFullName)
                     .ThenBy(x => x.ResourceTitle)
                     .ToList();
+
+                AssignDivisionNames(db, rows, departments, allowedFunctions);
+
+                return rows;
+            }
+        }
+
+        /// <summary>
+        /// Fills in each row's division, joining the names when a worker's departments span more than
+        /// one division. This runs as its own query because the credential rows are per achievement
+        /// while the division list is per worker.
+        /// </summary>
+        private static void AssignDivisionNames(
+            InternalDbContext db,
+            List<TrainingHistoryPerUser> rows,
+            Guid[] departments,
+            string[] allowedFunctions)
+        {
+            const int batchSize = 1000;
+
+            var userIdentifiers = rows.Select(x => x.UserIdentifier).Distinct().ToArray();
+
+            if (userIdentifiers.Length == 0)
+                return;
+
+            var anyDepartment = departments.Length == 0;
+            var pairs = new List<Tuple<Guid, string>>();
+
+            for (var offset = 0; offset < userIdentifiers.Length; offset += batchSize)
+            {
+                var batch = userIdentifiers.Skip(offset).Take(batchSize).ToArray();
+
+                var memberships = db.Memberships
+                    .Where(m => batch.Contains(m.UserIdentifier)
+                        && allowedFunctions.Contains(m.MembershipType));
+
+                if (!anyDepartment)
+                    memberships = memberships.Where(m => departments.Contains(m.GroupIdentifier));
+
+                var found = memberships
+                    .Join(db.Departments,
+                        m => m.GroupIdentifier,
+                        d => d.DepartmentIdentifier,
+                        (m, d) => new { m.UserIdentifier, d.DivisionIdentifier })
+                    .Join(db.Divisions,
+                        x => x.DivisionIdentifier,
+                        v => (Guid?)v.DivisionIdentifier,
+                        (x, v) => new { x.UserIdentifier, v.DivisionName })
+                    .Distinct()
+                    .ToList();
+
+                pairs.AddRange(found.Select(x => Tuple.Create(x.UserIdentifier, x.DivisionName)));
+            }
+
+            var namesByUser = pairs
+                .GroupBy(x => x.Item1)
+                .ToDictionary(
+                    g => g.Key,
+                    g => string.Join("; ", g.Select(x => x.Item2).Distinct().OrderBy(x => x)));
+
+            foreach (var row in rows)
+            {
+                if (namesByUser.TryGetValue(row.UserIdentifier, out var divisionName))
+                    row.DivisionName = divisionName;
             }
         }
 
@@ -1018,83 +1060,11 @@ ORDER BY c.Number;";
 
         }
 
-        public static IEnumerable<EmployeeComplianceHistory> SelectEmployeeComplianceHistory(
-            Guid organizationId,
-            Guid[] departments,
-            Guid[] employees,
-            int[] sequences,
-            DateTime startDate,
-            DateTime endDate,
-            int option,
-            bool excludeUsersWithoutProfile
-        )
-        {
-            const string query = "EXEC custom_cmds.SelectZUserStatus @OrganizationIdentifier, @Departments, @Employees, @Sequences, @StartDate, @EndDate, @Option, @ExcludeUsersWithoutProfile";
-
-            var sqlParameters = new[]
-            {
-                new SqlParameter("@OrganizationIdentifier", organizationId),
-                SqlParameterHelper.PrimaryKey("@Departments", departments),
-                SqlParameterHelper.PrimaryKey("@Employees", employees),
-                SqlParameterHelper.PrimaryKey("@Sequences", sequences),
-                new SqlParameter("@StartDate", startDate),
-                new SqlParameter("@EndDate", endDate),
-                new SqlParameter("@Option", option),
-                new SqlParameter("@ExcludeUsersWithoutProfile", excludeUsersWithoutProfile)
-            };
-
-            using (var db = new InternalDbContext())
-            {
-                db.Database.CommandTimeout = 60 * 5;
-
-                return db.Database
-                    .SqlQuery<EmployeeComplianceHistory>(query, sqlParameters)
-                    .ToList();
-            }
-        }
-
-        public static IEnumerable<EmployeeComplianceHistoryChart> SelectEmployeeComplianceHistoryChart(
-            Guid organizationId,
-            Guid[] departments,
-            Guid[] employees,
-            int[] sequences,
-            DateTime startDate,
-            DateTime endDate,
-            int option,
-            bool excludeUsersWithoutProfile
-        )
-        {
-            const string query = "EXEC custom_cmds.SelectZUserStatusChart @OrganizationIdentifier, @Departments, @Employees, @Sequences, @StartDate, @EndDate, @Option, @ExcludeUsersWithoutProfile";
-
-            var sqlParameters = new[]
-            {
-                new SqlParameter("@OrganizationIdentifier", organizationId),
-                SqlParameterHelper.PrimaryKey("@Departments", departments),
-                SqlParameterHelper.PrimaryKey("@Employees", employees),
-                SqlParameterHelper.PrimaryKey("@Sequences", sequences),
-                new SqlParameter("@StartDate", startDate),
-                new SqlParameter("@EndDate", endDate),
-                new SqlParameter("@Option", option),
-                new SqlParameter("@ExcludeUsersWithoutProfile", excludeUsersWithoutProfile)
-            };
-
-            using (var db = new InternalDbContext())
-            {
-                db.Database.CommandTimeout = 60 * 5;
-
-                return db.Database
-                    .SqlQuery<EmployeeComplianceHistoryChart>(query, sqlParameters)
-                    .ToList();
-            }
-        }
-
         public static List<EmployeeComplianceDepartment> SelectEmployeeComplianceDepartment(
             Guid organizationId,
             Guid[] departments,
             Guid[] employees,
             int[] sequences,
-            DateTime? startDate,
-            DateTime? endDate,
             int option,
             bool excludeUsersWithoutProfile,
             bool accessDepartment, bool accessCompany, bool accessAdministration
@@ -1108,8 +1078,8 @@ ORDER BY c.Number;";
                 SqlParameterHelper.PrimaryKey("@Departments", departments),
                 SqlParameterHelper.PrimaryKey("@Employees", employees),
                 SqlParameterHelper.PrimaryKey("@Sequences", sequences),
-                new SqlParameter("@StartDate", startDate.HasValue ? startDate : (object)DBNull.Value),
-                new SqlParameter("@EndDate", endDate.HasValue ? endDate : (object)DBNull.Value),
+                new SqlParameter("@StartDate", DBNull.Value),
+                new SqlParameter("@EndDate", DBNull.Value),
                 new SqlParameter("@Option", option),
                 new SqlParameter("@ExcludeUsersWithoutProfile", excludeUsersWithoutProfile),
                 new SqlParameter("@AccessDepartment", accessDepartment),
@@ -1123,6 +1093,35 @@ ORDER BY c.Number;";
 
                 return db.Database
                     .SqlQuery<EmployeeComplianceDepartment>(query, sqlParameters)
+                    .ToList();
+            }
+        }
+
+        public static List<ComplianceTrend> SelectComplianceTrend(
+            Guid organizationId,
+            Guid[] departments,
+            int[] sequences,
+            int months,
+            int option
+        )
+        {
+            const string query = "EXEC custom_cmds.SelectComplianceTrend @OrganizationIdentifier, @Departments, @Sequences, @Months, @Option";
+
+            var sqlParameters = new[]
+            {
+                new SqlParameter("@OrganizationIdentifier", organizationId),
+                SqlParameterHelper.PrimaryKey("@Departments", departments),
+                SqlParameterHelper.PrimaryKey("@Sequences", sequences),
+                new SqlParameter("@Months", months),
+                new SqlParameter("@Option", option)
+            };
+
+            using (var db = new InternalDbContext())
+            {
+                db.Database.CommandTimeout = 60 * 5;
+
+                return db.Database
+                    .SqlQuery<ComplianceTrend>(query, sqlParameters)
                     .ToList();
             }
         }
@@ -1145,23 +1144,14 @@ ORDER BY c.Number;";
             }
         }
 
-        public static bool HasComplianceSummary()
-        {
-            const string query = "SELECT TOP 1 1 FROM custom_cmds.QUserStatus";
-
-            using (var db = new InternalDbContext())
-            {
-                return db.Database.SqlQuery<int>(query).Count() > 0;
-            }
-        }
-
         public static IEnumerable<ComplianceSummary> SelectComplianceSummary(
             Guid organizationId,
             Guid[] departments,
             Guid[] employees,
             int[] sequences,
             int option,
-            bool excludeUsersWithoutProfile
+            bool excludeUsersWithoutProfile,
+            bool accessDepartment, bool accessCompany, bool accessAdministration
         )
         {
             const string query = @"
@@ -1172,6 +1162,9 @@ EXEC custom_cmds.SelectQUserStatus
    ,@Sequences
    ,@Option
    ,@ExcludeUsersWithoutProfile
+   ,@AccessDepartment
+   ,@AccessCompany
+   ,@AccessAdministration
 ";
 
             var sqlParameters = new SqlParameter[]
@@ -1182,6 +1175,9 @@ EXEC custom_cmds.SelectQUserStatus
                 SqlParameterHelper.PrimaryKey("@Sequences", sequences),
                 new SqlParameter("@Option", option),
                 new SqlParameter("@ExcludeUsersWithoutProfile", excludeUsersWithoutProfile),
+                new SqlParameter("@AccessDepartment", accessDepartment),
+                new SqlParameter("@AccessCompany", accessCompany),
+                new SqlParameter("@AccessAdministration", accessAdministration),
             };
 
             using (var db = new InternalDbContext())
@@ -1908,7 +1904,7 @@ WHERE s.DepartmentIdentifier = @DepartmentIdentifier";
 
         public class ExecutiveSummaryOnCompetencyStatus
         {
-            public DateTimeOffset AsAt { get; set; }
+            public DateTime AsAt { get; set; }
             public string DivisionName { get; set; }
             public string DepartmentName { get; set; }
             public string TagCriticality { get; set; }
@@ -1996,6 +1992,9 @@ ORDER BY
                     builder.AppendLine("AND Stat.AsAt < @AsAtBefore");
             }
 
+            if (filter.SnapshotAsAt.HasValue)
+                builder.AppendLine("AND Stat.AsAt = @SnapshotAsAt");
+
             if (filter.DivisionIdentifier.HasValue)
                 builder.AppendLine("AND Div.DivisionIdentifier = @DivisionIdentifier");
 
@@ -2017,11 +2016,14 @@ ORDER BY
             if (filter.AsAt != null)
             {
                 if (filter.AsAt.Since.HasValue)
-                    sqlParameters.Add(new SqlParameter("@AsAtSince", filter.AsAt.Since.Value));
+                    sqlParameters.Add(new SqlParameter("@AsAtSince", SqlDbType.Date) { Value = filter.AsAt.Since.Value });
 
                 if (filter.AsAt.Before.HasValue)
-                    sqlParameters.Add(new SqlParameter("@AsAtBefore", filter.AsAt.Before.Value));
+                    sqlParameters.Add(new SqlParameter("@AsAtBefore", SqlDbType.Date) { Value = filter.AsAt.Before.Value });
             }
+
+            if (filter.SnapshotAsAt.HasValue)
+                sqlParameters.Add(new SqlParameter("@SnapshotAsAt", SqlDbType.Date) { Value = filter.SnapshotAsAt.Value });
 
             if (filter.DivisionIdentifier.HasValue)
                 sqlParameters.Add(new SqlParameter("@DivisionIdentifier", filter.DivisionIdentifier.Value));
@@ -2037,7 +2039,7 @@ ORDER BY
 
         public class ExecutiveSummaryOnAchievementStatus
         {
-            public DateTimeOffset AsAt { get; set; }
+            public DateTime AsAt { get; set; }
             public string DepartmentName { get; set; }
             public string AchievementType { get; set; }
             public int SumCP { get; set; }
@@ -2118,6 +2120,9 @@ ORDER BY
                     builder.AppendLine("AND Stat.AsAt < @AsAtBefore");
             }
 
+            if (filter.SnapshotAsAt.HasValue)
+                builder.AppendLine("AND Stat.AsAt = @SnapshotAsAt");
+
             if (filter.DepartmentIdentifier.HasValue)
                 builder.AppendLine("AND Dept.DepartmentIdentifier = @DepartmentIdentifier");
 
@@ -2136,11 +2141,14 @@ ORDER BY
             if (filter.AsAt != null)
             {
                 if (filter.AsAt.Since.HasValue)
-                    sqlParameters.Add(new SqlParameter("@AsAtSince", filter.AsAt.Since.Value));
+                    sqlParameters.Add(new SqlParameter("@AsAtSince", SqlDbType.Date) { Value = filter.AsAt.Since.Value });
 
                 if (filter.AsAt.Before.HasValue)
-                    sqlParameters.Add(new SqlParameter("@AsAtBefore", filter.AsAt.Before.Value));
+                    sqlParameters.Add(new SqlParameter("@AsAtBefore", SqlDbType.Date) { Value = filter.AsAt.Before.Value });
             }
+
+            if (filter.SnapshotAsAt.HasValue)
+                sqlParameters.Add(new SqlParameter("@SnapshotAsAt", SqlDbType.Date) { Value = filter.SnapshotAsAt.Value });
 
             if (filter.DepartmentIdentifier.HasValue)
                 sqlParameters.Add(new SqlParameter("@DepartmentIdentifier", filter.DepartmentIdentifier.Value));
@@ -2149,37 +2157,6 @@ ORDER BY
                 sqlParameters.Add(new SqlParameter("@AchievementType", filter.AchievementType));
 
             return sqlParameters.ToArray();
-        }
-
-        public static string SnapshotStatusHtml(TimeZoneInfo zone)
-        {
-            using (var db = new InternalDbContext())
-            {
-                var html = new StringBuilder();
-
-                var asAt = db.Database
-                    .SqlQuery<DateTime>("select distinct asat from custom_cmds.QUserStatus")
-                    .FirstOrDefault();
-
-                if (asAt != DateTimeOffset.MinValue)
-                {
-                    var asAtOffset = TimeZones.GetDateTimeOffset(asAt, asAt, TimeZones.Utc);
-
-                    var local = TimeZones.Format(asAtOffset, zone);
-
-                    var line1 = $"The data in this report was last updated {local}.";
-
-                    html.AppendLine(line1);
-
-                    var tomorrow = TimeZones.Format(DateTime.Today.AddDays(1).AddMinutes(15), zone.Id);
-
-                    var line2 = $"The next update will take place tomorrow, {tomorrow}.";
-
-                    html.AppendLine(line2);
-                }
-
-                return html.ToString();
-            }
         }
     }
 }

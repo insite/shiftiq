@@ -1,14 +1,16 @@
 ﻿using System;
 
+using Shift.Common;
 using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
+using Shift.Constant;
 
+using InSite.Application.Assets.Read;
 using InSite.Application.Contacts.Read;
 using InSite.Application.People.Write;
 using InSite.Domain.Contacts;
 
-using Shift.Common;
-using Shift.Constant;
+using SearchObjectType = Shift.Contract.SearchObjectType;
 
 namespace InSite.Application.Contacts.Write
 {
@@ -19,6 +21,7 @@ namespace InSite.Application.Contacts.Write
         private readonly IUserSearch _userSearch;
         private readonly IPersonSearch _personSearch;
         private readonly Func<Guid, string> _getFullNamePolicy;
+        private readonly ISearchStore _searchQueueObjectStore;
 
         public PersonCommandReceiver(
             ICommandQueue commander,
@@ -26,7 +29,8 @@ namespace InSite.Application.Contacts.Write
             IChangeRepository repository,
             IUserSearch userSearch,
             IPersonSearch personSearch,
-            Func<Guid, string> getFullNamePolicy
+            Func<Guid, string> getFullNamePolicy,
+            ISearchStore searchQueueObjectStore
             )
         {
             _publisher = publisher;
@@ -34,6 +38,7 @@ namespace InSite.Application.Contacts.Write
             _userSearch = userSearch;
             _personSearch = personSearch;
             _getFullNamePolicy = getFullNamePolicy;
+            _searchQueueObjectStore = searchQueueObjectStore;
 
             commander.Subscribe<CreatePerson>(Handle);
             commander.Subscribe<ArchivePerson>(Handle);
@@ -73,15 +78,25 @@ namespace InSite.Application.Contacts.Write
             aggregate.CreatePerson(c.UserId, c.OrganizationId, fullName);
 
             Commit(aggregate, c);
+
+            _searchQueueObjectStore.EnqueueSearchObject(c.OrganizationId, c.UserId, SearchObjectType.Person);
         }
 
         public void Handle(DeletePerson c)
         {
+            Guid organizationId;
+            Guid userId;
+
             _repository.LockAndRun<PersonAggregate>(c.AggregateIdentifier, aggregate =>
             {
+                organizationId = aggregate.Data.Organization;
+                userId = aggregate.Data.User;
+
                 aggregate.DeletePerson();
                 Commit(aggregate, c);
             });
+
+            _searchQueueObjectStore.EnqueueSearchObject(organizationId, userId, SearchObjectType.Person);
         }
 
         public void Handle(ArchivePerson c)
@@ -237,19 +252,26 @@ namespace InSite.Application.Contacts.Write
 
         public void Handle(ModifyPersonFieldText c)
         {
+            Guid organizationId;
+            Guid? userId = null;
+
             _repository.LockAndRun<PersonAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 var data = aggregate.Data;
                 if (StringHelper.EqualsCaseSensitive(c.Value, data.GetTextValue(c.PersonField), true))
                     return;
 
-                if (c.PersonField == PersonField.PersonCode
-                    && !string.IsNullOrEmpty(c.Value)
-                    )
+                if (c.PersonField == PersonField.PersonCode)
                 {
-                    var persons = _personSearch.GetPersonsByPersonCodes(new[] { c.Value }, data.Organization);
-                    if (persons.Count > 0 && persons[0].PersonIdentifier != c.AggregateIdentifier)
-                        throw new ArgumentException($"There is a person in the org {data.Organization} with the same code: {c.Value}");
+                    if (!string.IsNullOrEmpty(c.Value))
+                    {
+                        var persons = _personSearch.GetPersonsByPersonCodes(new[] { c.Value }, data.Organization);
+                        if (persons.Count > 0 && persons[0].PersonIdentifier != c.AggregateIdentifier)
+                            throw new ArgumentException($"There is a person in the org {data.Organization} with the same code: {c.Value}");
+                    }
+                    
+                    organizationId = data.Organization;
+                    userId = data.User;
                 }
 
                 aggregate.ModifyPersonFieldText(c.PersonField, c.Value);
@@ -263,6 +285,9 @@ namespace InSite.Application.Contacts.Write
 
                 Commit(aggregate, c);
             });
+
+            if (userId != null)
+                _searchQueueObjectStore.EnqueueSearchObject(organizationId, userId.Value, SearchObjectType.Person);
         }
 
         public void Handle(ModifyPersonFieldDateOffset c)

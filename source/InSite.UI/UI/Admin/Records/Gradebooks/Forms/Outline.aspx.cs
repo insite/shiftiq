@@ -218,13 +218,6 @@ namespace InSite.Admin.Records.Gradebooks.Forms
             var credentialCounts = CredentialGrid.LoadData(GradebookID.Value);
             CredentialPanel.Visible = credentialCounts.CountInUsers > 0;
 
-            ScormRegistrationGrid.LoadData(GradebookID.Value);
-
-            var useScormCloud = Organization.Integrations?.ScormCloud?.UserName != null
-                && Organization.Integrations?.ScormCloud?.Password != null;
-
-            ScormPanel.Visible = useScormCloud && ScormRegistrationGrid.RowCount > 0;
-
             LearningMasteryGrid.LoadData(GradebookID);
             LearningMasteryPanel.Visible = queryGradebook.GradebookType == GradebookType.ScoresAndStandards.ToString();
 

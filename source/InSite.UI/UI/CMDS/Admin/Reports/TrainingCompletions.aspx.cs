@@ -50,6 +50,18 @@ namespace InSite.Cmds.Actions.Reporting.Report
             set => ViewState[nameof(CurrentParameters)] = value;
         }
 
+        protected bool ShowDivision
+        {
+            get => (bool)(ViewState[nameof(ShowDivision)] ?? false);
+            private set => ViewState[nameof(ShowDivision)] = value;
+        }
+
+        protected bool ShowJobDivision
+        {
+            get => (bool)(ViewState[nameof(ShowJobDivision)] ?? false);
+            private set => ViewState[nameof(ShowJobDivision)] = value;
+        }
+
         #endregion
 
         #region Initialization
@@ -111,6 +123,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     Person = x.FullName,
                     Email = x.Email,
                     Organization = x.CompanyName,
+                    Division = x.DivisionName,
                     Department = x.DepartmentName,
                     JobDivision = x.JobDivision,
                     Achievement = x.AchievementTitle,
@@ -127,8 +140,14 @@ namespace InSite.Cmds.Actions.Reporting.Report
             helper.Map("Person", "Person");
             helper.Map("Email", "Email");
             helper.Map("Organization", "Organization");
+
+            if (ShowDivision)
+                helper.Map("Division", "Division");
+
             helper.Map("Department", "Department");
-            helper.Map("JobDivision", "Job Division");
+
+            if (ShowJobDivision)
+                helper.Map("JobDivision", "Job Division");
             helper.Map("Achievement", "Achievement", 60, HorizontalAlignment.Left);
             helper.Map("AchievementType", "Achievement Type", 35, HorizontalAlignment.Left);
             helper.Map("Completed", "Completed", "MMM d, yyyy", 20, HorizontalAlignment.Center);
@@ -149,6 +168,9 @@ namespace InSite.Cmds.Actions.Reporting.Report
         private void LoadReport()
         {
             ReportTab.Visible = false;
+
+            ShowDivision = Criteria.DivisionsEnabled;
+            ShowJobDivision = Criteria.JobDivisionEnabled;
 
             if (!Criteria.ValidateNarrowSelection(out var error))
             {
@@ -213,6 +235,10 @@ namespace InSite.Cmds.Actions.Reporting.Report
 
         private void BindReportHeader()
         {
+            DivisionHeader.Visible = ShowDivision;
+            JobDivisionHeader.Visible = ShowJobDivision;
+            ReportHeaderCell.ColSpan = 10 + (ShowDivision ? 1 : 0) + (ShowJobDivision ? 1 : 0);
+
             var departmentNames = DepartmentSearch.Bind(
                 x => x.DepartmentName,
                 x => CurrentParameters.Departments.Contains(x.DepartmentIdentifier),

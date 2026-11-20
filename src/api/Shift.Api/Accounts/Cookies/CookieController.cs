@@ -24,11 +24,7 @@ public partial class CookieController : ShiftControllerBase
 
     private readonly OrganizationAdapter _organizationAdapter;
 
-    private readonly GroupService _groupService;
-
     private readonly IPrincipalProvider _identityService;
-
-    private readonly IReactService _reactService;
 
     private readonly ICookieService _cookieService;
 
@@ -37,9 +33,7 @@ public partial class CookieController : ShiftControllerBase
         PersonService personService,
         OrganizationService organizationService,
         OrganizationAdapter organizationAdapter,
-        GroupService groupService,
         IPrincipalProvider identityService,
-        IReactService reactService,
         ICookieService cookieService
         )
     {
@@ -51,11 +45,7 @@ public partial class CookieController : ShiftControllerBase
 
         _organizationAdapter = organizationAdapter;
 
-        _groupService = groupService;
-
         _identityService = identityService;
-
-        _reactService = reactService;
 
         _cookieService = cookieService;
     }
@@ -68,7 +58,7 @@ public partial class CookieController : ShiftControllerBase
         if (_cookieService.GetSecurityDomain() != "localhost" && !_cookieService.Debug)
             return BadRequest("An untrusted cookie can be injected by the client only for debugging purposes.");
 
-        var token = await new LoginHelper(_personService, _organizationService, _groupService, _identityService)
+        var token = await new LoginHelper(_personService, _organizationService, _identityService)
             .LoginAsync(organizationCode, email, impersonatorOrganizationCode, impersonatorUserEmail);
 
         if (token == null)
@@ -76,7 +66,7 @@ public partial class CookieController : ShiftControllerBase
 
         _cookieService.AppendSecurityCookie(token, true);
 
-        return Ok(token);
+        return token;
     }
 
     [HttpPost("logout")]
@@ -84,7 +74,7 @@ public partial class CookieController : ShiftControllerBase
     {
         _cookieService.DeleteSecurityCookie();
 
-        return Ok();
+        return NoContent();
     }
 
     /// <summary>

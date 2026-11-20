@@ -161,8 +161,23 @@ namespace InSite.UI
 
             if (catalog != null)
             {
-                CustomCatalogLink.HRef = $"/ui/portal/learning/catalogue?catalog={CustomCatalogId}&view=1";
+                CustomCatalogLink.HRef = $"/ui/portal/learning/catalogue?catalog={CustomCatalogId}";
                 CustomCatalogLink.InnerHtml = "<i class='fa-solid fa-books me-2'></i>" + catalog.CatalogName;
+            }
+
+            // The featured catalogue (the "Academy" of paid programs and hosted courses) gets its
+            // own button, named after the catalogue. Its identifier differs by environment, so it
+            // comes from configuration; null hides the button. The catalogue is partition-owned, so
+            // the lookup is not scoped to the signed-in organization.
+            var featuredId = ServiceLocator.AppSettings.Application.Catalogues?.Featured;
+            var featured = featuredId.HasValue ? CourseSearch.GetCatalog(null, featuredId.Value) : null;
+
+            FeaturedCatalogLink.Visible = featured != null && !featured.IsHidden;
+
+            if (featured != null)
+            {
+                FeaturedCatalogLink.HRef = $"/ui/portal/learning/catalogue?catalog={featuredId}";
+                FeaturedCatalogLink.InnerHtml = "<i class='fa-solid fa-university me-2'></i>" + featured.CatalogName;
             }
 
             var orientationRoles = new string[]
@@ -321,6 +336,8 @@ namespace InSite.UI
             ViewMySelfAssessmentsLink.Visible = isGrantedWorkers;
             TrainingPlanLink2.Visible = isGrantedWorkers;
 
+            BindMyPrograms(isGrantedWorkers);
+
             SearchCollegeCertificatesLink.Visible = isGrantedColleges;
 
             SearchUploadsLink.Visible = isGrantedFields;
@@ -333,13 +350,15 @@ namespace InSite.UI
                 new ControlHandle("ui/home#college-certificates", CollegeCertificatesCard),
                 new ControlHandle("ui/home#competencies", CompetenciesCard),
                 new ControlHandle("ui/home#elearning", ElearningLink),
+                new ControlHandle("ui/home#elearning", FeaturedCatalogLink),
                 new ControlHandle("ui/home#education-and-training", EducationAndTrainingLink),
                 new ControlHandle("ui/home#learning-portal", LearningPortalSection),
                 new ControlHandle("ui/home#dashboard", NavDashboard),
                 new ControlHandle("ui/home#profiles", NavProfiles),
                 new ControlHandle("ui/home#progress", ProgressSection),
                 new ControlHandle("ui/home#training-plan", TrainingPlanLink1),
-                new ControlHandle("ui/home#training-plan", TrainingPlanLink2)
+                new ControlHandle("ui/home#training-plan", TrainingPlanLink2),
+                new ControlHandle("ui/home#training-plan", MyProgramsCard)
             };
 
             var permissions = PermissionCache.Matrix.GetPermissions(Organization.Code);
@@ -347,6 +366,33 @@ namespace InSite.UI
             foreach (var denial in denials)
                 if (permissions.IsDenied(denial.Resource, roleNames))
                     denial.Control.Visible = false;
+        }
+
+        // The My Programs tile lists the programs the learner is enrolled in, each linking to the training plan
+        // filtered to that program. It reads the enrollment record, not the catalogue, so a Hidden program still
+        // appears. Enrollments are read across the signed-in organization and the partition, the same set the
+        // catalogue card routing and the plan's program filter use. Hidden when there are none, like the
+        // Upcoming Training Sessions card, and under the same permission as the My Training Plan link.
+        private void BindMyPrograms(bool isGrantedWorkers)
+        {
+            if (!isGrantedWorkers)
+            {
+                MyProgramsCard.Visible = false;
+                return;
+            }
+
+            var organizations = new[] { Organization.Identifier, ServiceLocator.Partition.Identifier }.Distinct().ToArray();
+
+            var programs = ProgramSearch1
+                .GetUserProgramEnrollments(User.UserIdentifier, organizations, x => x.Program)
+                .Where(x => x.Program != null)
+                .Select(x => new { x.ProgramIdentifier, x.Program.ProgramName })
+                .OrderBy(x => x.ProgramName)
+                .ToList();
+
+            MyProgramsCard.Visible = programs.Count > 0;
+            MyProgramsRepeater.DataSource = programs;
+            MyProgramsRepeater.DataBind();
         }
 
         private class ControlHandle

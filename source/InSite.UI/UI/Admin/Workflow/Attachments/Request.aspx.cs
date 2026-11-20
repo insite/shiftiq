@@ -38,7 +38,7 @@ namespace InSite.UI.Admin.Issues.Attachments
             if (issue == null || issue.OrganizationIdentifier != Organization.Identifier)
                 RedirectToSearch();
 
-            CaseInfo.BindIssue(issue, User.TimeZone, true, false);
+            CaseInfo.BindIssue(issue, true, false);
 
             LoadData();
 

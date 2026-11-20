@@ -8,6 +8,7 @@ namespace InSite.Application.Courses.Read
         public Guid CatalogIdentifier { get; set; }
         public Guid OrganizationIdentifier { get; set; }
 
+        public string CatalogDescription { get; set; }
         public string CatalogName { get; set; }
 
         public bool IsHidden { get; set; }

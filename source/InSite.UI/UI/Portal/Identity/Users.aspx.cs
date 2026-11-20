@@ -1,42 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 
-using InSite.Common.Web;
 using InSite.Common.Web.UI;
-using InSite.Domain.Reports;
 using InSite.Persistence;
-using InSite.UI.Layout.Admin;
 
 namespace InSite.UI.Desktops.Design.Users
 {
+    // Retired route. User administration is now served by the consolidated person search at
+    // /ui/portal/contacts/people/search. This shell issues a permanent redirect, preserving any
+    // query string, so legacy links and saved deep links continue to work. The .aspx shell is
+    // retained so the route continues to resolve. The redirect does not request a scope, so the
+    // consolidated page picks its default like any other visit: the caller's own contacts when
+    // they have some, otherwise the full organization where the E03 partition allows it.
     public partial class Search : SearchPage<PersonFilter>
     {
-        public override string EntityName => "User";
-
-        protected override void OnInit(EventArgs e)
-        {
-            base.OnInit(e);
-
-            SearchResults.Alert += (s, a) => ScreenStatus.AddMessage(a);
-        }
-
         protected override void OnLoad(EventArgs e)
         {
-            if (!CurrentSessionState.Identity.IsAuthenticated)
-                HttpResponseHelper.SendHttp403();
-
-            base.OnLoad(e);
-
-            if (IsPostBack)
-                return;
-
-            PageHelper.AutoBindHeader(this);
-        }
-
-        protected override IEnumerable<DownloadColumn> GetExportColumns()
-        {
-            return BaseSearchDownload.GetColumns(typeof(Controls.SearchResults.ExportDataItem)).OrderBy(x => x.Name);
+            Response.RedirectPermanent(
+                "/ui/portal/contacts/people/search"
+                + Request.Url.Query);
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System.Net.Http;
 using System.Text;
 
-using Shift.Common;
-
 namespace Shift.Common.Integration.Premailer
 {
     public class PremailerClient
@@ -23,9 +21,14 @@ namespace Shift.Common.Integration.Premailer
 
             var url = $"{baseUrl}{Endpoints.MoveCssInline}";
 
-            var content = new StringContent(htmlContent, Encoding.UTF8, "plain/text");
+            var request = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = new StringContent(htmlContent, Encoding.UTF8, "plain/text")
+            };
 
-            var postResult = TaskRunner.RunSync(StaticHttpClient.Client.PostAsync, url, content);
+            HubApiKey.Apply(request, _settings.ApiKey);
+
+            var postResult = TaskRunner.RunSync(() => StaticHttpClient.Client.SendAsync(request));
 
             postResult.EnsureSuccessStatusCode();
 

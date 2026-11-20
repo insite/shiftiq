@@ -1,13 +1,14 @@
-﻿using System.Linq;
-
-using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using InSite.Application.Banks.Read;
 using InSite.Application.Registrations.Read;
 using InSite.Domain.Registrations;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
 
 namespace InSite.Application.Registrations.Write
 {
@@ -27,6 +28,7 @@ namespace InSite.Application.Registrations.Write
             _registrationSearch = registrationSearch;
             _bankSearch = bankSearch;
 
+            commander.Subscribe<AddExamForm>(Handle);
             commander.Subscribe<AddInstructor>(Handle);
             commander.Subscribe<AssignAttempt>(Handle);
             commander.Subscribe<AssignCustomer>(Handle);
@@ -46,12 +48,15 @@ namespace InSite.Application.Registrations.Write
             commander.Subscribe<ChangeEvent>(Handle);
             commander.Subscribe<ChangeGrade>(Handle);
             commander.Subscribe<ChangeGrading>(Handle);
+            commander.Subscribe<ChangeExamFormPassword>(Handle);
             commander.Subscribe<ChangeRegistrationPassword>(Handle);
             commander.Subscribe<ChangeSynchronization>(Handle);
             commander.Subscribe<CommentRegistration>(Handle);
             commander.Subscribe<ElapseRegistrationTimer>(Handle);
             commander.Subscribe<GrantAccommodation>(Handle);
             commander.Subscribe<LimitExamTime>(Handle);
+            commander.Subscribe<RemoveExamForm>(Handle);
+            commander.Subscribe<ChangeExamForm>(Handle);
             commander.Subscribe<RemoveInstructor>(Handle);
             commander.Subscribe<RequestRegistration>(Handle);
             commander.Subscribe<RevokeAccommodation>(Handle);
@@ -79,6 +84,15 @@ namespace InSite.Application.Registrations.Write
             }
         }
 
+        public void Handle(AddExamForm c)
+        {
+            _repository.LockAndRun<RegistrationAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.AddExamForm(c.ExamForm, c.Form);
+                Commit(aggregate, c);
+            });
+        }
+
         public void Handle(AddInstructor c)
         {
             _repository.LockAndRun<RegistrationAggregate>(c.AggregateIdentifier, aggregate =>
@@ -95,7 +109,7 @@ namespace InSite.Application.Registrations.Write
                 if (aggregate.Data.Voided.HasValue)
                     return;
 
-                aggregate.AssignAttempt(c.Attempt);
+                aggregate.AssignAttempt(c.Form, c.Attempt);
                 Commit(aggregate, c);
             });
         }
@@ -212,7 +226,7 @@ namespace InSite.Application.Registrations.Write
         {
             _repository.LockAndRun<RegistrationAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.ChangeEligibility(c.Status, c.Reason, c.Process);
+                aggregate.ChangeEligibility(c.Form, c.Status, c.Reason, c.Process);
                 Commit(aggregate, c);
             });
         }
@@ -231,6 +245,15 @@ namespace InSite.Application.Registrations.Write
             _repository.LockAndRun<RegistrationAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 aggregate.ChangeGrading(c.Status);
+                Commit(aggregate, c);
+            });
+        }
+
+        public void Handle(ChangeExamFormPassword c)
+        {
+            _repository.LockAndRun<RegistrationAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.ChangeExamFormPassword(c.Form, c.Password);
                 Commit(aggregate, c);
             });
         }
@@ -305,30 +328,51 @@ namespace InSite.Application.Registrations.Write
 
         public void Handle(LimitExamTime c)
         {
-            var registration = _registrationSearch.GetRegistration(c.AggregateIdentifier, x => x.Accommodations);
+            var registration = _registrationSearch.GetRegistration(
+                c.AggregateIdentifier, x => x.Accommodations, x => x.ExamForms);
+
             if (registration == null)
                 return;
-
-            var form = registration.ExamFormIdentifier.HasValue
-                ? _bankSearch.GetFormData(registration.ExamFormIdentifier.Value)
-                : null;
 
             var timeExtension = registration.Accommodations.Count > 0
                 ? registration.Accommodations.Sum(x => x.TimeExtension ?? 0)
                 : 0;
-            var candidateTimeLimit = form != null
-                ? form.Invigilation.TimeLimit + timeExtension
-                : (int?)null;
 
-            if (candidateTimeLimit == 0)
-                candidateTimeLimit = null;
+            var examForms = new List<(Guid FormId, int? TimeLimit)>();
 
-            if (registration.ExamTimeLimit == candidateTimeLimit)
+            if (registration.ExamFormIdentifier.HasValue)
+                examForms.Add((registration.ExamFormIdentifier.Value, registration.ExamTimeLimit));
+
+            examForms.AddRange(registration.ExamForms.Select(x => (x.ExamFormIdentifier, x.ExamTimeLimit)));
+
+            if (c.Form.HasValue)
+                examForms = examForms.Where(x => x.FormId == c.Form.Value).ToList();
+
+            var changes = new List<(Guid FormId, int? TimeLimit)>();
+
+            foreach (var regForm in examForms)
+            {
+                var form = _bankSearch.GetFormData(regForm.FormId);
+
+                var candidateTimeLimit = form != null
+                    ? form.Invigilation.TimeLimit + timeExtension
+                    : (int?)null;
+
+                if (candidateTimeLimit == 0)
+                    candidateTimeLimit = null;
+
+                if (regForm.TimeLimit != candidateTimeLimit)
+                    changes.Add((regForm.FormId, candidateTimeLimit));
+            }
+
+            if (changes.Count == 0)
                 return;
 
             _repository.LockAndRun<RegistrationAggregate>(c.AggregateIdentifier, aggregate =>
             {
-                aggregate.LimitExamTime(candidateTimeLimit);
+                foreach (var (form, timeLimit) in changes)
+                    aggregate.LimitExamTime(form, timeLimit);
+
                 Commit(aggregate, c);
             });
         }
@@ -340,6 +384,24 @@ namespace InSite.Application.Registrations.Write
             var aggregate = new RegistrationAggregate { AggregateIdentifier = c.AggregateIdentifier, RootAggregateIdentifier = c.Event };
             aggregate.RequestRegistration(c.Tenant, c.Event, c.Candidate, c.AttendanceStatus, c.ApprovalStatus, c.Fee, c.Comment, c.Source, maxSequence + 1);
             Commit(aggregate, c);
+        }
+
+        public void Handle(ChangeExamForm c)
+        {
+            _repository.LockAndRun<RegistrationAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.ChangeExamForm(c.FromForm, c.ToForm);
+                Commit(aggregate, c);
+            });
+        }
+
+        public void Handle(RemoveExamForm c)
+        {
+            _repository.LockAndRun<RegistrationAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.RemoveExamForm(c.Form);
+                Commit(aggregate, c);
+            });
         }
 
         public void Handle(RemoveInstructor c)

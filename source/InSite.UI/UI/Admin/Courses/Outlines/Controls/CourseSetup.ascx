@@ -612,7 +612,10 @@
                                 <h3>Groups</h3>
                                 <uc:EnrollmentGroupGrid runat="server" ID="GroupEnrollments" />
                             </asp:Panel>
-
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
                             <asp:Panel runat="server" ID="UserEnrollmentContainer">
                                 <h3>People</h3>
                                 <uc:EnrollmentUserGrid runat="server" ID="UserEnrollments" />

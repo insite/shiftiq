@@ -71,9 +71,6 @@ namespace InSite.UI.Portal.Billing
 
             var cart = CartStorage.Get();
 
-            AssignToSkillsCheckTransferField.Visible = cart.Mode == PriceSelectionMode.Subscribe
-                && Organization.Toolkits.Sales?.TransferGroup.HasValue == true;
-
             ContinueShopping.HRef = Identity.IsAuthenticated
                 ? "/ui/portal/management/dashboard/catalog"
                 : "/ui/portal/billing/catalog";
@@ -81,14 +78,22 @@ namespace InSite.UI.Portal.Billing
             SubmitButton.Visible = IsCartNotEmpty();
 
             BindSummary(cart);
-            PortalMaster.ShowAvatar();
             PageHelper.AutoBindHeader(this, null, "Checkout");
-            PortalMaster.HideBreadcrumbsOnly();
 
-            if (Identity.IsAuthenticated)
-                OverrideHomeLink("/ui/portal/management/dashboard/home");
+            DashboardNavigation.Visible = PortalMaster.IsSalesReady;
+
+            if (PortalMaster.IsSalesReady)
+            {
+                PortalMaster.ShowAvatar();
+                PortalMaster.HideBreadcrumbsOnly();
+
+                if (Identity.IsAuthenticated)
+                    OverrideHomeLink("/ui/portal/management/dashboard/home");
+                else
+                    OverrideHomeLink("/ui/portal/billing/catalog");
+            }
             else
-                OverrideHomeLink("/ui/portal/billing/catalog");
+                PortalMaster.SidebarVisible(false);
         }
 
         #endregion
@@ -172,6 +177,8 @@ namespace InSite.UI.Portal.Billing
                 AttachPaymentToUser(userId);
             }
 
+            AssignToTransferGroup(userId, cart);
+
             var classEvents = CreateClasses(cart, orders);
 
             var distributions = DistributionHelper.BuildDistributionsFromOrders(
@@ -211,13 +218,13 @@ namespace InSite.UI.Portal.Billing
         private bool ProcessPayment(Guid userId, CartState cart, List<TOrder> orders)
         {
             var card = GetCreditCardDetails();
-            var taxRate = GetSelectedProvinceTaxRate();
+            var tax = GetSelectedProvinceTax();
 
             var paymentId = InvoiceHelper.ProcessOrderPayment(
                 orders,
                 userId,
                 cart.Mode,
-                taxRate,
+                tax,
                 card
             );
 
@@ -239,7 +246,7 @@ namespace InSite.UI.Portal.Billing
             user.Email = Email.Text.Trim();
             user.FirstName = FirstName.Text;
             user.LastName = LastName.Text;
-            user.TimeZone = Organization.TimeZone.Id;
+            user.TimeZone = Organization.TimeZone;
 
             UserStore.Insert(user, Organization.Toolkits?.Contacts?.FullNamePolicy);
 
@@ -262,17 +269,22 @@ namespace InSite.UI.Portal.Billing
             if (newPerson.EmployerGroupIdentifier.HasValue)
                 MembershipHelper.Save(newPerson.EmployerGroupIdentifier.Value, userId, MembershipType.Employee);
 
-            var salesSettings = Organization.Toolkits.Sales;
-            if (salesSettings != null)
-            {
-                if (salesSettings.ManagerGroup.HasValue)
-                    MembershipHelper.Save(salesSettings.ManagerGroup.Value, userId, null);
-
-                if (IsNewUser && AssignToSkillsCheckTransfer.Checked && salesSettings.TransferGroup.HasValue)
-                    MembershipHelper.Save(salesSettings.TransferGroup.Value, userId, null);
-            }
+            if (Organization.Toolkits.Sales?.ManagerGroup.HasValue == true)
+                MembershipHelper.Save(Organization.Toolkits.Sales.ManagerGroup.Value, userId, null);
 
             PersonHelper.SendAccountCreated(Organization.OrganizationIdentifier, Organization.LegalName, person.User, person);
+        }
+
+        private void AssignToTransferGroup(Guid userId, CartState cart)
+        {
+            var transferGroup = Organization.Toolkits.Sales?.TransferGroup;
+            if (!transferGroup.HasValue || cart.Mode != PriceSelectionMode.Subscribe || !cart.IsTransfer)
+                return;
+
+            MembershipHelper.Save(transferGroup.Value, userId, null);
+
+            if (!IsNewUser)
+                CurrentSessionModule.Initialize(Context, CurrentSessionState.Identity, true);
         }
 
         private void AttachPaymentToUser(Guid userId)
@@ -389,7 +401,7 @@ namespace InSite.UI.Portal.Billing
         {
             var subtotal = ComputeSubtotal(cart);
             var taxableBase = ComputeTaxableBase(cart);
-            var taxRate = GetSelectedProvinceTaxRate();
+            var taxRate = GetSelectedProvinceTax().Rate;
             var tax = Math.Round(taxableBase * taxRate, 2, MidpointRounding.AwayFromZero);
             var total = subtotal + tax;
 
@@ -539,29 +551,20 @@ namespace InSite.UI.Portal.Billing
             }
         }
 
-        private decimal GetSelectedProvinceTaxRate()
+        private ProvinceTax GetSelectedProvinceTax()
         {
             var region = BillState.Value;
-            if (string.IsNullOrWhiteSpace(region))
+            if (string.IsNullOrWhiteSpace(region) || region == "--")
             {
                 TaxPercentage.Text = "Calculated at Checkout";
-                return 0m;
+                return ProvinceTax.None;
             }
 
-            var orgId = Organization.Identifier;
-            var taxes = ServiceLocator.InvoiceSearch.GetTaxes(new TTaxFilter
-            {
-                OrganizationIdentifier = orgId,
-                RegionCode = region
-            }) ?? new List<TTax>();
+            var tax = TaxHelper.GetProvinceTax(Organization.Identifier, region);
 
-            var rate = taxes.Sum(t => t.TaxRate);
-            if (rate > 1m) rate /= 100m;
+            TaxPercentage.Text = TaxHelper.FormatRate(tax.Rate);
 
-            var pct = rate * 100m;
-            TaxPercentage.Text = (pct % 1m == 0m) ? $"{pct:0}%" : $"{pct:0.##}%";
-
-            return Math.Max(0m, rate);
+            return tax;
         }
 
         private UnmaskedCreditCard GetCreditCardDetails()

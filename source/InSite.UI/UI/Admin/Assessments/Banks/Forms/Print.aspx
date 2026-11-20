@@ -135,6 +135,7 @@
             <insite:DropDownButton runat="server" ID="BuildImagesButton" ButtonStyle="Success" DefaultAction="None" IconName="download" Text="Print Images" CssClass="d-inline-block" disabled="disabled"></insite:DropDownButton>
             <insite:Button runat="server" ID="BuildQuestionsInternal" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Questions (internal)" />
             <insite:Button runat="server" ID="BuildQuestionsDocx" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Questions (DOCX)" />
+            <insite:Button runat="server" ID="BuildQuestionsBasicDocx" ButtonStyle="Warning" Icon="fas fa-download" Text="Print Questions (Basic, DOCX)" />
             <insite:Button runat="server" ID="BuildQuestionsCompact" ButtonStyle="Info" Icon="fas fa-download" Text="Print Questions (compact)" />
             <insite:Button runat="server" ID="BuildQuestionsExternal" ButtonStyle="Success" Icon="fas fa-download" Text="Print Questions (external)" />
             <insite:CloseButton runat="server" ID="GoBackButton" />

@@ -35,6 +35,8 @@ public class PersonImporter(
         Guid organizationId,
         string? fullNamePolicy,
         string timeZone,
+        string? employerGroupName,
+        string[]? groupNames,
         Guid submittedBy,
         string submittedByName,
         IEnumerable<ImportPerson> imports
@@ -43,7 +45,7 @@ public class PersonImporter(
         var result = new List<ImportPersonResult>();
 
         foreach (var import in imports)
-            result.Add(await ImportAsync(organizationId, fullNamePolicy, timeZone, submittedBy, submittedByName, import));
+            result.Add(await ImportAsync(organizationId, fullNamePolicy, timeZone, employerGroupName, groupNames, submittedBy, submittedByName, import));
 
         return result.ToArray();
     }
@@ -52,6 +54,8 @@ public class PersonImporter(
         Guid organizationId,
         string? fullNamePolicy,
         string timeZone,
+        string? employerGroupName,
+        string[]? groupNames,
         Guid submittedBy,
         string submittedByName,
         ImportPerson input
@@ -59,14 +63,14 @@ public class PersonImporter(
     {
         var failure = new ValidationFailure();
 
-        var groupId = await GetGroupIdAsync(organizationId, input.GroupCode, failure);
+        var groupId = await GetGroupIdByCodeAsync(organizationId, input.GroupCode, failure);
         if (failure.Errors.Count > 0)
             return new ImportPersonResult(input) { Failure = failure, Status = ImportPersonResult.StatusEnum.Error };
 
         var existing = await GetPersonByCodeAsync(organizationId, input);
         if (existing != null)
         {
-            var original = await ModifyAsync(existing, groupId, fullNamePolicy, submittedByName, input, failure);
+            var original = await ModifyAsync(existing, groupId, fullNamePolicy, null, null, submittedByName, input, failure);
             return failure.Errors.Count > 0
                 ? new ImportPersonResult(input) { Failure = failure, Status = ImportPersonResult.StatusEnum.Error }
                 : original != null
@@ -82,7 +86,7 @@ public class PersonImporter(
                 : new ImportPersonResult(input) { PendingPersonId = pendingPersonId, Status = ImportPersonResult.StatusEnum.Pending };
         }
 
-        var userId = await CreateAsync(organizationId, groupId, fullNamePolicy, timeZone, submittedByName, input, failure);
+        var userId = await CreateAsync(organizationId, groupId, fullNamePolicy, timeZone, employerGroupName, groupNames, false, submittedByName, input, failure);
         return failure.Errors.Count > 0
             ? new ImportPersonResult(input) { Failure = failure, Status = ImportPersonResult.StatusEnum.Error }
             : new ImportPersonResult(input) { UserId = userId, Status = ImportPersonResult.StatusEnum.Created };
@@ -96,6 +100,8 @@ public class PersonImporter(
         Guid organizationId,
         string? fullNamePolicy,
         string timeZone,
+        string? employerGroupName,
+        string[]? groupNames,
         string submittedByName,
         IEnumerable<ImportPendingPerson> imports
         )
@@ -133,7 +139,18 @@ public class PersonImporter(
             else
                 matchPerson = null;
 
-            result.Add(await ImportPendingPersonAsync(organizationId, fullNamePolicy, timeZone, submittedByName, import.PendingPersonId, pendingPerson.GroupIdentifier, importPerson, matchPerson));
+            result.Add(await ImportPendingPersonAsync(
+                organizationId,
+                fullNamePolicy,
+                timeZone,
+                employerGroupName,
+                groupNames,
+                submittedByName,
+                import.PendingPersonId,
+                pendingPerson.GroupIdentifier,
+                importPerson,
+                matchPerson
+            ));
         }
 
         return result.ToArray();
@@ -143,6 +160,8 @@ public class PersonImporter(
         Guid organizationId,
         string? fullNamePolicy,
         string timeZone,
+        string? employerGroupName,
+        string[]? groupNames,
         string submittedByName,
         Guid pendingPersonId,
         Guid? groupId,
@@ -156,7 +175,7 @@ public class PersonImporter(
 
         if (matchPerson != null)
         {
-            var original = await ModifyAsync(matchPerson, groupId, fullNamePolicy, submittedByName, input, failure);
+            var original = await ModifyAsync(matchPerson, groupId, fullNamePolicy, employerGroupName, groupNames, submittedByName, input, failure);
             result = failure.Errors.Count > 0
                 ? new ImportPersonResult(input) { PendingPersonId = pendingPersonId, Failure = failure, Status = ImportPersonResult.StatusEnum.Error }
                 : original != null
@@ -165,7 +184,19 @@ public class PersonImporter(
         }
         else
         {
-            var userId = await CreateAsync(organizationId, groupId, fullNamePolicy, timeZone, submittedByName, input, failure);
+            var userId = await CreateAsync(
+                organizationId,
+                groupId,
+                fullNamePolicy,
+                timeZone,
+                employerGroupName,
+                groupNames,
+                input.EmployeeStatus == ImportPerson.EmployeeStatusEnum.Active,
+                submittedByName,
+                input,
+                failure
+            );
+            
             result = failure.Errors.Count > 0
                 ? new ImportPersonResult(input) { PendingPersonId = pendingPersonId, Failure = failure, Status = ImportPersonResult.StatusEnum.Error }
                 : new ImportPersonResult(input) { PendingPersonId = pendingPersonId, UserId = userId, Status = ImportPersonResult.StatusEnum.Created };
@@ -268,6 +299,8 @@ public class PersonImporter(
         PersonEntity person,
         Guid? groupId,
         string? fullNamePolicy,
+        string? employerGroupName,
+        string[]? groupNames,
         string submittedByName,
         ImportPerson input,
         ValidationFailure failure
@@ -286,7 +319,9 @@ public class PersonImporter(
         var commands = new List<ICommand>();
 
         AddModifyCommands(user, person, fullNamePolicy, input, commands);
+
         await AddMembershipCommandsAsync(person.UserIdentifier, groupId, commands);
+        await AddGroupCommandsAsync(person.OrganizationIdentifier, person.PersonIdentifier, person.UserIdentifier, employerGroupName, groupNames, true, commands);
         await ApplyEmployeeStatusAsync(person.OrganizationIdentifier, person.UserIdentifier, person.PersonIdentifier, person, submittedByName, input.EmployeeStatus, commands);
 
         if (commands.Count == 0)
@@ -348,7 +383,7 @@ public class PersonImporter(
         if (!string.Equals(person.JobTitle, input.JobTitle))
             commands.Add(new ModifyPersonFieldText(personId, PersonField.JobTitle, input.JobTitle));
 
-        var oldAddress = person.WorkAddress ?? new AddressEntity();
+        var oldAddress = person.WorkAddress ?? new PersonAddressEntity();
         var newAddress = CreatePersonAddress(input);
 
         if (!string.Equals(oldAddress.Country, newAddress.Country)
@@ -384,6 +419,9 @@ public class PersonImporter(
         Guid? groupId,
         string? fullNamePolicy,
         string timeZone,
+        string? employerGroupName,
+        string[]? groupNames,
+        bool grantAccess,
         string submittedByName,
         ImportPerson input,
         ValidationFailure failure
@@ -408,8 +446,13 @@ public class PersonImporter(
             new ModifyPersonAddress(personId, AddressType.Work, CreatePersonAddress(input)),
         };
 
+        if (grantAccess)
+            AddGrantAccessCommands(personId, submittedByName, commands);
+
         if (groupId.HasValue)
             commands.Add(new StartMembership(UniqueIdentifier.Create(), userId, groupId.Value, null, DateTimeOffset.UtcNow));
+
+        await AddGroupCommandsAsync(organizationId, personId, userId, employerGroupName, groupNames, false, commands);
 
         await ApplyEmployeeStatusAsync(organizationId, userId, personId, null, submittedByName, input.EmployeeStatus, commands);
 
@@ -425,6 +468,52 @@ public class PersonImporter(
         }
 
         return userId;
+    }
+
+    private void AddGrantAccessCommands(Guid personId, string submittedByName, List<ICommand> commands)
+    {
+        commands.Add(new GrantPersonAccess(personId, DateTimeOffset.UtcNow, submittedByName));
+        commands.Add(new ModifyPersonFieldBool(personId, PersonField.IsLearner, true));
+    }
+
+    private async Task AddGroupCommandsAsync(
+        Guid organizationId,
+        Guid personId,
+        Guid userId,
+        string? employerGroupName,
+        string[]? groupNames,
+        bool validateMemberships,
+        List<ICommand> commands
+    )
+    {
+        var employerGroupIds = !string.IsNullOrEmpty(employerGroupName)
+            ? await GetGroupIdsByNamesAsync(organizationId, [employerGroupName])
+            : [];
+
+        if (employerGroupIds.Length > 0)
+            commands.Add(new ModifyPersonFieldGuid(personId, PersonField.EmployerGroupIdentifier, employerGroupIds[0]));
+
+        var groupIds = groupNames != null && groupNames.Length > 0
+            ? await GetGroupIdsByNamesAsync(organizationId, groupNames)
+            : [];
+
+        List<MembershipEntity>? memberships;
+
+        if (validateMemberships)
+        {
+            var criteria = new CollectMemberships { OrganizationId = organizationId, UserId = userId };
+            criteria.DisablePaging();
+
+            memberships = await membershipReader.CollectAsync(criteria, null);            
+        }
+        else
+            memberships = null;
+
+        foreach (var groupId in groupIds)
+        {
+            if (memberships == null || !memberships.Any(x => x.GroupIdentifier == groupId))
+                commands.Add(new StartMembership(UniqueIdentifier.Create(), userId, groupId, null, DateTimeOffset.UtcNow));
+        }
     }
 
     private async Task ApplyEmployeeStatusAsync(
@@ -477,7 +566,10 @@ public class PersonImporter(
 
         if (person != null)
         {
-            var memberships = await membershipReader.CollectAsync(new CollectMemberships { OrganizationId = organizationId, UserId = userId }, null);
+            var criteria = new CollectMemberships { OrganizationId = organizationId, UserId = userId };
+            criteria.DisablePaging();
+
+            var memberships = await membershipReader.CollectAsync(criteria, null);
             foreach (var m in memberships)
                 commands.Add(new EndMembership(m.MembershipIdentifier));
         }
@@ -496,7 +588,7 @@ public class PersonImporter(
         };
     }
 
-    private async Task<Guid?> GetGroupIdAsync(Guid organizationId, string groupCode, ValidationFailure failure)
+    private async Task<Guid?> GetGroupIdByCodeAsync(Guid organizationId, string groupCode, ValidationFailure failure)
     {
         if (string.IsNullOrEmpty(groupCode))
             return null;
@@ -513,6 +605,20 @@ public class PersonImporter(
         failure.AddError($"Group '{groupCode}' is not found");
 
         return null;
+    }
+
+    private async Task<Guid[]> GetGroupIdsByNamesAsync(Guid organizationId, string[] groupNames)
+    {
+        if (groupNames.Length == 0)
+            return [];
+
+        var groups = await groupReader.CollectAsync(new CollectGroups
+        {
+           OrganizationId = organizationId,
+           GroupNames = groupNames
+        });
+
+        return groups.Select(x => x.GroupIdentifier).ToArray();
     }
 
     #endregion

@@ -127,8 +127,7 @@
                             <td><%# string.Join(
                                 "<div class='pb-2'></div>",
                                 ((IEnumerable<Field>)Eval("Fields")).OrderBy(x => x.Section.Form.Sequence).Select(x => string.Format(
-                                    "<div><a{6} target='_blank' href='/ui/admin/assessments/forms/workshop?bank={0}&form={1}&question={2}&panel=questions'>{3} [{4}.{5}]</a></div>",
-                                    x.Section.Form.Specification.Bank.Identifier, 
+                                    "<div><a{5} target='_blank' href='/client/admin/assessments/forms/workshop/{0}?question={1}&tab=questions'>{2} [{3}.{4}]</a></div>",
                                     x.Section.Form.Identifier, 
                                     x.Question.Identifier, 
                                     HttpUtility.HtmlEncode(x.Section.Form.Name),

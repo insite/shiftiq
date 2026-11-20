@@ -38,7 +38,7 @@ namespace InSite.UI.Admin.Issues.Issues
 
                 PageHelper.AutoBindHeader(this, qualifier: $"{issue.IssueTitle} <span class='fw-normal fs-md text-body-secondary'>Case #{issue.IssueNumber} - {issue.IssueType}</span>");
 
-                CaseInfo.BindIssue(issue, User.TimeZone);
+                CaseInfo.BindIssue(issue);
 
                 var attachmentCount = ServiceLocator.IssueSearch.CountAttachments(new QIssueAttachmentFilter
                 {

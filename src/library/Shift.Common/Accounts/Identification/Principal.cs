@@ -83,21 +83,11 @@ namespace Shift.Common
             }
         }
 
-        public TimeZoneInfo TimeZone
+        public string TimeZone
         {
             get
             {
-                if (User?.TimeZone == null)
-                    return TimeZoneInfo.Utc;
-
-                try
-                {
-                    return TimeZoneInfo.FindSystemTimeZoneById(User.TimeZone);
-                }
-                catch (TimeZoneNotFoundException)
-                {
-                    return TimeZoneInfo.Utc;
-                }
+                return TimeZones.IsValidZone(User?.TimeZone) ? User.TimeZone : TimeZones.Ids.Utc;
             }
         }
 

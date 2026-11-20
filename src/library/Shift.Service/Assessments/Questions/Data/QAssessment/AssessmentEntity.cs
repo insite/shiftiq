@@ -31,6 +31,7 @@ public partial class AssessmentEntity
     public string? FormTitle { get; set; }
     public string? FormType { get; set; }
     public string? FormVersion { get; set; }
+    public string? AIProctoringProvider { get; set; }
 
     public int AttemptGradedCount { get; set; }
     public int AttemptPassedCount { get; set; }

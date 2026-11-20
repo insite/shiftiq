@@ -31,7 +31,7 @@ namespace InSite.Application.Organizations.Write
             if (Languages.IsEmpty() || TimeZone.IsEmpty())
                 return true;
 
-            var isSame = state.TimeZone?.Id == TimeZone.NullIfEmpty()
+            var isSame = state.TimeZone == TimeZone.NullIfEmpty()
                 && state.Languages.Length == Languages.Length
                 && state.Languages
                     .Select(x => x.TwoLetterISOLanguageName)

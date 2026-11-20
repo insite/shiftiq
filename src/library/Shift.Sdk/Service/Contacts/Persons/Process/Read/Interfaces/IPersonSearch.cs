@@ -17,6 +17,7 @@ namespace InSite.Application.Contacts.Read
         QPerson GetPerson(Guid userId, Guid organizationId, params Expression<Func<QPerson, object>>[] includes);
         QPerson GetPerson(Guid organizationId, string email, params Expression<Func<QPerson, object>>[] includes);
         QPerson GetPerson(string personCode, Guid organizationId, params Expression<Func<QPerson, object>>[] includes);
+        QPerson GetPerson(QPersonFilter filter, params Expression<Func<QPerson, object>>[] includes);
         List<QPerson> GetPersonsByEmployer(Guid employerGroupId);
         List<QPerson> GetPersonsByEmails(IEnumerable<string> emails, Guid organizationId, params Expression<Func<QPerson, object>>[] includes);
         List<QPerson> GetPersonsByAlternateEmails(IEnumerable<string> alternateEmails, Guid organizationId, params Expression<Func<QPerson, object>>[] includes);

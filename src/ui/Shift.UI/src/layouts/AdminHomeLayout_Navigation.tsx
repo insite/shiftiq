@@ -11,12 +11,32 @@ import AdminHomeLayout_Navigation_AdminMenu from "./AdminHomeLayout_Navigation_A
 import AdminHomeLayout_Navigation_HelpMenu from "./AdminHomeLayout_Navigation_HelpMenu";
 import AdminHomeLayout_Navigation_Lang from "./AdminHomeLayout_Navigation_Lang";
 import AdminHomeLayout_Navigation_RecentMenu from "./AdminHomeLayout_Navigation_RecentMenu";
+import AdminHomeLayout_Navigation_Search from "./AdminHomeLayout_Navigation_Search";
+
+function getStateClass(state: SidebarState): string {
+    switch (state) {
+        case "collapsing1":
+            return "compact-move";
+        case "collapsing2":
+            return "compact-move compact-size";
+        case "collapsed":
+            return "compact-size";
+        case "expanding1":
+        case "expanding2":
+            return "compact-move";
+        case "expanded":
+            return "";
+        default:
+            throw new Error(`Unsupported state: ${state}`);
+    }
+}
 
 interface Props {
+    state: SidebarState;
     onStateChange: (state: SidebarState) => void;
 }
 
-export default function AdminHomeLayout_Navigation({ onStateChange }: Props) {
+export default function AdminHomeLayout_Navigation({ state, onStateChange }: Props) {
     const [show, setShow] = useState(false);
     const { siteSetting } = useSiteProvider();
 
@@ -33,7 +53,9 @@ export default function AdminHomeLayout_Navigation({ onStateChange }: Props) {
                     <button type="button" className="navbar-toggler" aria-label="Toggle navigation" onClick={handleToggleMobile}>
                         <span className="navbar-toggler-icon"></span>
                     </button>
-                    
+
+                    <AdminHomeLayout_Navigation_Search className={getStateClass(state)} />
+
                     <nav className="collapse navbar-collapse">
                         <ul className="navbar-nav ms-auto">
 

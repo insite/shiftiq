@@ -15,6 +15,14 @@ namespace InSite.Application.Records.Read
         public List<string> AchievementLabels { get; set; } = new List<string>();
         public string AchievementDescription { get; set; }
         public bool? AchievementIsEnabled { get; set; }
+        public bool? AchievementAllowSelfDeclared { get; set; }
+        public bool? AchievementIssuesCertificate { get; set; }
+
+        // Widens AchievementLabels to also match any achievement that issues a certificate.
+        public bool IncludeCertificateIssuingAchievements { get; set; }
+
+        // Owned by this organization, or shared with it through achievements.TAchievementOrganization.
+        public Guid? AvailableToOrganizationIdentifier { get; set; }
         public bool? HasMandatoryCredential { get; set; }
         public string ExpirationType { get; set; }
         public int? ExpirationLifetimeQuantity { get; set; }

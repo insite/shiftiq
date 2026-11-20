@@ -4,7 +4,6 @@
     {
         Bambora,
         Recaptcha,
-        ScormCloud,
         SmsGateway_DEPRECATED,
         BCMail
     }

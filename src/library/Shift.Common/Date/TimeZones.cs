@@ -2,83 +2,113 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+
+using NodaTime;
+using NodaTime.Text;
 
 namespace Shift.Common
 {
     public static class TimeZones
     {
-        private static readonly Dictionary<TimeZoneInfo, TimeZoneAbbreviation> Abbreviations;
-        private static readonly Dictionary<string, TimeZoneInfo> Aliases;
-        private static readonly ReadOnlyDictionary<string, TimeZoneInfo> ProvincesCanada;
-        private static readonly ReadOnlyDictionary<string, TimeZoneInfo> ProvincesUs;
+        #region Fields and properties
 
-        public static TimeZoneInfo Hawaiian { get; } = TimeZoneInfo.FindSystemTimeZoneById("Hawaiian Standard Time");
-        public static TimeZoneInfo Alaskan { get; } = TimeZoneInfo.FindSystemTimeZoneById("Alaskan Standard Time");
-        public static TimeZoneInfo Pacific { get; } = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-        public static TimeZoneInfo Mountain { get; } = TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time");
-        public static TimeZoneInfo Central { get; } = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
-        public static TimeZoneInfo Eastern { get; } = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-        public static TimeZoneInfo Newfoundland { get; } = TimeZoneInfo.FindSystemTimeZoneById("Newfoundland Standard Time");
-        public static TimeZoneInfo Atlantic { get; } = TimeZoneInfo.FindSystemTimeZoneById("Atlantic Standard Time");
-        public static TimeZoneInfo Utc { get; } = TimeZoneInfo.FindSystemTimeZoneById("UTC");
+        private static Dictionary<string, TimeZoneAbbreviation> Aliases;
+        private static ReadOnlyDictionary<string, string> ProvincesCanada;
+        private static ReadOnlyDictionary<string, string> ProvincesUs;
 
-        public static TimeZoneInfo[] Supported { get; } =
+        public static class Ids
         {
-            Hawaiian, Alaskan, Pacific, Mountain, Central, Eastern, Newfoundland, Atlantic, Utc
-        };
+            public const string Pacific = "America/Vancouver";
+            public const string Mountain = "America/Edmonton";
+            public const string Eastern = "America/Toronto";
+            public const string Utc = "UTC";
+        }
 
-        static TimeZones()
+        private static class PrivateIds
         {
-            Abbreviations = new Dictionary<TimeZoneInfo, TimeZoneAbbreviation>
+            public const string Hawaiian = "Pacific/Honolulu";
+            public const string Alaskan = "America/Anchorage";
+            public const string Pacific = "America/Vancouver";
+            public const string Mountain = "America/Edmonton";
+            public const string Central = "America/Winnipeg";
+            public const string Eastern = "America/Toronto";
+            public const string Newfoundland = "America/St_Johns";
+            public const string Atlantic = "America/Halifax";
+            public const string Utc = "UTC";
+        }
+
+        private static readonly TimeZoneAbbreviation Utc = new TimeZoneAbbreviation("UTC", GetStandardUtcOffset("UTC"), "UTC", "UTC", "UTC", "UTC", true);
+
+        private static TimeZoneAbbreviation[] Definitions = { Utc };
+
+        public static string[] Supported { get; private set; } = { Utc.TimeZoneId };
+
+        #endregion
+
+        #region Initialization
+
+        public static void Initialize(IEnumerable<TimeZoneDescription> timeZones)
+        {
+            Definitions = timeZones
+                .Select(x => new TimeZoneAbbreviation(
+                    x.Id,
+                    GetStandardUtcOffset(x.Id),
+                    x.Name,
+                    x.Generic,
+                    x.Standard,
+                    x.Daylight,
+                    x.IsIANACompatible
+                ))
+                .Union(new TimeZoneAbbreviation[] { Utc })
+                .ToArray();
+
+            Supported = Definitions.Select(x => x.TimeZoneId).ToArray();
+
+            Aliases = new Dictionary<string, TimeZoneAbbreviation>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var tz in Definitions)
             {
-                { Hawaiian, new TimeZoneAbbreviation(Hawaiian, "HST", "HST", "HDT", "Pacific/Honolulu") },
-                { Alaskan, new TimeZoneAbbreviation(Alaskan, "AKT", "AKST", "AKDT", "America/Anchorage") },
-                { Pacific, new TimeZoneAbbreviation(Pacific, "PT", "PST", "PDT", "America/Vancouver") },
-                { Mountain, new TimeZoneAbbreviation(Mountain, "MT", "MST", "MDT", "America/Edmonton") },
-                { Central, new TimeZoneAbbreviation(Central, "CT", "CST", "CDT", "America/Winnipeg") },
-                { Eastern, new TimeZoneAbbreviation(Eastern, "ET", "EST", "EDT", "America/Toronto") },
-                { Newfoundland, new TimeZoneAbbreviation(Newfoundland, "NT", "NST", "NDT", "America/St_Johns") },
-                { Atlantic, new TimeZoneAbbreviation(Atlantic, "AT", "AST", "ADT", "America/Halifax") },
-                { Utc, new TimeZoneAbbreviation(Utc, "UTC", "UTC", "UTC", "UTC") }
-            };
-
-            Aliases = new Dictionary<string, TimeZoneInfo>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var tz in Supported)
-            {
-                var abbrv = GetAbbreviation(tz);
-
-                var aliases = new[] { tz.DaylightName, tz.DisplayName, tz.Id, tz.StandardName, abbrv.Daylight, abbrv.Generic, abbrv.Moment, abbrv.Standard };
-                foreach (var alias in aliases)
-                {
-                    if (!Aliases.ContainsKey(alias))
-                        Aliases.Add(alias, tz);
-                }
+                AddAlias(tz.TimeZoneId, tz);
+                AddAlias(tz.DisplayName, tz);
+                AddAlias(tz.Generic, tz);
+                AddAlias(tz.Daylight, tz);
+                AddAlias(tz.Standard, tz);
             }
 
-            var provincesCanada = new Dictionary<string, TimeZoneInfo>(StringComparer.OrdinalIgnoreCase);
-            var provincesUs = new Dictionary<string, TimeZoneInfo>(StringComparer.OrdinalIgnoreCase);
+            var provincesCanada = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var provincesUs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             InitProvinces(provincesCanada, provincesUs);
 
-            ProvincesCanada = new ReadOnlyDictionary<string, TimeZoneInfo>(provincesCanada);
-            ProvincesUs = new ReadOnlyDictionary<string, TimeZoneInfo>(provincesUs);
-        }
+            ProvincesCanada = new ReadOnlyDictionary<string, string>(provincesCanada);
+            ProvincesUs = new ReadOnlyDictionary<string, string>(provincesUs);
 
-        public static TimeZoneInfo Find(DateTimeOffset date)
-        {
-            var offset = date.Offset;
-
-            foreach (var tz in Supported)
+            void AddAlias(string alias, TimeZoneAbbreviation abbrev)
             {
-                if (tz.GetUtcOffset(date).Equals(offset))
-                    return tz;
+                if (!string.IsNullOrWhiteSpace(alias) && !Aliases.ContainsKey(alias))
+                    Aliases.Add(alias, abbrev);
             }
-
-            return Utc;
         }
+
+        private static string GetStandardUtcOffset(string timeZoneId)
+        {
+            var pattern = OffsetPattern.CreateWithInvariantCulture("+HH:mm");
+            var instant = Instant.FromUtc(DateTime.Now.Year, 12, 31, 0, 0);
+
+            var zone = DateTimeZoneProviders.Tzdb[timeZoneId];
+            var offset = zone
+                .GetZoneInterval(instant)
+                .StandardOffset;
+
+            return $"UTC{pattern.Format(offset)}";
+        }
+
+        #endregion
+
+        #region Format
 
         public static string Format(DateTime date)
         {
@@ -87,59 +117,16 @@ namespace Shift.Common
                 : $"{date:MMM d, yyyy}";
         }
 
-        public static string FormatSql(DateTimeOffset dto, string tz)
-        {
-            var builder = new StringBuilder();
-
-            var zone = GetInfo(tz);
-            var time = TimeZoneInfo.ConvertTime(dto, zone);
-            var offset = zone.GetUtcOffset(time);
-
-            builder.AppendFormat("{0:yyyy-MM-dd HH:mm:ss}", time);
-            builder.AppendFormat(" {0:+;-;+}:{1}", offset.Hours, offset.Minutes);
-
-            return builder.ToString();
-        }
-
-        public static string Format(DateTimeOffset time, string zone, string language) => Format(time, GetInfo(zone), false, false, false, CultureInfo.GetCultureInfo(language));
-
-        public static string Format(DateTimeOffset time, string zone) => Format(time, GetInfo(zone));
-
-        public static string Format(DateTimeOffset time, TimeZoneInfo zone = null, bool isHtml = false, bool wrap = false, bool showSeconds = false, CultureInfo culture = null)
-        {
-            var builder = new StringBuilder();
-
-            Append(builder, time, zone, isHtml, wrap, showSeconds, culture);
-
-            return builder.ToString();
-        }
-
-        public static string FormatUTC(DateTime time, TimeZoneInfo zone, bool isHtml = false)
-        {
-            var timeUTC = time.ToUniversalTime();
-
-            var builder = new StringBuilder();
-
-            Append(builder, DateTimeOffset.Parse(timeUTC.ToString()), zone, isHtml);
-
-            return builder.ToString();
-        }
-
-        public static DateTimeOffset ConvertFromUtc(DateTimeOffset utc, TimeZoneInfo zone)
-        {
-            return TimeZoneInfo.ConvertTime(utc, zone);
-        }
-
-        public static void Append(StringBuilder builder, DateTimeOffset time, TimeZoneInfo zone = null, bool isHtml = false, bool wrap = false, bool showSeconds = false, CultureInfo culture = null)
+        public static void Append(StringBuilder builder, DateTimeOffset time, string timeZoneId = null, bool isHtml = false, bool wrap = false, bool showSeconds = false, CultureInfo culture = null)
         {
             // Convert the input time to the desired time zone.
-            if (zone != null)
-                time = TimeZoneInfo.ConvertTime(time, zone);
+            if (!string.IsNullOrEmpty(timeZoneId))
+                time = ConvertTime(time, timeZoneId);
             else
-                zone = Find(time);
+                timeZoneId = FindTimeZoneId(time);
 
             // Get the abbreviations for the desired time zone.
-            var abbreviation = GetAbbreviation(zone);
+            var abbreviation = GetAbbreviation(timeZoneId);
 
             // Determine whether or not daylight savings is in effect for the input time.
             var zz = abbreviation.GetAbbreviation(time);
@@ -161,71 +148,94 @@ namespace Shift.Common
                 builder.AppendFormat(@" - {0} {1}", timeAsString, zz);
         }
 
-        public static string FormatDateOnly(DateTimeOffset date, TimeZoneInfo outputZone, CultureInfo culture = null, string format = "{0:MMM d, yyyy}")
+        public static string Format(DateTimeOffset time, string zone, string language) => Format(time, zone, false, false, false, CultureInfo.GetCultureInfo(language));
+
+        public static string Format(DateTimeOffset time, string zone, bool isHtml = false, bool wrap = false, bool showSeconds = false, CultureInfo culture = null)
         {
-            var inputZone = Find(date);
+            var builder = new StringBuilder();
 
-            if (outputZone == null)
-                outputZone = inputZone;
+            Append(builder, time, zone, isHtml, wrap, showSeconds, culture);
 
-            var converted = TimeZoneInfo.ConvertTime(date, outputZone);
+            return builder.ToString();
+        }
+
+        public static string FormatDateOnly(DateTimeOffset date, string outputZoneId, CultureInfo culture = null, string format = "{0:MMM d, yyyy}")
+        {
+            var converted = !string.IsNullOrEmpty(outputZoneId) ? ConvertTime(date, outputZoneId) : date;
 
             return culture == null
                 ? string.Format(format ?? "{0:MMM d, yyyy}", converted)
                 : string.Format(culture, format ?? "{0:MMM d, yyyy}", converted);
         }
 
-        public static string FormatTimeOnly(DateTimeOffset date, TimeZoneInfo outputZone)
+        public static string FormatTimeOnly(DateTimeOffset date, string outputZoneId)
         {
-            var inputZone = Find(date);
-
-            if (outputZone == null)
-                outputZone = inputZone;
-
-            var converted = TimeZoneInfo.ConvertTime(date, outputZone);
-            var abbreviation = GetAbbreviation(outputZone);
+            var zoneId = !string.IsNullOrEmpty(outputZoneId) ? outputZoneId : FindTimeZoneId(date);
+            var converted = !string.IsNullOrEmpty(outputZoneId) ? ConvertTime(date, zoneId) : date;
+            var abbreviation = GetAbbreviation(zoneId);
             var zz = abbreviation.GetAbbreviation(converted);
             return $@"{converted:h:mm tt} {zz}";
         }
 
-        public static TimeZoneAbbreviation GetAbbreviation(string id)
-            => GetAbbreviation(GetInfo(id));
+        #endregion
 
-        public static TimeZoneAbbreviation GetAbbreviation(TimeZoneInfo info)
-            => Abbreviations.ContainsKey(info) ? Abbreviations[info] : null;
+        #region Convert
 
-        public static TimeZoneInfo GetInfo(string alias)
+        public static DateTimeOffset ConvertTime(DateTimeOffset date, string outputZoneId)
         {
-            if (string.IsNullOrEmpty(alias))
-                return Utc;
+            var outputZone = GetZone(outputZoneId);
+            var instant = OffsetDateTime.FromDateTimeOffset(date).ToInstant();
+            var converted = instant.InZone(outputZone);
 
-            return Aliases.ContainsKey(alias) ? Aliases[alias] : null;
+            if (converted.Year < 1)
+                return date;
+
+            return converted.ToDateTimeOffset();
         }
 
-        public static DateTimeOffset GetDateTimeOffset(DateTime date, DateTime? time, string tz) =>
-            GetDateTimeOffset(date, time, GetInfo(tz));
-
-        public static DateTimeOffset GetDateTimeOffset(DateTime date, DateTime? time, TimeZoneInfo tz)
+        public static DateTime ConvertTime(DateTime date, string inputZoneId, string outputZoneId)
         {
-            if (time.HasValue)
-                date = new DateTime(date.Year, date.Month, date.Day, time.Value.Hour, time.Value.Minute, time.Value.Second);
+            var inputZone = GetZone(inputZoneId);
+            var outputZone = GetZone(outputZoneId);
+            var local = LocalDateTime.FromDateTime(DateTime.SpecifyKind(date, DateTimeKind.Unspecified));
+            var instant = local.InZoneLeniently(inputZone).ToInstant();
 
-            return new DateTimeOffset(date, tz.GetUtcOffset(date));
+            return instant.InZone(outputZone).LocalDateTime.ToDateTimeUnspecified();
         }
 
-        public static DateTime? GetDate(DateTimeOffset? date, TimeZoneInfo outputZone)
+        public static DateTime ConvertTimeFromUtc(DateTime date, string outputZoneId)
         {
-            return date.HasValue ? GetDate(date.Value, outputZone) : (DateTime?)null;
+            var outputZone = GetZone(outputZoneId);
+            var utc = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+
+            return Instant.FromDateTimeUtc(utc).InZone(outputZone).LocalDateTime.ToDateTimeUnspecified();
         }
 
-        public static DateTime GetDate(DateTimeOffset date, TimeZoneInfo outputZone)
+        public static DateTimeOffset ToDateTimeOffset(DateTime date, string timeZoneId)
         {
-            var inputZone = Find(date);
+            var unspecified = DateTime.SpecifyKind(date, DateTimeKind.Unspecified);
+            var zoned = LocalDateTime.FromDateTime(unspecified).InZoneLeniently(GetZone(timeZoneId));
 
-            if (outputZone == null)
-                outputZone = inputZone;
+            return new DateTimeOffset(unspecified, zoned.Offset.ToTimeSpan());
+        }
 
-            var converted = TimeZoneInfo.ConvertTime(date, outputZone);
+        public static DateTimeOffset? ToDateTimeOffset(DateTime? date, string timeZoneId)
+        {
+            return date != null ? ToDateTimeOffset(date.Value, timeZoneId) : (DateTimeOffset?)null;
+        }
+
+        public static DateTime? GetDate(DateTimeOffset? date, string outputZoneId)
+        {
+            return date.HasValue ? GetDate(date.Value, outputZoneId) : (DateTime?)null;
+        }
+
+        public static DateTime GetDate(DateTimeOffset date, string outputZoneId)
+        {
+            var abbrev = GetAbbreviation(outputZoneId);
+            if (abbrev == null)
+                return date.DateTime;
+
+            var converted = ConvertTime(date, abbrev.TimeZoneId);
 
             return converted.DateTime;
         }
@@ -233,10 +243,93 @@ namespace Shift.Common
         public static DateTime? GetDateUtc(DateTime? date)
         {
             if (date.HasValue)
-                return TimeZoneInfo.ConvertTime(date.Value, Utc);
+                return date.Value.ToUniversalTime();
 
             return null;
         }
+
+        public static DateTimeOffset GetDateTimeOffset(DateTime date, DateTime? time, string tzId)
+        {
+            if (time.HasValue)
+                date = new DateTime(date.Year, date.Month, date.Day, time.Value.Hour, time.Value.Minute, time.Value.Second);
+
+            return ToDateTimeOffset(date, tzId);
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public static TimeZoneAbbreviation GetAbbreviation(string timeZoneAlias)
+        {
+            return !string.IsNullOrEmpty(timeZoneAlias)
+                ? Aliases.TryGetValue(timeZoneAlias, out var abbrev) ? abbrev : null
+                : Utc;
+        }
+
+        public static TimeSpan GetUtcOffset(DateTime date, string timeZoneId)
+        {
+            return LocalDateTime.FromDateTime(DateTime.SpecifyKind(date, DateTimeKind.Unspecified)).InZoneLeniently(GetZone(timeZoneId)).Offset.ToTimeSpan();
+        }
+
+        public static TimeSpan GetUtcOffset(DateTimeOffset date, string timeZoneAlias)
+        {
+            var instant = OffsetDateTime.FromDateTimeOffset(date).ToInstant();
+            return GetZone(timeZoneAlias).GetUtcOffset(instant).ToTimeSpan();
+        }
+
+        public static string FindTimeZoneId(DateTimeOffset date, string currentTimeZoneId = null)
+        {
+            var offset = date.Offset;
+
+            if (!string.IsNullOrEmpty(currentTimeZoneId)
+                && GetUtcOffset(date, currentTimeZoneId).Equals(offset)
+                )
+            {
+                return currentTimeZoneId;
+            }
+
+            foreach (var tzId in Supported)
+            {
+                if (GetUtcOffset(date, tzId).Equals(offset))
+                    return tzId;
+            }
+
+            return PrivateIds.Utc;
+        }
+
+        public static bool IsDaylightSavingTime(DateTimeOffset date, string timeZoneAlias)
+        {
+            var instant = OffsetDateTime.FromDateTimeOffset(date).ToInstant();
+            return GetZone(timeZoneAlias).GetZoneInterval(instant).Savings != Offset.Zero;
+        }
+
+        public static bool IsValidZone(string timeZoneAlias)
+        {
+            return !timeZoneAlias.IsEmpty() && GetAbbreviation(timeZoneAlias) != null;
+        }
+
+        public static string ValidateZone(string timeZoneId)
+        {
+            var abbrev = GetAbbreviation(timeZoneId);
+
+            if (abbrev == null)
+                throw new ArgumentException($"Invalid timeZoneId: {timeZoneId}");
+
+            return abbrev.TimeZoneId;
+        }
+
+        private static DateTimeZone GetZone(string alias)
+        {
+            var zoneId = GetAbbreviation(alias)?.TimeZoneId;
+
+            if (zoneId == null)
+                throw new ArgumentException($"Invalid timeZoneId: {alias}");
+
+            return DateTimeZoneProviders.Tzdb[zoneId];
+        }
+
+        #endregion
 
         #region Location
 
@@ -256,82 +349,94 @@ namespace Shift.Common
                 string.Equals(name, "US", StringComparison.OrdinalIgnoreCase);
         }
 
-        private static void InitProvinces(Dictionary<string, TimeZoneInfo> canada, Dictionary<string, TimeZoneInfo> us)
+        private static void InitProvinces(Dictionary<string, string> canada, Dictionary<string, string> us)
         {
-            AddLocations(canada, Mountain, "Alberta", "Alta", "Alb", "AB");
-            AddLocations(canada, Pacific, "BritishColumbia", "CB", "BC");
-            AddLocations(canada, Central, "Manitoba", "Man", "MB");
-            AddLocations(canada, Atlantic, "NewBrunswick", "NB");
-            AddLocations(canada, Atlantic, "NewfoundlandAndLabrador", "NewfoundlandLabrador", "Newfoundland", "Labrador", "NfLd", "TNL", "NL");
-            AddLocations(canada, Mountain, "NorthwestTerritories", "NorthwestTerr", "NWTerritories", "NWTerr", "NWT", "TNO", "NT");
-            AddLocations(canada, Atlantic, "NovaScotia", "NE", "NS");
-            AddLocations(canada, Central, "Nunavut", "NVT", "NU");
-            AddLocations(canada, Eastern, "Ontario", "ONT", "ON");
-            AddLocations(canada, Atlantic, "PrinceEdwardIsland", "PEI", "IPE", "PE");
-            AddLocations(canada, Eastern, "Quebec", "QUE", "QC");
-            AddLocations(canada, Central, "Saskatchewan", "Sask", "SK");
-            AddLocations(canada, Mountain, "Yukon", "YN", "YT");
+            var hawaiian = GetAbbreviation(PrivateIds.Hawaiian);
+            var alaskan = GetAbbreviation(PrivateIds.Alaskan);
+            var pacific = GetAbbreviation(PrivateIds.Pacific);
+            var mountain = GetAbbreviation(PrivateIds.Mountain);
+            var central = GetAbbreviation(PrivateIds.Central);
+            var eastern = GetAbbreviation(PrivateIds.Eastern);
+            var newfoundland = GetAbbreviation(PrivateIds.Newfoundland);
+            var atlantic = GetAbbreviation(PrivateIds.Atlantic);
 
-            AddLocations(us, Central, "Alabama", "AL");
-            AddLocations(us, Alaskan, "Alaska", "AK");
-            AddLocations(us, Mountain, "Arizona", "AZ");
-            AddLocations(us, Central, "Arkansas", "AR");
-            AddLocations(us, Pacific, "California", "CA");
-            AddLocations(us, Mountain, "Colorado", "CO");
-            AddLocations(us, Eastern, "Connecticut", "CT");
-            AddLocations(us, Eastern, "Delaware", "DE");
-            AddLocations(us, Eastern, "District of Columbia", "Columbia", "DC");
-            AddLocations(us, Eastern, "Florida", "FL");
-            AddLocations(us, Eastern, "Georgia", "GA");
-            AddLocations(us, Hawaiian, "Hawaii", "HI");
-            AddLocations(us, Mountain, "Idaho", "ID");
-            AddLocations(us, Central, "Illinois", "IL");
-            AddLocations(us, Eastern, "Indiana", "IN");
-            AddLocations(us, Central, "Iowa", "IA");
-            AddLocations(us, Central, "Kansas", "KS");
-            AddLocations(us, Eastern, "Kentucky", "KY");
-            AddLocations(us, Central, "Louisiana", "LA");
-            AddLocations(us, Eastern, "Maine", "ME");
-            AddLocations(us, Eastern, "Maryland", "MD");
-            AddLocations(us, Eastern, "Massachusetts", "MA");
-            AddLocations(us, Eastern, "Michigan", "MI");
-            AddLocations(us, Central, "Minnesota", "MN");
-            AddLocations(us, Central, "Mississippi", "MS");
-            AddLocations(us, Central, "Missouri", "MO");
-            AddLocations(us, Mountain, "Montana", "MT");
-            AddLocations(us, Central, "Nebraska", "NE");
-            AddLocations(us, Pacific, "Nevada", "NV");
-            AddLocations(us, Eastern, "NewHampshire", "NH");
-            AddLocations(us, Eastern, "NewJersey", "NJ");
-            AddLocations(us, Mountain, "NewMexico", "NM");
-            AddLocations(us, Eastern, "NewYork", "NY");
-            AddLocations(us, Eastern, "NorthCarolina", "NC");
-            AddLocations(us, Central, "NorthDakota", "ND");
-            AddLocations(us, Eastern, "Ohio", "OH");
-            AddLocations(us, Central, "Oklahoma", "OK");
-            AddLocations(us, Pacific, "Oregon", "OR");
-            AddLocations(us, Eastern, "Pennsylvania", "PA");
-            AddLocations(us, Eastern, "RhodeIsland", "RI");
-            AddLocations(us, Eastern, "SouthCarolina", "SC");
-            AddLocations(us, Central, "SouthDakota", "SD");
-            AddLocations(us, Eastern, "Tennessee", "TN");
-            AddLocations(us, Central, "Texas", "TX");
-            AddLocations(us, Mountain, "Utah", "UT");
-            AddLocations(us, Eastern, "Vermont", "VT");
-            AddLocations(us, Eastern, "Virginia", "VA");
-            AddLocations(us, Pacific, "Washington", "WA");
-            AddLocations(us, Eastern, "WestVirginia", "WV");
-            AddLocations(us, Central, "Wisconsin", "WI");
-            AddLocations(us, Mountain, "Wyoming", "WY");
+            AddLocations(canada, mountain, "Alberta", "Alta", "Alb", "AB");
+            AddLocations(canada, pacific, "BritishColumbia", "CB", "BC");
+            AddLocations(canada, central, "Manitoba", "Man", "MB");
+            AddLocations(canada, atlantic, "NewBrunswick", "NB");
+            AddLocations(canada, newfoundland, "NewfoundlandAndLabrador", "NewfoundlandLabrador", "Newfoundland", "Labrador", "NfLd", "TNL", "NL");
+            AddLocations(canada, mountain, "NorthwestTerritories", "NorthwestTerr", "NWTerritories", "NWTerr", "NWT", "TNO", "NT");
+            AddLocations(canada, atlantic, "NovaScotia", "NE", "NS");
+            AddLocations(canada, central, "Nunavut", "NVT", "NU");
+            AddLocations(canada, eastern, "Ontario", "ONT", "ON");
+            AddLocations(canada, atlantic, "PrinceEdwardIsland", "PEI", "IPE", "PE");
+            AddLocations(canada, eastern, "Quebec", "QUE", "QC");
+            AddLocations(canada, central, "Saskatchewan", "Sask", "SK");
+            AddLocations(canada, mountain, "Yukon", "YN", "YT");
 
-            void AddLocations(Dictionary<string, TimeZoneInfo> dict, TimeZoneInfo tz, params string[] names)
+            AddLocations(us, central, "Alabama", "AL");
+            AddLocations(us, alaskan, "Alaska", "AK");
+            AddLocations(us, mountain, "Arizona", "AZ");
+            AddLocations(us, central, "Arkansas", "AR");
+            AddLocations(us, pacific, "California", "CA");
+            AddLocations(us, mountain, "Colorado", "CO");
+            AddLocations(us, eastern, "Connecticut", "CT");
+            AddLocations(us, eastern, "Delaware", "DE");
+            AddLocations(us, eastern, "District of Columbia", "Columbia", "DC");
+            AddLocations(us, eastern, "Florida", "FL");
+            AddLocations(us, eastern, "Georgia", "GA");
+            AddLocations(us, hawaiian, "Hawaii", "HI");
+            AddLocations(us, mountain, "Idaho", "ID");
+            AddLocations(us, central, "Illinois", "IL");
+            AddLocations(us, eastern, "Indiana", "IN");
+            AddLocations(us, central, "Iowa", "IA");
+            AddLocations(us, central, "Kansas", "KS");
+            AddLocations(us, eastern, "Kentucky", "KY");
+            AddLocations(us, central, "Louisiana", "LA");
+            AddLocations(us, eastern, "Maine", "ME");
+            AddLocations(us, eastern, "Maryland", "MD");
+            AddLocations(us, eastern, "Massachusetts", "MA");
+            AddLocations(us, eastern, "Michigan", "MI");
+            AddLocations(us, central, "Minnesota", "MN");
+            AddLocations(us, central, "Mississippi", "MS");
+            AddLocations(us, central, "Missouri", "MO");
+            AddLocations(us, mountain, "Montana", "MT");
+            AddLocations(us, central, "Nebraska", "NE");
+            AddLocations(us, pacific, "Nevada", "NV");
+            AddLocations(us, eastern, "NewHampshire", "NH");
+            AddLocations(us, eastern, "NewJersey", "NJ");
+            AddLocations(us, mountain, "NewMexico", "NM");
+            AddLocations(us, eastern, "NewYork", "NY");
+            AddLocations(us, eastern, "NorthCarolina", "NC");
+            AddLocations(us, central, "NorthDakota", "ND");
+            AddLocations(us, eastern, "Ohio", "OH");
+            AddLocations(us, central, "Oklahoma", "OK");
+            AddLocations(us, pacific, "Oregon", "OR");
+            AddLocations(us, eastern, "Pennsylvania", "PA");
+            AddLocations(us, eastern, "RhodeIsland", "RI");
+            AddLocations(us, eastern, "SouthCarolina", "SC");
+            AddLocations(us, central, "SouthDakota", "SD");
+            AddLocations(us, eastern, "Tennessee", "TN");
+            AddLocations(us, central, "Texas", "TX");
+            AddLocations(us, mountain, "Utah", "UT");
+            AddLocations(us, eastern, "Vermont", "VT");
+            AddLocations(us, eastern, "Virginia", "VA");
+            AddLocations(us, pacific, "Washington", "WA");
+            AddLocations(us, eastern, "WestVirginia", "WV");
+            AddLocations(us, central, "Wisconsin", "WI");
+            AddLocations(us, mountain, "Wyoming", "WY");
+
+            void AddLocations(Dictionary<string, string> dict, TimeZoneAbbreviation tz, params string[] names)
             {
                 foreach (var n in names)
-                    dict.Add(n, tz);
+                {
+                    if (tz != null)
+                        dict.Add(n, tz.TimeZoneId);
+                }
             }
         }
 
-        public static TimeZoneInfo FindByProvince(string province, string country)
+        public static string FindTimeZoneIdByProvince(string province, string country)
         {
             if (province.IsEmpty())
                 return null;
@@ -347,7 +452,7 @@ namespace Shift.Common
             return null;
         }
 
-        public static TimeZoneInfo FindByProvince(string province)
+        public static string FindTimeZoneIdByProvince(string province)
         {
             if (province.IsEmpty())
                 return null;
@@ -361,7 +466,7 @@ namespace Shift.Common
         private static readonly Regex CanadaPostalCodePattern = new Regex("^[A-Z][0-9][A-Z]([0-9][A-Z][0-9])?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex UsZipCodePattern = new Regex("^[0-9]{5}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public static TimeZoneInfo FindByPostalCode(string code, string country)
+        public static string FindTimeZoneIdByPostalCode(string code, string country)
         {
             if (code.IsEmpty() || country.IsEmpty())
                 return null;
@@ -371,18 +476,18 @@ namespace Shift.Common
             if (IsCountryCanada(country))
             {
                 if (CanadaPostalCodePattern.IsMatch(code))
-                    return FindByCanadaPostalCode(code);
+                    return FindTimeZoneIdByCanadaPostalCode(code);
             }
             else if (IsCountryUs(country))
             {
                 if (UsZipCodePattern.IsMatch(code))
-                    return FindByUsZipCode(code);
+                    return FindTimeZoneIdByUsZipCode(code);
             }
 
             return null;
         }
 
-        public static TimeZoneInfo FindByPostalCode(string code)
+        public static string FindTimeZoneIdByPostalCode(string code)
         {
             if (code.IsEmpty())
                 return null;
@@ -390,84 +495,91 @@ namespace Shift.Common
             code = StringHelper.RemoveNonAlphanumericCharacters(code.ToLower());
 
             if (CanadaPostalCodePattern.IsMatch(code))
-                return FindByCanadaPostalCode(code);
+                return FindTimeZoneIdByCanadaPostalCode(code);
             else if (UsZipCodePattern.IsMatch(code))
-                return FindByUsZipCode(code);
+                return FindTimeZoneIdByUsZipCode(code);
 
             return null;
         }
 
-        private static TimeZoneInfo FindByCanadaPostalCode(string code)
+        private static string FindTimeZoneIdByCanadaPostalCode(string code)
         {
             var ch1 = code[0];
+
+            var pacific = GetAbbreviation(PrivateIds.Pacific);
+            var mountain = GetAbbreviation(PrivateIds.Mountain);
+            var central = GetAbbreviation(PrivateIds.Central);
+            var eastern = GetAbbreviation(PrivateIds.Eastern);
+            var newfoundland = GetAbbreviation(PrivateIds.Newfoundland);
+            var atlantic = GetAbbreviation(PrivateIds.Atlantic);
 
             if (ch1 == 'a')
             {
                 return code == "a0p" || code == "a0r" || code == "a2v"
-                    ? Atlantic
-                    : Newfoundland;
+                    ? atlantic?.TimeZoneId
+                    : newfoundland?.TimeZoneId;
             }
             else if (ch1 == 'b' || ch1 == 'c' || ch1 == 'e')
             {
-                return Atlantic;
+                return atlantic?.TimeZoneId;
             }
             else if (ch1 == 'g')
             {
                 return code == "g4t"
-                    ? Atlantic
-                    : Eastern;
+                    ? atlantic?.TimeZoneId
+                    : eastern?.TimeZoneId;
             }
             else if (ch1 == 'h')
             {
-                return Eastern;
+                return eastern?.TimeZoneId;
             }
             else if (ch1 == 'j')
             {
                 return code == "j4k"
-                    ? Atlantic
-                    : Eastern;
+                    ? atlantic?.TimeZoneId
+                    : eastern?.TimeZoneId;
             }
             else if (ch1 == 'k' || ch1 == 'l' || ch1 == 'm' || ch1 == 'n')
             {
-                return Eastern;
+                return eastern?.TimeZoneId;
             }
             else if (ch1 == 'p')
             {
                 return code == "p0v" || code == "p0w" || code == "p0x" || code == "p0y" || code == "p8n" || code == "p8t" || code == "p9a" || code == "p9n"
-                    ? Central
-                    : Eastern;
+                    ? central?.TimeZoneId
+                    : eastern?.TimeZoneId;
             }
             else if (ch1 == 'r')
             {
-                return Central;
+                return central?.TimeZoneId;
             }
             else if (ch1 == 's')
             {
                 return code == "s9v"
-                    ? Mountain
-                    : Central;
+                    ? mountain?.TimeZoneId
+                    : central?.TimeZoneId;
             }
             else if (ch1 == 't')
             {
-                return Mountain;
+                return mountain?.TimeZoneId;
             }
             else if (ch1 == 'v')
             {
                 return code == "v0a" || code == "v0b" || code == "v0c" || code == "v1a" || code == "v1c" || code == "v1g" || code == "v1j"
-                    ? Mountain
-                    : Pacific;
+                    ? mountain?.TimeZoneId
+                    : pacific?.TimeZoneId;
             }
             else if (ch1 == 'x')
             {
                 return code == "x0a"
-                    ? Eastern
+                    ? eastern?.TimeZoneId
                     : code == "x0c"
-                        ? Central
-                        : Mountain;
+                        ? central?.TimeZoneId
+                        : mountain?.TimeZoneId;
             }
             else if (ch1 == 'y')
             {
-                return Mountain;
+                return mountain?.TimeZoneId;
             }
 
             return null;
@@ -478,8 +590,15 @@ namespace Shift.Common
         private static readonly HashSet<int> UsZipCode_Mountain = new HashSet<int>(new[] { 57521, 57537, 57543, 57547, 57551, 57552, 57553, 57567, 57574, 57577, 58529, 58533, 58535, 58562, 58564, 58569, 58632, 58634, 58636, 58838, 67733, 67735, 67741, 67758, 67761, 67762, 67836, 67857, 67878, 67879, 69021, 69023, 69027, 69030, 69033, 69041, 69045, 69121, 69122, 69125, 69127, 69128, 69129, 69131, 69133, 69134, 69140, 69141, 69152, 69153, 69154, 69155, 69156, 69160, 69162, 69168, 69190, 69211, 69216, 69218, 69219, 79314, 79821, 79835, 79836, 79837, 79838, 79839, 79847, 79849, 79851, 79853, 83547, 83549, 97901, 97902, 97903, 97906 });
         private static readonly HashSet<int> UsZipCode_Pacific = new HashSet<int>(new[] { 83548, 83552, 83553, 83554, 83555, 84753, 97904, 97905, 97907 });
 
-        private static TimeZoneInfo FindByUsZipCode(string code)
+        private static string FindTimeZoneIdByUsZipCode(string code)
         {
+            var hawaiian = GetAbbreviation(PrivateIds.Hawaiian);
+            var alaskan = GetAbbreviation(PrivateIds.Alaskan);
+            var pacific = GetAbbreviation(PrivateIds.Pacific);
+            var mountain = GetAbbreviation(PrivateIds.Mountain);
+            var central = GetAbbreviation(PrivateIds.Central);
+            var eastern = GetAbbreviation(PrivateIds.Eastern);
+
             var num = int.Parse(code);
 
             var isEasternRange =
@@ -509,7 +628,7 @@ namespace Shift.Common
                 num >= 56901 && num <= 56972;
 
             if (isEasternRange || UsZipCode_Eastern.Contains(num))
-                return Eastern;
+                return eastern?.TimeZoneId;
 
             var isCentralRange =
                 num >= 32401 && num <= 32455 ||
@@ -540,7 +659,7 @@ namespace Shift.Common
                 num >= 79316 && num <= 79789;
 
             if (isCentralRange || UsZipCode_Central.Contains(num))
-                return Central;
+                return central?.TimeZoneId;
 
             var isMountainRange =
                 num >= 57620 && num <= 57630 ||
@@ -559,7 +678,7 @@ namespace Shift.Common
                 num >= 97908 && num <= 97920;
 
             if (isMountainRange || UsZipCode_Mountain.Contains(num))
-                return Mountain;
+                return mountain?.TimeZoneId;
 
             var isPacificRange =
                 num >= 83501 && num <= 83546 ||
@@ -569,13 +688,13 @@ namespace Shift.Common
                 num >= 98001 && num <= 99403;
 
             if (isPacificRange || UsZipCode_Pacific.Contains(num))
-                return Pacific;
+                return pacific?.TimeZoneId;
 
             if (num >= 99501 && num <= 99950)
-                return Alaskan;
+                return alaskan?.TimeZoneId;
 
             if (num >= 96701 && num <= 96898)
-                return Hawaiian;
+                return hawaiian?.TimeZoneId;
 
             return null;
         }

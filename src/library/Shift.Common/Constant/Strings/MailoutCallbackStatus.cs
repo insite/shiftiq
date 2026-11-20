@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Shift.Constant
+﻿namespace Shift.Constant
 {
     public static class MailoutCallbackStatus
     {

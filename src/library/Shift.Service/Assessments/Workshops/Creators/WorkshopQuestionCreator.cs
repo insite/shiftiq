@@ -125,7 +125,7 @@ internal class WorkshopQuestionCreator(
             .Comments.Where(y => y.AuthorRole == CommentAuthorType.Administrator)
             .ToArray();
             
-        var outputComments = await commentCreator.CreateAsync(inputComments, false);
+        var outputComments = await commentCreator.CreateAsync(inputComments, false, WorkshopCommentCreator.SortOrder.OldestToNewest);
 
         var candidateCommentCount = question.Comments.Where(x => x.AuthorRole == CommentAuthorType.Candidate).Count();
 
@@ -384,7 +384,7 @@ internal class WorkshopQuestionCreator(
             )
             .ToArray();
             
-        var outputComments = await commentCreator.CreateAsync(inputComments, false);
+        var outputComments = await commentCreator.CreateAsync(inputComments, false, WorkshopCommentCreator.SortOrder.OldestToNewest);
 
         _commentsPerQuestion = outputComments
             .GroupBy(x => x.EntityId)

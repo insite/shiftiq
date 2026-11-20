@@ -57,6 +57,11 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
                     filter = new VCmdsAchievementFilter();
                     filter.OrganizationIdentifier = Organization.Identifier;
 
+                    // The departments listed belong to this organization, so offer only the
+                    // achievements they can hold (i.e., those owned by this organization or by the
+                    // partition (Global) organization account).
+                    filter.OwnerOrganizationIdentifiers = new[] { Organization.Identifier, ServiceLocator.Partition.Identifier };
+
                     ViewState[nameof(AchievementFilter)] = filter;
                 }
 
@@ -138,9 +143,16 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            var n = SaveData();
+            var n = SaveData(out var rejected);
 
             var entities = Shift.Common.Humanizer.ToQuantity(n, "new assignment");
+
+            if (rejected > 0)
+            {
+                EditorStatus.AddMessage(AlertType.Warning,
+                    $"{entities} created. {Shift.Common.Humanizer.ToQuantity(rejected, "assignment")} could not be created because a department can hold only achievements owned by its own organization or by Global.");
+                return;
+            }
 
             var message = n == 0
                 ? "All the selected achievements are already added to the selected departments"
@@ -154,7 +166,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
         #region Save data methods
 
-        private int SaveData()
+        private int SaveData(out int rejected)
         {
             var achievements = GetSelectedAchievements();
 
@@ -176,9 +188,13 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
                 }
             }
 
-            TAchievementDepartmentStore.Insert(inserts);
+            var permitted = TAchievementDepartmentSearch.SelectPermitted(inserts);
 
-            return inserts.Count;
+            rejected = inserts.Count - permitted.Count;
+
+            TAchievementDepartmentStore.Insert(permitted);
+
+            return permitted.Count;
         }
 
         private Guid[] GetSelectedAchievements()

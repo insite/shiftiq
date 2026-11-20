@@ -256,7 +256,7 @@ namespace InSite.Admin.Workflow.Forms.Submissions.Controls
 
             var likertType = ReviewDetails.GetLikertType(question.LikertAnalysis);
 
-            var likertScale = ReviewDetails.GetLikertScale(question, options, response.QResponseOptions, likertType);
+            var likertScale = ReviewDetails.GetLikertScale(question, options, response.QResponseOptions, likertType, Current.Language);
             if (likertScale?.Items == null || likertScale.Items.Count == 0)
                 return (new string[0], null);
 

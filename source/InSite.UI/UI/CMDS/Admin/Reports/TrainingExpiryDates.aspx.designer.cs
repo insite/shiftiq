@@ -105,6 +105,33 @@ namespace InSite.Cmds.Actions.Reporting.Report
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl ReportTablePanel;
 
         /// <summary>
+        /// CornerHeaderCell control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell CornerHeaderCell;
+
+        /// <summary>
+        /// JobDivisionHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell JobDivisionHeader;
+
+        /// <summary>
+        /// DivisionHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell DivisionHeader;
+
+        /// <summary>
         /// CompanyHeaderRepeater control.
         /// </summary>
         /// <remarks>

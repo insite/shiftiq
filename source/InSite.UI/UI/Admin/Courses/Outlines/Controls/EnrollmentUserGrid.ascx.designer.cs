@@ -15,6 +15,24 @@ namespace InSite.Admin.Courses.Outlines.Controls
     {
 
         /// <summary>
+        /// EnrollmentStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.ComboBox EnrollmentStatus;
+
+        /// <summary>
+        /// DownloadDropDown control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.DropDownButton DownloadDropDown;
+
+        /// <summary>
         /// Grid control.
         /// </summary>
         /// <remarks>

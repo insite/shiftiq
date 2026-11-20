@@ -2,6 +2,7 @@ import { Window } from 'happy-dom';
 import { requestHelper } from "@/api/requestHelper";
 import { shiftClient } from "@/api/shiftClient";
 import { shiftConfig } from "@/helpers/shiftConfig";
+import { setupShared } from './setup.shared';
 
 declare global {
     // eslint-disable-next-line no-var
@@ -42,3 +43,5 @@ const window = new Window();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 global.window = window as any;
 global.localStorage = window.localStorage;
+
+setupShared();

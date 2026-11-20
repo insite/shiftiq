@@ -1,8 +1,10 @@
 import { createContext, useContext } from "react";
 import { WorkshopOtherState } from "./states/WorkshopOtherState";
+import { WorkshopProblemQuestion } from "./models/WorkshopProblemQuestion";
 
 type ContextData = WorkshopOtherState & {
     initOtherState: (state: WorkshopOtherState) => void;
+    modifyProblemQuestions: (problemQuestions: WorkshopProblemQuestion[]) => void;
 }
 
 export const WorkshopOtherProviderContext = createContext<ContextData>({
@@ -14,6 +16,7 @@ export const WorkshopOtherProviderContext = createContext<ContextData>({
     problemQuestions: null,
     readOnly: true,
     initOtherState() {},
+    modifyProblemQuestions() {},
 });
 
 export function useWorkshopOtherProvider() {

@@ -4,6 +4,8 @@
 
 <asp:Content ContentPlaceHolderID="BodyContent" runat="server">
 
+    <insite:Alert runat="server" ID="ScreenStatus" />
+
     <section class="pb-5 mb-md-2">    
         
         <h2 class="h4 mb-3">Content</h2>
@@ -48,6 +50,7 @@
                 <div class="row mt-4">
                     <div class="col-lg-12">
                         <a class="me-3" href="/ui/admin/assets/glossaries/terms/upload"><i class="fas fa-upload me-1"></i>Upload Glossary</a>
+                        <asp:LinkButton runat="server" ID="RefreshSearchButton"><i class="fas fa-cloud-upload me-1"></i>Refresh Global Search</asp:LinkButton>
                     </div>
                 </div>
 

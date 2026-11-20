@@ -7,10 +7,10 @@
         <div class="mb-2">
 
             <span runat="server" id="Commands" class="float-end ms-1" visible="<%# AllowEdit %>">
-                <cmds:IconButton runat="server" IsFontIcon="true" CssClass="trash-alt" ToolTip="Delete File" ConfirmText="Are you sure you want to delete this file?" CommandArgument='<%# Eval("UploadIdentifier") %>' CommandName="DeleteFile" />
+                <cmds:IconButton runat="server" IsFontIcon="true" CssClass="trash-alt" ToolTip="Delete File" ConfirmText="Are you sure you want to delete this file?" CommandArgument='<%# Eval("Identifier") %>' CommandName='<%# Eval("DeleteCommand") %>' />
             </span>
 
-            <a target="_blank" runat="server" href='<%# CmdsUploadProvider.GetFileRelativeUrl((Guid)Eval("ContainerIdentifier"), (string)Eval("Name")) %>'><%# Eval("Title") %></a>
+            <a target="_blank" runat="server" href='<%# Eval("Url") %>'><%# Eval("Title") %></a>
             
             <span class="form-text"><%# ((int)Eval("ContentSize") / 1024).ToString("n0") + " KB" %></span>
 

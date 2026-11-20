@@ -26,6 +26,8 @@ namespace InSite.Persistence
         public string PaymentTransactionId { get; set; }
         public string AchievementTitle { get; set; }
         public string InvoiceStatus { get; set; }
+        public string TaxCountry { get; set; }
+        public string TaxRegion { get; set; }
 
         public VEventRegistrationPaymentFilter()
         {

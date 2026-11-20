@@ -562,6 +562,15 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
 
         private void Save()
         {
+            // The selector hides paid-program achievements; this catches a stale page or a forged post.
+            var isPaidAchievement = AchievementIdentifier.Value.HasValue
+                && PaidProgramAchievementSearch.IsPaidAchievement(AchievementIdentifier.Value.Value);
+            if (isPaidAchievement)
+            {
+                EditorStatus.AddMessage(AlertType.Error, PaidProgramAchievementSearch.AssignmentRefusedMessage);
+                return;
+            }
+
             if (!CheckUploads())
             {
                 EditorStatus.AddMessage(AlertType.Error, "Session is expired. You need to re-enter data for bulk update.");
@@ -898,6 +907,7 @@ namespace InSite.Cmds.Actions.BulkTool.Assign
             AchievementIdentifier.Filter.AchievementType = AchievementType.Value;
             AchievementIdentifier.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementIdentifier.Filter.CategoryIdentifier = Category.ValueAsGuid;
+            AchievementIdentifier.Filter.ExcludePaidProgramAchievements = true;
             AchievementIdentifier.Value = null;
         }
 

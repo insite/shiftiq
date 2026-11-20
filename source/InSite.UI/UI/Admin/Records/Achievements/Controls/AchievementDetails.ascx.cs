@@ -6,7 +6,7 @@ namespace InSite.Admin.Achievements.Achievements.Controls
 {
     public partial class AchievementDetails : System.Web.UI.UserControl
     {
-        public void BindAchievement(QAchievement achievement, TimeZoneInfo tz, bool showExpiration = true)
+        public void BindAchievement(QAchievement achievement, string tz, bool showExpiration = true)
         {
             AchievementLink.HRef = $"/ui/admin/records/achievements/outline?id={achievement.AchievementIdentifier}";
             Title.Text = achievement.AchievementTitle;
@@ -18,7 +18,7 @@ namespace InSite.Admin.Achievements.Achievements.Controls
             Expiration.Visible = showExpiration;
         }
 
-        private string GetExpiryText(QAchievement i, TimeZoneInfo tz)
+        private string GetExpiryText(QAchievement i, string tz)
         {
             var achievementExpiration = new Domain.Records.Expiration(
                 i.ExpirationType, i.ExpirationFixedDate,

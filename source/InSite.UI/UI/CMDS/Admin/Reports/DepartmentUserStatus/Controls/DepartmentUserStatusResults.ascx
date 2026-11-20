@@ -7,7 +7,7 @@
 
         <asp:TemplateField HeaderText="As At">
             <ItemTemplate>
-                <%# Shift.Common.TimeZones.Format((DateTimeOffset)Eval("AsAt"), User.TimeZone, true) %>
+                <%# Eval("AsAt", "{0:yyyy-MM-dd}") %>
             </ItemTemplate>
         </asp:TemplateField>
 

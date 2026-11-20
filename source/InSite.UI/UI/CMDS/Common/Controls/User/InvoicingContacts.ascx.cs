@@ -54,14 +54,14 @@ namespace InSite.Cmds.Controls.User
             if (e.CommandName != "Remove")
                 return;
 
-            var parts = ((string)e.CommandArgument).Split('|');
-            if (parts.Length != 2)
+            if (!Guid.TryParse((string)e.CommandArgument, out var membershipId))
                 return;
 
-            if (!Guid.TryParse(parts[0], out var groupId) || !Guid.TryParse(parts[1], out var userId))
-                return;
+            var allowDelete = MembershipSearch.Exists(x =>
+                x.MembershipIdentifier == membershipId && x.OrganizationIdentifier == OrganizationIdentifier);
 
-            MembershipStore.Delete(new Membership { GroupIdentifier = groupId, UserIdentifier = userId });
+            if (allowDelete)
+                MembershipStore.Delete(membershipId);
 
             BindInvoicing();
         }
@@ -87,6 +87,7 @@ namespace InSite.Cmds.Controls.User
             var members = MembershipSearch.Bind(x =>
                 new InvoicingTeamMember
                 {
+                    MembershipId = x.MembershipIdentifier,
                     GroupId = x.Group.GroupIdentifier,
                     GroupName = x.Group.GroupName,
                     UserId = x.User.UserIdentifier,
@@ -114,6 +115,7 @@ namespace InSite.Cmds.Controls.User
 
         private class InvoicingTeamMember
         {
+            public Guid MembershipId { get; set; }
             public Guid GroupId { get; set; }
             public string GroupName { get; set; }
             public Guid UserId { get; set; }

@@ -131,6 +131,7 @@ namespace InSite.Admin.Records.Programs
 
             ProgramFlagColor.Value = program.ProgramFlagColor;
             ProgramFlagText.Text = program.ProgramFlagText;
+            ProgramFee.ValueAsDecimal = program.ProgramFee;
 
             BindTaskRepeater(program.ProgramIdentifier);
 
@@ -141,7 +142,6 @@ namespace InSite.Admin.Records.Programs
         {
             ProgramImage.ImageUrl = url;
             ProgramImageField.Visible = url.IsNotEmpty();
-            ProgramImageUrl.Text = url;
         }
 
         #endregion
@@ -161,6 +161,7 @@ namespace InSite.Admin.Records.Programs
             program.ProgramIcon = ProgramIcon.Text;
             program.ProgramFlagColor = ProgramFlagColor.Value;
             program.ProgramFlagText = ProgramFlagText.Text;
+            program.ProgramFee = ProgramFee.ValueAsDecimal;   // null or zero means unpaid
 
             SaveV2Image(program);
 

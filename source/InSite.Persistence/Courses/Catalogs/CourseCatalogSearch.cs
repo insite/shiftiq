@@ -13,6 +13,7 @@ namespace InSite.Persistence
     public class CourseCatalogSearch
     {
         private List<VCatalogCourse> _datasource;
+        private List<VCatalogProgram> _programSource = new List<VCatalogProgram>();
         private OrganizationList _organizations { get; set; }
 
         public List<CatalogMenu> Catalogs { get; set; }
@@ -25,7 +26,11 @@ namespace InSite.Persistence
 
         private readonly IPartitionModel _partition;
 
-        public CourseCatalogSearch(Guid organization, Guid? catalog, Guid[] groups, bool viewEntireCatalog, IPartitionModel partition)
+        // The organization whose subdomain is being browsed. Cards owned by anyone else need an
+        // absolute image URL - see CourseCatalogItem.ResolveImageUrl.
+        private string _viewerOrganizationCode;
+
+        public CourseCatalogSearch(Guid organization, Guid? catalog, Guid[] groups, bool displayPrograms, IPartitionModel partition)
         {
             _partition = partition;
 
@@ -39,11 +44,31 @@ namespace InSite.Persistence
                     .Where(x => !x.CatalogIsHidden && identifiers.Any(t => t == x.OrganizationIdentifier))
                     .ToList();
 
-                if (catalog.HasValue && !viewEntireCatalog)
+                // A requested catalogue scopes everything on the page - the cards, the item count, and the
+                // category menu - to that one catalogue.
+                if (catalog.HasValue)
                     _datasource = _datasource.Where(x => x.CatalogIdentifier == catalog).ToList();
+
+                // Programs published to a catalogue render in the same grid as courses, when the
+                // partition enables them (Application:Catalogues:DisplayPrograms). Published = the
+                // program carries a CatalogIdentifier (the view's inner join); hidden programs and
+                // hidden catalogues are excluded, matching the course rules. Left empty otherwise,
+                // which also keeps programs out of the category menu and the item count.
+                if (displayPrograms)
+                {
+                    _programSource = db.VCatalogPrograms.AsNoTracking()
+                        .Where(x => !x.CatalogIsHidden && !x.ProgramIsHidden && identifiers.Any(t => t == x.OrganizationIdentifier))
+                        .ToList();
+
+                    if (catalog.HasValue)
+                        _programSource = _programSource.Where(x => x.CatalogIdentifier == catalog).ToList();
+                }
             }
 
             _datasource = ApplyPrivacySettings(_datasource.ToArray(), groups).ToList();
+
+            if (displayPrograms)
+                _programSource = ApplyProgramPrivacySettings(_programSource.ToArray(), groups).ToList();
 
             Organizations = _datasource
                 .GroupBy(x => x.OrganizationIdentifier)
@@ -99,6 +124,40 @@ namespace InSite.Persistence
             return result.ToArray();
         }
 
+        // The program equivalent of ApplyPrivacySettings - a program with no group permissions is
+        // public; otherwise the viewer must belong to a permitted group. Hidden programs are already
+        // filtered out.
+        private VCatalogProgram[] ApplyProgramPrivacySettings(VCatalogProgram[] programs, Guid[] groups)
+        {
+            var programIdentifiers = programs.Select(x => x.ProgramIdentifier).Distinct().ToArray();
+
+            var permissions = TGroupPermissionSearch
+                .Bind(x => x, x => programIdentifiers.Any(id => id == x.ObjectIdentifier))
+                .ToList();
+
+            var result = new List<VCatalogProgram>();
+
+            foreach (var program in programs)
+            {
+                var programHasPermissions = permissions.Any(p => p.ObjectIdentifier == program.ProgramIdentifier);
+
+                if (programHasPermissions)
+                {
+                    var groupsWithAccess = permissions
+                        .Where(p => p.ObjectIdentifier == program.ProgramIdentifier)
+                        .Select(x => x.GroupIdentifier)
+                        .ToArray();
+
+                    if (!groupsWithAccess.Intersect(groups).Any())
+                        continue;
+                }
+
+                result.Add(program);
+            }
+
+            return result.ToArray();
+        }
+
         public void Refresh(CatalogItemFilter filter)
         {
             GetCategories(filter);
@@ -118,21 +177,33 @@ namespace InSite.Persistence
 
         private void GetCategories(CatalogItemFilter filter)
         {
-            var query = _datasource.AsQueryable();
+            var courseQuery = _datasource.AsQueryable();
+            var programQuery = _programSource.AsQueryable();
 
             if (filter != null && filter.Organizations.IsNotEmpty())
-                query = query.Where(x => filter.Organizations.Any(y => y == x.OrganizationIdentifier));
+            {
+                courseQuery = courseQuery.Where(x => filter.Organizations.Any(y => y == x.OrganizationIdentifier));
+                programQuery = programQuery.Where(x => filter.Organizations.Any(y => y == x.OrganizationIdentifier));
+            }
 
-            Catalogs = query
+            // Courses and programs share the same catalogue/category tag menu.
+            var entries = courseQuery
                 .Where(x => x.CatalogName != null && x.CourseCategory != null)
-                .Select(x => new { x.CatalogIdentifier, x.CatalogName, x.CourseCategory })
+                .Select(x => new CatalogEntry { CatalogIdentifier = x.CatalogIdentifier, CatalogName = x.CatalogName, Category = x.CourseCategory, ItemIdentifier = x.CourseIdentifier })
+                .Concat(programQuery
+                    .Where(x => x.CatalogName != null && x.ProgramCategory != null)
+                    .Select(x => new CatalogEntry { CatalogIdentifier = x.CatalogIdentifier, CatalogName = x.CatalogName, Category = x.ProgramCategory, ItemIdentifier = x.ProgramIdentifier }))
+                .ToList();
+
+            Catalogs = entries
+                .Select(x => new { x.CatalogIdentifier, x.CatalogName, x.Category })
                 .Distinct()
                 .GroupBy(x => x.CatalogName)
                 .OrderBy(x => x.Key)
                 .Select(x => new CatalogMenu
                 {
                     CatalogName = x.Key,
-                    Categories = x.Select(y => new CatalogMenuItem { CategoryName = y.CourseCategory.Trim() })
+                    Categories = x.Select(y => new CatalogMenuItem { CategoryName = y.Category.Trim() })
                         .OrderBy(z => z.CategoryName)
                         .ToList()
                 })
@@ -140,11 +211,11 @@ namespace InSite.Persistence
 
             foreach (var catalog in Catalogs)
             {
-                var courses = query.Where(x => x.CatalogName == catalog.CatalogName).ToList();
+                var items = entries.Where(x => x.CatalogName == catalog.CatalogName).ToList();
 
-                catalog.CatalogId = courses.Select(x => x.CatalogIdentifier).First();
+                catalog.CatalogId = items.Select(x => x.CatalogIdentifier).First();
 
-                catalog.CatalogSize = courses.Select(x => x.CourseIdentifier).Distinct().Count();
+                catalog.CatalogSize = items.Select(x => x.ItemIdentifier).Distinct().Count();
 
                 foreach (var category in catalog.Categories)
                 {
@@ -153,12 +224,22 @@ namespace InSite.Persistence
             }
         }
 
+        private class CatalogEntry
+        {
+            public Guid CatalogIdentifier { get; set; }
+            public Guid ItemIdentifier { get; set; }
+            public string CatalogName { get; set; }
+            public string Category { get; set; }
+        }
+
         private void GetOrganizations(Guid id)
         {
             _organizations = new OrganizationList();
 
             var organization = OrganizationSearch.Select(id);
             _organizations.Add(organization);
+
+            _viewerOrganizationCode = organization?.OrganizationCode;
 
             if (id != _partition.Identifier)
             {
@@ -211,13 +292,21 @@ namespace InSite.Persistence
                     ItemPopularity = 0,
                     ItemSubcategories = GetCategoriesHtml(x.CourseIdentifier),
                     Posted = x.CourseModified,
-                    ThumbnailImageUrl = x.CourseImage,
+                    ThumbnailImageUrl = CourseCatalogItem.ResolveImageUrl(x.CourseImage, x.OrganizationCode, _viewerOrganizationCode),
                     CourseFlagColor = x.CourseFlagColor?.ToLower(),
                     CourseFlagText = x.CourseFlagText,
                     IsOverview = x.CourseIsDisplayOverviewOnly
                 };
                 list.Add(item);
             }
+
+            // Merge published, non-hidden programs, then order the combined set as one grid so
+            // the page count and paging span both item types.
+            list.AddRange(GetProgramItems(keyword, filter));
+
+            list = sort == "newest"
+                ? list.OrderByDescending(x => x.Posted).ThenByDescending(x => x.Authored).ThenBy(x => x.ItemTitle).ToList()
+                : list.OrderBy(x => x.ItemTitle).ToList();
 
             ItemCount = list.Count;
 
@@ -226,6 +315,48 @@ namespace InSite.Persistence
             Items = list.Skip((page - 1) * PageSize).Take(PageSize).ToList();
 
             return Items;
+        }
+
+        private List<CourseCatalogItem> GetProgramItems(string keyword, CatalogItemFilter filter)
+        {
+            if (filter.Organizations.IsEmpty())
+                return new List<CourseCatalogItem>();
+
+            var query = _programSource.Where(x => filter.Organizations.Any(y => y == x.OrganizationIdentifier));
+
+            if (keyword.HasValue())
+                query = query.Where(x => x.ProgramName.Contains(keyword, StringComparison.OrdinalIgnoreCase)
+                                      || (x.ProgramCategory != null &&
+                                          x.ProgramCategory.Contains(keyword, StringComparison.OrdinalIgnoreCase)));
+
+            if (filter.CatalogSlugs.IsNotEmpty())
+                query = query.Where(x => filter.CatalogSlugs.Any(y => GetCatalogName(y) == x.CatalogName));
+
+            if (filter.CategorySlugs.IsNotEmpty())
+                query = query.Where(x => filter.CategorySlugs.Any(y => GetCategoryName(y) == x.ProgramCategory));
+
+            var list = new List<CourseCatalogItem>();
+
+            foreach (var x in query)
+            {
+                if (list.Any(i => i.ItemIdentifier == x.ProgramIdentifier))
+                    continue;
+
+                list.Add(new CourseCatalogItem(x.ProgramName)
+                {
+                    Authored = x.ProgramCreated,
+                    ItemIdentifier = x.ProgramIdentifier,
+                    ItemType = x.CatalogName,
+                    Posted = x.ProgramModified,
+                    ThumbnailImageUrl = CourseCatalogItem.ResolveImageUrl(x.ProgramImage, x.OrganizationCode, _viewerOrganizationCode),
+                    CourseFlagColor = x.ProgramFlagColor?.ToLower(),
+                    CourseFlagText = x.ProgramFlagText,
+                    IsProgram = true,
+                    ProgramFee = x.ProgramFee
+                });
+            }
+
+            return list;
         }
 
         private string GetCategoryName(string slug)
@@ -252,12 +383,12 @@ namespace InSite.Persistence
             return list.ToArray();
         }
 
-        public CatalogMenu FindCatalog(Guid? catalogId, string category, bool skipCategory)
+        public CatalogMenu FindCatalog(Guid? catalogId, string category)
         {
             if (catalogId == null)
                 return null;
 
-            if (category.IsEmpty() && !skipCategory)
+            if (category.HasValue())
                 return Catalogs.FirstOrDefault(x => x.CatalogId == catalogId
                     && x.Categories.Any(y => StringHelper.Equals(y.CategoryName, category)));
 

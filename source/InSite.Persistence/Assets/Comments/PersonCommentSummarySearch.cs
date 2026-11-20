@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 
 using InSite.Application.Contents.Read;
 
+using Shift.Common;
 using Shift.Constant;
 
 namespace InSite.Persistence
@@ -78,6 +79,45 @@ namespace InSite.Persistence
                     .Where(x => x.TopicUserIdentifier == user && x.OrganizationIdentifier == organization)
                     .OrderByDescending(x => x.CommentPosted)
                     .ToList();
+            }
+        }
+
+        public static string SelectLatestCommentFlag(Guid organization, Guid user)
+        {
+            using (var db = new InternalDbContext())
+            {
+                return db.QComments
+                    .AsNoTracking()
+                    .Where(x => x.OrganizationIdentifier == organization && x.TopicUserIdentifier == user)
+                    .OrderByDescending(x => x.CommentPosted)
+                    .ThenByDescending(x => x.CommentIdentifier)
+                    .Select(x => x.CommentFlag ?? string.Empty)
+                    .FirstOrDefault();
+            }
+        }
+
+        public static Dictionary<Guid, string> SelectLatestCommentFlags(Guid organization, Guid[] users)
+        {
+            if (users.IsEmpty())
+                return new Dictionary<Guid, string>();
+
+            using (var db = new InternalDbContext())
+            {
+                return db.QComments
+                    .AsNoTracking()
+                    .Where(x => x.OrganizationIdentifier == organization && users.Contains(x.TopicUserIdentifier.Value))
+                    .Select(x => new
+                    {
+                        x.CommentIdentifier,
+                        UserIdentifier = x.TopicUserIdentifier.Value,
+                        x.CommentPosted,
+                        x.CommentFlag
+                    })
+                    .ToList()
+                    .GroupBy(x => x.UserIdentifier)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.OrderByDescending(x => x.CommentPosted).ThenByDescending(x => x.CommentIdentifier).First().CommentFlag);
             }
         }
 

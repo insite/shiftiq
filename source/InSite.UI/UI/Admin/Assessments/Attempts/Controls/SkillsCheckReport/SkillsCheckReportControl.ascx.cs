@@ -13,10 +13,10 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
 {
     public partial class SkillsCheckReportControl : UserControl
     {
-        public static byte[] GetPdf(Page page, Guid attemptId, Guid managerUserId, Guid organizationId, TimeZoneInfo timeZone)
+        public static byte[] GetPdf(Page page, Guid attemptId, Guid managerUserId, Guid organizationId, string timeZoneId)
         {
             var report = (SkillsCheckReportControl)page.LoadControl("~/UI/Admin/Assessments/Attempts/Controls/SkillsCheckReport/SkillsCheckReportControl.ascx");
-            if (!report.LoadReport(attemptId, managerUserId, organizationId, timeZone))
+            if (!report.LoadReport(attemptId, managerUserId, organizationId, timeZoneId))
                 return null;
 
             var siteContent = new StringBuilder();
@@ -26,7 +26,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
                     report.RenderControl(htmlWriter);
             }
 
-            var date = DateTimeOffset.Now.FormatDateOnly(timeZone);
+            var date = DateTimeOffset.Now.FormatDateOnly(timeZoneId);
 
             var settings = new HtmlConverterSettings(ServiceLocator.AppSettings.Application.WebKitHtmlToPdfExePath)
             {
@@ -49,7 +49,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
             return data;
         }
 
-        private bool LoadReport(Guid attemptId, Guid managerUserId, Guid organizationId, TimeZoneInfo timeZone)
+        private bool LoadReport(Guid attemptId, Guid managerUserId, Guid organizationId, string timeZoneId)
         {
             var attempt = SkillsCheckReportData.GetAttempt(attemptId);
             if (attempt == null)
@@ -59,7 +59,7 @@ namespace InSite.UI.Admin.Assessments.Attempts.Controls.SkillsCheckReport
 
             FormTitle.Text = attempt.FormTitle;
             UserName.Text = attempt.UserName;
-            Completed.Text = attempt.Completed.FormatDateOnly(timeZone);
+            Completed.Text = attempt.Completed.FormatDateOnly(timeZoneId);
 
             ManagerName.Text = manager.UserName;
             EmployerName.Text = manager.EmployerName;

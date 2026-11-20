@@ -411,6 +411,24 @@ namespace InSite.Admin.Records.Logbooks
         protected global::System.Web.UI.WebControls.Literal LearnerAddedMessageName;
 
         /// <summary>
+        /// ChangeSupervisorMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.IconLink ChangeSupervisorMessage;
+
+        /// <summary>
+        /// SupervisorMessageName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal SupervisorMessageName;
+
+        /// <summary>
         /// ChangeTitle control.
         /// </summary>
         /// <remarks>

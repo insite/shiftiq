@@ -159,6 +159,15 @@ namespace InSite.Admin.Assessments.Banks.Forms
         protected global::InSite.Common.Web.UI.Button BuildQuestionsDocx;
 
         /// <summary>
+        /// BuildQuestionsBasicDocx control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Button BuildQuestionsBasicDocx;
+
+        /// <summary>
         /// BuildQuestionsCompact control.
         /// </summary>
         /// <remarks>

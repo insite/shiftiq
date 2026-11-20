@@ -14,11 +14,16 @@ namespace InSite.Admin.Contacts.People.Forms
     {
         private const string EditUrl = "/ui/admin/contacts/people/edit";
         private const string SearchUrl = "/ui/admin/contacts/people/search";
+
         private string ReturnUrl => !string.IsNullOrEmpty(Request.QueryString["returnURL"]) ? Request.QueryString["returnURL"] : "/";
 
-        private Guid? GroupIdentifier => Guid.TryParse(Request["from"], out var value) ? value : (Guid?)null;
+        private Guid MembershipId => Guid.TryParse(Request["id"], out var value) ? value : Guid.Empty;
 
-        private Guid? UserIdentifier => Guid.TryParse(Request["to"], out var value) ? value : (Guid?)null;
+        private Guid? UserId
+        {
+            get => (Guid?)ViewState[nameof(UserId)];
+            set => ViewState[nameof(UserId)] = value;
+        }
 
         protected override void OnInit(EventArgs e)
         {
@@ -40,27 +45,26 @@ namespace InSite.Admin.Contacts.People.Forms
             if (!CanEdit)
                 HttpResponseHelper.Redirect(SearchUrl);
 
-            var membership = MembershipSearch.SelectFirst(
-                x => x.GroupIdentifier == GroupIdentifier && x.UserIdentifier == UserIdentifier,
-                x => x.Group);
-
-            if (membership == null || membership.Group.OrganizationIdentifier != CurrentSessionState.Identity.Organization.OrganizationIdentifier)
+            var entity = MembershipSearch.SelectFirst(x => x.MembershipIdentifier == MembershipId, x => x.Group);
+            if (entity == null || entity.Group.OrganizationIdentifier != Organization.OrganizationIdentifier)
                 HttpResponseHelper.Redirect(SearchUrl);
 
-            var user = ServiceLocator.UserSearch.GetUser(UserIdentifier.Value);
-            var person = ServiceLocator.PersonSearch.GetPerson(UserIdentifier.Value, Organization.Key);
+            UserId = entity.UserIdentifier;
+
+            var user = ServiceLocator.UserSearch.GetUser(entity.UserIdentifier);
+            var person = ServiceLocator.PersonSearch.GetPerson(entity.UserIdentifier, Organization.OrganizationIdentifier);
 
             PageHelper.AutoBindHeader(Page, qualifier: user.FullName);
 
-            GroupDetail.BindGroup(membership.Group);
+            GroupDetail.BindGroup(entity.Group);
             PersonInfo.BindPerson(person, user, User.TimeZone);
 
-            GroupType.Text = membership.Group.GroupLabel ?? membership.Group.GroupType;
+            GroupType.Text = entity.Group.GroupLabel ?? entity.Group.GroupType;
             PersonName1.Text = PersonName2.Text = user.FirstName;
 
-            AssignedOn.Value = membership.Assigned;
-            MembershipFunction.Value = membership.MembershipType;
-            MembershipExpiry.Value = membership.MembershipExpiry;
+            AssignedOn.Value = entity.Assigned;
+            MembershipFunction.Value = entity.MembershipType;
+            MembershipExpiry.Value = entity.MembershipExpiry;
 
             CancelButton.NavigateUrl = GetReturnUrl();
         }
@@ -70,15 +74,17 @@ namespace InSite.Admin.Contacts.People.Forms
             if (!Page.IsValid)
                 return;
 
-            var membership = MembershipSearch.Select(GroupIdentifier.Value, UserIdentifier.Value);
+            var entity = MembershipSearch.SelectFirst(x => x.MembershipIdentifier == MembershipId, x => x.Group);
+            if (entity != null && entity.UserIdentifier == UserId)
+            {
+                if (AssignedOn.Value != null)
+                    entity.Assigned = AssignedOn.Value.Value;
 
-            if (AssignedOn.Value != null)
-                membership.Assigned = AssignedOn.Value.Value;
+                entity.MembershipType = MembershipFunction.Value;
+                entity.MembershipExpiry = MembershipExpiry.Value;
 
-            membership.MembershipType = MembershipFunction.Value;
-            membership.MembershipExpiry = MembershipExpiry.Value;
-
-            MembershipHelper.Save(membership, true, true, true);
+                MembershipHelper.Save(entity, true, true, true);
+            }
 
             HttpResponseHelper.Redirect(GetReturnUrl());
         }
@@ -89,7 +95,7 @@ namespace InSite.Admin.Contacts.People.Forms
             if (!(string.IsNullOrEmpty(url) || url == "/"))
                 return url;
 
-            return EditUrl + $"?contact={UserIdentifier}&panel=groups";
+            return EditUrl + $"?contact={UserId}&panel=groups";
         }
 
         public string GetParentLinkParameters(IWebRoute parent)

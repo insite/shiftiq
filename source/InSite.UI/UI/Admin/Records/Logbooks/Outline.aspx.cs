@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 
 using InSite.Application.JournalSetups.Write;
@@ -110,6 +110,10 @@ namespace InSite.Admin.Records.Logbooks
                 ? ServiceLocator.MessageSearch.GetMessage(journalSetup.LearnerAddedMessageIdentifier.Value)
                 : null;
 
+            var supervisorMessage = journalSetup.SupervisorMessageIdentifier.HasValue
+                ? ServiceLocator.MessageSearch.GetMessage(journalSetup.SupervisorMessageIdentifier.Value)
+                : null;
+
             PageHelper.AutoBindHeader(Page, qualifier: journalSetup.JournalSetupName);
 
             JournalSetupIdentifierLiteral.Text = JournalSetupIdentifier.ToString();
@@ -145,6 +149,10 @@ namespace InSite.Admin.Records.Logbooks
 
             LearnerAddedMessageName.Text = !string.IsNullOrEmpty(learnerAddedMessage?.MessageName)
                 ? $"<a href=\"/ui/admin/messages/outline?message={learnerAddedMessage.MessageIdentifier}\">{learnerAddedMessage.MessageName} </a>"
+                : "None";
+
+            SupervisorMessageName.Text = !string.IsNullOrEmpty(supervisorMessage?.MessageName)
+                ? $"<a href=\"/ui/admin/messages/outline?message={supervisorMessage.MessageIdentifier}\">{supervisorMessage.MessageName} </a>"
                 : "None";
 
             var content = ServiceLocator.ContentSearch.GetBlock(JournalSetupIdentifier, MultilingualString.DefaultLanguage);
@@ -280,6 +288,7 @@ namespace InSite.Admin.Records.Logbooks
             ChangeValidatorMessage.NavigateUrl = $"/ui/admin/records/logbooks/change?journalsetup={JournalSetupIdentifier}";
             ChangeLearnerMessage.NavigateUrl = $"/ui/admin/records/logbooks/change?journalsetup={JournalSetupIdentifier}";
             ChangeLearnerAddedMessage.NavigateUrl = $"/ui/admin/records/logbooks/change?journalsetup={JournalSetupIdentifier}";
+            ChangeSupervisorMessage.NavigateUrl = $"/ui/admin/records/logbooks/change?journalsetup={JournalSetupIdentifier}";
         }
 
         private static string GetLocalTime(DateTimeOffset? item)

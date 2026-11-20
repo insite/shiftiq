@@ -180,12 +180,14 @@ namespace InSite.Domain.Surveys.Forms
                 enableUserConfidentiality));
         }
 
-        public void ChangeSurveyFormStatus(SurveyFormStatus status)
+        public bool ChangeSurveyFormStatus(SurveyFormStatus status)
         {
             if (Data.Form.Status == status)
-                return;
+                return false;
 
             Apply(new SurveyFormStatusChanged(status));
+
+            return true;
         }
 
         public void ChangeSurveyHook(string hook)
@@ -429,12 +431,14 @@ namespace InSite.Domain.Surveys.Forms
             Apply(new SurveyRespondentsDeleted(respondents));
         }
 
-        public void RenameSurveyForm(string name)
+        public bool RenameSurveyForm(string name)
         {
             if (Data.Form.Name == name)
-                return;
+                return false;
 
             Apply(new SurveyFormRenamed(name));
+
+            return true;
         }
 
         public void ReorderSurveyOptionItems(Guid list, Dictionary<Guid, int> sequences)

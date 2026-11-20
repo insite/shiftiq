@@ -15,6 +15,15 @@ namespace InSite.UI.Admin.Assets
     {
 
         /// <summary>
+        /// ScreenStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Alert ScreenStatus;
+
+        /// <summary>
         /// ContentCard control.
         /// </summary>
         /// <remarks>
@@ -94,6 +103,15 @@ namespace InSite.UI.Admin.Assets
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal LabelCount;
+
+        /// <summary>
+        /// RefreshSearchButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton RefreshSearchButton;
 
         /// <summary>
         /// FilesSection control.

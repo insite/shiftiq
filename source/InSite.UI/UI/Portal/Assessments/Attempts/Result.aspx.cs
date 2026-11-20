@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -12,6 +12,7 @@ using Humanizer.Localisation;
 
 using InSite.Application.Attempts.Read;
 using InSite.Application.Contents.Read;
+using InSite.Common;
 using InSite.Common.Web;
 using InSite.Domain.Banks;
 using InSite.Persistence;
@@ -24,6 +25,7 @@ using InSite.Web.Helpers;
 using InSite.Web.Routing;
 
 using Shift.Common;
+using Shift.Common.Attempts;
 using Shift.Constant;
 
 namespace InSite.Portal.Assessments.Attempts
@@ -189,7 +191,11 @@ namespace InSite.Portal.Assessments.Attempts
             var conclusion = bankForm.Specification.Content.Conclusion?.Get(CurrentSessionState.Identity.Language);
             var hasConclusion = conclusion.IsNotEmpty();
 
-            KioskMode.Visible = bankForm.Invigilation.IsKioskModeRequired;
+            AIProctoringProvider? aiProctoringProvider = null;
+            if (Enum.TryParse<AIProctoringProvider>(attempt?.AIProctoringProvider, out var aiProctoringProviderTemp))
+                aiProctoringProvider = aiProctoringProviderTemp;
+
+            KioskMode.Visible = bankForm.Invigilation.IsKioskModeRequired || aiProctoringProvider == AIProctoringProvider.Proview;
             IsFormThirdPartyEnabled = bankForm.ThirdPartyAssessmentIsEnabled;
 
             PageTitle.InnerText = bankForm.Content.Title?.Get(CurrentSessionState.Identity.Language);
@@ -203,6 +209,7 @@ namespace InSite.Portal.Assessments.Attempts
             ScoreScaled.Text = model.ScoreScaled.ToString("P0");
 
             SubmissionCompletionHeader.Visible = (!isAttemptGraded || !isScoreVisible) && !hasConclusion;
+            SubmissionCompletionHeader.InnerText = LabelHelper.GetTranslation("[Attempts.Result].[SubmissionCompletion]");
 
             DownloadPDFButton.Visible = allowDownload;
             DownloadPdfScript.Visible = allowDownload;

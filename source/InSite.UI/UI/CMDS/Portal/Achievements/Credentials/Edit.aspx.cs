@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Shift.Common.Timeline.Commands;
 
@@ -260,6 +261,12 @@ namespace InSite.Custom.CMDS.User.Progressions.Forms
 
             var expectedExpiry = CredentialState.CalculateExpectedExpiry(expiration, completed);
 
+            // Revoking is how a credential returns to Pending (for example, a Submitted ticket sent
+            // back to the learner for resubmission). The validation above guarantees the Completed
+            // date is clear when Pending is selected.
+            if (item.Status == "Pending" && credential.CredentialStatus != "Pending")
+                commands.Add(new RevokeCredential(credential.CredentialIdentifier, DateTimeOffset.UtcNow, "Returned to Pending", null));
+
             if (completed.HasValue)
             {
                 var now = DateTimeOffset.Now;
@@ -276,6 +283,12 @@ namespace InSite.Custom.CMDS.User.Progressions.Forms
                         commands.Add(new ExpireCredential(credential.CredentialIdentifier, expectedExpiry.Value));
                 }
             }
+
+            // Send this last, as the learner upload does. A grant or an expiry in the same save would
+            // otherwise overwrite the Submitted status, so it is resent whenever one of them is queued.
+            var isStatusCommandQueued = commands.Any(c => c is GrantCredential || c is ExpireCredential);
+            if (item.Status == "Submitted" && (credential.CredentialStatus != "Submitted" || isStatusCommandQueued))
+                commands.Add(new SubmitCredential(credential.CredentialIdentifier, DateTimeOffset.UtcNow, item.Description));
 
             foreach (var command in commands)
                 ServiceLocator.SendCommand(command);

@@ -2,6 +2,8 @@
 {
     public class QueryFilter
     {
+        public static int MaxPageSize = 100;
+
         /// <summary>
         /// The subset of items requested within a paged data set
         /// </summary>

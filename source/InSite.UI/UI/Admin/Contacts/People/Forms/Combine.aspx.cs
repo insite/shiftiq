@@ -373,22 +373,43 @@ namespace InSite.Admin.Contacts.People.Forms
 
         private void MergeGroups(QUser u1, QUser u2)
         {
-            var roles1 = MembershipSearch.Select(x => x.UserIdentifier == u1.UserIdentifier && x.Group.OrganizationIdentifier == Organization.OrganizationIdentifier);
-            var roles2 = MembershipSearch.Select(x => x.UserIdentifier == u2.UserIdentifier && x.Group.OrganizationIdentifier == Organization.OrganizationIdentifier);
+            var roles1 = MembershipSearch
+                .Select(x => x.UserIdentifier == u1.UserIdentifier
+                          && x.Group.OrganizationIdentifier == Organization.OrganizationIdentifier);
+            var roles2 = MembershipSearch
+                .Select(x => x.UserIdentifier == u2.UserIdentifier
+                          && x.Group.OrganizationIdentifier == Organization.OrganizationIdentifier);
+            var canAddMembership = roles2
+                .Select(x => x.GroupIdentifier)
+                .Distinct()
+                .ToDictionary(x => x, x => MembershipPermissionHelper.CanModifyMembership(x));
 
             foreach (var role2 in roles2)
             {
-                var role1 = roles1.FirstOrDefault(x => x.GroupIdentifier == role2.GroupIdentifier);
+                var role1 = roles1
+                    .FirstOrDefault(x => x.GroupIdentifier == role2.GroupIdentifier
+                                      && x.OrganizationIdentifier == role2.OrganizationIdentifier);
 
                 MembershipStore.Delete(role2);
 
-                if ((role1 == null || string.IsNullOrEmpty(role1.MembershipType) && !string.IsNullOrEmpty(role2.MembershipType))
-                    && MembershipPermissionHelper.CanModifyMembership(role2.GroupIdentifier)
-                    )
+                if (canAddMembership.GetOrDefault(role2.GroupIdentifier) != true)
+                    continue;
+
+                if (role1 != null)
                 {
-                    role2.UserIdentifier = u1.UserIdentifier;
-                    MembershipHelper.Save(role2, false, false);
+                    if (role1.MembershipType.IsNotEmpty() || role2.MembershipType.IsEmpty())
+                        continue;
+
+                    role2.MembershipIdentifier = role1.MembershipIdentifier;
                 }
+                else
+                {
+                    role2.MembershipIdentifier = Guid.Empty;
+                }
+
+                role2.UserIdentifier = u1.UserIdentifier;
+
+                MembershipStore.Save(role2, modifyFunction: true, modifyExpiry: true, matchOrganization: true);
             }
         }
 

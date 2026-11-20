@@ -29,13 +29,19 @@ namespace InSite.UI.Portal.Billing
 
         public event EventHandler<PriceSelectionChangedEventArgs> SelectionChanged;
 
+        public bool IsTransfer => string.Equals(
+            ProductPriceSelectorComboBox.Value?.Trim(),
+            ProductPriceSelectorComboBox.SubscribeTransferValue,
+            StringComparison.Ordinal);
+
         public PriceSelectionMode Mode
         {
             get
             {
                 var raw = ProductPriceSelectorComboBox.Value?.Trim();
 
-                if (string.Equals(raw, ProductPriceSelectorComboBox.SubscribeValue, StringComparison.Ordinal))
+                if (string.Equals(raw, ProductPriceSelectorComboBox.SubscribeValue, StringComparison.Ordinal)
+                    || string.Equals(raw, ProductPriceSelectorComboBox.SubscribeTransferValue, StringComparison.Ordinal))
                     return PriceSelectionMode.Subscribe;
 
                 if (Guid.TryParse(raw, out var g))
@@ -128,7 +134,8 @@ namespace InSite.UI.Portal.Billing
             SelectedProductIdentifier = null;
             var cart = CartStorage.Get();
 
-            if (string.Equals(raw, ProductPriceSelectorComboBox.SubscribeValue, StringComparison.Ordinal))
+            if (string.Equals(raw, ProductPriceSelectorComboBox.SubscribeValue, StringComparison.Ordinal)
+                || string.Equals(raw, ProductPriceSelectorComboBox.SubscribeTransferValue, StringComparison.Ordinal))
             {
                 SetFields(false, false, false);
                 EnableButton(CartButton, cart.TotalSelected > 0);

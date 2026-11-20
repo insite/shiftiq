@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Application.Contacts.Read;
 using InSite.Application.Issues.Read;
@@ -48,6 +48,9 @@ namespace InSite.Admin.Issues.Controls
             base.OnInit(e);
 
             TopicDepartmentIdentifier.OrganizationIdentifier = Organization.OrganizationIdentifier;
+
+            TopicDistrictIdentifier.CurrentOrganizationOnly = true;
+            TopicDistrictIdentifier.Filter.GroupType = "District";
 
             IssueType.Settings.CollectionName = CollectionName.Cases_Classification_Type;
             IssueType.Settings.OrganizationIdentifier = Organization.OrganizationIdentifier;
@@ -113,6 +116,7 @@ namespace InSite.Admin.Issues.Controls
                     PersonCode = PersonCode.Text,
                     AssigneeOrganization = AssigneeOrganization.Text,
                     TopicDepartmentIdentifier = TopicDepartmentIdentifier.Value,
+                    TopicDistrictIdentifier = TopicDistrictIdentifier.Value,
 
                     DateReportedSince = DateReportedSince.Value,
                     DateReportedBefore = DateReportedBefore.Value,
@@ -184,6 +188,7 @@ namespace InSite.Admin.Issues.Controls
                 PersonCode.Text = value.PersonCode;
                 AssigneeOrganization.Text = value.AssigneeOrganization;
                 TopicDepartmentIdentifier.Value = value.TopicDepartmentIdentifier;
+                TopicDistrictIdentifier.Value = value.TopicDistrictIdentifier;
 
                 DateReportedSince.Value = value.DateReportedSince;
                 DateReportedBefore.Value = value.DateReportedBefore;
@@ -251,6 +256,7 @@ namespace InSite.Admin.Issues.Controls
             LawyerID.ValueAsGuid = null;
             MembershipStatus.ClearSelection();
             TopicDepartmentIdentifier.Value = null;
+            TopicDistrictIdentifier.Value = null;
 
             DateReportedSince.Value = null;
             DateReportedBefore.Value = null;

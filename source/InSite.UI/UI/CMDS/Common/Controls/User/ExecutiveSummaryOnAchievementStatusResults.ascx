@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ExecutiveSummaryOnAchievementStatusResults.ascx.cs" Inherits="InSite.Custom.CMDS.Admin.Reports.Controls.ExecutiveSummaryOnAchievementStatusResults" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ExecutiveSummaryOnAchievementStatusResults.ascx.cs" Inherits="InSite.Custom.CMDS.Admin.Reports.Controls.ExecutiveSummaryOnAchievementStatusResults" %>
 
 <asp:Literal id="Instructions" runat="server" />
 
@@ -7,7 +7,7 @@
             
         <asp:TemplateField HeaderText="AsAt">
             <ItemTemplate>
-                <%# Shift.Common.TimeZones.Format((DateTimeOffset)Eval("AsAt"), User.TimeZone, true) %>
+                <%# Eval("AsAt", "{0:yyyy-MM-dd}") %>
             </ItemTemplate>
         </asp:TemplateField>
 

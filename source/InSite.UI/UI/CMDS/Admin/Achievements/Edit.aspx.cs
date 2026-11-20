@@ -267,6 +267,9 @@ namespace InSite.Cmds.Admin.Achievements.Forms
                 commands.Add(new DescribeAchievement(AchievementIdentifier, info.AchievementLabel, info.AchievementTitle, info.AchievementDescription, info.AllowSelfDeclared));
             }
 
+            if (entity.AchievementIssuesCertificate != info.IssuesCertificate)
+                commands.Add(new ChangeAchievementCertificateIssuance(AchievementIdentifier, info.IssuesCertificate));
+
             bool isSelfDeclarationRevoked = entity.AchievementAllowSelfDeclared && !info.AllowSelfDeclared; // before != after
 
             if (isSelfDeclarationRevoked)
@@ -356,6 +359,9 @@ namespace InSite.Cmds.Admin.Achievements.Forms
             command.OriginOrganization = info.OrganizationIdentifier == OrganizationIdentifiers.CMDS ? Organization.Identifier : info.OrganizationIdentifier;
 
             ServiceLocator.SendCommand(command);
+
+            if (info.IssuesCertificate)
+                ServiceLocator.SendCommand(new ChangeAchievementCertificateIssuance(command.AggregateIdentifier, true));
 
             AchievementDetails.SaveAchievementCategoriesAndAccessControl(command.AggregateIdentifier);
 

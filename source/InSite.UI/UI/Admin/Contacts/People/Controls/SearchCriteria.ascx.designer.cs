@@ -60,6 +60,15 @@ namespace InSite.Admin.Contacts.People.Controls
         protected global::InSite.Common.Web.UI.TextBox Code;
 
         /// <summary>
+        /// Language control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.LanguageComboBox Language;
+
+        /// <summary>
         /// CommentKeyword control.
         /// </summary>
         /// <remarks>

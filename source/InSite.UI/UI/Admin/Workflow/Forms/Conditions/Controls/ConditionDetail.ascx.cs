@@ -41,7 +41,7 @@ namespace InSite.Admin.Surveys.Forms.Controls
             HideValidator.ServerValidate += HideValidator_ServerValidate;
         }
 
-        public void SetDefaultInputValues(SurveyForm form, Guid? defaultQuestionIdentifier, TimeZoneInfo tz)
+        public void SetDefaultInputValues(SurveyForm form, Guid? defaultQuestionIdentifier, string tz)
         {
             SurveyIdentifier = form.Identifier;
 
@@ -58,7 +58,7 @@ namespace InSite.Admin.Surveys.Forms.Controls
             OnQuestionChanged();
         }
 
-        public void SetInputValues(SurveyOptionItem optionItem, SurveyState survey, TimeZoneInfo tz)
+        public void SetInputValues(SurveyOptionItem optionItem, SurveyState survey, string tz)
         {
             var form = optionItem.Question.Form;
 

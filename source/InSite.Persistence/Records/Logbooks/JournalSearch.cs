@@ -268,7 +268,7 @@ namespace InSite.Persistence
                         Started = x.Experience.ExperienceStarted,
                         Stopped = x.Experience.ExperienceStopped,
                         Employer = x.Experience.Employer,
-                        Supervisor = x.Experience.Supervisor,
+                        Supervisor = x.Experience.Supervisor.UserFullName,
                         TrainingLocation = x.Experience.TrainingLocation,
                         Class = x.Experience.Journal.JournalSetup.Event.EventTitle,
                         EntryNumber = x.Experience.Sequence,
@@ -514,7 +514,7 @@ namespace InSite.Persistence
                 query = query.Where(x => x.Employer.Contains(filter.EmployerContains));
 
             if (filter.SupervisorContains.IsNotEmpty())
-                query = query.Where(x => x.Supervisor.Contains(filter.SupervisorContains));
+                query = query.Where(x => x.Supervisor.UserFullName.Contains(filter.SupervisorContains));
 
             if (filter.StartDateExact.HasValue)
                 query = query.Where(x => x.ExperienceStarted == filter.StartDateExact.Value);
@@ -813,26 +813,41 @@ namespace InSite.Persistence
             using (var db = CreateContext())
             {
                 var query = CreateJournalSetupUserQuery(filter, db)
-                    .Select(x => new JournalSetupUserExtended
-                    {
-                        JournalSetupIdentifier = x.JournalSetupIdentifier,
-                        UserIdentifier = x.UserIdentifier,
-                        OrganizationIdentifier = x.OrganizationIdentifier,
-                        JournalIdentifier = x.JournalIdentifier,
-                        EmployerGroupIdentifier = x.EmployerGroupIdentifier,
-                        UserRole = x.UserRole,
-                        JournalSetupName = x.JournalSetupName,
-                        JournalSetupCreated = x.JournalSetupCreated,
-                        UserFullName = x.UserFullName,
-                        UserEmail = x.UserEmail,
-                        UserEmailAlternate = x.UserEmailAlternate,
-                        EmployerGroupName = x.EmployerGroupName,
-                        PersonCode = x.PersonCode,
-                        ExperienceCount = db.QExperiences.Count(y => y.JournalIdentifier == x.JournalIdentifier),
-                        ValidatedExperienceCount = db.QExperiences.Count(y => y.JournalIdentifier == x.JournalIdentifier && y.ExperienceValidated.HasValue),
-                        HourSum = (decimal?)db.QExperiences.Where(y => y.JournalIdentifier == x.JournalIdentifier).Sum(y => y.ExperienceHours ?? 0) ?? 0,
-                        HasAchievement = db.QCredentials.Any(y => y.UserIdentifier == x.UserIdentifier && y.AchievementIdentifier == x.AchievementIdentifier)
-                    });
+                    .GroupJoin(
+                        db.QExperiences
+                            .GroupBy(x => x.JournalIdentifier)
+                            .Select(x => new
+                            {
+                                JournalIdentifier = x.Key,
+                                ExperienceCount = x.Count(),
+                                ValidatedExperienceCount = x.Sum(e => e.ExperienceValidated.HasValue ? 1 : 0),
+                                HourSum = x.Sum(e => e.ExperienceHours ?? 0)
+                            }),
+                        a => a.JournalIdentifier,
+                        b => b.JournalIdentifier,
+                        (a, b) => new { Sju = a, Exp = b }
+                    )
+                    .SelectMany(
+                        x => x.Exp.DefaultIfEmpty(),
+                        (x, Exp) => new JournalSetupUserExtended { 
+                            JournalSetupIdentifier = x.Sju.JournalSetupIdentifier,
+                            UserIdentifier = x.Sju.UserIdentifier,
+                            OrganizationIdentifier = x.Sju.OrganizationIdentifier,
+                            JournalIdentifier = x.Sju.JournalIdentifier,
+                            EmployerGroupIdentifier = x.Sju.EmployerGroupIdentifier,
+                            UserRole = x.Sju.UserRole,
+                            JournalSetupName = x.Sju.JournalSetupName,
+                            JournalSetupCreated = x.Sju.JournalSetupCreated,
+                            UserFullName = x.Sju.UserFullName,
+                            UserEmail = x.Sju.UserEmail,
+                            UserEmailAlternate = x.Sju.UserEmailAlternate,
+                            EmployerGroupName = x.Sju.EmployerGroupName,
+                            PersonCode = x.Sju.PersonCode,
+                            ExperienceCount = (int?)Exp.ExperienceCount ?? 0,
+                            ValidatedExperienceCount = (int?)Exp.ValidatedExperienceCount ?? 0,
+                            HourSum = (decimal?)Exp.HourSum ?? 0,
+                            HasAchievement = db.QCredentials.Any(y => y.UserIdentifier == x.Sju.UserIdentifier && y.AchievementIdentifier == x.Sju.AchievementIdentifier)
+                        });
 
                 if (string.Equals(filter.OrderBy, "JournalCreated"))
                 {
@@ -843,7 +858,9 @@ namespace InSite.Persistence
                 else
                     query = query.OrderBy(x => x.UserFullName);
 
-                return query.ApplyPaging(filter).ToList();
+                return query
+                    .ApplyPaging(filter)
+                    .ToList();
             }
         }
 

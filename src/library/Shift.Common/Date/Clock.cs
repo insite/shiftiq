@@ -72,10 +72,10 @@ namespace Shift.Common
                 : age;
         }
 
-        public static DateTimeOffset ToDateTimeOffset(this DateTime value, TimeZoneInfo tz) =>
-            new DateTimeOffset(value, tz.GetUtcOffset(value));
+        public static DateTimeOffset ToDateTimeOffset(this DateTime value, string tz) =>
+            new DateTimeOffset(value, TimeZones.GetUtcOffset(value, tz));
 
-        public static DateTimeOffset? ToDateTimeOffset(this DateTime? value, TimeZoneInfo tz) =>
+        public static DateTimeOffset? ToDateTimeOffset(this DateTime? value, string tz) =>
             value.HasValue ? value.Value.ToDateTimeOffset(tz) : (DateTimeOffset?)null;
 
         public static DateTimeOffset ToDateTimeOffset(this DateTime value, TimeSpan ts) =>

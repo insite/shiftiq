@@ -235,7 +235,7 @@ namespace InSite.Api.Controllers
                 throw new ArgumentException("The learner is missing a unique identifier value. (Learner.Identifier is a required property.)", nameof(learner));
 
             if (!ServiceLocator.PersonSearch.IsPersonExist(learner.Identifier, organization.Identifier))
-                Insert(learner, organization.Identifier, organization.TimeZone.Id, organization.Toolkits.Contacts?.DefaultMFA ?? false);
+                Insert(learner, organization.Identifier, organization.TimeZone, organization.Toolkits.Contacts?.DefaultMFA ?? false);
             else
                 Update(learner, organization.Identifier);
         }

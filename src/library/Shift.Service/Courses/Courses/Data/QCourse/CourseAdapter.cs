@@ -106,12 +106,12 @@ public class CourseAdapter : IEntityAdapter
         return entity;
     }
 
-    public IEnumerable<CourseModel> ToModel(IEnumerable<CourseEntity> entities, TimeZoneInfo? timezone)
+    public IEnumerable<CourseModel> ToModel(IEnumerable<CourseEntity> entities)
     {
-        return entities.Select(e => ToModel(e, timezone));
+        return entities.Select(ToModel);
     }
 
-    public CourseModel ToModel(CourseEntity entity, TimeZoneInfo? timezone)
+    public CourseModel ToModel(CourseEntity entity)
     {
         var model = new CourseModel
         {

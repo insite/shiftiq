@@ -1,4 +1,6 @@
-﻿(function () {
+﻿// Uses moment.js and moment-timezone.js
+
+(function () {
     var instance = null;
     {
         var inSite = window.inSite = window.inSite || {};
@@ -30,7 +32,7 @@
     const flatpickrCache = [];
 
     let isInitializationStarted = false;
-    let timeZones = [{ title: 'UTC', abbrv: 'UTC', moment: 'UTC' }];
+    let timeZones = [{ title: 'UTC', abbrv: 'UTC', moment: 'UTC', isIANACompatible: true }];
     let $timeZoneMenu = null;
     let destroyGarbageHandler = null;
 
@@ -201,6 +203,9 @@
             if (options.data.fullFormat)
                 pickerOptions.dateFormat = options.data.fullFormat;
 
+            if (options.data.noTimeZoneFormat)
+                pickerOptions.noTimeZoneFormat = options.data.noTimeZoneFormat;
+
             if (options.data.shortFormat)
                 pickerOptions.altFormat = pickerOptions.ariaDateFormat = options.data.shortFormat;
 
@@ -211,15 +216,15 @@
             }
 
             if (options.enableTz) {
-                let timeZone = getTimeZone(options.data.timeZone);
-                if (!timeZone)
-                    timeZone = getTimeZone('UTC');
+                let timeZoneInfo = getTimeZone(options.data.timeZone);
+                if (!timeZoneInfo)
+                    timeZoneInfo = getTimeZone('UTC');
 
-                pickerOptions.timeZone = timeZone.moment;
+                pickerOptions.timeZone = timeZoneInfo.moment;
                 data.$timezonebutton = $group.find('> .btn-timezone').on('click', onTimeZoneClick);
 
-                if (timeZone)
-                    data.$timezonelabel = data.$timezonebutton.find('> span').text(timeZone.abbrv);
+                if (timeZoneInfo)
+                    data.$timezonelabel = data.$timezonebutton.find('> span').text(timeZoneInfo.abbrv);
 
                 data.$timezonebutton[0][dtosId] = data;
             }
@@ -253,7 +258,7 @@
 
             for (let i = 0; i < timeZones.length; i++) {
                 const tzData = timeZones[i];
-                if (tzData.abbrv.toUpperCase() == value || tzData.moment.toUpperCase() == value)
+                if (tzData.moment.toUpperCase() == value)
                     return tzData;
             }
         }
@@ -521,9 +526,9 @@
         }
 
         if (data.datePicker.config.timeZone) {
-            const tz = getTimeZone(data.datePicker.config.timeZone);
-            if (tz)
-                inputData.timeZone = tz.abbrv;
+            const timeZoneInfo = getTimeZone(data.datePicker.config.timeZone);
+            if (timeZoneInfo)
+                inputData.timeZone = timeZoneInfo.moment;
         }
 
         data.$input.val(JSON.stringify(inputData));
@@ -532,9 +537,15 @@
     function formatDate(date, format) {
         const m = moment(date);
 
-        this.timeZone
-            ? m.tz(this.timeZone, true)
-            : m.local(true);
+        if (this.timeZone) {
+            const timeZoneInfo = this.timeZone ? getTimeZone(this.timeZone) : null;
+            if (timeZoneInfo && !timeZoneInfo.isIANACompatible) {
+                return m.format(this.noTimeZoneFormat) + " " + timeZoneInfo.abbrv;
+            }
+            m.tz(this.timeZone, true);
+        } else {
+            m.local(true);
+        }
 
         return m.format(format);
     }
@@ -543,17 +554,14 @@
         let date;
 
         if (this.timeZone) {
-            const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-            date = moment.tz(datestr, format, true, localTimeZone);
+            date = moment(datestr, this.noTimeZoneFormat, true);
 
             if (!date.isValid()) {
-                date = moment.tz(datestr, format, localTimeZone);
+                date = moment(datestr, this.noTimeZoneFormat);
 
                 if (!date.isValid())
-                    date = moment.tz(datestr, localTimeZone);
+                    date = moment(datestr);
             }
-
         } else {
             date = moment(datestr, format, true);
 

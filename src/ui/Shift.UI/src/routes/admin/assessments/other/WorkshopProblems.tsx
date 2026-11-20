@@ -77,8 +77,8 @@ export default function WorkshopProblems() {
                                     title="Jump to Question"
                                     href={
                                         formId
-                                            ? `/client/admin/assessment/forms/workshop/${formId}?tab=questions&question=${q.questionId}`
-                                            : `/client/admin/assessment/specs/workshop/${specificationId}?tab=questions&question=${q.questionId}`
+                                            ? `/client/admin/assessments/forms/workshop/${formId}?tab=questions&question=${q.questionId}`
+                                            : `/client/admin/assessments/specs/workshop/${specificationId}?tab=questions&question=${q.questionId}`
                                     }
                                     icon={{ style: "regular", name: "reply", className: "fa-rotate-270" }}
                                     enforceHttpRedirect

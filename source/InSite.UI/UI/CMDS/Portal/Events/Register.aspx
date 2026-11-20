@@ -10,6 +10,8 @@
 
     <insite:ValidationSummary runat="server" ValidationGroup="Register" />
 
+    <insite:Button runat="server" ID="RegisterAnotherUserLink" Visible="false" Text="Register Another User" Icon="fa fa-user-plus" ButtonStyle="Default" CssClass="mb-3" />
+
     <section runat="server" ID="RegistrationSection" visible="false" class="mb-3">
         
         <h2 class="h4 mb-3">
@@ -19,8 +21,6 @@
 
         <div class="card border-0 shadow-lg">
             <div class="card-body">
-
-                <insite:Button runat="server" ID="RegisterAnotherUserLink" Visible="false" Text="Register Another User" Icon="fa fa-user-plus" ButtonStyle="Default" CssClass="mb-3" />
 
                 <div class="row">
                     <div class="col-md-6">
@@ -130,7 +130,7 @@
         </div>
 
         <div class="mt-3">
-            <insite:Button runat="server" ID="SubmitButton" ButtonStyle="Success" Text="Register" ValidationGroup="Register" Icon="fa fa-user-plus" />
+            <insite:Button runat="server" ID="SubmitButton" ButtonStyle="Success" Text="Register" ValidationGroup="Register" Icon="fa fa-user-plus" DisableAfterClick="true" />
         </div>
 
     </section>

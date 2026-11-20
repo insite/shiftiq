@@ -8,6 +8,11 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 {
     public partial class SearchCriteria : SearchCriteriaController<VCredentialFilter>
     {
+        // CMDS has always listed orientations and safety certificates here. Any other achievement
+        // that issues a certificate is listed too, since a learner can upload one from the Add New
+        // Certificate tab.
+        private static readonly string[] CmdsAchievementLabels = { "Orientation", "Time-Sensitive Safety Certificate" };
+
         public override VCredentialFilter Filter
         {
             get
@@ -21,7 +26,14 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
                 };
 
                 if (ServiceLocator.Partition.IsE03())
-                    query.AchievementLabels = new[] { "Orientation", "Time-Sensitive Safety Certificate" };
+                {
+                    query.AchievementLabels = CmdsAchievementLabels.ToArray();
+                    query.IncludeCertificateIssuingAchievements = true;
+
+                    // The Add New Certificate tab offers achievements another organization shares
+                    // with this one, so a certificate uploaded for one must be listed here too.
+                    query.IncludeSharedAchievements = true;
+                }
 
                 GetCheckedShowColumns(query);
 
@@ -42,13 +54,20 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
             var query = AchievementIdentifier.Filter;
 
-            query.OrganizationIdentifiers.Add(Organization.Identifier);
-
             if (ServiceLocator.Partition.IsE03())
             {
-                query.AchievementLabels.Add("Orientation");
-                query.AchievementLabels.Add("Time-Sensitive Safety Certificate");
-                AchievementIdentifier.Filter.AchievementLabels = query.AchievementLabels;
+                // A CMDS learner filters by the same kinds of achievement the results grid lists,
+                // available to their organization: its own, plus global ones shared with it.
+                // Ownership alone would list every global achievement, including ones never shared
+                // with the organization.
+                query.OrganizationIdentifiers.Clear();
+                query.AvailableToOrganizationIdentifier = Organization.Identifier;
+                query.AchievementLabels.AddRange(CmdsAchievementLabels);
+                query.IncludeCertificateIssuingAchievements = true;
+            }
+            else
+            {
+                query.OrganizationIdentifiers.Add(Organization.Identifier);
             }
         }
 

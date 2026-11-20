@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 
@@ -6,11 +7,25 @@ using InSite.Common;
 using InSite.Domain.Payments;
 using InSite.Web.Helpers;
 
+using Shift.Common.Events;
+
 namespace InSite.UI.Portal.Billing.Controls
 {
     public partial class CardDetail : UserControl
     {
+        public event StringValueHandler ProvinceChanged;
+
+        private void OnProvinceChanged(string province) => ProvinceChanged?.Invoke(this, new StringValueArgs(province));
+
         private static readonly PortalFieldHandler<HtmlGenericControl> _fieldHandler = new PortalFieldHandler<HtmlGenericControl>();
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            ContactProvince.AutoPostBack = true;
+            ContactProvince.ValueChanged += (s, a) => OnProvinceChanged(a.NewValue);
+        }
 
         public void GetInputValues(UnmaskedCreditCard card, BillingAddress billing)
         {

@@ -247,7 +247,7 @@ namespace InSite.Admin.Contacts.People.Forms
 
         private void SetDefaultInputValues()
         {
-            OnePersonTimeZone.Value = CurrentSessionState.Identity.Organization.TimeZone.Id;
+            OnePersonTimeZone.Value = CurrentSessionState.Identity.Organization.TimeZone;
             OnePersonCheckDuplicates.Checked = true;
             OnePersonIsUserAccessGranted.Checked = false;
 
@@ -575,7 +575,7 @@ namespace InSite.Admin.Contacts.People.Forms
             user.MiddleName = OnePersonMiddleName.Text;
             user.LastName = OnePersonLastName.Text;
             user.Email = OnePersonEmail.Text;
-            user.TimeZone = Organization.TimeZone.Id;
+            user.TimeZone = Organization.TimeZone;
             person.EmailEnabled = true;
 
             var personCode = OnePersonCode.Text.NullIfWhiteSpace();

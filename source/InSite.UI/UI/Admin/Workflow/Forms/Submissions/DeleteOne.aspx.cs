@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Admin.Workflow.Forms.Utilities;
 using InSite.Application.Responses.Write;

@@ -5,5 +5,6 @@ export interface ApiPendingPersonImportModel {
     UserFirstName: string;
     UserLastName: string;
     EmployeeStatus: string;
+    SubmittedAt: string;
     MatchCount: number;
 }

@@ -5,6 +5,9 @@ using Shift.Common.Timeline.Commands;
 
 using InSite.Application.Courses.Read;
 using InSite.Domain.Courses;
+using InSite.Application.Assets.Read;
+using Shift.Contract;
+using System.Linq;
 
 namespace InSite.Application.Courses.Write
 {
@@ -13,17 +16,20 @@ namespace InSite.Application.Courses.Write
         private readonly IChangeQueue _publisher;
         private readonly IChangeRepository _repository;
         private readonly ICourseStore _courseStore;
+        private readonly ISearchStore _searchStore;
 
         public CourseCommandReceiver(
             ICommandQueue commander,
             IChangeQueue publisher,
             IChangeRepository repository,
-            ICourseStore courseStore
+            ICourseStore courseStore,
+            ISearchStore searchStore
             )
         {
             _publisher = publisher;
             _repository = repository;
             _courseStore = courseStore;
+            _searchStore = searchStore;
 
             commander.Subscribe<RunCommands>(Handle);
 
@@ -102,22 +108,34 @@ namespace InSite.Application.Courses.Write
             if (runCommands.Commands == null || runCommands.Commands.Length == 0)
                 return;
 
+            var hasChanges = false;
+            Guid? organizationId = null;
+
             if (runCommands.Commands[0] is IHasAggregate create)
             {
                 ((IHasRun)create).Run(null);
                 RunCommands(create.Course, runCommands, 1);
+
+                hasChanges = true;
+                organizationId = create.Course.Data.Organization;
             }
             else
             {
                 _repository.LockAndRun<CourseAggregate>(runCommands.AggregateIdentifier, course =>
                 {
-                    RunCommands(course, runCommands, 0);
+                    hasChanges = RunCommands(course, runCommands, 0);
+                    organizationId = course.Data.Organization;
                 });
             }
+
+            if (hasChanges && runCommands.Commands.Any(x => x is IGlobalSearchUpdater updater && updater.IsUpdater()))
+                _searchStore.EnqueueSearchObject(organizationId.Value, runCommands.Commands[0].AggregateIdentifier, SearchObjectType.Course);
         }
 
-        private void RunCommands(CourseAggregate course, RunCommands runCommands, int startIndex)
+        private bool RunCommands(CourseAggregate course, RunCommands runCommands, int startIndex)
         {
+            var hasChanges = false;
+
             for (int i = startIndex; i < runCommands.Commands.Length; i++)
             {
                 var command = runCommands.Commands[i];
@@ -125,7 +143,8 @@ namespace InSite.Application.Courses.Write
                 if (command.AggregateIdentifier != course.AggregateIdentifier)
                     throw new ArgumentException($"The command has wrong AggregateIdentifier: {command.AggregateIdentifier}");
 
-                ((IHasRun)command).Run(course);
+                if (((IHasRun)command).Run(course))
+                    hasChanges = true;
             }
 
             var transactionId = _courseStore.StartTransaction(course.AggregateIdentifier);
@@ -139,14 +158,21 @@ namespace InSite.Application.Courses.Write
                 _courseStore.CancelTransaction(transactionId);
                 throw;
             }
+
+            return hasChanges;
         }
 
         private void Handle<T>(T c) where T: Command, IHasRun
         {
+            Guid? organizationId = null;
+
             if (c is IHasAggregate create)
             {
                 if (c.Run(null))
+                {
+                    organizationId = create.Course.Data.Organization;
                     Commit(create.Course, c, null);
+                }
 
                 return;
             }
@@ -154,8 +180,14 @@ namespace InSite.Application.Courses.Write
             _repository.LockAndRun<CourseAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 if (c.Run(aggregate))
+                {
+                    organizationId = aggregate.Data.Organization;
                     Commit(aggregate, c, null);
+                }
             });
+
+            if (organizationId != null && c is IGlobalSearchUpdater updater && updater.IsUpdater())
+                _searchStore.EnqueueSearchObject(organizationId.Value, c.AggregateIdentifier, SearchObjectType.Course);
         }
 
         private void Commit(CourseAggregate aggregate, ICommand c, Guid? changeTransactionId)

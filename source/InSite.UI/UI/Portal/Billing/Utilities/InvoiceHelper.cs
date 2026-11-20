@@ -25,7 +25,7 @@ namespace InSite.UI.Portal.Billing.Utilities
             IList<TOrder> orders,
             Guid customerUserId,
             PriceSelectionMode mode,
-            decimal taxRate,
+            ProvinceTax tax,
             UnmaskedCreditCard card
             )
         {
@@ -33,7 +33,7 @@ namespace InSite.UI.Portal.Billing.Utilities
                 orders,
                 customerUserId,
                 mode,
-                taxRate,
+                tax,
                 now: null
             );
 
@@ -70,7 +70,7 @@ namespace InSite.UI.Portal.Billing.Utilities
             IList<TOrder> orders,
             Guid customerUserId,
             PriceSelectionMode mode,
-            decimal taxRate,
+            ProvinceTax tax,
             DateTimeOffset? now = null)
         {
             if (orders == null || orders.Count == 0)
@@ -79,17 +79,17 @@ namespace InSite.UI.Portal.Billing.Utilities
             var stamp = now ?? DateTimeOffset.UtcNow;
 
             if (mode == PriceSelectionMode.ALaCarte || mode == PriceSelectionMode.Subscribe)
-                return DraftALCorSubscribtionInvoice(orders, customerUserId, mode, taxRate, stamp);
+                return DraftALCorSubscribtionInvoice(orders, customerUserId, mode, tax, stamp);
 
-            return DraftPackageInvoice(orders, customerUserId, taxRate, stamp);
+            return DraftPackageInvoice(orders, customerUserId, tax, stamp);
         }
 
-        private static IList<TOrder> DraftPackageInvoice(IList<TOrder> orders, Guid customerUserId, decimal taxRate, DateTimeOffset stamp)
+        private static IList<TOrder> DraftPackageInvoice(IList<TOrder> orders, Guid customerUserId, ProvinceTax tax, DateTimeOffset stamp)
         {
             foreach (var order in orders)
             {
                 Guid rootItemId;
-                var invoiceItems = BuildInvoiceItemsForOrder(order, taxRate, out rootItemId);
+                var invoiceItems = BuildInvoiceItemsForOrder(order, tax, out rootItemId);
                 var invoiceId = UniqueIdentifier.Create();
                 var invoiceNumber = Sequence.Increment(OrganizationId, SequenceType.Invoice);
 
@@ -108,7 +108,7 @@ namespace InSite.UI.Portal.Billing.Utilities
             return orders;
         }
 
-        private static IList<TOrder> DraftALCorSubscribtionInvoice(IList<TOrder> orders, Guid customerUserId, PriceSelectionMode mode, decimal taxRate, DateTimeOffset stamp)
+        private static IList<TOrder> DraftALCorSubscribtionInvoice(IList<TOrder> orders, Guid customerUserId, PriceSelectionMode mode, ProvinceTax tax, DateTimeOffset stamp)
         {
             var invoiceId = UniqueIdentifier.Create();
             var invoiceNumber = Sequence.Increment(OrganizationId, SequenceType.Invoice);
@@ -118,7 +118,7 @@ namespace InSite.UI.Portal.Billing.Utilities
 
             foreach (var order in orders)
             {
-                var item = BuildSingleItemForOrder(order, mode, taxRate, out Guid itemId);
+                var item = BuildSingleItemForOrder(order, mode, tax, out Guid itemId);
                 items.Add(item);
                 perOrderItemId[order.OrderIdentifier] = itemId;
             }
@@ -140,50 +140,40 @@ namespace InSite.UI.Portal.Billing.Utilities
             return orders;
         }
 
-        private static InvoiceItem BuildSingleItemForOrder(TOrder order, PriceSelectionMode mode, decimal taxRate, out Guid itemId)
+        private static InvoiceItem BuildSingleItemForOrder(TOrder order, PriceSelectionMode mode, ProvinceTax tax, out Guid itemId)
         {
             itemId = UuidFactory.Create();
 
-            var li = order.OrderItems.FirstOrDefault();
-            var qty = li?.OrderItemQuantity ?? 1;
-            var unit = li?.UnitPrice ?? order.TotalAmount;
+            var orderItem = order.OrderItems.FirstOrDefault();
+            var productId = orderItem?.ProductIdentifier ?? order.ProductIdentifier;
+            var product = ServiceLocator.InvoiceSearch.GetProduct(productId);
+            var quantity = orderItem?.OrderItemQuantity ?? 1;
+
+            var invoiceItem = new InvoiceItem
+            {
+                Identifier = itemId,
+                Product = productId,
+                Quantity = quantity
+            };
 
             if (mode == PriceSelectionMode.Subscribe)
             {
-                var productId = li?.ProductIdentifier ?? order.ProductIdentifier;
-                var product = ServiceLocator.InvoiceSearch.GetProduct(productId);
-                bool taxable = (product?.IsTaxable ?? false);
-
-                return new InvoiceItem
-                {
-                    Identifier = itemId,
-                    Product = productId,
-                    Quantity = qty,
-                    Price = li?.UnitPrice ?? (qty > 0 ? Math.Round(order.TotalAmount / qty, 2) : order.TotalAmount),
-                    Description = "(Subscription) " + (li?.ProductName ?? order.ProductName),
-                    TaxRate = taxable ? taxRate : (decimal?)null
-                };
+                invoiceItem.Price = orderItem?.UnitPrice ?? (quantity > 0 ? Math.Round(order.TotalAmount / quantity, 2) : order.TotalAmount);
+                invoiceItem.Description = "(Subscription) " + (orderItem?.ProductName ?? order.ProductName);
+            }
+            else
+            {
+                invoiceItem.Price = orderItem?.UnitPrice ?? order.TotalAmount;
+                invoiceItem.Description = orderItem?.ProductName ?? order.ProductName;
             }
 
-            var alcProductId = li?.ProductIdentifier ?? order.ProductIdentifier;
-            var alc = ServiceLocator.InvoiceSearch.GetProduct(alcProductId);
-            bool alcTaxable = (alc?.IsTaxable ?? false);
+            SetTax(invoiceItem, tax, product?.IsTaxable == true);
 
-            return new InvoiceItem
-            {
-                Identifier = itemId,
-                Product = alcProductId,
-                Quantity = qty,
-                Price = unit,
-                Description = li?.ProductName ?? order.ProductName,
-                TaxRate = alcTaxable ? taxRate : (decimal?)null
-            };
+            return invoiceItem;
         }
 
-        private static InvoiceItem[] BuildInvoiceItemsForOrder(TOrder order, decimal taxRate, out Guid firstItemId)
+        private static InvoiceItem[] BuildInvoiceItemsForOrder(TOrder order, ProvinceTax tax, out Guid firstItemId)
         {
-            firstItemId = Guid.Empty;
-
             var hasPackageChildren = order.OrderItems.Any(i =>
                 string.Equals(i.OrderItemType, "PackageItem", StringComparison.OrdinalIgnoreCase));
 
@@ -193,22 +183,18 @@ namespace InSite.UI.Portal.Billing.Utilities
             if (!isPackage)
             {
                 var product = ServiceLocator.InvoiceSearch.GetProduct(order.ProductIdentifier);
-                bool taxable = (product?.IsTaxable ?? false);
-
-                var singleId = UuidFactory.Create();
-                firstItemId = singleId;
-                return new[]
+                var invoiceItem = new InvoiceItem
                 {
-                    new InvoiceItem
-                    {
-                        Identifier  = singleId,
-                        Product     = order.ProductIdentifier,
-                        Quantity    = 1,
-                        Price       = order.TotalAmount,
-                        Description = order.ProductName,
-                        TaxRate     = taxable ? taxRate : (decimal?)null
-                    }
+                    Identifier = firstItemId = UuidFactory.Create(),
+                    Product = order.ProductIdentifier,
+                    Quantity = 1,
+                    Price = order.TotalAmount,
+                    Description = order.ProductName,
                 };
+
+                SetTax(invoiceItem, tax, product?.IsTaxable == true);
+
+                return new[] { invoiceItem };
             }
 
             var package = ServiceLocator.InvoiceSearch.GetProduct(order.ProductIdentifier);
@@ -220,39 +206,51 @@ namespace InSite.UI.Portal.Billing.Utilities
                 var perSlot = (packQty > 0) ? Math.Round(order.TotalAmount / packQty, 2) : order.TotalAmount;
                 var pkgName = order.ProductName ?? package?.ProductName ?? "Package";
 
-                var lines = new List<InvoiceItem>();
+                var lines = new List<InvoiceItem>(order.OrderItems.Count);
+
                 foreach (var child in order.OrderItems)
                 {
-                    var id = UuidFactory.Create();
-                    if (firstItemId == Guid.Empty) firstItemId = id;
-
-                    lines.Add(new InvoiceItem
+                    var invoiceItem = new InvoiceItem
                     {
-                        Identifier = id,
+                        Identifier = UuidFactory.Create(),
                         Product = child.ProductIdentifier ?? order.ProductIdentifier,
                         Quantity = child.OrderItemQuantity,
                         Price = perSlot,
-                        Description = $"({pkgName}) {child.ProductName ?? "(Item)"}",
-                        TaxRate = pkgTaxable ? taxRate : (decimal?)null
-                    });
+                        Description = $"({pkgName}) {child.ProductName ?? "(Item)"}"
+                    };
+
+                    SetTax(invoiceItem, tax, pkgTaxable);
+
+                    lines.Add(invoiceItem);
                 }
+
+                firstItemId = lines.FirstOrDefault().Identifier;
+
                 return lines.ToArray();
             }
 
-            var rootId = UuidFactory.Create();
-            firstItemId = rootId;
-            return new[]
+            var rootItem = new InvoiceItem
             {
-                new InvoiceItem
-                {
-                    Identifier  = rootId,
-                    Product     = order.ProductIdentifier,
-                    Quantity    = 1,
-                    Price       = order.TotalAmount,
-                    Description = order.ProductName,
-                    TaxRate     = pkgTaxable ? taxRate : (decimal?)null
-                }
+                Identifier = firstItemId = UuidFactory.Create(),
+                Product = order.ProductIdentifier,
+                Quantity = 1,
+                Price = order.TotalAmount,
+                Description = order.ProductName
             };
+
+            SetTax(rootItem, tax, pkgTaxable);
+
+            return new[] { rootItem };
+        }
+
+        private static void SetTax(InvoiceItem item, ProvinceTax tax, bool isTaxable)
+        {
+            if (!isTaxable)
+                return;
+
+            item.TaxRate = tax.Rate;
+            item.TaxCountry = tax.Country;
+            item.TaxRegion = tax.Region;
         }
     }
 }

@@ -120,7 +120,8 @@
 
                 <div class="row mt-4">
                     <div class="col-lg-12">
-                        <a href="/ui/admin/learning/programs/enrollments/assign"><i class="fas fa-layer-plus me-1"></i>Assign Programs to Learners</a>
+                        <a class="me-3" href="/ui/admin/learning/programs/enrollments/assign"><i class="fas fa-layer-plus me-1"></i>Assign Programs to Learners</a>
+                        <a class="me-3" href="/ui/admin/learning/programs/enrollments/requests/search"><i class="fas fa-clipboard-check me-1"></i>Review Program Enrollment Requests</a>
                     </div>
                 </div>
 

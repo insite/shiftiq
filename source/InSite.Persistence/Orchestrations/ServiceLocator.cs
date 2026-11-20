@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 using InSite.Application;
+using InSite.Application.Assets.Read;
 using InSite.Application.Attempts.Read;
 using InSite.Application.Attempts.Write;
 using InSite.Application.Banks.Read;
@@ -57,6 +59,7 @@ using Serilog;
 
 using Shift.Common;
 using Shift.Common.Integration.Google;
+using Shift.Common.Integrations.Proview;
 using Shift.Common.Json;
 using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
@@ -114,6 +117,7 @@ namespace InSite
         public static IPrometricApi PrometricApi { get; internal set; }
         public static SwiftSmsGatewayClient SwiftSmsGatewayClient { get; internal set; }
         public static TranslationClient TranslationClient { get; internal set; }
+        public static ProviewClient ProviewClient { get; internal set; }
 
         public static MailgunServer MailgunServer { get; private set; }
         public static IEmailOutbox EmailOutbox { get; private set; }
@@ -207,6 +211,8 @@ namespace InSite
         public static IQuizAttemptSearch QuizAttemptSearch { get; set; }
         public static IQuizAttemptStore QuizAttemptStore { get; set; }
 
+        public static ISearchStore SearchStore { get; set; } = new SearchStore();
+
         // Custom Tenant-Specific Services
 
         public static CmdsProcessor CmdsProcessor { get; set; }
@@ -233,6 +239,7 @@ namespace InSite
         public static CredentialCommandReceiver CredentialCommandReceiver = null;
         public static ContactCommandReceiver ContactCommandSubscriber = null;
         public static ContactChangeProjector ContactChangeSubscriber = null;
+        public static CmdsUserCommandReceiver CmdsUserCommandSubscriber = null;
         public static GroupCommandReceiver GroupCommandSubscriber = null;
         public static GroupChangeProjector GroupChangeSubscriber = null;
         public static GlossaryCommandReceiver GlossaryCommandSubscriber = null;
@@ -300,6 +307,13 @@ namespace InSite
 
         public static void InitializeAppSettings(AppSettings settings, StartupRequirements requirements, bool disableCertificateValidation = true, Func<IPartitionModel> partitionFactory = null)
         {
+            Partition = partitionFactory == null ? settings.Partition : partitionFactory();
+
+            var timeZoneSet = settings.TimeZoneSets.FirstOrDefault(x => string.Equals(x.Name, Partition.TimeZoneSet, StringComparison.OrdinalIgnoreCase))
+                ?? throw new ArgumentNullException("TimeZones");
+
+            TimeZones.Initialize(timeZoneSet.TimeZones);
+
             if (disableCertificateValidation)
                 InitializeServerCertificateValidation();
 
@@ -330,10 +344,6 @@ namespace InSite
             Urls = new Urls(settings.Environment, settings.Partition.Domain, settings.HelpUrl);
 
             DbSettings.Init(AppSettings.Database.ConnectionStrings.Shift, settings.Partition.Domain, AppSettings.Database.IsReadOnly);
-
-            Partition = partitionFactory == null
-                ? settings.Partition
-                : partitionFactory();
 
             Persistence.MessageSearch.Init(AppSettings.Application.UseStrictModeForEmailEnabled);
 
@@ -447,7 +457,7 @@ namespace InSite
             RegistrationSearch = new RegistrationSearch();
             RegistrationStore = new RegistrationStore(Serializer);
 
-            BankStore = new BankStore(LearnerAttemptSummarySearch);
+            BankStore = new BankStore(LearnerAttemptSummarySearch, ContentStore);
 
             OldStandardSearch = new OldStandardSearch();
 
@@ -515,23 +525,26 @@ namespace InSite
             FileManagerService = new FileManagerService(FilePaths);
             StorageService = new StorageService(FileSearch, fileStore, FileManagerService, AppSettings.Application.TempFileExpirationInMinutes);
 
+            TGroupPermissionStore.SearchStore = SearchStore;
+            InSite.Persistence.ProgramStore.SearchStore = SearchStore;
+
             // Register subscribers for application commands and domain events.
 
-            AchievementCommandReceiver = new AchievementCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
+            AchievementCommandReceiver = new AchievementCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, SearchStore);
             AchievementChangeProjector = new AchievementChangeProjector(ChangeQueue, ChangeStore, AggregateSearch, AchievementStore);
 
             AttemptCommandSubscriber = new AttemptCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
             AttemptChangeProjector = new AttemptChangeProjector(ChangeQueue, ChangeStore, InstructorAttemptStore, BankSearch);
 
-            EventCommandReceiver = new EventCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
+            EventCommandReceiver = new EventCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, SearchStore);
             EventChangeProjector = new EventChangeProjector(ChangeQueue, ChangeStore, EventStore);
 
-            BankCommandSubscriber = new BankCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
+            BankCommandSubscriber = new BankCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, SearchStore);
             BankChangeProjector = new BankChangeProjector(ChangeQueue, ChangeStore, BankStore);
 
             CourseObjectCommandReceiver = new CourseObjectCommandReceiver(CommandQueue, ChangeQueue);
 
-            CourseCommandReceiver = new CourseCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, CourseStore);
+            CourseCommandReceiver = new CourseCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, CourseStore, SearchStore);
             CourseChangeSubscriber = new CourseChangeProjector(ChangeQueue, CourseStore);
 
             CredentialCommandReceiver = new CredentialCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
@@ -539,20 +552,22 @@ namespace InSite
             ContactCommandSubscriber = new ContactCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, MessageSearch);
             ContactChangeSubscriber = new ContactChangeProjector(ChangeQueue);
 
-            GroupCommandSubscriber = new GroupCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, GroupSearch);
+            CmdsUserCommandSubscriber = new CmdsUserCommandReceiver(CommandQueue, UserSearch, PersonSearch);
+
+            GroupCommandSubscriber = new GroupCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, GroupSearch, SearchStore);
             GroupChangeSubscriber = new GroupChangeProjector(ChangeQueue, ChangeStore, GroupStore);
 
             GlossaryCommandSubscriber = new GlossaryCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
             GlossaryChangeSubscriber = new GlossaryChangeProjector(ChangeQueue, GlossaryStore);
 
-            RecordCommandSubscriber = new GradebookCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, EventSearch, RecordSearch);
+            RecordCommandSubscriber = new GradebookCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, EventSearch, RecordSearch, SearchStore);
             RecordChangeSubscriber = new GradebookChangeProjector(ChangeQueue, ChangeStore, RecordStore);
 
             ProgressCommandSubscriber = new ProgressCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, RecordSearch);
 
-            JournalSetupCommandSubscriber = new JournalSetupCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, JournalSearch);
+            JournalSetupCommandSubscriber = new JournalSetupCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, JournalSearch, SearchStore);
             JournalCommandSubscriber = new JournalCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
-            JournalChangeSubscriber = new JournalChangeProjector(ChangeQueue, JournalStore, ContentStore);
+            JournalChangeSubscriber = new JournalChangeProjector(ChangeQueue, ChangeStore, JournalStore, ContentStore);
 
             InvoiceCommandReceiver = new InvoiceCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
             InvoiceChangeProjector = new InvoiceChangeProjector(ChangeQueue, InvoiceStore);
@@ -581,7 +596,7 @@ namespace InSite
             RubricCommandReceiver = new RubricCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, RubricStore);
             RubricChangeProjector = new RubricChangeProjector(ChangeQueue, RubricStore);
 
-            UserCommandSubscriber = new UserCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, UserSearch, PersonSearch);
+            UserCommandSubscriber = new UserCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, UserSearch, PersonSearch, SearchStore);
             UserChangeSubscriber = new UserChangeProjector(ChangeQueue, UserStore);
 
             PersonCommandSubscriber = new PersonCommandReceiver(
@@ -590,14 +605,15 @@ namespace InSite
                 SnapshotRepository,
                 UserSearch,
                 PersonSearch,
-                organizationId => InSite.Persistence.OrganizationSearch.GetPersonFullNamePolicy(organizationId)
+                organizationId => InSite.Persistence.OrganizationSearch.GetPersonFullNamePolicy(organizationId),
+                SearchStore
             );
             PersonChangeSubscriber = new PersonChangeProjector(ChangeQueue, PersonStore);
 
             PersonSecretCommandSubscriber = new PersonSecretCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
             PersonSecretChangeSubscriber = new PersonSecretChangeProjector(ChangeQueue, PersonSecretStore);
 
-            StandardCommandSubscriber = new StandardCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, StandardSearch);
+            StandardCommandSubscriber = new StandardCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, StandardSearch, SearchStore);
             StandardChangeSubscriber = new StandardChangeProjector(ChangeQueue, StandardStore, StandardTierStore, ContentStore);
 
             StandardValidationCommandSubscriber = new StandardValidationCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, StandardValidationSearch);
@@ -609,7 +625,7 @@ namespace InSite
             PageCommandReceiver = new PageCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
             PageChangeProjector = new PageChangeProjector(ChangeQueue, AggregateSearch, PageStore, ContentStore);
 
-            SurveyCommandReceiver = new SurveyCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository);
+            SurveyCommandReceiver = new SurveyCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, SearchStore);
             SurveyChangeProjector = new SurveyChangeProjector(ChangeQueue, SurveyStore);
 
             OrganizationCommandReceiver = new OrganizationCommandReceiver(CommandQueue, ChangeQueue, SnapshotRepository, OrganizationStore, OrganizationSearch);
@@ -653,7 +669,7 @@ namespace InSite
             _ = new BankChangeProcessor(commander, ChangeQueue, BankSearch, PageSearch, RecordSearch, UploadSearch, StorageService, AppSettings.Partition.Domain);
             ProgressRestarter = new ProgressRestarter(SendCommand, RecordSearch);
             _ = new CourseObjectChangeProcessor(commander, ChangeQueue, ProgressRestarter);
-            _ = new IssueChangeProcessor(ChangeQueue, AlertMailer, IssueSearch);
+            _ = new IssueChangeProcessor(ChangeQueue, AlertMailer, IssueSearch, OrganizationSearch, Urls);
             _ = new MembershipChangeProcessor(commander, ChangeQueue, ContactSearch, GroupSearch, MembershipSearch, InvoiceSearch, AlertMailer, Urls, orgId => Sequence.Increment(orgId, SequenceType.Invoice));
             PaymentChangeProcessor = new PaymentChangeProcessor(commander, ChangeQueue, InvoiceSearch, PaymentSearch, apiRequestLogger);
             _ = new RegistrationChangeProcessor(commander, ChangeQueue, OrganizationSearch, RegistrationSearch, PrometricApi);
@@ -682,13 +698,13 @@ namespace InSite
 
             MailgunServer = new MailgunServer(
                 AppSettings.Integration.Mailgun,
-                new MailgunServerSettings(Partition, AppSettings.Environment, AppSettings.Application)
+                new MailgunServerSettings(Partition, AppSettings)
             );
 
             EmailOutbox = new EmailOutbox(MailgunServer, AppSettings.Environment.Name, Partition, commander);
             FFmpeg = new FFmpeg(AppSettings.Application.FFmpegFolderPath);
-            CountrySearch = new CountrySearch(AppSettings.Engine.Api.Google.BaseUrl);
-            ProvinceSearch = new ProvinceSearch(AppSettings.Engine.Api.Google.BaseUrl, CountrySearch);
+            CountrySearch = new CountrySearch(AppSettings.Engine.Api.Google);
+            ProvinceSearch = new ProvinceSearch(AppSettings.Engine.Api.Google, CountrySearch);
 
             AlertMailer = new AlertMailer(AppSettings.Environment.Name, EmailOutbox, error);
 
@@ -701,6 +717,8 @@ namespace InSite
 
             HtmlBuilder.Initialize(AppSettings.Engine.Api.Premailer);
             ImageHelper.Initialize(AppSettings.Engine.Api.ImageMagick);
+
+            ProviewClient = new ProviewClient(StaticHttpClient.Client, AppSettings);
         }
 
         public static void BookmarkCommand(ICommand command, DateTimeOffset expired)

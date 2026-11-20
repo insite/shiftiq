@@ -10,6 +10,7 @@ using InSite.Application.Files.Read;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Records;
+using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 
 using Shift.Common;
@@ -43,8 +44,6 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
         private void OnAlert(AlertType type, string message) =>
             Alert?.Invoke(this, new AlertArgs(type, message));
 
-        private const string AchievementType = "Time-Sensitive Safety Certificate";
-
         public Guid NewCredentialId
         {
             get => (Guid?)ViewState[nameof(NewCredentialId)] ?? Guid.Empty;
@@ -64,9 +63,10 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             AchievementSelector.AutoPostBack = true;
             AchievementSelector.ValueChanged += AchievementSelector_ValueChanged;
 
-            AchievementSelector.Filter.AchievementType = AchievementType;
             AchievementSelector.Filter.OrganizationIdentifier = Organization.Identifier;
             AchievementSelector.Filter.AllowSelfDeclared = true;
+            AchievementSelector.Filter.IssuesCertificate = true;
+            AchievementSelector.Filter.ExcludePaidProgramAchievements = true;
 
             if (VCmdsAchievementSearch.CountForSelector(AchievementSelector.Filter, false) == 0)
                 Visible = false;
@@ -148,11 +148,11 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
             var achievementTitle = achievement.AchievementTitle;
 
-            var issuedText = TimeZones.FormatDateOnly(model.Issued, TimeZones.Mountain, null, "{0:dddd MMMM d, yyyy}");
+            var issuedText = TimeZones.FormatDateOnly(model.Issued, TimeZones.Ids.Mountain, null, "{0:dddd MMMM d, yyyy}");
 
             var expiry = model.Issued.AddMonths(model.Lifetime);
 
-            var expiryText = TimeZones.FormatDateOnly(expiry, TimeZones.Mountain, null, "{0:dddd MMMM d, yyyy}")
+            var expiryText = TimeZones.FormatDateOnly(expiry, TimeZones.Ids.Mountain, null, "{0:dddd MMMM d, yyyy}")
                 + " (valid for " + Shift.Common.Humanizer.ToQuantity(model.Lifetime, "month") + ")";
 
             ConfirmAchievement.Text = achievementTitle;
@@ -191,6 +191,14 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             if (!AchievementSelector.Value.HasValue)
             {
                 model.Errors.Add("Please select an achievement.");
+                return model;
+            }
+
+            // The selector hides paid-program achievements; this catches a stale page or a forged post.
+            var isPaidAchievement = PaidProgramAchievementSearch.IsPaidAchievement(AchievementSelector.Value.Value);
+            if (isPaidAchievement)
+            {
+                model.Errors.Add(PaidProgramAchievementSearch.AssignmentRefusedMessage);
                 return model;
             }
 
@@ -240,7 +248,15 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
             var model = ValidateInputs();
 
-            var utc = TimeZoneInfo.ConvertTime(model.Issued.Date, User.TimeZone, TimeZoneInfo.Utc);
+            // The Next step already validated, but a paid-program achievement is refused here too, so
+            // a replayed save cannot self-declare one.
+            if (model.Errors.Contains(PaidProgramAchievementSearch.AssignmentRefusedMessage))
+            {
+                OnAlert(AlertType.Error, PaidProgramAchievementSearch.AssignmentRefusedMessage);
+                return;
+            }
+
+            var utc = TimeZones.ConvertTime(model.Issued.Date, User.TimeZone, TimeZones.Ids.Utc);
 
             var description = $"Self-declared by {User.FirstName} on {DateTime.Today:MMM d, yyyy}.";
 

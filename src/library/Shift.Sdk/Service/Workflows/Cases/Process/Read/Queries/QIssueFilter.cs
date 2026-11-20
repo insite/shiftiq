@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Shift.Common;
 using Shift.Constant;
@@ -26,6 +26,7 @@ namespace InSite.Application.Issues.Read
         public Guid[] TopicUserIdentifiers { get; set; }
         public Guid? TopicUserConnectedFromUserIdentifier { get; set; }
         public Guid? TopicDepartmentIdentifier { get; set; }
+        public Guid? TopicDistrictIdentifier { get; set; }
         public Guid? ExcludeIssueIdentifier { get; set; }
         public int? IssueNumber { get; set; }
         public Guid[] AssigneeEmployer { get; set; }

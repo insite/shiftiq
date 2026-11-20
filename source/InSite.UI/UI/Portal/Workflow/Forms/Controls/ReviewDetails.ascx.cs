@@ -87,12 +87,12 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 }
             }
 
-            public LikertScaleItemInfo(SurveyScale scale, SurveyScaleItem scaleItem, decimal points, int count)
+            public LikertScaleItemInfo(SurveyScale scale, SurveyScaleItem scaleItem, decimal points, int count, string language)
             {
-                Category = scale.Category;
-                Grade = scaleItem.Grade;
+                Category = scale.GetCategory(language);
+                Grade = scaleItem.GetGrade(language);
                 Calculation = scaleItem.Calculation;
-                FeedbackHtml = FillPlaceholders(scaleItem.Content.Description.GetHtml());
+                FeedbackHtml = FillPlaceholders(scaleItem.Content.Description.GetHtml(language, true));
                 Points = points;
                 Count = count;
             }
@@ -393,7 +393,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             var answerInfo = new AnswerInfo
             {
                 Text = answer.ResponseAnswerText,
-                LikertScale = GetLikertScale(q, options, _state.Session.QResponseOptions, likertType)
+                LikertScale = GetLikertScale(q, options, _state.Session.QResponseOptions, likertType, _state.Language)
             };
 
             if (options.Length == 0)
@@ -447,7 +447,8 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             SurveyQuestion question,
             IEnumerable<QResponseOption> options,
             IEnumerable<QResponseOption> allOptions,
-            LikertAnalysisType likertType
+            LikertAnalysisType likertType,
+            string language
             )
         {
             if (question.Scales.IsEmpty())
@@ -456,15 +457,15 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
             switch (likertType)
             {
                 case LikertAnalysisType.Strategy1:
-                    return GetLikertScales_Strategy1(question, allOptions);
+                    return GetLikertScales_Strategy1(question, allOptions, language);
                 case LikertAnalysisType.Strategy2:
-                    return GetLikertScales_Strategy2(question, allOptions);
+                    return GetLikertScales_Strategy2(question, allOptions, language);
                 default:
-                    return GetLikertScales_Default(question, options);
+                    return GetLikertScales_Default(question, options, language);
             }
         }
 
-        private static LikertScaleInfo GetLikertScales_Default(SurveyQuestion question, IEnumerable<QResponseOption> options)
+        private static LikertScaleInfo GetLikertScales_Default(SurveyQuestion question, IEnumerable<QResponseOption> options, string language)
         {
             if (!options.Any())
                 return null;
@@ -494,13 +495,13 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
 
                 var scaleItem = scale.Items.FirstOrDefault(x => x.Minimum <= points && points <= x.Maximum);
                 if (scaleItem != null)
-                    result.Items.Add(new LikertScaleItemInfo(scale, scaleItem, points, count));
+                    result.Items.Add(new LikertScaleItemInfo(scale, scaleItem, points, count, language));
             }
 
             return result;
         }
 
-        private static LikertScaleInfo GetLikertScales_Strategy1(SurveyQuestion question, IEnumerable<QResponseOption> allOptions)
+        private static LikertScaleInfo GetLikertScales_Strategy1(SurveyQuestion question, IEnumerable<QResponseOption> allOptions, string language)
         {
             var result = new LikertScaleInfo();
 
@@ -549,14 +550,14 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 {
                     if (result.Items == null)
                         result.Items = new List<LikertScaleItemInfo>();
-                    result.Items.Add(new LikertScaleItemInfo(scale, scaleItem, points, count));
+                    result.Items.Add(new LikertScaleItemInfo(scale, scaleItem, points, count, language));
                 }
             }
 
             return result;
         }
 
-        private static LikertScaleInfo GetLikertScales_Strategy2(SurveyQuestion question, IEnumerable<QResponseOption> allOptions)
+        private static LikertScaleInfo GetLikertScales_Strategy2(SurveyQuestion question, IEnumerable<QResponseOption> allOptions, string language)
         {
             var result = new LikertScaleInfo();
 
@@ -605,7 +606,7 @@ namespace InSite.UI.Portal.Workflow.Forms.Controls
                 var scaleItem = scale.Items.FirstOrDefault(x => x.Minimum <= points && points <= x.Maximum);
                 if (scaleItem != null)
                 {
-                    result.Items.Add(new LikertScaleItemInfo(scale, scaleItem, points, count));
+                    result.Items.Add(new LikertScaleItemInfo(scale, scaleItem, points, count, language));
 
                     ok = true;
                 }

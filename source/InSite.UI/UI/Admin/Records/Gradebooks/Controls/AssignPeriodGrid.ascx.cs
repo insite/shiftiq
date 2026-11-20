@@ -5,6 +5,7 @@ using System.ComponentModel;
 using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
 
+using Shift.Common;
 using Shift.Common.Linq;
 
 namespace InSite.Admin.Records.Gradebooks.Controls
@@ -65,7 +66,7 @@ namespace InSite.Admin.Records.Gradebooks.Controls
                 return string.Empty;
 
             var when = (DateTimeOffset?)item;
-            var converted = TimeZoneInfo.ConvertTime(when.Value, User.TimeZone);
+            var converted = TimeZones.ConvertTime(when.Value, User.TimeZone);
 
             return $"{converted:MMM d, yyyy}";
         }

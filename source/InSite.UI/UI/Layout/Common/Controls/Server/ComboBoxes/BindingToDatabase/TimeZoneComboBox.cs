@@ -10,8 +10,8 @@ namespace InSite.Common.Web.UI
         {
             var list = new ListItemArray();
 
-            foreach (var item in TimeZones.Supported)
-                list.Add(item.Id);
+            foreach (var timeZoneId in TimeZones.Supported)
+                list.Add(new ListItem { Value = timeZoneId, Text = TimeZones.GetAbbreviation(timeZoneId).DisplayNameWithoutOffset });
 
             return list;
         }

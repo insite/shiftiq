@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using InSite.Application.Records.Read;
@@ -6,8 +6,6 @@ using InSite.Application.Records.Read;
 using Shift.Common;
 using Shift.Constant;
 using Shift.Toolbox;
-
-using TimeZone = Shift.Common.TimeZone;
 
 namespace InSite.Admin.Achievements.Credentials.Reports
 {
@@ -42,8 +40,8 @@ namespace InSite.Admin.Achievements.Credentials.Reports
                     StudentName= x.UserFullName,
                     AchievementName = x.AchievementTitle,
                     CredentialStatus = x.CredentialStatus,
-                    Granted = x.CredentialGranted.HasValue ? TimeZone.ConvertTime(x.CredentialGranted.Value.UtcDateTime, TimeZones.Utc, user.TimeZone) : (DateTime?)null,
-                    Expired = x.CredentialExpirationExpected.HasValue ? TimeZone.ConvertTime(x.CredentialExpirationExpected.Value.UtcDateTime, TimeZones.Utc, user.TimeZone) : (DateTime?)null,
+                    Granted = x.CredentialGranted.HasValue ? TimeZones.ConvertTime(x.CredentialGranted.Value.UtcDateTime, TimeZones.Ids.Utc, user.TimeZone) : (DateTime?)null,
+                    Expired = x.CredentialExpirationExpected.HasValue ? TimeZones.ConvertTime(x.CredentialExpirationExpected.Value.UtcDateTime, TimeZones.Ids.Utc, user.TimeZone) : (DateTime?)null,
                     AchievementDescription = x.AchievementDescription
                 })
                 .ToList();

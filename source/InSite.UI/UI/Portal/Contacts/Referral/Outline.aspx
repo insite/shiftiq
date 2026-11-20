@@ -19,6 +19,8 @@
                         <dd><%= Model.FullName %></dd>
                         <dt>Email</dt>
                         <dd><%= Model.Email %></dd>
+                        <dt>Birthdate</dt>
+                        <dd><%= Model.Birthdate %></dd>
                     </dl>
                 </div>
                 <div class="col-lg-3">
@@ -33,6 +35,8 @@
                     <dl>
                         <dt>Occupation</dt>
                         <dd><%= Model.OccupationTitle %></dd>
+                        <dt><insite:ContentTextLiteral runat="server" ContentLabel="Preferred Language"/></dt>
+                        <dd><%= Model.PreferredLanguage %></dd>
                     </dl>
                 </div>
                 <div runat="server" id="CaseColumn" class="col-lg-3">

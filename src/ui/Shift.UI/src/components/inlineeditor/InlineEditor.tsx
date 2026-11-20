@@ -122,6 +122,8 @@ export default function InlineEditor(props: Props) {
                             isSaving={isSaving}
                             items={props.items}
                             onChange={setEditorValue}
+                            onSave={handleSave}
+                            onCancel={cancelEditor}
                         />
                     ) : type === "TextArea" ? (
                         <InlineEditor_TextArea

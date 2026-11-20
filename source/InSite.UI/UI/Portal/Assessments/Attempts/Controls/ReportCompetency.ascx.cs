@@ -36,7 +36,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
             public string LogoImageUrl { get; set; }
             public string CurrentUrl { get; set; }
             public string Language { get; set; }
-            public TimeZoneInfo TimeZone { get; set; }
+            public string TimeZone { get; set; }
         }
 
         private class FieldInfo
@@ -150,7 +150,7 @@ namespace InSite.UI.Portal.Assessments.Attempts.Controls
             {
                 GetField("[Attempts.ReportCompetency].[UserName]", _data.Learner?.UserFullName ?? "N/A"),
                 GetField("[Attempts.ReportCompetency].[PersonCode]", _data.Learner?.PersonCode),
-                GetField("[Attempts.ReportCompetency].[AttemptDate]", _data.Attempt.AttemptSubmitted.FormatDateOnly(_data.TimeZone, culture: _culture)),
+                GetField("[Attempts.ReportCompetency].[AttemptDate]", _data.Attempt.AttemptSubmitted?.FormatDateOnly(_data.TimeZone, culture: _culture)),
                 GetField("[Attempts.ReportCompetency].[FrameworkName]", framework?.FrameworkTitleLang.IfNullOrEmpty(framework.FrameworkTitleEn) ?? "N/A"),
                 GetField("[Attempts.ReportCompetency].[AttemptLanguage]", attemptLangName),
             };

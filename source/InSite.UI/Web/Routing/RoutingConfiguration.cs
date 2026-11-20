@@ -62,12 +62,17 @@ namespace InSite.Web.Routing
             Register("LTI", "lti/{*path}", "~/UI/Lobby/LaunchLti.aspx");
             Register($"Portal/Course", "ui/portal/learning/course/{course}", $"~/UI/Portal/Learning/Course.aspx");
             Register($"Portal/Course/Scorm", "ui/portal/integrations/scorm/launch/{activity}", $"~/UI/Portal/integrations/scorm/launch.aspx");
-            Register($"Lobby/Scorm/Exit", "ui/lobby/scorm/{activity}/{registration}/exit", $"~/UI/Lobby/ScormExit.aspx");
             Register("Portal/Catalogue (Legacy Redirect)", "ui/portal/learning/catalog", "~/UI/Portal/Learning/CatalogRedirect.aspx");
         }
 
         private static void RegisterPrograms()
         {
+            // The pre-enrollment page is deliberately absent here, and takes its program identifier on the
+            // query string instead. A route registered with a parameter token carries that token in its
+            // pattern, and LobbyBasePage.InitializeRouting matches the pattern against
+            // settings.TAction.ActionUrl to find the row that carries the page's permission. A token route
+            // never matches, so its permission check is silently skipped. RegisterActions below registers
+            // the page from its own action row, where the two strings agree.
             Register($"Portal/Learning/Program", "ui/portal/learning/program/{slug}", $"~/UI/Portal/Learning/Program.aspx");
             Register($"Portal/Learning/Program/Task", "ui/portal/records/program/{slug}/task/{task}/", $"~/UI/Portal/Learning/Task.aspx");
         }

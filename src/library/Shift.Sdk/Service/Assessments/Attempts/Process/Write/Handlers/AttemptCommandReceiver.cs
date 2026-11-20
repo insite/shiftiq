@@ -41,6 +41,7 @@ namespace InSite.Application.Attempts.Write
             commander.Subscribe<StartAttempt>(Handle);
             commander.Subscribe<StartComposedQuestionAttempt>(Handle);
             commander.Subscribe<TagAttempt>(Handle);
+            commander.Subscribe<ModifyAIProctoringSessionId>(Handle);
             commander.Subscribe<VoidAttempt>(Handle);
             commander.Subscribe<VoidQuestion>(Handle);
             commander.Subscribe<RegradeQuestion>(Handle);
@@ -251,6 +252,15 @@ namespace InSite.Application.Attempts.Write
             _repository.LockAndRun<AttemptAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 aggregate.TagAttempt(c.Tag);
+                Commit(aggregate, c);
+            });
+        }
+
+        public void Handle(ModifyAIProctoringSessionId c)
+        {
+            _repository.LockAndRun<AttemptAggregate>(c.AggregateIdentifier, aggregate =>
+            {
+                aggregate.ModifyAIProctoringSessionId(c.SessionId);
                 Commit(aggregate, c);
             });
         }

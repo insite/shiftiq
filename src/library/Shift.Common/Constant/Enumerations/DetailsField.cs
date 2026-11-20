@@ -15,6 +15,7 @@
         Feedback,
         Rationale,
         Simulate,
+        AIProctoring,
         SafeExamBrowser,
         KioskMode,
         ScheduleOpenDate,

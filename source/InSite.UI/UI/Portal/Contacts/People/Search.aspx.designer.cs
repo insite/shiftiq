@@ -24,13 +24,13 @@ namespace InSite.UI.Portal.Contacts.People
         protected global::InSite.UI.Portal.Home.Management.Controls.DashboardNavigation DashboardNavigation;
 
         /// <summary>
-        /// StatusAlert control.
+        /// ScreenStatus control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::InSite.Common.Web.UI.Alert StatusAlert;
+        protected global::InSite.Common.Web.UI.Alert ScreenStatus;
 
         /// <summary>
         /// SearchResultsTab control.
@@ -67,5 +67,23 @@ namespace InSite.UI.Portal.Contacts.People
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.UI.Portal.Contacts.People.Controls.SearchCriteria SearchCriteria;
+
+        /// <summary>
+        /// DownloadsTab control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NavItem DownloadsTab;
+
+        /// <summary>
+        /// SearchDownload control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.UI.Layout.Common.Controls.SearchDownload SearchDownload;
     }
 }

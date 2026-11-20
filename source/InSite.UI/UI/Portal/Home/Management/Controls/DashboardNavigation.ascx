@@ -12,7 +12,7 @@
         My Contacts
     </a>
 
-    <a runat="server" id="A1" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/billing/invoices">
+    <a runat="server" id="MyInvoices" class="d-flex align-items-center list-group-item list-group-item-action" href="/ui/portal/billing/invoices">
         <i class="fas fa-file-invoice-dollar fs-lg me-2"></i>
         My Invoices
     </a>

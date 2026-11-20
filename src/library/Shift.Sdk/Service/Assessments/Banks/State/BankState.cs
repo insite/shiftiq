@@ -2065,6 +2065,14 @@ namespace InSite.Domain.Banks
             return form != null && form.Specification.Identifier == specId ? form : null;
         }
 
+        public List<Form> GetAllForms()
+        {
+            return _formIndex
+                .Values
+                .OrderBy(x => x.Asset)
+                .ToList();
+        }
+
         public Option FindOption(Guid question, int number)
         {
             if (!_optionIndex.TryGetValue(number, out var result))

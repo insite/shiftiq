@@ -11,6 +11,11 @@ import { useStatusProvider } from "@/contexts/status/StatusProviderContext";
 import { ApiImportPendingPerson } from "@/api/controllers/pending-people/ApiImportPendingPerson";
 import { AlertType } from "@/components/Alert";
 import { ApiImportResult } from "@/api/controllers/pending-people/ApiImportResult";
+import { DateTimeParts } from "@/helpers/date/dateTimeTypes";
+import { dateTimeHelper } from "@/helpers/date/dateTimeHelper";
+import { TimeZoneId } from "@/helpers/date/timeZones";
+import { useSiteProvider } from "@/contexts/site/SiteProviderContext";
+import DateTimeField from "@/components/DateTimeField";
 
 interface Row {
     pendingPersonId: string;
@@ -19,6 +24,7 @@ interface Row {
     firstName: string;
     lastName: string;
     employeeStatus: string;
+    submittedAt: DateTimeParts;
     matchCount: number;
 }
 
@@ -43,6 +49,8 @@ export default function PendingPeopleGrid({ onCountUpdated, onImported }: Props)
     const [pendingPersonIds, setPendingPesonIds] = useState<string[]>([]);
     const [selected, setSelected] = useState<Selected | null>(null);
     const [isImporting, setIsImporting] = useState(false);
+
+    const { siteSetting: { TimeZoneId: timeZoneId } } = useSiteProvider();
 
     const { addError, removeError, addStatus, removeStatus } = useStatusProvider();
 
@@ -69,7 +77,7 @@ export default function PendingPeopleGrid({ onCountUpdated, onImported }: Props)
     const gridRef = useRef<SearchGridFunctions>(null);
 
     async function handleLoad(pageIndex: number) {
-        const queryResult = await load(pageIndex);
+        const queryResult = await load(pageIndex, timeZoneId);
         setPendingPesonIds(queryResult.rows.map(x => x.pendingPersonId));
         onCountUpdated(queryResult.totalRowCount);
         return queryResult;
@@ -211,6 +219,11 @@ export default function PendingPeopleGrid({ onCountUpdated, onImported }: Props)
                         title: translate("Status"),
                         item: row => row.employeeStatus,
                     },
+                    {
+                        key: "submittedAt",
+                        title: translate("Import Date/Time"),
+                        item: row => <DateTimeField dateTime={row.submittedAt} />,
+                    },
                 ]}
                 onLoad={handleLoad}
             />
@@ -237,7 +250,7 @@ export default function PendingPeopleGrid({ onCountUpdated, onImported }: Props)
     );
 }
 
-async function load(pageIndex: number): Promise<QueryResult<Row>> {
+async function load(pageIndex: number, timeZoneId: TimeZoneId): Promise<QueryResult<Row>> {
     const result = await shiftClient.pendingPeople.search(pageIndex);
 
     return mapQueryResult(result, row => ({
@@ -248,6 +261,7 @@ async function load(pageIndex: number): Promise<QueryResult<Row>> {
         lastName: row.UserLastName,
         employeeStatus: row.EmployeeStatus,
         matchCount: row.MatchCount,
+        submittedAt: dateTimeHelper.parseServerDateTime(row.SubmittedAt, timeZoneId)!,
     }));
 }
 

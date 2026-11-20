@@ -33,6 +33,18 @@
                             </div>
                         </div>
 
+                        <div class="form-group mb-3">
+                            <label class="form-label">
+                                Description
+                            </label>
+                            <div>
+                                <insite:MarkdownEditor runat="server" ID="CatalogDescription" />
+                            </div>
+                            <div class="form-text">
+                                Shown to learners in the catalogue sidebar when they filter by this catalogue
+                            </div>
+                        </div>
+
                     </div>
                     <div class="col-lg-4">
 

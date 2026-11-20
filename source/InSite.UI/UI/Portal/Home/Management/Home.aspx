@@ -147,10 +147,12 @@
                     </ContentTemplate>
                 </insite:UpdatePanel>
                 <div class="ms-3">
-                    <div class="fw-bold">SkillsChecks</div>
+                    <div class="fw-bold">
+                        <asp:Literal runat="server" ID="SkillsCheckLiteral" Text="SkillsChecks" />
+                    </div>
                     <div class="small mb-3">to be assigned</div>
 
-                    <insite:UpdatePanel runat="server">
+                    <insite:UpdatePanel runat="server" ID="ProductFilterPanel">
                         <ContentTemplate>
                             <insite:ComboBox runat="server" ID="ProductFilter" ButtonSize="Small" Width="150px" EmptyMessage="All SkillsChecks" />
                         </ContentTemplate>

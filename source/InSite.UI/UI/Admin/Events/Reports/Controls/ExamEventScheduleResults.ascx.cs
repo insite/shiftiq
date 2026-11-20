@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -63,7 +63,7 @@ namespace InSite.Admin.Events.Reports.Controls
                 return (new ExportDataItem[0]).ToSearchResult();
 
             var data = VExamEventScheduleSearch.SelectByFilter(filter);
-            
+
             var accommodationSummaries = VExamEventScheduleSearch.SelectAccommodationSummaries(filter);
             var accommodationSummaryMap = accommodationSummaries
                 .GroupBy(x => x.EventIdentifier)
@@ -99,7 +99,7 @@ namespace InSite.Admin.Events.Reports.Controls
 
         protected string GetAccommodationsHtml(Guid @event)
         {
-            var registrations = ServiceLocator.RegistrationSearch.GetRegistrationsByEvent(@event, null, null, null, true);
+            var registrations = ServiceLocator.RegistrationSearch.GetRegistrationsByEvent(@event, includeAccommodations: true);
             var accommodations = registrations.SelectMany(x => x.Accommodations)
                 .GroupBy(x => x.AccommodationType)
                 .OrderBy(x => x.Key)
@@ -115,7 +115,7 @@ namespace InSite.Admin.Events.Reports.Controls
                     var accommodation = accommodations[i];
                     html.Append($"<div>{accommodation.Key}: {accommodation.Count()}</div>");
                 }
-            
+
             return html.ToString();
         }
     }

@@ -46,6 +46,7 @@ namespace InSite.Admin.Records.Programs
 
             CatalogIdentifier.ValueAsGuid = program.CatalogIdentifier;
             CatalogSequence.ValueAsInt = program.CatalogSequence;
+            ProgramIsHidden.Checked = program.IsHidden;
 
             ProgramCategoryList.SetProgram(program.ProgramIdentifier);
 
@@ -70,6 +71,8 @@ namespace InSite.Admin.Records.Programs
 
             if (program.CatalogSequence != CatalogSequence.ValueAsInt)
                 program.CatalogSequence = CatalogSequence.ValueAsInt;
+
+            program.IsHidden = ProgramIsHidden.Checked;
 
             ProgramStore.Update(program, User.Identifier);
 

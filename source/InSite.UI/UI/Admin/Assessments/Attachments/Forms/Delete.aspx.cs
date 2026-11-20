@@ -68,7 +68,7 @@ namespace InSite.Admin.Assessments.Attachments.Forms
                 var author = UserSearch.Bind(attachment.Author, x => new { x.FullName });
                 var authorName = author == null ? "(Unknown)" : author.FullName;
 
-                Timestamp.Text = $"Posted by {authorName} on {attachment.Uploaded.Format(User.TimeZone)}";
+                Timestamp.Text = $"Posted by {authorName} on {TimeZones.Format(attachment.Uploaded, User.TimeZone)}";
                 AttachmentType = attachment.Type;
 
                 var fileInfo = ReadFileInfo(attachment.FileIdentifier, attachment.Upload);

@@ -33,6 +33,12 @@ namespace InSite.Persistence.Content
 
         public Flag Flag { get; set; }
 
+        /// <summary>
+        /// True when the flag is a fee. A fee is content, not decoration: on a card with no image
+        /// there is nothing for a floating badge to sit over, so the fee renders in the card body.
+        /// </summary>
+        public bool FlagIsFee { get; set; }
+
         public Flag Progress { get; set; }
 
         public bool HasFlag() => !string.IsNullOrEmpty(Flag?.Color) && !string.IsNullOrEmpty(Flag?.Text);
@@ -43,7 +49,7 @@ namespace InSite.Persistence.Content
 
         public bool HasProgress() => !string.IsNullOrEmpty(Progress?.Text);
 
-        public string GetFlagHtml()
+        public string GetFlagHtml(bool floating = true)
         {
             if (!HasFlag())
                 return string.Empty;
@@ -51,8 +57,9 @@ namespace InSite.Persistence.Content
             var color = Flag.Color.ToLower();
             var text = Flag.Text;
             var icon = Icon.IsNotEmpty() ? $"<i class='{Icon} me-2'></i>" : string.Empty;
+            var position = floating ? " badge-floating" : string.Empty;
 
-            return $"<span class='badge badge-floating badge-pill bg-{color}'>{icon}{text}</span>";
+            return $"<span class='badge{position} badge-pill bg-{color}'>{icon}{text}</span>";
         }
 
         public string GetIconHtml()

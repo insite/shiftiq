@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
@@ -185,7 +186,29 @@ namespace InSite.Admin.Assessments.Attempts.Forms
 
             ServiceLocator.SendCommand(new SubmitAttempt(attemptId, HttpContext.Current.Request.UserAgent, !hasComposedQuestions));
 
+            CompleteAIProctoring(attempt);
+
             return true;
+        }
+
+        private static void CompleteAIProctoring(QAttempt attempt)
+        {
+            if (!Enum.TryParse<AIProctoringProvider>(attempt.AIProctoringProvider, out var provider)
+                || provider != AIProctoringProvider.Proview
+                || string.IsNullOrEmpty(attempt.AIProctoringSessionId)
+                )
+            {
+                return;
+            }
+
+            try
+            {
+                TaskRunner.RunSync(() => ServiceLocator.ProviewClient.CompleteSessionAsync(attempt.AIProctoringSessionId));
+            }
+            catch (Exception ex)
+            {
+                AppSentry.SentryError(ex);
+            }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -397,6 +420,19 @@ namespace InSite.Admin.Assessments.Attempts.Forms
 
             AttemptGraded = attempt.AttemptGraded;
             IsAttemptImported = attempt.AttemptImported.HasValue;
+
+            var aiProctoringProvider = Enum.TryParse<AIProctoringProvider>(attempt.AIProctoringProvider, out var aiProctoringProviderTemp)
+                ? aiProctoringProviderTemp
+                : (AIProctoringProvider?)null;
+
+            AIProctoringStateField.Visible = aiProctoringProvider == AIProctoringProvider.Proview && Organization.Toolkits.Assessments.AIProctoringEnabled;
+            AIProctoringSessionIdField.Visible = aiProctoringProvider == AIProctoringProvider.Proview && Organization.Toolkits.Assessments.AIProctoringEnabled;
+
+            AIProctoringProviderName.Text = aiProctoringProvider?.GetName();
+
+            AIProctoringSessionId.Text = !string.IsNullOrEmpty(attempt.AIProctoringSessionId)
+                ? $"<a href='/client/admin/assessments/attempts/proctoring-status/{attempt.AttemptIdentifier}'>{attempt.AIProctoringSessionId}</a>"
+                : "N/A";
 
             AttemptStartedOutput.Text = attempt.AttemptStarted.Format(User.TimeZone, nullValue: "N/A");
             AttemptSubmittedOutput.Text = attempt.AttemptSubmitted.Format(User.TimeZone, nullValue: "N/A");

@@ -26,6 +26,14 @@ namespace InSite.Domain.Surveys.Forms
         /// </summary>
         public List<SurveyScaleItem> Items { get; set; }
 
+        /// <summary>
+        /// The multilingual Text and/or HTML content for this survey scale.
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public ContentContainer Content { get; set; }
+
+        public const string CategoryLabel = "Category";
+
         public SurveyScale Clone()
         {
             var json = JsonConvert.SerializeObject(this);
@@ -36,11 +44,27 @@ namespace InSite.Domain.Surveys.Forms
         public SurveyScale()
         {
             Items = new List<SurveyScaleItem>();
+            Content = new ContentContainer();
         }
+
+        public bool ShouldSerializeContent() => Content?.IsEmpty == false;
 
         public void Sort()
         {
             Items.Sort(new SurveyScaleItemComparer());
+        }
+
+        public string GetCategory(string language)
+        {
+            return Content[CategoryLabel].GetText(language).IfNullOrEmpty(Category);
+        }
+
+        public void SyncDefaultContent()
+        {
+            Content[CategoryLabel].Text.Default = Category;
+
+            foreach (var item in Items)
+                item.SyncDefaultContent();
         }
     }
 
@@ -102,12 +126,21 @@ namespace InSite.Domain.Surveys.Forms
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ContentContainer Content { get; set; }
 
-        [JsonIgnore]
-        public static string[] ContentLabels => new[] { "Description" };
+        public const string GradeLabel = "Grade";
 
         public SurveyScaleItem()
         {
             Content = new ContentContainer();
+        }
+
+        public string GetGrade(string language)
+        {
+            return Content[GradeLabel].GetText(language).IfNullOrEmpty(Grade);
+        }
+
+        public void SyncDefaultContent()
+        {
+            Content[GradeLabel].Text.Default = Grade;
         }
     }
 }

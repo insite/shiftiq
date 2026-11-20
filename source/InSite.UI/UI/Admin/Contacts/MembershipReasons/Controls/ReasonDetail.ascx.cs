@@ -47,7 +47,7 @@ namespace InSite.UI.Admin.Contacts.MembershipReasons.Controls
 
             ReasonSubtype.Value = null;
             PersonOccupation.Text = null;
-            ReasonEffectiveDate.Value = TimeZoneInfo.ConvertTime(DateTimeOffset.Now, User.TimeZone);
+            ReasonEffectiveDate.Value = TimeZones.ConvertTime(DateTimeOffset.Now, User.TimeZone);
             ReasonExpiryDate.Value = null;
         }
 

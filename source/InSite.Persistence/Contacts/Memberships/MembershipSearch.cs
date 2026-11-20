@@ -173,15 +173,38 @@ namespace InSite.Persistence
         }
 
         public static Membership Select(Guid group, Guid user, params Expression<Func<Membership, object>>[] includes)
+            => Select(group, user, null, includes);
+
+        /// <remarks>
+        /// A user can hold one membership in a partition-wide group per organization (TEC-854), so
+        /// group and user alone do not always identify a single membership. When there is more than
+        /// one, the organization picks the membership; when the organization matches none of them,
+        /// there is nothing safe to return.
+        /// </remarks>
+        public static Membership Select(Guid group, Guid user, Guid? organization, params Expression<Func<Membership, object>>[] includes)
         {
+            List<Membership> memberships;
+
             using (var db = new InternalDbContext())
             {
-                var query = db.Memberships
+                memberships = db.Memberships
                     .Where(x => x.GroupIdentifier == group && x.UserIdentifier == user)
-                    .ApplyIncludes(includes);
-
-                return query.SingleOrDefault();
+                    .ApplyIncludes(includes)
+                    .ToList();
             }
+
+            if (memberships.Count <= 1)
+                return memberships.FirstOrDefault();
+
+            var match = memberships.SingleOrDefault(x => x.OrganizationIdentifier == organization);
+            if (match != null)
+                return match;
+
+            ServiceLocator.Logger?.Warning(
+                "User {User} has {Count} memberships in group {Group} and none belongs to organization {Organization}, so no membership is selected.",
+                user, memberships.Count, group, organization);
+
+            return null;
         }
 
         public static string[] SelectEmploymentTypes(Guid organizationId, bool excludeAdministration = true)

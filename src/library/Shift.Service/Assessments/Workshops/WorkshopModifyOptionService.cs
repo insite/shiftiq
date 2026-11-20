@@ -4,17 +4,16 @@ using InSite.Application.Banks.Write;
 using InSite.Domain.Banks;
 
 using Shift.Common;
-using Shift.Common.Timeline.Commands;
 
 using Shift.Contract;
 using Shift.Sdk.Service;
 
 namespace Shift.Service.Evaluation.Workshops;
 
-public class WorkshopModifyOptionService(ICommanderAsync commander)
+public class WorkshopModifyOptionService(ITimelineQuery timelineQuery, ICommanderAsync commander)
     : IWorkshopModifyOptionService
 {
-    public async Task<string?> ModifyAsync(BankState bank, Guid bankId, Guid questionId, int optionNumber, WorkshopQuestionOptionField field, int? columnIndex, string value)
+    public async Task<WorkshopModifyOptionResult> ModifyAsync(BankState bank, Guid bankId, Guid questionId, int optionNumber, WorkshopQuestionOptionField field, int? columnIndex, string value)
     {
         var question = bank.FindQuestion(questionId);
         if (question == null)
@@ -24,45 +23,47 @@ public class WorkshopModifyOptionService(ICommanderAsync commander)
         if (option == null)
             throw ApplicationError.Create("Option not found: {0}", optionNumber);
 
-        string? result = null;
-        ICommand command;
+        string? html = null;
+        int? questionPoints = null;
 
         switch (field)
         {
             case WorkshopQuestionOptionField.Title:
-                (command, result) = ModifyOptionTitle(bankId, option, value);
+                html = await ModifyOptionTitleAsync(bankId, option, value);
                 break;
             case WorkshopQuestionOptionField.ColumnTitle:
-                (command, result) = ModifyColumnTitle(bankId, option, columnIndex, value);
+                html = await ModifyColumnTitleAsync(bankId, option, columnIndex, value);
                 break;
             case WorkshopQuestionOptionField.Points:
-                command = ModifyOptionPoints(bankId, option, value);
+                questionPoints = await ModifyOptionPointsAsync(bankId, option, value);
                 break;               
             default:
                 throw new ArgumentException($"Unsupported field: {field}");
         }
 
-        await commander.SendCommandsAsync([command]);
-
-        return result;
+        return new WorkshopModifyOptionResult
+        {
+            Html = html,
+            QuestionPoints = questionPoints
+        };
     }
 
-    private static (ChangeOption, string?) ModifyOptionTitle(Guid bankId, Option option, string value)
+    private async Task<string?> ModifyOptionTitleAsync(Guid bankId, Option option, string value)
     {
         var content = option.Content != null ? option.Content.Clone() : new ContentTitle();
 
-        if (content.Title == null)
-            content.Title = new MultilingualString();
-
+        content.Title ??= new MultilingualString();
         content.Title.Default = value;
 
         var command = new ChangeOption(bankId, option.Question.Identifier, option.Number, content, option.Points, option.IsTrue, option.CutScore, option.Standard);
         var titleHtml = Markdown.ToHtml(value);
 
-        return (command, titleHtml);
+        await commander.SendCommandsAsync([command]);
+
+        return titleHtml;
     }
 
-    private static (ChangeOption, string?) ModifyColumnTitle(Guid bankId, Option option, int? columnIndex, string value)
+    private async Task<string?> ModifyColumnTitleAsync(Guid bankId, Option option, int? columnIndex, string value)
     {
         if (columnIndex == null)
             throw new ArgumentException($"Invalid columnIndex: {columnIndex}");
@@ -74,12 +75,14 @@ public class WorkshopModifyOptionService(ICommanderAsync commander)
         var command = new ChangeOption(bankId, option.Question.Identifier, option.Number, optionContentTable, option.Points, option.IsTrue, option.CutScore, option.Standard);
         var titleHtml = Markdown.ToHtml(value);
 
-        return (command, titleHtml);
+        await commander.SendCommandsAsync([command]);
+
+        return titleHtml;
     }
 
     private static string CreateOptionTitle(Question question, Option option, int columnIndex, string newValue)
     {
-        var optionTitleTable = BankQuestionTable.Build(question.Layout.Columns, new[] { option.Content.Title.Default });
+        var optionTitleTable = BankQuestionTable.Build(question.Layout.Columns, [option.Content.Title.Default]);
         var cells = optionTitleTable.GetBody()[0];
         var result = new StringBuilder();
         var currentColumnIndex = 0;
@@ -100,14 +103,23 @@ public class WorkshopModifyOptionService(ICommanderAsync commander)
         return result.ToString();
     }
 
-    private static ChangeOption ModifyOptionPoints(Guid bankId, Option option, string value)
+    private async Task<int> ModifyOptionPointsAsync(Guid bankId, Option option, string value)
     {
         if (!decimal.TryParse(value, out var points))
             throw new ArgumentException($"Invalid points value: {value}");
 
         points /= 10000m;
 
-        return new ChangeOption(bankId, option.Question.Identifier, option.Number, option.Content.Clone(), points, option.IsTrue, option.CutScore, option.Standard);
+        var command = new ChangeOption(bankId, option.Question.Identifier, option.Number, option.Content.Clone(), points, option.IsTrue, option.CutScore, option.Standard);
+
+        await commander.SendCommandsAsync([command]);
+
+        var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
+
+        var question = bank.FindQuestion(option.Question.Identifier)
+            ?? throw new ArgumentOutOfRangeException($"Question is not found: {option.Question.Identifier}");
+
+        return question.Points.HasValue ? (int)(question.Points.Value * 10000m) : 0;
     }
 
     private static string? ValidateMaxLength(string value, int maxLength)

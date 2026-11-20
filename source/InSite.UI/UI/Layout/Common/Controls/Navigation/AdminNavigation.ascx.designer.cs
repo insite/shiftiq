@@ -24,6 +24,15 @@ namespace InSite.UI.Layout.Admin
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl HomeContainer3;
 
         /// <summary>
+        /// AdminNavigationSearch control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.UI.Layout.Common.Controls.Navigation.AdminNavigationSearch AdminNavigationSearch;
+
+        /// <summary>
         /// RecentMenu control.
         /// </summary>
         /// <remarks>

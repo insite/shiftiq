@@ -13,7 +13,5 @@ namespace InSite.Persistence
         public string VerbDisplay { get; set; }
 
         public DateTimeOffset? StatementTimestamp { get; set; }
-
-        public virtual TScormRegistration Registration { get; set; }
     }
 }

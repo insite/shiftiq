@@ -1,6 +1,6 @@
 import { _dateTimeParser } from "./_dateTimeParser";
 import { DateParts, DateFormatType, months, TimeParts, DateTimeParts, isDateTimeInvalid, DateTime, weekDays } from "./dateTimeTypes";
-import { TimeZoneId, timeZones } from "./timeZones";
+import { TimeZoneId, getTimeZones } from "./timeZones";
 
 const _dateFormatters = {
     "mm/dd/yyyy": (date: DateParts) => {
@@ -29,13 +29,17 @@ const _timeFormatters = {
         }
 
         const { hour, minute, timeZoneId } = time;
+        const timeZoneInfo = getTimeZones().find(x => x.timeZoneId === timeZoneId);
 
         const formatter = new Intl.DateTimeFormat("en-CA", {
             timeZone: timeZoneId!,
             timeZoneName: "short",
         });
         const parts = formatter.formatToParts(new Date(date.year!, date.month! - 1, date.day!, hour!, minute!));
-        const timeZonePart = parts.find(x => x.type === 'timeZoneName')?.value ?? "Unknown";
+        
+        const timeZonePart = timeZoneInfo && !timeZoneInfo.isIANACompatible
+            ? timeZoneInfo.abbrev
+            : parts.find(x => x.type === 'timeZoneName')?.value ?? "Unknown";
 
         const hourAdj = hour! > 12
             ? hour! - 12
@@ -69,7 +73,7 @@ function isValidDate({ day, month, year }: DateParts) {
 function isValidTime({ hour, minute, timeZoneId }: TimeParts) {
     return hour !== null && hour >= 0 && hour <= 23
         && minute !== null && minute >= 0 && minute <= 59
-        && timeZones.find(x => x.timeZoneId === timeZoneId);
+        && getTimeZones().find(x => x.timeZoneId === timeZoneId);
 }
 
 function padZero(n: number | null) {
@@ -188,7 +192,7 @@ function toDate(dateTime: DateTimeParts | undefined | null): Date | null {
     assertValidDate(dateTime.date);
 
     const timeZoneId = dateTime.time.timeZoneId;
-    if (!timeZoneId || !timeZones.find(x => x.timeZoneId === timeZoneId)) {
+    if (!timeZoneId || !getTimeZones().find(x => x.timeZoneId === timeZoneId)) {
         throw new Error(`Invalid time zone: ${timeZoneId}`);
     }
 

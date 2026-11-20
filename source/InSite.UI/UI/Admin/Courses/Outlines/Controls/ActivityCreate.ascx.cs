@@ -291,7 +291,6 @@ namespace InSite.Admin.Courses.Outlines.Controls
                 else if (LinkType.Value == "SCORM")
                 {
                     activity.ActivityUrlType = "SCORM";
-                    activity.ActivityMode = "Preview";
                     activity.ActivityUrl = $"/ui/portal/integrations/scorm/launch/{activity.ActivityIdentifier}";
                     activity.ActivityPlatform = ActivityPlatform.Value;
 

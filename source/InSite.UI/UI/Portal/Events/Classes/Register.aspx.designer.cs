@@ -1581,13 +1581,49 @@ namespace InSite.UI.Portal.Events.Classes
         protected global::System.Web.UI.WebControls.Literal ConfirmSeatName;
 
         /// <summary>
+        /// SeatPriceItem control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SeatPriceItem;
+
+        /// <summary>
+        /// SeatPriceLiteral control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SeatPriceLiteral;
+
+        /// <summary>
+        /// SeatTaxItem control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SeatTaxItem;
+
+        /// <summary>
+        /// SeatTaxLiteral control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl SeatTaxLiteral;
+
+        /// <summary>
         /// PaymentAmountLiteral control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal PaymentAmountLiteral;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl PaymentAmountLiteral;
 
         /// <summary>
         /// ConfirmSeatAgreement control.

@@ -9,5 +9,11 @@ namespace Shift.Sdk.UI
     {
         public bool? Visible { get; set; }
         public ChartPosition Position { get; set; }
+
+        public DashboardChartLegend Clone() => new DashboardChartLegend
+        {
+            Visible = Visible,
+            Position = Position
+        };
     }
 }

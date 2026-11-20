@@ -110,6 +110,7 @@ namespace InSite.Persistence
         public string Phone { get; set; }
         public string Region { get; set; }
         public string IssueType { get; set; }
+        public string Language { get; set; }
 
         public Guid? ExcludeContainerIdentifier { get; set; }
 

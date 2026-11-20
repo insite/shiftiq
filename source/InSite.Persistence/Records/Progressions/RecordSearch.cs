@@ -482,6 +482,15 @@ namespace InSite.Persistence
             if (filter.LearnerFullName.IsNotEmpty())
                 query = query.Where(x => x.Learner.UserFullName.Contains(filter.LearnerFullName));
 
+            if (filter.CompletedCourseIdentifier.HasValue)
+            {
+                query = query
+                    .Where(x => db.QCourseEnrollments
+                        .Any(y => y.CourseIdentifier == filter.CompletedCourseIdentifier.Value
+                               && y.LearnerUserIdentifier == x.LearnerIdentifier
+                               && y.CourseCompleted != null));
+            }
+
             if (filter.GradedSince.HasValue || filter.GradedBefore.HasValue)
             {
                 var queryWithGraded = query.Select(x => new

@@ -30,7 +30,7 @@ public class SpecWorkshopModifyService(
             commands.Add(new ReconfigureSpecification(bankId, specificationId, ConsequenceType.Low, input.FormLimit, input.QuestionLimit));
 
         var standards = await new SpecWorkshopStandardCreator(standardReader).CreateAsync(spec);
-        var initData = new SpecWorkshopDetailsCreator().CreateAsync(spec, standards);
+        var initData = new SpecWorkshopDetailsCreator().Create(spec, standards);
         var standardNumbers = standards.ToDictionary(x => x.StandardId, x => x.AssetNumber.ToString());
 
         foreach (var inputCriterion in input.Criteria)

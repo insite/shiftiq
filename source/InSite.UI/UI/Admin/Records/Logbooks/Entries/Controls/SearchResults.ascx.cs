@@ -5,6 +5,7 @@ using System.Web.UI.WebControls;
 
 using InSite.Application.Contacts.Read;
 using InSite.Application.Records.Read;
+using InSite.Common;
 using InSite.Common.Web.UI;
 
 using Shift.Common;
@@ -17,6 +18,13 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
     {
         public bool IsValidator { get; set; }
 
+        protected override void OnInit(EventArgs e)
+        {
+            Grid.Columns.FindByHeaderText("Hours").HeaderText = LabelHelper.GetLabelContentText("Logbooks.Hours");
+
+            base.OnInit(e);
+        }
+
         protected override int SelectCount(QExperienceFilter filter)
         {
             return ServiceLocator.JournalSearch.CountExperiences(filter);
@@ -26,7 +34,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
         {
             var returnUrl = new ReturnUrl();
             var data = ServiceLocator.JournalSearch
-                .GetExperiences(filter, x => x.Journal.User, x => x.Journal.JournalSetup, x => x.Validator);
+                .GetExperiences(filter, x => x.Journal.User, x => x.Journal.JournalSetup, x => x.Validator, x => x.Supervisor);
 
             var departments = ServiceLocator.MembershipSearch
                 .Select(new QMembershipFilter
@@ -64,7 +72,7 @@ namespace InSite.UI.Admin.Records.Logbooks.Entries.Controls
                     UserDepartment = departments.GetOrDefault(x.Journal.UserIdentifier),
                     TrainingType = x.TrainingType,
                     Employer = x.Employer,
-                    Supervisor = x.Supervisor,
+                    Supervisor = x.Supervisor?.UserFullName,
                     ExperienceStarted = x.ExperienceStarted,
                     ExperienceStopped = x.ExperienceStopped,
                     ExperienceHours = x.ExperienceHours,

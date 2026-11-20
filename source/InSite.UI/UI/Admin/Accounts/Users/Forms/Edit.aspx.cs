@@ -111,7 +111,7 @@ namespace InSite.Admin.Accounts.Users.Forms
             UserStore.Update(entity, OrganizationSearch.GetPersonFullNamePolicy(Organization.Identifier));
 
             PasswordExpires.Value = DateTime.UtcNow;
-            PasswordExpires.DefaultTimeZone = CurrentSessionState.Identity.User.TimeZone.Id;
+            PasswordExpires.DefaultTimeZone = CurrentSessionState.Identity.User.TimeZone;
 
             ScreenStatus.AddMessage(
                 AlertType.Information,
@@ -259,7 +259,7 @@ namespace InSite.Admin.Accounts.Users.Forms
             if (user.UserPasswordExpired != null)
             {
                 PasswordExpires.Enabled = true;
-                PasswordExpires.DefaultTimeZone = CurrentSessionState.Identity.User.TimeZone.Id;
+                PasswordExpires.DefaultTimeZone = CurrentSessionState.Identity.User.TimeZone;
                 PasswordExpires.Value = user.UserPasswordExpired;
             }
             else

@@ -19,6 +19,7 @@ public class AchievementAdapter : IEntityAdapter
         entity.CertificateLayoutCode = modify.CertificateLayoutCode;
         entity.AchievementType = modify.AchievementType;
         entity.AchievementReportingDisabled = modify.AchievementReportingDisabled;
+        entity.AchievementIssuesCertificate = modify.AchievementIssuesCertificate;
         entity.BadgeImageUrl = modify.BadgeImageUrl;
         entity.HasBadgeImage = modify.HasBadgeImage;
         entity.AchievementAllowSelfDeclared = modify.AchievementAllowSelfDeclared;
@@ -49,6 +50,7 @@ public class AchievementAdapter : IEntityAdapter
             CertificateLayoutCode = create.CertificateLayoutCode,
             AchievementType = create.AchievementType,
             AchievementReportingDisabled = create.AchievementReportingDisabled,
+            AchievementIssuesCertificate = create.AchievementIssuesCertificate,
             BadgeImageUrl = create.BadgeImageUrl,
             HasBadgeImage = create.HasBadgeImage,
             AchievementAllowSelfDeclared = create.AchievementAllowSelfDeclared
@@ -79,6 +81,7 @@ public class AchievementAdapter : IEntityAdapter
             CertificateLayoutCode = entity.CertificateLayoutCode,
             AchievementType = entity.AchievementType,
             AchievementReportingDisabled = entity.AchievementReportingDisabled,
+            AchievementIssuesCertificate = entity.AchievementIssuesCertificate,
             BadgeImageUrl = entity.BadgeImageUrl,
             HasBadgeImage = entity.HasBadgeImage,
             AchievementAllowSelfDeclared = entity.AchievementAllowSelfDeclared

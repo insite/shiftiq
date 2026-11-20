@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using InSite.Application.Surveys.Read;
 using InSite.Domain.Surveys.Forms;

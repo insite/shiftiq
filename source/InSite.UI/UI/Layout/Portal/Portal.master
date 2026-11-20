@@ -97,6 +97,7 @@
                                 <div>
                                     <h3 runat="server" id="HelpHeading" class="d-block bg-secondary fs-sm fw-semibold text-body-secondary mb-0 px-4 py-3"><%= Translate("Instructions") %></h3>
                                     <div class="d-block p-4">
+                                        <div runat="server" id="HelpIntro" visible="false"></div>
                                         <h3 runat="server" id="CustomAboutHeading" class="h5"></h3>
                                         <div runat="server" id="CustomAboutBody"></div>
                                         <p class="fs-xs text-body-secondary mt-2">

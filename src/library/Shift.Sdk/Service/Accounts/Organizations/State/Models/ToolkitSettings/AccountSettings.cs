@@ -13,6 +13,10 @@ namespace InSite.Domain.Organizations
 
         public PersonCodeAutoincrementSettings PersonCodeAutoincrement { get; set; }
 
+        public bool OtherEnvironments { get; set; }
+
+        public bool AHRIFeatures { get; set; } // Temporary setting, will be removed later
+
         public AccountSettings()
         {
             PersonCodeAutoincrement = new PersonCodeAutoincrementSettings();
@@ -23,6 +27,8 @@ namespace InSite.Domain.Organizations
             return AutomaticGroupJoin == other.AutomaticGroupJoin
                 && DisplayDashboardPrototype == other.DisplayDashboardPrototype
                 && HideAdminMyDashboard == other.HideAdminMyDashboard
+                && OtherEnvironments == other.OtherEnvironments
+                && AHRIFeatures == other.AHRIFeatures
                 ;
         }
     }

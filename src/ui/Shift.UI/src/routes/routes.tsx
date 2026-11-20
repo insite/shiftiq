@@ -3,6 +3,7 @@ import { Navigate, RouteObject } from "react-router";
 import NotFound from "./NotFound";
 import ErrorPage from "./ErrorPage";
 import { formRouteHelper } from "./formRouteHelper";
+import AttemptAnswer from "./portal/assessments/attempts/AttemptAnswer";
 
 const children = [
     { index: true, element: <Navigate replace to="/client/admin/home" /> },
@@ -14,6 +15,10 @@ export const routes: RouteObject[] = [
         errorElement: <ErrorPage />,
         children: [
             { index: true, element: <Navigate replace to="/client/test" /> },
+            {
+                element: <AttemptAnswer />,
+                path: "client/portal/assessments/attempts/answer"
+            },
             {
                 element: <AdminHomeLayout />,
                 path: "client",

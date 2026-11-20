@@ -50,7 +50,7 @@ namespace InSite.Admin.Messages.Messages.Controls
 
                 filter.OrderBy = SortColumns.Value;
 
-                filter.TimeZone = User.TimeZone.Id;
+                filter.TimeZone = User.TimeZone;
 
                 return filter;
             }

@@ -243,8 +243,19 @@ namespace Shift.Common.Timeline.Snapshots
         /// <summary>
         /// Returns true if an aggregate exists.
         /// </summary>
+        /// <remarks>
+        /// An aggregate in the cache was loaded from the change store or saved to it, and the only
+        /// path that removes one from the store (Box) evicts it here too, so a cached instance is
+        /// proof enough. Answering from the cache spares a database round trip on every read of a
+        /// cached aggregate. The assessment player's keep-alive made one such read every five
+        /// seconds, and that round trip was what a nightly index rebuild blocked (Sentry
+        /// 7709212927).
+        /// </remarks>
         public bool Exists<T>(Guid aggregate)
         {
+            if (_cache.Get(aggregate)?.Aggregate is T)
+                return true;
+
             return _changeRepository.Exists<T>(aggregate);
         }
 

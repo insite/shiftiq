@@ -189,13 +189,17 @@ namespace InSite.Common.Web.UI
 
         private decimal? TextValueToDecimalValue(string text)
         {
-            if (string.IsNullOrEmpty(text))
+            if (text.IsEmpty())
                 return null;
-            else if (decimal.TryParse(text, out var dValue))
+
+            if (decimal.TryParse(text, out var dValue))
                 return dValue;
-            else
-                throw ApplicationError.Create("Invalid numeric value: " + text);
+
+            throw ApplicationError.Create("Invalid numeric value: " + text);
         }
+
+        private static decimal? TryTextValueToDecimalValue(string text) =>
+            decimal.TryParse(text, out var value) ? value : (decimal?)null;
 
         #endregion
 
@@ -209,7 +213,7 @@ namespace InSite.Common.Web.UI
 
             if (Visible && !ReadOnly)
             {
-                var value = TextValueToDecimalValue(postCollection[postDataKey]);
+                var value = TryTextValueToDecimalValue(postCollection[postDataKey]);
                 value = ValidateDecimalValue(value);
 
                 isChanged = value != ValueAsDecimal;
@@ -244,6 +248,7 @@ namespace InSite.Common.Web.UI
             writer.AddAttribute(HtmlTextWriterAttribute.Name, UniqueID);
             writer.AddAttribute(HtmlTextWriterAttribute.Class, ControlHelper.MergeCssClasses("insite-numeric form-control", CssClass));
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "text");
+            writer.AddAttribute(HtmlTextWriterAttribute.AutoComplete, "off");
 
             var jsonSettings = new ClientSideSettings(this);
             writer.AddAttribute("data-settings", JsonConvert.SerializeObject(jsonSettings));

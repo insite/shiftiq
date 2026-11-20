@@ -5,7 +5,6 @@ namespace Shift.Api;
 public class LoginHelper(
     PersonService personService,
     OrganizationService organizationService,
-    GroupService groupService,
     IPrincipalProvider identityService
     )
 {
@@ -32,9 +31,7 @@ public class LoginHelper(
 
         var principal = identityService.GetPrincipal();
 
-        var userRoles = await groupService.SearchUserRolesAsync(principal.Partition.Identifier, organizationId.Value, person.UserId);
-
-        return CreateToken(organizationCode, organizationId.Value, person, userRoles, impersonatorOrganizationCode, impersonatorUserEmail);
+        return CreateToken(organizationCode, organizationId.Value, person, impersonatorOrganizationCode, impersonatorUserEmail);
     }
 
     private async Task<(Guid? organizationId, PersonMatch? person)> FindPersonAsync(string organizationCode, string email)
@@ -67,7 +64,6 @@ public class LoginHelper(
         string organizationCode,
         Guid organizationId,
         PersonMatch person,
-        string[] userRoles,
         string? impersonatorOrganizationCode,
         string? impersonatorUserEmail
     )
@@ -80,10 +76,6 @@ public class LoginHelper(
             OrganizationIdentifier = organizationId,
             UserEmail = person.UserEmail,
             UserIdentifier = person.UserId,
-            IsAdministrator = person.IsAdministrator,
-            IsDeveloper = person.IsDeveloper,
-            IsOperator = person.IsOperator,
-            UserRoles = userRoles,
             ImpersonatorOrganization = impersonatorOrganizationCode,
             ImpersonatorUser = impersonatorUserEmail,
             TimeZoneId = person.TimeZone,

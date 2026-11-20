@@ -3,10 +3,10 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
+using Shift.Common.Integration;
 using Shift.Hub;
 using Shift.Hub.Google;
 using Shift.Hub.Partitions;
-using Shift.Hub.ScormCloud;
 
 var config = HubApplication.LoadConfiguration<EngineSettings>(
     "Shift.Hub",
@@ -48,8 +48,71 @@ var app = HubApplication.BuildWebApp(
     {
         options.Filters.Add<ControllerHeaderAttribute>();
     },
-    configApp: (app, _, _) =>
+    configApp: (app, _, settings) =>
     {
+        // The Shift.Hub contract - partition registration and the Google, Premailer and
+        // ImageMagick integrations - takes X-Hub-Api-Key. Clients send Engine:Api:ApiKey, and the
+        // hub checks against its own value of the same key.
+        //
+        // The rollout is soft. A wrong key is refused, but a call with no header at all is served
+        // as before and reported to Sentry as a warning: it comes from an InSite partition that
+        // has not been redeployed with the key, and the warning is the reminder to do it. A hub
+        // with no key of its own does the same for every call. Both warnings are throttled to one
+        // per caller per hour, because a busy partition makes hundreds of these calls (Premailer
+        // runs once per email) and one line is enough to act on.
+        var hubApiKey = settings.Api?.ApiKey;
+
+        var monitor = app.Services.GetRequiredService<IMonitor>();
+
+        if (string.IsNullOrWhiteSpace(hubApiKey))
+            monitor.Warning(
+                "Engine:Api:ApiKey is not configured, so Shift.Hub serves its contract routes without checking {Header}. Configure it before the header becomes required.",
+                HubApiKey.HeaderName);
+
+        var lastWarned = new System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset>();
+
+        bool ShouldWarn(string caller)
+        {
+            var now = DateTimeOffset.UtcNow;
+            var previous = lastWarned.GetOrAdd(caller, DateTimeOffset.MinValue);
+
+            return now - previous >= TimeSpan.FromHours(1)
+                && lastWarned.TryUpdate(caller, now, previous);
+        }
+
+        app.Use(async (context, next) =>
+        {
+            var path = context.Request.Path.Value;
+            var check = HubApiKey.Evaluate(path, context.Request.Headers[HubApiKey.HeaderName].ToString(), hubApiKey);
+            var caller = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+            if (check == HubApiKey.Check.Missing && ShouldWarn("missing|" + caller))
+                monitor.Warning(
+                    "Shift.Hub served {Method} {Path} from {Caller} without the {Header} header. Redeploy that InSite partition with Engine:Api:ApiKey; the header will become required.",
+                    context.Request.Method, path, caller, HubApiKey.HeaderName);
+
+            if (check == HubApiKey.Check.Unconfigured && ShouldWarn("unconfigured|" + caller))
+                monitor.Warning(
+                    "Shift.Hub served {Method} {Path} from {Caller} without checking {Header}, because Engine:Api:ApiKey is not configured.",
+                    context.Request.Method, path, caller, HubApiKey.HeaderName);
+
+            if (check == HubApiKey.Check.Invalid)
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/problem+json";
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    type = "https://httpstatuses.io/401",
+                    title = "Hub API key not recognized.",
+                    status = 401,
+                    detail = $"The {HubApiKey.HeaderName} header does not match this environment's Engine:Api:ApiKey.",
+                });
+                return;
+            }
+
+            await next();
+        });
+
         var deadEndProvider = new PhysicalFileProvider(
             Path.Combine(app.Environment.ContentRootPath, "DeadEnd"));
         app.UseDefaultFiles(new DefaultFilesOptions
@@ -66,12 +129,6 @@ var app = HubApplication.BuildWebApp(
         app.UseRouting();
         app.UseAuthentication();
         app.UseRateLimiter();
-
-        // SCORM authenticator applies only to /scorm paths so the other integrations
-        // (Google, Premailer, ImageMagick) do not require UserName/Password headers.
-        app.UseWhen(
-            ctx => ctx.Request.Path.StartsWithSegments("/scorm", StringComparison.OrdinalIgnoreCase),
-            branch => branch.UseMiddleware<ScormAuthenticator>());
     });
 
 await HubApplication.StartupAsync(app, config, async app =>

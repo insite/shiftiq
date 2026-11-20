@@ -10,10 +10,10 @@ namespace InSite.Common.Data
     public class Database
     {
         private readonly string _connectionString;
-        private readonly TimeZoneInfo _timezone;
+        private readonly string _timezone;
         private readonly bool _isHtml;
 
-        public Database(string connectionString, TimeZoneInfo timezone, bool isHtml = true)
+        public Database(string connectionString, string timezone, bool isHtml = true)
         {
             _connectionString = connectionString;
             _timezone = timezone;

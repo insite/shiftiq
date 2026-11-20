@@ -193,9 +193,9 @@ namespace InSite.UI.Layout.Portal
             return input;
         }
 
-        public void RenderHelpContent(TAction model)
+        public void RenderHelpContent(TAction model, bool allowForSalesReady = false)
         {
-            if (IsSalesReady)
+            if (IsSalesReady && !allowForSalesReady)
             {
                 HelpPanel.Visible = false;
                 return;
@@ -207,7 +207,17 @@ namespace InSite.UI.Layout.Portal
                 return;
             }
 
+            HelpPanel.Visible = true;
+
             BindCustomAbout(model, CustomAboutHeading, CustomAboutBody, CustomAboutCreate, CustomAboutEdit);
+        }
+
+        // Page-specific content shown directly under the Instructions heading, above the organization's
+        // help content. Empty hides it. It sits inside the help panel, so it is hidden wherever that is.
+        public void SetHelpIntro(string html)
+        {
+            HelpIntro.InnerHtml = html;
+            HelpIntro.Visible = html.HasValue();
         }
 
         private void BindCustomAbout(TAction action, HtmlGenericControl heading, HtmlGenericControl body, LinkButton create, HyperLink edit)

@@ -20,7 +20,7 @@ namespace InSite.Application.Records.Read
         private readonly IJournalStore _store;
         private readonly IContentStore _contentStore;
 
-        public JournalChangeProjector(IChangeQueue publisher, IJournalStore store, IContentStore contentStore)
+        public JournalChangeProjector(IChangeQueue publisher, IChangeStore changeStore, IJournalStore store, IContentStore contentStore)
         {
             _store = store;
             _contentStore = contentStore;
@@ -66,7 +66,7 @@ namespace InSite.Application.Records.Read
             publisher.Subscribe<ExperienceEvidenceChanged>(Handle);
             publisher.Subscribe<ExperienceHoursChanged>(Handle);
             publisher.Subscribe<ExperienceInstructorChanged>(Handle);
-            publisher.Subscribe<ExperienceSupervisorChanged>(Handle);
+            publisher.Subscribe<ExperienceSupervisorChanged2>(Handle);
             publisher.Subscribe<ExperienceTimeChanged>(Handle);
             publisher.Subscribe<ExperienceTrainingChanged>(Handle);
             publisher.Subscribe<ExperienceValidated>(Handle);
@@ -74,6 +74,11 @@ namespace InSite.Application.Records.Read
             publisher.Subscribe<ExperienceCapturedEvidenceChanged>(Handle);
             publisher.Subscribe<JournalCreated>(Handle);
             publisher.Subscribe<JournalDeleted>(Handle);
+
+            changeStore.RegisterObsoleteChangeTypes(new[]
+            {
+                ObsoleteChangeType.ExperienceSupervisorChanged1
+            });
         }
 
         public void Handle(CompetencyRequirementAdded e)
@@ -151,6 +156,7 @@ namespace InSite.Application.Records.Read
                     x.ValidatorMessageIdentifier = e.ValidatorMessage;
                     x.LearnerMessageIdentifier = e.LearnerMessage;
                     x.LearnerAddedMessageIdentifier = e.LearnerAddedMessage;
+                    x.SupervisorMessageIdentifier = e.SupervisorMessage;
                 }
             );
 
@@ -220,8 +226,8 @@ namespace InSite.Application.Records.Read
         public void Handle(ExperienceInstructorChanged e)
             => _store.UpdateExperience(e.Experience, x => x.Instructor = e.Instructor);
 
-        public void Handle(ExperienceSupervisorChanged e)
-            => _store.UpdateExperience(e.Experience, x => x.Supervisor = e.Supervisor);
+        public void Handle(ExperienceSupervisorChanged2 e)
+            => _store.UpdateExperience(e.Experience, x => x.SupervisorUserIdentifier = e.Supervisor);
 
         public void Handle(ExperienceTimeChanged e)
         {
@@ -275,5 +281,14 @@ namespace InSite.Application.Records.Read
 
         public void Handle(JournalDeleted e)
             => _store.DeleteJournal(e);
+
+        public void Handle(SerializedChange e)
+        {
+            if (e.ChangeType == ObsoleteChangeType.ExperienceSupervisorChanged1)
+            {
+                var v2 = ExperienceSupervisorChanged2.Upgrade(e);
+                Handle(v2);
+            }
+        }
     }
 }

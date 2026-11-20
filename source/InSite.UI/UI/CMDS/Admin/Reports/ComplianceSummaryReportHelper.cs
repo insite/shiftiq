@@ -61,8 +61,6 @@ namespace InSite.Cmds.Admin.Reports.Forms
             public string CompanyName { get; }
             public string DepartmentName { get; }
 
-            public CmdsReportHelper.EmployeeComplianceHistoryChart[] ChartData { get; internal set; }
-
             #endregion
         }
 
@@ -106,22 +104,6 @@ namespace InSite.Cmds.Admin.Reports.Forms
             public string ChartName { get; set; }
             public int Width { get; set; }
             public int DataRowCount { get; set; }
-        }
-
-        public class LineChartSerieData
-        {
-            public int Row { get; set; }
-            public int DateRow { get; set; }
-            public int Column { get; set; }
-            public int AchievementIndex { get; set; }
-        }
-
-        public class LineChartData
-        {
-            public string ChartName { get; set; }
-            public int ReportRowNumber { get; set; }
-            public int Width { get; set; }
-            public List<LineChartSerieData> Series { get; set; }
         }
 
         #endregion
@@ -239,134 +221,102 @@ namespace InSite.Cmds.Admin.Reports.Forms
 
         #endregion
 
-        #region Classes (history)
+        #region Classes (company summary)
 
-        public class HistoryReportDataSource : GroupTable<DepartmentInfo, AchievementInfo, HistoryAchievementData>
+        // One row per department and one column per achievement type, plus a company total per type. The cells
+        // are built with the same CurrentAchievementData as the per-department report, so the figures agree.
+        // The total is the sum of the department figures: a person in two departments counts in both.
+        public class CompanySummary
         {
-            public DateTime? SnapshotDate1 { get; set; }
-            public DateTime? SnapshotDate2 { get; set; }
-            public DateTime? SnapshotDate3 { get; set; }
+            #region Classes
 
-            public IEnumerable<HistoryAchievementItem> GetAchievements(GroupLeaf col)
+            public class Department
             {
-                return Rows
-                    .Select(x => new HistoryAchievementItem
-                    {
-                        Info = x,
-                        Data = GetCell(col, x)
-                    })
-                    .OrderBy(x => x.Info.Sequeunce);
+                public Guid Identifier { get; set; }
+                public string Name { get; set; }
             }
-        }
 
-        public class HistoryAchievementItem
-        {
+            #endregion
+
             #region Properties
 
-            public AchievementInfo Info { get; set; }
-
-            public HistoryAchievementData Data
-            {
-                get => _data;
-                set => _data = value ?? HistoryAchievementData.Empty;
-            }
+            public string CompanyName { get; private set; }
+            public List<Department> Departments { get; private set; }
+            public List<AchievementInfo> AchievementTypes { get; private set; }
 
             #endregion
 
             #region Fields
 
-            private HistoryAchievementData _data = null;
-
-            #endregion
-        }
-
-        public class HistoryAchievementData
-        {
-            #region Properties
-
-            public static HistoryAchievementData Empty { get; } = new HistoryAchievementData();
+            private readonly Dictionary<(Guid, int), CurrentAchievementData> _cells = new Dictionary<(Guid, int), CurrentAchievementData>();
+            private readonly Dictionary<int, CurrentAchievementData> _totals = new Dictionary<int, CurrentAchievementData>();
 
             #endregion
 
             #region Construction
 
-            private HistoryAchievementData()
+            private CompanySummary()
             {
-                _isEmpty = true;
             }
 
-            public HistoryAchievementData(CmdsReportHelper.EmployeeComplianceHistory row)
+            public static CompanySummary Create(IEnumerable<CmdsReportHelper.ComplianceSummary> rows, Dictionary<string, string> achievementDisplayMapping)
             {
-                Append(row);
+                var result = new CompanySummary();
+                var departments = new Dictionary<Guid, Department>();
+                var achievements = new Dictionary<int, AchievementInfo>();
+
+                foreach (var row in rows)
+                {
+                    if (result.CompanyName == null)
+                        result.CompanyName = row.CompanyName;
+
+                    if (!departments.ContainsKey(row.DepartmentIdentifier))
+                        departments.Add(row.DepartmentIdentifier, new Department { Identifier = row.DepartmentIdentifier, Name = row.DepartmentName });
+
+                    if (!achievements.ContainsKey(row.Sequence))
+                        achievements.Add(row.Sequence, new AchievementInfo(row.Sequence, achievementDisplayMapping.GetOrDefault(row.Heading, row.Heading)));
+
+                    var key = (row.DepartmentIdentifier, row.Sequence);
+
+                    if (result._cells.TryGetValue(key, out var cell))
+                        cell.Append(row);
+                    else
+                        result._cells.Add(key, new CurrentAchievementData(row));
+
+                    if (result._totals.TryGetValue(row.Sequence, out var total))
+                        total.Append(row);
+                    else
+                        result._totals.Add(row.Sequence, new CurrentAchievementData(row));
+                }
+
+                result.Departments = departments.Values
+                    .OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                // A type with nothing required and nothing validated anywhere scores NA in every department.
+                result.AchievementTypes = achievements.Values
+                    .Where(x => result._totals[x.Sequeunce].Score.HasValue)
+                    .OrderBy(x => x.Sequeunce)
+                    .ToList();
+
+                return result;
             }
 
             #endregion
 
             #region Methods
 
-            public void Append(CmdsReportHelper.EmployeeComplianceHistory row)
+            public CurrentAchievementData GetCell(Guid department, int sequence)
             {
-                if (_isEmpty)
-                    throw new InvalidOperationException("The operation is not applicable to this object.");
+                return _cells.TryGetValue((department, sequence), out var cell) ? cell : CurrentAchievementData.Empty;
+            }
 
-                Expired = Sum(Expired, row.Expired);
-                NotCompleted = Sum(NotCompleted, row.NotCompleted);
-                NotApplicable = Sum(NotApplicable, row.NotApplicable);
-                NeedsTraining = Sum(NeedsTraining, row.NeedsTraining);
-                SelfAssessed = Sum(SelfAssessed, row.SelfAssessed);
-                Submitted = Sum(Submitted, row.Submitted);
-                Required += row.Required;
-                Satisfied += row.Satisfied;
-
-                _score.Add(row.Score);
-
-                if (row.Score1.HasValue)
-                    _score1.Add(row.Score1.Value);
-
-                if (row.Score2.HasValue)
-                    _score2.Add(row.Score2.Value);
-
-                if (row.Score3.HasValue)
-                    _score3.Add(row.Score3.Value);
+            public CurrentAchievementData GetTotal(int sequence)
+            {
+                return _totals.TryGetValue(sequence, out var total) ? total : CurrentAchievementData.Empty;
             }
 
             #endregion
-
-            #region Properties
-
-            public int? Expired { get; private set; }
-            public int? NotCompleted { get; private set; }
-            public int? NotApplicable { get; private set; }
-            public int? NeedsTraining { get; private set; }
-            public int? SelfAssessed { get; private set; }
-            public int? Submitted { get; private set; }
-            public int Required { get; private set; }
-            public int Satisfied { get; private set; }
-            public decimal? Score => _score.Count == 0 ? (decimal?)null : _score.Average();
-            public decimal? Score1 => _score1.Count == 0 ? (decimal?)null : _score1.Average();
-            public decimal? Score2 => _score2.Count == 0 ? (decimal?)null : _score2.Average();
-            public decimal? Score3 => _score3.Count == 0 ? (decimal?)null : _score3.Average();
-
-            #endregion
-
-            #region Fields
-
-            private readonly bool _isEmpty = false;
-            private List<decimal> _score { get; } = new List<decimal>();
-            private List<decimal> _score1 { get; } = new List<decimal>();
-            private List<decimal> _score2 { get; } = new List<decimal>();
-            private List<decimal> _score3 { get; } = new List<decimal>();
-
-            #endregion
-        }
-
-        public class HistoryDepartmentChartDataItem
-        {
-            public string Name { get; set; }
-            public decimal? Score { get; set; }
-            public decimal? Score1 { get; set; }
-            public decimal? Score2 { get; set; }
-            public decimal? Score3 { get; set; }
         }
 
         #endregion
@@ -472,150 +422,42 @@ namespace InSite.Cmds.Admin.Reports.Forms
             chart.Legend.Remove();
         }
 
-        public static void AddLineChartData(
-            ExcelWorksheet reportSheet, ref int reportRowNumber,
-            ExcelWorksheet chartSheet, ref int chartRowNumber,
-            DepartmentInfo departmentData,
-            string organization,
-            int width,
-            List<LineChartData> charts)
+        #endregion
+
+        #region Methods (sheet names)
+
+        // Excel rejects a worksheet name longer than 31 characters or containing any of []:*?/\ and treats names
+        // case-insensitively, so a department name is cleaned, cut to fit and given a numbered suffix when two
+        // departments would otherwise collide.
+        public static string CreateSheetName(string name, HashSet<string> used)
         {
-            var achievementTypeMapping = Custom.CMDS.Common.Controls.Server.AchievementTypeSelector.CreateAchievementLabelMapping(organization);
+            var source = string.IsNullOrWhiteSpace(name) ? "Department" : name;
 
-            var chartData = new LineChartData
+            var clean = new string(source.Select(c => "[]:*?/\\".IndexOf(c) >= 0 ? ' ' : c).ToArray()).Trim();
+
+            if (clean.Length == 0)
+                clean = "Department";
+
+            if (clean.Length > 31)
+                clean = clean.Substring(0, 31);
+
+            var candidate = clean;
+            var suffix = 2;
+            var isUnique = used.Add(candidate);
+
+            while (!isUnique)
             {
-                ChartName = departmentData.DepartmentName + " Chart",
-                ReportRowNumber = reportRowNumber,
-                Width = width,
-                Series = new List<LineChartSerieData>()
-            };
+                var tail = " (" + suffix + ")";
+                suffix++;
 
-            charts.Add(chartData);
+                candidate = clean.Length + tail.Length > 31
+                    ? clean.Substring(0, 31 - tail.Length) + tail
+                    : clean + tail;
 
-            // Data Table
-
-            chartSheet.Cells[chartRowNumber++, 1].Value = $"Chart Data for {departmentData.CompanyName}: {departmentData.DepartmentName}";
-
-            var chartDateRow = chartRowNumber;
-            var dates = departmentData.ChartData
-                .Where(x => x.SnapshotDate.HasValue)
-                .Select(x => x.SnapshotDate.Value)
-                .OrderBy(x => x)
-                .Distinct()
-                .ToList();
-
-            var columnNumber = 2;
-
-            foreach (var date in dates)
-            {
-                var cell = chartSheet.Cells[chartRowNumber, columnNumber++];
-                cell.Value = date;
-                cell.Style.Numberformat.Format = "MMM d, yyyy";
+                isUnique = used.Add(candidate);
             }
 
-            {
-                dates.Add(DateTime.MaxValue);
-
-                var cell = chartSheet.Cells[chartRowNumber, columnNumber];
-                cell.Value = "Current";
-            }
-
-            chartRowNumber++;
-
-            foreach (var achievementData in departmentData.ChartData.GroupBy(x => x.Sequence).OrderBy(x => x.Key))
-            {
-                columnNumber = 1;
-
-                var heading = achievementData.First().Heading;
-                var name = achievementTypeMapping.GetOrDefault(heading, heading);
-
-                chartSheet.Cells[chartRowNumber, columnNumber++].Value = name;
-
-                var scoresByDate = achievementData.ToDictionary(x => x.SnapshotDate ?? DateTime.MaxValue, x => x.Score);
-                foreach (var d in dates)
-                {
-                    var cell = chartSheet.Cells[chartRowNumber, columnNumber++];
-                    cell.Value = scoresByDate.ContainsKey(d) ? (scoresByDate[d] ?? 0) : 0;
-                    cell.Style.Numberformat.Format = "0%";
-                }
-
-                chartData.Series.Add(new LineChartSerieData { Row = chartRowNumber, DateRow = chartDateRow, Column = columnNumber - 1, AchievementIndex = achievementData.Key - 1 });
-
-                chartRowNumber++;
-            }
-
-            chartRowNumber++;
-            reportRowNumber += 21;
-        }
-
-        public static void AddLineChart(ExcelWorksheet reportSheet, ExcelWorksheet chartSheet, LineChartData chartData)
-        {
-            var chart = (ExcelLineChart)reportSheet.Drawings.AddChart(chartData.ChartName, eChartType.Line);
-
-            foreach (var serieData in chartData.Series)
-            {
-                var serie = (ExcelLineChartSerie)chart.Series.Add(
-                    chartSheet.Cells[serieData.Row, 2, serieData.Row, serieData.Column],
-                    chartSheet.Cells[serieData.DateRow, 2, serieData.DateRow, serieData.Column]);
-
-                serie.HeaderAddress = chartSheet.Cells[serieData.Row, 1];
-
-                var achievementTypeColor = ColorTranslator.FromHtml(AchievementTypes.RetrieveColor(serieData.AchievementIndex));
-
-                var achievementTypeMarker = eMarkerStyle.Dot;
-
-                if (Enum.TryParse(AchievementTypes.RetrieveMarker(serieData.AchievementIndex), out eMarkerStyle marker))
-                    achievementTypeMarker = marker;
-
-                serie.Marker.Style = marker;
-                serie.Marker.Border.Fill.Color = achievementTypeColor;
-                serie.Border.Width = 1;
-                serie.Border.Fill.Color = achievementTypeColor;
-            }
-
-            chart.RoundedCorners = false;
-
-            chart.Fill.Style = eFillStyle.SolidFill;
-            chart.Fill.Color = Color.White;
-            chart.Fill.Transparancy = 0;
-
-            chart.PlotArea.Fill.Style = eFillStyle.SolidFill;
-            chart.PlotArea.Fill.Color = Color.White;
-            chart.PlotArea.Fill.Transparancy = 0;
-            chart.PlotArea.Border.LineStyle = eLineStyle.Solid;
-            chart.PlotArea.Border.LineCap = eLineCap.Square;
-            chart.PlotArea.Border.Fill.Style = eFillStyle.SolidFill;
-            chart.PlotArea.Border.Fill.Color = Color.Gainsboro;
-            chart.PlotArea.Border.Fill.Transparancy = 0;
-
-            // X-Axis
-            var xAxis = chart.Axis[0];
-
-            xAxis.MajorGridlines.Fill.Style = eFillStyle.SolidFill;
-            xAxis.MajorGridlines.Fill.Color = Color.Gainsboro;
-            xAxis.MajorGridlines.Fill.Transparancy = 0;
-            xAxis.MajorTickMark = eAxisTickMark.None;
-            xAxis.MinorTickMark = eAxisTickMark.None;
-
-            // Y-Axis
-            var yAxis = chart.Axis[1];
-            yAxis.MaxValue = 1;
-
-            yAxis.MajorGridlines.Fill.Style = eFillStyle.SolidFill;
-            yAxis.MajorGridlines.Fill.Color = Color.Gainsboro;
-            yAxis.MajorGridlines.Fill.Transparancy = 0;
-            yAxis.MajorTickMark = eAxisTickMark.None;
-            yAxis.MinorTickMark = eAxisTickMark.None;
-
-            // Position
-
-            chart.From.Row = chartData.ReportRowNumber;
-            chart.From.Column = 0;
-
-            chart.To.Row = chartData.ReportRowNumber + 19;
-            chart.To.Column = chartData.Width;
-
-            chart.Legend.Position = eLegendPosition.Top;
+            return candidate;
         }
 
         #endregion
@@ -625,8 +467,8 @@ namespace InSite.Cmds.Admin.Reports.Forms
         public static void Timestamp(ExcelWorksheet sheet, ref int rowNumber, int width)
         {
             var user = CurrentSessionState.Identity.User;
-            var userTime = TimeZoneInfo.ConvertTime(DateTimeOffset.Now, user.TimeZone);
-            var timezoneAbbrv = user.TimeZone.GetAbbreviation();
+            var userTime = TimeZones.ConvertTime(DateTimeOffset.Now, user.TimeZone);
+            var timezoneAbbrv = TimeZones.GetAbbreviation(user.TimeZone);
             var zz = timezoneAbbrv.GetAbbreviation(userTime);
 
             var cell = sheet.Cells[rowNumber, 1, rowNumber, width];

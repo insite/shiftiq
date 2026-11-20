@@ -1,13 +1,15 @@
 ﻿using System;
 
+using Shift.Common;
 using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Commands;
 
+using InSite.Application.Assets.Read;
 using InSite.Application.Contacts.Read;
 using InSite.Application.Users.Write;
 using InSite.Domain.Contacts;
 
-using Shift.Common;
+using SearchObjectType = Shift.Contract.SearchObjectType;
 
 namespace InSite.Application.Contacts.Write
 {
@@ -17,19 +19,22 @@ namespace InSite.Application.Contacts.Write
         private readonly IChangeRepository _repository;
         private readonly IUserSearch _userSearch;
         private readonly IPersonSearch _personSearch;
+        private readonly ISearchStore _searchStore;
 
         public UserCommandReceiver(
             ICommandQueue commander,
             IChangeQueue publisher,
             IChangeRepository repository,
             IUserSearch userSearch,
-            IPersonSearch personSearch
+            IPersonSearch personSearch,
+            ISearchStore searchStore
             )
         {
             _publisher = publisher;
             _repository = repository;
             _userSearch = userSearch;
             _personSearch = personSearch;
+            _searchStore = searchStore;
 
             commander.Subscribe<CreateUser>(Handle);
             commander.Subscribe<DeleteUser>(Handle);
@@ -175,6 +180,8 @@ namespace InSite.Application.Contacts.Write
                     Commit(aggregate, c);
                 });
             }
+
+            _searchStore.EnqueueSearchObject(null, c.AggregateIdentifier, SearchObjectType.Person);
         }
 
         public void Handle(ModifyUserPassword c)
@@ -259,6 +266,8 @@ namespace InSite.Application.Contacts.Write
 
         public void Handle(ModifyUserFieldText c)
         {
+            var isEmailModified = false;
+
             _repository.LockAndRun<UserAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 if (StringHelper.EqualsCaseSensitive(aggregate.Data.GetTextValue(c.UserField), c.Value, true))
@@ -269,23 +278,35 @@ namespace InSite.Application.Contacts.Write
                     var user = _userSearch.GetUserByEmail(c.Value);
                     if (user != null && user.UserIdentifier != c.AggregateIdentifier)
                         throw new ArgumentException($"There is a user with the same email: {c.Value}");
+
+                    isEmailModified = true;
                 }
 
                 aggregate.ModifyUserTextField(c.UserField, c.Value);
                 Commit(aggregate, c);
             });
+
+            if (isEmailModified)
+                _searchStore.EnqueueSearchObject(null, c.AggregateIdentifier, SearchObjectType.Person);
         }
 
         public void Handle(ModifyUserFieldDateOffset c)
         {
+            var isAccountCloakedModified = false;
+
             _repository.LockAndRun<UserAggregate>(c.AggregateIdentifier, aggregate =>
             {
                 if (aggregate.Data.GetDateOffsetValue(c.UserField) == c.Value)
                     return;
 
+                isAccountCloakedModified = c.UserField == UserField.AccountCloaked;
+
                 aggregate.ModifyUserDateField(c.UserField, c.Value);
                 Commit(aggregate, c);
             });
+
+            if (isAccountCloakedModified)
+                _searchStore.EnqueueSearchObject(null, c.AggregateIdentifier, SearchObjectType.Person);
         }
 
         public void Handle(ModifyUserFieldBool c)

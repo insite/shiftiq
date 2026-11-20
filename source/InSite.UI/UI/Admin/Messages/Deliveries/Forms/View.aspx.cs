@@ -125,7 +125,7 @@ namespace InSite.Admin.Messages.Deliveries.Forms
             foreach (var kv in recipient.Variables)
                 variables[kv.Key] = kv.Value;
 
-            var envelope = new EmailVariables(recipient.Identifier.Value, recipient.Address, email.OrganizationIdentifier, variables);
+            var envelope = EmailOutbox.CreateEmailVariables(email.OrganizationIdentifier, recipient.Identifier.Value, recipient.Address, variables);
 
             var subject = email.ContentSubject.Default;
             subject = MessageHelper.ReplacePlaceholdersForMailgun(email.OrganizationIdentifier, email.SenderIdentifier, email.SurveyNumber, subject, envelope);

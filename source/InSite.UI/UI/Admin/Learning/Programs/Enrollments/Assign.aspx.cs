@@ -227,9 +227,28 @@ namespace InSite.Cmds.Admin.Records.Programs
             Step1NextButton.Visible = hasData;
         }
 
+        // A paid program needs a funding path and a billing row per learner; this bulk path has neither, so it
+        // refuses paid programs and points the admin at Add Learners to Program.
+        private bool RefusePaidProgram()
+        {
+            var programId = ProgramIdentifier.Value;
+            if (!programId.HasValue)
+                return false;
+
+            var program = ProgramSearch.GetProgram(programId.Value);
+            if (!(program?.ProgramFee > 0))
+                return false;
+
+            EditorStatus.AddMessage(AlertType.Error, "This is a paid program. Enrol learners from Add Learners to Program, which records the funding path for billing. Group assignment is not available for paid programs.");
+            return true;
+        }
+
         private void Step1NextButton_Click(object sender, EventArgs e)
         {
             if (!Page.IsValid)
+                return;
+
+            if (RefusePaidProgram())
                 return;
 
             Step2.Visible = true;
@@ -259,6 +278,9 @@ namespace InSite.Cmds.Admin.Records.Programs
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
             if (!Page.IsValid)
+                return;
+
+            if (RefusePaidProgram())
                 return;
 
             var items = GetAssignLearnerItems();
@@ -593,7 +615,7 @@ namespace InSite.Cmds.Admin.Records.Programs
 
             if (DownloadAlert.Visible)
             {
-                var date = TimeZones.ConvertFromUtc(DateTimeOffset.Now, User.TimeZone);
+                var date = TimeZones.ConvertTime(DateTimeOffset.Now, User.TimeZone);
 
                 var exportFileName = $"Learner achievements prior to bulk program assignment {date:yyyy-MM-dd-HH-mm}.csv";
 

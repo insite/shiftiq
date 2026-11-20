@@ -19,7 +19,7 @@
                     </FooterTemplate>
                     <ItemTemplate>
                         <tr id="Row" runat="server">
-                            <td>
+                            <td style="width:1px;">
                                 <insite:Icon runat="server" ID="FlagIcon" />
                             </td>
                             <td>

@@ -35,7 +35,7 @@ namespace InSite.Persistence
             var dates = new Dictionary<string, DateTimeOffset>();
             foreach (var offset in offsets)
             {
-                var pst = TimeZones.FormatDateOnly(offset, TimeZones.Pacific);
+                var pst = TimeZones.FormatDateOnly(offset, TimeZones.Ids.Pacific);
                 if (dates.ContainsKey(pst))
                     Delete(organization, offset);
                 else

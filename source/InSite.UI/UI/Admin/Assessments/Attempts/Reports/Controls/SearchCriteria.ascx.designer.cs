@@ -114,6 +114,15 @@ namespace InSite.Admin.Attempts.Reports.Controls
         protected global::InSite.Common.Web.UI.TextBox CandidateEmail;
 
         /// <summary>
+        /// LearnerEmployerId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindEmployer LearnerEmployerId;
+
+        /// <summary>
         /// AssessorName control.
         /// </summary>
         /// <remarks>

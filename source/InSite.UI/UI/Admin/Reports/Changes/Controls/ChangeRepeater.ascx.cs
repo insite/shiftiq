@@ -27,26 +27,7 @@ namespace InSite.Admin.Reports.Changes.Controls
             public string Name { get; set; }
             public string Data { get; set; }
 
-            public static DataItem FromChange(IChange change, TimeZoneInfo timeZone)
-            {
-                var user = UserSearch.Bind(
-                    change.OriginUser,
-                    x => new { x.UserIdentifier, x.FullName });
-
-                var item = new DataItem
-                {
-                    AggregateIdentifier = change.AggregateIdentifier,
-                    Version = change.AggregateVersion,
-                    User = user != null ? user.FullName : "(Unknown)",
-                    Time = change.ChangeTime.Format(timeZone, true, false),
-                    Name = change.GetType().Name
-                };
-
-                item.Data = change.Serialize(item.AggregateIdentifier, item.Version).ChangeData;
-                return item;
-            }
-
-            public static DataItem[] FromChanges(IEnumerable<IChange> changes, TimeZoneInfo timeZone, bool html = true)
+            public static DataItem[] FromChanges(IEnumerable<IChange> changes, string timeZoneId, bool html = true)
             {
                 var users = UserSearch
                     .Bind(
@@ -63,7 +44,7 @@ namespace InSite.Admin.Reports.Changes.Controls
                         AggregateIdentifier = e.AggregateIdentifier,
                         Version = e.AggregateVersion,
                         User = users.TryGetValue(e.OriginUser, out var user) ? user.FullName : "(Unknown)",
-                        Time = e.ChangeTime.Format(timeZone, html, false),
+                        Time = TimeZones.Format(e.ChangeTime, timeZoneId, html, false),
                         Name = e.GetType().Name,
                     };
 

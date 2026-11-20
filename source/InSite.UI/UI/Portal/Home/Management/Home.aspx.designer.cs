@@ -105,6 +105,24 @@ namespace InSite.UI.Portal.Home.Management
         protected global::System.Web.UI.WebControls.Literal ProductProgress;
 
         /// <summary>
+        /// SkillsCheckLiteral control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal SkillsCheckLiteral;
+
+        /// <summary>
+        /// ProductFilterPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.UpdatePanel ProductFilterPanel;
+
+        /// <summary>
         /// ProductFilter control.
         /// </summary>
         /// <remarks>

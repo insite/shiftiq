@@ -43,6 +43,8 @@ namespace InSite.Domain.Registrations
         public string ExamFormTitle { get; set; }
         public string ExamFormName { get; set; }
         public string ExamFormCode { get; set; }
+        public IEnumerable<string> AdditionalExamFormNames { get; set; }
+        public IEnumerable<string> AdditionalExamFormCodes { get; set; }
         public IEnumerable<string> DepartmentNames { get; set; }
         public IEnumerable<string> AccommodationNames { get; set; }
     }

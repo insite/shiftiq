@@ -207,7 +207,7 @@ namespace InSite.UI.Portal.Billing.Controls
 
             var subtotal = CalculateSubtotal(cart);
 
-            SetCartHeader("Subscribe & Choose Later");
+            SetCartHeader(cart.IsTransfer ? "Subscribe & Transfer to Member Organizations" : "Subscribe & Choose Later");
 
             SetFinalPricing(Currency(subtotal), string.Empty, Currency(subtotal));
             AllowCheckout = cart.TotalSelected > 0;

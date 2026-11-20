@@ -339,7 +339,7 @@ namespace InSite.Api.Controllers
 
             var userId = UserSearch.BindFirst(x => (Guid?)x.UserIdentifier, new UserFilter { EmailExact = model.Email });
             if (userId == null)
-                return JsonBadRequest("Subscribing to the blog is available to CMDS users only. Please contact admin_cmds@keyera.com for more information.");
+                return JsonBadRequest($"Subscribing to the blog is available to CMDS users only. Please contact {ServiceLocator.AppSettings.Partition.Email} for more information.");
 
             var groupFilter = new QGroupFilter { GroupNameExact = "CMDS Blog Subscribers", OrganizationIdentifier = OrganizationIdentifiers.CMDS };
             var group = ServiceLocator.GroupSearch.GetFirstGroup(groupFilter);

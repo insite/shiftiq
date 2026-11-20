@@ -25,5 +25,6 @@
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/css/common.outputAudio.css" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/css/common.outputVideo.css" />
         <insite:ResourceBundleFile Url="/ui/layout/common/parts/css/common.portalSidebar.css" />
+        <insite:ResourceBundleFile Url="/ui/layout/common/parts/css/common.adminNavigationSearch.css" />
     </Items>
 </insite:ResourceBundle>

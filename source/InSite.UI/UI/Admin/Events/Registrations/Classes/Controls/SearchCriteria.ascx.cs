@@ -95,7 +95,12 @@ namespace InSite.Admin.Events.Registrations.Controls
             DepartmentId.Filter.GroupType = GroupTypes.Department;
             DepartmentId.Filter.OrganizationIdentifier = Organization.Identifier;
 
-            ExamFormIdentifier.Filter.IncludeFormStatus = "Published";
+            ExamFormIdentifier.Filter.IncludeFormStatuses = new[]
+            {
+                nameof(PublicationStatus.Published),
+                nameof(PublicationStatus.Unpublished),
+                nameof(PublicationStatus.Archived)
+            };
         }
 
         public override void Clear()

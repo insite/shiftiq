@@ -55,7 +55,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var principal = principalProvider.GetPrincipal();
         var bank = await bankReader.RetrieveAsync(bankId);
 
-        if (bank == null || !principalProvider.AllowOrganizationAccess(principal, bank.OrganizationIdentifier))
+        if (bank == null || bank.OrganizationIdentifier != principal.OrganizationId)
             return NotFound();
 
         var result = await imageListService.CollectImagesAsync(principal, bankId);
@@ -71,7 +71,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var principal = principalProvider.GetPrincipal();
         var bank = await bankReader.RetrieveAsync(bankId);
 
-        if (bank == null || !principalProvider.AllowOrganizationAccess(principal, bank.OrganizationIdentifier))
+        if (bank == null || bank.OrganizationIdentifier != principal.OrganizationId)
             return NotFound();
 
         var questions = await questionReader.CollectByBankIdAsync(bankId);
@@ -101,7 +101,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var principal = principalProvider.GetPrincipal();
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
 
-        if (bank == null || !principalProvider.AllowOrganizationAccess(principal, bank.Tenant))
+        if (bank == null || bank.Tenant != principal.OrganizationId)
             return NotFound();
 
         var result = await modifyQuestionService.ModifyAsync(bank, bankId, questionId, input.Field, input.ColumnIndex, input.Value);
@@ -112,7 +112,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
     [HttpPut("api/assessments/workshops/banks/{bankId}/questions/{questionId}/options/{optionNumber}")]
     [HybridPermission("evaluation/banks", DataAccess.Update)]
     [EndpointName("modifyWorkshopOption")]
-    public async Task<ActionResult<Result>> ModifyWorkshopOptionAsync(
+    public async Task<ActionResult<WorkshopModifyOptionResult>> ModifyWorkshopOptionAsync(
         IWorkshopModifyOptionService modifyOptionService,
         Guid bankId,
         Guid questionId,
@@ -123,12 +123,10 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var principal = principalProvider.GetPrincipal();
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
 
-        if (bank == null || !principalProvider.AllowOrganizationAccess(principal, bank.Tenant))
+        if (bank == null || bank.Tenant != principal.OrganizationId)
             return NotFound();
 
-        var result = await modifyOptionService.ModifyAsync(bank, bankId, questionId, optionNumber, input.Field, input.ColumnIndex, input.Value);
-
-        return Ok(new Result { Html = result });
+        return await modifyOptionService.ModifyAsync(bank, bankId, questionId, optionNumber, input.Field, input.ColumnIndex, input.Value);
     }
 
     [HttpPost("api/assessments/workshops/banks/{bankId}/questions/{questionId}/comments")]
@@ -145,7 +143,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var principal = principalProvider.GetPrincipal();
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
 
-        if (bank == null || bank.FindQuestion(questionId) == null || !principalProvider.AllowOrganizationAccess(principal, bank.Tenant))
+        if (bank == null || bank.Tenant != principal.OrganizationId || bank.FindQuestion(questionId) == null)
             return NotFound();
 
         var command = new PostComment(
@@ -164,7 +162,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
 
         await commander.SendCommandsAsync([command]);
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
         var result = await retrieveService.RetrieveQuestionCommentsAsync(bankId, questionId, timeZone);
 
         return Ok(result);
@@ -184,7 +182,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var principal = principalProvider.GetPrincipal();
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
 
-        if (bank == null || bank.FindField(fieldId) == null || !principalProvider.AllowOrganizationAccess(principal, bank.Tenant))
+        if (bank == null || bank.Tenant != principal.OrganizationId || bank.FindField(fieldId) == null)
             return NotFound();
 
         var command = new PostComment(
@@ -203,7 +201,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
 
         await commander.SendCommandsAsync([command]);
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
         var result = await retrieveService.RetrieveQuestionCommentsAsync(bankId, fieldId, timeZone);
 
         return Ok(result);
@@ -224,12 +222,12 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
         var field = bank?.FindField(fieldId);
 
-        if (field == null || !principalProvider.AllowOrganizationAccess(principal, bank!.Tenant))
+        if (bank == null || bank.Tenant != principal.OrganizationId || field == null)
             return NotFound();
 
         await modifyService.ReplaceQuestionAsync(bank, bankId, fieldId, command);
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
         var sectionData = await retrieveService.RetrieveSectionAsync(bankId, field.Section.Identifier, timeZone);
 
         return Ok(sectionData);
@@ -253,7 +251,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
         var set = bank?.FindSet(setId);
 
-        if (set == null || !principalProvider.AllowOrganizationAccess(principal, bank!.Tenant))
+        if (bank == null || bank.Tenant != principal.OrganizationId || set == null)
             return NotFound();
 
         if (standardId.HasValue)
@@ -265,7 +263,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
 
         var questionId = await modifyService.AddQuestionAsync(bank.Tenant, bankId, setId, standardId, command);
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
         var result = await retrieveService.RetrieveSpecSetAsync(bankId, specificationId, setId, timeZone);
 
         result.QuestionId = questionId;
@@ -290,7 +288,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
         var question = bank?.FindQuestion(questionId);
 
-        if (question == null || !principalProvider.AllowOrganizationAccess(principal, bank!.Tenant))
+        if (bank == null || bank.Tenant != principal.OrganizationId || question == null)
             return NotFound();
 
         var assetNumber = await sequence.IncrementAsync(bank.Tenant, SequenceType.Asset);
@@ -298,7 +296,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
 
         await commander.SendCommandsAsync([new DuplicateQuestion(bankId, questionId, newQuestionId, assetNumber)]);
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById(principal.User.TimeZone);
+        var timeZone = principal.User.TimeZone;
         var result = await retrieveService.RetrieveSpecSetAsync(bankId, specificationId, setId, timeZone);
 
         result.QuestionId = newQuestionId;
@@ -322,7 +320,7 @@ public class BankWorkshopController(IPrincipalProvider principalProvider, ITimel
         var bank = await timelineQuery.GetAggregateStateAsync<BankAggregate, BankState>(bankId);
         var comment = bank?.FindComment(commentId);
 
-        if (comment == null || !principalProvider.AllowOrganizationAccess(principal, bank!.Tenant))
+        if (bank == null || bank.Tenant != principal.OrganizationId || comment == null)
             return NotFound();
 
         var command = new ChangeCommentVisibility(bankId, commentId, hidden);

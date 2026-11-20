@@ -24,7 +24,8 @@ namespace InSite.Cmds.Admin.People.Forms
                 return;
             try
             {
-                PersonHelper.SendWelcomeMessage(Organization.Identifier, PersonID.Value, CarbonCopy(Cc.Text));
+                PersonHelper.SendWelcomeMessage(Organization.Identifier, PersonID.Value,
+                    CarbonCopy(Cc.Text), subject: Subject.Text, body: MessageBody.Text);
 
                 HttpResponseHelper.Redirect($"/ui/cmds/admin/users/edit?userID={PersonID}", true);
             }
@@ -114,18 +115,33 @@ namespace InSite.Cmds.Admin.People.Forms
 
         private Guid[] CarbonCopy(string text)
         {
-            if (string.IsNullOrWhiteSpace(text))
+            var user = FindCarbonCopyUser(text);
+
+            return user.HasValue ? new[] { user.Value } : null;
+        }
+
+        // The outbox copies a user only through a person in this organization (any organization
+        // when this one is the partition) whose email is enabled, and drops anyone else without a
+        // word. Validation and the send share this lookup, so an address that passes is one that
+        // is copied.
+        private Guid? FindCarbonCopyUser(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
                 return null;
 
-            var thumbprint = UserSearch.BindFirst(x => x.UserIdentifier, new UserFilter
-            {
-                EmailExact = text,
-                IsCmds = true
-            });
-            if (thumbprint != Guid.Empty)
-                return new Guid[] { thumbprint };
-            return null;
+            var organization = Organization.Identifier;
 
+            var user = UserSearch.BindFirst(x => x.UserIdentifier, new UserFilter
+            {
+                EmailExact = email,
+                IsCmds = true,
+                PersonOrganizationIdentifier = organization == ServiceLocator.Partition.Identifier
+                    ? (Guid?)null
+                    : organization,
+                PersonEmailEnabled = true
+            });
+
+            return user != Guid.Empty ? user : (Guid?)null;
         }
 
         private bool AreEmailAddressesValid()
@@ -134,6 +150,11 @@ namespace InSite.Cmds.Admin.People.Forms
 
             AddEmailIfInvalid(To.Text, message);
             AddEmailIfInvalid(Cc.Text, message);
+
+            if (message.Length == 0 && Cc.Text.IsNotEmpty() && FindCarbonCopyUser(Cc.Text) == null)
+                message.AppendFormat(
+                    "Cannot copy {0}: the address must belong to a CMDS user in this organization "
+                    + "whose email is enabled.", Cc.Text);
 
             if (message.Length == 0)
                 return true;

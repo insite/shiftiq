@@ -8,43 +8,44 @@ namespace Shift.Api;
 
 internal class MailgunWebhookListener : BackgroundService
 {
-    private readonly RabbitMq _settings;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<MailgunWebhookListener> _logger;
+    private readonly RabbitMq _settings;
     private readonly string _queueName;
 
-    private IConnection? _connection;
-    private IChannel? _channel;
-
     public MailgunWebhookListener(
-        AppSettings settings,
         IServiceProvider serviceProvider,
-        ILogger<MailgunWebhookListener> logger)
+        ILogger<MailgunWebhookListener> logger,
+        AppSettings settings,
+        string queueName)
     {
-        _settings = settings.Integration.RabbitMq;
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _queueName = $"mailgun-webhooks-{settings.Environment.Slug}-{settings.Partition.Slug}";
+        _settings = settings.Integration.RabbitMq;
+        _queueName = queueName;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (_settings.Disabled)
-            return;
-
         try
         {
             var factory = new ConnectionFactory
             {
                 HostName = _settings.Host,
+                Port = _settings.Port ?? AmqpTcpEndpoint.UseDefaultPort,
                 UserName = _settings.Username,
-                Password = _settings.Password
+                Password = _settings.Password,
+                Ssl = new SslOption
+                {
+                    Enabled = _settings.Mode == RabbitMqMode.Tls,
+                    ServerName = _settings.Host
+                }
             };
 
-            _connection = await factory.CreateConnectionAsync(stoppingToken);
-            _channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
+            await using var connection = await factory.CreateConnectionAsync(stoppingToken);
+            await using var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
 
-            await _channel.QueueDeclareAsync(
+            await channel.QueueDeclareAsync(
                 queue: _queueName,
                 durable: true,
                 exclusive: false,
@@ -52,13 +53,13 @@ internal class MailgunWebhookListener : BackgroundService
                 arguments: null,
                 cancellationToken: stoppingToken);
 
-            await _channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false, stoppingToken);
+            await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false, stoppingToken);
 
-            var consumer = new AsyncEventingBasicConsumer(_channel);
+            var consumer = new AsyncEventingBasicConsumer(channel);
 
-            consumer.ReceivedAsync += async (s, e) => await HandleMessageAsync(e);
+            consumer.ReceivedAsync += async (s, e) => await HandleMessageAsync(channel, e, stoppingToken);
 
-            await _channel.BasicConsumeAsync(
+            await channel.BasicConsumeAsync(
                 _queueName,
                 autoAck: false,
                 consumer,
@@ -83,7 +84,7 @@ internal class MailgunWebhookListener : BackgroundService
         }
     }
 
-    private async Task HandleMessageAsync(BasicDeliverEventArgs e)
+    private async Task HandleMessageAsync(IChannel channel, BasicDeliverEventArgs e, CancellationToken stoppingToken)
     {
         try
         {
@@ -96,17 +97,17 @@ internal class MailgunWebhookListener : BackgroundService
                 await handler.ProcessAsync(json);
             }
 
-            await _channel!.BasicAckAsync(e.DeliveryTag, multiple: false);
+            await channel.BasicAckAsync(e.DeliveryTag, multiple: false, stoppingToken);
         }
         catch (Exception ex) when (IsTransient(ex))
         {
             _logger.LogWarning(ex, "Transient error processing webhook, returning to queue");
-            await _channel!.BasicNackAsync(e.DeliveryTag, multiple: false, requeue: true);
+            await channel.BasicNackAsync(e.DeliveryTag, multiple: false, requeue: true, stoppingToken);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing webhook, discarding message");
-            await _channel!.BasicAckAsync(e.DeliveryTag, multiple: false);
+            await channel.BasicAckAsync(e.DeliveryTag, multiple: false, stoppingToken);
         }
     }
 
@@ -115,21 +116,27 @@ internal class MailgunWebhookListener : BackgroundService
         return false; // TODO: Declare transient error types
     }
 
-    public override async Task StopAsync(CancellationToken cancellationToken)
+    internal static void RegisterService(IServiceCollection services, Serilog.ILogger logger, AppSettings settings)
     {
-        try
+        if (settings.Integration.RabbitMq.Mode == RabbitMqMode.Off)
         {
-            if (_channel != null)
-                await _channel.CloseAsync(cancellationToken);
-
-            if (_connection != null)
-                await _connection.CloseAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Error closing RabbitMQ connection");
+            logger.Information("MailgunWebhookListener is disabled (RabbitMQ mode is Off)");
+            return;
         }
 
-        await base.StopAsync(cancellationToken);
+        var queueHelper = new MailgunQueueHelper(settings);
+        var shortName = MailgunQueueHelper.GetQueueShortName(settings);
+
+        if (!queueHelper.TryGetQueueFullName(shortName, out var fullName))
+        {
+            logger.Information(
+                "MailgunWebhookListener is disabled ({ShortName} partition is not supported)",
+                shortName);
+            return;
+        }
+
+        logger.Information("MailgunWebhookListener is enabled for queue {QueueName}", fullName);
+
+        services.AddHostedService(sp => ActivatorUtilities.CreateInstance<MailgunWebhookListener>(sp, fullName));
     }
 }

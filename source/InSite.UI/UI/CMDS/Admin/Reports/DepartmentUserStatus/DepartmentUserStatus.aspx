@@ -117,7 +117,7 @@
                         </FooterTemplate>
                         <ItemTemplate>
                             <tr>
-                                <td><%# LocalizeDate((DateTimeOffset)Eval("AsAt")) %></td>
+                                <td><%# Eval("AsAt", "{0:yyyy-MM-dd}") %></td>
                                 <td class="text-nowrap text-end">
                                     <insite:IconButton runat="server" Name="trash-alt" CommandName="Delete" OnClientClick='return confirm("Are you sure you want to remove this snapshot?");'
                                         style="padding:8px" ToolTip="Delete Snapshot" />

@@ -85,5 +85,23 @@ namespace InSite.Admin.Events.Classes.Controls
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.Grid Grid;
+
+        /// <summary>
+        /// AddFormSelector control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindBankForm AddFormSelector;
+
+        /// <summary>
+        /// AddFormRegistrationIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField AddFormRegistrationIdentifier;
     }
 }

@@ -106,6 +106,9 @@ namespace InSite.Common.Web.UI
             [JsonProperty(PropertyName = "fullFormat")]
             public string FullDateFormat { get; set; }
 
+            [JsonProperty(PropertyName = "noTimeZoneFormat")]
+            public string NoTimeZoneDateFormat { get; set; }
+
             [JsonProperty(PropertyName = "shortFormat")]
             public string ShortDateFormat { get; set; }
 

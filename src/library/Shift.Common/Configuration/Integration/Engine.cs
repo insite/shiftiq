@@ -34,31 +34,14 @@ namespace Shift.Common
 
         public PartitionRegistrationSettings PartitionRegistration { get; set; }
 
-        // Shared service key sent as X-Api-Key on Engine (Hub) calls that run server-side.
+        // Sent as X-Hub-Api-Key on every Engine (Hub) call: partition registration, Google,
+        // Premailer and ImageMagick.
 
         public string ApiKey { get; set; }
 
         public ApiSettings Google => Segment("google/");
         public ApiSettings Premailer => Segment("premailer/");
         public ApiSettings ImageMagick => Segment("imagemagick/");
-
-        private ApiSettings _scorm;
-        public ApiSettings Scorm
-        {
-            get
-            {
-                // ScormCloud carries a configured CallbackPath; fill in the derived BaseUrl while
-                // preserving whatever was bound from configuration.
-
-                var settings = _scorm ?? new ApiSettings();
-
-                if (string.IsNullOrEmpty(settings.BaseUrl))
-                    settings.BaseUrl = Segment("scorm/")?.BaseUrl;
-
-                return settings;
-            }
-            set => _scorm = value;
-        }
 
         public ScoopSettings Scoop { get; set; }
 
@@ -69,7 +52,7 @@ namespace Shift.Common
 
             var root = BaseUrl.EndsWith("/") ? BaseUrl : BaseUrl + "/";
 
-            return new ApiSettings { BaseUrl = root + segment };
+            return new ApiSettings { BaseUrl = root + segment, ApiKey = ApiKey };
         }
     }
 
@@ -109,6 +92,8 @@ namespace Shift.Common
 
         public string WhitelistDomains { get; set; }
         public string WhitelistEmails { get; set; }
+
+        public string TimeZoneSet { get; set; }
 
         public bool IsE01() => Number == 1;
         public bool IsE02() => Number == 2;

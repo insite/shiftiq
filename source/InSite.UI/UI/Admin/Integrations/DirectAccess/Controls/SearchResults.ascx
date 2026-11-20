@@ -18,7 +18,7 @@
 
         <asp:TemplateField HeaderText="Refreshed">
             <ItemTemplate>
-                <%# TimeZones.Format((DateTimeOffset)Eval("Refreshed"), TimeZones.Utc) %>
+                <%# TimeZones.Format((DateTimeOffset)Eval("Refreshed"), TimeZones.Ids.Utc) %>
             </ItemTemplate>
         </asp:TemplateField>
 

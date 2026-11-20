@@ -179,7 +179,7 @@ namespace InSite.Domain.Records
             });
         }
 
-        public void When(ExperienceSupervisorChanged e)
+        public void When(ExperienceSupervisorChanged2 e)
         {
             ProcessExperience(e.Experience, (experience) =>
             {
@@ -242,6 +242,18 @@ namespace InSite.Domain.Records
 
         public void When(JournalDeleted _)
         {
+        }
+
+        public void When(SerializedChange e)
+        {
+            // Obsolete changes go here
+
+            if (e.ChangeType == ObsoleteChangeType.ExperienceSupervisorChanged1)
+            {
+                var v2 = ExperienceSupervisorChanged2.Upgrade(e);
+
+                When(v2);
+            }
         }
 
         private void ProcessExperience(Guid experienceIdentifier, Action<Experience> action)

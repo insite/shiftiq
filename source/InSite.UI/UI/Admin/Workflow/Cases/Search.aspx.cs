@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using InSite.Application.Issues.Read;
@@ -38,6 +38,7 @@ namespace InSite.UI.Admin.Issues.Issues
                 new DownloadColumn("IssueOpenedby", "Case Opened by"),
                 new DownloadColumn("TopicUserIdentifier"),
                 new DownloadColumn("TopicUserDepartment"),
+                new DownloadColumn("TopicUserDistrict", "District"),
                 new DownloadColumn("AdministratorUserName"),
                 new DownloadColumn("IssueDescription", "Case Description"),
                 new DownloadColumn("IssueEmployerGroupName", "Case Employer Group Name"),

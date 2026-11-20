@@ -39,6 +39,7 @@
                 <div class="mb-3 row">
                     <label class="col-md-2 col-form-label" for="<%= MessageBody.ClientID %>">
                         Body:
+                        <insite:RequiredValidator runat="server" ControlToValidate="MessageBody" ValidationGroup="SendEmail" />
                     </label>
                     <div class="col-md-10">
                         <insite:TextBox runat="server" ID="MessageBody" TextMode="MultiLine" Rows="21" />

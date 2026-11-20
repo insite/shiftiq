@@ -1,11 +1,14 @@
-﻿using Shift.Common.Timeline.Changes;
-using Shift.Common.Timeline.Commands;
+﻿using System;
 
+using InSite.Application.Assets.Read;
 using InSite.Application.JournalSetups.Write;
 using InSite.Application.Records.Read;
 using InSite.Domain.Records;
 
 using Shift.Common;
+using Shift.Common.Timeline.Changes;
+using Shift.Common.Timeline.Commands;
+using Shift.Contract;
 
 namespace InSite.Application.Records.Write
 {
@@ -14,12 +17,20 @@ namespace InSite.Application.Records.Write
         private readonly IChangeQueue _publisher;
         private readonly IChangeRepository _repository;
         private readonly IJournalSearch _journalSearch;
+        private readonly ISearchStore _searchStore;
 
-        public JournalSetupCommandReceiver(ICommandQueue commander, IChangeQueue publisher, IChangeRepository repository, IJournalSearch journalSearch)
+        public JournalSetupCommandReceiver(
+            ICommandQueue commander,
+            IChangeQueue publisher,
+            IChangeRepository repository,
+            IJournalSearch journalSearch,
+            ISearchStore searchStore
+            )
         {
             _publisher = publisher;
             _repository = repository;
             _journalSearch = journalSearch;
+            _searchStore = searchStore;
 
             commander.Subscribe<AddCompetencyRequirement>(Handle);
             commander.Subscribe<ChangeCompetencyRequirement>(Handle);
@@ -162,6 +173,8 @@ namespace InSite.Application.Records.Write
             aggregate.Create(c.Tenant, c.Name);
 
             Commit(aggregate, c);
+
+            _searchStore.EnqueueSearchObject(c.Tenant, c.AggregateIdentifier, SearchObjectType.Logbook);
         }
 
         public void Handle(DeleteJournalSetup c)
@@ -169,12 +182,19 @@ namespace InSite.Application.Records.Write
             if (_journalSearch.JournalExists(new QJournalFilter { JournalSetupIdentifier = c.AggregateIdentifier }))
                 throw new JournalSetupException($"Journal setup {c.AggregateIdentifier} has referenced journals and cannot be deleted");
 
+            Guid? organizationId = null;
+
             _repository.LockAndRun<JournalSetupAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
+                organizationId = aggregate.Data.Tenant;
+
                 aggregate.Delete();
 
                 Commit(aggregate, c);
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Logbook);
         }
 
         public void Handle(AddJournalSetupField c)
@@ -306,29 +326,38 @@ namespace InSite.Application.Records.Write
         {
             _repository.LockAndRun<JournalSetupAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
-                if (aggregate.Data.ValidatorMessage != c.ValidatorMessage
+                var isChanged = aggregate.Data.ValidatorMessage != c.ValidatorMessage
                     || aggregate.Data.LearnerMessage != c.LearnerMessage
                     || aggregate.Data.LearnerAddedMessage != c.LearnerAddedMessage
-                    )
-                {
-                    aggregate.ChangeMessages(c.ValidatorMessage, c.LearnerMessage, c.LearnerAddedMessage);
+                    || aggregate.Data.SupervisorMessage != c.SupervisorMessage;
 
-                    Commit(aggregate, c);
-                }
+                if (!isChanged)
+                    return;
+
+                aggregate.ChangeMessages(c.ValidatorMessage, c.LearnerMessage, c.LearnerAddedMessage, c.SupervisorMessage);
+
+                Commit(aggregate, c);
             });
         }
 
         public void Handle(RenameJournalSetup c)
         {
+            Guid? organizationId = null;
+
             _repository.LockAndRun<JournalSetupAggregate>(c.AggregateIdentifier, (aggregate) =>
             {
                 if (!string.Equals(aggregate.Data.Name, c.Name))
                 {
+                    organizationId = aggregate.Data.Tenant;
+
                     aggregate.Rename(c.Name);
 
                     Commit(aggregate, c);
                 }
             });
+
+            if (organizationId != null)
+                _searchStore.EnqueueSearchObject(organizationId, c.AggregateIdentifier, SearchObjectType.Logbook);
         }
 
         public void Handle(AddJournalSetupUser c)

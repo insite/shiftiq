@@ -189,6 +189,9 @@ namespace InSite.Cmds.Portal.Validations.CollegeCertificates
 
             NoCertifications.Visible = table.Rows.Count == 0;
 
+            var supportEmail = ServiceLocator.AppSettings.Partition.Email;
+            SupportEmail.Text = string.Format("<a href=\"mailto:{0}\">{0}</a>", supportEmail);
+
             if (ProfileStandardIdentifier.HasValue)
                 LoadResults();
         }

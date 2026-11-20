@@ -8,7 +8,7 @@ using Shift.Common;
 namespace Shift.Contract
 {
     [Serializable]
-    public class CookieToken : ISystemRoles
+    public class CookieToken
     {
         private static readonly CultureInfo Culture = CultureInfo.InvariantCulture;
 
@@ -44,14 +44,7 @@ namespace Shift.Contract
 
         public string ImpersonatorUser { get; set; }
 
-        public bool IsAdministrator { get; set; }
-
         public bool IsAuthenticated => UserIdentifier.HasValue && UserIdentifier != Guid.Empty;
-
-        public bool IsDeveloper { get; set; }
-
-        public bool IsOperator { get; set; }
-        public bool IsLearner { get; set; }
 
         public string Language { get; set; }
 
@@ -72,8 +65,6 @@ namespace Shift.Contract
         public string UserEmail { get; set; }
 
         public Guid? UserIdentifier { get; set; }
-
-        public string[] UserRoles { get; set; }
 
         public string ValidationKey { get; set; }
 

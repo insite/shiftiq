@@ -23,6 +23,7 @@ namespace InSite.Application.Contacts.Read
         public Guid? RegistrationEventIdentifier { get; set; }
         public Guid? ExcludeGradebookIdentifier { get; set; }
         public Guid? ExcludeLearnerJournalSetupIdentifier { get; set; }
+        public Guid? MembershipGroupIdentifier { get; set; }
 
         public QUserFilter Clone()
         {

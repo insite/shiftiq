@@ -219,5 +219,70 @@ public class RegistrationController : ShiftControllerBase
         return Ok(matches);
     }
 
+    /// <summary>
+    /// Searches for the list of registration details that match specific criteria
+    /// </summary>
+    [HttpPost("api/events/registrations/search-details")]
+    [HybridPermission("booking/registrations/details", DataAccess.Read)]
+    [EndpointName("searchRegistrationDetails")]
+    public async Task<ActionResult<IEnumerable<RegistrationDetailsMatch>>> PostSearchDetailsAsync([FromBody] SearchRegistrationDetails query, CancellationToken cancellation = default)
+    {
+        return await SearchDetailsAsync(query, cancellation);
+    }
+
+    [HttpGet("api/events/registrations/search-details")]
+    [HybridPermission("booking/registrations/details", DataAccess.Read)]
+    [EndpointName("searchRegistrationDetails_get")]
+    [AliasFor("searchRegistrationDetails")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<ActionResult<IEnumerable<RegistrationDetailsMatch>>> GetSearchDetailsAsync([FromQuery] SearchRegistrationDetails query, CancellationToken cancellation = default)
+    {
+        return await SearchDetailsAsync(query, cancellation);
+    }
+
+    private async Task<ActionResult<IEnumerable<RegistrationDetailsMatch>>> SearchDetailsAsync(SearchRegistrationDetails query, CancellationToken cancellation)
+    {
+        var principal = _principalProvider.GetPrincipal();
+
+        if (!principal.Claims.Paging)
+            query.DisablePaging();
+
+        _principalProvider.ValidateOrganizationId(principal, query);
+
+        var matches = await _registrationService.SearchDetailsAsync(query, cancellation);
+
+        var count = await _registrationService.CountDetailsAsync(query, cancellation);
+
+        Response.AddPagination(query.Filter, count);
+
+        return Ok(matches);
+    }
+
     #endregion Queries
+
+    #region Modify
+
+    public record ModifyAttendanceStatusInput(string? AttendanceStatus);
+
+    /// <summary>
+    /// Modifies AttendanceStatus fof the registration
+    /// </summary>
+    [HttpPut("api/events/registrations/{registration:guid}/attendance-status")]
+    [HybridPermission("booking/registrations/attendance-status", DataAccess.Update)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [EndpointName("modifyRegistrationAttendanceStatus")]
+    public async Task<ActionResult> ModifyAttendanceStatusAsync(Guid registration, ModifyAttendanceStatusInput input, CancellationToken cancellation = default)
+    {
+        var principal = _principalProvider.GetPrincipal();
+
+        if (!await _registrationService.ModifyAttendanceStatusAsync(principal.OrganizationId, registration, input.AttendanceStatus, cancellation))
+            return NotFound();
+
+        return NoContent();
+    }
+
+    #endregion
 }

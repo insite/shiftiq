@@ -21,6 +21,7 @@ namespace InSite.UI.Admin.Accounts
             {
                 OrganizationSearch.Refresh();
                 Global.InitIntegrations();
+                InSite.UI.Portal.Security.Organizations.ClearPartitionCache();
             };
 
             ResyncOrganizationsWithHub.Click += (x, y) =>
@@ -28,6 +29,7 @@ namespace InSite.UI.Admin.Accounts
                 try
                 {
                     Global.RegisterPartition();
+                    InSite.UI.Portal.Security.Organizations.ClearPartitionCache();
                     ScreenStatus.AddMessage(AlertType.Success, "Organizations resynced with the Hub.");
                 }
                 catch (Exception ex)

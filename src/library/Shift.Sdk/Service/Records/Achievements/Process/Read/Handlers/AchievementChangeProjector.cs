@@ -52,6 +52,7 @@ namespace InSite.Application.Records.Read
 
             publisher.Subscribe<AchievementReportingDisabled>(Handle);
             publisher.Subscribe<AchievementReportingEnabled>(Handle);
+            publisher.Subscribe<AchievementCertificateIssuanceChanged>(Handle);
 
             publisher.Subscribe<AchievementBadgeImageDisabled>(Handle);
             publisher.Subscribe<AchievementBadgeImageEnabled>(Handle);
@@ -122,6 +123,9 @@ namespace InSite.Application.Records.Read
             => _store.UpdateAchievement(e);
 
         public void Handle(AchievementReportingEnabled e)
+            => _store.UpdateAchievement(e);
+
+        public void Handle(AchievementCertificateIssuanceChanged e)
             => _store.UpdateAchievement(e);
 
         public void Handle(AchievementDeleted e)

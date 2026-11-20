@@ -48,6 +48,9 @@ namespace InSite.Domain.Attempts
         [JsonProperty]
         public decimal Duration { get; private set; }
 
+        [JsonProperty]
+        public string AIProctoringSessionId { get; private set; }
+
         #region Methods (time intervals)
 
         private void OnAttemptStarted(Change e)
@@ -154,6 +157,9 @@ namespace InSite.Domain.Attempts
             {
                 var interval = TimeIntervals[i];
                 var sectionIndex = interval.SectionIndex.Value;
+                if (sectionIndex >= sectionsData.Length)
+                    continue;
+
                 var section = sectionsData[sectionIndex]
                     ?? (sectionsData[sectionIndex] = new IntervalCalculationItem { Started = interval.Started });
 
@@ -348,6 +354,11 @@ namespace InSite.Domain.Attempts
         }
 
         public void When(AttemptTagged _)
+        {
+
+        }
+
+        public void When(AttemptAIProctoringSessionIdModified _)
         {
 
         }

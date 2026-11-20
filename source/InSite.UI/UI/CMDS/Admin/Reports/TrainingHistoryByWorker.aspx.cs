@@ -47,6 +47,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
         private class UserDataItem
         {
             public string PersonFullName { get; set; }
+            public string DivisionName { get; set; }
 
             public string PersonEmail { get; set; }
 
@@ -62,6 +63,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
             public DateTimeOffset? ExpirationDate { get; set; }
             public string AccreditorName { get; set; }
             public bool IsCompetent { get; set; }
+            public string CredentialStatus { get; set; }
             public decimal? Score { get; set; }
         }
 
@@ -73,6 +75,12 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             get => (SearchParameters)ViewState[nameof(CurrentParameters)];
             set => ViewState[nameof(CurrentParameters)] = value;
+        }
+
+        protected bool ShowDivision
+        {
+            get => (bool)(ViewState[nameof(ShowDivision)] ?? false);
+            private set => ViewState[nameof(ShowDivision)] = value;
         }
 
         #endregion
@@ -200,6 +208,18 @@ namespace InSite.Cmds.Actions.Reporting.Report
                         : $"{userName} - Job Division: {user.JobDivision}";
 
                     rowNumber++;
+
+                    var hasDivision = ShowDivision && !string.IsNullOrEmpty(user.DivisionName);
+
+                    if (hasDivision)
+                    {
+                        var divisionCell = sheet.Cells[rowNumber, 1, rowNumber, 5];
+                        divisionCell.Merge = true;
+                        divisionCell.Value = user.DivisionName;
+
+                        rowNumber++;
+                    }
+
                     sheet.Row(rowNumber++).Height = 10;
 
                     var achievementNameHeaderCell = sheet.Cells[rowNumber, 1];
@@ -211,19 +231,19 @@ namespace InSite.Cmds.Actions.Reporting.Report
                     providerHeaderCell.StyleName = tableHeaderStyle.Name;
 
                     var completionDateHeaderCell = sheet.Cells[rowNumber, 3];
-                    completionDateHeaderCell.Value = "Completion";
+                    completionDateHeaderCell.Value = "Completed";
                     completionDateHeaderCell.StyleName = tableHeaderStyle.Name;
                     completionDateHeaderCell.Style.WrapText = true;
                     completionDateHeaderCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
                     var renewalDateHeaderCell = sheet.Cells[rowNumber, 4];
-                    renewalDateHeaderCell.Value = "Renewal";
+                    renewalDateHeaderCell.Value = "Expiry";
                     renewalDateHeaderCell.StyleName = tableHeaderStyle.Name;
                     renewalDateHeaderCell.Style.WrapText = true;
                     renewalDateHeaderCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
                     var completeHeaderCell = sheet.Cells[rowNumber, 5];
-                    completeHeaderCell.Value = "Valid";
+                    completeHeaderCell.Value = "Status";
                     completeHeaderCell.StyleName = tableHeaderStyle.Name;
                     completeHeaderCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
@@ -250,7 +270,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                         renewalDateCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
                         var completeCell = sheet.Cells[rowNumber, 5];
-                        completeCell.Value = achievement.IsCompetent ? "yes" : "no";
+                        completeCell.Value = achievement.CredentialStatus;
                         completeCell.StyleName = tableCellStyle.Name;
                         completeCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
@@ -287,10 +307,12 @@ namespace InSite.Cmds.Actions.Reporting.Report
         {
             ReportTab.Visible = false;
 
+            ShowDivision = Criteria.DivisionsEnabled;
+
             CurrentParameters = new SearchParameters
             {
                 OrganizationIdentifier = Organization.Identifier,
-                Departments = Criteria.DepartmentValues,
+                Departments = Criteria.DepartmentFilterValues,
                 Achievements = Criteria.SelectedAchievements,
                 Learners = Criteria.LearnerValues,
                 IsRequired = Criteria.IsRequiredFilter,
@@ -370,6 +392,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                         PersonFullName = firstUser.PersonFullName,
                         PersonEmail = firstUser.PersonEmail,
                         JobDivision = firstUser.JobDivision,
+                        DivisionName = firstUser.DivisionName,
                         Achievements = userGroup.Select(x => new AchievementDataItem
                         {
                             AchievementTitle = x.ResourceTitle,
@@ -377,6 +400,7 @@ namespace InSite.Cmds.Actions.Reporting.Report
                             ExpirationDate = x.ExpirationDate,
                             AccreditorName = x.AccreditorName,
                             IsCompetent = x.IsCompetent,
+                            CredentialStatus = x.CredentialStatus,
                             Score = x.Score
                         })
                     };

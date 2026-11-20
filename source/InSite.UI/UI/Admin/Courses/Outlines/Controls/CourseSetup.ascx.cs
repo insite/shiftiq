@@ -172,6 +172,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
             RecordsTab.IsSelected = Request.QueryString["tab"] == "records";
             PublicationsTab.IsSelected = Request.QueryString["tab"] == "publication";
+            EnrollmentsTab.IsSelected = Request.QueryString["tab"] == "enrollments";
 
             FrameworkIdentifier.Value = course.Framework;
 
@@ -639,7 +640,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
             if (reload)
             {
                 GroupEnrollments.LoadData(gradebookId.Value);
-                UserEnrollments.LoadData(gradebookId.Value);
+                UserEnrollments.LoadData(CourseIdentifier, CourseName.Text, gradebookId.Value, Request.QueryString["enrollment"] == "completed");
             }
             else
             {
@@ -658,7 +659,7 @@ namespace InSite.Admin.Courses.Outlines.Controls
 
         private void OnUserEnrollmentsUpdated()
         {
-            UserEnrollmentContainer.Visible = UserEnrollments.RowCount > 0;
+            UserEnrollmentContainer.Visible = UserEnrollments.RowCount > 0 || UserEnrollments.IsCompletedFilter;
         }
 
         private void EnrollmentClassAdd_Click(object sender, EventArgs e)

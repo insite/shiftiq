@@ -6,7 +6,7 @@ namespace Shift.Service.Utility;
 
 public class CollectionItemReader(IDbContextFactory<TableDbContext> context) : IEntityReader
 {
-    public Task<List<CollectionItemEntity>> CollectAsync(Guid organizationId, string collectionName)
+    public Task<List<CollectionItemEntity>> CollectAsync(Guid organizationId, string collectionName, CancellationToken ct = default)
     {
         return ExecuteAsync(db =>
         {
@@ -18,7 +18,7 @@ public class CollectionItemReader(IDbContextFactory<TableDbContext> context) : I
                     (i, c) => i
                 )
                 .OrderBy(x => x.ItemSequence)
-                .ToListAsync();
+                .ToListAsync(ct);
         });
     }
 

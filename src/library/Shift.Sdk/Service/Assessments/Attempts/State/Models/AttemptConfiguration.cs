@@ -20,6 +20,8 @@ namespace InSite.Domain.Attempts
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
         public SpecificationTabTimeLimit TabTimeLimit { get; set; }
 
+        public AIProctoringProvider? AIProctoringProvider { get; set; }
+
         public AttemptConfiguration Clone()
         {
             return (AttemptConfiguration)MemberwiseClone();

@@ -11,6 +11,7 @@ namespace Shift.Contract
         public string UserFirstName { get; set; }
         public string UserLastName { get; set; }
         public string EmployeeStatus { get; set; }
+        public DateTimeOffset SubmittedAt { get; set; }
         public int MatchCount { get; set; }
     }
 }

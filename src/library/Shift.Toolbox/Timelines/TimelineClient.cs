@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Shift.Common;
@@ -56,7 +57,7 @@ namespace Shift.Toolbox
             return result;
         }
 
-        public async Task<ApiResult> QueueCommandsAsync(IEnumerable<ICommand> commands, string token)
+        public async Task<ApiResult> QueueCommandsAsync(IEnumerable<ICommand> commands, string token, CancellationToken ct = default)
         {
             var apiCommands = commands.Select(x =>
             {
@@ -86,10 +87,10 @@ namespace Shift.Toolbox
                 };
             });
 
-            return await QueueCommandsAsync(apiCommands, token);
+            return await QueueCommandsAsync(apiCommands, token, ct);
         }
 
-        public async Task<ApiResult> QueueCommandsAsync(IEnumerable<ApiCommand> commands, string token)
+        public async Task<ApiResult> QueueCommandsAsync(IEnumerable<ApiCommand> commands, string token, CancellationToken ct = default)
         {
             var serialized = _serializer.Serialize(commands);
             var content = new StringContent(serialized, Encoding.UTF8, "application/json");
@@ -98,7 +99,7 @@ namespace Shift.Toolbox
             request.Content = content;
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await _http.SendAsync(request);
+            var response = await _http.SendAsync(request, ct);
             var result = new ApiResult<string>(response.StatusCode, response.Headers);
 
             try

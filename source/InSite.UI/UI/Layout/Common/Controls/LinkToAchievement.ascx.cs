@@ -1,4 +1,4 @@
-﻿using InSite.Application.Records.Read;
+using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
 
 using Shift.Common;

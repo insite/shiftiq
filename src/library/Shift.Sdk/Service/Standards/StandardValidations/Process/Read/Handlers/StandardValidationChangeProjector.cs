@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Shift.Common.Timeline.Changes;
 using Shift.Common.Timeline.Exceptions;
@@ -79,6 +80,10 @@ namespace InSite.Application.Standards.Read
         /// <summary>
         /// Regenerate the projection of standard validation changes from the log to query tables.
         /// </summary>
+        /// <remarks>
+        /// The store builds every row from the aggregate state carried on the change, but a change read back from the
+        /// log carries no state, so it is rebuilt here as it stood after each change.
+        /// </remarks>
         public void Replay(IChangeStore store, Action<string, int, int, Guid> progress, Guid? id)
         {
             // Clear existing data from the query tables.
@@ -87,8 +92,10 @@ namespace InSite.Application.Standards.Read
             else
                 _store.DeleteAll();
 
-            // Get the subset of changes for which this projector is a subscriber. 
+            // Get the subset of changes for which this projector is a subscriber.
             var changes = store.GetChanges("StandardValidation", id, null);
+
+            var states = new Dictionary<Guid, StandardValidationState>();
 
             // Handle each of the changes in the order they occurred.
             for (var i = 0; i < changes.Length; i++)
@@ -96,6 +103,16 @@ namespace InSite.Application.Standards.Read
                 var e = changes[i];
 
                 progress("Standard Validation", i + 1, changes.Length, e.AggregateIdentifier);
+
+                var isTracked = states.TryGetValue(e.AggregateIdentifier, out var state);
+                if (!isTracked)
+                {
+                    state = new StandardValidationState();
+                    states.Add(e.AggregateIdentifier, state);
+                }
+
+                state.Apply(e);
+                e.AggregateState = state;
 
                 var handler = GetType().GetMethod("Handle", new Type[] { e.GetType() });
                 if (handler == null)

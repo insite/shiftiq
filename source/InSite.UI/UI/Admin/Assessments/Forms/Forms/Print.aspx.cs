@@ -61,6 +61,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             BuildAddendum.Click += BuildAddendum_Click;
             BuildFormInternal.Click += BuildFormInternal_Click;
             BuildFormDocx.Click += BuildFormDocx_Click;
+            BuildFormBasicDocx.Click += BuildFormBasicDocx_Click;
             BuildFormCompact.Click += BuildFormCompact_Click;
 
             DownloadButton.Click += DownloadButton_Click;
@@ -140,16 +141,35 @@ namespace InSite.Admin.Assessments.Forms.Forms
 
         private void BuildFormDocx_Click(object sender, EventArgs e)
         {
+            var authorName = User.FullName;
+            var defaultImagePath = MapPath("~/UI/Layout/Common/Images/None.png");
+            var websiteUrl = $"{Request.Url.Scheme}://{Request.Url.Host}";
+
             PrintQueue.QueuePrint(
                 _queueStoragePath,
                 User.Identifier, FormID,
-                new QuestionDocxPrinter.PrinterOptions
+                new QuestionPrintInternal.FormOptions(Organization.Identifier, User.TimeZone, ReportLanguage.Value, FormID)
+                {
+                    IncludeImages = IncludeImages.Checked,
+                    IncludeAdminComments = IncludeAdminComments.Checked,
+                    ExcludeHiddenComments = ExcludeHiddenComments.Checked,
+                    QuestionFilter = CreateQuestionFilter()
+                },
+                (user, options) => QuestionPrintInternal.RenderDocx(options, authorName, defaultImagePath, websiteUrl));
+        }
+
+        private void BuildFormBasicDocx_Click(object sender, EventArgs e)
+        {
+            PrintQueue.QueuePrint(
+                _queueStoragePath,
+                User.Identifier, FormID,
+                new QuestionBasicDocxPrinter.PrinterOptions
                 {
                     OrganizationId = Organization.Identifier,
                     BankId = BankID,
                     FormId = FormID,
                     Language = ReportLanguage.Value,
-                    TimeZone = User.TimeZone,
+                    TimeZoneId = User.TimeZone,
                     IncludeImages = IncludeImages.Checked,
                     IncludeAdminComments = IncludeAdminComments.Checked,
                     ExcludeHiddenComments = ExcludeHiddenComments.Checked,
@@ -158,7 +178,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
                     DefaultImagePath = MapPath("~/UI/Layout/Common/Images/None.png"),
                     WebsiteUrl = $"{Request.Url.Scheme}://{Request.Url.Host}"
                 },
-                (_, options) => QuestionDocxPrinter.RenderFormQuestions(options));
+                (_, options) => QuestionBasicDocxPrinter.RenderFormQuestions(options));
         }
 
         private void BuildFormCompact_Click(object sender, EventArgs e)
@@ -234,6 +254,7 @@ namespace InSite.Admin.Assessments.Forms.Forms
             BuildForm.Enabled = hasQuestions;
             BuildFormInternal.Enabled = hasQuestions;
             BuildFormDocx.Enabled = hasQuestions;
+            BuildFormBasicDocx.Enabled = hasQuestions;
 
             if (!form.Addendum.IsEmpty)
                 BuildAddendum.Enabled = true;

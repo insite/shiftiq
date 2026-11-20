@@ -107,7 +107,5 @@ namespace Shift.Common.Linq
                     stack.Pop().Dispose();
             }
         }
-
-        public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> value) => value == null ? Enumerable.Empty<T>() : value;
     }
 }

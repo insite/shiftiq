@@ -30,7 +30,7 @@ namespace InSite.Custom.CMDS.Reports.Controls
 
         private class DataGroup : IEquatable<DataGroup>
         {
-            public DateTimeOffset AsAt { get; set; }
+            public DateTime AsAt { get; set; }
             public string StatisticType { get; set; }
             public string StatisticName { get; set; }
 
@@ -58,7 +58,7 @@ namespace InSite.Custom.CMDS.Reports.Controls
 
         private class GridRow
         {
-            public DateTimeOffset? AsAt { get; set; }
+            public DateTime? AsAt { get; set; }
             public string StatisticName { get; set; }
 
             public int CountCP { get; set; }
@@ -109,10 +109,8 @@ namespace InSite.Custom.CMDS.Reports.Controls
                 Width = 20,
                 SetupCell = (range, data) =>
                 {
-                    range.Value = data.AsAt.HasValue
-                        ? (DateTime?)TimeZoneInfo.ConvertTime(data.AsAt.Value, User.TimeZone).DateTime
-                        : null;
-                    range.Style.Numberformat.Format = "yyyy-MM-dd HH:mm";
+                    range.Value = data.AsAt;
+                    range.Style.Numberformat.Format = "yyyy-MM-dd";
                 }
             },
             new XlsxColumnInfo
@@ -404,7 +402,7 @@ namespace InSite.Custom.CMDS.Reports.Controls
                 excel.Workbook.Properties.Title = reportTitle;
                 excel.Workbook.Properties.Company = Organization.Name;
                 excel.Workbook.Properties.Author = User.FullName;
-                excel.Workbook.Properties.Created = TimeZoneInfo.ConvertTime(DateTimeOffset.Now, User.TimeZone).DateTime;
+                excel.Workbook.Properties.Created = TimeZones.ConvertTime(DateTimeOffset.Now, User.TimeZone).DateTime;
 
                 foreach (var sheet in excel.Workbook.Worksheets)
                 {
@@ -453,7 +451,7 @@ namespace InSite.Custom.CMDS.Reports.Controls
 
                 var dataGroup = includeAsAt
                     ? depGroup.GroupBy(row => new DataGroup { AsAt = row.AsAt, StatisticType = row.ListDomain, StatisticName = row.ItemName })
-                    : depGroup.GroupBy(row => new DataGroup { AsAt = DateTimeOffset.MinValue, StatisticType = row.ListDomain, StatisticName = row.ItemName });
+                    : depGroup.GroupBy(row => new DataGroup { AsAt = DateTime.MinValue, StatisticType = row.ListDomain, StatisticName = row.ItemName });
 
                 department.GridRows = dataGroup
                     .Select(dg =>

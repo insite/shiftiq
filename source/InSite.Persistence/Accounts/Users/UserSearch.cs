@@ -835,7 +835,7 @@ ORDER BY PersonName
                         PasswordHash = x.User.UserPasswordHash,
                         PersonCode = x.PersonCode,
                         Phone = x.Phone,
-                        TimeZoneId = x.User.TimeZone,
+                        TimeZone = x.User.TimeZone,
                         UserLicenseAccepted = x.User.UserLicenseAccepted
                     });
 
@@ -844,8 +844,7 @@ ORDER BY PersonName
                 if (model == null)
                     return;
 
-                model.TimeZone = TimeZones.GetInfo(model.TimeZoneId)
-                    ?? TimeZoneInfo.FindSystemTimeZoneById(model.TimeZoneId);
+                TimeZones.ValidateZone(model.TimeZone);
 
                 var mfa = db.TUserAuthenticationFactors.FirstOrDefault(x => x.UserIdentifier == model.UserIdentifier);
                 model.ActiveOtpMode = mfa?.OtpMode ?? OtpModes.None;

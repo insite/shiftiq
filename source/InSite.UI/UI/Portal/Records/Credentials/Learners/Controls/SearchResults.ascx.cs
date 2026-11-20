@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -156,7 +156,7 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
 
         private string GetDateString(DateTimeOffset? date)
         {
-            return date.FormatDateOnly(User.TimeZone, CultureInfo.GetCultureInfo(Identity.Language));
+            return date != null ? date.Value.FormatDateOnly(User.TimeZone, CultureInfo.GetCultureInfo(Identity.Language)) : null;
         }
 
         private string GetStatusHtml(CredentialStatus status, bool isSelfDeclared)

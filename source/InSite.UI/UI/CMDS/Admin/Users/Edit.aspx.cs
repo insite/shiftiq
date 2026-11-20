@@ -344,7 +344,7 @@ namespace InSite.Cmds.Admin.People.Forms
             }
             else
             {
-                helper.CmdsUnarchive(user);
+                helper.CmdsUnarchive(user, Organization.OrganizationIdentifier);
 
                 ServiceLocator.AlertMailer.Send(Organization.OrganizationIdentifier, user.UserIdentifier, new AlertUserAccountArchived
                 {

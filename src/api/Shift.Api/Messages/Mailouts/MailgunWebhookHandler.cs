@@ -23,12 +23,10 @@ public class MailgunWebhookHandler(
     MailoutService mailoutService,
     RecipientService recipientService,
     PersonService personService,
-    IMemoryCache tokenCache,
     ILogger<MailgunWebhookHandler> logger
 )
 {
-    private static readonly TimeSpan TimestampTolerance = TimeSpan.FromMinutes(5);
-    private readonly string Domain = GetDomain(appSettings);
+    private readonly string QueueName = MailgunQueueHelper.GetQueueShortName(appSettings);
 
     public async Task ProcessAsync(string json)
     {
@@ -72,7 +70,7 @@ public class MailgunWebhookHandler(
             )
         };
 
-        if (info.Status == "Failed" || info.Status == "Delivered")
+        if (info.Status == MailoutCallbackStatus.Failed)
             await DisabledRecipientEmailAsync(mailout.MailoutId, info.Recipient, commands);
 
         await commander.SendCommandsAsync(OrganizationIdentifiers.Global, UserIdentifiers.Root, commands);
@@ -80,13 +78,6 @@ public class MailgunWebhookHandler(
         logger.LogInformation(
             "Processed mailgun webhook: Mailout={MailoutId}, Status={Status}, Recipient={Recipient}",
             mailoutId, info.Status, info.Recipient);
-    }
-
-    private static string GetDomain(AppSettings appSettings)
-    {
-        var env = appSettings.Release.GetEnvironment();
-        var part = appSettings.Partition;
-        return (env.GetSubdomainPrefix() + part.Slug + "." + part.Domain).ToLowerInvariant();
     }
 
     private bool DeserializePayload(string json, [NotNullWhen(true)] out Payload? payload)
@@ -139,23 +130,10 @@ public class MailgunWebhookHandler(
             return false;
         }
 
-        var signatureAge = DateTime.UtcNow - signatureTimestamp;
-        if (signatureAge < TimeSpan.Zero || signatureAge > TimestampTolerance)
-        {
-            logger.LogWarning("Signature timestamp out of tolerance: age={SignatureAge}", signatureAge);
-            return false;
-        }
-
         var signatureToken = signature.Token;
         if (signatureToken.IsEmpty())
         {
             logger.LogWarning("Signature token is empty");
-            return false;
-        }
-
-        if (tokenCache.TryGetValue(signatureToken, out _))
-        {
-            logger.LogWarning("Duplicate signature token: {SignatureToken}", signatureToken);
             return false;
         }
 
@@ -164,9 +142,6 @@ public class MailgunWebhookHandler(
             logger.LogWarning("Invalid signature hash");
             return false;
         }
-
-        var cacheExpiry = TimestampTolerance + TimeSpan.FromSeconds(60);
-        tokenCache.Set(signatureToken, true, cacheExpiry);
 
         return true;
     }
@@ -184,15 +159,15 @@ public class MailgunWebhookHandler(
             return false;
         }
 
-        if (!userVariables.TryGetValue("environment-domain", out var environmentDomain) || environmentDomain.IsEmpty())
+        if (!userVariables.TryGetValue(MailgunQueueHelper.VariableName, out var queueShortName) || queueShortName.IsEmpty())
         {
-            logger.LogWarning("Missing environment-domain in user-variables");
+            logger.LogWarning("Missing {VariableName} in user-variables", MailgunQueueHelper.VariableName);
             return false;
         }
 
-        if (!string.Equals(environmentDomain, Domain, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(queueShortName, QueueName, StringComparison.Ordinal))
         {
-            logger.LogWarning("environment-domain mismatch: expected={Domain}, got={EnvironmentDomain}", Domain, environmentDomain);
+            logger.LogWarning("{VariableName} mismatch: expected={QueueName}, got={QueueShortName}", MailgunQueueHelper.VariableName, QueueName, queueShortName);
             return false;
         }
 

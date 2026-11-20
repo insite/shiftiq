@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -1068,7 +1068,7 @@ namespace InSite.Admin.Contacts.People.Forms
             }
 
             var newUser = new QUser();
-            newUser.TimeZone = Organization.TimeZone.Id;
+            newUser.TimeZone = Organization.TimeZone;
 
             var newPerson = UserFactory.CreatePerson(Organization.OrganizationIdentifier);
             var row = new PersonImportRow(duplicateUser, newUser, newPerson);
@@ -1360,7 +1360,7 @@ namespace InSite.Admin.Contacts.People.Forms
 
         private static string ValidateTimeZone(string value)
         {
-            return !string.IsNullOrEmpty(value) && TimeZones.GetInfo(value) == null
+            return !string.IsNullOrEmpty(value) && !TimeZones.IsValidZone(value)
                 ? $"'{value}' is unsupported time zone"
                 : null;
         }
@@ -1547,7 +1547,6 @@ namespace InSite.Admin.Contacts.People.Forms
             SetAddress(person, ContactAddressType.Work, row.WorkAddress, settings.WorkAddress);
 
             user.Email = FixCaseOnEmail(row.Email);
-            user.EmailAlternate = FixCaseOnEmail(row.AlternateEmail);
             person.EmailAlternateEnabled = true;
             person.EmailEnabled = true;
             user.FirstName = FixCaseOnName(row.FirstName);
@@ -1555,6 +1554,9 @@ namespace InSite.Admin.Contacts.People.Forms
             user.FullName = string.IsNullOrEmpty(user.MiddleName) || user.Email != null && user.Email.EndsWith(ServiceLocator.AppSettings.Partition.Domain) || !PersonSearch.IsUserAssignedToOrganization(user.UserIdentifier, OrganizationIdentifiers.RCABC)
                 ? $"{user.FirstName} {user.LastName}"
                 : $"{user.FirstName} {user.MiddleName} {user.LastName}";
+
+            if (settings.AlternateEmailIndex >= 0)
+                user.EmailAlternate = FixCaseOnEmail(row.AlternateEmail);
 
             if (settings.JobTitleIndex >= 0)
                 person.JobTitle = AdjustString(row.JobTitle, 256);
@@ -1602,7 +1604,7 @@ namespace InSite.Admin.Contacts.People.Forms
                 }
 
             if (settings.TimeZoneIndex >= 0 && !string.IsNullOrEmpty(row.TimeZone))
-                user.TimeZone = TimeZones.GetInfo(row.TimeZone).Id;
+                user.TimeZone = TimeZones.IsValidZone(row.TimeZone) ? row.TimeZone : TimeZones.Ids.Utc;
 
             if (settings.TradeworkerNumberIndex >= 0)
                 person.TradeworkerNumber = AdjustString(row.TradeworkerNumber, 20);
@@ -1744,7 +1746,7 @@ namespace InSite.Admin.Contacts.People.Forms
                 }
 
                 var newUser = new QUser();
-                newUser.TimeZone = organization.TimeZone.Id;
+                newUser.TimeZone = organization.TimeZone;
 
                 var newPerson = UserFactory.CreatePerson(organization.OrganizationIdentifier);
 

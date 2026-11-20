@@ -12,10 +12,10 @@ namespace InSite.UI.Admin.Contacts.People.Controls
 {
     public partial class PersonInfo : UserControl
     {
-        public void BindPerson(QPerson person, TimeZoneInfo tz, string customPersonUrl = null) =>
+        public void BindPerson(QPerson person, string tz, string customPersonUrl = null) =>
             BindPerson(person, person?.User, tz, customPersonUrl);
 
-        public void BindPerson(QPerson person, QUser user, TimeZoneInfo tz, string customPersonUrl = null)
+        public void BindPerson(QPerson person, QUser user, string tz, string customPersonUrl = null)
         {
             BindPerson(person, user, tz,
                 UserName, UserLink,
@@ -26,7 +26,7 @@ namespace InSite.UI.Admin.Contacts.People.Controls
                 UserLink.HRef = customPersonUrl;
         }
 
-        public static void BindPerson(QPerson person, QUser user, TimeZoneInfo tz,
+        public static void BindPerson(QPerson person, QUser user, string tz,
             AspLiteral userName = null, HtmlAnchor userLink = null,
             AspLiteral email = null, AspLiteral personCode = null, AspLiteral birthdate = null,
             AspLiteral employer = null)
@@ -70,7 +70,7 @@ namespace InSite.UI.Admin.Contacts.People.Controls
                 email.Text = $"<a href='mailto:{user.Email}'>{user.Email}</a>";
         }
 
-        private static void BindPersonInfo(QPerson person, TimeZoneInfo tz, AspLiteral personCode, AspLiteral birthdate, AspLiteral employer)
+        private static void BindPersonInfo(QPerson person, string tz, AspLiteral personCode, AspLiteral birthdate, AspLiteral employer)
         {
             if (person == null)
             {

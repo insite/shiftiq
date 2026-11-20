@@ -95,7 +95,7 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
 
                 summary.OnInsert(attempt);
 
-                SyncRegistrationBackpointer(db, e.Registration, attempt.AttemptIdentifier);
+                SyncRegistrationBackpointer(db, e.Registration, attempt);
 
                 db.SaveChanges();
             }
@@ -240,7 +240,7 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
 
                 summary.OnInsert(attempt);
 
-                SyncRegistrationBackpointer(db, e.RegistrationIdentifier, attempt.AttemptIdentifier);
+                SyncRegistrationBackpointer(db, e.RegistrationIdentifier, attempt);
 
                 db.SaveChanges();
             }
@@ -302,7 +302,7 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
 
                 summary.OnInsert(attempt);
 
-                SyncRegistrationBackpointer(db, e.RegistrationIdentifier, attempt.AttemptIdentifier);
+                SyncRegistrationBackpointer(db, e.RegistrationIdentifier, attempt);
 
                 db.SaveChanges();
             }
@@ -332,6 +332,7 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
                 ActiveSectionIndex = state.ActiveSectionIndex,
                 ActiveQuestionIndex = state.ActiveQuestionIndex,
                 CriteriaAsSectionsEnabled = e.Configuration.CriteriaAsSections,
+                AIProctoringProvider = e.Configuration.AIProctoringProvider?.ToString(),
             };
 
             UpdateAttemptTime(result, state);
@@ -1301,11 +1302,15 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
                     // back-pointer on the old registration so a join via RegistrationIdentifier
                     // still finds the correct attempt.
                     var staleRegistration = db.Registrations.FirstOrDefault(x => x.RegistrationIdentifier == oldRegistration.Value);
-                    if (staleRegistration != null && staleRegistration.AttemptIdentifier == e.AggregateIdentifier)
-                        staleRegistration.AttemptIdentifier = null;
+                    if (staleRegistration != null)
+                    {
+                        var examForms = staleRegistration.ExamForms.Where(x => x.AttemptIdentifier == e.AggregateIdentifier).ToArray();
+                        foreach (var examForm in examForms)
+                            examForm.AttemptIdentifier = null;
+                    }
                 }
 
-                SyncRegistrationBackpointer(db, e.Registration, e.AggregateIdentifier);
+                SyncRegistrationBackpointer(db, e.Registration, attempt);
 
                 db.SaveChanges();
             }
@@ -1318,6 +1323,18 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
                 var attempt = db.QAttempts.First(x => x.AttemptIdentifier == e.AggregateIdentifier);
 
                 attempt.AttemptTag = e.Tag;
+
+                db.SaveChanges();
+            }
+        }
+
+        public void UpdateAttempt(AttemptAIProctoringSessionIdModified e)
+        {
+            using (var db = CreateContext())
+            {
+                var attempt = db.QAttempts.First(x => x.AttemptIdentifier == e.AggregateIdentifier);
+
+                attempt.AIProctoringSessionId = e.SessionId;
 
                 db.SaveChanges();
             }
@@ -1507,20 +1524,31 @@ UPDATE registrations.QRegistration SET AttemptIdentifier = NULL WHERE AttemptIde
 
         #region Methods (helpers)
 
-        private static void SyncRegistrationBackpointer(InternalDbContext db, Guid? registrationIdentifier, Guid attemptIdentifier)
+        private static void SyncRegistrationBackpointer(InternalDbContext db, Guid? registrationId, QAttempt attempt)
         {
             // Guard against the historical pattern that left QRegistration.AttemptIdentifier null.
             // The Registration aggregate also raises AttemptAssigned via the process manager; this
             // keeps the projection consistent in the same transaction as the QAttempt insert/update.
-            if (!registrationIdentifier.HasValue)
+            if (!registrationId.HasValue)
                 return;
 
-            var registration = db.Registrations.FirstOrDefault(x => x.RegistrationIdentifier == registrationIdentifier.Value);
+            var registration = db.Registrations.FirstOrDefault(x => x.RegistrationIdentifier == registrationId.Value);
             if (registration == null)
                 return;
 
-            if (registration.AttemptIdentifier != attemptIdentifier)
-                registration.AttemptIdentifier = attemptIdentifier;
+            var examForm = registration.ExamFormIdentifier == attempt.FormIdentifier
+                ? null
+                : registration.ExamForms.FirstOrDefault(x => x.ExamFormIdentifier == attempt.FormIdentifier);
+
+            if (examForm == null)
+            {
+                if (registration.AttemptIdentifier != attempt.AttemptIdentifier)
+                    registration.AttemptIdentifier = attempt.AttemptIdentifier;
+            }
+            else if (examForm.AttemptIdentifier != attempt.AttemptIdentifier)
+            {
+                examForm.AttemptIdentifier = attempt.AttemptIdentifier;
+            }
         }
 
         private static void RegradeSingleCorrectOptions(QuestionRegraded e, BankQuestion questionData, QAttemptQuestion question, List<QAttemptOption> options)

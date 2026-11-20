@@ -17,7 +17,8 @@ namespace InSite.Application.Messages.Read
             Guid? recipient,
             Guid? message,
             StringDictionary variables,
-            Guid[] to = null, Guid[] cc = null, Guid[] bcc = null
+            Guid[] to = null, Guid[] cc = null, Guid[] bcc = null,
+            string subject = null, string body = null
         );
 
         void Send(EmailDraft email, string tag, string type = null);

@@ -1,8 +1,10 @@
 using System;
 
+using Shift.Common;
+
 namespace Shift.Contract
 {
-    public partial class PersonMatch
+    public partial class PersonMatch : ISystemRoles
     {
         // Identity
 

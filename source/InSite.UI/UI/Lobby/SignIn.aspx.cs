@@ -222,7 +222,7 @@ namespace InSite.UI.Lobby
 
             var html = $"<div class='alert alert-{color}'><p>You are signing in to the <strong>{environment.Name}</strong> environment.</p></div>";
 
-            if (links.Length > 0)
+            if (links.Length > 0 && Organization.Toolkits?.Accounts?.OtherEnvironments == true)
                 html += $"<p><span class='me-2'>Other environments:</span>{links}</p>";
 
             return html;

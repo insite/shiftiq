@@ -11,7 +11,7 @@
                     <thead>
                         <tr>
                             <th>Logbook</th>
-                            <th runat="server" visible='<%# IsHoursColumnVisible %>' style="text-align:center;">Hours</th>
+                            <th runat="server" visible='<%# IsHoursColumnVisible %>' style="text-align:center;"><insite:ContentTextLiteral runat="server" ContentLabel="Logbooks.Hours" /></th>
                             <th style="text-align:center;">Entries</th>
                         </tr>
                     </thead>

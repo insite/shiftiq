@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Web.UI;
 
@@ -336,6 +336,11 @@ namespace InSite.Admin.Contacts.People.Forms
                 HttpResponseHelper.Redirect(SearchUrl, true);
 
             var title = $"{person.User.FullName} <span class='form-text'>{person?.PersonCode}</span>";
+
+            var commentFlag = PersonCommentSummarySearch.SelectLatestCommentFlag(Organization.Identifier, person.UserIdentifier);
+            if (commentFlag != null)
+                title += $" <span class='ms-2 fs-5'>{PersonHelper.GetCommentIndicatorHtml(commentFlag)}</span>";
+
             if (person.IsArchived || person.User.UtcArchived.HasValue)
                 title += " <span class='badge bg-danger'>Archived</span>";
 

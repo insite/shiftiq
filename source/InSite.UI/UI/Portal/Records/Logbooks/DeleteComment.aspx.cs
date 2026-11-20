@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using InSite.Common.Web;
 using InSite.Common.Web.UI;

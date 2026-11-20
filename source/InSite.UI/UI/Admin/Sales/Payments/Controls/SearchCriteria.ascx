@@ -78,6 +78,12 @@
                     <div class="mb-2">
                         <insite:DateTimeOffsetSelector ID="PaymentAbortedBefore" runat="server" EmptyMessage="Payment Aborted Before" />
                     </div>
+
+                    <h4 class="mt-3">Taxes</h4>
+
+                    <div class="mb-2">
+                        <insite:TaxRegionComboBox ID="TaxRegion" runat="server" EmptyMessage="Province/State" />
+                    </div>
                 </div>
             </div> 
         </div>

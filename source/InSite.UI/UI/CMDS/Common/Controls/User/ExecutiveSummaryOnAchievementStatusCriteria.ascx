@@ -24,11 +24,11 @@
                     </div>
 
                     <div runat="server" id="SnapshotDateSinceField" class="mb-2">
-                        <insite:DateTimeOffsetSelector runat="server" ID="SnapshotDateSince" EmptyMessage="Snapshot Date &ge;" Width="100%" />
+                        <insite:DateSelector runat="server" ID="SnapshotDateSince" EmptyMessage="Snapshot Date &ge;" Width="100%" />
                     </div>
 
                     <div runat="server" id="SnapshotDateBeforeField" class="mb-2">
-                        <insite:DateTimeOffsetSelector runat="server" ID="SnapshotDateBefore" EmptyMessage="Snapshot Date &lt;" Width="100%" />
+                        <insite:DateSelector runat="server" ID="SnapshotDateBefore" EmptyMessage="Snapshot Date &lt;" Width="100%" />
                     </div>
 
                 </div>

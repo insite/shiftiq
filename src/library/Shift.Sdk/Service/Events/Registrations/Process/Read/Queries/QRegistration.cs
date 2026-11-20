@@ -84,6 +84,7 @@ namespace InSite.Application.Registrations.Read
         public virtual ICollection<QRegistrationInstructor> RegistrationInstructors { get; set; } = new HashSet<QRegistrationInstructor>();
         public virtual ICollection<QAccommodation> Accommodations { get; set; } = new HashSet<QAccommodation>();
         public virtual ICollection<QAttempt> Attempts { get; set; } = new HashSet<QAttempt>();
+        public virtual ICollection<QRegistrationExamForm> ExamForms { get; set; } = new HashSet<QRegistrationExamForm>();
 
         public bool IsPresent => StringHelper.EqualsAny(AttendanceStatus, new[] { "Attended", "Present" });
 

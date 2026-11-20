@@ -244,10 +244,6 @@
                             </label>
                             <insite:TextBox runat="server" ID="Email" CssClass="form-control" TextMode="Email" MaxLength="254" />
                         </div>
-
-                        <div runat="server" id="AssignToSkillsCheckTransferField" class="mb-3">
-                            <insite:CheckBox runat="server" ID="AssignToSkillsCheckTransfer" Text="Purchase for Distribution to Other Organizations" Checked="true" />
-                        </div>
                     </div>
 
                 </div>

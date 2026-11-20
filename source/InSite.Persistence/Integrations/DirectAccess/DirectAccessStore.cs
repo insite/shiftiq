@@ -128,7 +128,7 @@ namespace InSite.Persistence.Integration.DirectAccess
             var user = new QUser
             {
                 UserIdentifier = UniqueIdentifier.Create(),
-                TimeZone = TimeZones.Pacific.Id,
+                TimeZone = TimeZones.Ids.Pacific,
                 MultiFactorAuthentication = organization.Toolkits.Contacts?.DefaultMFA ?? false
             };
 

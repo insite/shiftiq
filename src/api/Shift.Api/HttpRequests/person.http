@@ -1,0 +1,4 @@
+POST {{host}}/api/contacts/people/import
+Authorization: {{auth}}
+
+[]

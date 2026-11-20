@@ -3,43 +3,53 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 
+using InSite.Application.Assets.Read;
 using InSite.Application.Records.Read;
 
 using Shift.Common;
+using Shift.Contract;
 
 namespace InSite.Persistence
 {
     public static class ProgramStore
     {
-        public static void Update(TProgram list, Guid modifiedBy)
+        public static ISearchStore SearchStore { get; set; }
+
+        public static void Update(TProgram entity, Guid modifiedBy)
         {
-            list.Modified = DateTimeOffset.UtcNow;
-            list.ModifiedBy = modifiedBy;
+            entity.Modified = DateTimeOffset.UtcNow;
+            entity.ModifiedBy = modifiedBy;
 
             using (var db = new InternalDbContext())
             {
-                db.Entry(list).State = EntityState.Modified;
+                db.Entry(entity).State = EntityState.Modified;
                 db.SaveChanges();
             }
+
+            SearchStore.EnqueueSearchObject(entity.OrganizationIdentifier, entity.ProgramIdentifier, SearchObjectType.Program);
         }
 
-        public static void Insert(TProgram list, Guid createdBy)
+        public static void Insert(TProgram entity, Guid createdBy)
         {
-            list.Created = DateTimeOffset.UtcNow;
-            list.CreatedBy = createdBy;
-            list.Modified = list.Created;
-            list.ModifiedBy = list.CreatedBy;
+            entity.Created = DateTimeOffset.UtcNow;
+            entity.CreatedBy = createdBy;
+            entity.Modified = entity.Created;
+            entity.ModifiedBy = entity.CreatedBy;
 
             using (var db = new InternalDbContext())
             {
-                db.TPrograms.Add(list);
+                db.TPrograms.Add(entity);
                 db.SaveChanges();
             }
+
+            SearchStore.EnqueueSearchObject(entity.OrganizationIdentifier, entity.ProgramIdentifier, SearchObjectType.Program);
         }
 
         public static void Delete(Guid programIdentifier)
         {
             ProgramContainmentStore.DeleteAllForProgram(programIdentifier);
+
+            Guid organizationId;
 
             using (var db = new InternalDbContext())
             {
@@ -71,10 +81,14 @@ namespace InSite.Persistence
                 if (programTasks.Count > 0)
                     db.TTasks.RemoveRange(programTasks);
 
+                organizationId = program.OrganizationIdentifier;
+
                 db.TPrograms.Remove(program);
 
                 db.SaveChanges();
             }
+
+            SearchStore.EnqueueSearchObject(organizationId, programIdentifier, SearchObjectType.Program);
         }
 
         public static void InsertGroupEnrollment(Guid organizationId, Guid programId, Guid groupId, Guid creatorUserId)
@@ -135,6 +149,17 @@ namespace InSite.Persistence
 
                 db.TProgramEnrollments.Add(enrollment);
                 db.SaveChanges();
+            }
+        }
+
+        public static Guid? GetEnrollmentIdentifier(Guid program, Guid learner)
+        {
+            using (var db = new InternalDbContext())
+            {
+                var enrollment = db.TProgramEnrollments.AsNoTracking()
+                    .FirstOrDefault(x => x.ProgramIdentifier == program && x.LearnerUserIdentifier == learner);
+
+                return enrollment?.EnrollmentIdentifier;
             }
         }
 

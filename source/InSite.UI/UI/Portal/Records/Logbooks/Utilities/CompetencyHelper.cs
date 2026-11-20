@@ -137,7 +137,7 @@ namespace InSite.UI.Portal.Records.Logbooks.Models
                     return;
 
                 var areaContent = ServiceLocator.ContentSearch.GetBlock(
-                    competency.CompetencyIdentifier,
+                    competency.AreaIdentifier.Value,
                     null,
                     new[] { ContentLabel.Title }
                 );

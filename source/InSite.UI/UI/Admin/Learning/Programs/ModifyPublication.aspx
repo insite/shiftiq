@@ -60,13 +60,6 @@
                                             <insite:FileUploadV2 runat="server" ID="ProgramImageUploadV2" LabelText="Upload New Program Image" FileUploadType="Image"/>
                                         </div>
 
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">
-                                                URL overwrite
-                                            </label>
-                                            <insite:TextBox runat="server" ID="ProgramImageUrl" />
-                                        </div>
-
                                         <div class="mb-3">
                                             <label class="form-label">
                                                 Custom Flag Color
@@ -81,6 +74,18 @@
                                             </label>
                                             <div>
                                                 <insite:TextBox runat="server" ID="ProgramFlagText" MaxLength="50" />
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Program Fee
+                                            </label>
+                                            <div>
+                                                <insite:NumericBox runat="server" ID="ProgramFee" NumericMode="Float" DecimalPlaces="2" MinValue="0" MaxValue="99999.99" />
+                                            </div>
+                                            <div class="form-text">
+                                                Leave blank or zero for an unpaid program. A fee greater than zero makes the program paid: the catalogue card shows it, and a learner must request enrollment.
                                             </div>
                                         </div>
 

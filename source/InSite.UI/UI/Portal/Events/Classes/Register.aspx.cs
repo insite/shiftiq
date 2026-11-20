@@ -126,10 +126,34 @@ namespace InSite.UI.Portal.Events.Classes
             }
         }
 
-        private decimal PaymentAmount
+        private decimal SeatPrice
         {
-            get => ViewState[nameof(PaymentAmount)] as decimal? ?? 0;
-            set => ViewState[nameof(PaymentAmount)] = value;
+            get => ViewState[nameof(SeatPrice)] as decimal? ?? 0m;
+            set => ViewState[nameof(SeatPrice)] = value;
+        }
+
+        private decimal? SeatTaxRate
+        {
+            get => (decimal?)ViewState[nameof(SeatTaxRate)];
+            set => ViewState[nameof(SeatTaxRate)] = value;
+        }
+
+        private string SeatTaxCountry
+        {
+            get => (string)ViewState[nameof(SeatTaxCountry)];
+            set => ViewState[nameof(SeatTaxCountry)] = value;
+        }
+
+        private string SeatTaxRegion
+        {
+            get => (string)ViewState[nameof(SeatTaxRegion)];
+            set => ViewState[nameof(SeatTaxRegion)] = value;
+        }
+
+        private decimal SeatTaxAmount
+        {
+            get => ViewState[nameof(SeatTaxAmount)] as decimal? ?? 0m;
+            set => ViewState[nameof(SeatTaxAmount)] = value;
         }
 
         private UnmaskedCreditCard CreditCard
@@ -324,6 +348,15 @@ namespace InSite.UI.Portal.Events.Classes
 
             if (price == 0)
             {
+                SeatPrice = 0m;
+                SeatTaxRate = null;
+                SeatTaxCountry = null;
+                SeatTaxRegion = null;
+                SeatTaxAmount = 0m;
+                PaymentAmountLiteral.InnerText = 0m.ToString("n2");
+                SeatPriceItem.Visible = false;
+                SeatTaxItem.Visible = false;
+
                 CreditCardPanel.Visible = false;
 
                 // Show Cart details logic...
@@ -334,11 +367,26 @@ namespace InSite.UI.Portal.Events.Classes
             }
             else
             {
+                var seat = Guid.TryParse(SelectedSeat.Value, out var seatId)
+                    ? ServiceLocator.EventSearch.GetSeat(seatId)
+                    : null;
+                var provinceTax = seat != null && seat.IsTaxable
+                    ? TaxHelper.GetProvinceTax(Organization.Identifier, Province.Value)
+                    : ProvinceTax.None;
+                var rate = provinceTax.Rate;
+                var tax = TaxHelper.CalculateTax(price, rate);
+
+                SeatPrice = price;
+                SeatTaxRate = rate > 0m ? rate : (decimal?)null;
+                SeatTaxCountry = provinceTax.Country;
+                SeatTaxRegion = provinceTax.Region;
+                SeatTaxAmount = tax;
+
                 ConfirmSection.Visible = false;
                 PaymentSection.Visible = PaymentSection.IsSelected = true;
 
                 PaymentDetail.Visible = true;
-                PaymentDetail.SetInputValues(price, true);
+                PaymentDetail.SetInputValues(price + tax, true);
 
                 NextButton4.Enabled = true;
 
@@ -384,8 +432,13 @@ namespace InSite.UI.Portal.Events.Classes
                 return;
             }
 
-            PaymentAmount = payment.PaymentAmount;
-            PaymentAmountLiteral.Text = payment.PaymentAmount.ToString("n2");
+            PaymentAmountLiteral.InnerText = payment.PaymentAmount.ToString("n2");
+
+            SeatPriceLiteral.InnerText = SeatPrice.ToString("n2");
+            SeatTaxLiteral.InnerText = $"{SeatTaxAmount:n2} ({TaxHelper.FormatRate(SeatTaxRate ?? 0m)})";
+
+            SeatPriceItem.Visible = SeatTaxAmount > 0m;
+            SeatTaxItem.Visible = SeatTaxAmount > 0m;
 
             ShowConfirmationDetails();
 
@@ -574,7 +627,8 @@ namespace InSite.UI.Portal.Events.Classes
             InvoiceIdentifier = UniqueIdentifier.Create();
             var invoiceNumber = Sequence.Increment(@event.OrganizationIdentifier, SequenceType.Invoice);
 
-            var paymentAmount = PaymentAmount;
+            var taxAmount = TaxHelper.CalculateTax(SeatPrice, SeatTaxRate);
+            var paymentAmount = SeatPrice + taxAmount;
             var card = CreditCard;
             var productIdentifier = GetOrCreateProduct(@event);
             var paymentDescription = $"{@event.EventTitle} activity registration for {FirstName.Text} {LastName.Text}";
@@ -586,8 +640,11 @@ namespace InSite.UI.Portal.Events.Classes
                     Identifier = UuidFactory.Create(),
                     Product = productIdentifier,
                     Quantity = 1,
-                    Price = paymentAmount,
-                    Description = paymentDescription
+                    Price = SeatPrice,
+                    Description = paymentDescription,
+                    TaxRate = SeatTaxRate,
+                    TaxCountry = SeatTaxCountry,
+                    TaxRegion = SeatTaxRegion
                 }
             }));
             ServiceLocator.SendCommand(new SubmitInvoice(InvoiceIdentifier.Value));

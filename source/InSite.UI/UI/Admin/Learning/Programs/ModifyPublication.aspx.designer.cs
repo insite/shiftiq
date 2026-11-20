@@ -96,15 +96,6 @@ namespace InSite.Admin.Records.Programs
         protected global::InSite.Common.Web.UI.FileUploadV2 ProgramImageUploadV2;
 
         /// <summary>
-        /// ProgramImageUrl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::InSite.Common.Web.UI.TextBox ProgramImageUrl;
-
-        /// <summary>
         /// ProgramFlagColor control.
         /// </summary>
         /// <remarks>
@@ -121,6 +112,15 @@ namespace InSite.Admin.Records.Programs
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::InSite.Common.Web.UI.TextBox ProgramFlagText;
+
+        /// <summary>
+        /// ProgramFee control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.NumericBox ProgramFee;
 
         /// <summary>
         /// WebSiteIdentifier control.

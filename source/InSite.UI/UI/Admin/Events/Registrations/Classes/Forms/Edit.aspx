@@ -95,25 +95,30 @@
                                     </div>
                                 </div>
 
-                                <div runat="server" id="FormField" class="form-group mb-3">
-                                    <label class="form-label">
-                                        Assessment Form
-                                    </label>
-                                    <div>
-                                        <insite:FindBankForm runat="server" ID="FormIdentifier" />
-                                    </div>
-                                    <div class="form-text">
-                                        <asp:CheckBox runat="server" ID="IsEligible" Text="Eligible" />
-                                    </div>
-                                </div>
+                                <asp:Repeater runat="server" ID="FormRepeater">
+                                    <ItemTemplate>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">
+                                                <%# (bool)Eval("ShowNumber") ? $"Assessment Form {Eval("Number"):n0}" : "Assessment Form" %>
+                                            </label>
+                                            <div>
+                                                <asp:Literal runat="server" ID="OriginalFormIdentifier" Text='<%# Eval("FormIdentifier") %>' Visible="false" />
+                                                <insite:FindBankForm runat="server" ID="FormIdentifier" />
+                                            </div>
+                                            <div class="form-text">
+                                                <asp:CheckBox runat="server" ID="IsEligible" Text="Eligible" Enabled='<%# Eval("IsEligible") %>' Checked='<%# Eval("IsEligible") %>' />
+                                            </div>
+                                        </div>
 
-                                <div runat="server" id="RegistrationPasswordField" class="form-group mb-3">
-                                    <label class="form-label">
-                                        Exam Password
-                                        <insite:RequiredValidator runat="server" ControlToValidate="RegistrationPassword" FieldName="Registration Password" ValidationGroup="Registration" />
-                                    </label>
-                                    <insite:TextBox runat="server" ID="RegistrationPassword" MaxLength="14" />
-                                </div>
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">
+                                                Exam Password
+                                                <insite:RequiredValidator runat="server" ControlToValidate="RegistrationPassword" FieldName="Registration Password" ValidationGroup="Registration" />
+                                            </label>
+                                            <insite:TextBox runat="server" ID="RegistrationPassword" MaxLength="14" Text='<%# Eval("Password") %>' />
+                                        </div>
+                                    </ItemTemplate>
+                                </asp:Repeater>
 
                                 <div class="form-group mb-3">
                                     <label class="form-label">
@@ -219,24 +224,38 @@
                             </div>
                         </div>
 
-                        <div runat="server" id="AccommodationCard" class="card">
+                        <div class="card">
                             <div class="card-body">
 
-                                <h4 class="card-title mb-3">Accommodation
-                                </h4>
-                                <div class="form-group mb-3">
-                                    <table>
-                                        <tr>
-                                            <td>
-                                                <insite:AccommodationTypeComboBox runat="server" ID="AccommodationTypeSelector" AllowBlank="true" EnableSearch="true" Width="225px" DropDown-Width="268px" />
-                                                <insite:RequiredValidator runat="server" ControlToValidate="AccommodationTypeSelector" FieldName="Accommodation Type" ValidationGroup="Accommodation" RenderMode="Dot" Display="None" />
-                                            </td>
-                                            <td style="padding-left: 5px;">
-                                                <insite:Button runat="server" ID="AddAccommodationButton"
-                                                    ValidationGroup="Accommodation" ButtonStyle="OutlinePrimary" Icon="far fa-plus-circle" ToolTip="Add Accommodation" />
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <div class="d-flex mb-3">
+                                    <div>
+                                        <h4 class="card-title mb-3">Accommodation</h4>
+                                
+                                        <div runat="server" id="TimeExtensionWarning1" visible="false" class="alert alert-danger py-2 d-xxl-none">
+                                            Time extensions will only be applied once an Assessment Form is assigned to this registration.
+                                        </div>
+
+                                        <div class="form-group">
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <insite:AccommodationTypeComboBox runat="server" ID="AccommodationTypeSelector" AllowBlank="true" EnableSearch="true" Width="225px" DropDown-Width="268px" />
+                                                        <insite:RequiredValidator runat="server" ControlToValidate="AccommodationTypeSelector" FieldName="Accommodation Type" ValidationGroup="Accommodation" RenderMode="Dot" Display="None" />
+                                                    </td>
+                                                    <td style="padding-left: 5px;">
+                                                        <insite:Button runat="server" ID="AddAccommodationButton"
+                                                            ValidationGroup="Accommodation" ButtonStyle="OutlinePrimary" Icon="far fa-plus-circle" ToolTip="Add Accommodation" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                    <div runat="server" id="TimeExtensionWarning2" visible="false" class="alert alert-danger py-2 mb-0 ms-3 d-none d-xxl-flex align-items-center">
+                                        <div>
+                                            Time extensions will only be applied once an Assessment Form is assigned to this registration.
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div runat="server" id="AccommodationField" class="form-group mb-3">

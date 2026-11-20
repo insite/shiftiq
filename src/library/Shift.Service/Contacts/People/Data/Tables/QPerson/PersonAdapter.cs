@@ -349,7 +349,7 @@ public class PersonAdapter : IEntityAdapter
         return match;
     }
 
-    private static PersonAddressModel? ToAddressModel(AddressEntity? entity)
+    private static PersonAddressModel? ToAddressModel(PersonAddressEntity? entity)
     {
         if (entity == null) return null;
 

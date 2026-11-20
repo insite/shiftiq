@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -92,7 +92,7 @@ namespace InSite.Admin.Records.Scores.Controls
                 x => x.GradeItem
             );
 
-            CallUpdateDateTimeOffsets(data, User.TimeZoneId);
+            CallUpdateDateTimeOffsets(data, User.TimeZone);
 
             var result = new List<ExportDataItem>(data.Count);
 

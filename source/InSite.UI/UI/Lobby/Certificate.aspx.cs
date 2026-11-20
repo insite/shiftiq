@@ -28,7 +28,7 @@ namespace InSite.UI.Lobby
             if (credential == null || credential.UserTimeZone == null)
                 HttpResponseHelper.SendHttp404();
 
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(credential.UserTimeZone.IfNullOrEmpty("UTC"));
+            var timeZone = credential.UserTimeZone.IfNullOrEmpty(TimeZones.Ids.Utc);
 
             _certificate = CertificateHelper.TryCreateCredential(credential, timeZone);
 

@@ -1,4 +1,4 @@
-<%@ Page Language="C#" CodeBehind="Outline.aspx.cs" Inherits="InSite.Admin.Records.Logbooks.Outline" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
+﻿<%@ Page Language="C#" CodeBehind="Outline.aspx.cs" Inherits="InSite.Admin.Records.Logbooks.Outline" MasterPageFile="~/UI/Layout/Admin/AdminHome.master" %>
 
 <%@ Register Src="Controls/FieldGrid.ascx" TagName="FieldGrid" TagPrefix="uc" %>
 <%@ Register Src="Controls/CompetencyGrid.ascx" TagName="CompetencyGrid" TagPrefix="uc" %>
@@ -252,6 +252,19 @@
                                         <asp:Literal runat="server" ID="LearnerAddedMessageName" />
                                     </div>
                                     <div class="form-text">The message that sent to the learner when added to the logbook.</div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <div class="float-end">
+                                        <insite:IconLink Name="pencil" runat="server" id="ChangeSupervisorMessage" style="padding:8px" ToolTip="Change Notification Message (Supervisor Added)" />
+                                    </div>
+                                    <label class="form-label">
+                                        Notification Message (Supervisor Added)
+                                    </label>
+                                    <div>
+                                        <asp:Literal runat="server" ID="SupervisorMessageName" />
+                                    </div>
+                                    <div class="form-text">The message that sent to the supervisor when they are added to a logbook entry.</div>
                                 </div>
 
                             </div>

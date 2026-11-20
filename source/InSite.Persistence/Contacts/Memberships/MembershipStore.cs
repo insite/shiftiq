@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using InSite.Application;
@@ -28,9 +29,20 @@ namespace InSite.Persistence
 
             using (var db = new InternalDbContext())
             {
-                var existing = matchOrganization
-                    ? db.Memberships.SingleOrDefault(x => x.GroupIdentifier == membership.GroupIdentifier && x.UserIdentifier == membership.UserIdentifier && x.OrganizationIdentifier == membership.OrganizationIdentifier)
-                    : db.Memberships.SingleOrDefault(x => x.GroupIdentifier == membership.GroupIdentifier && x.UserIdentifier == membership.UserIdentifier);
+                var query = db.Memberships.AsQueryable();
+
+                if (matchOrganization)
+                    query = query.Where(x => x.OrganizationIdentifier == membership.OrganizationIdentifier);
+
+                var matchIdentifier = membership.MembershipIdentifier != Guid.Empty;
+
+                query = matchIdentifier
+                    ? query.Where(x => x.MembershipIdentifier == membership.MembershipIdentifier)
+                    : query.Where(x => x.GroupIdentifier == membership.GroupIdentifier && x.UserIdentifier == membership.UserIdentifier);
+
+                var existing = matchIdentifier || matchOrganization
+                    ? query.SingleOrDefault()
+                    : SelectExisting(query.ToList(), membership, db);
 
                 if (existing != null)
                 {
@@ -47,6 +59,24 @@ namespace InSite.Persistence
             script.Execute(_commander);
 
             return membershipId;
+        }
+
+        /// <remarks>
+        /// When a user holds memberships in the same group for more than one organization, update
+        /// the one in the organization this membership would be inserted into. If there is none,
+        /// then the caller inserts it there.
+        /// </remarks>
+        private static Membership SelectExisting(List<Membership> candidates, Membership membership, InternalDbContext db)
+        {
+            if (candidates.Count <= 1)
+                return candidates.FirstOrDefault();
+
+            var organization = membership.OrganizationIdentifier;
+
+            if (organization == null || organization == Guid.Empty)
+                organization = db.QGroups.FirstOrDefault(x => x.GroupIdentifier == membership.GroupIdentifier)?.OrganizationIdentifier;
+
+            return candidates.SingleOrDefault(x => x.OrganizationIdentifier == organization);
         }
 
         private static void UpdateExistingMembership(
@@ -96,7 +126,7 @@ namespace InSite.Persistence
             var effective = inserted.Assigned;
             var function = inserted.MembershipType;
 
-            var identifier = CreateMembershipIdentifier(db, user, group);
+            var identifier = CreateMembershipIdentifier(db, user, group, inserted.OrganizationIdentifier);
 
             if (identifier.isNew)
             {
@@ -108,7 +138,17 @@ namespace InSite.Persistence
                 script.Add(start);
             }
             else
-                script.Add(new ResumeMembership(identifier.id, user, group, function, effective));
+            {
+                // The projection takes the membership's organization from the change, so without
+                // this the resumed membership would belong to the organization of whoever is
+                // signed in.
+                var resume = new ResumeMembership(identifier.id, user, group, function, effective);
+
+                if (inserted.OrganizationIdentifier.HasValue)
+                    resume.OriginOrganization = inserted.OrganizationIdentifier.Value;
+
+                script.Add(resume);
+            }
 
             if (modifyFunction)
                 script.Add(new ModifyMembershipFunction(identifier.id, inserted.MembershipType));
@@ -151,12 +191,19 @@ namespace InSite.Persistence
         }
 
         /// <remarks>
-        /// If a membership for this user and group existed in the past, and was deleted, then reuse its membership 
-        /// identifier. Otherwise create a new identifier.
+        /// If a membership for this user, group, and organization existed in the past, and was
+        /// deleted, then reuse its membership identifier. Otherwise create a new identifier. The
+        /// organization matters because a user can hold one membership in a partition-wide group
+        /// per organization (TEC-854), and a deleted membership might have been resumed since, so
+        /// its identifier might be in use already.
         /// </remarks>
-        private static (Guid id, bool isNew) CreateMembershipIdentifier(InternalDbContext db, Guid user, Guid group)
+        private static (Guid id, bool isNew) CreateMembershipIdentifier(InternalDbContext db, Guid user, Guid group, Guid? organization)
         {
-            var deletion = db.QMembershipDeletions.FirstOrDefault(x => x.UserIdentifier == user && x.GroupIdentifier == group);
+            var deletion = db.QMembershipDeletions
+                .Where(x => x.UserIdentifier == user && x.GroupIdentifier == group && x.OrganizationIdentifier == organization)
+                .Where(x => !db.QMemberships.Any(y => y.MembershipIdentifier == x.MembershipIdentifier))
+                .OrderByDescending(x => x.DeletionWhen)
+                .FirstOrDefault();
 
             if (deletion != null)
                 return (deletion.MembershipIdentifier, false);
@@ -172,13 +219,28 @@ namespace InSite.Persistence
             if (membership == null)
                 return;
 
-            var entity = MembershipSearch.Select(membership.GroupIdentifier, membership.UserIdentifier);
+            if (membership.MembershipIdentifier != Guid.Empty)
+            {
+                Delete(membership.MembershipIdentifier);
+                return;
+            }
+
+            var entity = MembershipSearch.Select(membership.GroupIdentifier, membership.UserIdentifier, membership.OrganizationIdentifier);
             if (entity == null)
                 return;
 
-            var id = entity.MembershipIdentifier;
+            _commander.Send(new EndMembership(entity.MembershipIdentifier));
+        }
 
-            _commander.Send(new EndMembership(id));
+        public static void Delete(Guid membershipId)
+        {
+            if (_commander == null)
+                throw new InvalidOperationException("The MembershipStore must be initialized before it is used.");
+
+            if (!MembershipSearch.Exists(x => x.MembershipIdentifier == membershipId))
+                return;
+
+            _commander.Send(new EndMembership(membershipId));
         }
     }
 }

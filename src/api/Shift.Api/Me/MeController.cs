@@ -61,6 +61,7 @@ public class MeController : ControllerBase
     /// </returns>
     /// <response code="200">Successfully retrieved user context. Returns SiteSettings object.</response>
     [HttpGet("context")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<ActionResult<SiteSettings>> RetrieveContextAsync(
         [FromQuery] bool refresh = false,
         CancellationToken cancellationToken = default)
@@ -89,7 +90,7 @@ public class MeController : ControllerBase
     /// Retrieves the list of permissions granted (or denied) to me
     /// </summary>
     [HttpGet("permissions")]
-    public ActionResult<string[]> RetrievePermissions()
+    public ActionResult<PermissionResult> RetrievePermissions()
     {
         var me = _principalProvider.GetPrincipal();
 
@@ -126,7 +127,7 @@ public class MeController : ControllerBase
 
         Response.AddFingerprint(myPermissions);
 
-        return Ok(myPermissions);
+        return myPermissions;
     }
 
     public class PermissionResult

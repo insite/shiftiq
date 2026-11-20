@@ -62,7 +62,7 @@ namespace InSite.Application.Records.Read
             publisher.Subscribe<ExperienceEvidenceChanged>(Handle);
             publisher.Subscribe<ExperienceHoursChanged>(Handle);
             publisher.Subscribe<ExperienceInstructorChanged>(Handle);
-            publisher.Subscribe<ExperienceSupervisorChanged>(Handle);
+            publisher.Subscribe<ExperienceSupervisorChanged2>(Handle);
             publisher.Subscribe<ExperienceTimeChanged>(Handle);
             publisher.Subscribe<ExperienceTrainingChanged>(Handle);
             publisher.Subscribe<ExperienceDeleted>(Handle);
@@ -156,9 +156,12 @@ namespace InSite.Application.Records.Read
             OnLogbookModified(change, change.Experience, "Entry Updated");
         }
 
-        private void Handle(ExperienceSupervisorChanged change)
+        private void Handle(ExperienceSupervisorChanged2 change)
         {
             OnLogbookModified(change, change.Experience, "Entry Updated");
+
+            var notification = CreateSupervisorAssignedNotification(change);
+            SendNotificationForSupervisorAssigned(notification);
         }
 
         private void Handle(ExperienceTimeChanged change)
@@ -258,6 +261,42 @@ namespace InSite.Application.Records.Read
             }
         }
 
+        private LogbookSupervisorAssignedNotification CreateSupervisorAssignedNotification(ExperienceSupervisorChanged2 change)
+        {
+            if (!change.Supervisor.HasValue)
+                return null;
+
+            var variables = new LogbookSupervisorAssignedNotification();
+            var journal = _journals.GetJournal(change.AggregateIdentifier, x => x.JournalSetup);
+
+            InitLogbookNotification(change, variables, journal?.JournalSetup);
+
+            variables.ExperienceIdentifier = change.Experience;
+            variables.SupervisorIdentifier = change.Supervisor;
+
+            if (journal != null)
+            {
+                variables.LearnerIdentifier = journal.UserIdentifier;
+                variables.LearnerName = _contacts.GetUser(journal.UserIdentifier)?.UserFullName ?? "Unknown";
+            }
+
+            variables.LogbookUrl = $"{variables.AppUrl}/ui/admin/records/logbooks/validators/entries/view-experience?experience={change.Experience}";
+
+            return variables;
+        }
+
+        private void SendNotificationForSupervisorAssigned(LogbookSupervisorAssignedNotification notification)
+        {
+            if (notification?.MessageToSupervisorWhenAssigned == null)
+                return;
+
+            if (!notification.SupervisorIdentifier.HasValue || notification.SupervisorIdentifier == notification.OriginUser)
+                return;
+
+            notification.MessageIdentifier = notification.MessageToSupervisorWhenAssigned;
+            _mailer.Send(notification, notification.SupervisorIdentifier);
+        }
+
         private LogbookJoinedNotification CreateJoinedNotification(JournalSetupUserAdded change)
         {
             var variables = new LogbookJoinedNotification();
@@ -309,6 +348,7 @@ namespace InSite.Application.Records.Read
                 variables.MessageToLearnerWhenLogbookModified = journalSetup.LearnerMessageIdentifier;
                 variables.MessageToLearnerWhenLogbookStarted = journalSetup.LearnerAddedMessageIdentifier;
                 variables.MessageToValidatorWhenLogbookModified = journalSetup.ValidatorMessageIdentifier;
+                variables.MessageToSupervisorWhenAssigned = journalSetup.SupervisorMessageIdentifier;
             }
 
             var changeAuthor = _contacts.GetUser(change.OriginUser);

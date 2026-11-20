@@ -10,6 +10,7 @@ namespace InSite.Common.Web.UI
     public class ProductPriceSelectorComboBox : ComboBox
     {
         public const string SubscribeValue = "__SUBSCRIBE__";
+        public const string SubscribeTransferValue = "__SUBSCRIBE_TRANSFER__";
 
         protected override ListItemArray CreateDataSource()
         {
@@ -31,7 +32,12 @@ namespace InSite.Common.Web.UI
                 list.Add(product.ProductIdentifier.ToString(), $"{product.ProductName} ({product.ProductQuantity}-pack) ${product.ProductPrice}");
 
             if (products != null && products.Count() > 0)
+            {
                 list.Add(new ListItem() { Value = SubscribeValue, Text = "Subscribe & Choose later" });
+
+                if (CurrentSessionState.Identity?.Organization?.Toolkits?.Sales?.TransferGroup.HasValue == true)
+                    list.Add(new ListItem() { Value = SubscribeTransferValue, Text = "Subscribe & Transfer to Member Organizations" });
+            }
 
             return list;
         }

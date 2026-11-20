@@ -85,9 +85,24 @@ namespace InSite.Admin.Achievements.Credentials.Forms
 
             PageHelper.AutoBindHeader(this, null, achievement.AchievementTitle);
 
+            // A paid program's achievement reaches a learner only through the program's enrollment
+            // path, so the page explains why and offers nothing to save.
+            var isPaidAchievement = PaidProgramAchievementSearch.IsPaidAchievement(achievement.AchievementIdentifier);
+            if (isPaidAchievement)
+            {
+                CreatorStatus.AddMessage(AlertType.Error, PaidProgramAchievementSearch.AssignmentRefusedMessage);
+
+                SearchCriteriaSection.Visible = false;
+                SearchResultsSection.Visible = false;
+                SavedUsersSection.Visible = false;
+                SaveButton.Visible = false;
+
+                return;
+            }
+
             // Set defaults
 
-            Assigned.Value = TimeZones.ConvertFromUtc(DateTimeOffset.UtcNow, User.TimeZone);
+            Assigned.Value = TimeZones.ConvertTime(DateTimeOffset.UtcNow, User.TimeZone);
 
             if (UserCreated && CreateControl.SavedIdentifiers.IsNotEmpty())
             {
@@ -203,6 +218,13 @@ namespace InSite.Admin.Achievements.Credentials.Forms
             if (contacts.Count == 0)
             {
                 CreatorStatus.AddMessage(AlertType.Error, "There are no selected contacts");
+                return;
+            }
+
+            var isPaidAchievement = PaidProgramAchievementSearch.IsPaidAchievement(AchievementIdentifier.Value);
+            if (isPaidAchievement)
+            {
+                CreatorStatus.AddMessage(AlertType.Error, PaidProgramAchievementSearch.AssignmentRefusedMessage);
                 return;
             }
 

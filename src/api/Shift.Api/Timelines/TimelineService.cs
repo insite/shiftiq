@@ -37,14 +37,14 @@ public class TimelineService(AppSettings appSettings, IPrincipalProvider princip
         return result.Data;
     }
 
-    public async Task SendCommandsAsync(IEnumerable<ICommand> commands)
+    public async Task SendCommandsAsync(IEnumerable<ICommand> commands, CancellationToken ct = default)
     {
         var principal = principalProvider.GetPrincipal();
 
-        await SendCommandsAsync(principal.OrganizationId, principal.UserId, commands);
+        await SendCommandsAsync(principal.OrganizationId, principal.UserId, commands, ct);
     }
 
-    public async Task SendCommandsAsync(Guid organizationId, Guid userId, IEnumerable<ICommand> commands)
+    public async Task SendCommandsAsync(Guid organizationId, Guid userId, IEnumerable<ICommand> commands, CancellationToken ct = default)
     {
         var token = await GetTokenAsync();
         var client = GetClient(appSettings);
@@ -55,7 +55,7 @@ public class TimelineService(AppSettings appSettings, IPrincipalProvider princip
             command.OriginUser = userId;
         }
 
-        var result = await client.QueueCommandsAsync(commands, token);
+        var result = await client.QueueCommandsAsync(commands, token, ct);
         if (!result.IsOK())
             throw new InvalidOperationException($"Error while executing command: {result.Problem?.Title ?? "Unknown"}. {result.Problem?.Detail ?? "Unknown"}");
     }

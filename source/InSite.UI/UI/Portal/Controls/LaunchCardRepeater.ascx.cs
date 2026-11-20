@@ -75,6 +75,7 @@ namespace InSite.UI.Portal.Controls
             var image = (ITextControl)e.Item.FindControl("Image");
             var icon = (ITextControl)e.Item.FindControl("Icon");
             var title = (HtmlGenericControl)e.Item.FindControl("Title");
+            var inlineFlag = (HtmlGenericControl)e.Item.FindControl("InlineFlag");
             var summary = (HtmlGenericControl)e.Item.FindControl("Summary");
             var progress = (HtmlGenericControl)e.Item.FindControl("Progress");
 
@@ -87,14 +88,33 @@ namespace InSite.UI.Portal.Controls
             summary.InnerText = card.Summary;
             summary.Visible = !string.IsNullOrEmpty(card.Summary);
 
-            if (card.HasImage())
+            var hasImage = card.HasImage();
+            var hasFlag = card.HasFlag();
+
+            if (hasImage)
                 image.Text = card.GetImageHtml();
 
             else if (card.HasIcon())
                 icon.Text = card.GetIconHtml();
 
-            if (card.HasFlag())
-                flag.Text = card.GetFlagHtml();
+            if (hasFlag)
+            {
+                // A floating badge sits over the card image. Without an image it lands on the
+                // title instead, so a fee, which the learner has to be able to read, moves into
+                // the card body below the title. Other flags keep their floating position.
+
+                var floating = hasImage || !card.FlagIsFee;
+
+                if (floating)
+                {
+                    flag.Text = card.GetFlagHtml(true);
+                }
+                else
+                {
+                    inlineFlag.InnerHtml = card.GetFlagHtml(false);
+                    inlineFlag.Visible = true;
+                }
+            }
 
             if (card.HasProgress())
                 progress.InnerHtml = card.GetProgressHtml();

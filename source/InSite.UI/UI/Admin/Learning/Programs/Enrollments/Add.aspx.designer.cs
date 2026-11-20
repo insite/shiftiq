@@ -15,6 +15,51 @@ namespace InSite.Admin.Records.Programs
     {
 
         /// <summary>
+        /// ScreenStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.Alert ScreenStatus;
+
+        /// <summary>
+        /// FundingPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl FundingPanel;
+
+        /// <summary>
+        /// ProgramFeeText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ProgramFeeText;
+
+        /// <summary>
+        /// FundingPath control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButtonList FundingPath;
+
+        /// <summary>
+        /// LearnerOrganizationIdentifier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::InSite.Common.Web.UI.FindOrganization LearnerOrganizationIdentifier;
+
+        /// <summary>
         /// ScreenControl control.
         /// </summary>
         /// <remarks>

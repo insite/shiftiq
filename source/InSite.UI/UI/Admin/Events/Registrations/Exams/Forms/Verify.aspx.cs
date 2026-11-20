@@ -11,6 +11,7 @@ using InSite.UI.Layout.Admin;
 using InSite.Web.Instrumentation;
 
 using Shift.Common;
+using Shift.Constant;
 
 namespace InSite.Admin.Events.Candidates.Forms
 {
@@ -128,7 +129,7 @@ namespace InSite.Admin.Events.Candidates.Forms
                 for (var i = 0; i < registrations.Count; i++)
                 {
                     var id = registrations[i].RegistrationIdentifier;
-                    ServiceLocator.SendCommand(new ChangeEligibility(id, "Check Eligibility in DA", null));
+                    ServiceLocator.SendCommand(new ChangeEligibility(id, RegistrationEligibility.CheckEligibilityInDA, null));
 
                     ProgressPanel.UpdateExternalContext(data.Application, data.ProgressContext, context =>
                     {

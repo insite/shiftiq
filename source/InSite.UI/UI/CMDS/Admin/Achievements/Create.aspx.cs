@@ -4,6 +4,7 @@ using InSite.Application.Achievements.Write;
 using InSite.Cmds.Admin.Achievements.Models;
 using InSite.Common.Web;
 using InSite.Domain.Records;
+using InSite.Persistence;
 using InSite.Persistence.Plugin.CMDS;
 using InSite.UI.Layout.Admin;
 
@@ -57,7 +58,15 @@ namespace InSite.Cmds.Admin.Achievements.Forms
 
             ServiceLocator.SendCommand(command);
 
+            if (info.IssuesCertificate)
+                ServiceLocator.SendCommand(new ChangeAchievementCertificateIssuance(command.AggregateIdentifier, true));
+
             AchievementDetails.SaveAchievementCategoriesAndAccessControl(command.AggregateIdentifier);
+
+            // Assign the new achievement to the organization that created it, as Duplicate does on
+            // the Edit page. The achievement search and selectors list only the achievements
+            // assigned to an organization.
+            TAchievementOrganizationStore.InsertOrganizationAchievement(Organization.Identifier, command.AggregateIdentifier);
 
             var after = new CmdsAchievementChanged
             {

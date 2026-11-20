@@ -990,6 +990,33 @@ SELECT
                 return db.Database.SqlQuery<int>(curQuery, GetParametersForDepartmentFilter(filter, searchText).ToArray()).FirstOrDefault();
         }
 
+        // Distinct divisions among the departments this filter can reach. Used to scope the division
+        // dropdown to the divisions the current user actually has a department in, so the dropdown
+        // always agrees with the department cascade that runs through the same filter.
+        public static Guid[] SelectDivisionIdentifiersForDepartmentFilter(DepartmentFilter filter)
+        {
+            const string query = @"SELECT DISTINCT Department.DivisionIdentifier FROM identities.Department AS Department {0} AND Department.DivisionIdentifier IS NOT NULL";
+
+            var where = CreateWhereForDepartmentFilter(filter);
+            var curQuery = string.Format(query, where);
+
+            using (var db = new InternalDbContext())
+                return db.Database.SqlQuery<Guid>(curQuery, GetParametersForDepartmentFilter(filter).ToArray()).ToArray();
+        }
+
+        // Every department this filter can reach, unpaged. Used where a report covers all the departments
+        // the current user can see, so it agrees with what the department selector would offer.
+        public static Guid[] SelectDepartmentIdentifiersForDepartmentFilter(DepartmentFilter filter)
+        {
+            const string query = @"SELECT Department.DepartmentIdentifier FROM identities.Department AS Department {0}";
+
+            var where = CreateWhereForDepartmentFilter(filter);
+            var curQuery = string.Format(query, where);
+
+            using (var db = new InternalDbContext())
+                return db.Database.SqlQuery<Guid>(curQuery, GetParametersForDepartmentFilter(filter).ToArray()).ToArray();
+        }
+
         private const string QueryDepartmentsForSelector = @"
 WITH Departments AS (
     SELECT DepartmentIdentifier

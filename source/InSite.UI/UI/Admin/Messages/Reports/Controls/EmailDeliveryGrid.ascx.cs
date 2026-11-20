@@ -127,7 +127,7 @@ namespace InSite.Admin.Messages.Reports.Controls
 
         #region Helpers
 
-        private string Format(DateTimeOffset? value, TimeZoneInfo timezone)
+        private string Format(DateTimeOffset? value, string timezone)
         {
             return value.Format(timezone, nullValue: string.Empty);
         }
