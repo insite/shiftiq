@@ -39,6 +39,11 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             public List<string> Errors { get; set; } = new List<string>();
         }
 
+        // An upload is temporary for eight hours (TempFileExpirationInMinutes). A page left open
+        // longer, or posted again after Save, refers to files it can no longer attach.
+        private const string UploadUnavailableMessage =
+            "Your file upload is no longer available. Please start again and select your files.";
+
         public event AlertHandler Alert;
 
         private void OnAlert(AlertType type, string message) =>
@@ -144,6 +149,18 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
                 return;
             }
 
+            // The uploads stay temporary until Save attaches them. Attaching them here left them on
+            // the credential when the learner cancelled, and the next attempt added more files.
+            var uploads = GetUploads();
+
+            if (!CredentialFiles.CanAttach(uploads))
+            {
+                AchievementFile.ClearFiles();
+                ValidationStatus.Visible = true;
+                ValidationStatus.Text = UploadUnavailableMessage;
+                return;
+            }
+
             var achievement = ServiceLocator.AchievementSearch.GetAchievement(model.AchievementId);
 
             var achievementTitle = achievement.AchievementTitle;
@@ -167,21 +184,27 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             NewCredentialId = ServiceLocator.AchievementSearch
                 .GetCredentialIdentifier(credential?.CredentialIdentifier, model.AchievementId, User.Identifier);
 
-            if (AchievementFile.HasFile)
-            {
-                var file = AchievementFile.SaveFile(NewCredentialId, FileObjectType.Credential);
-
-                var attachment = new FileModel
-                {
-                    DownloadUrl = ServiceLocator.StorageService.GetFileUrl(file.FileIdentifier, file.FileName, true),
-                    FileName = HttpUtility.HtmlEncode(file.FileName),
-                    FileSize = file.FileSize.Bytes().Humanize("#")
-                };
-
-                ConfirmFile.Text = $"<a href='{attachment.DownloadUrl}'>{attachment.FileName}</a> <span class='text-muted fs-sm'>({attachment.FileSize})</span>";
-            }
+            ConfirmFile.Text = string.Join("<br />", uploads
+                .Select(x => GetAttachmentHtml(ServiceLocator.StorageService.GetFile(x))));
 
             Wizard.ActiveViewIndex = 1;
+        }
+
+        private Guid[] GetUploads() =>
+            AchievementFile.UploadedFiles.Select(x => x.FileIdentifier).ToArray();
+
+        private static string GetAttachmentHtml(FileStorageModel file)
+        {
+            var attachment = new FileModel
+            {
+                DownloadUrl = ServiceLocator.StorageService
+                    .GetFileUrl(file.FileIdentifier, file.FileName, true),
+                FileName = HttpUtility.HtmlEncode(file.FileName),
+                FileSize = file.FileSize.Bytes().Humanize("#")
+            };
+
+            return $"<a href='{attachment.DownloadUrl}'>{attachment.FileName}</a>"
+                + $" <span class='text-muted fs-sm'>({attachment.FileSize})</span>";
         }
 
         private AddCertificateModel ValidateInputs()
@@ -256,6 +279,19 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
                 return;
             }
 
+            var uploads = GetUploads();
+
+            if (!CredentialFiles.CanAttach(uploads))
+            {
+                OnAlert(AlertType.Error, UploadUnavailableMessage);
+                return;
+            }
+
+            // Read before the commands below, which leave the credential Submitted. Whether an
+            // administrator accepted the previous submission decides if its files are replaced.
+            var previousStatus = ServiceLocator.AchievementSearch
+                .GetCredential(NewCredentialId)?.CredentialStatus;
+
             var utc = TimeZones.ConvertTime(model.Issued.Date, User.TimeZone, TimeZones.Ids.Utc);
 
             var description = $"Self-declared by {User.FirstName} on {DateTime.Today:MMM d, yyyy}.";
@@ -283,6 +319,11 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             var submit = new SubmitCredential(NewCredentialId, DateTimeOffset.UtcNow, description);
 
             ServiceLocator.SendCommand(submit);
+
+            // Attach after the commands, so a failure above keeps the previous certificates. This
+            // also deletes the files of a previous submission nobody accepted in the same cycle;
+            // an accepted submission and an earlier cycle are the credential's record and stay.
+            CredentialFiles.Attach(org, NewCredentialId, uploads, previousStatus);
 
             HttpResponseHelper.Redirect(Page.Request.RawUrl);
         }

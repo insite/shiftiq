@@ -392,9 +392,9 @@
                 if (date) {
                     data.datePicker.setDate(date.local(true).toDate());
                     onChange(data);
-                } else {
-                    updateInput(data)
                 }
+
+                updateInput(data);
             }
         }
 

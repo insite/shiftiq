@@ -512,11 +512,13 @@ namespace InSite.Admin.Records.Gradebooks.Controls
             if (HideIgnoreScoreCheckbox)
                 return;
 
+            if (IgnoredScoreKey.Value.IsEmpty() || !bool.TryParse(IsIgnored.Value, out var isIgnored))
+                return;
+
             var gradebook = ServiceLocator.RecordSearch.GetGradebookState(GradebookIdentifier);
             if (gradebook.IsLocked)
                 return;
 
-            var isIgnored = bool.Parse(IsIgnored.Value);
             var keyParts = IgnoredScoreKey.Value.Split(new[] { ':' });
             var studentIndex = int.Parse(keyParts[0]);
             var scoreIndex = int.Parse(keyParts[1]);

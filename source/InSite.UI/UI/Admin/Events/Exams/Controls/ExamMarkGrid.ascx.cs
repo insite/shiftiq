@@ -14,6 +14,9 @@ namespace InSite.Admin.Events.Exams.Controls
 {
     public partial class ExamMarkGrid : SearchResultsGridViewController<QRegistrationFilter>
     {
+        // Publishing waits for Direct Access, which is allowed up to 4 minutes to respond.
+        private const int PublishScriptTimeoutSeconds = 5 * 60;
+
         protected override bool IsFinder => false;
 
         protected bool CanWrite
@@ -89,6 +92,8 @@ namespace InSite.Admin.Events.Exams.Controls
         {
             try
             {
+                Server.ScriptTimeout = PublishScriptTimeoutSeconds;
+
                 var registrations = _logic.GetRegistrations(Filter);
                 if (registrations.Length == 0)
                 {
@@ -96,20 +101,11 @@ namespace InSite.Admin.Events.Exams.Controls
                 }
                 else
                 {
-                    var identifiers = registrations.Select(x => x.RegistrationIdentifier).ToArray();
-                    _logic.PublishGrades(Filter.EventIdentifier.Value, identifiers);
+                    _logic.PublishGrades(Filter.EventIdentifier.Value, registrations.Select(x => x.RegistrationIdentifier).ToArray());
+
                     Search(Filter);
                     BindStatus();
-
-                    var count = 0;
-                    foreach (var identifier in identifiers)
-                    {
-                        var registration = ServiceLocator.RegistrationSearch.GetRegistration(identifier);
-                        if (registration?.GradingStatus == "Published")
-                            count++;
-                    }
-
-                    OnPublished(count, null);
+                    OnPublished(_logic.CountNewlyPublished(registrations), null);
                 }
             }
             catch (Exception ex)
@@ -147,10 +143,14 @@ namespace InSite.Admin.Events.Exams.Controls
             {
                 try
                 {
+                    Server.ScriptTimeout = PublishScriptTimeoutSeconds;
+
+                    var before = ServiceLocator.RegistrationSearch.GetRegistration(registrationId);
+
                     _logic.PublishGrade(Filter.EventIdentifier.Value, registrationId);
 
+                    var count = _logic.CountNewlyPublished(new[] { before });
                     var registration = ServiceLocator.RegistrationSearch.GetRegistration(registrationId, x => x.Candidate);
-                    var count = registration?.GradingStatus == "Published" ? 1 : 0;
 
                     OnPublished(count, registration.Candidate?.UserFullName);
                 }

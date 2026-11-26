@@ -41,7 +41,9 @@
 
                         <div class="form-group mb-3">
                             <span class="float-end text-info fs-sm">*.jpg, *.pdf, or *.png</span>
-                            <insite:FileUploadV2 runat="server" ID="AchievementFile" LabelText="Select a file to attach" AllowedExtensions=".jpg,.pdf,.png" FileUploadType="Image" />
+                            <insite:FileUploadV2 runat="server" ID="AchievementFile"
+                                LabelText="Select one or more files to attach" AllowMultiple="true"
+                                AllowedExtensions=".jpg,.pdf,.png" FileUploadType="Image" />
                         </div>
 
                         <insite:NextButton runat="server" ID="NextButton" />
@@ -64,7 +66,7 @@
                             <dt>Expiry</dt>
                             <dd>
                                 <asp:Label runat="server" ID="ConfirmExpiry" /></dd>
-                            <dt>Attachment</dt>
+                            <dt>Attachments</dt>
                             <dd>
                                 <asp:Label runat="server" ID="ConfirmFile" /></dd>
                         </dl>

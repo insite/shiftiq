@@ -53,7 +53,7 @@ namespace InSite.Common.Web.UI
                 get
                 {
                     var timeZoneId = Value != null
-                        ? TimeZones.FindTimeZoneId(Value.Value, CurrentSessionState.Identity.User.TimeZone)
+                        ? TimeZones.FindTimeZoneId(Value.Value, _defaultTimeZone)
                         : _defaultTimeZone;
 
                     if (TimeZones.GetAbbreviation(timeZoneId) == null)

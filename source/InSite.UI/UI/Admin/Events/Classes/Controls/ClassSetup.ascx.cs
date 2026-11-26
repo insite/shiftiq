@@ -72,12 +72,12 @@ namespace InSite.UI.Admin.Events.Classes.Controls
                 : null;
 
             EventTitle.Text = ev.EventTitle;
-            RegistrationStart.Text = ev.RegistrationStart.Format(null, true, nullValue: "None");
-            RegistrationDeadline.Text = ev.RegistrationDeadline.Format(null, true, nullValue: "None");
+            RegistrationStart.Text = ev.RegistrationStart.FormatKeepingOffset(User.TimeZone, true, "None");
+            RegistrationDeadline.Text = ev.RegistrationDeadline.FormatKeepingOffset(User.TimeZone, true, "None");
             AchievementTitle.Text = achievement != null ?
                 $"<a href=\"/ui/admin/records/achievements/outline?id={achievement?.AchievementIdentifier}\">{achievement?.AchievementTitle} </a>" : "None";
-            EventScheduledStart.Text = ev.EventScheduledStart.Format(null, true);
-            EventScheduledEnd.Text = ev.EventScheduledEnd.Format(null, true, nullValue: "None");
+            EventScheduledStart.Text = ev.EventScheduledStart.FormatKeepingOffset(User.TimeZone, true);
+            EventScheduledEnd.Text = ev.EventScheduledEnd.FormatKeepingOffset(User.TimeZone, true, "None");
             Duration.Text = ev.DurationQuantity.HasValue && ev.DurationUnit.HasValue() ? ev.DurationUnit.ToQuantity(ev.DurationQuantity.Value) : "None";
             Capacity.Text = GetCapacityHtml(ev);
             Waitlist.Text = ev.WaitlistEnabled ? "Enabled" : "Disabled";

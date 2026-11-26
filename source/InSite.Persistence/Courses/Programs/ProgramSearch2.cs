@@ -215,7 +215,13 @@ namespace InSite.Persistence
                     .SqlQuery<ProgramEnrollmentTaskCompletionCounterForUsers>(query, new SqlParameter("ProgramIdentifier", programId), new SqlParameter("UserIdentifier", userId))
                     .FirstOrDefault();
 
-                return (completionData != null && completionData.TaskCount == completionData.CompletionCounter);
+                // A program with no countable tasks has nothing for the learner to finish, so it is
+                // never complete by this rule. Treating 0 = 0 as complete stamped ProgressCompleted
+                // at enrollment.
+                if (completionData == null || completionData.TaskCount == 0)
+                    return false;
+
+                return completionData.TaskCount == completionData.CompletionCounter;
             }
         }
     }

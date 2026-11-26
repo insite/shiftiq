@@ -48,12 +48,18 @@ namespace InSite.Api.Controllers
         [Route("api/token")]
         public HttpResponseMessage GenerateToken([FromBody] JwtRequest request)
         {
-            ServiceLocator.Logger.Debug("JWT request received. (Secret = {secret}, Lifetime = {lifetime}, Organization = {organization})", request.Secret, request.Lifetime, request.Organization);
-
             if (!RemoteIpAddressIsValid())
                 return JsonUnauthorized("Invalid IP address");
 
-            if (string.IsNullOrEmpty(request?.Secret))
+            if (request == null)
+            {
+                ServiceLocator.Logger.Warning("JWT request rejected: the request body is empty.");
+                return JsonBadRequest("The request body is empty.");
+            }
+
+            ServiceLocator.Logger.Debug("JWT request received. (Secret = {secret}, Lifetime = {lifetime}, Organization = {organization})", request.Secret, request.Lifetime, request.Organization);
+
+            if (string.IsNullOrEmpty(request.Secret))
                 return JsonUnauthorized("Missing secret");
 
             try
@@ -136,6 +142,12 @@ namespace InSite.Api.Controllers
         {
             if (!RemoteIpAddressIsValid())
                 return JsonUnauthorized("Invalid IP address");
+
+            if (login == null)
+            {
+                ServiceLocator.Logger.Warning("Authentication request rejected: the request body is empty.");
+                return JsonBadRequest("The request body is empty.");
+            }
 
             try
             {

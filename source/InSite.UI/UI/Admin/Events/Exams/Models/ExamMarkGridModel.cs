@@ -83,6 +83,15 @@ namespace InSite.Admin.Events.Exams.Controls
                 ServiceLocator.SendCommand(new PublishEventScores(@event, registrations, true));
         }
 
+        public int CountNewlyPublished(QRegistration[] before)
+        {
+            var previous = before.ToDictionary(x => x.RegistrationIdentifier, x => x.GradePublished);
+            var filter = new QRegistrationFilter { RegistrationIdentifiers = previous.Keys.ToArray() };
+
+            return ServiceLocator.RegistrationSearch.GetRegistrations(filter)
+                .Count(x => x.GradePublished.HasValue && x.GradePublished != previous[x.RegistrationIdentifier]);
+        }
+
         public string FormatScore(object o)
         {
             var registration = (QRegistration)o;

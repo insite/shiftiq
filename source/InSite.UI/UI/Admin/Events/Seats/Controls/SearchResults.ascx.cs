@@ -67,7 +67,7 @@ namespace InSite.Admin.Events.Seats.Controls
         protected static string GetLocalTime(object item)
         {
             var when = (DateTimeOffset?)item;
-            return when.Format((string)null, true, nullValue: string.Empty);
+            return when.FormatKeepingOffset(User.TimeZone, true, string.Empty);
         }
 
         protected static string GetDescription(object item)

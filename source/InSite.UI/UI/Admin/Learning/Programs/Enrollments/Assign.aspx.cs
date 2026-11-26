@@ -312,6 +312,15 @@ namespace InSite.Cmds.Admin.Records.Programs
                 return result;
             }
 
+            // Items are learner x achievement, but program and task enrolment belong to the learner.
+            // EnrollUserToProgramTasks walks every task in the program, so running it once per item
+            // repeated that walk for each achievement, and a large program took minutes per learner.
+            // None of the per-learner calls read anything this loop changes (the commands are sent
+            // after it), so one pass per learner produces the same enrolments.
+            var learnersToEnrol = new List<Guid>();
+            var learnersSeen = new HashSet<Guid>();
+            var achievementLabels = new Dictionary<Guid, string>();
+
             foreach (var item in items)
             {
                 var achievement = item.AchievementIdentifier;
@@ -337,9 +346,17 @@ namespace InSite.Cmds.Admin.Records.Programs
                     }
                     else
                     {
-                        ProgramStore.InsertEnrollment(Organization.Identifier, programIdentifier, item.UserIdentifier, User.Identifier);
+                        var isFirstForLearner = learnersSeen.Add(learner);
+                        if (isFirstForLearner)
+                            learnersToEnrol.Add(learner);
 
-                        var label = ServiceLocator.AchievementSearch.GetAchievement(achievement).AchievementLabel;
+                        var hasLabel = achievementLabels.TryGetValue(achievement, out var label);
+                        if (!hasLabel)
+                        {
+                            label = ServiceLocator.AchievementSearch.GetAchievement(achievement).AchievementLabel;
+                            achievementLabels.Add(achievement, label);
+                        }
+
                         var credential = credentials.FirstOrDefault(x => x.UserIdentifier == learner && x.AchievementIdentifier == achievement);
 
                         var expiration = item.LifetimeMonths.HasValue
@@ -366,14 +383,26 @@ namespace InSite.Cmds.Admin.Records.Programs
                             commands.Add(new ChangeCredentialExpiration(credential.CredentialIdentifier, expiration));
                             commands.Add(new TagCredential(credential.CredentialIdentifier, necessity, priority));
                         }
-
-                        TaskStore.EnrollUserToProgramTasks(Organization.Identifier, programIdentifier, learner);
-                        ProgramStore1.CompleteProgramWhenAllTasksCompleted(programIdentifier, learner);
                     }
                 }
                 catch (Exception ex)
                 {
                     var message = $"Unable to assign achievement {achievement} to learner {learner}.";
+                    throw new PresentationException(message, ex);
+                }
+            }
+
+            foreach (var learner in learnersToEnrol)
+            {
+                try
+                {
+                    ProgramStore.InsertEnrollment(Organization.Identifier, programIdentifier, learner, User.Identifier);
+                    TaskStore.EnrollUserToProgramTasks(Organization.Identifier, programIdentifier, learner);
+                    ProgramStore1.CompleteProgramWhenAllTasksCompleted(programIdentifier, learner);
+                }
+                catch (Exception ex)
+                {
+                    var message = $"Unable to enrol learner {learner} in program {programIdentifier}.";
                     throw new PresentationException(message, ex);
                 }
             }

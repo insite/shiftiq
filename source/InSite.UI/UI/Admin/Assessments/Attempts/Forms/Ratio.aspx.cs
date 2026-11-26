@@ -264,7 +264,7 @@ namespace InSite.Admin.Assessments.Attempts.Forms
                 input == null || !input.Any() ? emptyValue : WebUtility.HtmlEncode(string.Join(", ", input));
 
             string GetValueDate(DateTimeOffset? input) =>
-                !input.HasValue ? emptyValue : input.Value.Format(isHtml: true);
+                !input.HasValue ? emptyValue : input.Value.FormatKeepingOffset(User.TimeZone, true);
         }
 
         private void SetGroupBySelector()

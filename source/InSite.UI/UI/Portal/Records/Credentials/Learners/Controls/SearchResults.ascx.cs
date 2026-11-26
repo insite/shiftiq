@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web.UI.WebControls;
 
+using InSite.Application.Files.Read;
 using InSite.Application.Records.Read;
 using InSite.Common.Web.UI;
 using InSite.Persistence;
@@ -82,8 +83,9 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             var credentials = ServiceLocator.AchievementSearch
                 .GetCredentials(filter);
 
-            var files = ServiceLocator.FileSearch
-                .GetModels(filter.OrganizationIdentifier, credentials.Select(x => x.CredentialIdentifier).ToArray(), null, false);
+            var credentialIds = credentials.Select(x => x.CredentialIdentifier).ToArray();
+            var files = CredentialFiles.GroupByCredential(ServiceLocator.FileSearch
+                .GetModels(filter.OrganizationIdentifier, credentialIds, null, false));
 
             var achievementIds = credentials.Select(x => x.AchievementIdentifier).Distinct().ToArray();
             var coursesByAchievement = new Dictionary<Guid, List<Guid>>();
@@ -135,16 +137,18 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
                 item.HasBadgeImage = credential.HasBadgeImage ?? false;
                 item.BadgeImageUrl = credential.BadgeImageUrl;
 
-                string fileUrl = null;
-                var file = files.FirstOrDefault(x => x.ObjectIdentifier == id);
-                if (file != null)
-                    fileUrl = ServiceLocator.StorageService.GetFileUrl(file.FileIdentifier, file.FileName, true);
+                files.TryGetValue(id, out var credentialFiles);
+
+                // A renewed credential keeps the certificates of its earlier cycles, but only the
+                // current cycle's files stand for it here.
+                var currentFiles = CredentialFiles.InCurrentCycle(credentialFiles,
+                    credential.CredentialGranted);
 
                 string badgeUrl = null;
                 if (item.HasBadgeImage && credential.BadgeImageUrl.IsNotEmpty())
                     badgeUrl = credential.BadgeImageUrl;
 
-                item.DownloadLink = GetDownloadLink(id, status, fileUrl, badgeUrl, layout);
+                item.DownloadLink = GetDownloadLink(id, status, currentFiles, badgeUrl, layout);
                 item.DeleteLink = GetDeleteLink(item);
                 item.StatusMessageHtml = GetStatusMessageHtml(status, credential.AchievementAllowSelfDeclared, item.AchievementIdentifier, item.CourseIdentifier, item.CourseCount);
 
@@ -221,26 +225,22 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             return $"<div class='form-text text-danger'>{text}</div>";
         }
 
-        public static string GetDownloadLink(Guid id, CredentialStatus status, string downloadUrl, string badgeUrl, string layout)
+        public static string GetDownloadLink(Guid id, CredentialStatus status,
+            IList<FileStorageModel> files, string badgeUrl, string layout)
         {
-            // A submitted credential is not verified yet, so only the uploaded file is offered.
+            var fileLinks = GetFileLinks(files);
+
+            // A submitted credential is not verified yet, so only the uploaded files are offered.
             // The badge and certificate-layout fallbacks below would render a system-issued
             // certificate for a credential nobody has reviewed.
             if (status == CredentialStatus.Submitted)
-            {
-                return downloadUrl.IsNotEmpty()
-                    ? $"<a title='Download Certificate' target='_blank' href='{downloadUrl}'><i class='fa-solid fa-download'></i></a>"
-                    : null;
-            }
+                return fileLinks;
 
             if (status != CredentialStatus.Valid)
                 return null;
 
-            if (downloadUrl.IsNotEmpty())
-            {
-                var html = $"<a title='Download Certificate' target='_blank' href='{downloadUrl}'><i class='fa-solid fa-download'></i></a>";
-                return html;
-            }
+            if (fileLinks != null)
+                return fileLinks;
 
             if (badgeUrl.IsNotEmpty())
             {
@@ -255,6 +255,24 @@ namespace InSite.UI.Portal.Records.Credentials.Learners.Controls
             }
 
             return null;
+        }
+
+        // One link per uploaded certificate. With several, each link is titled with its file
+        // name, so an administrator can tell the certificates of one submission apart.
+        private static string GetFileLinks(IList<FileStorageModel> files)
+        {
+            if (files == null || files.Count == 0)
+                return null;
+
+            return string.Join(" ", files.Select(x =>
+            {
+                var url = ServiceLocator.StorageService
+                    .GetFileUrl(x.FileIdentifier, x.FileName, true);
+                var title = files.Count == 1 ? "Download Certificate" : $"Download {x.FileName}";
+
+                return $"<a title='{System.Web.HttpUtility.HtmlAttributeEncode(title)}'"
+                    + $" target='_blank' href='{url}'><i class='fa-solid fa-download'></i></a>";
+            }));
         }
     }
 }

@@ -36,6 +36,8 @@ namespace InSite.Admin.Records.Scores
 
         public static byte[] GetXlsx(QProgressFilter filter)
         {
+            var timeZone = CurrentSessionState.Identity.User.TimeZone;
+
             var data = ServiceLocator.RecordSearch.GetMostImprovedStudents(filter);
 
             var criteriaItems = GradebookScoreCriteriaHelper.GetCriteriaItems(filter);
@@ -92,8 +94,8 @@ namespace InSite.Admin.Records.Scores
                     sheet.Rows[i + 3].Height = student.Levels.Count * 15;
                     sheet.Cells.Add(new XlsxCell(0, i + 3) { Value = $"{student.UserFullName}\n{student.UserEmail}", Style = normalStyle });
                     sheet.Cells.Add(new XlsxCell(1, i + 3) { Value = $"{student.EmployerName}\n{student.EmployerRegion}", Style = normalStyle });
-                    sheet.Cells.Add(new XlsxCell(2, i + 3) { Value = ((DateTimeOffset?)student.EventScheduledStart).FormatDateOnly("MMMM, yyyy"), Style = normalStyle });
-                    sheet.Cells.Add(new XlsxCell(3, i + 3) { Value = student.EventScheduledEnd.FormatDateOnly("MMMM, yyyy"), Style = normalStyle });
+                    sheet.Cells.Add(new XlsxCell(2, i + 3) { Value = ((DateTimeOffset?)student.EventScheduledStart).FormatDateOnly(timeZone), Style = normalStyle });
+                    sheet.Cells.Add(new XlsxCell(3, i + 3) { Value = student.EventScheduledEnd.FormatDateOnly(timeZone), Style = normalStyle });
 
                     StringBuilder levels = new StringBuilder();
                     foreach (var level in student.Levels)

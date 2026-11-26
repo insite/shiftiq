@@ -21,6 +21,12 @@ namespace Shift.Common
         public static string Format(this DateTimeOffset? dateValue, string zoneId = null, bool isHtml = false, bool wrap = false, bool showSeconds = false, CultureInfo culture = null, string nullValue = null) =>
             dateValue.HasValue ? dateValue.Value.Format(zoneId, isHtml, wrap, showSeconds, culture) : nullValue;
 
+        public static string FormatKeepingOffset(this DateTimeOffset dateValue, string preferredZoneId, bool isHtml = false) =>
+            TimeZones.Format(dateValue, TimeZones.FindTimeZoneId(dateValue, preferredZoneId), isHtml);
+
+        public static string FormatKeepingOffset(this DateTimeOffset? dateValue, string preferredZoneId, bool isHtml = false, string nullValue = null) =>
+            dateValue.HasValue ? dateValue.Value.FormatKeepingOffset(preferredZoneId, isHtml) : nullValue;
+
         public static string FormatDateOnly(this DateTimeOffset dateValue) =>
             TimeZones.FormatDateOnly(dateValue, TimeZones.FindTimeZoneId(dateValue));
 

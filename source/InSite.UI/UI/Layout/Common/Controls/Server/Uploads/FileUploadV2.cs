@@ -121,6 +121,8 @@ namespace InSite.Common.Web.UI
 
         public UploadFileInfo File => HasFile ? Files[0] : null;
 
+        public UploadFileInfo[] UploadedFiles => HasFile ? Files : new UploadFileInfo[0];
+
         public bool HasFile => Files != null && Files.Length > 0;
 
         public string FileName => File?.FileName;

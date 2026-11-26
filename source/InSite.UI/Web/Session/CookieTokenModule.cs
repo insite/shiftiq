@@ -170,6 +170,7 @@ namespace InSite
             {
                 token.UserEmail = null;
                 token.UserIdentifier = null;
+                token.AuthenticationSource = null;
                 RemoveActiveToken(token, true);
             }
 
@@ -224,6 +225,7 @@ namespace InSite
 
             token.UserEmail = null;
             token.UserIdentifier = null;
+            token.AuthenticationSource = null;
 
             SetToken(response, session, token);
             RemoveActiveToken(token, true);

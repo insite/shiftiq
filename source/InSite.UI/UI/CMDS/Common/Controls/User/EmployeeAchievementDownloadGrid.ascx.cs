@@ -172,17 +172,24 @@ namespace InSite.Custom.CMDS.User.Progressions.Controls
                 .ToList();
 
             // Files attached to the credential through the new file storage, such as a
-            // certificate a learner uploaded for review.
+            // certificate a learner uploaded for review. A renewed credential keeps the
+            // certificates of its earlier cycles, so each is listed in the order it was uploaded
+            // and dated, and a reviewer can tell the current certificate from the record.
             var storedFiles = ServiceLocator.FileSearch.GetModels(null, ContainerGuid, null, false);
 
+            var timeZone = CurrentSessionState.Identity.User.TimeZone;
+
             items.AddRange(storedFiles
-                .OrderBy(x => x.FileName)
+                .OrderBy(x => x.Uploaded)
+                .ThenBy(x => x.FileIdentifier)
                 .Select(x => new DownloadItem
                 {
                     Identifier = x.FileIdentifier,
                     DeleteCommand = "DeleteStoredFile",
                     Url = ServiceLocator.StorageService.GetFileUrl(x.FileIdentifier, x.FileName, true),
                     Title = x.FileName,
+                    Description = "Uploaded "
+                        + TimeZones.FormatDateOnly(x.Uploaded, timeZone, null, "{0:yyyy-MM-dd}"),
                     ContentSize = x.FileSize
                 }));
 

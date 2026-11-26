@@ -155,7 +155,7 @@ namespace InSite.Admin.Events.Registrations.Reports
 
                 sheet.Cells.Add(new XlsxCell(2, i + 1) { Value = thirdColumn.ToString(), Style = normalStyle, WrapText = true });
 
-                string fourthColumn = $"{registration.ApprovalStatus} on {registration.RegistrationDate.FormatDateOnly("MMMM, yyyy")} \r\n";
+                string fourthColumn = $"{registration.ApprovalStatus} on {registration.RegistrationDate.FormatDateOnly(timeZone)} \r\n";
 
                 if (!string.IsNullOrEmpty(registration.AttendanceStatus))
                     fourthColumn += $"{registration.AttendanceStatus} \r\n";

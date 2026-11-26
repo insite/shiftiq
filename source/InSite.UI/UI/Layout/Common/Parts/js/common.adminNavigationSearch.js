@@ -386,6 +386,9 @@
             return;
         }
 
+        if (event.key === 'Enter')
+            event.preventDefault();
+
         if (state.results.length === 0)
             return;
 
@@ -400,7 +403,6 @@
             state.isDismissed = false;
             nextSelectedIndex = Math.max(state.selectedIndex - 1, 0);
         } else if (event.key === 'Enter' && state.isOpen) {
-            event.preventDefault();
             const selectedOption = getSelectedOption(state);
             const anchor = selectedOption ? selectedOption.querySelector('a') : null;
             if (anchor)

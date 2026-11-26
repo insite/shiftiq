@@ -173,7 +173,7 @@
         <ContentTemplate>
             <asp:HiddenField runat="server" ID="IsIgnored" />
             <asp:HiddenField runat="server" ID="IgnoredScoreKey" />
-            <asp:Button runat="server" ID="SaveIsIgnored" />
+            <asp:Button runat="server" ID="SaveIsIgnored" UseSubmitBehavior="false" />
         </ContentTemplate>
     </insite:UpdatePanel>
 </div>

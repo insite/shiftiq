@@ -12,9 +12,9 @@ using Shift.Contract;
 using Shift.Sdk.Service;
 using Shift.Service.Security;
 
-using ModifyPersonAddress = InSite.Application.People.Write.ModifyPersonAddress;
-using CreateUser = InSite.Application.Users.Write.CreateUser;
 using CreatePerson = InSite.Application.People.Write.CreatePerson;
+using CreateUser = InSite.Application.Users.Write.CreateUser;
+using ModifyPersonAddress = InSite.Application.People.Write.ModifyPersonAddress;
 
 namespace Shift.Service.Directory;
 
@@ -180,7 +180,7 @@ public class PersonImporter(
                 ? new ImportPersonResult(input) { PendingPersonId = pendingPersonId, Failure = failure, Status = ImportPersonResult.StatusEnum.Error }
                 : original != null
                     ? new ImportPersonResult(input) { PendingPersonId = pendingPersonId, UserId = matchPerson.UserIdentifier, Status = ImportPersonResult.StatusEnum.Modified, Original = original }
-                    : new ImportPersonResult(input) { PendingPersonId = pendingPersonId, UserId = matchPerson.UserIdentifier, Status = ImportPersonResult.StatusEnum.NotChanged };            
+                    : new ImportPersonResult(input) { PendingPersonId = pendingPersonId, UserId = matchPerson.UserIdentifier, Status = ImportPersonResult.StatusEnum.NotChanged };
         }
         else
         {
@@ -196,7 +196,7 @@ public class PersonImporter(
                 input,
                 failure
             );
-            
+
             result = failure.Errors.Count > 0
                 ? new ImportPersonResult(input) { PendingPersonId = pendingPersonId, Failure = failure, Status = ImportPersonResult.StatusEnum.Error }
                 : new ImportPersonResult(input) { PendingPersonId = pendingPersonId, UserId = userId, Status = ImportPersonResult.StatusEnum.Created };
@@ -407,7 +407,7 @@ public class PersonImporter(
             return;
 
         var membershipId = await membershipReader.RetrieveDeletedMembershipIdAsync(userId, groupId.Value);
-        
+
         if (membershipId != null)
             commands.Add(new ResumeMembership(membershipId.Value, userId, groupId.Value, null, DateTimeOffset.UtcNow));
         else
@@ -501,10 +501,10 @@ public class PersonImporter(
 
         if (validateMemberships)
         {
-            var criteria = new CollectMemberships { OrganizationId = organizationId, UserId = userId };
+            var criteria = new CollectMemberships { UserId = userId };
             criteria.DisablePaging();
 
-            memberships = await membershipReader.CollectAsync(criteria, null);            
+            memberships = await membershipReader.CollectAsync(criteria, null);
         }
         else
             memberships = null;
@@ -595,8 +595,8 @@ public class PersonImporter(
 
         var groups = await groupReader.CollectAsync(new CollectGroups
         {
-           OrganizationId = organizationId,
-           GroupCode = groupCode
+            OrganizationId = organizationId,
+            GroupCode = groupCode
         });
 
         if (groups.Count > 0)
@@ -614,8 +614,8 @@ public class PersonImporter(
 
         var groups = await groupReader.CollectAsync(new CollectGroups
         {
-           OrganizationId = organizationId,
-           GroupNames = groupNames
+            OrganizationId = organizationId,
+            GroupNames = groupNames
         });
 
         return groups.Select(x => x.GroupIdentifier).ToArray();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
@@ -16,6 +17,9 @@ namespace InSite.Persistence.Integration.DirectAccess
 {
     public class DirectAccessClient : IDirectAccessClient
     {
+        // Direct Access can take longer than the default 100 seconds to accept a submission of exam results.
+        private static readonly TimeSpan ExamSubmissionTimeout = TimeSpan.FromMinutes(4);
+
         private readonly VariantSkilledTradesBC _servers;
         private readonly IApiRequestLogger _logger;
         private readonly IJsonSerializer _serializer;
@@ -93,7 +97,7 @@ namespace InSite.Persistence.Integration.DirectAccess
 
             foreach (var server in servers)
             {
-                var result = Shift.Common.TaskRunner.RunSync(HttpPostAsync, user, server, input.Serialize());
+                var result = Shift.Common.TaskRunner.RunSync(HttpPostExamAsync, user, server, input.Serialize());
 
                 if (response == null)
                     response = ExamSubmissionResponse.Deserialize(result?.Content);
@@ -178,7 +182,20 @@ namespace InSite.Persistence.Integration.DirectAccess
             return CreateApiResponse(status, content);
         }
 
-        async Task<DirectAccessApiResponse> HttpPostAsync(Guid user, DirectAccessServer api, string json)
+        Task<DirectAccessApiResponse> HttpPostAsync(Guid user, DirectAccessServer api, string json)
+        {
+            return SendPostAsync(StaticHttpClient.Client, user, api, json, CancellationToken.None);
+        }
+
+        async Task<DirectAccessApiResponse> HttpPostExamAsync(Guid user, DirectAccessServer api, string json)
+        {
+            using (var timeout = new CancellationTokenSource(ExamSubmissionTimeout))
+            {
+                return await SendPostAsync(StaticHttpClient.ClientNoTimeout, user, api, json, timeout.Token);
+            }
+        }
+
+        async Task<DirectAccessApiResponse> SendPostAsync(HttpClient client, Guid user, DirectAccessServer api, string json, CancellationToken token)
         {
             DirectAccessApiResponse response = null;
 
@@ -189,7 +206,7 @@ namespace InSite.Persistence.Integration.DirectAccess
 
                 var key = LogRequest(user, request.Headers, "POST", api.ApiUrl, json);
 
-                var http = await StaticHttpClient.Client.SendAsync(request);
+                var http = await client.SendAsync(request, token);
                 var content = await http.Content.ReadAsStringAsync();
                 var status = (int)http.StatusCode;
 

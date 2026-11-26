@@ -350,18 +350,14 @@ namespace InSite.UI.Layout.Portal
 
         private bool IsAuthorizationRequirementSatisfied()
         {
-            if (Request.IsAuthenticated)
-                return true;
-
-            var authRequirement = ActionModel?.AuthorizationRequirement;
-            if (authRequirement.IsEmpty())
+            if (!Request.IsAuthenticated)
                 return false;
 
             var authSource = CookieTokenModule.Current.AuthenticationSource.IfNullOrEmpty(AuthenticationSource.None);
-            if (authRequirement == ActionAuthorizationRequirement.ShiftIqExamEventAuthentication && authSource == AuthenticationSource.ShiftIqExamEvent)
-                return true;
+            if (authSource == AuthenticationSource.ShiftIqExamEvent)
+                return ActionModel?.AuthorizationRequirement == ActionAuthorizationRequirement.ShiftIqExamEventAuthentication;
 
-            return false;
+            return true;
         }
 
         private bool IsMultifactorAuthenticationDisabled()

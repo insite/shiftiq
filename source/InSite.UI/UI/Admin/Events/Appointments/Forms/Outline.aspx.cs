@@ -73,8 +73,8 @@ namespace InSite.Admin.Events.Appointments.Forms
             AppointmentType.Text = ev.AppointmentType.IfNullOrEmpty("N/A");
             EventDescription.Text = ev.EventDescription.IfNullOrEmpty("N/A");
             EventThumbprint.Text = ev.EventIdentifier.ToString();
-            EventScheduledStart.Text = ev.EventScheduledStart.Format((string)null, true);
-            EventScheduledEnd.Text = ev.EventScheduledEnd.Format((string)null, true, nullValue: "None");
+            EventScheduledStart.Text = ev.EventScheduledStart.FormatKeepingOffset(User.TimeZone, true);
+            EventScheduledEnd.Text = ev.EventScheduledEnd.FormatKeepingOffset(User.TimeZone, true, "None");
             AppointmentCalendarColorBox.Text = ColorBoxHtml(ev.EventCalendarColor ?? DefaultColor);
             AppointmentCalendarColorName.Text = ColorName(ev.EventCalendarColor ?? DefaultColor);
 

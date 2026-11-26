@@ -48,7 +48,7 @@ namespace InSite.Admin.Events.Exams.Forms
 
             PageHelper.AutoBindHeader(this, null, ev.EventTitle);
 
-            EventScheduledStart.Text = ev.EventScheduledStart.Format((string)null, true);
+            EventScheduledStart.Text = ev.EventScheduledStart.FormatKeepingOffset(User.TimeZone, true);
             ExamStarted.Value = ev.ExamStarted;
             ScheduleTimer.Text = ev.ExamMaterialReturnShipmentReceived == null
                 ? ev.EventScheduledStart.Humanize()

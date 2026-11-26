@@ -90,12 +90,17 @@ namespace InSite.Admin.Events.Exams.Forms
             {
                 EditorStatus.AddMessage(AlertType.Warning, "There are no unpublished attempts");
             }
+            else if (e.Count == 0)
+            {
+                var subject = e.CandidateName.IsEmpty() ? "The attempts were" : $"Attempt for {e.CandidateName} was";
+
+                EditorStatus.AddMessage(AlertType.Error, $"{subject} not published to Direct Access. See the Comments tab for details.");
+
+                CommentPanel.LoadData(EventIdentifier, EventType.Exam);
+            }
             else if (!string.IsNullOrEmpty(e.CandidateName))
             {
-                if (e.Count > 0)
-                    EditorStatus.AddMessage(AlertType.Success, $"Attempt for {e.CandidateName} is published");
-                else
-                    EditorStatus.AddMessage(AlertType.Error, $"Attempt for {e.CandidateName} was not published");
+                EditorStatus.AddMessage(AlertType.Success, $"Attempt for {e.CandidateName} is published");
             }
             else
                 EditorStatus.AddMessage(AlertType.Success, $"<strong>{e.Count}</strong> attempt(s) have been published");

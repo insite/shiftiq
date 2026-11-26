@@ -31,8 +31,10 @@ namespace InSite.UI.Admin.Events.Classes.Controls
 
         public void Bind(QEvent ev)
         {
-            EventScheduledStart.Text = ev.EventScheduledStart.Format((string)null, true);
-            EventScheduledEnd.Text = ev.EventScheduledEnd.Format((string)null, true, nullValue: "None");
+            var timeZone = CurrentSessionState.Identity.User.TimeZone;
+
+            EventScheduledStart.Text = ev.EventScheduledStart.FormatKeepingOffset(timeZone, true);
+            EventScheduledEnd.Text = ev.EventScheduledEnd.FormatKeepingOffset(timeZone, true, "None");
 
             VenueInfo.Bind(ev.EventIdentifier, ev.VenueLocation);
 

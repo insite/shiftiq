@@ -7,6 +7,8 @@ using InSite.Application.Contacts.Read;
 using InSite.Application.Groups.Write;
 using InSite.Application.Messages.Read;
 using InSite.Application.Messages.Write;
+using InSite.Application.Registrations.Read;
+using InSite.Application.Registrations.Write;
 using InSite.Common.Web;
 using InSite.Common.Web.UI;
 using InSite.Domain.Contacts;
@@ -235,6 +237,7 @@ namespace InSite.UI.Admin.Contacts.Groups.Forms
             MergeSubscriberGroups(g1, g2, commands);
             MergeFields(g1, g2, mergeItems, commands);
             MergeConnections(g1, g2, commands);
+            MergeRegistrations(g1, g2, commands);
 
             ServiceLocator.SendCommands(commands);
 
@@ -360,6 +363,21 @@ namespace InSite.UI.Admin.Contacts.Groups.Forms
                     }
                 }
             }
+        }
+
+        private void MergeRegistrations(QGroup g1, QGroup g2, List<Command> commands)
+        {
+            var employerRegistrationIds = ServiceLocator.RegistrationSearch
+                .GetRegistrationIdentifiers(new QRegistrationFilter { RegistrationEmployerIdentifier = g2.GroupIdentifier });
+
+            foreach (var registrationId in employerRegistrationIds)
+                commands.Add(new AssignEmployer(registrationId, g1.GroupIdentifier));
+
+            var customerRegistrationIds = ServiceLocator.RegistrationSearch
+                .GetRegistrationIdentifiers(new QRegistrationFilter { RegistrationCustomerIdentifier = g2.GroupIdentifier });
+
+            foreach (var registrationId in customerRegistrationIds)
+                commands.Add(new AssignCustomer(registrationId, g1.GroupIdentifier));
         }
 
         private void MergeEmployerGroup(QGroup g1, QGroup g2)

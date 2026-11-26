@@ -6,6 +6,15 @@ namespace Shift.Toolbox.Integrations.DirectAccess
 {
     public class ExamSubmissionResponse
     {
+        [JsonProperty("statusCode")]
+        public int StatusCode { get; set; }
+
+        [JsonProperty("message")]
+        public string Message { get; set; }
+
+        [JsonIgnore]
+        public bool IsSuccess => StatusCode == 200;
+
         public string ReceiptId { get; set; }
 
         public string SessionId { get; set; }

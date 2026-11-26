@@ -236,7 +236,7 @@ public class PendingPersonController : ShiftControllerBase
 
         var collectPeople = new CollectPendingPeople { OrganizationId = principal.OrganizationId };
         collectPeople.Filter.Page = criteria.Filter.Page;
-        collectPeople.Filter.Sort = nameof(PendingPersonEntity.PersonCode);
+        collectPeople.Filter.Sort = $"{nameof(PendingPersonEntity.SubmittedAt)} desc, {nameof(PendingPersonEntity.PendingPersonIdentifier)}";
 
         var matches = await _pendingPersonService.CollectImportAsync(collectPeople, cancellation);
         var count = await _pendingPersonService.CountAsync(collectPeople, cancellation);

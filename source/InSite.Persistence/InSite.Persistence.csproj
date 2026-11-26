@@ -283,6 +283,7 @@
     <Compile Include="Assets\Files\TFileActivityConfiguration.cs" />
     <Compile Include="Assets\Files\TFileClaimConfiguration.cs" />
     <Compile Include="Assets\Files\TFileConfiguration.cs" />
+    <Compile Include="Assets\Files\CredentialFiles.cs" />
     <Compile Include="Assets\Files\FileChangeFactory.cs" />
     <Compile Include="Assets\Files\FileManagerService.cs" />
     <Compile Include="Assets\Files\TFileSearch.cs" />

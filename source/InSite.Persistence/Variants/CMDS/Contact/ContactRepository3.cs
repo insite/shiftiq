@@ -1754,32 +1754,41 @@ SELECT COUNT(*)
 
             if (filter.DepartmentsForParentId.HasValue && filter.OrganizationIdentifier.HasValue)
             {
+                // The parent's departments are resolved in a nested subquery, and the person is matched with a
+                // correlated EXISTS. Joining the two memberships directly makes SQL Server rescan every member of
+                // the parent's departments once per person, which takes over 20 seconds for a large department.
                 where.AppendFormat(@"
-                    AND cmdsPerson.UserIdentifier IN (
-                            SELECT m.UserIdentifier
+                    AND EXISTS (
+                            SELECT 1
                               FROM contacts.Membership AS m WITH (NOLOCK)
-                              INNER JOIN contacts.Membership AS m_parent WITH (NOLOCK)
-                                ON m_parent.GroupIdentifier = m.GroupIdentifier
-                              INNER JOIN identities.Department dep WITH (NOLOCK)
-                                ON dep.DepartmentIdentifier = m.GroupIdentifier
-                              WHERE dep.OrganizationIdentifier = @OrganizationIdentifier
-                                AND m_parent.UserIdentifier = @DepartmentsForParentID
+                              WHERE m.UserIdentifier = cmdsPerson.UserIdentifier
                                 {0}
+                                AND m.GroupIdentifier IN (
+                                      SELECT m_parent.GroupIdentifier
+                                        FROM contacts.Membership AS m_parent WITH (NOLOCK)
+                                        INNER JOIN identities.Department AS dep WITH (NOLOCK)
+                                          ON dep.DepartmentIdentifier = m_parent.GroupIdentifier
+                                        WHERE dep.OrganizationIdentifier = @OrganizationIdentifier
+                                          AND m_parent.UserIdentifier = @DepartmentsForParentID
+                                    )
                         )
                     ", assignmentWhere);
             }
             else if (filter.CompaniesForParentId.HasValue)
             {
                 where.AppendFormat(@"
-                    AND cmdsPerson.UserIdentifier IN (
-                            SELECT m.UserIdentifier
+                    AND EXISTS (
+                            SELECT 1
                               FROM contacts.Membership AS m WITH (NOLOCK)
-                              INNER JOIN contacts.Membership AS m_parent WITH (NOLOCK)
-                                ON m_parent.GroupIdentifier = m.GroupIdentifier
-                              INNER JOIN identities.Department AS dep WITH (NOLOCK)
-                                ON dep.DepartmentIdentifier = m.GroupIdentifier
-                              WHERE m_parent.UserIdentifier = @CompaniesForParentID
+                              WHERE m.UserIdentifier = cmdsPerson.UserIdentifier
                                 {0}
+                                AND m.GroupIdentifier IN (
+                                      SELECT m_parent.GroupIdentifier
+                                        FROM contacts.Membership AS m_parent WITH (NOLOCK)
+                                        INNER JOIN identities.Department AS dep WITH (NOLOCK)
+                                          ON dep.DepartmentIdentifier = m_parent.GroupIdentifier
+                                        WHERE m_parent.UserIdentifier = @CompaniesForParentID
+                                    )
                         )
                     ", assignmentWhere);
             }

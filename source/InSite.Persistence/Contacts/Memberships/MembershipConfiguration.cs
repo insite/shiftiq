@@ -9,7 +9,7 @@ namespace InSite.Persistence
         public MembershipConfiguration(string schema)
         {
             ToTable("Membership", schema);
-            HasKey(x => new { x.GroupIdentifier, x.UserIdentifier });
+            HasKey(x => x.MembershipIdentifier);
 
             Property(x => x.Assigned).IsRequired();
             Property(x => x.GroupIdentifier).IsRequired();

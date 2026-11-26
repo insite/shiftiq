@@ -59,7 +59,7 @@ namespace InSite.Admin.Events.Exams.Forms
             var registrationsCount = ServiceLocator.RegistrationSearch.CountRegistrations(new InSite.Application.Registrations.Read.QRegistrationFilter { EventIdentifier = _event.EventIdentifier });
             RegistrationCount.Text = registrationsCount.ToString();
 
-            EventTime.Text = _event.EventDate + " " + _event.EventTime;
+            EventTime.Text = _event.EventScheduledStart.FormatKeepingOffset(User.TimeZone);
         }
 
         private void OnConfirmed(object sender, EventArgs e)

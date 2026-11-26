@@ -199,8 +199,8 @@ describe("WorkshopQuestions", () => {
         expect(view.container.textContent).toContain("No questions match the current filter.");
 
         await clickButton(view.container, "Clear");
-        expect(getVisibleQuestionIds(view.container)).toEqual(["q1", "q2"]);
-        expect(getSelect(view.container, ".question-filter-competency").value).toEqual("std1");
+        expect(getVisibleQuestionIds(view.container)).toEqual(["q3"]);
+        expect(getSelect(view.container, ".question-filter-competency").value).toEqual("std2");
     });
 
     test("loads an unloaded section once and reuses cached data", async () => {

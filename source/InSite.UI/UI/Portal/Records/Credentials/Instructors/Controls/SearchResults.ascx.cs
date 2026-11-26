@@ -154,8 +154,9 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
 
                 }).ToList();
 
-            var files = ServiceLocator.FileSearch
-                .GetModels(filter.OrganizationIdentifier, items.Select(x => x.CredentialIdentifier).ToArray(), null, false);
+            var credentialIds = items.Select(x => x.CredentialIdentifier).ToArray();
+            var files = CredentialFiles.GroupByCredential(ServiceLocator.FileSearch
+                .GetModels(filter.OrganizationIdentifier, credentialIds, null, false));
 
             foreach (var item in items)
             {
@@ -170,10 +171,12 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
                     ? statusHtml
                     : Translate(item.CredentialStatus);
 
-                string fileUrl = null;
-                var file = files.FirstOrDefault(x => x.ObjectIdentifier == item.CredentialIdentifier);
-                if (file != null)
-                    fileUrl = ServiceLocator.StorageService.GetFileUrl(file.FileIdentifier, file.FileName, true);
+                files.TryGetValue(item.CredentialIdentifier, out var credentialFiles);
+
+                // Only the current cycle's files, so a reviewer never mistakes a renewed
+                // credential's earlier certificate for the one under review.
+                var currentFiles = CredentialFiles.InCurrentCycle(credentialFiles,
+                    item.CredentialGranted);
 
                 string badgeUrl = null;
                 if (item.HasBadgeImage && item.BadgeImageUrl.IsNotEmpty())
@@ -182,7 +185,8 @@ namespace InSite.UI.Portal.Records.Credentials.Instructors.Controls
                 var layout = item.AchievementCertificateLayoutCode;
 
                 item.DownloadLink = InSite.UI.Portal.Records.Credentials.Learners.Controls.SearchResults
-                    .GetDownloadLink(item.CredentialIdentifier, status, fileUrl, badgeUrl, layout);
+                    .GetDownloadLink(item.CredentialIdentifier, status, currentFiles, badgeUrl,
+                        layout);
             }
 
             return items.ToSearchResult();

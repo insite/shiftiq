@@ -431,7 +431,7 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
 
             var code = SubmitExamResultsToDirectAccess(e, @event, registrations);
 
-            if (e.AlertMessageEnabled)
+            if (code != null && e.AlertMessageEnabled)
             {
                 if (@event.ExamType == EventExamType.Class.Value || @event.ExamType == EventExamType.Arc.Value)
                 {
@@ -454,9 +454,30 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
             if (request.Sessions.Count == 0)
                 return null;
 
-            var response = _da.SubmitExamData(e.OriginUser, request);
-            if (response == null)
+            ExamSubmissionResponse response;
+
+            try
+            {
+                response = _da.SubmitExamData(e.OriginUser, request);
+            }
+            catch (Exception ex)
+            {
+                _error?.Invoke(ex);
+                ReportExamSubmissionFailure(e, @event, "the request failed", CsvConverter.ListToStringList(ex.GetMessages(), ". "));
                 return null;
+            }
+
+            if (response == null)
+            {
+                ReportExamSubmissionFailure(e, @event, "no response was received");
+                return null;
+            }
+
+            if (!response.IsSuccess)
+            {
+                ReportExamSubmissionFailure(e, @event, response.Message ?? "an unexpected response was received");
+                return null;
+            }
 
             var code = $"Direct Access Transaction Receipt #{response.ReceiptId}";
 
@@ -467,6 +488,16 @@ namespace InSite.Persistence.Plugin.SkilledTradesBC
             }
 
             return code;
+        }
+
+        private void ReportExamSubmissionFailure(IChange e, QEvent @event, string reason, string details = null)
+        {
+            var source = typeof(EventProcessor).FullName + "." + nameof(ReportExamSubmissionFailure);
+            var message = $"Exam results for event {@event.EventNumber} were not accepted by Direct Access: {reason}.";
+
+            Comment(e, $"{message} The grades are not marked as published. Use Push to DA to submit them again.");
+
+            OnDirectAccessError(details.IsEmpty() ? message : $"{message} {details}", source);
         }
 
         private void ValidateAttempts(IChange e, QEvent @event, List<QRegistration> registrations)

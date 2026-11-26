@@ -202,7 +202,7 @@ export default function WorkshopQuestions({ selectedQuestionId, defaultFilter }:
     }
 
     function handleClearFilter() {
-        const competencyId = getDefaultCompetencyId(sectionCompetencyItems);
+        const competencyId = appliedFilter.competencyId;
         const emptyDraftFilter = workshopQuestionFilter.createWorkshopQuestionsFilterState(sectionId, competencyId);
         const emptyAppliedFilter = workshopQuestionFilter.createWorkshopQuestionsFilterState(sectionId, competencyId);
 

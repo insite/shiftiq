@@ -232,10 +232,10 @@ namespace InSite.UI.Portal.Events.Classes
             }
 
             RegistrationStartField.Visible = @event.RegistrationStart.HasValue;
-            RegistrationStart.Text = @event.RegistrationStart.Format((string)null, true);
+            RegistrationStart.Text = @event.RegistrationStart.FormatKeepingOffset(User.TimeZone, true);
 
             RegistrationDeadline.Text = @event.RegistrationDeadline.HasValue
-                ? @event.RegistrationDeadline.Format((string)null, true)
+                ? @event.RegistrationDeadline.FormatKeepingOffset(User.TimeZone, true)
                 : @event.EventScheduledStart.Format(User.TimeZone, true);
 
             Venue.BindVenue(@event, "Location", "Venue");
